@@ -118,7 +118,7 @@ export default async function DocumentsPage({
               {docs.map((doc) => {
                 const total = doc.lines.reduce((s, l) => s + l.lineTotal, 0);
                 return (
-                  <tr key={doc.id} style={{ cursor: "pointer" }} onClick={() => {}}>
+                  <tr key={doc.id}>
                     <td className="num" style={{ color: "var(--muted)", fontSize: 12 }}>{doc.number}</td>
                     <td style={{ fontSize: 13 }}>{TYPE_LABELS[doc.type]}</td>
                     <td style={{ fontWeight: 600 }}>{doc.client?.name ?? "—"}</td>

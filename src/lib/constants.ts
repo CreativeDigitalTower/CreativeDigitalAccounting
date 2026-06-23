@@ -19,34 +19,6 @@ export const BANK_DETAILS = {
 
 export const VAT_RATES = [0, 9, 20] as const;
 
-// Ориентировъчни валутни курсове спрямо EUR (1 EUR = X валута).
-// BGN е фиксиран; останалите са приблизителни и могат да се обновяват.
-export const FX_RATES_PER_EUR: Record<string, number> = {
-  EUR: 1,
-  BGN: 1.95583,
-  USD: 1.08,
-  GBP: 0.85,
-  CHF: 0.94,
-  RON: 4.97,
-  TRY: 35.0,
-  PLN: 4.3,
-  CZK: 25.2,
-  SEK: 11.3,
-  NOK: 11.6,
-  CAD: 1.47,
-  AUD: 1.63,
-  JPY: 169.0,
-  CNY: 7.8,
-};
-
-/** Конвертира сума между валути през EUR. */
-export function convertCurrency(amount: number, from: string, to: string): number {
-  const f = FX_RATES_PER_EUR[from] ?? 1;
-  const t = FX_RATES_PER_EUR[to] ?? 1;
-  const eur = amount / f;
-  return Math.round(eur * t * 100) / 100;
-}
-
 export const DOC_PREFIXES: Record<string, string> = {
   invoice: "", // фактурите са с чисто число: 0000000001
   proforma: "PF-",

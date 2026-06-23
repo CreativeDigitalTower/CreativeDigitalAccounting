@@ -50,6 +50,12 @@ function NewDocumentForm() {
 
   useEffect(() => {
     fetch("/api/clients").then((r) => r.json()).then(setClients).catch(() => {});
+    // Зареди основните настройки от профила на фирмата
+    fetch("/api/company").then((r) => r.json()).then((c) => {
+      if (c?.defaultCurrency) setCurrency(c.defaultCurrency);
+      if (c?.defaultLanguage) setLanguage(c.defaultLanguage);
+      if (c?.invoiceTemplate) setTemplate(c.invoiceTemplate);
+    }).catch(() => {});
   }, []);
 
   // Зареди предложен номер при смяна на типа

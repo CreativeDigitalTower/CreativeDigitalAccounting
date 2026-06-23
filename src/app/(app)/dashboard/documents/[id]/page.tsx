@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Stamp } from "@/components/Stamp";
 import { DocumentActions } from "@/components/app/DocumentActions";
-import { formatCurrency, toBGN, isDualCurrencyActive, EUR_TO_BGN, getTemplate, convertCurrency } from "@/lib/constants";
+import { formatCurrency, toBGN, isDualCurrencyActive, EUR_TO_BGN, getTemplate } from "@/lib/constants";
 
 const TYPE_LABELS: Record<string, string> = {
   invoice: "ФАКТУРА",
@@ -33,8 +33,6 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
   const accent = tpl.accent;
   const isBand = tpl.layout === "band";
   const isMinimal = tpl.layout === "minimal";
-  // Втора валута за документи извън EUR/BGN (ориентировъчно в EUR)
-  const showEurApprox = doc.currency !== "EUR" && doc.currency !== "BGN";
 
   return (
     <>
@@ -139,11 +137,6 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
           {dual && (
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "var(--muted)", fontFamily: "'IBM Plex Mono', monospace", paddingTop: 4 }}>
               <span>≈ BGN:</span><span>{formatCurrency(toBGN(total), "BGN")}</span>
-            </div>
-          )}
-          {showEurApprox && (
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "var(--muted)", fontFamily: "'IBM Plex Mono', monospace", paddingTop: 4 }}>
-              <span>≈ EUR:</span><span>{formatCurrency(convertCurrency(total, doc.currency, "EUR"), "EUR")}</span>
             </div>
           )}
         </div>
