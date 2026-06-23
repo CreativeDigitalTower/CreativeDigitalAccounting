@@ -2,10 +2,27 @@ import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Stamp } from "@/components/Stamp";
+import { WelcomeWizard } from "@/components/app/WelcomeWizard";
 import { formatCurrency, toBGN, isDualCurrencyActive, FREE_PLAN_LIMIT, getYearMonth } from "@/lib/constants";
 
 export default async function DashboardPage() {
-  const { companyId } = await requireCompany();
+  const { companyId, userId } = await requireCompany();
+
+  const me = await prisma.user.findUnique({ where: { id: userId }, select: { onboardedAt: true } });
+  let onboarding = null;
+  if (!me?.onboardedAt) {
+    const [company, clientCount, invoiceCount] = await Promise.all([
+      prisma.company.findUnique({ where: { id: companyId }, select: { eik: true, address: true, logoUrl: true } }),
+      prisma.client.count({ where: { companyId } }),
+      prisma.document.count({ where: { companyId, type: "invoice" } }),
+    ]);
+    onboarding = {
+      hasCompanyData: !!(company?.eik || company?.address),
+      hasLogo: !!company?.logoUrl,
+      hasClient: clientCount > 0,
+      hasInvoice: invoiceCount > 0,
+    };
+  }
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -78,6 +95,8 @@ export default async function DashboardPage() {
 
   return (
     <>
+      {onboarding && <WelcomeWizard status={onboarding} />}
+
       {/* Topbar */}
       <div className="topbar">
         <div>

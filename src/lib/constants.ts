@@ -94,15 +94,15 @@ export type PlanId = keyof typeof SUBSCRIPTION_PLANS;
 
 // Кои функции са достъпни за кой план (за заключване в UI)
 export const PLAN_FEATURES: Record<PlanId, string[]> = {
-  free: ["documents", "clients", "suppliers", "warehouse", "dashboard"],
-  start: ["documents", "clients", "suppliers", "warehouse", "dashboard", "expenses", "recurring"],
+  free: ["documents", "clients", "suppliers", "warehouse", "dashboard", "cash"],
+  start: ["documents", "clients", "suppliers", "warehouse", "dashboard", "cash", "expenses", "recurring"],
   business: [
-    "documents", "clients", "suppliers", "warehouse", "dashboard", "expenses",
-    "recurring", "projects", "contracts", "analytics", "archive", "assets", "users",
+    "documents", "clients", "suppliers", "warehouse", "dashboard", "cash", "expenses",
+    "recurring", "projects", "contracts", "analytics", "archive", "assets", "users", "audit",
   ],
   pro: [
-    "documents", "clients", "suppliers", "warehouse", "dashboard", "expenses",
-    "recurring", "projects", "contracts", "analytics", "archive", "assets", "users",
+    "documents", "clients", "suppliers", "warehouse", "dashboard", "cash", "expenses",
+    "recurring", "projects", "contracts", "analytics", "archive", "assets", "users", "audit",
     "multicompany", "ai", "api",
   ],
 };

@@ -12,6 +12,7 @@ const navItems = [
   { href: "/dashboard/clients", label: "Клиенти", icon: "👥", feature: "clients" },
   { href: "/dashboard/suppliers", label: "Доставчици", icon: "🚚", feature: "suppliers" },
   { href: "/dashboard/warehouse", label: "Склад", icon: "📦", feature: "warehouse" },
+  { href: "/dashboard/cash", label: "Каса", icon: "🏦", feature: "cash" },
   { href: "/dashboard/expenses", label: "Разходи", icon: "💰", feature: "expenses" },
   { href: "/dashboard/contracts", label: "Договори", icon: "📑", feature: "contracts" },
   { href: "/dashboard/projects", label: "Проекти", icon: "🏗️", feature: "projects" },
@@ -19,6 +20,7 @@ const navItems = [
   { href: "/dashboard/assets", label: "Активи", icon: "🏭", feature: "assets" },
   { href: "/dashboard/analytics", label: "Анализи", icon: "📊", feature: "analytics" },
   { href: "/dashboard/users", label: "Потребители", icon: "👤", feature: "users" },
+  { href: "/dashboard/audit", label: "Одит лог", icon: "📜", feature: "audit" },
   { href: "/dashboard/settings", label: "Профил на фирмата", icon: "⚙️", feature: "dashboard" },
   { href: "/dashboard/subscription", label: "Абонамент", icon: "💳", feature: "dashboard" },
 ];
@@ -26,9 +28,10 @@ const navItems = [
 interface SidebarProps {
   companyName: string;
   plan: string;
+  isSuperAdmin?: boolean;
 }
 
-export function Sidebar({ companyName, plan }: SidebarProps) {
+export function Sidebar({ companyName, plan, isSuperAdmin }: SidebarProps) {
   const pathname = usePathname();
   const planId = plan as PlanId;
 
@@ -115,6 +118,23 @@ export function Sidebar({ companyName, plan }: SidebarProps) {
             </Link>
           );
         })}
+
+        {isSuperAdmin && (
+          <Link
+            href="/dashboard/admin"
+            style={{
+              display: "flex", alignItems: "center", gap: 11, padding: "8.5px 12px",
+              borderRadius: 6, fontSize: 13.3, fontWeight: 600, marginTop: 6,
+              color: pathname.startsWith("/dashboard/admin") ? "#fff" : "var(--brass)",
+              textDecoration: "none",
+              background: pathname.startsWith("/dashboard/admin") ? "rgba(166,130,47,.3)" : "rgba(166,130,47,.12)",
+              border: "1px solid rgba(166,130,47,.4)",
+            }}
+          >
+            <span style={{ fontSize: 15 }}>🛡️</span>
+            Супер Админ
+          </Link>
+        )}
 
         {/* AI Copilot locked teaser */}
         <div

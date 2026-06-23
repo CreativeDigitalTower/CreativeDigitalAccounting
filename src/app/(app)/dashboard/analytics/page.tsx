@@ -1,5 +1,6 @@
 import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { FinancialHistoryForm } from "@/components/app/FinancialHistoryForm";
 import { formatCurrency, toBGN, isDualCurrencyActive } from "@/lib/constants";
 
 export default async function AnalyticsPage() {
@@ -165,31 +166,47 @@ export default async function AnalyticsPage() {
       </div>
 
       {/* Historical data */}
-      {financialHistory.length > 0 && (
-        <div className="glass panel" style={{ marginTop: 18 }}>
-          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>Историческа справка</h3>
+      <div className="glass panel" style={{ marginTop: 18 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, gap: 12, flexWrap: "wrap" }}>
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>Историческа справка (многогодишен тренд)</h3>
+          <FinancialHistoryForm />
+        </div>
+
+        {financialHistory.length === 0 ? (
+          <div style={{ fontSize: 13, color: "var(--muted)", padding: "12px 0" }}>
+            Въведете оборотите и печалбата от предходни години, за да следите реалния растеж на бизнеса.
+          </div>
+        ) : (
           <table>
             <thead>
               <tr>
                 <th>Година</th>
                 <th className="num">Приходи</th>
                 <th className="num">Печалба</th>
+                <th className="num">Растеж</th>
                 <th className="num">Служители</th>
               </tr>
             </thead>
             <tbody>
-              {financialHistory.map((h) => (
-                <tr key={h.id}>
-                  <td style={{ fontWeight: 600 }}>{h.year}</td>
-                  <td className="num">{formatCurrency(h.revenue)}</td>
-                  <td className="num">{h.profit != null ? formatCurrency(h.profit) : "—"}</td>
-                  <td className="num">{h.employeeCount ?? "—"}</td>
-                </tr>
-              ))}
+              {financialHistory.map((h, i) => {
+                const prev = i > 0 ? financialHistory[i - 1].revenue : null;
+                const growth = prev && prev > 0 ? ((h.revenue - prev) / prev) * 100 : null;
+                return (
+                  <tr key={h.id}>
+                    <td style={{ fontWeight: 600 }}>{h.year}</td>
+                    <td className="num">{formatCurrency(h.revenue)}</td>
+                    <td className="num">{h.profit != null ? formatCurrency(h.profit) : "—"}</td>
+                    <td className="num" style={{ color: growth == null ? "var(--muted)" : growth >= 0 ? "var(--emerald)" : "var(--brick)" }}>
+                      {growth == null ? "—" : `${growth >= 0 ? "▲" : "▼"} ${Math.abs(growth).toFixed(1)}%`}
+                    </td>
+                    <td className="num">{h.employeeCount ?? "—"}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 }
