@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   isDualCurrencyActive, toBGN, formatCurrency, EUR_TO_BGN,
-  CURRENCIES, DOC_LANGUAGES,
+  CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES,
 } from "@/lib/constants";
 
 type Client = { id: string; name: string; vatNumber: string | null };
@@ -35,6 +35,7 @@ function NewDocumentForm() {
   });
   const [currency, setCurrency] = useState("EUR");
   const [language, setLanguage] = useState("bg");
+  const [template, setTemplate] = useState("classic");
   const [lines, setLines] = useState<Line[]>([{ description: "", quantity: 1, unitPrice: 0, vatRate: 20 }]);
   const [issueDate, setIssueDate] = useState(new Date().toISOString().slice(0, 10));
   const [taxEventDate, setTaxEventDate] = useState(new Date().toISOString().slice(0, 10));
@@ -102,7 +103,7 @@ function NewDocumentForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         type, number: number || undefined, clientId: finalClientId,
-        issueDate, taxEventDate, dueDate, currency, language, notes, lines, status,
+        issueDate, taxEventDate, dueDate, currency, language, template, notes, lines, status,
       }),
     });
     setSaving(false);
@@ -167,6 +168,12 @@ function NewDocumentForm() {
             <label>Език на документа</label>
             <select value={language} onChange={(e) => setLanguage(e.target.value)}>
               {DOC_LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label>Дизайн на фактурата</label>
+            <select value={template} onChange={(e) => setTemplate(e.target.value)}>
+              {INVOICE_TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
             </select>
           </div>
         </div>

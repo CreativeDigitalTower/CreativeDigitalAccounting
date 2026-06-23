@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Stamp } from "@/components/Stamp";
 import { DocumentActions } from "@/components/app/DocumentActions";
-import { formatCurrency, toBGN, isDualCurrencyActive, EUR_TO_BGN } from "@/lib/constants";
+import { formatCurrency, toBGN, isDualCurrencyActive, EUR_TO_BGN, getTemplate, convertCurrency } from "@/lib/constants";
 
 const TYPE_LABELS: Record<string, string> = {
   invoice: "ФАКТУРА",
@@ -25,10 +25,16 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
 
   if (!doc || doc.companyId !== companyId) notFound();
 
-  const dual = isDualCurrencyActive();
+  const dual = isDualCurrencyActive() && doc.currency === "EUR";
   const subtotal = doc.lines.reduce((s, l) => s + l.quantity * l.unitPrice, 0);
   const vat = doc.lines.reduce((s, l) => s + l.quantity * l.unitPrice * (l.vatRate / 100), 0);
   const total = subtotal + vat;
+  const tpl = getTemplate(doc.template);
+  const accent = tpl.accent;
+  const isBand = tpl.layout === "band";
+  const isMinimal = tpl.layout === "minimal";
+  // Втора валута за документи извън EUR/BGN (ориентировъчно в EUR)
+  const showEurApprox = doc.currency !== "EUR" && doc.currency !== "BGN";
 
   return (
     <>
@@ -47,13 +53,15 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
       </div>
 
       {/* Document */}
-      <div className="glass" style={{ borderRadius: 14, padding: "40px 48px", maxWidth: 800 }}>
+      <div className="glass" style={{ borderRadius: 14, maxWidth: 800, overflow: "hidden" }}>
+        {isBand && <div style={{ height: 10, background: accent }} />}
+        <div style={{ padding: "40px 48px" }}>
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
           <div>
             {doc.company.logoUrl
               ? <img src={doc.company.logoUrl} alt={doc.company.name} style={{ maxHeight: 56, maxWidth: 180, objectFit: "contain", marginBottom: 8 }} />
-              : <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 20, color: "var(--emerald)", marginBottom: 6 }}>{doc.company.name}</div>}
+              : <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 20, color: accent, marginBottom: 6 }}>{doc.company.name}</div>}
             <div style={{ fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.7 }}>
               <div style={{ fontWeight: 600 }}>{doc.company.name}</div>
               {doc.company.mol && <div>МОЛ: {doc.company.mol}</div>}
@@ -65,7 +73,7 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
             </div>
           </div>
           <div style={{ textAlign: "right" }}>
-            <div style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 700, marginBottom: 4 }}>
+            <div style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 700, marginBottom: 4, color: accent }}>
               {TYPE_LABELS[doc.type] ?? doc.type.toUpperCase()}
             </div>
             <div className="num" style={{ fontSize: 16, color: "var(--ink-soft)", marginBottom: 12 }}>№ {doc.number}</div>
@@ -107,9 +115,9 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
               <tr key={line.id}>
                 <td style={{ paddingLeft: 0 }}>{line.description}</td>
                 <td className="num">{line.quantity}</td>
-                <td className="num">{formatCurrency(line.unitPrice)}</td>
+                <td className="num">{formatCurrency(line.unitPrice, doc.currency)}</td>
                 <td className="num">{line.vatRate}%</td>
-                <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(line.lineTotal)}</td>
+                <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(line.lineTotal, doc.currency)}</td>
               </tr>
             ))}
           </tbody>
@@ -122,15 +130,20 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
             { label: "ДДС:", value: vat },
           ].map((r) => (
             <div key={r.label} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "4px 0", color: "var(--ink-soft)" }}>
-              <span>{r.label}</span><span className="num">{formatCurrency(r.value)}</span>
+              <span>{r.label}</span><span className="num">{formatCurrency(r.value, doc.currency)}</span>
             </div>
           ))}
-          <div style={{ display: "flex", justifyContent: "space-between", borderTop: "2px solid var(--border)", marginTop: 6, paddingTop: 10, fontSize: 18, fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace" }}>
-            <span>ОБЩО:</span><span>{formatCurrency(total)}</span>
+          <div style={{ display: "flex", justifyContent: "space-between", borderTop: `2px solid ${accent}`, marginTop: 6, paddingTop: 10, fontSize: 18, fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace", color: isMinimal ? "var(--ink)" : accent }}>
+            <span>ОБЩО:</span><span>{formatCurrency(total, doc.currency)}</span>
           </div>
           {dual && (
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "var(--muted)", fontFamily: "'IBM Plex Mono', monospace", paddingTop: 4 }}>
               <span>≈ BGN:</span><span>{formatCurrency(toBGN(total), "BGN")}</span>
+            </div>
+          )}
+          {showEurApprox && (
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "var(--muted)", fontFamily: "'IBM Plex Mono', monospace", paddingTop: 4 }}>
+              <span>≈ EUR:</span><span>{formatCurrency(convertCurrency(total, doc.currency, "EUR"), "EUR")}</span>
             </div>
           )}
         </div>
@@ -147,6 +160,7 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
             <strong>Бележки:</strong> {doc.notes}
           </div>
         )}
+        </div>
       </div>
     </>
   );

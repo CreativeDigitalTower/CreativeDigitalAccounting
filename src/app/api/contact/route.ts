@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { sendMail } from "@/lib/mail";
 import { COMPANY_EMAIL } from "@/lib/constants";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { z } from "zod";
 
 const schema = z.object({
@@ -12,6 +13,9 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   try {
+    if (!rateLimit(`contact:${clientIp(req)}`, 5, 60 * 60 * 1000)) {
+      return NextResponse.json({ error: "Твърде много съобщения. Опитайте по-късно." }, { status: 429 });
+    }
     const data = schema.parse(await req.json());
 
     const text = [

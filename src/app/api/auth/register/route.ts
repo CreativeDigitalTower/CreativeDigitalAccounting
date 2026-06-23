@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { z } from "zod";
 
 const schema = z.object({
@@ -14,6 +15,9 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   try {
+    if (!rateLimit(`register:${clientIp(req)}`, 5, 60 * 60 * 1000)) {
+      return NextResponse.json({ error: "Твърде много опити. Опитайте по-късно." }, { status: 429 });
+    }
     const body = await req.json();
     const data = schema.parse(body);
 

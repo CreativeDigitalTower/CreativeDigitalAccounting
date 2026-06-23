@@ -43,11 +43,18 @@ export default async function DocumentsPage({
         </div>
       </div>
 
+      {/* Категории документи */}
+      <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
+        <span className="filter-tab active">Изходящи документи</span>
+        <Link href="/dashboard/expenses" className="filter-tab">Разходни фактури</Link>
+        <Link href="/dashboard/bank-statements" className="filter-tab">Банкови извлечения</Link>
+      </div>
+
       {/* Filter tabs */}
       <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
         {[
           { label: "Всички", type: "" },
-          { label: "Фактури", type: "invoice" },
+          { label: "Приходни фактури", type: "invoice" },
           { label: "Проформи", type: "proforma" },
           { label: "Оферти", type: "quote" },
           { label: "Кр. известия", type: "credit_note" },

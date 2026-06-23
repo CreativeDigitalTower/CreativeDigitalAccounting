@@ -60,6 +60,13 @@ export async function POST(req: Request) {
       number = await generateDocumentNumber(companyId, data.type);
     }
 
+    // Шаблон по подразбиране от фирмения профил, ако не е зададен
+    let template = data.template;
+    if (!template) {
+      const comp = await prisma.company.findUnique({ where: { id: companyId }, select: { invoiceTemplate: true } });
+      template = comp?.invoiceTemplate ?? "classic";
+    }
+
     const document = await prisma.document.create({
       data: {
         companyId,
@@ -71,7 +78,7 @@ export async function POST(req: Request) {
         dueDate: data.dueDate ? new Date(data.dueDate) : null,
         currency: data.currency,
         language: data.language,
-        template: data.template ?? "classic",
+        template,
         notes: data.notes,
         status: data.status,
         parentDocumentId: data.parentDocumentId ?? null,

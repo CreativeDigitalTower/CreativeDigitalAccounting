@@ -104,6 +104,7 @@ model Company {
 
   auditLogs         AuditLog[]
   cashRegisters     CashRegister[]
+  bankStatements    BankStatement[]
 
   companyUsers      CompanyUser[]
   clients           Client[]
@@ -493,6 +494,21 @@ model CashEntry {
   createdAt  DateTime      @default(now())
 
   register CashRegister @relation(fields: [registerId], references: [id], onDelete: Cascade)
+}
+
+// ─── Банкови извлечения ──────────────────────────────────────────────────
+model BankStatement {
+  id         String   @id @default(cuid())
+  companyId  String
+  name       String
+  fileUrl    String   @db.Text // data URL (PDF/Excel/CSV)
+  fileType   String   // pdf | excel | csv
+  periodFrom DateTime?
+  periodTo   DateTime?
+  note       String?
+  createdAt  DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 // ─── Subscriptions / Billing ─────────────────────────────────────────────

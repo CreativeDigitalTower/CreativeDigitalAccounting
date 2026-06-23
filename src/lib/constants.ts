@@ -19,6 +19,34 @@ export const BANK_DETAILS = {
 
 export const VAT_RATES = [0, 9, 20] as const;
 
+// Ориентировъчни валутни курсове спрямо EUR (1 EUR = X валута).
+// BGN е фиксиран; останалите са приблизителни и могат да се обновяват.
+export const FX_RATES_PER_EUR: Record<string, number> = {
+  EUR: 1,
+  BGN: 1.95583,
+  USD: 1.08,
+  GBP: 0.85,
+  CHF: 0.94,
+  RON: 4.97,
+  TRY: 35.0,
+  PLN: 4.3,
+  CZK: 25.2,
+  SEK: 11.3,
+  NOK: 11.6,
+  CAD: 1.47,
+  AUD: 1.63,
+  JPY: 169.0,
+  CNY: 7.8,
+};
+
+/** Конвертира сума между валути през EUR. */
+export function convertCurrency(amount: number, from: string, to: string): number {
+  const f = FX_RATES_PER_EUR[from] ?? 1;
+  const t = FX_RATES_PER_EUR[to] ?? 1;
+  const eur = amount / f;
+  return Math.round(eur * t * 100) / 100;
+}
+
 export const DOC_PREFIXES: Record<string, string> = {
   invoice: "", // фактурите са с чисто число: 0000000001
   proforma: "PF-",
@@ -58,19 +86,23 @@ export const DOC_LANGUAGES = [
   { code: "el", label: "Ελληνικά" },
 ] as const;
 
-// 10 дизайна за фактури
+// 10 дизайна за фактури (layout: classic | band | minimal)
 export const INVOICE_TEMPLATES = [
-  { id: "classic", name: "Класически", accent: "#1F6F54" },
-  { id: "modern", name: "Модерен", accent: "#2C4A66" },
-  { id: "minimal", name: "Минимал", accent: "#16201C" },
-  { id: "elegant", name: "Елегантен", accent: "#A6822F" },
-  { id: "bold", name: "Контрастен", accent: "#A23B2B" },
-  { id: "corporate", name: "Корпоративен", accent: "#2C4A66" },
-  { id: "fresh", name: "Свеж", accent: "#3F9C82" },
-  { id: "warm", name: "Топъл", accent: "#C49A45" },
-  { id: "mono", name: "Монохром", accent: "#3A4540" },
-  { id: "premium", name: "Премиум", accent: "#16201C" },
+  { id: "classic", name: "Класически", accent: "#1F6F54", layout: "classic" },
+  { id: "modern", name: "Модерен", accent: "#2C4A66", layout: "band" },
+  { id: "minimal", name: "Минимал", accent: "#16201C", layout: "minimal" },
+  { id: "elegant", name: "Елегантен", accent: "#A6822F", layout: "classic" },
+  { id: "bold", name: "Контрастен", accent: "#A23B2B", layout: "band" },
+  { id: "corporate", name: "Корпоративен", accent: "#2C4A66", layout: "band" },
+  { id: "fresh", name: "Свеж", accent: "#3F9C82", layout: "classic" },
+  { id: "warm", name: "Топъл", accent: "#C49A45", layout: "classic" },
+  { id: "mono", name: "Монохром", accent: "#3A4540", layout: "minimal" },
+  { id: "premium", name: "Премиум", accent: "#16201C", layout: "band" },
 ] as const;
+
+export function getTemplate(id: string | null | undefined) {
+  return INVOICE_TEMPLATES.find((t) => t.id === id) ?? INVOICE_TEMPLATES[0];
+}
 
 export const DOC_STATUSES = [
   { value: "draft", label: "Чернова", color: "muted" },
