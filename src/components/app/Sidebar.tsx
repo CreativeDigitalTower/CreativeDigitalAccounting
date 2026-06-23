@@ -1,0 +1,184 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Logo } from "@/components/Logo";
+import { clsx } from "clsx";
+
+const navItems = [
+  { href: "/dashboard", label: "Табло", icon: "⊞" },
+  { href: "/dashboard/documents", label: "Документи", icon: "📄" },
+  { href: "/dashboard/clients", label: "Клиенти", icon: "👥" },
+  { href: "/dashboard/suppliers", label: "Доставчици", icon: "🚚" },
+  { href: "/dashboard/warehouse", label: "Склад", icon: "📦" },
+  { href: "/dashboard/expenses", label: "Разходи", icon: "💰" },
+  { href: "/dashboard/contracts", label: "Договори", icon: "📑" },
+  { href: "/dashboard/projects", label: "Проекти", icon: "🏗️" },
+  { href: "/dashboard/archive", label: "Архив", icon: "🗂️" },
+  { href: "/dashboard/assets", label: "Активи", icon: "🏭" },
+  { href: "/dashboard/analytics", label: "Анализи", icon: "📊" },
+  { href: "/dashboard/users", label: "Потребители", icon: "👤" },
+  { href: "/dashboard/subscription", label: "Абонамент", icon: "💳" },
+];
+
+interface SidebarProps {
+  companyName: string;
+  plan: string;
+}
+
+export function Sidebar({ companyName, plan }: SidebarProps) {
+  const pathname = usePathname();
+
+  return (
+    <aside
+      className="sidebar-glass"
+      style={{
+        width: 240,
+        flexShrink: 0,
+        display: "flex",
+        flexDirection: "column",
+        padding: "22px 16px",
+        gap: 22,
+        color: "#E9E7DA",
+        minHeight: "100vh",
+        position: "sticky",
+        top: 0,
+      }}
+    >
+      {/* Brand */}
+      <div style={{ padding: "0 4px" }}>
+        <Logo dark />
+      </div>
+
+      {/* Company chip */}
+      <div
+        style={{
+          background: "rgba(255,255,255,.06)",
+          borderRadius: 8,
+          padding: "8px 12px",
+          fontSize: 12.5,
+          color: "#C9C7B6",
+          border: "1px solid rgba(255,255,255,.08)",
+        }}
+      >
+        <div style={{ fontSize: 10.5, color: "var(--brass)", fontWeight: 600, letterSpacing: 1, marginBottom: 3 }}>
+          АКТИВНА ФИРМА
+        </div>
+        <div style={{ fontWeight: 600, color: "#E9E7DA", fontSize: 13 }}>{companyName}</div>
+      </div>
+
+      {/* Navigation */}
+      <nav style={{ display: "flex", flexDirection: "column", gap: 1, flex: 1 }}>
+        {navItems.map((item) => {
+          const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 11,
+                padding: "8.5px 12px",
+                borderRadius: 6,
+                fontSize: 13.3,
+                fontWeight: 500,
+                color: isActive ? "#fff" : "#C9C7B6",
+                textDecoration: "none",
+                background: isActive ? "rgba(255,255,255,.12)" : "transparent",
+                transition: "background .15s, color .15s",
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) {
+                  (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.07)";
+                  (e.currentTarget as HTMLElement).style.color = "#fff";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) {
+                  (e.currentTarget as HTMLElement).style.background = "transparent";
+                  (e.currentTarget as HTMLElement).style.color = "#C9C7B6";
+                }
+              }}
+            >
+              <span style={{ fontSize: 15, opacity: isActive ? 1 : 0.8 }}>{item.icon}</span>
+              {item.label}
+            </Link>
+          );
+        })}
+
+        {/* AI Copilot locked teaser */}
+        <div
+          style={{
+            marginTop: 8,
+            display: "flex",
+            alignItems: "center",
+            gap: 11,
+            padding: "8.5px 12px",
+            borderRadius: 6,
+            fontSize: 13.3,
+            fontWeight: 500,
+            color: "rgba(201,199,182,.4)",
+            cursor: "default",
+            position: "relative",
+          }}
+        >
+          <span style={{ fontSize: 15, opacity: 0.4 }}>🤖</span>
+          AI Асистент
+          <span
+            style={{
+              marginLeft: "auto",
+              fontSize: 9.5,
+              color: "var(--brass)",
+              border: "1px solid var(--brass)",
+              borderRadius: 10,
+              padding: "1px 7px",
+              opacity: 0.7,
+            }}
+          >
+            СКОРО
+          </span>
+        </div>
+      </nav>
+
+      {/* Footer */}
+      <div style={{ paddingTop: 12, borderTop: "1px solid rgba(255,255,255,.1)" }}>
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            fontSize: 11.5,
+            color: "#C9C7B6",
+            background: "rgba(255,255,255,.07)",
+            padding: "4px 9px",
+            borderRadius: 20,
+            marginBottom: 8,
+          }}
+        >
+          <span style={{ color: "var(--brass)", fontWeight: 700 }}>
+            {plan === "free" ? "Безплатен" : plan === "start" ? "Старт" : plan === "business" ? "Бизнес" : "Про"}
+          </span>{" "}
+          план
+        </div>
+        <form action="/api/auth/signout" method="post">
+          <button
+            type="submit"
+            style={{
+              width: "100%",
+              textAlign: "left",
+              background: "none",
+              border: "none",
+              color: "#8A8878",
+              fontSize: 12.5,
+              cursor: "pointer",
+              padding: "4px 0",
+            }}
+          >
+            Изход ↗
+          </button>
+        </form>
+      </div>
+    </aside>
+  );
+}

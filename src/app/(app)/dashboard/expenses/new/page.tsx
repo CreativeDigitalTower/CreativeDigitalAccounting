@@ -1,0 +1,119 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+
+type Category = { id: string; name: string };
+type Supplier = { id: string; name: string };
+
+export default function NewExpensePage() {
+  const router = useRouter();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetch("/api/expense-categories").then((r) => r.json()).then(setCategories);
+    fetch("/api/suppliers").then((r) => r.json()).then(setSuppliers);
+  }, []);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSaving(true);
+    setError("");
+    const fd = new FormData(e.currentTarget);
+    const amount = parseFloat(fd.get("amount") as string);
+    const vatRate = parseFloat(fd.get("vatRate") as string) / 100;
+    const vatAmount = amount * vatRate / (1 + vatRate);
+
+    const res = await fetch("/api/expenses", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        categoryId: fd.get("categoryId"),
+        supplierId: fd.get("supplierId") || null,
+        description: fd.get("description"),
+        amount,
+        vatAmount: parseFloat(vatAmount.toFixed(2)),
+        date: fd.get("date"),
+        source: "manual",
+      }),
+    });
+
+    setSaving(false);
+    if (!res.ok) {
+      const data = await res.json();
+      setError(data.error ?? "Грешка при запис.");
+    } else {
+      router.push("/dashboard/expenses");
+    }
+  }
+
+  return (
+    <>
+      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
+        <Link href="/dashboard/expenses" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← Разходи</Link>
+        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>Нов разход</h1>
+      </div>
+
+      {error && (
+        <div style={{ background: "var(--brick-soft)", border: "1px solid var(--brick)", color: "var(--brick)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 16 }}>
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit}>
+        <div className="glass panel" style={{ padding: "28px", marginBottom: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14 }}>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label>Описание *</label>
+              <input type="text" name="description" required placeholder="Наем офис м. Юни" />
+            </div>
+            <div>
+              <label>Категория *</label>
+              <select name="categoryId" required>
+                <option value="">— Изберете —</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label>Доставчик</label>
+              <select name="supplierId">
+                <option value="">— Без доставчик —</option>
+                {suppliers.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label>Бруто сума (EUR) *</label>
+              <input type="number" name="amount" required min="0" step="0.01" placeholder="100.00" />
+            </div>
+            <div>
+              <label>ДДС ставка</label>
+              <select name="vatRate">
+                <option value="20">20%</option>
+                <option value="9">9%</option>
+                <option value="0">0%</option>
+              </select>
+            </div>
+            <div>
+              <label>Дата *</label>
+              <input type="date" name="date" required defaultValue={new Date().toISOString().slice(0, 10)} />
+            </div>
+          </div>
+        </div>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+          <Link href="/dashboard/expenses" className="btn btn-ghost">Отказ</Link>
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? "Записване…" : "Запази разход"}
+          </button>
+        </div>
+      </form>
+    </>
+  );
+}

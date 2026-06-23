@@ -1,0 +1,490 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Auth (NextAuth v5) ──────────────────────────────────────────────────
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  passwordHash  String?
+  name          String?
+  image         String?
+  createdAt     DateTime  @default(now())
+
+  accounts     Account[]
+  sessions     Session[]
+  companyUsers CompanyUser[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Company / Multi-tenant ──────────────────────────────────────────────
+model Company {
+  id              String   @id @default(cuid())
+  name            String
+  eik             String?
+  vatNumber       String?
+  address         String?
+  city            String?
+  mol             String?
+  logoUrl         String?
+  brandColor      String?
+  defaultCurrency String   @default("EUR")
+  bankIban        String?
+  phone           String?
+  email           String?
+  website         String?
+  createdAt       DateTime @default(now())
+
+  companyUsers      CompanyUser[]
+  clients           Client[]
+  suppliers         Supplier[]
+  warehouses        Warehouse[]
+  stockItems        StockItem[]
+  documents         Document[]
+  expenseCategories ExpenseCategory[]
+  expenses          Expense[]
+  contracts         Contract[]
+  projects          Project[]
+  assets            Asset[]
+  subscription      Subscription?
+  usageCounters     UsageCounter[]
+  financialGoals    FinancialGoal[]
+  financialHistory  FinancialHistory[]
+  handoverProtocols HandoverProtocol[]
+}
+
+enum CompanyRole {
+  owner
+  manager
+  accountant
+  sales
+  warehouse
+  viewer
+}
+
+model CompanyUser {
+  userId    String
+  companyId String
+  role      CompanyRole @default(viewer)
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@id([userId, companyId])
+}
+
+// ─── CRM ─────────────────────────────────────────────────────────────────
+model Client {
+  id           String   @id @default(cuid())
+  companyId    String
+  name         String
+  eik          String?
+  vatNumber    String?
+  address      String?
+  city         String?
+  contactEmail String?
+  phone        String?
+  createdAt    DateTime @default(now())
+
+  company   Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  notes     ClientNote[]
+  documents Document[]
+  contracts Contract[]
+  projects  Project[]
+}
+
+model ClientNote {
+  id        String   @id @default(cuid())
+  clientId  String
+  note      String   @db.Text
+  createdAt DateTime @default(now())
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+// ─── Suppliers ───────────────────────────────────────────────────────────
+model Supplier {
+  id           String   @id @default(cuid())
+  companyId    String
+  name         String
+  eik          String?
+  vatNumber    String?
+  address      String?
+  contactEmail String?
+  phone        String?
+  rating       Int?
+  notes        String?  @db.Text
+  createdAt    DateTime @default(now())
+
+  company           Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  stockMovements    StockMovement[]
+  expenses          Expense[]
+  supplierDocuments SupplierDocument[]
+  contracts         Contract[]
+}
+
+model SupplierDocument {
+  id         String @id @default(cuid())
+  supplierId String
+  fileUrl    String
+  type       String
+
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+}
+
+// ─── Warehouse ───────────────────────────────────────────────────────────
+model Warehouse {
+  id        String @id @default(cuid())
+  companyId String
+  name      String
+
+  company    Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  stockItems StockItem[]
+}
+
+model StockItem {
+  id          String  @id @default(cuid())
+  companyId   String
+  warehouseId String
+  name        String
+  sku         String?
+  quantity    Float   @default(0)
+  minQuantity Float?
+  unit        String  @default("бр")
+  unitCost    Float?
+
+  company   Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  warehouse Warehouse       @relation(fields: [warehouseId], references: [id])
+  movements StockMovement[]
+}
+
+enum StockMovementType {
+  receive
+  issue
+  production
+  transfer
+}
+
+model StockMovement {
+  id          String            @id @default(cuid())
+  stockItemId String
+  type        StockMovementType
+  quantity    Float
+  supplierId  String?
+  unitPrice   Float?
+  date        DateTime
+  note        String?
+
+  stockItem StockItem @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
+  supplier  Supplier? @relation(fields: [supplierId], references: [id])
+}
+
+// ─── Documents ───────────────────────────────────────────────────────────
+enum DocumentType {
+  invoice
+  proforma
+  quote
+  credit_note
+  debit_note
+}
+
+enum DocumentStatus {
+  draft
+  sent
+  paid
+  overdue
+  cancelled
+}
+
+model Document {
+  id                 String         @id @default(cuid())
+  companyId          String
+  type               DocumentType
+  number             String
+  clientId           String?
+  issueDate          DateTime
+  dueDate            DateTime?
+  currency           String         @default("EUR")
+  status             DocumentStatus @default(draft)
+  isRecurring        Boolean        @default(false)
+  recurrenceInterval String?
+  parentDocumentId   String?
+  notes              String?        @db.Text
+  createdAt          DateTime       @default(now())
+
+  company        Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  client         Client?        @relation(fields: [clientId], references: [id])
+  parentDocument Document?      @relation("DocumentChain", fields: [parentDocumentId], references: [id])
+  childDocuments Document[]     @relation("DocumentChain")
+  lines          DocumentLine[]
+}
+
+model DocumentLine {
+  id               String  @id @default(cuid())
+  documentId       String
+  description      String
+  quantity         Float
+  unitPrice        Float
+  vatRate          Float   @default(20)
+  lineTotal        Float
+  nomenclatureCode String?
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+}
+
+// ─── Expenses ────────────────────────────────────────────────────────────
+model ExpenseCategory {
+  id        String  @id @default(cuid())
+  companyId String?
+  name      String
+  isCustom  Boolean @default(false)
+
+  company  Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  expenses Expense[]
+}
+
+enum ExpenseSource {
+  manual
+  incoming_invoice
+}
+
+model Expense {
+  id            String        @id @default(cuid())
+  companyId     String
+  categoryId    String
+  supplierId    String?
+  description   String
+  amount        Float
+  vatAmount     Float         @default(0)
+  date          DateTime
+  source        ExpenseSource @default(manual)
+  attachmentUrl String?
+  createdAt     DateTime      @default(now())
+
+  company  Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category ExpenseCategory @relation(fields: [categoryId], references: [id])
+  supplier Supplier?       @relation(fields: [supplierId], references: [id])
+}
+
+// ─── Contracts ───────────────────────────────────────────────────────────
+enum ContractCounterpartyType {
+  client
+  supplier
+}
+
+enum ContractStatus {
+  active
+  expired
+  cancelled
+}
+
+model Contract {
+  id               String                   @id @default(cuid())
+  companyId        String
+  title            String
+  counterpartyType ContractCounterpartyType
+  clientId         String?
+  supplierId       String?
+  startDate        DateTime
+  endDate          DateTime?
+  autoRenew        Boolean                  @default(false)
+  status           ContractStatus           @default(active)
+  attachmentUrl    String?
+
+  company  Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  client   Client?   @relation(fields: [clientId], references: [id])
+  supplier Supplier? @relation(fields: [supplierId], references: [id])
+}
+
+// ─── Projects ────────────────────────────────────────────────────────────
+enum ProjectStatus {
+  active
+  completed
+  on_hold
+  cancelled
+}
+
+enum ProjectEntryType {
+  revenue
+  expense
+}
+
+model Project {
+  id                String        @id @default(cuid())
+  companyId         String
+  name              String
+  clientId          String?
+  responsibleUserId String?
+  budget            Float?
+  plannedBudget     Float?
+  actualSpent       Float         @default(0)
+  status            ProjectStatus @default(active)
+  deadline          DateTime?
+  progressPercent   Int           @default(0)
+
+  company Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  client  Client?        @relation(fields: [clientId], references: [id])
+  entries ProjectEntry[]
+  files   ProjectFile[]
+}
+
+model ProjectEntry {
+  id        String           @id @default(cuid())
+  projectId String
+  refType   String
+  refId     String
+  amount    Float
+  type      ProjectEntryType
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectFile {
+  id        String  @id @default(cuid())
+  projectId String
+  fileUrl   String
+  name      String?
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// ─── Assets ──────────────────────────────────────────────────────────────
+model Asset {
+  id                 String    @id @default(cuid())
+  companyId          String
+  name               String
+  category           String
+  acquiredDate       DateTime
+  value              Float
+  annualDepreciation Float     @default(0)
+  bookValue          Float
+  warrantyUntil      DateTime?
+  insuranceUntil     DateTime?
+
+  company     Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  serviceLogs AssetServiceLog[]
+}
+
+model AssetServiceLog {
+  id          String   @id @default(cuid())
+  assetId     String
+  date        DateTime
+  description String
+
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+}
+
+// ─── Handover Protocols ──────────────────────────────────────────────────
+model HandoverProtocol {
+  id             String   @id @default(cuid())
+  companyId      String
+  number         String
+  counterpartyId String?
+  date           DateTime
+  description    String?  @db.Text
+  createdAt      DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+// ─── Subscriptions / Billing ─────────────────────────────────────────────
+enum SubscriptionPlan {
+  free
+  start
+  business
+  pro
+}
+
+enum SubscriptionStatus {
+  active
+  cancelled
+  past_due
+  trialing
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  companyId            String             @unique
+  plan                 SubscriptionPlan   @default(free)
+  status               SubscriptionStatus @default(active)
+  stripeSubscriptionId String?
+  stripeCustomerId     String?
+  currentPeriodEnd     DateTime?
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model UsageCounter {
+  companyId            String
+  yearMonth            String
+  documentsIssuedCount Int    @default(0)
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@id([companyId, yearMonth])
+}
+
+// ─── Analytics ───────────────────────────────────────────────────────────
+model FinancialGoal {
+  id            String @id @default(cuid())
+  companyId     String
+  year          Int
+  targetRevenue Float
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, year])
+}
+
+model FinancialHistory {
+  id            String @id @default(cuid())
+  companyId     String
+  year          Int
+  revenue       Float
+  profit        Float?
+  employeeCount Int?
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, year])
+}

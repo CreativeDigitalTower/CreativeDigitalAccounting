@@ -1,0 +1,109 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { Logo } from "@/components/Logo";
+
+const links = [
+  { href: "/", label: "Начало" },
+  { href: "/software", label: "За Софтуера" },
+  { href: "/about", label: "За Нас" },
+  { href: "/contact", label: "Контакти" },
+];
+
+export function MarketingNavbar() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <nav
+      className="glass no-print"
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 50,
+        padding: "0 32px",
+        borderRadius: 0,
+        borderLeft: "none",
+        borderRight: "none",
+        borderTop: "none",
+      }}
+    >
+      <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "center", height: 64, gap: 32 }}>
+        <Link href="/" style={{ textDecoration: "none" }}>
+          <Logo />
+        </Link>
+
+        {/* Desktop links */}
+        <div style={{ display: "flex", gap: 4, flex: 1 }} className="hidden sm:flex">
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              style={{
+                padding: "6px 12px",
+                borderRadius: 8,
+                fontSize: 13.5,
+                fontWeight: 500,
+                color: "var(--ink-soft)",
+                textDecoration: "none",
+                transition: "background .15s, color .15s",
+              }}
+              onMouseEnter={(e) => {
+                (e.target as HTMLElement).style.background = "rgba(255,255,255,.6)";
+                (e.target as HTMLElement).style.color = "var(--ink)";
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLElement).style.background = "transparent";
+                (e.target as HTMLElement).style.color = "var(--ink-soft)";
+              }}
+            >
+              {l.label}
+            </Link>
+          ))}
+        </div>
+
+        <div style={{ marginLeft: "auto", display: "flex", gap: 10, alignItems: "center" }}>
+          <Link href="/login" className="btn btn-ghost btn-sm hidden sm:inline-flex">
+            Вход
+          </Link>
+          <Link href="/register" className="btn btn-primary btn-sm">
+            Регистрация
+          </Link>
+          {/* Mobile menu */}
+          <button
+            className="sm:hidden btn btn-ghost btn-sm"
+            onClick={() => setOpen(!open)}
+            aria-label="Меню"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              {open
+                ? <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>
+                : <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>}
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {open && (
+        <div
+          className="sm:hidden"
+          style={{ padding: "12px 0 16px", borderTop: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: 2 }}
+        >
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              onClick={() => setOpen(false)}
+              style={{ padding: "10px 8px", fontSize: 14, fontWeight: 500, color: "var(--ink-soft)", textDecoration: "none" }}
+            >
+              {l.label}
+            </Link>
+          ))}
+          <Link href="/login" style={{ padding: "10px 8px", fontSize: 14, fontWeight: 500, color: "var(--navy)", textDecoration: "none" }}>
+            Вход
+          </Link>
+        </div>
+      )}
+    </nav>
+  );
+}
