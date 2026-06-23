@@ -2,22 +2,129 @@ export const EUR_TO_BGN = 1.95583;
 export const DUAL_CURRENCY_UNTIL = new Date("2026-08-08");
 export const FREE_PLAN_LIMIT = 5; // документа/месец
 
+export const COMPANY_NAME = "Криейтив Диджитъл Тауър ЕООД";
+export const COMPANY_EIK = "205748188";
+export const COMPANY_WEBSITE = "https://creativedigitaltower.com/";
+export const COMPANY_EMAIL = "office@creativedigitaltower.com";
+export const FACEBOOK_PAGE = "https://www.facebook.com/CreativeDigitalAccounting";
+export const FACEBOOK_PAGE_ID = "CreativeDigitalAccounting";
+
+// Банкови данни за абонаменти (само банков превод засега)
+export const BANK_DETAILS = {
+  recipient: "Криейтив Диджитъл Тауър ЕООД",
+  iban: "BG84STSA93000028480494",
+  bank: "Банка ДСК",
+  reason: "Абонамент Creative Digital Accounting — избран пакет",
+};
+
 export const VAT_RATES = [0, 9, 20] as const;
 
 export const DOC_PREFIXES: Record<string, string> = {
-  invoice: "CDA",
-  proforma: "PRO",
-  quote: "ОФ",
-  credit_note: "КИ",
-  debit_note: "ДИ",
+  invoice: "", // фактурите са с чисто число: 0000000001
+  proforma: "PF-",
+  quote: "OF-",
+  credit_note: "KI-",
+  debit_note: "DI-",
 };
 
+// Поддържани валути за фактуриране
+export const CURRENCIES = [
+  { code: "EUR", label: "Евро (€)", symbol: "€" },
+  { code: "BGN", label: "Лев (лв)", symbol: "лв" },
+  { code: "USD", label: "Щатски долар ($)", symbol: "$" },
+  { code: "GBP", label: "Британска лира (£)", symbol: "£" },
+  { code: "CHF", label: "Швейцарски франк", symbol: "CHF" },
+  { code: "RON", label: "Румънска лея", symbol: "lei" },
+  { code: "TRY", label: "Турска лира (₺)", symbol: "₺" },
+  { code: "PLN", label: "Полска злота", symbol: "zł" },
+  { code: "CZK", label: "Чешка крона", symbol: "Kč" },
+  { code: "SEK", label: "Шведска крона", symbol: "kr" },
+  { code: "NOK", label: "Норвежка крона", symbol: "kr" },
+  { code: "CAD", label: "Канадски долар", symbol: "C$" },
+  { code: "AUD", label: "Австралийски долар", symbol: "A$" },
+  { code: "JPY", label: "Японска йена (¥)", symbol: "¥" },
+  { code: "CNY", label: "Китайски юан", symbol: "¥" },
+] as const;
+
+// Езици за документите
+export const DOC_LANGUAGES = [
+  { code: "bg", label: "Български" },
+  { code: "en", label: "English" },
+  { code: "de", label: "Deutsch" },
+  { code: "fr", label: "Français" },
+  { code: "es", label: "Español" },
+  { code: "it", label: "Italiano" },
+  { code: "ro", label: "Română" },
+  { code: "el", label: "Ελληνικά" },
+] as const;
+
+// 10 дизайна за фактури
+export const INVOICE_TEMPLATES = [
+  { id: "classic", name: "Класически", accent: "#1F6F54" },
+  { id: "modern", name: "Модерен", accent: "#2C4A66" },
+  { id: "minimal", name: "Минимал", accent: "#16201C" },
+  { id: "elegant", name: "Елегантен", accent: "#A6822F" },
+  { id: "bold", name: "Контрастен", accent: "#A23B2B" },
+  { id: "corporate", name: "Корпоративен", accent: "#2C4A66" },
+  { id: "fresh", name: "Свеж", accent: "#3F9C82" },
+  { id: "warm", name: "Топъл", accent: "#C49A45" },
+  { id: "mono", name: "Монохром", accent: "#3A4540" },
+  { id: "premium", name: "Премиум", accent: "#16201C" },
+] as const;
+
+export const DOC_STATUSES = [
+  { value: "draft", label: "Чернова", color: "muted" },
+  { value: "issued", label: "Издадена", color: "navy" },
+  { value: "sent", label: "Изпратена", color: "navy" },
+  { value: "partially_paid", label: "Частично платена", color: "brass" },
+  { value: "paid", label: "Платена", color: "emerald" },
+  { value: "overdue", label: "Просрочена", color: "brick" },
+  { value: "cancelled", label: "Анулирана", color: "brick" },
+] as const;
+
+// ─── Абонаментни планове (нови цени) ─────────────────────────────────────
 export const SUBSCRIPTION_PLANS = {
-  free: { name: "Безплатен", price: 0, docsPerMonth: 5 },
-  start: { name: "Старт", price: 19, docsPerMonth: 50 },
-  business: { name: "Бизнес", price: 49, docsPerMonth: 200 },
-  pro: { name: "Про", price: 99, docsPerMonth: Infinity },
+  free: { name: "Безплатен", price: 0, docsPerMonth: 5, users: 1, companies: 1 },
+  start: { name: "Старт", price: 9, docsPerMonth: 50, users: 1, companies: 1 },
+  business: { name: "Бизнес", price: 29, docsPerMonth: 300, users: 5, companies: 1 },
+  pro: { name: "Про", price: 59, docsPerMonth: Infinity, users: Infinity, companies: Infinity },
 } as const;
+
+export type PlanId = keyof typeof SUBSCRIPTION_PLANS;
+
+// Кои функции са достъпни за кой план (за заключване в UI)
+export const PLAN_FEATURES: Record<PlanId, string[]> = {
+  free: ["documents", "clients", "suppliers", "warehouse", "dashboard"],
+  start: ["documents", "clients", "suppliers", "warehouse", "dashboard", "expenses", "recurring"],
+  business: [
+    "documents", "clients", "suppliers", "warehouse", "dashboard", "expenses",
+    "recurring", "projects", "contracts", "analytics", "archive", "assets", "users",
+  ],
+  pro: [
+    "documents", "clients", "suppliers", "warehouse", "dashboard", "expenses",
+    "recurring", "projects", "contracts", "analytics", "archive", "assets", "users",
+    "multicompany", "ai", "api",
+  ],
+};
+
+const PLAN_RANK: Record<PlanId, number> = { free: 0, start: 1, business: 2, pro: 3 };
+
+export function planHasFeature(plan: PlanId, feature: string): boolean {
+  return PLAN_FEATURES[plan]?.includes(feature) ?? false;
+}
+
+// Минималният план, който отключва дадена функция
+export function minPlanForFeature(feature: string): PlanId {
+  const order: PlanId[] = ["free", "start", "business", "pro"];
+  for (const p of order) {
+    if (PLAN_FEATURES[p].includes(feature)) return p;
+  }
+  return "pro";
+}
+
+export function planRank(plan: PlanId): number {
+  return PLAN_RANK[plan] ?? 0;
+}
 
 export function isDualCurrencyActive(): boolean {
   return new Date() < DUAL_CURRENCY_UNTIL;
@@ -28,11 +135,15 @@ export function toBGN(eur: number): number {
 }
 
 export function formatCurrency(amount: number, currency = "EUR"): string {
-  return new Intl.NumberFormat("bg-BG", {
-    style: "currency",
-    currency,
-    minimumFractionDigits: 2,
-  }).format(amount);
+  try {
+    return new Intl.NumberFormat("bg-BG", {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 2,
+    }).format(amount);
+  } catch {
+    return `${amount.toFixed(2)} ${currency}`;
+  }
 }
 
 export function formatDate(date: Date | string): string {

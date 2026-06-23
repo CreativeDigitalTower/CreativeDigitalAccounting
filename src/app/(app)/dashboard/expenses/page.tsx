@@ -1,10 +1,10 @@
-import { requireCompany } from "@/lib/session";
+import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { formatCurrency, toBGN, isDualCurrencyActive } from "@/lib/constants";
 
 export default async function ExpensesPage() {
-  const { companyId } = await requireCompany();
+  const { companyId } = await requireFeature("expenses");
   const dual = isDualCurrencyActive();
 
   const [expenses, totalResult] = await Promise.all([

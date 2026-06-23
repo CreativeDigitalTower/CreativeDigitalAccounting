@@ -1,10 +1,10 @@
-import { requireCompany } from "@/lib/session";
+import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/constants";
 
 export default async function ProjectsPage() {
-  const { companyId } = await requireCompany();
+  const { companyId } = await requireFeature("projects");
 
   const projects = await prisma.project.findMany({
     where: { companyId },

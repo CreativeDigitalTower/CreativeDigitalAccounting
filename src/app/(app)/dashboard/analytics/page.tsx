@@ -1,9 +1,9 @@
-import { requireCompany } from "@/lib/session";
+import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { formatCurrency, toBGN, isDualCurrencyActive } from "@/lib/constants";
 
 export default async function AnalyticsPage() {
-  const { companyId } = await requireCompany();
+  const { companyId } = await requireFeature("analytics");
   const dual = isDualCurrencyActive();
   const now = new Date();
   const year = now.getFullYear();

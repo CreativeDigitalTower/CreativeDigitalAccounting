@@ -5,6 +5,8 @@ import {
   generateDocumentNumber,
   checkInvoiceLimit,
   incrementInvoiceCounter,
+  isNumberTaken,
+  audit,
 } from "@/lib/documents";
 import { z } from "zod";
 
@@ -17,32 +19,46 @@ const lineSchema = z.object({
 
 const schema = z.object({
   type: z.enum(["invoice", "proforma", "quote", "credit_note", "debit_note"]),
+  number: z.string().optional(), // ръчно зададен номер (ако липсва — автоматичен)
   clientId: z.string().nullable().optional(),
   issueDate: z.string(),
-  dueDate: z.string().optional(),
+  taxEventDate: z.string().optional().nullable(),
+  dueDate: z.string().optional().nullable(),
+  currency: z.string().default("EUR"),
+  language: z.string().default("bg"),
+  template: z.string().optional(),
   notes: z.string().optional(),
   lines: z.array(lineSchema).min(1),
-  status: z.enum(["draft", "sent"]).default("draft"),
+  status: z.enum(["draft", "issued", "sent"]).default("draft"),
   parentDocumentId: z.string().optional(),
 });
 
 export async function POST(req: Request) {
   try {
-    const { companyId } = await requireCompany();
+    const { companyId, userId } = await requireCompany();
     const body = await req.json();
     const data = schema.parse(body);
+    const issued = data.status === "issued" || data.status === "sent";
 
-    if (data.type === "invoice" && data.status === "sent") {
+    if (data.type === "invoice" && issued) {
       const allowed = await checkInvoiceLimit(companyId);
       if (!allowed) {
         return NextResponse.json(
-          { error: "Достигнат лимит от 5 фактури/месец. Надградете плана си." },
+          { error: "Достигнат месечен лимит за документи. Надградете плана си." },
           { status: 403 }
         );
       }
     }
 
-    const number = await generateDocumentNumber(companyId, data.type);
+    // Ръчно зададен номер или автоматичен; проверка за дублиране
+    let number = data.number?.trim();
+    if (number) {
+      if (await isNumberTaken(companyId, number)) {
+        return NextResponse.json({ error: "Този номер вече е използван." }, { status: 400 });
+      }
+    } else {
+      number = await generateDocumentNumber(companyId, data.type);
+    }
 
     const document = await prisma.document.create({
       data: {
@@ -51,7 +67,11 @@ export async function POST(req: Request) {
         number,
         clientId: data.clientId ?? null,
         issueDate: new Date(data.issueDate),
+        taxEventDate: data.taxEventDate ? new Date(data.taxEventDate) : null,
         dueDate: data.dueDate ? new Date(data.dueDate) : null,
+        currency: data.currency,
+        language: data.language,
+        template: data.template ?? "classic",
         notes: data.notes,
         status: data.status,
         parentDocumentId: data.parentDocumentId ?? null,
@@ -68,9 +88,11 @@ export async function POST(req: Request) {
       include: { lines: true },
     });
 
-    if (data.type === "invoice" && data.status === "sent") {
+    if (data.type === "invoice" && issued) {
       await incrementInvoiceCounter(companyId);
     }
+
+    await audit(companyId, userId, "create", "Document", document.id, `${data.type} ${number}`);
 
     return NextResponse.json(document);
   } catch (err) {

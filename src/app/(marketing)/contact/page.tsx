@@ -4,11 +4,27 @@ import { useState } from "react";
 
 export default function ContactPage() {
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // TODO: wire to email API
-    setSent(true);
+    setLoading(true);
+    setError("");
+    const fd = new FormData(e.currentTarget);
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: fd.get("name"),
+        email: fd.get("email"),
+        company: fd.get("company") || undefined,
+        message: fd.get("message"),
+      }),
+    });
+    setLoading(false);
+    if (res.ok) setSent(true);
+    else setError("Възникна грешка. Опитайте отново или ни пишете директно.");
   }
 
   return (
@@ -20,52 +36,54 @@ export default function ContactPage() {
         Имате въпрос или предложение? Пишете ни и ще отговорим в рамките на работен ден.
       </p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 40 }}>
-        {[
-          { icon: "✉️", label: "Имейл", value: "info@creativedigital.bg" },
-          { icon: "📍", label: "Адрес", value: "София, България" },
-        ].map((c) => (
-          <div key={c.label} className="glass panel" style={{ padding: "20px 24px" }}>
-            <div style={{ fontSize: 24, marginBottom: 8 }}>{c.icon}</div>
-            <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
-              {c.label}
-            </div>
-            <div style={{ fontSize: 14, color: "var(--ink)" }}>{c.value}</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 24 }}>
+        <a href="mailto:office@creativedigitaltower.com" className="glass panel" style={{ padding: "20px 24px", textDecoration: "none", color: "inherit" }}>
+          <div style={{ fontSize: 24, marginBottom: 8 }}>✉️</div>
+          <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Имейл</div>
+          <div style={{ fontSize: 14, color: "var(--navy)", fontWeight: 600 }}>office@creativedigitaltower.com</div>
+        </a>
+        <a href="https://www.facebook.com/CreativeDigitalAccounting" target="_blank" rel="noopener noreferrer" className="glass panel" style={{ padding: "20px 24px", textDecoration: "none", color: "inherit" }}>
+          <div style={{ fontSize: 24, marginBottom: 8 }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#0866FF"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.99 3.66 9.13 8.44 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99C18.34 21.13 22 16.99 22 12z" /></svg>
           </div>
-        ))}
+          <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Facebook / Messenger</div>
+          <div style={{ fontSize: 14, color: "#0866FF", fontWeight: 600 }}>Пишете ни в Messenger →</div>
+        </a>
       </div>
 
       {sent ? (
-        <div
-          className="glass"
-          style={{ padding: "32px", borderRadius: 14, textAlign: "center", borderLeft: "4px solid var(--emerald)" }}
-        >
+        <div className="glass" style={{ padding: "32px", borderRadius: 14, textAlign: "center", borderLeft: "4px solid var(--emerald)" }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>✓</div>
           <h3 style={{ fontFamily: "'Fraunces', serif", margin: "0 0 8px" }}>Съобщението е изпратено!</h3>
-          <p style={{ color: "var(--ink-soft)", margin: 0 }}>Ще ви отговорим до 1 работен ден.</p>
+          <p style={{ color: "var(--ink-soft)", margin: 0 }}>Ще ви отговорим до 1 работен ден на посочения имейл.</p>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="glass panel" style={{ padding: "32px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+          {error && (
+            <div style={{ background: "var(--brick-soft)", border: "1px solid var(--brick)", color: "var(--brick)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 16 }}>
+              {error}
+            </div>
+          )}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 16, marginBottom: 16 }}>
             <div>
               <label>Име</label>
-              <input type="text" required placeholder="Иван Иванов" />
+              <input type="text" name="name" required placeholder="Иван Иванов" />
             </div>
             <div>
               <label>Имейл</label>
-              <input type="email" required placeholder="ivan@firma.bg" />
+              <input type="email" name="email" required placeholder="ivan@firma.bg" />
             </div>
           </div>
           <div style={{ marginBottom: 16 }}>
             <label>Фирма (незадължително)</label>
-            <input type="text" placeholder="ООД Примерна" />
+            <input type="text" name="company" placeholder="ООД Примерна" />
           </div>
           <div style={{ marginBottom: 24 }}>
             <label>Съобщение</label>
-            <textarea required rows={5} placeholder="Как можем да помогнем?" style={{ resize: "vertical" }} />
+            <textarea name="message" required rows={5} placeholder="Как можем да помогнем?" style={{ resize: "vertical" }} />
           </div>
-          <button type="submit" className="btn btn-primary" style={{ width: "100%", justifyContent: "center" }}>
-            Изпрати съобщение
+          <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: "100%", justifyContent: "center" }}>
+            {loading ? "Изпращане…" : "Изпрати съобщение"}
           </button>
         </form>
       )}

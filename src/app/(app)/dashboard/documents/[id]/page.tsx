@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Stamp } from "@/components/Stamp";
+import { DocumentActions } from "@/components/app/DocumentActions";
 import { formatCurrency, toBGN, isDualCurrencyActive, EUR_TO_BGN } from "@/lib/constants";
 
 const TYPE_LABELS: Record<string, string> = {
@@ -38,16 +39,10 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
           <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, fontWeight: 600, margin: 0 }}>{doc.number}</h1>
           <Stamp status={doc.status} />
         </div>
-        <div style={{ display: "flex", gap: 10 }} className="no-print">
+        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }} className="no-print">
           {doc.type === "quote" && <Link href={`/dashboard/documents/new?type=proforma&parent=${doc.id}`} className="btn btn-ghost btn-sm">→ Проформа</Link>}
           {doc.type === "proforma" && <Link href={`/dashboard/documents/new?type=invoice&parent=${doc.id}`} className="btn btn-ghost btn-sm">→ Фактура</Link>}
-          {doc.type === "invoice" && doc.status === "sent" && (
-            <form action={`/api/documents/${doc.id}/mark-paid`} method="POST">
-              <button type="submit" className="btn btn-primary btn-sm">✓ Маркирай платена</button>
-            </form>
-          )}
-          <button onClick={() => window.print()} className="btn btn-ghost btn-sm">🖨 Печат</button>
-          <Link href={`/dashboard/documents/${doc.id}/pdf`} className="btn btn-ghost btn-sm">↓ PDF</Link>
+          <DocumentActions id={doc.id} status={doc.status} />
         </div>
       </div>
 
@@ -56,10 +51,12 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
           <div>
-            <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 20, color: "var(--emerald)", marginBottom: 6 }}>
-              Creative Digital
-            </div>
+            {doc.company.logoUrl
+              ? <img src={doc.company.logoUrl} alt={doc.company.name} style={{ maxHeight: 56, maxWidth: 180, objectFit: "contain", marginBottom: 8 }} />
+              : <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 20, color: "var(--emerald)", marginBottom: 6 }}>{doc.company.name}</div>}
             <div style={{ fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.7 }}>
+              <div style={{ fontWeight: 600 }}>{doc.company.name}</div>
+              {doc.company.mol && <div>МОЛ: {doc.company.mol}</div>}
               {doc.company.address && <div>{doc.company.address}</div>}
               {doc.company.city && <div>{doc.company.city}</div>}
               {doc.company.eik && <div>ЕИК: {doc.company.eik}</div>}
@@ -73,8 +70,9 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
             </div>
             <div className="num" style={{ fontSize: 16, color: "var(--ink-soft)", marginBottom: 12 }}>№ {doc.number}</div>
             <div style={{ fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.8 }}>
-              <div>Дата: {new Date(doc.issueDate).toLocaleDateString("bg-BG")}</div>
-              {doc.dueDate && <div>Срок: {new Date(doc.dueDate).toLocaleDateString("bg-BG")}</div>}
+              <div>Дата на издаване: {new Date(doc.issueDate).toLocaleDateString("bg-BG")}</div>
+              {doc.taxEventDate && <div>Дата на данъчно събитие: {new Date(doc.taxEventDate).toLocaleDateString("bg-BG")}</div>}
+              {doc.dueDate && <div>Срок за плащане: {new Date(doc.dueDate).toLocaleDateString("bg-BG")}</div>}
             </div>
           </div>
         </div>

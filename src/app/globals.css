@@ -35,6 +35,7 @@ h1,h2,h3,h4,.font-serif{font-family:'Fraunces',serif;}
 .stamp-draft{color:var(--muted);background:rgba(239,238,229,.7);border-style:dashed;}
 .stamp-cancelled{color:var(--brick);background:rgba(244,227,222,.4);border-style:dashed;}
 .stamp-proforma{color:var(--navy);background:rgba(228,234,239,.7);}
+.stamp-low{color:var(--brass);background:rgba(243,234,210,.7);}
 
 .sidebar-glass{background:rgba(19,27,23,.82);backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%);border-right:1px solid rgba(255,255,255,.08);}
 
@@ -82,5 +83,23 @@ label{display:block;font-size:12px;color:var(--ink-soft);font-weight:600;margin-
 ::-webkit-scrollbar{width:6px;height:6px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+/* ─── Responsive helpers (надеждни, не зависят от Tailwind) ─── */
+.desktop-only{display:flex;}
+.mobile-only{display:none;}
+@media(max-width:768px){
+  .desktop-only{display:none !important;}
+  .mobile-only{display:flex !important;}
+  .app-shell{flex-direction:column;}
+}
+
+/* Messenger чат балонче */
+.fb-bubble{position:fixed;bottom:22px;right:22px;z-index:60;display:flex;align-items:center;gap:10px;background:#0866FF;color:#fff;border-radius:30px;padding:12px 18px 12px 14px;box-shadow:0 8px 28px rgba(8,102,255,.4);text-decoration:none;font-weight:600;font-size:14px;transition:transform .15s, box-shadow .15s;}
+.fb-bubble:hover{transform:translateY(-2px);box-shadow:0 12px 34px rgba(8,102,255,.5);}
+@media(max-width:600px){.fb-bubble span.fb-label{display:none;}.fb-bubble{padding:14px;border-radius:50%;}}
+
+/* Заключени (premium) функции */
+.lock-overlay{position:relative;}
+.lock-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--brass);border:1px solid var(--brass);border-radius:10px;padding:1px 7px;text-transform:uppercase;}
 
 @media print{.no-print{display:none!important;}}

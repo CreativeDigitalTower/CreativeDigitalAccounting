@@ -3,41 +3,18 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { FREE_PLAN_LIMIT, getYearMonth } from "@/lib/constants";
 
+import { BANK_DETAILS, EUR_TO_BGN } from "@/lib/constants";
+
 const PLANS = [
-  {
-    id: "free",
-    name: "Безплатен",
-    price: 0,
-    priceBGN: 0,
-    docs: "5 документа/месец",
-    features: ["5 фактури/месец", "Неограничени клиенти", "Склад", "Базов анализ"],
-  },
-  {
-    id: "start",
-    name: "Старт",
-    price: 19,
-    priceBGN: 37.16,
-    docs: "50 документа/месец",
-    features: ["50 фактури/месец", "Повтарящи се фактури", "Разходи", "CRM бележки"],
-  },
-  {
-    id: "business",
-    name: "Бизнес",
-    price: 49,
-    priceBGN: 95.84,
-    docs: "200 документа/месец",
-    features: ["200 фактури/месец", "Проекти", "Договори", "PDF отчет"],
-    recommended: true,
-  },
-  {
-    id: "pro",
-    name: "Про",
-    price: 99,
-    priceBGN: 193.63,
-    docs: "Неограничени",
-    features: ["Неограничени фактури", "Активи", "Многофирмен достъп", "Приоритетна поддръжка"],
-  },
-];
+  { id: "free", name: "Безплатен", price: 0, docs: "5 документа/месец",
+    features: ["5 фактури/месец", "Неограничени клиенти", "Склад", "Базов анализ"] },
+  { id: "start", name: "Старт", price: 9, docs: "50 документа/месец",
+    features: ["50 фактури/месец", "Повтарящи се фактури", "Разходи", "CRM бележки"] },
+  { id: "business", name: "Бизнес", price: 29, docs: "300 документа/месец",
+    features: ["300 фактури/месец", "Проекти", "Договори", "PDF отчет"], recommended: true },
+  { id: "pro", name: "Про", price: 59, docs: "Неограничени",
+    features: ["Неограничени фактури", "Активи", "Многофирмен достъп", "Приоритетна поддръжка"] },
+].map((p) => ({ ...p, priceBGN: +(p.price * EUR_TO_BGN).toFixed(2) }));
 
 export default async function SubscriptionPage() {
   const { companyId } = await requireCompany();
@@ -159,20 +136,41 @@ export default async function SubscriptionPage() {
                 Безплатен
               </button>
             ) : (
-              <form action="/api/billing/checkout" method="POST">
-                <input type="hidden" name="plan" value={plan.id} />
-                <button type="submit" className={plan.recommended ? "btn btn-primary" : "btn btn-ghost"} style={{ width: "100%", justifyContent: "center" }}>
-                  {currentPlan === "free" ? "Надгради" : "Смени план"}
-                </button>
-              </form>
+              <a href="#bank-transfer" className={plan.recommended ? "btn btn-primary" : "btn btn-ghost"} style={{ width: "100%", justifyContent: "center" }}>
+                {currentPlan === "free" ? "Надгради" : "Смени план"}
+              </a>
             )}
           </div>
         ))}
       </div>
 
+      {/* Банков превод */}
+      <div id="bank-transfer" className="glass panel" style={{ marginTop: 24, padding: "24px 28px", borderLeft: "4px solid var(--emerald)" }}>
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, margin: "0 0 6px" }}>💳 Плащане по банков път</h3>
+        <p style={{ fontSize: 13, color: "var(--ink-soft)", margin: "0 0 16px", maxWidth: 680 }}>
+          Към момента абонаментите се заплащат само по банков път. За да активирате избран план,
+          преведете съответната сума по сметката по-долу. <strong>Скоро ще добавим и други методи на
+          плащане (карта и др.), които ще бъдат налични директно в платформата.</strong> След като
+          получим плащането, ще активираме плана ви и ще ви изпратим фактура за направеното плащане.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))", gap: 14 }}>
+          {[
+            { label: "Получател", value: BANK_DETAILS.recipient },
+            { label: "IBAN", value: BANK_DETAILS.iban },
+            { label: "Банка", value: BANK_DETAILS.bank },
+            { label: "Основание", value: BANK_DETAILS.reason },
+          ].map((b) => (
+            <div key={b.label} style={{ background: "rgba(255,255,255,.5)", borderRadius: 8, padding: "12px 14px", border: "1px solid var(--border)" }}>
+              <div style={{ fontSize: 11, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>{b.label}</div>
+              <div className="num" style={{ fontSize: 14, fontWeight: 600 }}>{b.value}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 16, maxWidth: 640 }}>
-        Всички цени са без ДДС. 1 EUR = 1,95583 лв. При смяна на план, промяната влиза в сила от следващия период.
-        Плащанията се обработват сигурно чрез Stripe.
+        Всички цени са без ДДС. 1 EUR = {EUR_TO_BGN} лв. При смяна на план, промяната влиза в сила
+        след потвърждаване на плащането. 14 дни безплатен тест на Бизнес и Про плановете.
       </p>
     </>
   );

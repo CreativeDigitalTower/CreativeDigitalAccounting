@@ -7,11 +7,12 @@ const schema = z.object({
   categoryId: z.string(),
   supplierId: z.string().nullable().optional(),
   description: z.string().min(1),
+  invoiceNumber: z.string().optional().nullable(),
   amount: z.number().positive(),
   vatAmount: z.number().min(0),
   date: z.string(),
   source: z.enum(["manual", "incoming_invoice"]).default("manual"),
-  attachmentUrl: z.string().optional(),
+  attachmentUrl: z.string().optional().nullable(),
 });
 
 export async function POST(req: Request) {
@@ -26,11 +27,12 @@ export async function POST(req: Request) {
         categoryId: data.categoryId,
         supplierId: data.supplierId ?? null,
         description: data.description,
+        invoiceNumber: data.invoiceNumber ?? null,
         amount: data.amount,
         vatAmount: data.vatAmount,
         date: new Date(data.date),
         source: data.source,
-        attachmentUrl: data.attachmentUrl,
+        attachmentUrl: data.attachmentUrl ?? null,
       },
     });
     return NextResponse.json(expense);

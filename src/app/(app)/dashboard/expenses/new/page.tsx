@@ -13,11 +13,26 @@ export default function NewExpensePage() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [attachment, setAttachment] = useState<string | null>(null);
+  const [attachmentName, setAttachmentName] = useState("");
 
   useEffect(() => {
     fetch("/api/expense-categories").then((r) => r.json()).then(setCategories);
     fetch("/api/suppliers").then((r) => r.json()).then(setSuppliers);
   }, []);
+
+  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 3 * 1024 * 1024) {
+      setError("Файлът трябва да е под 3MB.");
+      return;
+    }
+    setAttachmentName(file.name);
+    const reader = new FileReader();
+    reader.onload = () => setAttachment(reader.result as string);
+    reader.readAsDataURL(file);
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -35,10 +50,12 @@ export default function NewExpensePage() {
         categoryId: fd.get("categoryId"),
         supplierId: fd.get("supplierId") || null,
         description: fd.get("description"),
+        invoiceNumber: (fd.get("invoiceNumber") as string) || null,
         amount,
         vatAmount: parseFloat(vatAmount.toFixed(2)),
         date: fd.get("date"),
-        source: "manual",
+        source: (fd.get("invoiceNumber") as string) ? "incoming_invoice" : "manual",
+        attachmentUrl: attachment,
       }),
     });
 
@@ -70,6 +87,10 @@ export default function NewExpensePage() {
             <div style={{ gridColumn: "1 / -1" }}>
               <label>Описание *</label>
               <input type="text" name="description" required placeholder="Наем офис м. Юни" />
+            </div>
+            <div>
+              <label>Номер на разходна фактура</label>
+              <input type="text" name="invoiceNumber" placeholder="напр. 0000001234" />
             </div>
             <div>
               <label>Категория *</label>
@@ -104,6 +125,11 @@ export default function NewExpensePage() {
             <div>
               <label>Дата *</label>
               <input type="date" name="date" required defaultValue={new Date().toISOString().slice(0, 10)} />
+            </div>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label>Прикачи разходна фактура (PDF/снимка)</label>
+              <input type="file" accept="application/pdf,image/*" onChange={handleFile} style={{ fontSize: 13 }} />
+              {attachmentName && <div style={{ fontSize: 12, color: "var(--emerald)", marginTop: 6 }}>✓ Прикачен: {attachmentName}</div>}
             </div>
           </div>
         </div>

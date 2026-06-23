@@ -1,9 +1,9 @@
-import { requireCompany } from "@/lib/session";
+import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
 export default async function ContractsPage() {
-  const { companyId } = await requireCompany();
+  const { companyId } = await requireFeature("contracts");
   const now = new Date();
   const soon = new Date(now.getTime() + 30 * 24 * 3600 * 1000);
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Pricing } from "@/components/marketing/Pricing";
 
 const features = [
   {
@@ -30,46 +31,6 @@ const features = [
     icon: "🏗️",
     title: "Проекти и Договори",
     desc: "Проследяване на приходи, разходи и печалба по проект с напомняния за договори.",
-  },
-];
-
-const plans = [
-  {
-    name: "Безплатен",
-    price: "0",
-    desc: "За стартиращи",
-    features: ["5 документа/месец", "Неограничени клиенти", "Склад", "Базов анализ"],
-    cta: "Започни безплатно",
-    href: "/register",
-    highlight: false,
-  },
-  {
-    name: "Старт",
-    price: "19",
-    desc: "€/месец",
-    features: ["50 документа/месец", "Повтарящи се фактури", "Разходи", "CRM бележки"],
-    cta: "Опитай 14 дни",
-    href: "/register?plan=start",
-    highlight: false,
-  },
-  {
-    name: "Бизнес",
-    price: "49",
-    desc: "€/месец",
-    features: ["200 документа/месец", "Проекти", "Договори", "Финансов отчет PDF"],
-    cta: "Опитай 14 дни",
-    href: "/register?plan=business",
-    highlight: true,
-    ribbon: "Препоръчан",
-  },
-  {
-    name: "Про",
-    price: "99",
-    desc: "€/месец",
-    features: ["Неограничени документи", "Активи и амортизация", "Многофирмен достъп", "Приоритетна поддръжка"],
-    cta: "Опитай 14 дни",
-    href: "/register?plan=pro",
-    highlight: false,
   },
 ];
 
@@ -198,67 +159,35 @@ export default function HomePage() {
       </section>
 
       {/* Pricing */}
-      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 100px" }}>
-        <h2
-          style={{
-            fontFamily: "'Fraunces', serif",
-            fontSize: 36,
-            fontWeight: 700,
-            textAlign: "center",
-            marginBottom: 8,
-          }}
-        >
-          Абонаментни планове
-        </h2>
-        <p style={{ textAlign: "center", color: "var(--muted)", marginBottom: 40, fontSize: 14 }}>
-          Всички цени без ДДС. 1 EUR = {(1.95583).toFixed(5)} лв.
-        </p>
+      <Pricing />
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
-          {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className="glass panel"
-              style={{
-                padding: "24px 20px",
-                position: "relative",
-                border: plan.highlight ? "2px solid var(--brass)" : undefined,
-              }}
-            >
-              {plan.ribbon && <span className="ribbon">{plan.ribbon}</span>}
-              <div style={{ fontFamily: "'Fraunces', serif", fontSize: 20, fontWeight: 600, marginBottom: 2 }}>
-                {plan.name}
-              </div>
-              <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 30, fontWeight: 700, margin: "10px 0 2px" }}>
-                {plan.price}
-                <span style={{ fontSize: 13, color: "var(--muted)", fontFamily: "inherit", fontWeight: 400 }}>
-                  {" "}{plan.desc}
-                </span>
-              </div>
-              {plan.price !== "0" && (
-                <div style={{ fontSize: 11, color: "var(--muted)", fontFamily: "'IBM Plex Mono', monospace", marginBottom: 16 }}>
-                  ≈ {(parseFloat(plan.price) * 1.95583).toFixed(2)} лв/месец
-                </div>
-              )}
-              <ul style={{ listStyle: "none", padding: 0, margin: "16px 0 20px", display: "flex", flexDirection: "column", gap: 8 }}>
-                {plan.features.map((f) => (
-                  <li key={f} style={{ fontSize: 13, color: "var(--ink-soft)", paddingLeft: 18, position: "relative" }}>
-                    <span style={{ position: "absolute", left: 0, color: "var(--emerald)", fontWeight: 700 }}>✓</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href={plan.href}
-                className={plan.highlight ? "btn btn-primary" : "btn btn-ghost"}
-                style={{ width: "100%", justifyContent: "center" }}
-              >
-                {plan.cta}
-              </Link>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* JSON-LD структурирани данни за SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "Creative Digital Accounting",
+            applicationCategory: "BusinessApplication",
+            operatingSystem: "Web",
+            description:
+              "Уеб софтуер за фактуриране, склад, разходи и финансови анализи за малки и средни фирми в България.",
+            offers: {
+              "@type": "AggregateOffer",
+              priceCurrency: "EUR",
+              lowPrice: "0",
+              highPrice: "59",
+              offerCount: "4",
+            },
+            publisher: {
+              "@type": "Organization",
+              name: "Криейтив Диджитъл Тауър ЕООД",
+              url: "https://creativedigitaltower.com",
+            },
+          }),
+        }}
+      />
     </>
   );
 }

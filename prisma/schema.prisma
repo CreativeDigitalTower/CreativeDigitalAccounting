@@ -14,11 +14,31 @@ model User {
   passwordHash  String?
   name          String?
   image         String?
+  isSuperAdmin  Boolean   @default(false)
+  onboardedAt   DateTime?
   createdAt     DateTime  @default(now())
 
   accounts     Account[]
   sessions     Session[]
   companyUsers CompanyUser[]
+  auditLogs    AuditLog[]
+}
+
+// ─── Audit log (кой / кога / какво) ──────────────────────────────────────
+model AuditLog {
+  id        String   @id @default(cuid())
+  companyId String
+  userId    String?
+  action    String   // create | update | delete | status_change | login | impersonate
+  entity    String   // Document | Client | Expense | Company | ...
+  entityId  String?
+  summary   String?  @db.Text
+  createdAt DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id])
+
+  @@index([companyId, createdAt])
 }
 
 model Account {
@@ -63,17 +83,26 @@ model Company {
   name            String
   eik             String?
   vatNumber       String?
+  vatRegistered   Boolean  @default(false)
   address         String?
   city            String?
   mol             String?
   logoUrl         String?
   brandColor      String?
   defaultCurrency String   @default("EUR")
+  defaultLanguage String   @default("bg")
+  invoiceTemplate String   @default("classic")
   bankIban        String?
+  bankName        String?
+  bankBic         String?
   phone           String?
   email           String?
   website         String?
+  // Per-type number start values (next number = max(start, count)+1)
+  invoiceNumberStart Int   @default(1)
   createdAt       DateTime @default(now())
+
+  auditLogs         AuditLog[]
 
   companyUsers      CompanyUser[]
   clients           Client[]
@@ -230,7 +259,9 @@ enum DocumentType {
 
 enum DocumentStatus {
   draft
+  issued
   sent
+  partially_paid
   paid
   overdue
   cancelled
@@ -243,8 +274,12 @@ model Document {
   number             String
   clientId           String?
   issueDate          DateTime
+  taxEventDate       DateTime?
   dueDate            DateTime?
   currency           String         @default("EUR")
+  language           String         @default("bg")
+  template           String         @default("classic")
+  paidAmount         Float          @default(0)
   status             DocumentStatus @default(draft)
   isRecurring        Boolean        @default(false)
   recurrenceInterval String?
@@ -294,6 +329,7 @@ model Expense {
   categoryId    String
   supplierId    String?
   description   String
+  invoiceNumber String?
   amount        Float
   vatAmount     Float         @default(0)
   date          DateTime

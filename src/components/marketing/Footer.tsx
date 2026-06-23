@@ -59,9 +59,35 @@ export function MarketingFooter() {
           <span style={{ fontSize: 12.5, color: "#8A8878" }}>
             © {new Date().getFullYear()} Creative Digital Accounting. Всички права запазени.
           </span>
-          <span style={{ fontSize: 12, color: "#8A8878" }}>
-            ДДС ставки: 20% / 9% / 0% · 1 EUR = 1,95583 лв
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+            <a
+              href="https://www.facebook.com/CreativeDigitalAccounting"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+              style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#C9C7B6", textDecoration: "none", fontSize: 12.5 }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.99 3.66 9.13 8.44 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99C18.34 21.13 22 16.99 22 12z" /></svg>
+              Facebook
+            </a>
+            <span style={{ fontSize: 12, color: "#8A8878" }}>
+              1 EUR = 1,95583 лв
+            </span>
+          </div>
+        </div>
+
+        {/* Кредит към Creative Digital Tower */}
+        <div style={{ marginTop: 16, textAlign: "center", fontSize: 12.5, color: "#8A8878" }}>
+          Създадено от{" "}
+          <a
+            href="https://creativedigitaltower.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "var(--brass)", fontWeight: 600, textDecoration: "none" }}
+          >
+            Creative Digital Tower
+          </a>{" "}
+          · Криейтив Диджитъл Тауър ЕООД · ЕИК 205748188
         </div>
       </div>
     </footer>

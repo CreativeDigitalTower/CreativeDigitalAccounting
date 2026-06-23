@@ -1,6 +1,7 @@
 import { BlobBackground } from "@/components/Backgrounds";
 import { MarketingNavbar } from "@/components/marketing/Navbar";
 import { MarketingFooter } from "@/components/marketing/Footer";
+import { MessengerBubble } from "@/components/marketing/MessengerBubble";
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,6 +12,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         <main style={{ flex: 1 }}>{children}</main>
         <MarketingFooter />
       </div>
+      <MessengerBubble />
     </div>
   );
 }

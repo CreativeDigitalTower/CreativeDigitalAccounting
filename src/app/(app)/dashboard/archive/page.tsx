@@ -1,9 +1,9 @@
-import { requireCompany } from "@/lib/session";
+import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
 export default async function ArchivePage() {
-  const { companyId } = await requireCompany();
+  const { companyId } = await requireFeature("archive");
 
   const [protocols, docCount] = await Promise.all([
     prisma.handoverProtocol.findMany({

@@ -1,4 +1,4 @@
-import { requireCompany } from "@/lib/session";
+import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
@@ -21,7 +21,7 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
 };
 
 export default async function UsersPage() {
-  const { companyId, userId } = await requireCompany();
+  const { companyId, userId } = await requireFeature("users");
 
   const companyUsers = await prisma.companyUser.findMany({
     where: { companyId },

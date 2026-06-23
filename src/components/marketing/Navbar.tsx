@@ -17,91 +17,55 @@ export function MarketingNavbar() {
   return (
     <nav
       className="glass no-print"
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 50,
-        padding: "0 32px",
-        borderRadius: 0,
-        borderLeft: "none",
-        borderRight: "none",
-        borderTop: "none",
-      }}
+      style={{ position: "sticky", top: 0, zIndex: 50, padding: "0 24px", borderRadius: 0, borderLeft: "none", borderRight: "none", borderTop: "none" }}
     >
-      <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "center", height: 64, gap: 32 }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "center", height: 64, gap: 24 }}>
         <Link href="/" style={{ textDecoration: "none" }}>
           <Logo />
         </Link>
 
         {/* Desktop links */}
-        <div style={{ display: "flex", gap: 4, flex: 1 }} className="hidden sm:flex">
+        <div className="desktop-only" style={{ gap: 4, flex: 1 }}>
           {links.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              style={{
-                padding: "6px 12px",
-                borderRadius: 8,
-                fontSize: 13.5,
-                fontWeight: 500,
-                color: "var(--ink-soft)",
-                textDecoration: "none",
-                transition: "background .15s, color .15s",
-              }}
-              onMouseEnter={(e) => {
-                (e.target as HTMLElement).style.background = "rgba(255,255,255,.6)";
-                (e.target as HTMLElement).style.color = "var(--ink)";
-              }}
-              onMouseLeave={(e) => {
-                (e.target as HTMLElement).style.background = "transparent";
-                (e.target as HTMLElement).style.color = "var(--ink-soft)";
-              }}
-            >
+            <Link key={l.href} href={l.href} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 13.5, fontWeight: 500, color: "var(--ink-soft)", textDecoration: "none" }}>
               {l.label}
             </Link>
           ))}
         </div>
 
-        <div style={{ marginLeft: "auto", display: "flex", gap: 10, alignItems: "center" }}>
-          <Link href="/login" className="btn btn-ghost btn-sm hidden sm:inline-flex">
-            Вход
-          </Link>
-          <Link href="/register" className="btn btn-primary btn-sm">
-            Регистрация
-          </Link>
-          {/* Mobile menu */}
-          <button
-            className="sm:hidden btn btn-ghost btn-sm"
-            onClick={() => setOpen(!open)}
-            aria-label="Меню"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              {open
-                ? <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>
-                : <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>}
-            </svg>
-          </button>
+        {/* Desktop CTAs */}
+        <div className="desktop-only" style={{ marginLeft: "auto", gap: 10, alignItems: "center" }}>
+          <Link href="/login" className="btn btn-ghost btn-sm">Вход</Link>
+          <Link href="/register" className="btn btn-primary btn-sm">Регистрация</Link>
         </div>
+
+        {/* Mobile burger */}
+        <button
+          className="mobile-only btn btn-ghost btn-sm"
+          style={{ marginLeft: "auto" }}
+          onClick={() => setOpen(!open)}
+          aria-label="Меню"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            {open
+              ? <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>
+              : <><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>}
+          </svg>
+        </button>
       </div>
 
+      {/* Mobile dropdown */}
       {open && (
-        <div
-          className="sm:hidden"
-          style={{ padding: "12px 0 16px", borderTop: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: 2 }}
-        >
+        <div className="mobile-only" style={{ flexDirection: "column", padding: "8px 0 16px", borderTop: "1px solid var(--border)", gap: 2 }}>
           {links.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              onClick={() => setOpen(false)}
-              style={{ padding: "10px 8px", fontSize: 14, fontWeight: 500, color: "var(--ink-soft)", textDecoration: "none" }}
-            >
+            <Link key={l.href} href={l.href} onClick={() => setOpen(false)} style={{ padding: "11px 8px", fontSize: 15, fontWeight: 500, color: "var(--ink-soft)", textDecoration: "none" }}>
               {l.label}
             </Link>
           ))}
-          <Link href="/login" style={{ padding: "10px 8px", fontSize: 14, fontWeight: 500, color: "var(--navy)", textDecoration: "none" }}>
-            Вход
-          </Link>
+          <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+            <Link href="/login" onClick={() => setOpen(false)} className="btn btn-ghost btn-sm" style={{ flex: 1, justifyContent: "center" }}>Вход</Link>
+            <Link href="/register" onClick={() => setOpen(false)} className="btn btn-primary btn-sm" style={{ flex: 1, justifyContent: "center" }}>Регистрация</Link>
+          </div>
         </div>
       )}
     </nav>

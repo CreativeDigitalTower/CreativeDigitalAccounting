@@ -3,22 +3,24 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/Logo";
-import { clsx } from "clsx";
+import { planHasFeature, type PlanId } from "@/lib/constants";
 
 const navItems = [
-  { href: "/dashboard", label: "Табло", icon: "⊞" },
-  { href: "/dashboard/documents", label: "Документи", icon: "📄" },
-  { href: "/dashboard/clients", label: "Клиенти", icon: "👥" },
-  { href: "/dashboard/suppliers", label: "Доставчици", icon: "🚚" },
-  { href: "/dashboard/warehouse", label: "Склад", icon: "📦" },
-  { href: "/dashboard/expenses", label: "Разходи", icon: "💰" },
-  { href: "/dashboard/contracts", label: "Договори", icon: "📑" },
-  { href: "/dashboard/projects", label: "Проекти", icon: "🏗️" },
-  { href: "/dashboard/archive", label: "Архив", icon: "🗂️" },
-  { href: "/dashboard/assets", label: "Активи", icon: "🏭" },
-  { href: "/dashboard/analytics", label: "Анализи", icon: "📊" },
-  { href: "/dashboard/users", label: "Потребители", icon: "👤" },
-  { href: "/dashboard/subscription", label: "Абонамент", icon: "💳" },
+  { href: "/dashboard", label: "Табло", icon: "⊞", feature: "dashboard" },
+  { href: "/dashboard/invoices", label: "Фактури", icon: "🧾", feature: "documents" },
+  { href: "/dashboard/documents", label: "Документи", icon: "📄", feature: "documents" },
+  { href: "/dashboard/clients", label: "Клиенти", icon: "👥", feature: "clients" },
+  { href: "/dashboard/suppliers", label: "Доставчици", icon: "🚚", feature: "suppliers" },
+  { href: "/dashboard/warehouse", label: "Склад", icon: "📦", feature: "warehouse" },
+  { href: "/dashboard/expenses", label: "Разходи", icon: "💰", feature: "expenses" },
+  { href: "/dashboard/contracts", label: "Договори", icon: "📑", feature: "contracts" },
+  { href: "/dashboard/projects", label: "Проекти", icon: "🏗️", feature: "projects" },
+  { href: "/dashboard/archive", label: "Архив", icon: "🗂️", feature: "archive" },
+  { href: "/dashboard/assets", label: "Активи", icon: "🏭", feature: "assets" },
+  { href: "/dashboard/analytics", label: "Анализи", icon: "📊", feature: "analytics" },
+  { href: "/dashboard/users", label: "Потребители", icon: "👤", feature: "users" },
+  { href: "/dashboard/settings", label: "Профил на фирмата", icon: "⚙️", feature: "dashboard" },
+  { href: "/dashboard/subscription", label: "Абонамент", icon: "💳", feature: "dashboard" },
 ];
 
 interface SidebarProps {
@@ -28,6 +30,7 @@ interface SidebarProps {
 
 export function Sidebar({ companyName, plan }: SidebarProps) {
   const pathname = usePathname();
+  const planId = plan as PlanId;
 
   return (
     <aside
@@ -71,10 +74,13 @@ export function Sidebar({ companyName, plan }: SidebarProps) {
       <nav style={{ display: "flex", flexDirection: "column", gap: 1, flex: 1 }}>
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+          const locked = !planHasFeature(planId, item.feature);
+          const href = locked ? "/dashboard/subscription" : item.href;
           return (
             <Link
               key={item.href}
-              href={item.href}
+              href={href}
+              title={locked ? "Достъпно в по-висок план" : undefined}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -83,19 +89,19 @@ export function Sidebar({ companyName, plan }: SidebarProps) {
                 borderRadius: 6,
                 fontSize: 13.3,
                 fontWeight: 500,
-                color: isActive ? "#fff" : "#C9C7B6",
+                color: isActive ? "#fff" : locked ? "rgba(201,199,182,.45)" : "#C9C7B6",
                 textDecoration: "none",
                 background: isActive ? "rgba(255,255,255,.12)" : "transparent",
                 transition: "background .15s, color .15s",
               }}
               onMouseEnter={(e) => {
-                if (!isActive) {
+                if (!isActive && !locked) {
                   (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.07)";
                   (e.currentTarget as HTMLElement).style.color = "#fff";
                 }
               }}
               onMouseLeave={(e) => {
-                if (!isActive) {
+                if (!isActive && !locked) {
                   (e.currentTarget as HTMLElement).style.background = "transparent";
                   (e.currentTarget as HTMLElement).style.color = "#C9C7B6";
                 }
@@ -103,6 +109,9 @@ export function Sidebar({ companyName, plan }: SidebarProps) {
             >
               <span style={{ fontSize: 15, opacity: isActive ? 1 : 0.8 }}>{item.icon}</span>
               {item.label}
+              {locked && (
+                <span style={{ marginLeft: "auto", fontSize: 11, opacity: 0.6 }} aria-label="заключено">🔒</span>
+              )}
             </Link>
           );
         })}
