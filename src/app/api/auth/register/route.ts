@@ -40,6 +40,7 @@ export async function POST(req: Request) {
       const user = await tx.user.create({
         data: {
           email: data.email, name: data.name, passwordHash,
+          representativeRole: data.representativeRole || null,
           marketingConsent: !!data.marketingConsent, termsAcceptedAt: new Date(),
         },
       });

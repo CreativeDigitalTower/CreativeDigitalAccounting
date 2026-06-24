@@ -14,11 +14,12 @@ model User {
   passwordHash     String?
   name             String?
   image            String?
-  isSuperAdmin     Boolean   @default(false)
-  onboardedAt      DateTime?
-  marketingConsent Boolean   @default(false)
-  termsAcceptedAt  DateTime?
-  createdAt        DateTime  @default(now())
+  isSuperAdmin       Boolean   @default(false)
+  onboardedAt        DateTime?
+  representativeRole String?
+  marketingConsent   Boolean   @default(false)
+  termsAcceptedAt    DateTime?
+  createdAt          DateTime  @default(now())
 
   accounts     Account[]
   sessions     Session[]

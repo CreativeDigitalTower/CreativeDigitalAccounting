@@ -67,6 +67,15 @@ export default async function AdminPage() {
                 docs={c._count.documents}
                 createdAt={new Date(c.createdAt).toLocaleDateString("bg-BG")}
                 owners={c.companyUsers.map((cu) => cu.user.email).slice(0, 2).join(", ")}
+                details={{
+                  vatNumber: c.vatNumber, address: c.address, city: c.city,
+                  mol: c.mol, sector: c.sector, phone: c.phone, email: c.email,
+                }}
+                members={c.companyUsers.map((cu) => ({
+                  name: cu.user.name, email: cu.user.email, representativeRole: cu.user.representativeRole,
+                  marketingConsent: cu.user.marketingConsent, termsAcceptedAt: cu.user.termsAcceptedAt?.toISOString() ?? null,
+                  createdAt: cu.user.createdAt.toISOString(),
+                }))}
               />
             ))}
           </tbody>
