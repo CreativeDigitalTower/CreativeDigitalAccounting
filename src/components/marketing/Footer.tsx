@@ -92,8 +92,7 @@ export function MarketingFooter() {
             style={{ color: "var(--brass)", fontWeight: 600, textDecoration: "none" }}
           >
             Creative Digital Tower
-          </a>{" "}
-          · Криейтив Диджитъл Тауър ЕООД · ЕИК 205748188
+          </a>
         </div>
       </div>
     </footer>

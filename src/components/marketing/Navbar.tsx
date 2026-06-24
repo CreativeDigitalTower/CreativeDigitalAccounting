@@ -7,7 +7,17 @@ import { Logo } from "@/components/Logo";
 const links = [
   { href: "/", label: "Начало" },
   { href: "/software", label: "За Софтуера" },
-  { href: "/tools", label: "Безплатни инструменти" },
+];
+
+const toolsLinks = [
+  { href: "/tools/currency", label: "Валутен калкулатор" },
+  { href: "/tools/salary", label: "Калкулатор за заплати" },
+  { href: "/tools/vat", label: "ДДС калкулатор" },
+  { href: "/tools/interest", label: "Лихвен калкулатор" },
+  { href: "/tools/markup", label: "Надценка и печалба" },
+];
+
+const linksAfter = [
   { href: "/accountants", label: "За счетоводители" },
   { href: "/about", label: "За Нас" },
   { href: "/contact", label: "Контакти" },
@@ -15,6 +25,7 @@ const links = [
 
 export function MarketingNavbar() {
   const [open, setOpen] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
 
   return (
     <nav
@@ -27,8 +38,31 @@ export function MarketingNavbar() {
         </Link>
 
         {/* Desktop links */}
-        <div className="desktop-only" style={{ gap: 4, flex: 1 }}>
+        <div className="desktop-only" style={{ gap: 4, flex: 1, alignItems: "center" }}>
           {links.map((l) => (
+            <Link key={l.href} href={l.href} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 13.5, fontWeight: 500, color: "var(--ink-soft)", textDecoration: "none" }}>
+              {l.label}
+            </Link>
+          ))}
+
+          {/* Tools dropdown */}
+          <div style={{ position: "relative" }} onMouseEnter={() => setToolsOpen(true)} onMouseLeave={() => setToolsOpen(false)}>
+            <Link href="/tools" style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 8, fontSize: 13.5, fontWeight: 500, color: "var(--ink-soft)", textDecoration: "none" }}>
+              Безплатни инструменти
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9" /></svg>
+            </Link>
+            {toolsOpen && (
+              <div className="glass" style={{ position: "absolute", top: "100%", left: 0, minWidth: 230, borderRadius: 10, padding: 6, boxShadow: "0 12px 32px rgba(0,0,0,.14)", zIndex: 60 }}>
+                {toolsLinks.map((t) => (
+                  <Link key={t.href} href={t.href} style={{ display: "block", padding: "9px 12px", borderRadius: 7, fontSize: 13, color: "var(--ink-soft)", textDecoration: "none" }}>
+                    {t.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {linksAfter.map((l) => (
             <Link key={l.href} href={l.href} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 13.5, fontWeight: 500, color: "var(--ink-soft)", textDecoration: "none" }}>
               {l.label}
             </Link>
@@ -60,6 +94,19 @@ export function MarketingNavbar() {
       {open && (
         <div className="mobile-only" style={{ flexDirection: "column", padding: "8px 0 16px", borderTop: "1px solid var(--border)", gap: 2 }}>
           {links.map((l) => (
+            <Link key={l.href} href={l.href} onClick={() => setOpen(false)} style={{ padding: "11px 8px", fontSize: 15, fontWeight: 500, color: "var(--ink-soft)", textDecoration: "none" }}>
+              {l.label}
+            </Link>
+          ))}
+          <Link href="/tools" onClick={() => setOpen(false)} style={{ padding: "11px 8px", fontSize: 15, fontWeight: 600, color: "var(--ink)", textDecoration: "none" }}>
+            Безплатни инструменти
+          </Link>
+          {toolsLinks.map((t) => (
+            <Link key={t.href} href={t.href} onClick={() => setOpen(false)} style={{ padding: "9px 8px 9px 22px", fontSize: 14, color: "var(--ink-soft)", textDecoration: "none" }}>
+              · {t.label}
+            </Link>
+          ))}
+          {linksAfter.map((l) => (
             <Link key={l.href} href={l.href} onClick={() => setOpen(false)} style={{ padding: "11px 8px", fontSize: 15, fontWeight: 500, color: "var(--ink-soft)", textDecoration: "none" }}>
               {l.label}
             </Link>

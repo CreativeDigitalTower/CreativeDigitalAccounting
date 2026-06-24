@@ -3,13 +3,8 @@
 import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-
-const PLANS = [
-  { id: "free", name: "Безплатен", price: "0 €" },
-  { id: "start", name: "Старт", price: "9 €/мес" },
-  { id: "business", name: "Бизнес", price: "29 €/мес" },
-  { id: "pro", name: "Про", price: "59 €/мес" },
-];
+import { PLAN_DETAILS, BILLING_PERIODS } from "@/components/marketing/Pricing";
+import { EUR_TO_BGN } from "@/lib/constants";
 
 const SECTORS = ["Търговия", "Услуги", "Производство", "IT / Софтуер", "Строителство", "Транспорт", "Туризъм / Ресторантьорство", "Земеделие", "Здравеопазване", "Образование", "Финанси", "Свободна професия", "Друг"];
 
@@ -17,6 +12,9 @@ function RegisterForm() {
   const router = useRouter();
   const params = useSearchParams();
   const [plan, setPlan] = useState(params.get("plan") ?? "free");
+  const [period, setPeriod] = useState(
+    BILLING_PERIODS.find((p) => p.id === params.get("period")) ?? BILLING_PERIODS[0]
+  );
   const [step, setStep] = useState<"account" | "company">("account");
   const [acc, setAcc] = useState({ name: "", representativeRole: "", email: "", email2: "", password: "", password2: "" });
   const [error, setError] = useState("");
@@ -105,14 +103,57 @@ function RegisterForm() {
 
             <div>
               <label>Абонаментен план</label>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 8, marginTop: 4 }}>
-                {PLANS.map((p) => (
-                  <button type="button" key={p.id} onClick={() => setPlan(p.id)}
-                    style={{ textAlign: "left", padding: "10px 12px", borderRadius: 8, cursor: "pointer", background: plan === p.id ? "var(--emerald-soft)" : "rgba(255,255,255,.5)", border: plan === p.id ? "2px solid var(--emerald)" : "1px solid var(--border)" }}>
-                    <div style={{ fontWeight: 600, fontSize: 13 }}>{p.name}</div>
-                    <div className="num" style={{ fontSize: 12, color: "var(--muted)" }}>{p.price}</div>
+              {/* Период на плащане */}
+              <div style={{ display: "flex", gap: 4, margin: "4px 0 12px", background: "rgba(255,255,255,.5)", borderRadius: 20, padding: 4, width: "fit-content" }}>
+                {BILLING_PERIODS.map((p) => (
+                  <button type="button" key={p.id} onClick={() => setPeriod(p)}
+                    style={{ border: "none", cursor: "pointer", borderRadius: 16, padding: "6px 14px", fontSize: 12, fontWeight: 600,
+                      background: period.id === p.id ? "var(--emerald)" : "transparent", color: period.id === p.id ? "#fff" : "var(--ink-soft)" }}>
+                    {p.label}{p.discount > 0 && <span style={{ marginLeft: 4, fontSize: 10.5, color: period.id === p.id ? "#fff" : "var(--brass)" }}>−{p.discount * 100}%</span>}
                   </button>
                 ))}
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                {PLAN_DETAILS.map((p) => {
+                  const monthlyEff = p.price * (1 - period.discount);
+                  const total = p.price * period.months * (1 - period.discount);
+                  const active = plan === p.id;
+                  const Icon = p.Icon;
+                  return (
+                    <button type="button" key={p.id} onClick={() => setPlan(p.id)}
+                      style={{ textAlign: "left", padding: "12px 14px", borderRadius: 10, cursor: "pointer", position: "relative",
+                        background: active ? "var(--emerald-soft)" : "rgba(255,255,255,.5)", border: active ? "2px solid var(--emerald)" : "1px solid var(--border)" }}>
+                      {p.recommended && <span style={{ position: "absolute", top: -8, right: 10, background: "var(--brass)", color: "#fff", fontSize: 9.5, fontWeight: 700, padding: "2px 7px", borderRadius: 10 }}>Препоръчан</span>}
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                        <span className="icon-tile" style={{ width: 30, height: 30 }}><Icon /></span>
+                        <span style={{ fontWeight: 700, fontSize: 14, fontFamily: "'Fraunces', serif" }}>{p.name}</span>
+                        {active && <span style={{ marginLeft: "auto", color: "var(--emerald)", fontWeight: 700 }}>✓</span>}
+                      </div>
+                      <div className="num" style={{ fontSize: 19, fontWeight: 700 }}>
+                        {p.price === 0 ? "0" : monthlyEff.toFixed(monthlyEff % 1 === 0 ? 0 : 2)}
+                        <span style={{ fontSize: 11, color: "var(--muted)", fontWeight: 500 }}> € / мес</span>
+                      </div>
+                      {p.price > 0 && period.months > 1 && (
+                        <div style={{ fontSize: 10.5, color: "var(--muted)", marginTop: 1 }}>{total.toFixed(2)} € за {period.months} м.</div>
+                      )}
+                      {p.price > 0 && period.months === 1 && (
+                        <div className="num" style={{ fontSize: 10.5, color: "var(--muted)" }}>≈ {(p.price * EUR_TO_BGN).toFixed(2)} лв</div>
+                      )}
+                      <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 6, lineHeight: 1.4 }}>{p.tagline}</div>
+                      <ul style={{ listStyle: "none", padding: 0, margin: "8px 0 0", display: "flex", flexDirection: "column", gap: 3 }}>
+                        {p.features.slice(0, 4).map((f) => (
+                          <li key={f} style={{ fontSize: 10.5, color: "var(--ink-soft)", paddingLeft: 14, position: "relative" }}>
+                            <span style={{ position: "absolute", left: 0, color: "var(--emerald)", fontWeight: 700 }}>✓</span>{f}
+                          </li>
+                        ))}
+                      </ul>
+                      <div style={{ marginTop: 10, textAlign: "center", fontSize: 12, fontWeight: 700, color: active ? "var(--emerald-dark)" : "var(--navy)", border: `1px solid ${active ? "var(--emerald)" : "var(--border)"}`, borderRadius: 7, padding: "6px 0", background: active ? "rgba(15,138,106,.08)" : "transparent" }}>
+                        {active ? "✓ Избран" : "Избери"}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

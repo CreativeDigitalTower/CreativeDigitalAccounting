@@ -44,7 +44,7 @@ export default function AboutPage() {
           Готови да опитате?
         </h2>
         <p style={{ color: "var(--ink-soft)", marginBottom: 24 }}>
-          Регистрацията отнема 5 минути. Без кредитна карта.
+          Регистрацията отнема 2 минути.
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
           <Link href="/register" className="btn btn-primary">Регистрирай се безплатно</Link>

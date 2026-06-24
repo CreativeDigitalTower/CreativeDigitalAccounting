@@ -76,9 +76,11 @@ export function Pricing() {
             <div key={plan.id} className="glass panel"
               style={{ padding: "24px 20px", position: "relative", display: "flex", flexDirection: "column", border: plan.recommended ? "2px solid var(--brass)" : undefined }}>
               {plan.recommended && <span className="ribbon">Препоръчан</span>}
-              <div className="icon-tile" style={{ marginBottom: 12 }}><Icon /></div>
-              <div style={{ fontFamily: "'Fraunces', serif", fontSize: 21, fontWeight: 600 }}>{plan.name}</div>
-              <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 2, minHeight: 34 }}>{plan.tagline}</div>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+                <div className="icon-tile" style={{ width: 56, height: 56 }}><Icon /></div>
+              </div>
+              <div style={{ fontFamily: "'Fraunces', serif", fontSize: 21, fontWeight: 700, textAlign: "center" }}>{plan.name}</div>
+              <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 2, minHeight: 34, textAlign: "center" }}>{plan.tagline}</div>
 
               <div className="num" style={{ fontSize: 32, fontWeight: 700, margin: "12px 0 0" }}>
                 {plan.price === 0 ? "0" : monthlyEff.toFixed(monthlyEff % 1 === 0 ? 0 : 2)}
@@ -127,7 +129,7 @@ export function Pricing() {
 
       <div style={{ marginTop: 24, textAlign: "center", display: "flex", flexDirection: "column", gap: 8 }}>
         <p style={{ fontSize: 13.5, color: "var(--ink-soft)", margin: 0 }}>
-          <strong>14 дни безплатен тест</strong> на Бизнес и Про плановете. Без банкова карта.
+          <strong>14 дни безплатен тест</strong> на Бизнес и Про плановете.
         </p>
         <p style={{ fontSize: 13, color: "var(--emerald)", margin: 0, fontWeight: 600 }}>
           Автоматично преминаване към еврото и пълна готовност за въвеждането на EUR в България

@@ -3,7 +3,7 @@ import { Pricing } from "@/components/marketing/Pricing";
 import { IconInvoice, IconWarehouse, IconUsers, IconExpense, IconChart, IconProjects } from "@/components/Icons";
 
 const features = [
-  { Icon: IconInvoice, title: "Фактуриране", desc: "Фактури, проформи, оферти, кредитни и дебитни известия с автоматична номерация и двойно EUR/BGN обозначаване." },
+  { Icon: IconInvoice, title: "Фактуриране", desc: "Фактури, проформи, оферти, кредитни и дебитни известия, приемо-предавателни протоколи — с автоматична номерация и двойно EUR/BGN обозначаване." },
   { Icon: IconWarehouse, title: "Склад", desc: "Управление на наличности, заприходяване, изписване и производство в множество локации." },
   { Icon: IconUsers, title: "Клиенти и Доставчици", desc: "CRM бележки, досиета, история на документи и договори за всеки контрагент." },
   { Icon: IconExpense, title: "Разходи", desc: "Ръчно въвеждане и входящи фактури от доставчици по персонализирани категории." },
@@ -72,7 +72,7 @@ export default function HomePage() {
         </div>
 
         <p style={{ marginTop: 16, fontSize: 12.5, color: "var(--muted)" }}>
-          Без кредитна карта · 5 документа/месец безплатно завинаги
+          5 документа/месец безплатно завинаги
         </p>
       </section>
 
@@ -92,7 +92,7 @@ export default function HomePage() {
               style={{ padding: "22px 24px" }}
             >
               <div className="icon-tile" style={{ marginBottom: 14 }}><f.Icon /></div>
-              <h3 style={{ margin: "0 0 8px", fontSize: 16, fontFamily: "'Fraunces', serif" }}>
+              <h3 style={{ margin: "0 0 8px", fontSize: 17, fontFamily: "'Fraunces', serif", fontWeight: 700 }}>
                 {f.title}
               </h3>
               <p style={{ margin: 0, color: "var(--ink-soft)", fontSize: 13.5, lineHeight: 1.55 }}>
@@ -120,7 +120,7 @@ export default function HomePage() {
           }}
         >
           {[
-            { num: "5", unit: "мин", label: "за регистрация" },
+            { num: "2", unit: "мин", label: "за регистрация" },
             { num: "1,95583", unit: "лв/EUR", label: "фиксиран курс" },
             { num: "20 / 9 / 0", unit: "%", label: "ДДС ставки" },
             { num: "SAF-T", unit: "", label: "готовност от старт" },
