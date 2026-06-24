@@ -1,164 +1,139 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+
+const PLANS = [
+  { id: "free", name: "Безплатен", price: "0 €" },
+  { id: "start", name: "Старт", price: "9 €/мес" },
+  { id: "business", name: "Бизнес", price: "29 €/мес" },
+  { id: "pro", name: "Про", price: "59 €/мес" },
+];
+
+const SECTORS = ["Търговия", "Услуги", "Производство", "IT / Софтуер", "Строителство", "Транспорт", "Туризъм / Ресторантьорство", "Земеделие", "Здравеопазване", "Образование", "Финанси", "Свободна професия", "Друг"];
 
 function RegisterForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const plan = params.get("plan") ?? "free";
+  const [plan, setPlan] = useState(params.get("plan") ?? "free");
+  const [step, setStep] = useState<"account" | "company">("account");
+  const [acc, setAcc] = useState({ name: "", representativeRole: "", email: "", email2: "", password: "", password2: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<"account" | "company">("account");
-  const [accountData, setAccountData] = useState({ name: "", email: "", password: "" });
 
-  async function handleAccount(e: React.FormEvent<HTMLFormElement>) {
+  function nextStep(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    setAccountData({
-      name: fd.get("name") as string,
-      email: fd.get("email") as string,
-      password: fd.get("password") as string,
-    });
+    setError("");
+    if (acc.email !== acc.email2) { setError("Имейлите не съвпадат."); return; }
+    if (acc.password !== acc.password2) { setError("Паролите не съвпадат."); return; }
+    if (acc.password.length < 8) { setError("Паролата трябва да е поне 8 символа."); return; }
     setStep("company");
   }
 
-  async function handleCompany(e: React.FormEvent<HTMLFormElement>) {
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError("");
-    setLoading(true);
+    setError(""); setLoading(true);
     const fd = new FormData(e.currentTarget);
+    if (!fd.get("acceptTerms")) { setLoading(false); setError("Трябва да приемете Общите условия и Политиката за поверителност."); return; }
 
     const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        ...accountData,
-        companyName: fd.get("companyName"),
-        eik: fd.get("eik"),
-        plan,
+        name: acc.name, email: acc.email, password: acc.password, representativeRole: acc.representativeRole,
+        companyName: fd.get("companyName"), eik: fd.get("eik"), vatNumber: fd.get("vatNumber") || undefined,
+        address: fd.get("address") || undefined, city: fd.get("city") || undefined, mol: fd.get("mol") || undefined,
+        sector: fd.get("sector") || undefined, plan,
+        acceptTerms: true, marketingConsent: !!fd.get("marketingConsent"),
       }),
     });
-
     setLoading(false);
-    if (!res.ok) {
-      const data = await res.json();
-      setError(data.error ?? "Грешка при регистрацията.");
-    } else {
-      router.push("/login?registered=1");
-    }
+    if (res.ok) router.push("/login?registered=1");
+    else setError((await res.json()).error ?? "Грешка при регистрацията.");
   }
 
   return (
-    <div style={{ width: "100%", maxWidth: 440 }}>
-      <div className="glass panel" style={{ padding: "40px 36px" }}>
-        {/* Steps indicator */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 28 }}>
-          {["Акаунт", "Фирма"].map((s, i) => (
-            <div key={s} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div
-                style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: "50%",
-                  background: (i === 0 && step === "account") || (i === 1 && step === "company")
-                    ? "var(--emerald)"
-                    : i === 0 && step === "company"
-                    ? "var(--emerald)"
-                    : "var(--border)",
-                  color: (i === 0 && step === "company") || (i === 1 && step === "company")
-                    ? "#fff"
-                    : "var(--muted)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 11,
-                  fontWeight: 700,
-                  fontFamily: "'IBM Plex Mono', monospace",
-                }}
-              >
-                {i === 0 && step === "company" ? "✓" : i + 1}
-              </div>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--ink-soft)" }}>{s}</span>
-              {i === 0 && <span style={{ color: "var(--border)", fontSize: 16 }}>›</span>}
-            </div>
-          ))}
+    <div style={{ width: "100%", maxWidth: 520 }}>
+      <div className="glass panel" style={{ padding: "36px 34px" }}>
+        <div style={{ display: "flex", gap: 8, marginBottom: 24, fontSize: 13, fontWeight: 600 }}>
+          <span style={{ color: step === "account" ? "var(--emerald)" : "var(--muted)" }}>1. Акаунт</span>
+          <span style={{ color: "var(--border)" }}>→</span>
+          <span style={{ color: step === "company" ? "var(--emerald)" : "var(--muted)" }}>2. Фирма и план</span>
         </div>
 
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 26, fontWeight: 700, margin: "0 0 6px" }}>
-          {step === "account" ? "Създай акаунт" : "Регистрирай фирма"}
+          {step === "account" ? "Създай акаунт" : "Данни на фирмата"}
         </h1>
-        <p style={{ color: "var(--muted)", fontSize: 13, margin: "0 0 24px" }}>
-          {step === "account"
-            ? "Въведете данните за вашия личен акаунт"
-            : "Въведете данните за вашата фирма"}
+        <p style={{ color: "var(--muted)", fontSize: 13, margin: "0 0 22px" }}>
+          {step === "account" ? "Въведете личните си данни за вход" : "Тези данни се ползват за издаване на фактури"}
         </p>
 
-        {error && (
-          <div style={{ background: "var(--brick-soft)", border: "1px solid var(--brick)", color: "var(--brick)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 16 }}>
-            {error}
-          </div>
-        )}
+        {error && <div style={{ background: "var(--brick-soft)", border: "1px solid var(--brick)", color: "var(--brick)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 16 }}>{error}</div>}
 
         {step === "account" ? (
-          <form onSubmit={handleAccount} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <div>
-              <label>Пълно име</label>
-              <input type="text" name="name" required placeholder="Иван Иванов" />
+          <form onSubmit={nextStep} style={{ display: "flex", flexDirection: "column", gap: 13 }}>
+            <div><label>Вашите имена *</label><input type="text" required value={acc.name} onChange={(e) => setAcc({ ...acc, name: e.target.value })} placeholder="Иван Иванов" /></div>
+            <div><label>Качество (представител на фирмата) *</label>
+              <select required value={acc.representativeRole} onChange={(e) => setAcc({ ...acc, representativeRole: e.target.value })}>
+                <option value="" disabled>Изберете</option>
+                {["Собственик / Управител", "Счетоводител", "Финансов директор", "Служител", "Упълномощено лице", "Друго"].map((r) => <option key={r}>{r}</option>)}
+              </select>
             </div>
-            <div>
-              <label>Имейл адрес</label>
-              <input type="email" name="email" required placeholder="ivan@firma.bg" />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div><label>Имейл *</label><input type="email" required value={acc.email} onChange={(e) => setAcc({ ...acc, email: e.target.value })} /></div>
+              <div><label>Потвърди имейл *</label><input type="email" required value={acc.email2} onChange={(e) => setAcc({ ...acc, email2: e.target.value })} /></div>
             </div>
-            <div>
-              <label>Парола (мин. 8 символа)</label>
-              <input type="password" name="password" required minLength={8} placeholder="••••••••" />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div><label>Парола *</label><input type="password" required minLength={8} value={acc.password} onChange={(e) => setAcc({ ...acc, password: e.target.value })} /></div>
+              <div><label>Потвърди парола *</label><input type="password" required minLength={8} value={acc.password2} onChange={(e) => setAcc({ ...acc, password2: e.target.value })} /></div>
             </div>
-            <button type="submit" className="btn btn-primary" style={{ justifyContent: "center", marginTop: 4 }}>
-              Следваща стъпка →
-            </button>
+            <button type="submit" className="btn btn-primary" style={{ justifyContent: "center", marginTop: 4 }}>Следваща стъпка →</button>
           </form>
         ) : (
-          <form onSubmit={handleCompany} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 13 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div><label>Наименование на фирмата *</label><input type="text" name="companyName" required placeholder="ЕООД Примерна" /></div>
+              <div><label>ЕИК / Булстат *</label><input type="text" name="eik" required /></div>
+              <div><label>ДДС номер</label><input type="text" name="vatNumber" placeholder="BG..." /></div>
+              <div><label>МОЛ</label><input type="text" name="mol" /></div>
+              <div><label>Град</label><input type="text" name="city" /></div>
+              <div><label>Сектор на дейност</label>
+                <select name="sector" defaultValue=""><option value="">Изберете</option>{SECTORS.map((s) => <option key={s}>{s}</option>)}</select>
+              </div>
+              <div style={{ gridColumn: "1 / -1" }}><label>Адрес на регистрация</label><input type="text" name="address" /></div>
+            </div>
+
             <div>
-              <label>Наименование на фирмата</label>
-              <input type="text" name="companyName" required placeholder="ЕООД Примерна" />
+              <label>Абонаментен план</label>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 8, marginTop: 4 }}>
+                {PLANS.map((p) => (
+                  <button type="button" key={p.id} onClick={() => setPlan(p.id)}
+                    style={{ textAlign: "left", padding: "10px 12px", borderRadius: 8, cursor: "pointer", background: plan === p.id ? "var(--emerald-soft)" : "rgba(255,255,255,.5)", border: plan === p.id ? "2px solid var(--emerald)" : "1px solid var(--border)" }}>
+                    <div style={{ fontWeight: 600, fontSize: 13 }}>{p.name}</div>
+                    <div className="num" style={{ fontSize: 12, color: "var(--muted)" }}>{p.price}</div>
+                  </button>
+                ))}
+              </div>
             </div>
-            <div>
-              <label>ЕИК / Булстат</label>
-              <input type="text" name="eik" placeholder="123456789" />
+
+            <label style={{ display: "flex", gap: 8, alignItems: "flex-start", fontWeight: 400, fontSize: 12.5, marginTop: 4 }}>
+              <input type="checkbox" name="acceptTerms" style={{ width: "auto", marginTop: 2 }} />
+              <span>Прочетох и приемам <Link href="/terms" target="_blank" style={{ color: "var(--navy)", fontWeight: 600 }}>Общите условия</Link> и <Link href="/privacy" target="_blank" style={{ color: "var(--navy)", fontWeight: 600 }}>Политиката за поверителност</Link>. *</span>
+            </label>
+            <label style={{ display: "flex", gap: 8, alignItems: "flex-start", fontWeight: 400, fontSize: 12.5 }}>
+              <input type="checkbox" name="marketingConsent" style={{ width: "auto", marginTop: 2 }} />
+              <span>Съгласен/на съм да получавам имейли и известия от Creative Digital Accounting.</span>
+            </label>
+
+            <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
+              <button type="button" className="btn btn-ghost" onClick={() => setStep("account")} style={{ justifyContent: "center" }}>← Назад</button>
+              <button type="submit" className="btn btn-primary" disabled={loading} style={{ flex: 1, justifyContent: "center" }}>{loading ? "Регистрация…" : "Завърши регистрацията"}</button>
             </div>
-            <div
-              style={{
-                background: "var(--emerald-soft)",
-                border: "1px solid rgba(31,111,84,.2)",
-                borderRadius: 8,
-                padding: "10px 14px",
-                fontSize: 12.5,
-                color: "var(--emerald)",
-              }}
-            >
-              ✓ План: <strong>{plan === "free" ? "Безплатен (5 документа/месец)" : plan}</strong>
-            </div>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={loading}
-              style={{ justifyContent: "center", marginTop: 4, opacity: loading ? 0.7 : 1 }}
-            >
-              {loading ? "Регистрация…" : "Завърши регистрацията →"}
-            </button>
-            <button type="button" className="btn btn-ghost" onClick={() => setStep("account")} style={{ justifyContent: "center" }}>
-              ← Назад
-            </button>
           </form>
         )}
 
         <p style={{ marginTop: 20, textAlign: "center", fontSize: 13, color: "var(--ink-soft)" }}>
-          Вече имате акаунт?{" "}
-          <Link href="/login" style={{ color: "var(--navy)", fontWeight: 600 }}>Вход</Link>
+          Вече имате акаунт? <Link href="/login" style={{ color: "var(--navy)", fontWeight: 600 }}>Вход</Link>
         </p>
       </div>
     </div>
@@ -166,9 +141,5 @@ function RegisterForm() {
 }
 
 export default function RegisterPage() {
-  return (
-    <Suspense>
-      <RegisterForm />
-    </Suspense>
-  );
+  return <Suspense><RegisterForm /></Suspense>;
 }

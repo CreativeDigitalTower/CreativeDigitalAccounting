@@ -8,9 +8,17 @@ const schema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
   password: z.string().min(8),
+  representativeRole: z.string().optional(),
   companyName: z.string().min(2),
-  eik: z.string().optional(),
+  eik: z.string().min(1),
+  vatNumber: z.string().optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  mol: z.string().optional(),
+  sector: z.string().optional(),
   plan: z.enum(["free", "start", "business", "pro"]).default("free"),
+  acceptTerms: z.literal(true),
+  marketingConsent: z.boolean().optional(),
 });
 
 export async function POST(req: Request) {
@@ -30,11 +38,17 @@ export async function POST(req: Request) {
 
     const result = await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
-        data: { email: data.email, name: data.name, passwordHash },
+        data: {
+          email: data.email, name: data.name, passwordHash,
+          marketingConsent: !!data.marketingConsent, termsAcceptedAt: new Date(),
+        },
       });
 
       const company = await tx.company.create({
-        data: { name: data.companyName, eik: data.eik },
+        data: {
+          name: data.companyName, eik: data.eik, vatNumber: data.vatNumber,
+          address: data.address, city: data.city, mol: data.mol, sector: data.sector,
+        },
       });
 
       await tx.companyUser.create({
