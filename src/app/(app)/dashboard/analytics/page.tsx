@@ -1,6 +1,7 @@
 import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { FinancialHistoryForm } from "@/components/app/FinancialHistoryForm";
+import { TopClientsChart, aggregateClientRevenue } from "@/components/app/TopClientsChart";
 import { formatCurrency, toBGN, isDualCurrencyActive } from "@/lib/constants";
 
 export default async function AnalyticsPage() {
@@ -13,7 +14,7 @@ export default async function AnalyticsPage() {
   const [invoices, expenses, goal, financialHistory, overdueCount, paidCount] = await Promise.all([
     prisma.document.findMany({
       where: { companyId, type: "invoice", issueDate: { gte: yearStart } },
-      include: { lines: true },
+      include: { lines: true, client: { select: { name: true } } },
     }),
     prisma.expense.aggregate({
       where: { companyId, date: { gte: yearStart } },
@@ -80,6 +81,10 @@ export default async function AnalyticsPage() {
             )}
           </div>
         ))}
+      </div>
+
+      <div style={{ marginBottom: 18 }}>
+        <TopClientsChart data={aggregateClientRevenue(invoices)} title={`Топ 5 клиента по приход (${year})`} />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 18 }}>

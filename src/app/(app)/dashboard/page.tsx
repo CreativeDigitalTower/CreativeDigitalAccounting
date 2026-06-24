@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Stamp } from "@/components/Stamp";
 import { WelcomeWizard } from "@/components/app/WelcomeWizard";
 import { formatCurrency, toBGN, isDualCurrencyActive, FREE_PLAN_LIMIT, getYearMonth } from "@/lib/constants";
+import { TopClientsChart, aggregateClientRevenue } from "@/components/app/TopClientsChart";
 
 export default async function DashboardPage() {
   const { companyId, userId } = await requireCompany();
@@ -93,6 +94,13 @@ export default async function DashboardPage() {
   const lowStockItems = lowStock.filter((i) => i.minQuantity !== null && i.quantity <= (i.minQuantity ?? 0));
   const dual = isDualCurrencyActive();
 
+  // Приходи по клиент (за топ 5 диаграмата)
+  const clientRevenueInvoices = await prisma.document.findMany({
+    where: { companyId, type: "invoice", clientId: { not: null } },
+    select: { client: { select: { name: true } }, lines: { select: { lineTotal: true } } },
+  });
+  const clientRevenue = aggregateClientRevenue(clientRevenueInvoices);
+
   return (
     <>
       {onboarding && <WelcomeWizard status={onboarding} />}
@@ -173,6 +181,11 @@ export default async function DashboardPage() {
             )}
           </div>
         ))}
+      </div>
+
+      {/* Топ клиенти по приход */}
+      <div style={{ marginBottom: 18 }}>
+        <TopClientsChart data={clientRevenue} />
       </div>
 
       {/* Main grid */}

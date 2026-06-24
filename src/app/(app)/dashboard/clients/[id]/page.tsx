@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Stamp } from "@/components/Stamp";
 import { AddNote } from "@/components/app/AddNote";
+import { ClientInfoCard } from "@/components/app/ClientInfoCard";
 import { formatCurrency } from "@/lib/constants";
 
 export default async function ClientDossierPage({ params }: { params: Promise<{ id: string }> }) {
@@ -36,24 +37,14 @@ export default async function ClientDossierPage({ params }: { params: Promise<{ 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1.6fr", gap: 18, alignItems: "start" }}>
         {/* Инфо */}
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          <div className="glass panel">
-            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 12px" }}>Данни</h3>
-            <dl style={{ margin: 0, fontSize: 13, display: "grid", gridTemplateColumns: "auto 1fr", gap: "8px 12px" }}>
-              {[
-                ["ЕИК", client.eik], ["ДДС №", client.vatNumber], ["Град", client.city],
-                ["Адрес", client.address], ["Имейл", client.contactEmail], ["Телефон", client.phone],
-              ].filter(([, v]) => v).map(([k, v]) => (
-                <div key={k as string} style={{ display: "contents" }}>
-                  <dt style={{ color: "var(--muted)" }}>{k}</dt>
-                  <dd style={{ margin: 0, fontWeight: 500 }}>{v}</dd>
-                </div>
-              ))}
-            </dl>
-            <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid var(--border)" }}>
-              <div style={{ fontSize: 12, color: "var(--muted)" }}>Общо фактурирано</div>
-              <div className="num" style={{ fontSize: 20, fontWeight: 700 }}>{formatCurrency(totalInvoiced)}</div>
-            </div>
-          </div>
+          <ClientInfoCard
+            client={{
+              id: client.id, name: client.name, eik: client.eik, vatNumber: client.vatNumber,
+              mol: client.mol, contactPerson: client.contactPerson, city: client.city,
+              address: client.address, contactEmail: client.contactEmail, phone: client.phone,
+            }}
+            totalInvoiced={totalInvoiced}
+          />
 
           {/* CRM бележки */}
           <div className="glass panel">

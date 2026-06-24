@@ -149,16 +149,18 @@ model CompanyUser {
 
 // ─── CRM ─────────────────────────────────────────────────────────────────
 model Client {
-  id           String   @id @default(cuid())
-  companyId    String
-  name         String
-  eik          String?
-  vatNumber    String?
-  address      String?
-  city         String?
-  contactEmail String?
-  phone        String?
-  createdAt    DateTime @default(now())
+  id            String   @id @default(cuid())
+  companyId     String
+  name          String
+  eik           String?
+  vatNumber     String?
+  address       String?
+  city          String?
+  mol           String?
+  contactPerson String?
+  contactEmail  String?
+  phone         String?
+  createdAt     DateTime @default(now())
 
   company   Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
   notes     ClientNote[]

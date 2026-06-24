@@ -1,0 +1,79 @@
+import { formatCurrency } from "@/lib/constants";
+
+export type ClientRevenue = { name: string; total: number };
+
+const COLORS = ["#0F8A6A", "#2C4A66", "#A5812E", "#3F9C82", "#A23B2B"];
+
+/** Топ 5 клиента по приход (на база издадени фактури) с процентно разпределение. */
+export function TopClientsChart({ data, title = "Топ 5 клиента по приход" }: { data: ClientRevenue[]; title?: string }) {
+  const top = [...data].sort((a, b) => b.total - a.total).slice(0, 5);
+  const grand = data.reduce((s, d) => s + d.total, 0);
+  const max = top[0]?.total || 1;
+
+  if (top.length === 0 || grand === 0) {
+    return (
+      <div className="glass panel">
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 12px" }}>{title}</h3>
+        <div style={{ fontSize: 13, color: "var(--muted)", padding: "16px 0" }}>Все още няма данни за приходи от фактури.</div>
+      </div>
+    );
+  }
+
+  // Donut chart (conic-gradient)
+  let acc = 0;
+  const segments = top.map((c, i) => {
+    const start = (acc / grand) * 100;
+    acc += c.total;
+    const end = (acc / grand) * 100;
+    return `${COLORS[i % COLORS.length]} ${start}% ${end}%`;
+  });
+  const othersPct = grand > acc ? ((grand - acc) / grand) * 100 : 0;
+  const gradient = `conic-gradient(${segments.join(", ")}${othersPct > 0 ? `, #D9D7C8 ${(acc / grand) * 100}% 100%` : ""})`;
+
+  return (
+    <div className="glass panel">
+      <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>{title}</h3>
+      <div style={{ display: "flex", gap: 20, alignItems: "center", flexWrap: "wrap" }}>
+        <div style={{ position: "relative", width: 120, height: 120, flexShrink: 0 }}>
+          <div style={{ width: 120, height: 120, borderRadius: "50%", background: gradient }} />
+          <div style={{ position: "absolute", inset: 18, borderRadius: "50%", background: "var(--paper, #fff)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ fontSize: 10, color: "var(--muted)" }}>Общо</div>
+            <div className="num" style={{ fontSize: 13, fontWeight: 700 }}>{formatCurrency(grand)}</div>
+          </div>
+        </div>
+        <div style={{ flex: 1, minWidth: 220, display: "flex", flexDirection: "column", gap: 9 }}>
+          {top.map((c, i) => {
+            const pct = (c.total / grand) * 100;
+            return (
+              <div key={c.name}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 600 }}>
+                    <span style={{ width: 9, height: 9, borderRadius: 2, background: COLORS[i % COLORS.length] }} />
+                    {c.name}
+                  </span>
+                  <span className="num" style={{ color: "var(--ink-soft)" }}>{formatCurrency(c.total)} · {pct.toFixed(1)}%</span>
+                </div>
+                <div style={{ height: 6, background: "rgba(217,215,200,.5)", borderRadius: 3, overflow: "hidden" }}>
+                  <div style={{ width: `${(c.total / max) * 100}%`, height: "100%", background: COLORS[i % COLORS.length], borderRadius: 3 }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Помощна функция: агрегира приходите по клиент от фактури. */
+export function aggregateClientRevenue(
+  invoices: { client: { name: string } | null; lines: { lineTotal: number }[] }[]
+): ClientRevenue[] {
+  const map = new Map<string, number>();
+  for (const inv of invoices) {
+    if (!inv.client) continue;
+    const sum = inv.lines.reduce((s, l) => s + l.lineTotal, 0);
+    map.set(inv.client.name, (map.get(inv.client.name) ?? 0) + sum);
+  }
+  return [...map.entries()].map(([name, total]) => ({ name, total }));
+}

@@ -22,6 +22,8 @@ export default function NewClientPage() {
         name: fd.get("name"),
         eik: fd.get("eik") || undefined,
         vatNumber: fd.get("vatNumber") || undefined,
+        contactPerson: fd.get("contactPerson") || undefined,
+        mol: fd.get("mol") || undefined,
         address: fd.get("address") || undefined,
         city: fd.get("city") || undefined,
         contactEmail: fd.get("contactEmail") || undefined,
@@ -66,6 +68,14 @@ export default function NewClientPage() {
             <div>
               <label>ДДС номер</label>
               <input type="text" name="vatNumber" placeholder="BG123456789" />
+            </div>
+            <div>
+              <label>Контактно лице</label>
+              <input type="text" name="contactPerson" placeholder="Иван Иванов" />
+            </div>
+            <div>
+              <label>МОЛ</label>
+              <input type="text" name="mol" placeholder="Иван Иванов" />
             </div>
             <div>
               <label>Адрес</label>

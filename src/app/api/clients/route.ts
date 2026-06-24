@@ -9,6 +9,8 @@ const schema = z.object({
   vatNumber: z.string().optional(),
   address: z.string().optional(),
   city: z.string().optional(),
+  mol: z.string().optional(),
+  contactPerson: z.string().optional(),
   contactEmail: z.string().email().optional().or(z.literal("")),
   phone: z.string().optional(),
 });
