@@ -125,6 +125,7 @@ model Company {
   financialGoals    FinancialGoal[]
   financialHistory  FinancialHistory[]
   handoverProtocols HandoverProtocol[]
+  archiveFiles      ArchiveFile[]
 }
 
 enum CompanyRole {
@@ -465,9 +466,31 @@ model HandoverProtocol {
   companyId      String
   number         String
   counterpartyId String?
+  // Свободни данни на приемащата страна
+  counterpartyName    String?
+  counterpartyEik     String?
+  counterpartyAddress String?
+  counterpartyMol     String?
+  place          String?
+  handedBy       String?
+  receivedBy     String?
+  items          String?  @db.Text
   date           DateTime
   description    String?  @db.Text
   createdAt      DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model ArchiveFile {
+  id         String   @id @default(cuid())
+  companyId  String
+  name       String
+  category   String?
+  mimeType   String
+  size       Int
+  dataUrl    String   @db.Text
+  uploadedAt DateTime @default(now())
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }

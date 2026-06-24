@@ -39,6 +39,7 @@ export default async function DocumentsPage({
           <div style={{ color: "var(--muted)", fontSize: 13 }}>{docs.length} документа</div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
+          <Link href="/dashboard/documents/protocols" className="btn btn-ghost">📋 Приемо-предавателни протоколи</Link>
           <Link href="/dashboard/documents/new" className="btn btn-primary">+ Нов документ</Link>
         </div>
       </div>
@@ -46,6 +47,7 @@ export default async function DocumentsPage({
       {/* Категории документи */}
       <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
         <span className="filter-tab active">Изходящи документи</span>
+        <Link href="/dashboard/documents/protocols" className="filter-tab">Протоколи (ППП)</Link>
         <Link href="/dashboard/expenses" className="filter-tab">Разходни фактури</Link>
         <Link href="/dashboard/bank-statements" className="filter-tab">Банкови извлечения</Link>
       </div>

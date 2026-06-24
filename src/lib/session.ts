@@ -65,6 +65,16 @@ export async function requireFeature(feature: string) {
   return { userId, companyId, plan };
 }
 
+/** Спира достъпа, ако фирмата е на безплатен план (само за платени абонаменти). */
+export async function requirePaidPlan() {
+  const { userId, companyId } = await requireCompany();
+  const plan = await getPlan(companyId);
+  if (plan === "free") {
+    redirect("/dashboard/subscription?locked=protocols");
+  }
+  return { userId, companyId, plan };
+}
+
 export async function isSuperAdmin(userId: string): Promise<boolean> {
   const u = await prisma.user.findUnique({ where: { id: userId }, select: { isSuperAdmin: true } });
   return !!u?.isSuperAdmin;
