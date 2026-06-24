@@ -2,6 +2,7 @@ import { BlobBackground } from "@/components/Backgrounds";
 import { MarketingNavbar } from "@/components/marketing/Navbar";
 import { MarketingFooter } from "@/components/marketing/Footer";
 import { MessengerBubble } from "@/components/marketing/MessengerBubble";
+import { CookieConsent } from "@/components/marketing/CookieConsent";
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -13,6 +14,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         <MarketingFooter />
       </div>
       <MessengerBubble />
+      <CookieConsent />
     </div>
   );
 }

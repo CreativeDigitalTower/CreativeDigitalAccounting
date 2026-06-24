@@ -1,37 +1,14 @@
 import Link from "next/link";
 import { Pricing } from "@/components/marketing/Pricing";
+import { IconInvoice, IconWarehouse, IconUsers, IconExpense, IconChart, IconProjects } from "@/components/Icons";
 
 const features = [
-  {
-    icon: "📄",
-    title: "Фактуриране",
-    desc: "Фактури, проформи, оферти, кредитни и дебитни известия с автоматична номерация и двойно EUR/BGN обозначаване.",
-  },
-  {
-    icon: "📦",
-    title: "Склад",
-    desc: "Управление на наличности, заприходяване, изписване и производство в множество локации.",
-  },
-  {
-    icon: "👥",
-    title: "Клиенти и Доставчици",
-    desc: "CRM бележки, досиета, история на документи и договори за всеки контрагент.",
-  },
-  {
-    icon: "💰",
-    title: "Разходи",
-    desc: "Ръчно въвеждане и входящи фактури от доставчици по персонализирани категории.",
-  },
-  {
-    icon: "📊",
-    title: "Финансови Анализи",
-    desc: "Оборот, паричен поток, финансова цел, данъчен календар и инвеститорски PDF отчет.",
-  },
-  {
-    icon: "🏗️",
-    title: "Проекти и Договори",
-    desc: "Проследяване на приходи, разходи и печалба по проект с напомняния за договори.",
-  },
+  { Icon: IconInvoice, title: "Фактуриране", desc: "Фактури, проформи, оферти, кредитни и дебитни известия с автоматична номерация и двойно EUR/BGN обозначаване." },
+  { Icon: IconWarehouse, title: "Склад", desc: "Управление на наличности, заприходяване, изписване и производство в множество локации." },
+  { Icon: IconUsers, title: "Клиенти и Доставчици", desc: "CRM бележки, досиета, история на документи и договори за всеки контрагент." },
+  { Icon: IconExpense, title: "Разходи", desc: "Ръчно въвеждане и входящи фактури от доставчици по персонализирани категории." },
+  { Icon: IconChart, title: "Финансови Анализи", desc: "Оборот, паричен поток, финансова цел, данъчен календар и инвеститорски PDF отчет." },
+  { Icon: IconProjects, title: "Проекти и Договори", desc: "Проследяване на приходи, разходи и печалба по проект с напомняния за договори." },
 ];
 
 export default function HomePage() {
@@ -82,7 +59,7 @@ export default function HomePage() {
           }}
         >
           Фактуриране, склад, разходи и финансови анализи в едно —
-          проектирано за малки и средни фирми в България.
+          проектирано за фирми с всякакъв капацитет в България: от малки и средни до големи компании.
         </p>
 
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
@@ -114,7 +91,7 @@ export default function HomePage() {
               className="glass panel"
               style={{ padding: "22px 24px" }}
             >
-              <div style={{ fontSize: 28, marginBottom: 12 }}>{f.icon}</div>
+              <div className="icon-tile" style={{ marginBottom: 14 }}><f.Icon /></div>
               <h3 style={{ margin: "0 0 8px", fontSize: 16, fontFamily: "'Fraunces', serif" }}>
                 {f.title}
               </h3>

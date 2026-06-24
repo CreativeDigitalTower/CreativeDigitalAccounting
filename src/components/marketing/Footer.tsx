@@ -36,6 +36,7 @@ export function MarketingFooter() {
             <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--brass)", letterSpacing: 1, marginBottom: 14 }}>КОМПАНИЯ</div>
             {[
               { href: "/about", label: "За Нас" },
+              { href: "/accountants", label: "За счетоводители" },
               { href: "/contact", label: "Контакти" },
             ].map((l) => (
               <Link key={l.href} href={l.href} style={{ display: "block", color: "#C9C7B6", textDecoration: "none", fontSize: 13.5, marginBottom: 8 }}>
@@ -46,8 +47,13 @@ export function MarketingFooter() {
           <div>
             <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--brass)", letterSpacing: 1, marginBottom: 14 }}>ПРАВНО</div>
             {[
-              { href: "/privacy", label: "Политика за поверителност" },
               { href: "/terms", label: "Общи условия" },
+              { href: "/privacy", label: "Политика за поверителност" },
+              { href: "/cookies", label: "Политика за бисквитки" },
+              { href: "/dpa", label: "Обработване на данни (DPA)" },
+              { href: "/license", label: "Лицензионно споразумение" },
+              { href: "/ip-policy", label: "Интелектуална собственост" },
+              { href: "/security", label: "Информационна сигурност" },
             ].map((l) => (
               <Link key={l.href} href={l.href} style={{ display: "block", color: "#C9C7B6", textDecoration: "none", fontSize: 13.5, marginBottom: 8 }}>
                 {l.label}

@@ -8,9 +8,10 @@
   --muted: #74786E;
   --border: #D9D7C8;
   --glass-border: rgba(255,255,255,.55);
-  --emerald: #1F6F54;
-  --emerald-soft: #E3EEE7;
-  --brass: #A6822F;
+  --emerald: #0F8A6A;
+  --emerald-dark: #0B5E4A;
+  --emerald-soft: #E1F0EA;
+  --brass: #A5812E;
   --brass-soft: #F3EAD2;
   --brick: #A23B2B;
   --brick-soft: #F4E3DE;
@@ -56,7 +57,7 @@ th.num,td.num{text-align:right;}
 
 .btn{border-radius:var(--radius-md);padding:9px 16px;font-size:13.5px;font-weight:600;border:1px solid transparent;cursor:pointer;font-family:inherit;transition:background .15s;display:inline-flex;align-items:center;gap:6px;text-decoration:none;}
 .btn-primary{background:var(--emerald);color:#fff;}
-.btn-primary:hover{background:#19533F;}
+.btn-primary:hover{background:var(--emerald-dark);}
 .btn-ghost{background:rgba(255,255,255,.4);border:1px solid var(--border);color:var(--ink-soft);}
 .btn-ghost:hover{background:rgba(255,255,255,.7);}
 .btn-danger{background:var(--brick);color:#fff;}
@@ -101,5 +102,18 @@ label{display:block;font-size:12px;color:var(--ink-soft);font-weight:600;margin-
 /* Заключени (premium) функции */
 .lock-overlay{position:relative;}
 .lock-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--brass);border:1px solid var(--brass);border-radius:10px;padding:1px 7px;text-transform:uppercase;}
+
+/* Видими file inputs (#3) */
+input[type=file]{font-family:inherit;font-size:13px;color:var(--ink-soft);width:100%;}
+input[type=file]::file-selector-button{
+  font-family:inherit;font-weight:600;font-size:12.5px;cursor:pointer;
+  background:var(--emerald);color:#fff;border:none;border-radius:var(--radius-sm);
+  padding:8px 16px;margin-right:12px;transition:background .15s;
+}
+input[type=file]::file-selector-button:hover{background:var(--emerald-dark);}
+
+/* Иконки (пиктограми) */
+.icon-tile{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:12px;background:var(--emerald-soft);color:var(--emerald);}
+.icon-tile svg{width:24px;height:24px;}
 
 @media print{.no-print{display:none!important;}}
