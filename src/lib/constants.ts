@@ -179,3 +179,17 @@ export function formatDate(date: Date | string): string {
 export function getYearMonth(date = new Date()): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
+
+const BG_MONTHS = ["Януари", "Февруари", "Март", "Април", "Май", "Юни", "Юли", "Август", "Септември", "Октомври", "Ноември", "Декември"];
+
+/** Групира записи по месец и година (по issueDate), най-новите първи. */
+export function groupByMonth<T extends { issueDate: Date | string }>(items: T[]) {
+  const map = new Map<string, { key: string; label: string; items: T[] }>();
+  for (const it of items) {
+    const d = new Date(it.issueDate);
+    const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
+    if (!map.has(key)) map.set(key, { key, label: `${BG_MONTHS[d.getMonth()]} ${d.getFullYear()}`, items: [] });
+    map.get(key)!.items.push(it);
+  }
+  return Array.from(map.values()).sort((a, b) => (a.key < b.key ? 1 : -1));
+}

@@ -2,7 +2,7 @@ import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Stamp } from "@/components/Stamp";
-import { formatCurrency, toBGN, isDualCurrencyActive } from "@/lib/constants";
+import { formatCurrency, toBGN, isDualCurrencyActive, groupByMonth } from "@/lib/constants";
 
 const TYPE_LABELS: Record<string, string> = {
   invoice: "Фактура",
@@ -90,59 +90,50 @@ export default async function DocumentsPage({
         ))}
       </div>
 
-      <div className="glass panel" style={{ padding: "8px 0" }}>
-        {docs.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>📄</div>
-            <div style={{ fontSize: 14, marginBottom: 16 }}>Няма документи</div>
-            <Link href="/dashboard/documents/new" className="btn btn-primary btn-sm">
-              Създай първия документ
-            </Link>
-          </div>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Номер</th>
-                <th>Тип</th>
-                <th>Клиент</th>
-                <th>Дата</th>
-                <th>Падеж</th>
-                <th className="num">Сума</th>
-                {dual && <th className="num">BGN</th>}
-                <th>Статус</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {docs.map((doc) => {
-                const total = doc.lines.reduce((s, l) => s + l.lineTotal, 0);
-                return (
-                  <tr key={doc.id}>
-                    <td className="num" style={{ color: "var(--muted)", fontSize: 12 }}>{doc.number}</td>
-                    <td style={{ fontSize: 13 }}>{TYPE_LABELS[doc.type]}</td>
-                    <td style={{ fontWeight: 600 }}>{doc.client?.name ?? "—"}</td>
-                    <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>
-                      {new Date(doc.issueDate).toLocaleDateString("bg-BG")}
-                    </td>
-                    <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>
-                      {doc.dueDate ? new Date(doc.dueDate).toLocaleDateString("bg-BG") : "—"}
-                    </td>
-                    <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(total)}</td>
-                    {dual && <td className="num" style={{ fontSize: 11.5, color: "var(--muted)" }}>{formatCurrency(toBGN(total), "BGN")}</td>}
-                    <td><Stamp status={doc.status} /></td>
-                    <td>
-                      <Link href={`/dashboard/documents/${doc.id}`} className="btn btn-ghost btn-sm">
-                        Преглед
-                      </Link>
-                    </td>
+      {docs.length === 0 ? (
+        <div className="glass panel" style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
+          <div style={{ fontSize: 32, marginBottom: 12 }}>📄</div>
+          <div style={{ fontSize: 14, marginBottom: 16 }}>Няма документи</div>
+          <Link href="/dashboard/documents/new" className="btn btn-primary btn-sm">Създай първия документ</Link>
+        </div>
+      ) : (
+        groupByMonth(docs).map((group) => (
+          <div key={group.key} style={{ marginBottom: 18 }}>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 8px" }}>{group.label}</h3>
+            <div className="glass panel" style={{ padding: "8px 0" }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Номер</th><th>Тип</th><th>Клиент</th><th>Дата</th><th>Падеж</th>
+                    <th className="num">Сума</th>{dual && <th className="num">BGN</th>}<th>Статус</th><th></th>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
+                </thead>
+                <tbody>
+                  {group.items.map((doc) => {
+                    const total = doc.lines.reduce((s, l) => s + l.lineTotal, 0);
+                    return (
+                      <tr key={doc.id}>
+                        <td className="num" style={{ color: "var(--muted)", fontSize: 12 }}>{doc.number}</td>
+                        <td style={{ fontSize: 13 }}>{TYPE_LABELS[doc.type]}</td>
+                        <td style={{ fontWeight: 600 }}>{doc.client?.name ?? "—"}</td>
+                        <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>{new Date(doc.issueDate).toLocaleDateString("bg-BG")}</td>
+                        <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>{doc.dueDate ? new Date(doc.dueDate).toLocaleDateString("bg-BG") : "—"}</td>
+                        <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(total, doc.currency)}</td>
+                        {dual && <td className="num" style={{ fontSize: 11.5, color: "var(--muted)" }}>{formatCurrency(toBGN(total), "BGN")}</td>}
+                        <td><Stamp status={doc.status} /></td>
+                        <td style={{ display: "flex", gap: 6 }}>
+                          <Link href={`/dashboard/documents/${doc.id}`} className="btn btn-ghost btn-sm">Преглед</Link>
+                          <Link href={`/dashboard/documents/${doc.id}/edit`} className="btn btn-ghost btn-sm">✎</Link>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))
+      )}
     </>
   );
 }

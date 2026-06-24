@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES } from "@/lib/constants";
+import { TemplatePreview } from "@/components/app/TemplatePreview";
 
 type Company = {
   name: string; eik: string | null; vatNumber: string | null; vatRegistered: boolean;
@@ -179,8 +180,8 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <label style={{ marginTop: 18 }}>Дизайн на фактурата</label>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px,1fr))", gap: 10, marginTop: 6 }}>
+        <label style={{ marginTop: 18 }}>Дизайн на фактурата — изберете от 10 шаблона</label>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px,1fr))", gap: 12, marginTop: 6 }}>
           {INVOICE_TEMPLATES.map((t) => (
             <button
               key={t.id}
@@ -188,14 +189,20 @@ export default function SettingsPage() {
               onClick={() => set("invoiceTemplate", t.id)}
               style={{
                 border: c.invoiceTemplate === t.id ? `2px solid ${t.accent}` : "1px solid var(--border)",
-                borderRadius: 8, padding: "12px 10px", background: "rgba(255,255,255,.5)", cursor: "pointer", textAlign: "left",
+                borderRadius: 10, padding: 8, background: c.invoiceTemplate === t.id ? "var(--emerald-soft)" : "rgba(255,255,255,.5)", cursor: "pointer", textAlign: "left",
               }}
             >
-              <div style={{ height: 6, width: 36, borderRadius: 3, background: t.accent, marginBottom: 8 }} />
-              <div style={{ fontSize: 12.5, fontWeight: 600 }}>{t.name}</div>
+              <TemplatePreview templateId={t.id} showLogo={!!c.logoUrl} />
+              <div style={{ fontSize: 12.5, fontWeight: 600, marginTop: 6, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                {t.name}
+                {c.invoiceTemplate === t.id && <span style={{ color: "var(--emerald)" }}>✓</span>}
+              </div>
             </button>
           ))}
         </div>
+        <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 10 }}>
+          Логото във фактурата е достъпно само за платените планове (Старт, Бизнес, Про).
+        </p>
       </div>
 
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, position: "sticky", bottom: 0, padding: "12px 0" }}>

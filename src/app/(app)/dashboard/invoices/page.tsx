@@ -2,7 +2,7 @@ import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Stamp } from "@/components/Stamp";
-import { formatCurrency, toBGN, isDualCurrencyActive, DOC_STATUSES } from "@/lib/constants";
+import { formatCurrency, toBGN, isDualCurrencyActive, DOC_STATUSES, groupByMonth } from "@/lib/constants";
 
 export default async function InvoicesPage({
   searchParams,
@@ -104,14 +104,3 @@ export default async function InvoicesPage({
   );
 }
 
-function groupByMonth<T extends { issueDate: Date | string }>(items: T[]) {
-  const MONTHS = ["Януари", "Февруари", "Март", "Април", "Май", "Юни", "Юли", "Август", "Септември", "Октомври", "Ноември", "Декември"];
-  const map = new Map<string, { key: string; label: string; items: T[] }>();
-  for (const it of items) {
-    const d = new Date(it.issueDate);
-    const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
-    if (!map.has(key)) map.set(key, { key, label: `${MONTHS[d.getMonth()]} ${d.getFullYear()}`, items: [] });
-    map.get(key)!.items.push(it);
-  }
-  return Array.from(map.values()).sort((a, b) => (a.key < b.key ? 1 : -1));
-}
