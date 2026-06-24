@@ -63,13 +63,13 @@ export const INVOICE_TEMPLATES = [
   { id: "classic", name: "Класически", accent: "#1F6F54", layout: "classic" },
   { id: "modern", name: "Модерен", accent: "#2C4A66", layout: "band" },
   { id: "minimal", name: "Минимал", accent: "#16201C", layout: "minimal" },
-  { id: "elegant", name: "Елегантен", accent: "#A6822F", layout: "classic" },
-  { id: "bold", name: "Контрастен", accent: "#A23B2B", layout: "band" },
-  { id: "corporate", name: "Корпоративен", accent: "#2C4A66", layout: "band" },
-  { id: "fresh", name: "Свеж", accent: "#3F9C82", layout: "classic" },
-  { id: "warm", name: "Топъл", accent: "#C49A45", layout: "classic" },
+  { id: "elegant", name: "Елегантен", accent: "#A6822F", layout: "centered" },
+  { id: "bold", name: "Контрастен", accent: "#A23B2B", layout: "leftrail" },
+  { id: "corporate", name: "Корпоративен", accent: "#2C4A66", layout: "boxed" },
+  { id: "fresh", name: "Свеж", accent: "#3F9C82", layout: "split" },
+  { id: "warm", name: "Топъл", accent: "#C49A45", layout: "centered" },
   { id: "mono", name: "Монохром", accent: "#3A4540", layout: "minimal" },
-  { id: "premium", name: "Премиум", accent: "#16201C", layout: "band" },
+  { id: "premium", name: "Премиум", accent: "#16201C", layout: "leftrail" },
 ] as const;
 
 export function getTemplate(id: string | null | undefined) {

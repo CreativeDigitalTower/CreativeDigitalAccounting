@@ -183,21 +183,25 @@ export default function SettingsPage() {
         <label style={{ marginTop: 18 }}>Дизайн на фактурата — изберете от 10 шаблона</label>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px,1fr))", gap: 12, marginTop: 6 }}>
           {INVOICE_TEMPLATES.map((t) => (
-            <button
+            <div
               key={t.id}
-              type="button"
-              onClick={() => set("invoiceTemplate", t.id)}
               style={{
                 border: c.invoiceTemplate === t.id ? `2px solid ${t.accent}` : "1px solid var(--border)",
-                borderRadius: 10, padding: 8, background: c.invoiceTemplate === t.id ? "var(--emerald-soft)" : "rgba(255,255,255,.5)", cursor: "pointer", textAlign: "left",
+                borderRadius: 10, padding: 8, background: c.invoiceTemplate === t.id ? "var(--emerald-soft)" : "rgba(255,255,255,.5)", textAlign: "left",
               }}
             >
-              <TemplatePreview templateId={t.id} showLogo={!!c.logoUrl} />
-              <div style={{ fontSize: 12.5, fontWeight: 600, marginTop: 6, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                {t.name}
-                {c.invoiceTemplate === t.id && <span style={{ color: "var(--emerald)" }}>✓</span>}
+              <div onClick={() => set("invoiceTemplate", t.id)} style={{ cursor: "pointer" }}>
+                <TemplatePreview templateId={t.id} showLogo={!!c.logoUrl} />
+                <div style={{ fontSize: 12.5, fontWeight: 600, marginTop: 6, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  {t.name}
+                  {c.invoiceTemplate === t.id && <span style={{ color: "var(--emerald)" }}>✓</span>}
+                </div>
               </div>
-            </button>
+              <a href={`/dashboard/settings/preview?template=${t.id}`} target="_blank" rel="noopener noreferrer"
+                style={{ display: "block", textAlign: "center", marginTop: 6, fontSize: 11.5, fontWeight: 600, color: "var(--navy)", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 0", textDecoration: "none" }}>
+                👁 Преглед
+              </a>
+            </div>
           ))}
         </div>
         <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 10 }}>

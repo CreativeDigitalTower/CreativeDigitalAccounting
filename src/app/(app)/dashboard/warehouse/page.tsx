@@ -28,6 +28,7 @@ export default async function WarehousePage() {
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <Link href="/dashboard/warehouse/receive" className="btn btn-ghost">+ Заприходяване</Link>
+          <Link href="/dashboard/warehouse/issue" className="btn btn-ghost">− Изписване</Link>
           <Link href="/dashboard/warehouse/items/new" className="btn btn-primary">+ Нов артикул</Link>
         </div>
       </div>

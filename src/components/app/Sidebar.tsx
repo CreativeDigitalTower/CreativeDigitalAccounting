@@ -19,6 +19,7 @@ const navItems = [
   { href: "/dashboard/archive", label: "Архив", icon: "🗂️", feature: "archive" },
   { href: "/dashboard/assets", label: "Активи", icon: "🏭", feature: "assets" },
   { href: "/dashboard/analytics", label: "Анализи", icon: "📊", feature: "analytics" },
+  { href: "/dashboard/tools", label: "Безплатни инструменти", icon: "🧮", feature: "dashboard" },
   { href: "/dashboard/users", label: "Потребители", icon: "👤", feature: "users" },
   { href: "/dashboard/audit", label: "Одит лог", icon: "📜", feature: "audit" },
   { href: "/dashboard/settings", label: "Профил на фирмата", icon: "⚙️", feature: "dashboard" },
@@ -57,19 +58,25 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl }: SidebarPro
         <Logo dark />
       </div>
 
-      {/* Company chip */}
-      <div
+      {/* Company chip — links to company profile */}
+      <Link
+        href="/dashboard/settings"
+        title="Профил на фирмата"
         style={{
+          display: "block",
           background: "rgba(255,255,255,.06)",
           borderRadius: 8,
           padding: "8px 12px",
           fontSize: 12.5,
           color: "#C9C7B6",
           border: "1px solid rgba(255,255,255,.08)",
+          textDecoration: "none",
         }}
+        onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.1)")}
+        onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.06)")}
       >
-        <div style={{ fontSize: 10.5, color: "var(--brass)", fontWeight: 600, letterSpacing: 1, marginBottom: 6 }}>
-          АКТИВНА ФИРМА
+        <div style={{ fontSize: 10.5, color: "var(--brass)", fontWeight: 600, letterSpacing: 1, marginBottom: 6, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          АКТИВНА ФИРМА <span style={{ opacity: .7 }}>✎</span>
         </div>
         {logoUrl && (
           <div style={{ background: "#fff", borderRadius: 6, padding: 6, marginBottom: 8, display: "flex", justifyContent: "center" }}>
@@ -78,7 +85,7 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl }: SidebarPro
           </div>
         )}
         <div style={{ fontWeight: 600, color: "#E9E7DA", fontSize: 13 }}>{companyName}</div>
-      </div>
+      </Link>
 
       {/* Navigation */}
       <nav style={{ display: "flex", flexDirection: "column", gap: 1, flex: 1 }}>
