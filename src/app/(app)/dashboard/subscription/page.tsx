@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FREE_PLAN_LIMIT, getYearMonth } from "@/lib/constants";
 
 import { BANK_DETAILS, EUR_TO_BGN } from "@/lib/constants";
+import { SubscriptionPlans } from "@/components/app/SubscriptionPlans";
 
 const PLANS = [
   { id: "free", name: "Безплатен", price: 0, docs: "5 документа/месец",
@@ -72,77 +73,8 @@ export default async function SubscriptionPage() {
         </div>
       </div>
 
-      {/* Plans grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
-        {PLANS.map((plan) => (
-          <div
-            key={plan.id}
-            className="glass panel"
-            style={{
-              padding: "24px 20px",
-              position: "relative",
-              border: plan.recommended ? "2px solid var(--brass)" : currentPlan === plan.id ? "2px solid var(--emerald)" : undefined,
-            }}
-          >
-            {plan.recommended && <span className="ribbon">Препоръчан</span>}
-            {currentPlan === plan.id && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: -10,
-                  left: 16,
-                  background: "var(--emerald)",
-                  color: "#fff",
-                  fontSize: 10.5,
-                  fontWeight: 600,
-                  padding: "3px 10px",
-                  borderRadius: 20,
-                }}
-              >
-                Активен
-              </span>
-            )}
-
-            <div style={{ fontFamily: "'Fraunces', serif", fontSize: 20, fontWeight: 600, marginBottom: 2 }}>
-              {plan.name}
-            </div>
-            <div className="num" style={{ fontSize: 28, fontWeight: 700, margin: "10px 0 2px" }}>
-              {plan.price === 0 ? "0" : plan.price}
-              <span style={{ fontSize: 13, color: "var(--muted)", fontFamily: "'IBM Plex Sans', sans-serif", fontWeight: 400 }}>
-                {" "}{plan.price === 0 ? "безплатно" : "€/месец"}
-              </span>
-            </div>
-            {plan.price > 0 && (
-              <div className="num" style={{ fontSize: 11, color: "var(--muted)", marginBottom: 14 }}>
-                ≈ {plan.priceBGN.toFixed(2)} лв/месец
-              </div>
-            )}
-
-            <ul style={{ listStyle: "none", padding: 0, margin: "14px 0 20px", display: "flex", flexDirection: "column", gap: 8 }}>
-              {plan.features.map((f) => (
-                <li key={f} style={{ fontSize: 13, color: "var(--ink-soft)", paddingLeft: 18, position: "relative" }}>
-                  <span style={{ position: "absolute", left: 0, color: "var(--emerald)", fontWeight: 700 }}>✓</span>
-                  {f}
-                </li>
-              ))}
-            </ul>
-
-            {currentPlan === plan.id ? (
-              <button className="btn btn-ghost" style={{ width: "100%", justifyContent: "center" }} disabled>
-                Текущ план
-              </button>
-            ) : plan.price === 0 ? (
-              <button className="btn btn-ghost" style={{ width: "100%", justifyContent: "center" }} disabled>
-                Безплатен
-              </button>
-            ) : (
-              <a href="#bank-transfer" className={plan.recommended ? "btn btn-primary" : "btn btn-ghost"} style={{ width: "100%", justifyContent: "center" }}>
-                {currentPlan === "free" ? "Надгради" : "Смени план"}
-              </a>
-            )}
-          </div>
-        ))}
-      </div>
+      {/* Plans grid — същите като на началната страница, с месечно/6м/годишно */}
+      <SubscriptionPlans currentPlan={currentPlan} />
 
       {/* Банков превод */}
       <div id="bank-transfer" className="glass panel" style={{ marginTop: 24, padding: "24px 28px", borderLeft: "4px solid var(--emerald)" }}>

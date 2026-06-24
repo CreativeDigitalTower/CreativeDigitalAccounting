@@ -1,7 +1,7 @@
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { Stamp } from "@/components/Stamp";
+import { StatusSelect } from "@/components/app/StatusSelect";
 import { formatCurrency, toBGN, isDualCurrencyActive, groupByMonth } from "@/lib/constants";
 
 const TYPE_LABELS: Record<string, string> = {
@@ -122,7 +122,7 @@ export default async function DocumentsPage({
                         <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>{doc.dueDate ? new Date(doc.dueDate).toLocaleDateString("bg-BG") : "—"}</td>
                         <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(total, doc.currency)}</td>
                         {dual && <td className="num" style={{ fontSize: 11.5, color: "var(--muted)" }}>{formatCurrency(toBGN(total), "BGN")}</td>}
-                        <td><Stamp status={doc.status} /></td>
+                        <td><StatusSelect id={doc.id} status={doc.status} /></td>
                         <td style={{ display: "flex", gap: 6 }}>
                           <Link href={`/dashboard/documents/${doc.id}`} className="btn btn-ghost btn-sm">Преглед</Link>
                           <Link href={`/dashboard/documents/${doc.id}/edit`} className="btn btn-ghost btn-sm">✎</Link>

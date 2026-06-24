@@ -2,7 +2,8 @@ import { requirePaidPlan } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { PrintButton } from "@/components/app/PrintButton";
+import { DownloadButtons } from "@/components/app/DownloadButtons";
+import { PLATFORM_CREDIT } from "@/lib/constants";
 
 export default async function ProtocolDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { companyId } = await requirePaidPlan();
@@ -30,7 +31,7 @@ export default async function ProtocolDetailPage({ params }: { params: Promise<{
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }} className="no-print">
         <Link href="/dashboard/documents/protocols" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← Протоколи</Link>
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, fontWeight: 600, margin: 0 }}>{p.number}</h1>
-        <div style={{ marginLeft: "auto" }}><PrintButton /></div>
+        <div style={{ marginLeft: "auto" }}><DownloadButtons filename={p.number} /></div>
       </div>
 
       <div className="glass printable" style={{ borderRadius: 14, maxWidth: 800, padding: "40px 48px" }}>
@@ -66,6 +67,10 @@ export default async function ProtocolDetailPage({ params }: { params: Promise<{
           <div style={{ flex: 1, textAlign: "center" }}>
             <div style={{ borderTop: "1px solid var(--ink)", paddingTop: 6, fontSize: 12.5 }}>Приел: {p.receivedBy ?? "................"}</div>
           </div>
+        </div>
+
+        <div style={{ marginTop: 28, paddingTop: 12, borderTop: "1px solid var(--border)", fontSize: 10.5, color: "var(--muted)", textAlign: "center" }}>
+          {PLATFORM_CREDIT}
         </div>
       </div>
     </>

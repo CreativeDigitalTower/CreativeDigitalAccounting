@@ -1,7 +1,7 @@
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { Stamp } from "@/components/Stamp";
+import { StatusSelect } from "@/components/app/StatusSelect";
 import { formatCurrency, toBGN, isDualCurrencyActive, DOC_STATUSES, groupByMonth } from "@/lib/constants";
 
 export default async function InvoicesPage({
@@ -86,7 +86,7 @@ export default async function InvoicesPage({
                         <td style={{ fontSize: 13, color: "var(--ink-soft)" }}>{new Date(doc.issueDate).toLocaleDateString("bg-BG")}</td>
                         <td style={{ fontSize: 13, color: "var(--ink-soft)" }}>{doc.dueDate ? new Date(doc.dueDate).toLocaleDateString("bg-BG") : "—"}</td>
                         <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(total, doc.currency)}</td>
-                        <td><Stamp status={doc.status} /></td>
+                        <td><StatusSelect id={doc.id} status={doc.status} /></td>
                         <td style={{ display: "flex", gap: 6 }}>
                           <Link href={`/dashboard/documents/${doc.id}`} className="btn btn-ghost btn-sm">Отвори</Link>
                           <Link href={`/dashboard/documents/${doc.id}/edit`} className="btn btn-ghost btn-sm">✎</Link>

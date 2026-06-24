@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { DOC_STATUSES } from "@/lib/constants";
+import { DownloadButtons } from "@/components/app/DownloadButtons";
 
-export function DocumentActions({ id, status }: { id: string; status: string }) {
+export function DocumentActions({ id, status, number }: { id: string; status: string; number?: string }) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [current, setCurrent] = useState(status);
@@ -20,12 +21,6 @@ export function DocumentActions({ id, status }: { id: string; status: string }) 
     });
     setSaving(false);
     if (res.ok) router.refresh();
-  }
-
-  function downloadPdf() {
-    document.body.classList.add("printing-doc");
-    window.print();
-    setTimeout(() => document.body.classList.remove("printing-doc"), 500);
   }
 
   return (
@@ -44,7 +39,7 @@ export function DocumentActions({ id, status }: { id: string; status: string }) 
         </select>
       </div>
       <Link href={`/dashboard/documents/${id}/edit`} className="btn btn-ghost btn-sm">✎ Редактирай</Link>
-      <button onClick={downloadPdf} className="btn btn-primary btn-sm">↓ Изтегли PDF</button>
+      <DownloadButtons filename={number ?? "document"} />
     </div>
   );
 }

@@ -21,7 +21,20 @@ export async function POST(req: Request) {
       }
     }
 
-    await prisma.siteVisit.create({ data: { visitorId, path, area, userId, companyId } });
+    // Записваме само ЕДНО посещение на посетител за деня (брой хора, не презареждания).
+    const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
+    const existing = await prisma.siteVisit.findFirst({
+      where: { visitorId, area, createdAt: { gte: dayStart } },
+      select: { id: true, userId: true },
+    });
+    if (existing) {
+      // Допълваме потребителя/фирмата, ако посетителят се е логнал по-късно същия ден.
+      if (userId && !existing.userId) {
+        await prisma.siteVisit.update({ where: { id: existing.id }, data: { userId, companyId } });
+      }
+    } else {
+      await prisma.siteVisit.create({ data: { visitorId, path, area, userId, companyId } });
+    }
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ ok: false }, { status: 200 });

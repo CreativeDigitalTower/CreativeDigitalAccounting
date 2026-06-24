@@ -32,7 +32,7 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
         <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }} className="no-print">
           {doc.type === "quote" && <Link href={`/dashboard/documents/new?type=proforma&parent=${doc.id}`} className="btn btn-ghost btn-sm">→ Проформа</Link>}
           {doc.type === "proforma" && <Link href={`/dashboard/documents/new?type=invoice&parent=${doc.id}`} className="btn btn-ghost btn-sm">→ Фактура</Link>}
-          <DocumentActions id={doc.id} status={doc.status} />
+          <DocumentActions id={doc.id} status={doc.status} number={doc.number} />
         </div>
       </div>
 

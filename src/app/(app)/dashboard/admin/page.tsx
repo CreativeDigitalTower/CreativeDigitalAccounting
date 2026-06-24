@@ -1,9 +1,22 @@
 import { requireSuperAdmin } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 import { AdminCompanyRow } from "@/components/app/AdminCompanyRow";
 
-export default async function AdminPage() {
+const RANGES = [
+  { id: "7d", label: "7 дни", days: 7, bucket: "day" as const },
+  { id: "30d", label: "30 дни", days: 30, bucket: "day" as const },
+  { id: "90d", label: "90 дни", days: 90, bucket: "day" as const },
+  { id: "12m", label: "12 месеца", days: 365, bucket: "month" as const },
+  { id: "all", label: "Цял период", days: null, bucket: "month" as const },
+];
+const MONTH_NAMES = ["Ян", "Фев", "Мар", "Апр", "Май", "Юни", "Юли", "Авг", "Сеп", "Окт", "Ное", "Дек"];
+const PLAN_PRICE: Record<string, number> = { free: 0, start: 9, business: 29, pro: 59 };
+
+export default async function AdminPage({ searchParams }: { searchParams: Promise<{ range?: string }> }) {
   await requireSuperAdmin();
+  const sp = await searchParams;
+  const range = RANGES.find((r) => r.id === sp?.range) ?? RANGES[1]; // по подразбиране 30 дни
 
   const companies = await prisma.company.findMany({
     include: {
@@ -21,56 +34,73 @@ export default async function AdminPage() {
     return acc;
   }, {} as Record<string, number>);
 
-  // ─── Статистика на посещенията (последни 7 дни) ───
-  const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
-  const weekStart = new Date(dayStart); weekStart.setDate(weekStart.getDate() - 6);
-  const visits = await prisma.siteVisit.findMany({
-    where: { createdAt: { gte: weekStart } },
-    select: { visitorId: true, userId: true, createdAt: true },
-  });
+  // ─── Бизнес показатели ───
+  const [totalUsers, totalDocuments, allTimeVisitorRows, allTimeUserRows] = await Promise.all([
+    prisma.user.count(),
+    prisma.document.count(),
+    prisma.siteVisit.findMany({ distinct: ["visitorId"], select: { visitorId: true } }),
+    prisma.siteVisit.findMany({ where: { userId: { not: null } }, distinct: ["userId"], select: { userId: true } }),
+  ]);
+  const allTimeVisitors = allTimeVisitorRows.length;
+  const allTimeUsers = allTimeUserRows.length;
+  const paidCount = (counts.start ?? 0) + (counts.business ?? 0) + (counts.pro ?? 0);
+  const mrr = companies.reduce((s, c) => s + (PLAN_PRICE[c.subscription?.plan ?? "free"] ?? 0), 0);
+  const conversion = companies.length ? Math.round((paidCount / companies.length) * 100) : 0;
 
-  const DAY_NAMES = ["Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
-  const days = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(weekStart); d.setDate(weekStart.getDate() + i);
-    return { date: d, label: DAY_NAMES[d.getDay()], visits: 0, visitorSet: new Set<string>(), userSet: new Set<string>() };
-  });
-  for (const v of visits) {
-    const idx = Math.floor((new Date(v.createdAt).setHours(0, 0, 0, 0) - weekStart.getTime()) / 86400000);
-    if (idx < 0 || idx > 6) continue;
-    days[idx].visits++;
-    days[idx].visitorSet.add(v.visitorId);
-    if (v.userId) days[idx].userSet.add(v.userId);
+  // Сектори
+  const sectorMap = new Map<string, number>();
+  for (const c of companies) {
+    const s = c.sector || "Непосочен";
+    sectorMap.set(s, (sectorMap.get(s) ?? 0) + 1);
   }
-  const today = days[6];
-  const todayVisits = today.visits;
-  const todayVisitors = today.visitorSet.size;
-  const todayActiveUsers = today.userSet.size;
-  const maxVisits = Math.max(1, ...days.map((d) => d.visits));
+  const sectors = [...sectorMap.entries()].sort((a, b) => b[1] - a[1]);
 
-  // ─── Пълна статистика за целия период (по месеци) ───
-  const allVisits = await prisma.siteVisit.findMany({
+  // ─── Посещения (по избран период; броим ХОРА, не презареждания) ───
+  const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
+  let since: Date | null = null;
+  if (range.days) { since = new Date(dayStart); since.setDate(since.getDate() - (range.days - 1)); }
+
+  const visits = await prisma.siteVisit.findMany({
+    where: since ? { createdAt: { gte: since } } : {},
     select: { visitorId: true, userId: true, createdAt: true },
     orderBy: { createdAt: "asc" },
   });
 
-  const allTimeVisitors = new Set<string>();
-  const allTimeUsers = new Set<string>();
-  const MONTH_NAMES = ["Ян", "Фев", "Мар", "Апр", "Май", "Юни", "Юли", "Авг", "Сеп", "Окт", "Ное", "Дек"];
-  const monthMap = new Map<string, { label: string; visits: number; visitorSet: Set<string>; userSet: Set<string> }>();
-  for (const v of allVisits) {
-    allTimeVisitors.add(v.visitorId);
-    if (v.userId) allTimeUsers.add(v.userId);
-    const d = new Date(v.createdAt);
-    const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
-    if (!monthMap.has(key)) monthMap.set(key, { label: `${MONTH_NAMES[d.getMonth()]} ${String(d.getFullYear()).slice(2)}`, visits: 0, visitorSet: new Set(), userSet: new Set() });
-    const m = monthMap.get(key)!;
-    m.visits++;
-    m.visitorSet.add(v.visitorId);
-    if (v.userId) m.userSet.add(v.userId);
+  const keyOf = (d: Date) => range.bucket === "day"
+    ? `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
+    : `${d.getFullYear()}-${d.getMonth()}`;
+  const labelOf = (d: Date) => range.bucket === "day"
+    ? `${d.getDate()}.${d.getMonth() + 1}`
+    : `${MONTH_NAMES[d.getMonth()]} ${String(d.getFullYear()).slice(2)}`;
+
+  type Bucket = { label: string; visitorSet: Set<string>; userSet: Set<string> };
+  const bucketMap = new Map<string, Bucket>();
+  const ensure = (key: string, label: string) => {
+    if (!bucketMap.has(key)) bucketMap.set(key, { label, visitorSet: new Set(), userSet: new Set() });
+    return bucketMap.get(key)!;
+  };
+  if (range.bucket === "day" && range.days) {
+    for (let i = range.days - 1; i >= 0; i--) { const d = new Date(dayStart); d.setDate(d.getDate() - i); ensure(keyOf(d), labelOf(d)); }
+  } else if (range.id === "12m") {
+    for (let i = 11; i >= 0; i--) { const d = new Date(dayStart.getFullYear(), dayStart.getMonth() - i, 1); ensure(keyOf(d), labelOf(d)); }
   }
-  const months = [...monthMap.entries()].sort((a, b) => (a[0] < b[0] ? -1 : 1)).map(([, v]) => v);
-  const maxMonthVisits = Math.max(1, ...months.map((m) => m.visits));
-  const allTimeVisits = allVisits.length;
+  const todayVisitorSet = new Set<string>();
+  const todayUserSet = new Set<string>();
+  for (const v of visits) {
+    const d = new Date(v.createdAt);
+    const b = ensure(keyOf(d), labelOf(d));
+    b.visitorSet.add(v.visitorId);
+    if (v.userId) b.userSet.add(v.userId);
+    if (d >= dayStart) { todayVisitorSet.add(v.visitorId); if (v.userId) todayUserSet.add(v.userId); }
+  }
+  const buckets = [...bucketMap.values()];
+  const maxBucket = Math.max(1, ...buckets.map((b) => b.visitorSet.size));
+
+  const rangeVisitors = new Set(visits.map((v) => v.visitorId)).size;
+  const rangeUsers = new Set(visits.filter((v) => v.userId).map((v) => v.userId)).size;
+  const todayVisitors = todayVisitorSet.size;
+  const todayActiveUsers = todayUserSet.size;
+  const newCompanies = companies.filter((c) => !since || new Date(c.createdAt) >= since).length;
 
   return (
     <>
@@ -82,7 +112,7 @@ export default async function AdminPage() {
       </div>
 
       {/* Plan distribution */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 14 }}>
         {(["free", "start", "business", "pro"] as const).map((p) => (
           <div key={p} className="glass kpi-card">
             <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>{planLabels[p]}</div>
@@ -92,87 +122,114 @@ export default async function AdminPage() {
         ))}
       </div>
 
-      {/* Статистика на посещенията */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 14 }}>
+      {/* Бизнес показатели */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 20 }}>
         <div className="glass kpi-card">
-          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Посещения днес</div>
-          <div className="num" style={{ fontSize: 22, fontWeight: 600 }}>{todayVisits}</div>
-          <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>прегледани страници</div>
+          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Регистрирани потребители</div>
+          <div className="num" style={{ fontSize: 22, fontWeight: 600 }}>{totalUsers.toLocaleString("bg-BG")}</div>
         </div>
         <div className="glass kpi-card">
-          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Уникални посетители днес</div>
-          <div className="num" style={{ fontSize: 22, fontWeight: 600, color: "var(--navy)" }}>{todayVisitors}</div>
-          <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>вкл. анонимни</div>
+          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Издадени документи</div>
+          <div className="num" style={{ fontSize: 22, fontWeight: 600 }}>{totalDocuments.toLocaleString("bg-BG")}</div>
         </div>
         <div className="glass kpi-card">
-          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Активни регистрирани днес</div>
-          <div className="num" style={{ fontSize: 22, fontWeight: 600, color: "var(--emerald-dark)" }}>{todayActiveUsers}</div>
-          <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>потребители на фирми</div>
+          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Очакван месечен приход (MRR)</div>
+          <div className="num" style={{ fontSize: 22, fontWeight: 600, color: "var(--emerald-dark)" }}>{mrr.toLocaleString("bg-BG")} €</div>
+        </div>
+        <div className="glass kpi-card">
+          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Конверсия към платен план</div>
+          <div className="num" style={{ fontSize: 22, fontWeight: 600, color: "var(--navy)" }}>{conversion}%</div>
+          <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>{paidCount} от {companies.length} фирми</div>
         </div>
       </div>
 
+      {/* Посещения — с избор на период */}
       <div className="glass panel" style={{ padding: "18px 22px", marginBottom: 20 }}>
-        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 16px" }}>Активност през последните 7 дни</h3>
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 12, height: 130 }}>
-          {days.map((d, i) => (
-            <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-              <div style={{ fontSize: 11, color: "var(--ink-soft)" }} className="num">{d.visits}</div>
-              <div style={{ width: "100%", display: "flex", flexDirection: "column", justifyContent: "flex-end", height: 80 }}>
-                <div title={`${d.visits} посещения · ${d.visitorSet.size} уникални · ${d.userSet.size} активни`}
-                  style={{ height: `${(d.visits / maxVisits) * 100}%`, minHeight: 3, background: i === 6 ? "var(--emerald)" : "var(--navy)", borderRadius: "4px 4px 0 0" }} />
-              </div>
-              <div style={{ fontSize: 11, color: "var(--muted)" }}>{d.label}</div>
-              <div style={{ fontSize: 10, color: "var(--emerald-dark)", fontWeight: 600 }} className="num">{d.userSet.size}👤</div>
-            </div>
-          ))}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>Посещения и активност на сайта</h3>
+          <div style={{ display: "flex", gap: 4 }}>
+            {RANGES.map((r) => (
+              <Link key={r.id} href={`/dashboard/admin?range=${r.id}`}
+                className={`filter-tab${range.id === r.id ? " active" : ""}`} style={{ fontSize: 11.5 }}>
+                {r.label}
+              </Link>
+            ))}
+          </div>
         </div>
-        <div style={{ display: "flex", gap: 18, marginTop: 14, fontSize: 11.5, color: "var(--muted)" }}>
-          <span><span style={{ display: "inline-block", width: 9, height: 9, background: "var(--navy)", borderRadius: 2, marginRight: 5 }} />Посещения / ден</span>
-          <span>👤 Активни регистрирани потребители / ден</span>
-        </div>
-      </div>
 
-      {/* Статистика за целия период */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 14 }}>
-        <div className="glass kpi-card">
-          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Общо посещения (за целия период)</div>
-          <div className="num" style={{ fontSize: 22, fontWeight: 600 }}>{allTimeVisits.toLocaleString("bg-BG")}</div>
+        {/* KPIs за избрания период */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 18 }}>
+          <div style={{ background: "var(--navy-soft)", borderRadius: 10, padding: "12px 14px" }}>
+            <div style={{ fontSize: 11.5, color: "var(--muted)" }}>Посетители днес</div>
+            <div className="num" style={{ fontSize: 20, fontWeight: 700, color: "var(--navy)" }}>{todayVisitors}</div>
+          </div>
+          <div style={{ background: "var(--emerald-soft)", borderRadius: 10, padding: "12px 14px" }}>
+            <div style={{ fontSize: 11.5, color: "var(--muted)" }}>Активни регистрирани днес</div>
+            <div className="num" style={{ fontSize: 20, fontWeight: 700, color: "var(--emerald-dark)" }}>{todayActiveUsers}</div>
+          </div>
+          <div style={{ background: "var(--navy-soft)", borderRadius: 10, padding: "12px 14px" }}>
+            <div style={{ fontSize: 11.5, color: "var(--muted)" }}>Посетители ({range.label.toLowerCase()})</div>
+            <div className="num" style={{ fontSize: 20, fontWeight: 700, color: "var(--navy)" }}>{rangeVisitors}</div>
+          </div>
+          <div style={{ background: "var(--emerald-soft)", borderRadius: 10, padding: "12px 14px" }}>
+            <div style={{ fontSize: 11.5, color: "var(--muted)" }}>Активни регистрирани ({range.label.toLowerCase()})</div>
+            <div className="num" style={{ fontSize: 20, fontWeight: 700, color: "var(--emerald-dark)" }}>{rangeUsers}</div>
+          </div>
         </div>
-        <div className="glass kpi-card">
-          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Уникални посетители (общо)</div>
-          <div className="num" style={{ fontSize: 22, fontWeight: 600, color: "var(--navy)" }}>{allTimeVisitors.size.toLocaleString("bg-BG")}</div>
-        </div>
-        <div className="glass kpi-card">
-          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Активни регистрирани (общо)</div>
-          <div className="num" style={{ fontSize: 22, fontWeight: 600, color: "var(--emerald-dark)" }}>{allTimeUsers.size.toLocaleString("bg-BG")}</div>
-        </div>
-      </div>
 
-      <div className="glass panel" style={{ padding: "18px 22px", marginBottom: 20 }}>
-        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 16px" }}>Посещения по месеци — за целия период</h3>
-        {months.length === 0 ? (
-          <div style={{ fontSize: 13, color: "var(--muted)", padding: "12px 0" }}>Все още няма натрупани данни.</div>
+        {buckets.length === 0 ? (
+          <div style={{ fontSize: 13, color: "var(--muted)", padding: "12px 0" }}>Все още няма натрупани данни за този период.</div>
         ) : (
           <>
-            <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 150, overflowX: "auto", paddingBottom: 4 }}>
-              {months.map((m, i) => (
-                <div key={i} style={{ minWidth: 38, flex: "1 0 38px", display: "flex", flexDirection: "column", alignItems: "center", gap: 5 }}>
-                  <div style={{ fontSize: 10.5, color: "var(--ink-soft)" }} className="num">{m.visits}</div>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 150, overflowX: "auto", paddingBottom: 4 }}>
+              {buckets.map((b, i) => (
+                <div key={i} style={{ minWidth: 30, flex: "1 0 30px", display: "flex", flexDirection: "column", alignItems: "center", gap: 5 }}>
+                  <div style={{ fontSize: 10, color: "var(--ink-soft)" }} className="num">{b.visitorSet.size}</div>
                   <div style={{ width: "100%", display: "flex", flexDirection: "column", justifyContent: "flex-end", height: 90 }}>
-                    <div title={`${m.label}: ${m.visits} посещения · ${m.visitorSet.size} уникални · ${m.userSet.size} активни регистрирани`}
-                      style={{ height: `${(m.visits / maxMonthVisits) * 100}%`, minHeight: 3, background: i === months.length - 1 ? "var(--emerald)" : "var(--navy)", borderRadius: "4px 4px 0 0" }} />
+                    <div title={`${b.label}: ${b.visitorSet.size} посетители · ${b.userSet.size} активни регистрирани`}
+                      style={{ height: `${(b.visitorSet.size / maxBucket) * 100}%`, minHeight: 2, background: i === buckets.length - 1 ? "var(--emerald)" : "var(--navy)", borderRadius: "4px 4px 0 0" }} />
                   </div>
-                  <div style={{ fontSize: 10, color: "var(--muted)", whiteSpace: "nowrap" }}>{m.label}</div>
-                  <div style={{ fontSize: 9.5, color: "var(--emerald-dark)", fontWeight: 600 }} className="num">{m.userSet.size}👤</div>
+                  <div style={{ fontSize: 9, color: "var(--muted)", whiteSpace: "nowrap" }}>{b.label}</div>
+                  <div style={{ fontSize: 9, color: "var(--emerald-dark)", fontWeight: 600 }} className="num">{b.userSet.size}👤</div>
                 </div>
               ))}
             </div>
             <div style={{ display: "flex", gap: 18, marginTop: 14, fontSize: 11.5, color: "var(--muted)" }}>
-              <span><span style={{ display: "inline-block", width: 9, height: 9, background: "var(--navy)", borderRadius: 2, marginRight: 5 }} />Посещения / месец</span>
-              <span>👤 Активни регистрирани потребители / месец</span>
+              <span><span style={{ display: "inline-block", width: 9, height: 9, background: "var(--navy)", borderRadius: 2, marginRight: 5 }} />Посетители (хора)</span>
+              <span>👤 Активни регистрирани потребители</span>
+              <span style={{ marginLeft: "auto" }}>Общо за периода на сайта: {allTimeVisitors.toLocaleString("bg-BG")} посетители · {allTimeUsers.toLocaleString("bg-BG")} активни</span>
             </div>
           </>
         )}
+      </div>
+
+      {/* Разпределение по сектори + нови фирми */}
+      <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 16, marginBottom: 20, alignItems: "start" }}>
+        <div className="glass panel">
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>Фирми по сектор</h3>
+          {sectors.length === 0 ? <div style={{ fontSize: 13, color: "var(--muted)" }}>—</div> : sectors.map(([name, n]) => {
+            const max = sectors[0][1];
+            return (
+              <div key={name} style={{ marginBottom: 8 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
+                  <span>{name}</span><span className="num" style={{ color: "var(--muted)" }}>{n}</span>
+                </div>
+                <div style={{ height: 6, background: "rgba(217,215,200,.5)", borderRadius: 3 }}>
+                  <div style={{ width: `${(n / max) * 100}%`, height: "100%", background: "var(--brass)", borderRadius: 3 }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="glass panel">
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>Растеж</h3>
+          <div style={{ fontSize: 13, color: "var(--ink-soft)", lineHeight: 2 }}>
+            <div>Нови фирми ({range.label.toLowerCase()}): <strong className="num">{newCompanies}</strong></div>
+            <div>Общо фирми: <strong className="num">{companies.length}</strong></div>
+            <div>Платени фирми: <strong className="num">{paidCount}</strong></div>
+            <div>Безплатни фирми: <strong className="num">{counts.free ?? 0}</strong></div>
+          </div>
+        </div>
       </div>
 
       <div className="glass panel" style={{ padding: "8px 0", overflowX: "auto" }}>
