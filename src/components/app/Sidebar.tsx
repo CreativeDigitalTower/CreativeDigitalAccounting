@@ -29,9 +29,10 @@ interface SidebarProps {
   companyName: string;
   plan: string;
   isSuperAdmin?: boolean;
+  logoUrl?: string | null;
 }
 
-export function Sidebar({ companyName, plan, isSuperAdmin }: SidebarProps) {
+export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl }: SidebarProps) {
   const pathname = usePathname();
   const planId = plan as PlanId;
 
@@ -67,9 +68,15 @@ export function Sidebar({ companyName, plan, isSuperAdmin }: SidebarProps) {
           border: "1px solid rgba(255,255,255,.08)",
         }}
       >
-        <div style={{ fontSize: 10.5, color: "var(--brass)", fontWeight: 600, letterSpacing: 1, marginBottom: 3 }}>
+        <div style={{ fontSize: 10.5, color: "var(--brass)", fontWeight: 600, letterSpacing: 1, marginBottom: 6 }}>
           АКТИВНА ФИРМА
         </div>
+        {logoUrl && (
+          <div style={{ background: "#fff", borderRadius: 6, padding: 6, marginBottom: 8, display: "flex", justifyContent: "center" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={logoUrl} alt={companyName} style={{ maxHeight: 36, maxWidth: "100%", objectFit: "contain" }} />
+          </div>
+        )}
         <div style={{ fontWeight: 600, color: "#E9E7DA", fontSize: 13 }}>{companyName}</div>
       </div>
 

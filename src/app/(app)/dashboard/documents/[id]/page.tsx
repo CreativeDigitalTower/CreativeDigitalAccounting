@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Stamp } from "@/components/Stamp";
 import { DocumentActions } from "@/components/app/DocumentActions";
-import { formatCurrency, toBGN, isDualCurrencyActive, EUR_TO_BGN, getTemplate } from "@/lib/constants";
+import { formatCurrency, toBGN, isDualCurrencyActive, EUR_TO_BGN, getTemplate, paymentMethodLabel } from "@/lib/constants";
 
 const TYPE_LABELS: Record<string, string> = {
   invoice: "ФАКТУРА",
@@ -20,10 +20,13 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
 
   const doc = await prisma.document.findUnique({
     where: { id },
-    include: { client: true, lines: true, company: true },
+    include: { client: true, lines: true, company: { include: { subscription: true } } },
   });
 
   if (!doc || doc.companyId !== companyId) notFound();
+
+  const plan = doc.company.subscription?.plan ?? "free";
+  const showLogo = plan !== "free" && !!doc.company.logoUrl; // лого във фактурата само за платени планове
 
   const dual = isDualCurrencyActive() && doc.currency === "EUR";
   const subtotal = doc.lines.reduce((s, l) => s + l.quantity * l.unitPrice, 0);
@@ -51,14 +54,14 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
       </div>
 
       {/* Document */}
-      <div className="glass" style={{ borderRadius: 14, maxWidth: 800, overflow: "hidden" }}>
+      <div className="glass printable" style={{ borderRadius: 14, maxWidth: 800, overflow: "hidden" }}>
         {isBand && <div style={{ height: 10, background: accent }} />}
         <div style={{ padding: "40px 48px" }}>
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
           <div>
-            {doc.company.logoUrl
-              ? <img src={doc.company.logoUrl} alt={doc.company.name} style={{ maxHeight: 56, maxWidth: 180, objectFit: "contain", marginBottom: 8 }} />
+            {showLogo
+              ? <img src={doc.company.logoUrl!} alt={doc.company.name} style={{ maxHeight: 56, maxWidth: 180, objectFit: "contain", marginBottom: 8 }} />
               : <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 20, color: accent, marginBottom: 6 }}>{doc.company.name}</div>}
             <div style={{ fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.7 }}>
               <div style={{ fontWeight: 600 }}>{doc.company.name}</div>
@@ -148,13 +151,35 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
           </p>
         )}
 
+        {/* Начин на плащане */}
+        <div style={{ marginTop: 20, borderTop: "1px solid var(--border)", paddingTop: 14, fontSize: 12.5, color: "var(--ink-soft)" }}>
+          <strong style={{ color: accent }}>Начин на плащане:</strong> {paymentMethodLabel(doc.paymentMethod)}
+          {doc.paymentMethod === "bank_transfer" && doc.company.bankIban && (
+            <div style={{ marginTop: 8, lineHeight: 1.7 }}>
+              <div>Получател: <strong>{doc.company.name}</strong></div>
+              <div>IBAN: <span className="num">{doc.company.bankIban}</span></div>
+              {doc.company.bankName && <div>Банка: {doc.company.bankName}</div>}
+              {doc.company.bankBic && <div>BIC: {doc.company.bankBic}</div>}
+              <div>Основание: {doc.number}</div>
+            </div>
+          )}
+        </div>
+
         {doc.notes && (
-          <div style={{ marginTop: 20, fontSize: 12.5, color: "var(--ink-soft)", borderTop: "1px solid var(--border)", paddingTop: 12 }}>
-            <strong>Бележки:</strong> {doc.notes}
+          <div style={{ marginTop: 16, fontSize: 12.5, color: "var(--ink-soft)", borderTop: "1px solid var(--border)", paddingTop: 12 }}>
+            <strong>Забележки:</strong> {doc.notes}
           </div>
         )}
         </div>
       </div>
+
+      {/* Вътрешен коментар — само за вашия екип, НЕ е част от документа */}
+      {doc.internalComment && (
+        <div className="glass no-print" style={{ maxWidth: 800, marginTop: 14, padding: "14px 18px", borderRadius: 12, borderLeft: "4px solid var(--brass)" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--brass)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Вътрешен коментар (не се вижда от клиента)</div>
+          <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>{doc.internalComment}</div>
+        </div>
+      )}
     </>
   );
 }

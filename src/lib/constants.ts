@@ -76,6 +76,28 @@ export function getTemplate(id: string | null | undefined) {
   return INVOICE_TEMPLATES.find((t) => t.id === id) ?? INVOICE_TEMPLATES[0];
 }
 
+export const PAYMENT_METHODS = [
+  { id: "cash", label: "В брой" },
+  { id: "bank_transfer", label: "Банков път" },
+  { id: "cod", label: "Наложен платеж" },
+  { id: "card", label: "С карта" },
+  { id: "payment_order", label: "Платежно нареждане" },
+  { id: "cheque", label: "Чек / Ваучер" },
+  { id: "offset", label: "С насрещно прихващане" },
+  { id: "money_transfer", label: "Паричен превод" },
+  { id: "epay", label: "ePay" },
+  { id: "paypal", label: "PayPal" },
+  { id: "stripe", label: "Stripe" },
+  { id: "revolut", label: "Revolut" },
+  { id: "easypay", label: "EasyPay" },
+  { id: "postal", label: "Пощенски паричен превод" },
+  { id: "other", label: "Друг" },
+] as const;
+
+export function paymentMethodLabel(id: string): string {
+  return PAYMENT_METHODS.find((m) => m.id === id)?.label ?? id;
+}
+
 export const DOC_STATUSES = [
   { value: "draft", label: "Чернова", color: "muted" },
   { value: "issued", label: "Издадена", color: "navy" },

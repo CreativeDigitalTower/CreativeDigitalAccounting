@@ -281,12 +281,14 @@ model Document {
   currency           String         @default("EUR")
   language           String         @default("bg")
   template           String         @default("classic")
+  paymentMethod      String         @default("bank_transfer")
   paidAmount         Float          @default(0)
   status             DocumentStatus @default(draft)
   isRecurring        Boolean        @default(false)
   recurrenceInterval String?
   parentDocumentId   String?
   notes              String?        @db.Text
+  internalComment    String?        @db.Text
   createdAt          DateTime       @default(now())
 
   company        Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)

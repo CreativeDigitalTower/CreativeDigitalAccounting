@@ -63,45 +63,55 @@ export default async function InvoicesPage({
         ))}
       </div>
 
-      <div className="glass panel" style={{ padding: "8px 0" }}>
-        {invoices.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>🧾</div>
-            <div style={{ fontSize: 14, marginBottom: 16 }}>Няма фактури</div>
-            <Link href="/dashboard/documents/new?type=invoice" className="btn btn-primary btn-sm">Издай първата фактура</Link>
+      {invoices.length === 0 ? (
+        <div className="glass panel" style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
+          <div style={{ fontSize: 32, marginBottom: 12 }}>🧾</div>
+          <div style={{ fontSize: 14, marginBottom: 16 }}>Няма фактури</div>
+          <Link href="/dashboard/documents/new?type=invoice" className="btn btn-primary btn-sm">Издай първата фактура</Link>
+        </div>
+      ) : (
+        groupByMonth(invoices).map((group) => (
+          <div key={group.key} style={{ marginBottom: 18 }}>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 8px", textTransform: "capitalize" }}>{group.label}</h3>
+            <div className="glass panel" style={{ padding: "8px 0" }}>
+              <table>
+                <thead><tr><th>№</th><th>Клиент</th><th>Дата</th><th>Падеж</th><th className="num">Сума</th><th>Статус</th><th></th></tr></thead>
+                <tbody>
+                  {group.items.map((doc) => {
+                    const total = doc.lines.reduce((s, l) => s + l.lineTotal, 0);
+                    return (
+                      <tr key={doc.id}>
+                        <td className="num" style={{ fontSize: 12.5 }}>{doc.number}</td>
+                        <td style={{ fontWeight: 600 }}>{doc.client?.name ?? "—"}</td>
+                        <td style={{ fontSize: 13, color: "var(--ink-soft)" }}>{new Date(doc.issueDate).toLocaleDateString("bg-BG")}</td>
+                        <td style={{ fontSize: 13, color: "var(--ink-soft)" }}>{doc.dueDate ? new Date(doc.dueDate).toLocaleDateString("bg-BG") : "—"}</td>
+                        <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(total, doc.currency)}</td>
+                        <td><Stamp status={doc.status} /></td>
+                        <td style={{ display: "flex", gap: 6 }}>
+                          <Link href={`/dashboard/documents/${doc.id}`} className="btn btn-ghost btn-sm">Отвори</Link>
+                          <Link href={`/dashboard/documents/${doc.id}/edit`} className="btn btn-ghost btn-sm">✎</Link>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>№</th>
-                <th>Клиент</th>
-                <th>Дата</th>
-                <th>Падеж</th>
-                <th className="num">Сума</th>
-                <th>Статус</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {invoices.map((doc) => {
-                const total = doc.lines.reduce((s, l) => s + l.lineTotal, 0);
-                return (
-                  <tr key={doc.id}>
-                    <td className="num" style={{ fontSize: 12.5 }}>{doc.number}</td>
-                    <td style={{ fontWeight: 600 }}>{doc.client?.name ?? "—"}</td>
-                    <td style={{ fontSize: 13, color: "var(--ink-soft)" }}>{new Date(doc.issueDate).toLocaleDateString("bg-BG")}</td>
-                    <td style={{ fontSize: 13, color: "var(--ink-soft)" }}>{doc.dueDate ? new Date(doc.dueDate).toLocaleDateString("bg-BG") : "—"}</td>
-                    <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(total, doc.currency)}</td>
-                    <td><Stamp status={doc.status} /></td>
-                    <td><Link href={`/dashboard/documents/${doc.id}`} className="btn btn-ghost btn-sm">Отвори</Link></td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
+        ))
+      )}
     </>
   );
+}
+
+function groupByMonth<T extends { issueDate: Date | string }>(items: T[]) {
+  const MONTHS = ["Януари", "Февруари", "Март", "Април", "Май", "Юни", "Юли", "Август", "Септември", "Октомври", "Ноември", "Декември"];
+  const map = new Map<string, { key: string; label: string; items: T[] }>();
+  for (const it of items) {
+    const d = new Date(it.issueDate);
+    const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
+    if (!map.has(key)) map.set(key, { key, label: `${MONTHS[d.getMonth()]} ${d.getFullYear()}`, items: [] });
+    map.get(key)!.items.push(it);
+  }
+  return Array.from(map.values()).sort((a, b) => (a.key < b.key ? 1 : -1));
 }

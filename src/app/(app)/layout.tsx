@@ -30,7 +30,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div style={{ display: "flex", minHeight: "100vh", position: "relative" }}>
       <BlobBackground />
       <div style={{ position: "relative", zIndex: 1, display: "flex", width: "100%" }}>
-        <Sidebar companyName={company.name} plan={plan} isSuperAdmin={isSuperAdmin} />
+        <Sidebar companyName={company.name} plan={plan} isSuperAdmin={isSuperAdmin} logoUrl={plan !== "free" ? company.logoUrl : null} />
         <main style={{ flex: 1, minWidth: 0, maxWidth: 1180 }}>
           {impersonating && <ImpersonationBanner companyName={company.name} />}
           <div style={{ padding: "28px 36px 60px" }}>{children}</div>

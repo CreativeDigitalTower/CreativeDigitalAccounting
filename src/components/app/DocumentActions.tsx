@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { DOC_STATUSES } from "@/lib/constants";
 
 export function DocumentActions({ id, status }: { id: string; status: string }) {
@@ -21,6 +22,12 @@ export function DocumentActions({ id, status }: { id: string; status: string }) 
     if (res.ok) router.refresh();
   }
 
+  function downloadPdf() {
+    document.body.classList.add("printing-doc");
+    window.print();
+    setTimeout(() => document.body.classList.remove("printing-doc"), 500);
+  }
+
   return (
     <div className="no-print" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -36,7 +43,8 @@ export function DocumentActions({ id, status }: { id: string; status: string }) 
           ))}
         </select>
       </div>
-      <button onClick={() => window.print()} className="btn btn-ghost btn-sm">🖨 Печат</button>
+      <Link href={`/dashboard/documents/${id}/edit`} className="btn btn-ghost btn-sm">✎ Редактирай</Link>
+      <button onClick={downloadPdf} className="btn btn-primary btn-sm">↓ Изтегли PDF</button>
     </div>
   );
 }

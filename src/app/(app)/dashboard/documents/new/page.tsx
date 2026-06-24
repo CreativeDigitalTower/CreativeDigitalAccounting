@@ -5,10 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   isDualCurrencyActive, toBGN, formatCurrency, EUR_TO_BGN,
-  CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES,
+  CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, PAYMENT_METHODS,
 } from "@/lib/constants";
 
-type Client = { id: string; name: string; vatNumber: string | null };
+type ClientFull = { id: string; name: string; eik: string | null; vatNumber: string | null; city: string | null; address: string | null; contactEmail: string | null };
 type Line = { description: string; quantity: number; unitPrice: number; vatRate: number };
 
 const DOC_TYPES = [
@@ -26,9 +26,10 @@ function NewDocumentForm() {
 
   const [type, setType] = useState(searchParams.get("type") ?? "invoice");
   const [number, setNumber] = useState("");
-  const [clientMode, setClientMode] = useState<"select" | "manual">("select");
+  const [clientMode, setClientMode] = useState<"select" | "manual">("manual");
   const [clientId, setClientId] = useState("");
-  const [clients, setClients] = useState<Client[]>([]);
+  const [clients, setClients] = useState<ClientFull[]>([]);
+  const [suggestOpen, setSuggestOpen] = useState(false);
   // ръчни данни на клиента
   const [mClient, setMClient] = useState({
     name: "", eik: "", vatNumber: "", vatRegistered: false, mol: "", city: "", address: "", contactEmail: "",
@@ -36,6 +37,7 @@ function NewDocumentForm() {
   const [currency, setCurrency] = useState("EUR");
   const [language, setLanguage] = useState("bg");
   const [template, setTemplate] = useState("classic");
+  const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
   const [lines, setLines] = useState<Line[]>([{ description: "", quantity: 1, unitPrice: 0, vatRate: 20 }]);
   const [issueDate, setIssueDate] = useState(new Date().toISOString().slice(0, 10));
   const [taxEventDate, setTaxEventDate] = useState(new Date().toISOString().slice(0, 10));
@@ -45,8 +47,27 @@ function NewDocumentForm() {
     return d.toISOString().slice(0, 10);
   });
   const [notes, setNotes] = useState("");
+  const [internalComment, setInternalComment] = useState("");
+  const [companyReady, setCompanyReady] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  // Предложения за клиент при ръчно въвеждане (по име или ЕИК)
+  const suggestions = mClient.name.length >= 2 || mClient.eik.length >= 2
+    ? clients.filter((c) =>
+        c.name.toLowerCase().includes(mClient.name.toLowerCase()) ||
+        (mClient.eik && c.eik?.includes(mClient.eik))
+      ).slice(0, 6)
+    : [];
+
+  function pickClient(c: ClientFull) {
+    setMClient({
+      name: c.name, eik: c.eik ?? "", vatNumber: c.vatNumber ?? "", vatRegistered: false,
+      mol: "", city: c.city ?? "", address: c.address ?? "", contactEmail: c.contactEmail ?? "",
+    });
+    setClientId(c.id);
+    setSuggestOpen(false);
+  }
 
   useEffect(() => {
     fetch("/api/clients").then((r) => r.json()).then(setClients).catch(() => {});
@@ -55,6 +76,8 @@ function NewDocumentForm() {
       if (c?.defaultCurrency) setCurrency(c.defaultCurrency);
       if (c?.defaultLanguage) setLanguage(c.defaultLanguage);
       if (c?.invoiceTemplate) setTemplate(c.invoiceTemplate);
+      // Изисква попълнени фирмени данни преди фактуриране
+      setCompanyReady(!!(c?.name && c?.eik && c?.address));
     }).catch(() => {});
   }, []);
 
@@ -82,26 +105,43 @@ function NewDocumentForm() {
   const showBgn = dual && currency === "EUR";
 
   async function handleSave(status: "draft" | "issued" | "sent") {
-    setSaving(true);
     setError("");
 
-    let finalClientId: string | null = clientId || null;
+    // Изисквай фирмени данни преди реално издаване
+    if (status !== "draft" && !companyReady) {
+      setError("Първо попълнете данните на вашата фирма (Профил на фирмата), за да издавате документи.");
+      return;
+    }
 
-    // Ръчно въведен клиент → създай и запиши в базата
-    if (clientMode === "manual" && mClient.name.trim()) {
-      const cRes = await fetch("/api/clients", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(mClient),
-      });
-      if (cRes.ok) {
-        const created = await cRes.json();
-        finalClientId = created.id;
-      } else {
-        setSaving(false);
-        setError("Грешка при запис на клиента.");
+    // Валидация на получателя (при издаване)
+    if (status !== "draft") {
+      if (clientMode === "manual") {
+        const req = [mClient.name, mClient.eik, mClient.city, mClient.address];
+        if (req.some((v) => !v.trim())) {
+          setError("Попълнете задължителните данни на клиента: име, ЕИК, град и адрес.");
+          return;
+        }
+      } else if (!clientId) {
+        setError("Изберете клиент или въведете данните ръчно.");
         return;
       }
+      if (lines.some((l) => !l.description.trim() || l.quantity <= 0)) {
+        setError("Всеки ред трябва да има описание и количество.");
+        return;
+      }
+    }
+
+    setSaving(true);
+    let finalClientId: string | null = clientId || null;
+
+    // Ръчно въведен клиент без избор от списъка → създай нов и запиши в базата
+    if (clientMode === "manual" && !clientId && mClient.name.trim()) {
+      const cRes = await fetch("/api/clients", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(mClient),
+      });
+      if (cRes.ok) finalClientId = (await cRes.json()).id;
+      else { setSaving(false); setError("Грешка при запис на клиента."); return; }
     }
 
     const res = await fetch("/api/documents", {
@@ -109,7 +149,8 @@ function NewDocumentForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         type, number: number || undefined, clientId: finalClientId,
-        issueDate, taxEventDate, dueDate, currency, language, template, notes, lines, status,
+        issueDate, taxEventDate, dueDate, currency, language, template, paymentMethod,
+        notes, internalComment, lines, status,
       }),
     });
     setSaving(false);
@@ -121,8 +162,6 @@ function NewDocumentForm() {
       router.push(`/dashboard/documents/${doc.id}`);
     }
   }
-
-  const curSymbol = CURRENCIES.find((c) => c.code === currency)?.code ?? currency;
 
   return (
     <>
@@ -141,6 +180,13 @@ function NewDocumentForm() {
 
       {error && (
         <div style={{ background: "var(--brick-soft)", border: "1px solid var(--brick)", color: "var(--brick)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 16 }}>{error}</div>
+      )}
+
+      {!companyReady && (
+        <div style={{ background: "var(--brass-soft)", border: "1px solid var(--brass)", color: "var(--brass)", borderRadius: 8, padding: "12px 16px", fontSize: 13, marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+          <span>⚠ За да издавате документи, първо попълнете данните на вашата фирма (име, ЕИК, адрес).</span>
+          <Link href="/dashboard/settings" className="btn btn-primary btn-sm">Попълни сега →</Link>
+        </div>
       )}
 
       <div className="glass panel" style={{ padding: "24px 28px" }}>
@@ -182,6 +228,12 @@ function NewDocumentForm() {
               {INVOICE_TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
             </select>
           </div>
+          <div>
+            <label>Начин на плащане</label>
+            <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
+              {PAYMENT_METHODS.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
+            </select>
+          </div>
         </div>
 
         {/* Клиент: избор / ръчно */}
@@ -201,13 +253,30 @@ function NewDocumentForm() {
             </select>
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
-              <div style={{ gridColumn: "1 / -1" }}>
+              <div style={{ gridColumn: "1 / -1", position: "relative" }}>
                 <label>Клиент / Фирма *</label>
-                <input type="text" value={mClient.name} onChange={(e) => setMClient({ ...mClient, name: e.target.value })} placeholder="ЕООД Примерна" />
+                <input
+                  type="text" value={mClient.name}
+                  onChange={(e) => { setMClient({ ...mClient, name: e.target.value }); setClientId(""); setSuggestOpen(true); }}
+                  onFocus={() => setSuggestOpen(true)}
+                  placeholder="Започнете да пишете име или ЕИК…" autoComplete="off"
+                />
+                {suggestOpen && suggestions.length > 0 && (
+                  <div className="glass" style={{ position: "absolute", top: "100%", left: 0, right: 0, zIndex: 20, borderRadius: 8, marginTop: 4, maxHeight: 220, overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,.15)" }}>
+                    {suggestions.map((c) => (
+                      <button key={c.id} type="button" onClick={() => pickClient(c)}
+                        style={{ display: "block", width: "100%", textAlign: "left", padding: "9px 12px", background: "none", border: "none", borderBottom: "1px solid rgba(217,215,200,.5)", cursor: "pointer", fontSize: 13 }}>
+                        <span style={{ fontWeight: 600 }}>{c.name}</span>
+                        {c.eik && <span style={{ color: "var(--muted)", marginLeft: 8, fontSize: 12 }}>ЕИК {c.eik}</span>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {clientId && <div style={{ fontSize: 11.5, color: "var(--emerald)", marginTop: 4 }}>✓ Избран съществуващ клиент — данните са попълнени автоматично.</div>}
               </div>
               <div>
-                <label>ЕИК / Булстат</label>
-                <input type="text" value={mClient.eik} onChange={(e) => setMClient({ ...mClient, eik: e.target.value })} />
+                <label>ЕИК / Булстат *</label>
+                <input type="text" value={mClient.eik} onChange={(e) => { setMClient({ ...mClient, eik: e.target.value }); setClientId(""); setSuggestOpen(true); }} />
               </div>
               <div>
                 <label>ДДС номер</label>
@@ -225,11 +294,11 @@ function NewDocumentForm() {
                 <input type="text" value={mClient.mol} onChange={(e) => setMClient({ ...mClient, mol: e.target.value })} />
               </div>
               <div>
-                <label>Град</label>
+                <label>Град *</label>
                 <input type="text" value={mClient.city} onChange={(e) => setMClient({ ...mClient, city: e.target.value })} />
               </div>
               <div style={{ gridColumn: "1 / -1" }}>
-                <label>Адрес</label>
+                <label>Адрес *</label>
                 <input type="text" value={mClient.address} onChange={(e) => setMClient({ ...mClient, address: e.target.value })} />
               </div>
               <div>
@@ -306,9 +375,15 @@ function NewDocumentForm() {
           </p>
         )}
 
-        <div style={{ marginTop: 20 }}>
-          <label>Бележки (незадължително)</label>
-          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Допълнителна информация за клиента…" />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 20 }}>
+          <div>
+            <label>Забележки (видими за клиента)</label>
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Напр. условия, благодарност, допълнителна информация…" />
+          </div>
+          <div>
+            <label>Коментари (вътрешни, НЕ се виждат от клиента)</label>
+            <textarea value={internalComment} onChange={(e) => setInternalComment(e.target.value)} rows={3} placeholder="Вътрешни бележки само за вашия екип…" style={{ background: "rgba(166,130,47,.06)" }} />
+          </div>
         </div>
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 24, flexWrap: "wrap" }}>
