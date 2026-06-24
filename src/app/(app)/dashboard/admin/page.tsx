@@ -21,6 +21,32 @@ export default async function AdminPage() {
     return acc;
   }, {} as Record<string, number>);
 
+  // ─── Статистика на посещенията (последни 7 дни) ───
+  const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
+  const weekStart = new Date(dayStart); weekStart.setDate(weekStart.getDate() - 6);
+  const visits = await prisma.siteVisit.findMany({
+    where: { createdAt: { gte: weekStart } },
+    select: { visitorId: true, userId: true, createdAt: true },
+  });
+
+  const DAY_NAMES = ["Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(weekStart); d.setDate(weekStart.getDate() + i);
+    return { date: d, label: DAY_NAMES[d.getDay()], visits: 0, visitorSet: new Set<string>(), userSet: new Set<string>() };
+  });
+  for (const v of visits) {
+    const idx = Math.floor((new Date(v.createdAt).setHours(0, 0, 0, 0) - weekStart.getTime()) / 86400000);
+    if (idx < 0 || idx > 6) continue;
+    days[idx].visits++;
+    days[idx].visitorSet.add(v.visitorId);
+    if (v.userId) days[idx].userSet.add(v.userId);
+  }
+  const today = days[6];
+  const todayVisits = today.visits;
+  const todayVisitors = today.visitorSet.size;
+  const todayActiveUsers = today.userSet.size;
+  const maxVisits = Math.max(1, ...days.map((d) => d.visits));
+
   return (
     <>
       <div style={{ marginBottom: 20 }}>
@@ -39,6 +65,46 @@ export default async function AdminPage() {
             <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>фирми</div>
           </div>
         ))}
+      </div>
+
+      {/* Статистика на посещенията */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 14 }}>
+        <div className="glass kpi-card">
+          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Посещения днес</div>
+          <div className="num" style={{ fontSize: 22, fontWeight: 600 }}>{todayVisits}</div>
+          <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>прегледани страници</div>
+        </div>
+        <div className="glass kpi-card">
+          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Уникални посетители днес</div>
+          <div className="num" style={{ fontSize: 22, fontWeight: 600, color: "var(--navy)" }}>{todayVisitors}</div>
+          <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>вкл. анонимни</div>
+        </div>
+        <div className="glass kpi-card">
+          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Активни регистрирани днес</div>
+          <div className="num" style={{ fontSize: 22, fontWeight: 600, color: "var(--emerald-dark)" }}>{todayActiveUsers}</div>
+          <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>потребители на фирми</div>
+        </div>
+      </div>
+
+      <div className="glass panel" style={{ padding: "18px 22px", marginBottom: 20 }}>
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 16px" }}>Активност през последните 7 дни</h3>
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 12, height: 130 }}>
+          {days.map((d, i) => (
+            <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+              <div style={{ fontSize: 11, color: "var(--ink-soft)" }} className="num">{d.visits}</div>
+              <div style={{ width: "100%", display: "flex", flexDirection: "column", justifyContent: "flex-end", height: 80 }}>
+                <div title={`${d.visits} посещения · ${d.visitorSet.size} уникални · ${d.userSet.size} активни`}
+                  style={{ height: `${(d.visits / maxVisits) * 100}%`, minHeight: 3, background: i === 6 ? "var(--emerald)" : "var(--navy)", borderRadius: "4px 4px 0 0" }} />
+              </div>
+              <div style={{ fontSize: 11, color: "var(--muted)" }}>{d.label}</div>
+              <div style={{ fontSize: 10, color: "var(--emerald-dark)", fontWeight: 600 }} className="num">{d.userSet.size}👤</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: 18, marginTop: 14, fontSize: 11.5, color: "var(--muted)" }}>
+          <span><span style={{ display: "inline-block", width: 9, height: 9, background: "var(--navy)", borderRadius: 2, marginRight: 5 }} />Посещения / ден</span>
+          <span>👤 Активни регистрирани потребители / ден</span>
+        </div>
       </div>
 
       <div className="glass panel" style={{ padding: "8px 0", overflowX: "auto" }}>

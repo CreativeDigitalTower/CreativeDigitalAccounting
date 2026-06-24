@@ -483,6 +483,20 @@ model HandoverProtocol {
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
+// ─── Посещения на сайта (за статистика в админ панела) ───────────────────
+model SiteVisit {
+  id        String   @id @default(cuid())
+  visitorId String
+  path      String
+  area      String   @default("public") // public | app
+  userId    String?
+  companyId String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([visitorId])
+}
+
 model ArchiveFile {
   id         String   @id @default(cuid())
   companyId  String

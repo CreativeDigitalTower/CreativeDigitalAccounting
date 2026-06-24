@@ -6,6 +6,7 @@ import { getCompanyId, IMPERSONATE_COOKIE } from "@/lib/session";
 import { BlobBackground } from "@/components/Backgrounds";
 import { Sidebar } from "@/components/app/Sidebar";
 import { ImpersonationBanner } from "@/components/app/ImpersonationBanner";
+import { VisitTracker } from "@/components/VisitTracker";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -28,6 +29,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", position: "relative" }}>
+      <VisitTracker area="app" />
       <BlobBackground />
       <div style={{ position: "relative", zIndex: 1, display: "flex", width: "100%" }}>
         <Sidebar companyName={company.name} plan={plan} isSuperAdmin={isSuperAdmin} logoUrl={plan !== "free" ? company.logoUrl : null} />
