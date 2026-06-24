@@ -70,7 +70,15 @@ function NewDocumentForm() {
   }
 
   useEffect(() => {
-    fetch("/api/clients").then((r) => r.json()).then(setClients).catch(() => {});
+    const preselect = searchParams.get("clientId");
+    fetch("/api/clients").then((r) => r.json()).then((list: ClientFull[]) => {
+      setClients(list);
+      // Предварителен избор на клиент (от списъка с клиенти / досие)
+      if (preselect) {
+        const c = list.find((x) => x.id === preselect);
+        if (c) { setClientMode("manual"); pickClient(c); }
+      }
+    }).catch(() => {});
     // Зареди основните настройки от профила на фирмата
     fetch("/api/company").then((r) => r.json()).then((c) => {
       if (c?.defaultCurrency) setCurrency(c.defaultCurrency);
