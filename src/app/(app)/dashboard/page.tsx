@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Stamp } from "@/components/Stamp";
 import { WelcomeWizard } from "@/components/app/WelcomeWizard";
-import { formatCurrency, toBGN, isDualCurrencyActive, FREE_PLAN_LIMIT, getYearMonth } from "@/lib/constants";
+import { formatCurrency, toBGN, isDualCurrencyActive, FREE_PLAN_LIMIT, getYearMonth, planHasFeature, type PlanId } from "@/lib/constants";
 import { TopClientsChart, aggregateClientRevenue } from "@/components/app/TopClientsChart";
 
 export default async function DashboardPage() {
@@ -27,6 +27,7 @@ export default async function DashboardPage() {
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const yearStart = new Date(now.getFullYear(), 0, 1);
 
   // KPIs
@@ -100,6 +101,45 @@ export default async function DashboardPage() {
     select: { client: { select: { name: true } }, lines: { select: { lineTotal: true } } },
   });
   const clientRevenue = aggregateClientRevenue(clientRevenueInvoices);
+
+  // Бизнес здравен индекс + напомняния за плащане (Бизнес + Про)
+  const hasHealth = planHasFeature((subscription?.plan ?? "free") as PlanId, "health_index");
+  let health: { score: number; notes: string[] } | null = null;
+  let paymentReminders: { id: string; number: string; client: string; total: number; dueDate: Date; daysOverdue: number }[] = [];
+  if (hasHealth) {
+    const lastMonthInvoices = await prisma.document.findMany({
+      where: { companyId, type: "invoice", status: { in: ["paid", "sent"] }, issueDate: { gte: lastMonthStart, lt: monthStart } },
+      include: { lines: true },
+    });
+    const lastMonthRevenue = lastMonthInvoices.reduce((s, d) => s + d.lines.reduce((ss, l) => ss + l.lineTotal, 0), 0);
+    const margin = monthRevenue > 0 ? (profit / monthRevenue) * 100 : 0;
+    const notes: string[] = [];
+    let score = 100;
+    if (monthRevenue === 0) { score -= 25; notes.push("Няма приходи за текущия месец."); }
+    if (profit < 0) { score -= 30; notes.push("Разходите надвишават приходите."); }
+    else if (margin < 10) { score -= 10; notes.push("Нисък марж на печалба (под 10%)."); }
+    if (overdueInvoices > 0) { score -= Math.min(25, overdueInvoices * 5); notes.push(`${overdueInvoices} просрочени фактури.`); }
+    if (lastMonthRevenue > 0 && monthRevenue < lastMonthRevenue) { score -= 15; notes.push("Спад в приходите спрямо миналия месец."); }
+    if (notes.length === 0) notes.push("Бизнесът е в добро финансово състояние.");
+    score = Math.max(0, Math.min(100, Math.round(score)));
+    health = { score, notes };
+
+    const unpaid = await prisma.document.findMany({
+      where: { companyId, type: "invoice", status: { in: ["sent", "overdue", "issued"] }, dueDate: { not: null } },
+      include: { client: true, lines: true },
+      orderBy: { dueDate: "asc" },
+    });
+    const todayMid = new Date(); todayMid.setHours(0, 0, 0, 0);
+    paymentReminders = unpaid
+      .map((d) => {
+        const total = d.lines.reduce((s, l) => s + l.lineTotal, 0);
+        const due = d.dueDate as Date;
+        const daysOverdue = Math.round((todayMid.getTime() - new Date(due).setHours(0, 0, 0, 0)) / 86400000);
+        return { id: d.id, number: d.number, client: d.client?.name ?? "—", total, dueDate: due, daysOverdue };
+      })
+      .filter((r) => r.daysOverdue >= -3) // падеж до 3 дни напред или вече просрочени
+      .slice(0, 8);
+  }
 
   return (
     <>
@@ -182,6 +222,48 @@ export default async function DashboardPage() {
           </div>
         ))}
       </div>
+
+      {/* Бизнес здравен индекс + Напомняния за плащане */}
+      {hasHealth && health && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: 18, marginBottom: 18, alignItems: "start" }}>
+          <div className="glass panel">
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 12px" }}>Бизнес здравен индекс</h3>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <div style={{ position: "relative", width: 90, height: 90, flexShrink: 0 }}>
+                <div style={{ width: 90, height: 90, borderRadius: "50%", background: `conic-gradient(${health.score >= 70 ? "var(--emerald)" : health.score >= 40 ? "var(--brass)" : "var(--brick)"} ${health.score * 3.6}deg, rgba(217,215,200,.5) 0deg)` }} />
+                <div style={{ position: "absolute", inset: 12, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
+                  <span className="num" style={{ fontSize: 22, fontWeight: 700 }}>{health.score}</span>
+                  <span style={{ fontSize: 9, color: "var(--muted)" }}>/ 100</span>
+                </div>
+              </div>
+              <ul style={{ margin: 0, paddingLeft: 16, fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.6 }}>
+                {health.notes.map((n, i) => <li key={i}>{n}</li>)}
+              </ul>
+            </div>
+          </div>
+
+          <div className="glass panel">
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 12px" }}>Напомняния за плащане</h3>
+            {paymentReminders.length === 0 ? (
+              <div style={{ fontSize: 13, color: "var(--muted)" }}>Няма предстоящи или просрочени неплатени фактури.</div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {paymentReminders.map((r) => (
+                  <Link key={r.id} href={`/dashboard/documents/${r.id}`} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, fontSize: 13, padding: "6px 0", borderBottom: "1px solid rgba(217,215,200,.4)", textDecoration: "none", color: "inherit" }}>
+                    <span><strong>{r.client}</strong> <span style={{ color: "var(--muted)", fontSize: 12 }}>· {r.number}</span></span>
+                    <span style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                      <span className="num">{formatCurrency(r.total)}</span>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: r.daysOverdue > 0 ? "var(--brick)" : r.daysOverdue === 0 ? "var(--brass)" : "var(--emerald-dark)" }}>
+                        {r.daysOverdue > 0 ? `просрочена с ${r.daysOverdue} дни` : r.daysOverdue === 0 ? "падеж днес" : `до падеж: ${-r.daysOverdue} дни`}
+                      </span>
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Топ клиенти по приход */}
       <div style={{ marginBottom: 18 }}>
