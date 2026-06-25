@@ -22,7 +22,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     include: {
       subscription: true,
       companyUsers: { include: { user: true } },
-      _count: { select: { documents: true, companyUsers: true } },
+      _count: { select: { documents: true, companyUsers: true, clients: true, stockItems: true } },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -54,6 +54,101 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     sectorMap.set(s, (sectorMap.get(s) ?? 0) + 1);
   }
   const sectors = [...sectorMap.entries()].sort((a, b) => b[1] - a[1]);
+
+  // ─── Приходи (MRR/ARR + платформена активност по фактури) ───
+  const arr = mrr * 12;
+  const nowD = new Date();
+  const mStart = new Date(nowD.getFullYear(), nowD.getMonth(), 1);
+  const lmStart = new Date(nowD.getFullYear(), nowD.getMonth() - 1, 1);
+  const platformInvoices = await prisma.document.findMany({
+    where: { type: "invoice", issueDate: { gte: lmStart } },
+    select: { issueDate: true, lines: { select: { lineTotal: true } } },
+  });
+  let invThisMonth = 0, invLastMonth = 0;
+  for (const inv of platformInvoices) {
+    const v = inv.lines.reduce((s, l) => s + l.lineTotal, 0);
+    if (new Date(inv.issueDate) >= mStart) invThisMonth += v; else invLastMonth += v;
+  }
+  const invGrowth = invLastMonth > 0 ? Math.round(((invThisMonth - invLastMonth) / invLastMonth) * 100) : (invThisMonth > 0 ? 100 : 0);
+
+  // Общо фактурирана стойност на платформата + документи по тип
+  const [allInvoiceAgg, docsByType] = await Promise.all([
+    prisma.documentLine.aggregate({ _sum: { lineTotal: true }, where: { document: { type: "invoice" } } }),
+    prisma.document.groupBy({ by: ["type"], _count: { _all: true } }),
+  ]);
+  const totalInvoiceValue = allInvoiceAgg._sum.lineTotal ?? 0;
+
+  // ─── Фуния на продажбите ───
+  const activatedCompanies = companies.filter((c) => c._count.clients > 0 || c._count.documents > 0).length;
+  const firstInvoiceCompanies = (await prisma.document.groupBy({ by: ["companyId"], where: { type: "invoice" }, _count: { _all: true } })).length;
+  const funnel = [
+    { label: "Посетители", value: allTimeVisitors },
+    { label: "Регистрации (фирми)", value: companies.length },
+    { label: "Активирани фирми", value: activatedCompanies },
+    { label: "Издали първа фактура", value: firstInvoiceCompanies },
+    { label: "Платен абонамент", value: paidCount },
+  ];
+
+  // ─── Използване на модулите (от посещенията в приложението) ───
+  const appVisits = await prisma.siteVisit.findMany({ where: { area: "app" }, select: { path: true } });
+  const moduleNames: Record<string, string> = {
+    invoices: "Фактури", documents: "Документи", clients: "Клиенти", suppliers: "Доставчици",
+    warehouse: "Склад", production: "Производство", employees: "Служители", haccp: "HACCP",
+    cash: "Каса", expenses: "Разходи", contracts: "Договори", projects: "Проекти",
+    archive: "Архив", assets: "Активи", analytics: "Анализи", "tax-calendar": "Данъчен календар",
+    tools: "Инструменти", settings: "Профил", subscription: "Абонамент",
+  };
+  const moduleUsage = new Map<string, number>();
+  for (const v of appVisits) {
+    const seg = v.path.split("/")[2] || "dashboard";
+    if (moduleNames[seg]) moduleUsage.set(seg, (moduleUsage.get(seg) ?? 0) + 1);
+  }
+  const modulesSorted = [...moduleUsage.entries()].sort((a, b) => b[1] - a[1]);
+  const maxModule = Math.max(1, ...modulesSorted.map(([, n]) => n));
+
+  // Използване на публичните инструменти
+  const toolNames: Record<string, string> = { currency: "Валутен", salary: "Заплати", vat: "ДДС", interest: "Лихвен", markup: "Надценка" };
+  const publicVisits = await prisma.siteVisit.findMany({ where: { area: "public" }, select: { path: true } });
+  const toolUsage = new Map<string, number>();
+  for (const v of publicVisits) {
+    const parts = v.path.split("/");
+    if (parts[1] === "tools" && parts[2] && toolNames[parts[2]]) toolUsage.set(parts[2], (toolUsage.get(parts[2]) ?? 0) + 1);
+  }
+
+  // ─── Lead scoring / Revenue opportunities ───
+  const usageCounters = await prisma.usageCounter.findMany({ where: { yearMonth: `${nowD.getFullYear()}-${String(nowD.getMonth() + 1).padStart(2, "0")}` } });
+  const usageByCompany = new Map(usageCounters.map((u) => [u.companyId, u.documentsIssuedCount]));
+  const planLimit: Record<string, number> = { free: 5, start: 50, business: 300, pro: Infinity };
+
+  const leads = companies.map((c) => {
+    const plan = c.subscription?.plan ?? "free";
+    let score = 0;
+    if (c.logoUrl) score += 15;
+    if (c._count.clients >= 3) score += 20;
+    if (c._count.documents >= 5) score += 30;
+    if (c._count.stockItems >= 10) score += 20;
+    if (c._count.companyUsers >= 2) score += 15;
+    const used = usageByCompany.get(c.id) ?? 0;
+    const limit = planLimit[plan];
+    const nearLimit = limit !== Infinity && used >= limit * 0.8;
+    return { id: c.id, name: c.name, plan, score, used, limit, nearLimit };
+  });
+  const hotLeads = leads.filter((l) => l.plan === "free").sort((a, b) => b.score - a.score).slice(0, 5);
+  const upgradeOpportunities = leads.filter((l) => l.nearLimit && l.plan !== "pro").sort((a, b) => b.used - a.used).slice(0, 5);
+
+  // ─── Customer success: неактивни фирми ───
+  const lastActivity = new Map<string, Date>();
+  const appByCompany = await prisma.siteVisit.findMany({ where: { area: "app", companyId: { not: null } }, select: { companyId: true, createdAt: true }, orderBy: { createdAt: "desc" } });
+  for (const v of appByCompany) { if (v.companyId && !lastActivity.has(v.companyId)) lastActivity.set(v.companyId, v.createdAt); }
+  const daysSince = (d?: Date) => d ? Math.floor((nowD.getTime() - new Date(d).getTime()) / 86400000) : Infinity;
+  const inactive = companies.map((c) => ({ id: c.id, name: c.name, plan: c.subscription?.plan ?? "free", days: daysSince(lastActivity.get(c.id)) }))
+    .filter((c) => c.days >= 7).sort((a, b) => b.days - a.days).slice(0, 8);
+
+  // ─── Автоматични известия ───
+  const adminAlerts: string[] = [];
+  for (const o of upgradeOpportunities) adminAlerts.push(`🔥 ${o.name} е близо до лимита (${o.used}/${o.limit === Infinity ? "∞" : o.limit}) — вероятен ъпгрейд.`);
+  for (const l of hotLeads.filter((x) => x.score >= 70)) adminAlerts.push(`🔥 Горещ lead: ${l.name} (score ${l.score}/100) — готов за платен план.`);
+  if (invThisMonth > 100000) adminAlerts.push(`🔥 Платформен оборот този месец: ${Math.round(invThisMonth).toLocaleString("bg-BG")} €.`);
 
   // ─── Посещения (по избран период; броим ХОРА, не презареждания) ───
   const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
@@ -140,6 +235,113 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Конверсия към платен план</div>
           <div className="num" style={{ fontSize: 22, fontWeight: 600, color: "var(--navy)" }}>{conversion}%</div>
           <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>{paidCount} от {companies.length} фирми</div>
+        </div>
+      </div>
+
+      {/* Приходи */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, marginBottom: 20 }}>
+        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>MRR</div><div className="num" style={{ fontSize: 20, fontWeight: 700, color: "var(--emerald-dark)" }}>{mrr.toLocaleString("bg-BG")} €</div></div>
+        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>ARR</div><div className="num" style={{ fontSize: 20, fontWeight: 700, color: "var(--emerald-dark)" }}>{arr.toLocaleString("bg-BG")} €</div></div>
+        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>Фактурирано (този месец)</div><div className="num" style={{ fontSize: 18, fontWeight: 700 }}>{Math.round(invThisMonth).toLocaleString("bg-BG")} €</div></div>
+        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>Фактурирано (миналия месец)</div><div className="num" style={{ fontSize: 18, fontWeight: 700, color: "var(--muted)" }}>{Math.round(invLastMonth).toLocaleString("bg-BG")} €</div></div>
+        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>Ръст</div><div className="num" style={{ fontSize: 20, fontWeight: 700, color: invGrowth >= 0 ? "var(--emerald-dark)" : "var(--brick)" }}>{invGrowth >= 0 ? "+" : ""}{invGrowth}%</div></div>
+      </div>
+
+      {/* Документи по тип + обща стойност */}
+      <div className="glass panel" style={{ padding: "16px 20px", marginBottom: 20 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+          <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>
+            {docsByType.map((d) => (
+              <div key={d.type} style={{ fontSize: 13 }}>
+                <span style={{ color: "var(--muted)" }}>{d.type}:</span> <strong className="num">{d._count._all}</strong>
+              </div>
+            ))}
+          </div>
+          <div style={{ fontSize: 13 }}>Обща стойност на всички фактури: <strong className="num" style={{ color: "var(--emerald-dark)" }}>{Math.round(totalInvoiceValue).toLocaleString("bg-BG")} €</strong></div>
+        </div>
+      </div>
+
+      {/* Автоматични известия */}
+      {adminAlerts.length > 0 && (
+        <div className="glass panel" style={{ padding: "16px 20px", marginBottom: 20, borderLeft: "4px solid var(--brass)" }}>
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 10px" }}>Автоматични известия</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {adminAlerts.map((a, i) => <div key={i} style={{ fontSize: 13, color: "var(--ink-soft)" }}>{a}</div>)}
+          </div>
+        </div>
+      )}
+
+      {/* Фуния на продажбите */}
+      <div className="glass panel" style={{ padding: "18px 22px", marginBottom: 20 }}>
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>Фуния на продажбите</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {funnel.map((f, i) => {
+            const top = funnel[0].value || 1;
+            const pct = Math.round((f.value / top) * 100);
+            const prev = i > 0 ? funnel[i - 1].value : null;
+            const conv = prev && prev > 0 ? Math.round((f.value / prev) * 100) : null;
+            return (
+              <div key={f.label}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
+                  <span>{f.label}</span>
+                  <span><strong className="num">{f.value.toLocaleString("bg-BG")}</strong>{conv != null && <span style={{ color: "var(--muted)", marginLeft: 8 }}>({conv}% от предходния)</span>}</span>
+                </div>
+                <div style={{ height: 22, background: "rgba(217,215,200,.4)", borderRadius: 5, overflow: "hidden" }}>
+                  <div style={{ width: `${Math.max(3, pct)}%`, height: "100%", background: i === funnel.length - 1 ? "var(--emerald)" : "var(--navy)", borderRadius: 5 }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Модули + инструменти */}
+      <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 16, marginBottom: 20, alignItems: "start" }}>
+        <div className="glass panel">
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>Използване на модулите</h3>
+          {modulesSorted.length === 0 ? <div style={{ fontSize: 13, color: "var(--muted)" }}>Все още няма данни.</div> : modulesSorted.slice(0, 12).map(([seg, n]) => (
+            <div key={seg} style={{ marginBottom: 7 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 2 }}><span>{moduleNames[seg]}</span><span className="num" style={{ color: "var(--muted)" }}>{n}</span></div>
+              <div style={{ height: 5, background: "rgba(217,215,200,.5)", borderRadius: 3 }}><div style={{ width: `${(n / maxModule) * 100}%`, height: "100%", background: "var(--navy)", borderRadius: 3 }} /></div>
+            </div>
+          ))}
+        </div>
+        <div className="glass panel">
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>Публични инструменти</h3>
+          {Object.keys(toolNames).map((k) => (
+            <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "5px 0", borderBottom: "1px solid rgba(217,215,200,.4)" }}>
+              <span>{toolNames[k]} калкулатор</span><span className="num">{toolUsage.get(k) ?? 0}</span>
+            </div>
+          ))}
+          <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 8 }}>Брой посещения на всеки публичен инструмент.</p>
+        </div>
+      </div>
+
+      {/* Lead scoring + Revenue opportunities + Customer success */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 20, alignItems: "start" }}>
+        <div className="glass panel">
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 12px" }}>🔥 Горещи lead-ове (free)</h3>
+          {hotLeads.length === 0 ? <div style={{ fontSize: 12.5, color: "var(--muted)" }}>—</div> : hotLeads.map((l) => (
+            <div key={l.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, padding: "5px 0", borderBottom: "1px solid rgba(217,215,200,.4)" }}>
+              <span>{l.name}</span><strong className="num" style={{ color: l.score >= 70 ? "var(--emerald-dark)" : "var(--ink)" }}>{l.score}/100</strong>
+            </div>
+          ))}
+        </div>
+        <div className="glass panel">
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 12px" }}>💰 Възможности за ъпгрейд</h3>
+          {upgradeOpportunities.length === 0 ? <div style={{ fontSize: 12.5, color: "var(--muted)" }}>—</div> : upgradeOpportunities.map((o) => (
+            <div key={o.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, padding: "5px 0", borderBottom: "1px solid rgba(217,215,200,.4)" }}>
+              <span>{o.name} <span style={{ color: "var(--muted)" }}>({o.plan})</span></span><strong className="num" style={{ color: "var(--brick)" }}>{o.used}/{o.limit === Infinity ? "∞" : o.limit}</strong>
+            </div>
+          ))}
+        </div>
+        <div className="glass panel">
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 12px" }}>Неактивни фирми</h3>
+          {inactive.length === 0 ? <div style={{ fontSize: 12.5, color: "var(--muted)" }}>Всички са активни 🎉</div> : inactive.map((c) => (
+            <div key={c.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, padding: "5px 0", borderBottom: "1px solid rgba(217,215,200,.4)" }}>
+              <span>{c.name}</span><span style={{ color: c.days >= 30 ? "var(--brick)" : "var(--muted)" }}>{c.days === Infinity ? "никога" : `${c.days} дни`}</span>
+            </div>
+          ))}
         </div>
       </div>
 
