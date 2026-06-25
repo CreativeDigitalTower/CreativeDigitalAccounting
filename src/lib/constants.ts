@@ -75,11 +75,23 @@ export const INVOICE_TEMPLATES = [
   { id: "warm", name: "Топъл", accent: "#C49A45", layout: "centered" },
   { id: "mono", name: "Монохром", accent: "#3A4540", layout: "minimal" },
   { id: "premium", name: "Премиум", accent: "#16201C", layout: "leftrail" },
+  // Нови стилове
+  { id: "aurora", name: "Аврора", accent: "#0F8A6A", layout: "gradient" },
+  { id: "lumen", name: "Лумен", accent: "#2C4A66", layout: "letterhead" },
+  { id: "atlas", name: "Атлас", accent: "#5A3E85", layout: "sidebar" },
+  { id: "ledger", name: "Леджър", accent: "#2F2A24", layout: "typewriter" },
+  { id: "duo", name: "Дуо", accent: "#B0552B", layout: "cards" },
 ] as const;
 
 export function getTemplate(id: string | null | undefined) {
   return INVOICE_TEMPLATES.find((t) => t.id === id) ?? INVOICE_TEMPLATES[0];
 }
+
+// Мерни единици за складови артикули и производство
+export const STOCK_UNITS = [
+  "бр", "кг", "г", "мг", "т", "л", "мл", "м", "см", "мм",
+  "кв.м", "куб.м", "оп.", "пакет", "кашон", "каса", "стек", "чувал", "ролка", "комплект", "час",
+] as const;
 
 export const PAYMENT_METHODS = [
   { id: "cash", label: "В брой" },

@@ -1,10 +1,16 @@
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { BlobBackground } from "@/components/Backgrounds";
 import { MarketingNavbar } from "@/components/marketing/Navbar";
 import { MarketingFooter } from "@/components/marketing/Footer";
 import { VisitTracker } from "@/components/VisitTracker";
 
-// Безплатните инструменти са публични и ползват менюто на сайта.
-export default function ToolsLayout({ children }: { children: React.ReactNode }) {
+// Безплатните инструменти са достъпни само за регистрирани потребители,
+// но запазват менюто на сайта (логото води към началната страница).
+export default async function ToolsLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth();
+  if (!session?.user?.id) redirect("/login?next=/tools");
+
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative" }}>
       <VisitTracker area="public" />

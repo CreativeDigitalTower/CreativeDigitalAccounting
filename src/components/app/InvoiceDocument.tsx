@@ -31,7 +31,8 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
   const vat = data.lines.reduce((s, l) => s + l.quantity * l.unitPrice * (l.vatRate / 100), 0);
   const total = subtotal + vat;
   const title = TYPE_LABELS[data.type] ?? data.type.toUpperCase();
-  const filledHead = layout === "band" || layout === "split" || layout === "boxed";
+  const filledHead = ["band", "split", "boxed", "gradient", "letterhead", "cards"].includes(layout);
+  const borderedClient = layout === "boxed" || layout === "cards";
   const serif = "'Fraunces', serif";
 
   const company = data.company;
@@ -66,8 +67,8 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
   );
 
   const clientBox = data.client && (
-    <div style={{ background: layout === "boxed" ? "transparent" : "rgba(255,255,255,.4)", border: layout === "boxed" ? `1px solid ${accent}` : undefined, borderRadius: 10, padding: "14px 18px", marginBottom: 28 }}>
-      <div style={{ fontSize: 11.5, color: layout === "boxed" ? accent : "var(--muted)", fontWeight: 600, letterSpacing: 1, marginBottom: 6 }}>ПОЛУЧАТЕЛ</div>
+    <div style={{ background: borderedClient ? "transparent" : "rgba(255,255,255,.4)", border: borderedClient ? `1px solid ${accent}` : undefined, borderRadius: 10, padding: "14px 18px", marginBottom: 28 }}>
+      <div style={{ fontSize: 11.5, color: borderedClient ? accent : "var(--muted)", fontWeight: 600, letterSpacing: 1, marginBottom: 6 }}>ПОЛУЧАТЕЛ</div>
       <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 4 }}>{data.client.name}</div>
       <div style={{ fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.7 }}>
         {data.client.mol && <div>МОЛ: {data.client.mol}</div>}
@@ -153,6 +154,84 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
           </div>
         </div>
       </div>
+    );
+  } else if (layout === "gradient") {
+    header = (
+      <div style={{ margin: "-40px -48px 28px", padding: "34px 48px 30px", background: `linear-gradient(120deg, ${accent}, ${accent}cc 55%, ${accent}88)`, color: "#fff", borderRadius: "0 0 24px 24px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
+          <div>
+            <div style={{ fontFamily: serif, fontWeight: 700, fontSize: 22 }}>{company.name}</div>
+            <div style={{ fontSize: 12.5, lineHeight: 1.7, opacity: .92, marginTop: 6 }}>
+              {company.eik && <div>ЕИК: {company.eik}{company.vatNumber ? ` · ДДС ${company.vatNumber}` : ""}</div>}
+              {company.address && <div>{company.address}{company.city ? `, ${company.city}` : ""}</div>}
+            </div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontFamily: serif, fontSize: 30, fontWeight: 700, letterSpacing: 1 }}>{title}</div>
+            <div className="num" style={{ fontSize: 15, opacity: .95 }}>№ {data.number}</div>
+            {data.type === "invoice" && <div style={{ display: "inline-block", background: "rgba(255,255,255,.18)", fontSize: 10.5, fontWeight: 700, letterSpacing: 1.5, padding: "2px 10px", borderRadius: 20, marginTop: 8 }}>ОРИГИНАЛ</div>}
+            <div style={{ fontSize: 12, opacity: .92, marginTop: 8, lineHeight: 1.7 }}>
+              <div>Издадена: {fmtDate(data.issueDate)}</div>
+              {data.dueDate && <div>Падеж: {fmtDate(data.dueDate)}</div>}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  } else if (layout === "letterhead") {
+    header = (
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ margin: "-40px -48px 24px", padding: "26px 48px", background: accent, color: "#fff", textAlign: "center" }}>
+          <div style={{ fontFamily: serif, fontWeight: 700, fontSize: 22, letterSpacing: .5 }}>{company.name}</div>
+          <div style={{ fontSize: 12, opacity: .9, marginTop: 4 }}>
+            {[company.address, company.city].filter(Boolean).join(", ")}{company.eik ? ` · ЕИК ${company.eik}` : ""}{company.vatNumber ? ` · ДДС ${company.vatNumber}` : ""}
+          </div>
+        </div>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontFamily: serif, fontSize: 24, fontWeight: 700, color: accent, letterSpacing: 2 }}>{title}</div>
+          <div className="num" style={{ fontSize: 14, color: "var(--ink-soft)", marginTop: 2 }}>№ {data.number}</div>
+          {data.type === "invoice" && <div style={{ display: "inline-block", border: `1.5px solid ${accent}`, color: accent, fontSize: 10.5, fontWeight: 700, letterSpacing: 1.5, padding: "2px 10px", borderRadius: 4, margin: "8px 0" }}>ОРИГИНАЛ</div>}
+          <div style={{ display: "flex", justifyContent: "center", gap: 18, fontSize: 12, color: "var(--ink-soft)", marginTop: 4, flexWrap: "wrap" }}>
+            <span>Издадена: {fmtDate(data.issueDate)}</span>
+            {data.taxEventDate && <span>Дан. събитие: {fmtDate(data.taxEventDate)}</span>}
+            {data.dueDate && <span>Падеж: {fmtDate(data.dueDate)}</span>}
+          </div>
+        </div>
+      </div>
+    );
+  } else if (layout === "typewriter") {
+    header = (
+      <div style={{ marginBottom: 28, fontFamily: "'IBM Plex Mono', monospace" }}>
+        <div style={{ borderTop: "3px solid var(--ink)", borderBottom: "1px solid var(--ink)", padding: "10px 0", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+          <div style={{ fontWeight: 700, fontSize: 15, textTransform: "uppercase", letterSpacing: 1 }}>{company.name}</div>
+          <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 2 }}>{title} № {data.number}</div>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12, flexWrap: "wrap", gap: 16, fontSize: 12, lineHeight: 1.7 }}>
+          <div style={{ color: "var(--ink-soft)" }}>
+            {company.eik && <div>ЕИК: {company.eik}</div>}
+            {company.vatNumber && <div>ДДС: {company.vatNumber}</div>}
+            {company.address && <div>{company.address}{company.city ? `, ${company.city}` : ""}</div>}
+          </div>
+          <div style={{ textAlign: "right", color: "var(--ink-soft)" }}>
+            <div>ИЗДАДЕНА: {fmtDate(data.issueDate)}</div>
+            {data.dueDate && <div>ПАДЕЖ: {fmtDate(data.dueDate)}</div>}
+            {data.type === "invoice" && <div style={{ marginTop: 4, fontWeight: 700, color: "var(--ink)" }}>[ ОРИГИНАЛ ]</div>}
+          </div>
+        </div>
+      </div>
+    );
+  } else if (layout === "cards") {
+    header = (
+      <>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 18, gap: 16, flexWrap: "wrap" }}>
+          <div>{logoOrName}</div>
+          {meta("right")}
+        </div>
+        <div style={{ border: `1px solid ${accent}`, borderRadius: 10, padding: "14px 18px", marginBottom: 14 }}>
+          <div style={{ fontSize: 11.5, color: accent, fontWeight: 600, letterSpacing: 1, marginBottom: 6 }}>ДОСТАВЧИК</div>
+          {senderLines}
+        </div>
+      </>
     );
   } else {
     // classic & band share this header (band has top color strip rendered by wrapper)
@@ -258,6 +337,31 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
               {data.dueDate && <div>Падеж: {fmtDate(data.dueDate)}</div>}
             </div>
           </div>
+          {body}
+        </div>
+      </div>
+    );
+  }
+
+  if (layout === "sidebar") {
+    return (
+      <div className="glass printable" style={{ borderRadius: 14, maxWidth: 800, overflow: "hidden", display: "flex", alignItems: "stretch" }}>
+        <div style={{ width: "34%", flexShrink: 0, background: `${accent}10`, borderRight: `3px solid ${accent}`, padding: "36px 26px" }}>
+          <div style={{ marginBottom: 18 }}>{logoOrName}</div>
+          <div style={{ fontFamily: serif, fontSize: 22, fontWeight: 700, color: accent, letterSpacing: 1, marginBottom: 4 }}>{title}</div>
+          <div className="num" style={{ fontSize: 14, color: "var(--ink-soft)", marginBottom: 6 }}>№ {data.number}</div>
+          {data.type === "invoice" && <div style={{ display: "inline-block", border: `1.5px solid ${accent}`, color: accent, fontSize: 10, fontWeight: 700, letterSpacing: 1.5, padding: "2px 9px", borderRadius: 4, marginBottom: 16 }}>ОРИГИНАЛ</div>}
+          <div style={{ fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.9, marginBottom: 18 }}>
+            <div>Издадена: {fmtDate(data.issueDate)}</div>
+            {data.taxEventDate && <div>Дан. събитие: {fmtDate(data.taxEventDate)}</div>}
+            {data.dueDate && <div>Падеж: {fmtDate(data.dueDate)}</div>}
+          </div>
+          <div style={{ borderTop: `1px solid ${accent}40`, paddingTop: 14 }}>
+            <div style={{ fontSize: 10.5, color: accent, fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>ДОСТАВЧИК</div>
+            {senderLines}
+          </div>
+        </div>
+        <div style={{ padding: "36px 32px", flex: 1, minWidth: 0 }}>
           {body}
         </div>
       </div>

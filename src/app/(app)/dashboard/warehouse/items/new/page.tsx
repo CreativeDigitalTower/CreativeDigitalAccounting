@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { STOCK_UNITS } from "@/lib/constants";
 
 type Warehouse = { id: string; name: string };
 type Cat = { id: string; name: string };
@@ -57,7 +58,7 @@ export default function NewStockItemPage() {
             )}
             <div style={{ gridColumn: "1 / -1" }}><label>Наименование *</label><input type="text" name="name" required /></div>
             <div><label>SKU / Код</label><input type="text" name="sku" /></div>
-            <div><label>Ед. мярка</label><input type="text" name="unit" defaultValue="бр" /></div>
+            <div><label>Мерна единица</label><select name="unit" defaultValue="бр">{STOCK_UNITS.map((u) => <option key={u} value={u}>{u}</option>)}</select></div>
             <div><label>Начална наличност</label><input type="number" name="quantity" step="0.01" min="0" defaultValue={0} /></div>
             <div><label>Мин. наличност</label><input type="number" name="minQuantity" step="0.01" min="0" /></div>
             <div><label>Ед. цена (EUR)</label><input type="number" name="unitCost" step="0.01" min="0" /></div>

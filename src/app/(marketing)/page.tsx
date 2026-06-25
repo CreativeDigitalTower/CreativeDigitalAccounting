@@ -1,14 +1,30 @@
 import Link from "next/link";
 import { Pricing } from "@/components/marketing/Pricing";
-import { IconInvoice, IconWarehouse, IconUsers, IconExpense, IconChart, IconProjects } from "@/components/Icons";
+import {
+  IconInvoice, IconWarehouse, IconUsers, IconExpense, IconChart, IconProjects,
+  IconBuilding, IconDoc, IconShield, IconCash, IconCalculator, IconBank,
+} from "@/components/Icons";
 
 const features = [
-  { Icon: IconInvoice, title: "Фактуриране", desc: "Фактури, проформи, оферти, кредитни и дебитни известия, приемо-предавателни протоколи — с автоматична номерация и двойно EUR/BGN обозначаване." },
-  { Icon: IconWarehouse, title: "Склад", desc: "Управление на наличности, заприходяване, изписване и производство в множество локации." },
-  { Icon: IconUsers, title: "Клиенти и Доставчици", desc: "CRM бележки, досиета, история на документи и договори за всеки контрагент." },
-  { Icon: IconExpense, title: "Разходи", desc: "Ръчно въвеждане и входящи фактури от доставчици по персонализирани категории." },
-  { Icon: IconChart, title: "Финансови Анализи", desc: "Оборот, паричен поток, финансова цел, данъчен календар и инвеститорски PDF отчет." },
-  { Icon: IconProjects, title: "Проекти и Договори", desc: "Проследяване на приходи, разходи и печалба по проект с напомняния за договори." },
+  { Icon: IconInvoice, title: "Фактуриране", desc: "Фактури, проформи, оферти, кредитни и дебитни известия, приемо-предавателни протоколи и декларации за съответствие — с автоматична номерация, 10 професионални шаблона, печат и сваляне в PDF, двойно EUR/BGN обозначаване и надпис ОРИГИНАЛ." },
+  { Icon: IconWarehouse, title: "Склад с проследяемост", desc: "Наличности в множество складове, категории, партидни номера, заприходяване, изписване, бракуване и ревизия (инвентаризация). Складът се обновява автоматично при фактуриране." },
+  { Icon: IconBuilding, title: "Производство и рецепти", desc: "Създавайте рецепти със суровини и произвеждайте готова продукция — системата изписва съставките по метод FIFO и заприходява готовия продукт с партиден номер." },
+  { Icon: IconUsers, title: "Клиенти, Доставчици и CRM", desc: "Досиета, контактни лица, CRM бележки, история на документите, приходи по клиент и топ клиенти. Редактируеми профили и автоматично предложение при въвеждане." },
+  { Icon: IconExpense, title: "Разходи и Каса", desc: "Входящи фактури от доставчици по категории, каса и банкови извлечения за пълна картина на паричния поток." },
+  { Icon: IconChart, title: "Финансови анализи", desc: "Оборот, печалба, марж, паричен поток, финансова цел, бизнес здравен индекс и диаграми за топ клиенти — на таблото и в детайлни справки." },
+  { Icon: IconProjects, title: "Проекти и Договори", desc: "Приходи, разходи и печалба по проект, управление на договори с напомняния за изтичащи срокове." },
+  { Icon: IconShield, title: "HACCP и хранителна безопасност", desc: "Технологична документация (ТД) за всеки продукт — рецептура, режими на изпичане, охлаждане, съхранение и срок на годност, съгласно изискванията на БАБХ." },
+  { Icon: IconUsers, title: "Служители", desc: "Пълно досие на персонала — позиция, заплата, контакти, плюс отчет на отпуски и болнични с натрупани дни." },
+  { Icon: IconDoc, title: "Документен архив", desc: "Качвайте и съхранявайте сканирани документи, договори и файлове по категории на едно сигурно място." },
+  { Icon: IconCash, title: "Данъчен календар", desc: "Срокове по ЗДДС, ЗКПО, ЗДДФЛ, КСО и ГФО с предупреждения, плюс собствени напомняния, за да не пропускате задължения." },
+  { Icon: IconCalculator, title: "Безплатни бизнес инструменти", desc: "Калкулатори за ДДС, заплати, валута, лихви и надценка — достъпни за всички регистрирани потребители." },
+];
+
+const highlights = [
+  { Icon: IconBank, title: "Готовност за еврото", desc: "Двойно EUR/BGN обозначаване и автоматичен преход към еврото по фиксирания курс." },
+  { Icon: IconShield, title: "Сигурност и роли", desc: "Потребителски роли и права, одит лог на всички действия и контрол на достъпа." },
+  { Icon: IconChart, title: "Бизнес здравен индекс", desc: "Автоматична оценка 0–100 на финансовото състояние с конкретни препоръки." },
+  { Icon: IconInvoice, title: "Автоматични напомняния", desc: "Известия за неплатени и просрочени фактури, за да си получавате парите навреме." },
 ];
 
 export default function HomePage() {
@@ -58,8 +74,9 @@ export default function HomePage() {
             lineHeight: 1.6,
           }}
         >
-          Фактуриране, склад, разходи и финансови анализи в едно —
-          проектирано за фирми с всякакъв капацитет в България: от малки и средни до големи компании.
+          Фактуриране, склад с проследяемост, производство, HACCP, служители,
+          разходи и финансови анализи — всичко в една система. Проектирано за фирми с всякакъв
+          капацитет в България: от фрийлансъри и малки фирми до производство и хранителна индустрия.
         </p>
 
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
@@ -78,6 +95,12 @@ export default function HomePage() {
 
       {/* Features grid */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 80px" }}>
+        <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 30, fontWeight: 700, textAlign: "center", marginBottom: 8 }}>
+          Всичко за вашия бизнес на едно място
+        </h2>
+        <p style={{ textAlign: "center", color: "var(--muted)", marginBottom: 32, fontSize: 14, maxWidth: 640, marginInline: "auto" }}>
+          От първата фактура до производството, складовата проследяемост и финансовите анализи.
+        </p>
         <div
           style={{
             display: "grid",
@@ -100,6 +123,39 @@ export default function HomePage() {
               </p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Highlights */}
+      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 70px" }}>
+        <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 30, fontWeight: 700, textAlign: "center", marginBottom: 8 }}>
+          Защо Creative Digital Accounting
+        </h2>
+        <p style={{ textAlign: "center", color: "var(--muted)", marginBottom: 32, fontSize: 14, maxWidth: 640, marginInline: "auto" }}>
+          Една платформа вместо пет отделни програми — спестявате време, пари и грешки.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 18 }}>
+          {highlights.map((h) => (
+            <div key={h.title} className="glass panel" style={{ padding: "22px 24px", textAlign: "center" }}>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+                <div className="icon-tile" style={{ width: 50, height: 50 }}><h.Icon /></div>
+              </div>
+              <h3 style={{ margin: "0 0 8px", fontSize: 16, fontFamily: "'Fraunces', serif", fontWeight: 700 }}>{h.title}</h3>
+              <p style={{ margin: 0, color: "var(--ink-soft)", fontSize: 13, lineHeight: 1.55 }}>{h.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* За кого е */}
+      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 70px" }}>
+        <div className="glass panel" style={{ padding: "28px 32px" }}>
+          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 700, margin: "0 0 14px", textAlign: "center" }}>Подходящ за всеки бизнес</h2>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
+            {["Търговия и онлайн магазини", "Производство", "Пекарни и хранителна индустрия (HACCP)", "Услуги и агенции", "Фрийлансъри и консултанти", "Ресторанти и кетъринг", "Строителство", "Счетоводни кантори"].map((t) => (
+              <span key={t} style={{ background: "var(--emerald-soft)", color: "var(--emerald-dark)", borderRadius: 20, padding: "7px 16px", fontSize: 13, fontWeight: 600 }}>{t}</span>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -149,7 +205,7 @@ export default function HomePage() {
             applicationCategory: "BusinessApplication",
             operatingSystem: "Web",
             description:
-              "Уеб софтуер за фактуриране, склад, разходи и финансови анализи за малки и средни фирми в България.",
+              "Уеб софтуер за фактуриране, складова проследяемост, производство, HACCP, служители, разходи и финансови анализи за фирми в България. Готов за еврото.",
             offers: {
               "@type": "AggregateOffer",
               priceCurrency: "EUR",
