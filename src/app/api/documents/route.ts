@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireCompany } from "@/lib/session";
+import { requireCompany, getPlan } from "@/lib/session";
+import { planHasFeature } from "@/lib/constants";
 import {
   generateDocumentNumber,
   checkInvoiceLimit,
@@ -103,9 +104,41 @@ export async function POST(req: Request) {
       await incrementInvoiceCounter(companyId);
     }
 
-    await audit(companyId, userId, "create", "Document", document.id, `${data.type} ${number}`);
+    // Автоматично намаляване на склада при фактуриране (Бизнес + Про).
+    // Намира артикул по точно име на реда и изписва по метод FIFO (най-старата партида първа).
+    let stockNote: string | null = null;
+    if (data.type === "invoice" && issued) {
+      const plan = await getPlan(companyId);
+      if (planHasFeature(plan, "production")) {
+        const adjusted: string[] = [];
+        for (const line of data.lines) {
+          const item = await prisma.stockItem.findFirst({
+            where: { companyId, name: { equals: line.description.trim(), mode: "insensitive" } },
+          });
+          if (!item) continue;
+          const qty = line.quantity;
+          await prisma.stockMovement.create({
+            data: { stockItemId: item.id, type: "sale", quantity: -qty, date: new Date(data.issueDate), note: `Продажба по фактура ${number}` },
+          });
+          await prisma.stockItem.update({ where: { id: item.id }, data: { quantity: { decrement: qty } } });
+          // FIFO консумация по партиди
+          let remaining = qty;
+          const batches = await prisma.stockBatch.findMany({ where: { stockItemId: item.id, quantity: { gt: 0 } }, orderBy: { createdAt: "asc" } });
+          for (const b of batches) {
+            if (remaining <= 0) break;
+            const take = Math.min(b.quantity, remaining);
+            await prisma.stockBatch.update({ where: { id: b.id }, data: { quantity: { decrement: take } } });
+            remaining -= take;
+          }
+          adjusted.push(item.name);
+        }
+        if (adjusted.length) stockNote = `Намалена наличност: ${adjusted.join(", ")}`;
+      }
+    }
 
-    return NextResponse.json(document);
+    await audit(companyId, userId, "create", "Document", document.id, `${data.type} ${number}${stockNote ? ` · ${stockNote}` : ""}`);
+
+    return NextResponse.json({ ...document, stockNote });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: "Невалидни данни.", issues: err.issues }, { status: 400 });
