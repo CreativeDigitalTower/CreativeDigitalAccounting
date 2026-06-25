@@ -6,6 +6,7 @@ import { z } from "zod";
 
 const schema = z.object({
   warehouseId: z.string(),
+  categoryId: z.string().optional().nullable(),
   name: z.string().min(1),
   sku: z.string().optional().nullable(),
   quantity: z.number().min(0).default(0),
@@ -24,7 +25,7 @@ export async function POST(req: Request) {
 
     const item = await prisma.stockItem.create({
       data: {
-        companyId, warehouseId: data.warehouseId, name: data.name,
+        companyId, warehouseId: data.warehouseId, categoryId: data.categoryId ?? null, name: data.name,
         sku: data.sku ?? null, quantity: data.quantity,
         minQuantity: data.minQuantity ?? null, unit: data.unit, unitCost: data.unitCost ?? null,
       },

@@ -30,6 +30,7 @@ export default function ReceiveStockPage() {
         quantity: Number(fd.get("quantity")),
         unitPrice: fd.get("unitPrice") ? Number(fd.get("unitPrice")) : null,
         supplierId: fd.get("supplierId") || null,
+        batchNumber: fd.get("batchNumber") || null,
         date: fd.get("date"),
         note: fd.get("note") || null,
       }),
@@ -56,6 +57,7 @@ export default function ReceiveStockPage() {
             <div><label>Количество *</label><input type="number" name="quantity" step="0.01" min="0.01" required /></div>
             <div><label>Ед. цена (EUR)</label><input type="number" name="unitPrice" step="0.01" min="0" /></div>
             <div><label>Доставчик</label><select name="supplierId"><option value="">—</option>{suppliers.map((s)=><option key={s.id} value={s.id}>{s.name}</option>)}</select></div>
+            <div><label>Партиден номер</label><input type="text" name="batchNumber" placeholder="напр. L2026-0617" /></div>
             <div><label>Дата *</label><input type="date" name="date" required defaultValue={new Date().toISOString().slice(0,10)} /></div>
             <div style={{ gridColumn: "1 / -1" }}><label>Бележка</label><input type="text" name="note" /></div>
           </div>

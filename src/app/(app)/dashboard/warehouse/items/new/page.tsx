@@ -5,14 +5,19 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 type Warehouse = { id: string; name: string };
+type Cat = { id: string; name: string };
 
 export default function NewStockItemPage() {
   const router = useRouter();
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const [categories, setCategories] = useState<Cat[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => { fetch("/api/warehouses").then((r) => r.json()).then((d) => setWarehouses(Array.isArray(d) ? d : [])).catch(() => {}); }, []);
+  useEffect(() => {
+    fetch("/api/warehouses").then((r) => r.json()).then((d) => setWarehouses(Array.isArray(d) ? d : [])).catch(() => {});
+    fetch("/api/stock-categories").then((r) => r.ok ? r.json() : []).then((d) => setCategories(Array.isArray(d) ? d : [])).catch(() => {});
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -22,6 +27,7 @@ export default function NewStockItemPage() {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         warehouseId: fd.get("warehouseId"),
+        categoryId: fd.get("categoryId") || null,
         name: fd.get("name"), sku: fd.get("sku") || null,
         quantity: fd.get("quantity") ? Number(fd.get("quantity")) : 0,
         minQuantity: fd.get("minQuantity") ? Number(fd.get("minQuantity")) : null,
@@ -46,6 +52,9 @@ export default function NewStockItemPage() {
         <div className="glass panel" style={{ padding: 28, marginBottom: 16 }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px,1fr))", gap: 14 }}>
             <div><label>Склад *</label><select name="warehouseId" required>{warehouses.map((w)=><option key={w.id} value={w.id}>{w.name}</option>)}</select></div>
+            {categories.length > 0 && (
+              <div><label>Категория</label><select name="categoryId"><option value="">—</option>{categories.map((c)=><option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
+            )}
             <div style={{ gridColumn: "1 / -1" }}><label>Наименование *</label><input type="text" name="name" required /></div>
             <div><label>SKU / Код</label><input type="text" name="sku" /></div>
             <div><label>Ед. мярка</label><input type="text" name="unit" defaultValue="бр" /></div>

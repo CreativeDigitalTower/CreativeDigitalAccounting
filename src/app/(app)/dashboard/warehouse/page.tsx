@@ -1,20 +1,25 @@
-import { requireCompany } from "@/lib/session";
+import { requireCompany, getPlan } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { planHasFeature } from "@/lib/constants";
+import { CategoriesManager } from "@/components/app/CategoriesManager";
 import Link from "next/link";
 
 export default async function WarehousePage() {
   const { companyId } = await requireCompany();
+  const plan = await getPlan(companyId);
+  const extended = planHasFeature(plan, "production"); // Бизнес + Про
 
-  const [stockItems, warehouses] = await Promise.all([
+  const [stockItems, warehouses, categories] = await Promise.all([
     prisma.stockItem.findMany({
       where: { companyId },
-      include: { warehouse: true },
+      include: { warehouse: true, category: true },
       orderBy: { name: "asc" },
     }),
     prisma.warehouse.findMany({
       where: { companyId },
       include: { _count: { select: { stockItems: true } } },
     }),
+    prisma.stockCategory.findMany({ where: { companyId }, orderBy: { name: "asc" } }),
   ]);
 
   const lowStock = stockItems.filter((i) => i.minQuantity !== null && i.quantity <= (i.minQuantity ?? 0));
@@ -26,12 +31,16 @@ export default async function WarehousePage() {
           <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>Склад</h1>
           <div style={{ color: "var(--muted)", fontSize: 13 }}>{stockItems.length} артикула в {warehouses.length} склада</div>
         </div>
-        <div style={{ display: "flex", gap: 10 }}>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <Link href="/dashboard/warehouse/receive" className="btn btn-ghost">+ Заприходяване</Link>
           <Link href="/dashboard/warehouse/issue" className="btn btn-ghost">− Изписване</Link>
+          {extended && <Link href="/dashboard/warehouse/scrap" className="btn btn-ghost">🗑 Брак</Link>}
+          {extended && <Link href="/dashboard/warehouse/revision" className="btn btn-ghost">📋 Ревизия</Link>}
           <Link href="/dashboard/warehouse/items/new" className="btn btn-primary">+ Нов артикул</Link>
         </div>
       </div>
+
+      {extended && <CategoriesManager initial={categories.map((c) => ({ id: c.id, name: c.name }))} />}
 
       {/* Warehouses overview */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 20 }}>
@@ -65,6 +74,7 @@ export default async function WarehousePage() {
               <tr>
                 <th>Артикул</th>
                 <th>SKU</th>
+                {extended && <th>Категория</th>}
                 <th>Склад</th>
                 <th>Ед. мярка</th>
                 <th className="num">Наличност</th>
@@ -81,6 +91,7 @@ export default async function WarehousePage() {
                   <tr key={item.id}>
                     <td style={{ fontWeight: 600 }}>{item.name}</td>
                     <td className="num" style={{ color: "var(--muted)", fontSize: 12 }}>{item.sku ?? "—"}</td>
+                    {extended && <td style={{ fontSize: 12.5 }}>{item.category?.name ?? "—"}</td>}
                     <td style={{ fontSize: 13 }}>{item.warehouse.name}</td>
                     <td style={{ fontSize: 13 }}>{item.unit}</td>
                     <td className="num" style={{ fontWeight: 600, color: isLow ? "var(--brick)" : "inherit" }}>
