@@ -127,6 +127,13 @@ model Company {
   financialHistory  FinancialHistory[]
   handoverProtocols HandoverProtocol[]
   archiveFiles      ArchiveFile[]
+  stockCategories   StockCategory[]
+  recipes           Recipe[]
+  employees         Employee[]
+  technologicalDocs TechnologicalDoc[]
+  conformityDeclarations ConformityDeclaration[]
+  stocktakes        Stocktake[]
+  taxReminders      TaxReminder[]
 }
 
 enum CompanyRole {
@@ -224,6 +231,7 @@ model StockItem {
   id          String  @id @default(cuid())
   companyId   String
   warehouseId String
+  categoryId  String?
   name        String
   sku         String?
   quantity    Float   @default(0)
@@ -233,7 +241,161 @@ model StockItem {
 
   company   Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
   warehouse Warehouse       @relation(fields: [warehouseId], references: [id])
+  category  StockCategory?  @relation(fields: [categoryId], references: [id])
   movements StockMovement[]
+  batches   StockBatch[]
+}
+
+model StockCategory {
+  id        String @id @default(cuid())
+  companyId String
+  name      String
+  parentId  String?
+
+  company Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  parent  StockCategory?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children StockCategory[] @relation("CategoryTree")
+  items   StockItem[]
+}
+
+model StockBatch {
+  id          String   @id @default(cuid())
+  stockItemId String
+  batchNumber String
+  quantity    Float    @default(0)
+  unitCost    Float?
+  note        String?
+  createdAt   DateTime @default(now())
+
+  stockItem StockItem @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
+
+  @@index([stockItemId, createdAt])
+}
+
+// Рецепти за производство
+model Recipe {
+  id             String       @id @default(cuid())
+  companyId      String
+  name           String
+  outputItemId   String?
+  outputQuantity Float        @default(1)
+  note           String?      @db.Text
+  createdAt      DateTime     @default(now())
+
+  company     Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  ingredients RecipeItem[]
+}
+
+model RecipeItem {
+  id          String @id @default(cuid())
+  recipeId    String
+  stockItemId String
+  quantity    Float
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+}
+
+// Служители
+model Employee {
+  id        String   @id @default(cuid())
+  companyId String
+  name      String
+  position  String?
+  phone     String?
+  email     String?
+  address   String?
+  salary    Float?
+  hiredAt   DateTime?
+  active    Boolean  @default(true)
+  notes     String?  @db.Text
+  createdAt DateTime @default(now())
+
+  company Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  leaves  EmployeeLeave[]
+}
+
+model EmployeeLeave {
+  id         String   @id @default(cuid())
+  employeeId String
+  type       String   // leave | sick | unpaid | other
+  startDate  DateTime
+  endDate    DateTime
+  days       Float?
+  note       String?
+  createdAt  DateTime @default(now())
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+}
+
+// HACCP — Технологична документация
+model TechnologicalDoc {
+  id          String   @id @default(cuid())
+  companyId   String
+  productName String
+  ingredients String?  @db.Text
+  preparation String?  @db.Text
+  bakingTime  String?
+  bakingTemp  String?
+  cooling     String?
+  storage     String?
+  shelfLife   String?
+  notes       String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+// Декларация за съответствие
+model ConformityDeclaration {
+  id           String   @id @default(cuid())
+  companyId    String
+  number       String
+  productName  String
+  batchNumber  String?
+  standards    String?  @db.Text
+  description  String?  @db.Text
+  issuedFor    String?
+  date         DateTime
+  signedBy     String?
+  createdAt    DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+// Ревизия (инвентаризация)
+model Stocktake {
+  id        String          @id @default(cuid())
+  companyId String
+  date      DateTime        @default(now())
+  note      String?
+  status    String          @default("applied") // draft | applied
+  createdAt DateTime        @default(now())
+
+  company Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  lines   StocktakeLine[]
+}
+
+model StocktakeLine {
+  id          String @id @default(cuid())
+  stocktakeId String
+  stockItemId String
+  itemName    String
+  previousQty Float
+  countedQty  Float
+
+  stocktake Stocktake @relation(fields: [stocktakeId], references: [id], onDelete: Cascade)
+}
+
+// Данъчни напомняния (календар)
+model TaxReminder {
+  id        String   @id @default(cuid())
+  companyId String
+  title     String
+  dueDate   DateTime
+  done      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 enum StockMovementType {
@@ -241,6 +403,10 @@ enum StockMovementType {
   issue
   production
   transfer
+  scrap
+  stocktake
+  packaging
+  sale
 }
 
 model StockMovement {

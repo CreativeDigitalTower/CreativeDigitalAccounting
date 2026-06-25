@@ -1,0 +1,45 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { requireFeature } from "@/lib/session";
+import { z } from "zod";
+
+const schema = z.object({
+  name: z.string().min(2),
+  position: z.string().optional().nullable(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  address: z.string().optional().nullable(),
+  salary: z.number().optional().nullable(),
+  hiredAt: z.string().optional().nullable(),
+  notes: z.string().optional().nullable(),
+  active: z.boolean().optional(),
+});
+
+export async function GET() {
+  try {
+    const { companyId } = await requireFeature("employees");
+    const employees = await prisma.employee.findMany({ where: { companyId }, orderBy: { name: "asc" } });
+    return NextResponse.json(employees);
+  } catch {
+    return NextResponse.json({ error: "Неоторизиран достъп." }, { status: 401 });
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const { companyId } = await requireFeature("employees");
+    const data = schema.parse(await req.json());
+    const employee = await prisma.employee.create({
+      data: {
+        companyId, name: data.name, position: data.position ?? null, phone: data.phone ?? null,
+        email: data.email ?? null, address: data.address ?? null, salary: data.salary ?? null,
+        hiredAt: data.hiredAt ? new Date(data.hiredAt) : null, notes: data.notes ?? null,
+        active: data.active ?? true,
+      },
+    });
+    return NextResponse.json(employee);
+  } catch (err) {
+    if (err instanceof z.ZodError) return NextResponse.json({ error: "Невалидни данни." }, { status: 400 });
+    return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
+  }
+}
