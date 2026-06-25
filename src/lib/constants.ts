@@ -131,12 +131,12 @@ export const PLAN_FEATURES: Record<PlanId, string[]> = {
     "documents", "clients", "suppliers", "warehouse", "dashboard", "cash", "expenses",
     "recurring", "projects", "contracts", "analytics", "archive", "assets", "users", "audit",
     // Разширени модули (Бизнес + Про)
-    "production", "employees", "haccp", "revision", "stock_categories", "tax_calendar", "health_index",
+    "production", "employees", "haccp", "revision", "stock_categories", "tax_calendar", "health_index", "declarations",
   ],
   pro: [
     "documents", "clients", "suppliers", "warehouse", "dashboard", "cash", "expenses",
     "recurring", "projects", "contracts", "analytics", "archive", "assets", "users", "audit",
-    "production", "employees", "haccp", "revision", "stock_categories", "tax_calendar", "health_index",
+    "production", "employees", "haccp", "revision", "stock_categories", "tax_calendar", "health_index", "declarations",
     "multicompany", "ai", "api",
   ],
 };

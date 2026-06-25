@@ -38,8 +38,9 @@ export default async function DocumentsPage({
           <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>Документи</h1>
           <div style={{ color: "var(--muted)", fontSize: 13 }}>{docs.length} документа</div>
         </div>
-        <div style={{ display: "flex", gap: 10 }}>
-          <Link href="/dashboard/documents/protocols" className="btn btn-ghost">📋 Приемо-предавателни протоколи</Link>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <Link href="/dashboard/documents/protocols" className="btn btn-ghost">📋 ППП</Link>
+          <Link href="/dashboard/documents/declarations" className="btn btn-ghost">📜 Декларации</Link>
           <Link href="/dashboard/documents/new" className="btn btn-primary">+ Нов документ</Link>
         </div>
       </div>
@@ -48,6 +49,7 @@ export default async function DocumentsPage({
       <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
         <span className="filter-tab active">Изходящи документи</span>
         <Link href="/dashboard/documents/protocols" className="filter-tab">Протоколи (ППП)</Link>
+        <Link href="/dashboard/documents/declarations" className="filter-tab">Декларации за съответствие</Link>
         <Link href="/dashboard/expenses" className="filter-tab">Разходни фактури</Link>
         <Link href="/dashboard/bank-statements" className="filter-tab">Банкови извлечения</Link>
       </div>
