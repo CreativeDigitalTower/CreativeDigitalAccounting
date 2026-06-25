@@ -63,7 +63,7 @@ th.num,td.num{text-align:right;}
 .btn-danger{background:var(--brick);color:#fff;}
 .btn-sm{padding:6px 12px;font-size:12.5px;}
 
-input[type=text],input[type=email],input[type=password],input[type=number],input[type=date],select,textarea{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:rgba(255,255,255,.55);font-family:inherit;font-size:13.5px;color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;}
+input[type=text],input[type=email],input[type=password],input[type=number],input[type=date],input[type=tel],input[type=search],input:not([type]),select,textarea{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:rgba(255,255,255,.55);font-family:inherit;font-size:13.5px;color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;}
 input:focus,select:focus,textarea:focus{border-color:var(--navy);box-shadow:0 0 0 2px rgba(44,74,102,.15);}
 label{display:block;font-size:12px;color:var(--ink-soft);font-weight:600;margin-bottom:5px;}
 

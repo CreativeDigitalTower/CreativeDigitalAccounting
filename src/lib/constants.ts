@@ -81,6 +81,12 @@ export function getTemplate(id: string | null | undefined) {
   return INVOICE_TEMPLATES.find((t) => t.id === id) ?? INVOICE_TEMPLATES[0];
 }
 
+// Мерни единици за складови артикули и производство
+export const STOCK_UNITS = [
+  "бр", "кг", "г", "мг", "т", "л", "мл", "м", "см", "мм",
+  "кв.м", "куб.м", "оп.", "пакет", "кашон", "каса", "стек", "чувал", "ролка", "комплект", "час",
+] as const;
+
 export const PAYMENT_METHODS = [
   { id: "cash", label: "В брой" },
   { id: "bank_transfer", label: "Банков път" },
