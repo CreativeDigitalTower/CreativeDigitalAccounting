@@ -1,32 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-const DEFAULT_STANDARDS = "Регламент (ЕС) № 1169/2011 за предоставяне на информация за храните на потребителите; Регламент (ЕО) № 852/2004 относно хигиената на храните; Закон за храните; БДС приложими стандарти.";
+const DEFAULT_TEXT = "Декларирам, че експедираният продукт съответства на изискванията на поръчката и е годен за човешка употреба, позовавайки се на лабораторни изследвания, гарантиращи безопасността на продуктите ни.";
+type Product = { name: string; kg: string; batch: string; bestBefore: string };
+type Lab = { indicator: string; method: string; result: string };
+type Client = { id: string; name: string; eik: string | null; vatNumber: string | null; address: string | null; city: string | null; mol: string | null };
 
 export function DeclarationForm() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [form, setForm] = useState({
-    number: "", productName: "", batchNumber: "", issuedFor: "",
-    standards: DEFAULT_STANDARDS, description: "", date: new Date().toISOString().slice(0, 10), signedBy: "",
-  });
-  const set = (k: keyof typeof form, v: string) => setForm((p) => ({ ...p, [k]: v }));
+  const [clients, setClients] = useState<Client[]>([]);
+  const [number, setNumber] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [client, setClient] = useState({ clientName: "", clientEik: "", clientAddress: "", clientMol: "" });
+  const [products, setProducts] = useState<Product[]>([{ name: "", kg: "", batch: "", bestBefore: "" }]);
+  const [labs, setLabs] = useState<Lab[]>([{ indicator: "", method: "", result: "" }]);
+  const [declarationText, setDeclarationText] = useState(DEFAULT_TEXT);
+  const [storageNote, setStorageNote] = useState("Да се съхранява на сухо и хладно място.");
+  const [signedBy, setSignedBy] = useState("");
+
+  useEffect(() => { fetch("/api/clients").then((r) => r.ok ? r.json() : []).then((d) => setClients(Array.isArray(d) ? d : [])).catch(() => {}); }, []);
+
+  function pickClient(id: string) {
+    const c = clients.find((x) => x.id === id);
+    if (!c) { setClient({ clientName: "", clientEik: "", clientAddress: "", clientMol: "" }); return; }
+    setClient({ clientName: c.name, clientEik: c.eik ?? c.vatNumber ?? "", clientAddress: [c.address, c.city].filter(Boolean).join(", "), clientMol: c.mol ?? "" });
+  }
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSaving(true); setError("");
     const res = await fetch("/api/declarations", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, number: form.number || undefined }),
+      body: JSON.stringify({
+        number: number || undefined, date, ...client,
+        products: products.filter((p) => p.name.trim()),
+        labResults: labs.filter((l) => l.indicator.trim()),
+        declarationText, storageNote, signedBy,
+      }),
     });
     setSaving(false);
     if (res.ok) router.push("/dashboard/documents/declarations");
     else setError((await res.json()).error ?? "Грешка при запис.");
   }
+
+  const setP = (i: number, k: keyof Product, v: string) => setProducts(products.map((p, idx) => idx === i ? { ...p, [k]: v } : p));
+  const setL = (i: number, k: keyof Lab, v: string) => setLabs(labs.map((l, idx) => idx === i ? { ...l, [k]: v } : l));
 
   return (
     <>
@@ -37,17 +60,71 @@ export function DeclarationForm() {
       {error && <div style={{ background: "var(--brick-soft)", border: "1px solid var(--brick)", color: "var(--brick)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 16 }}>{error}</div>}
       <form onSubmit={submit}>
         <div className="glass panel" style={{ padding: 24, marginBottom: 16 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px,1fr))", gap: 14 }}>
-            <div><label>Номер (по избор — авто)</label><input value={form.number} onChange={(e) => set("number", e.target.value)} placeholder="ДС-2026-0001" /></div>
-            <div><label>Дата *</label><input type="date" value={form.date} onChange={(e) => set("date", e.target.value)} required /></div>
-            <div style={{ gridColumn: "1 / -1" }}><label>Наименование на продукта *</label><input value={form.productName} onChange={(e) => set("productName", e.target.value)} required /></div>
-            <div><label>Партиден номер</label><input value={form.batchNumber} onChange={(e) => set("batchNumber", e.target.value)} /></div>
-            <div><label>Издадена за (получател)</label><input value={form.issuedFor} onChange={(e) => set("issuedFor", e.target.value)} /></div>
-            <div style={{ gridColumn: "1 / -1" }}><label>Приложими стандарти и нормативни изисквания</label><textarea rows={3} value={form.standards} onChange={(e) => set("standards", e.target.value)} /></div>
-            <div style={{ gridColumn: "1 / -1" }}><label>Описание / Декларирано съответствие</label><textarea rows={3} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="Декларираме, че продуктът отговаря на изискванията за безопасност…" /></div>
-            <div><label>Подписал (МОЛ)</label><input value={form.signedBy} onChange={(e) => set("signedBy", e.target.value)} /></div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 12 }}>
+            <div><label>Номер (по избор — авто)</label><input value={number} onChange={(e) => setNumber(e.target.value)} placeholder="ДС-2026-0001" /></div>
+            <div><label>Дата *</label><input type="date" value={date} onChange={(e) => setDate(e.target.value)} required /></div>
+          </div>
+          <p style={{ fontSize: 12, color: "var(--muted)", margin: 0 }}>Доставчик: <strong>вашата фирма</strong> (попълва се автоматично от профила). Клиентът се въвежда по-долу.</p>
+        </div>
+
+        <div className="glass panel" style={{ padding: 24, marginBottom: 16 }}>
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 12px" }}>Клиент (получател)</h3>
+          {clients.length > 0 && (
+            <div style={{ marginBottom: 12 }}>
+              <label>Избор от клиенти (попълва автоматично)</label>
+              <select onChange={(e) => pickClient(e.target.value)} defaultValue=""><option value="">— Въведи ръчно —</option>{clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
+            </div>
+          )}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px,1fr))", gap: 12 }}>
+            <div style={{ gridColumn: "1 / -1" }}><label>Наименование *</label><input value={client.clientName} onChange={(e) => setClient({ ...client, clientName: e.target.value })} required /></div>
+            <div><label>ЕИК / ДДС №</label><input value={client.clientEik} onChange={(e) => setClient({ ...client, clientEik: e.target.value })} /></div>
+            <div><label>МОЛ</label><input value={client.clientMol} onChange={(e) => setClient({ ...client, clientMol: e.target.value })} /></div>
+            <div style={{ gridColumn: "1 / -1" }}><label>Адрес</label><input value={client.clientAddress} onChange={(e) => setClient({ ...client, clientAddress: e.target.value })} /></div>
           </div>
         </div>
+
+        <div className="glass panel" style={{ padding: 24, marginBottom: 16 }}>
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 6px" }}>Декларирани продукти</h3>
+          <table>
+            <thead><tr><th>Наименование</th><th>Кг.</th><th>Партиден номер</th><th>Най-добър до</th><th></th></tr></thead>
+            <tbody>
+              {products.map((p, i) => (
+                <tr key={i}>
+                  <td><input value={p.name} onChange={(e) => setP(i, "name", e.target.value)} style={{ padding: "6px 8px", fontSize: 13 }} /></td>
+                  <td><input value={p.kg} onChange={(e) => setP(i, "kg", e.target.value)} style={{ padding: "6px 8px", fontSize: 13, maxWidth: 90 }} /></td>
+                  <td><input value={p.batch} onChange={(e) => setP(i, "batch", e.target.value)} style={{ padding: "6px 8px", fontSize: 13, maxWidth: 140 }} /></td>
+                  <td><input value={p.bestBefore} onChange={(e) => setP(i, "bestBefore", e.target.value)} placeholder="дд.мм.гггг" style={{ padding: "6px 8px", fontSize: 13, maxWidth: 130 }} /></td>
+                  <td>{products.length > 1 && <button type="button" onClick={() => setProducts(products.filter((_, x) => x !== i))} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer", fontSize: 16 }}>×</button>}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <button type="button" onClick={() => setProducts([...products, { name: "", kg: "", batch: "", bestBefore: "" }])} style={{ marginTop: 8, fontSize: 12.5, fontWeight: 600, color: "var(--navy)", background: "none", border: "1px dashed var(--border)", padding: "7px 12px", borderRadius: 6, cursor: "pointer" }}>+ Продукт</button>
+        </div>
+
+        <div className="glass panel" style={{ padding: 24, marginBottom: 16 }}>
+          <div><label>Декларативен текст</label><textarea rows={3} value={declarationText} onChange={(e) => setDeclarationText(e.target.value)} /></div>
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 14, margin: "16px 0 6px" }}>Резултати от лабораторни изпитвания (по избор)</h3>
+          <table>
+            <thead><tr><th>Показател</th><th>Метод на изпитване</th><th>Резултат</th><th></th></tr></thead>
+            <tbody>
+              {labs.map((l, i) => (
+                <tr key={i}>
+                  <td><input value={l.indicator} onChange={(e) => setL(i, "indicator", e.target.value)} style={{ padding: "6px 8px", fontSize: 13 }} /></td>
+                  <td><input value={l.method} onChange={(e) => setL(i, "method", e.target.value)} placeholder="БДС ISO …" style={{ padding: "6px 8px", fontSize: 13 }} /></td>
+                  <td><input value={l.result} onChange={(e) => setL(i, "result", e.target.value)} style={{ padding: "6px 8px", fontSize: 13, maxWidth: 120 }} /></td>
+                  <td>{labs.length > 1 && <button type="button" onClick={() => setLabs(labs.filter((_, x) => x !== i))} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer", fontSize: 16 }}>×</button>}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <button type="button" onClick={() => setLabs([...labs, { indicator: "", method: "", result: "" }])} style={{ marginTop: 8, fontSize: 12.5, fontWeight: 600, color: "var(--navy)", background: "none", border: "1px dashed var(--border)", padding: "7px 12px", borderRadius: 6, cursor: "pointer" }}>+ Ред</button>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 14 }}>
+            <div><label>Условия за съхранение</label><input value={storageNote} onChange={(e) => setStorageNote(e.target.value)} /></div>
+            <div><label>Изготвил (подпис, печат)</label><input value={signedBy} onChange={(e) => setSignedBy(e.target.value)} /></div>
+          </div>
+        </div>
+
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
           <Link href="/dashboard/documents/declarations" className="btn btn-ghost">Отказ</Link>
           <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? "Записване…" : "Създай декларация"}</button>

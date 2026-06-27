@@ -332,14 +332,28 @@ model EmployeeLeave {
 model TechnologicalDoc {
   id          String   @id @default(cuid())
   companyId   String
+  docNumber   String?
   productName String
+  purpose     String?  @db.Text
+  classification String? @db.Text
   ingredients String?  @db.Text
+  rawMaterials String? @db.Text
+  packaging   String?  @db.Text
   preparation String?  @db.Text
+  process     String?  @db.Text
   bakingTime  String?
   bakingTemp  String?
   cooling     String?
+  organoleptic String? @db.Text
+  physicochemical String? @db.Text
+  microbiological String? @db.Text
+  samplingMethods String? @db.Text
+  labeling    String?  @db.Text
   storage     String?
+  storageConditions String?
+  transport   String?
   shelfLife   String?
+  productionControl String? @db.Text
   notes       String?  @db.Text
   createdAt   DateTime @default(now())
 
@@ -351,10 +365,19 @@ model ConformityDeclaration {
   id           String   @id @default(cuid())
   companyId    String
   number       String
-  productName  String
-  batchNumber  String?
+  // Клиент (получател)
+  clientName    String?
+  clientEik     String?
+  clientAddress String?
+  clientMol     String?
+  products      String?  @db.Text // JSON: [{name, kg, batch, bestBefore}]
+  labResults    String?  @db.Text // JSON: [{indicator, method, result}]
+  declarationText String? @db.Text
+  storageNote   String?
   standards    String?  @db.Text
   description  String?  @db.Text
+  productName  String?
+  batchNumber  String?
   issuedFor    String?
   date         DateTime
   signedBy     String?
