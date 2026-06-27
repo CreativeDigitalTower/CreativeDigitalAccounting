@@ -5,12 +5,12 @@ import { useEffect, useState, Fragment } from "react";
 type Leave = { id: string; type: string; startDate: string; endDate: string; days: number | null; note: string | null };
 type Employee = {
   id: string; name: string; position: string | null; phone: string | null; email: string | null;
-  address: string | null; salary: number | null; hiredAt: string | null; notes: string | null; active: boolean;
+  address: string | null; salary: number | null; hiredAt: string | null; paidLeaveDays: number; notes: string | null; active: boolean;
   leaves?: Leave[];
 };
 
-const LEAVE_LABELS: Record<string, string> = { leave: "Отпуск", sick: "Болничен", unpaid: "Неплатен", other: "Друго" };
-const empty = { name: "", position: "", phone: "", email: "", address: "", salary: "", hiredAt: "", notes: "" };
+const LEAVE_LABELS: Record<string, string> = { leave: "Платен отпуск", sick: "Болничен", unpaid: "Неплатен отпуск", other: "Друго" };
+const empty = { name: "", position: "", phone: "", email: "", address: "", salary: "", hiredAt: "", paidLeaveDays: "20", notes: "" };
 
 export function EmployeesPanel({ initial }: { initial: Employee[] }) {
   const [employees, setEmployees] = useState<Employee[]>(initial);
@@ -33,7 +33,8 @@ export function EmployeesPanel({ initial }: { initial: Employee[] }) {
   function startEdit(e: Employee) {
     setForm({
       name: e.name, position: e.position ?? "", phone: e.phone ?? "", email: e.email ?? "",
-      address: e.address ?? "", salary: e.salary != null ? String(e.salary) : "", hiredAt: e.hiredAt?.slice(0, 10) ?? "", notes: e.notes ?? "",
+      address: e.address ?? "", salary: e.salary != null ? String(e.salary) : "", hiredAt: e.hiredAt?.slice(0, 10) ?? "",
+      paidLeaveDays: String(e.paidLeaveDays ?? 20), notes: e.notes ?? "",
     });
     setEditing(e.id); setShowForm(true); setError("");
   }
@@ -42,6 +43,7 @@ export function EmployeesPanel({ initial }: { initial: Employee[] }) {
     setError("");
     const body = {
       ...form, salary: form.salary ? Number(form.salary) : null, hiredAt: form.hiredAt || null,
+      paidLeaveDays: form.paidLeaveDays ? Number(form.paidLeaveDays) : 20,
     };
     const res = await fetch(editing ? `/api/employees/${editing}` : "/api/employees", {
       method: editing ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
@@ -77,6 +79,7 @@ export function EmployeesPanel({ initial }: { initial: Employee[] }) {
             <div><label>Имейл</label><input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
             <div><label>Заплата (бруто)</label><input type="number" value={form.salary} onChange={(e) => setForm({ ...form, salary: e.target.value })} /></div>
             <div><label>Дата на назначаване</label><input type="date" value={form.hiredAt} onChange={(e) => setForm({ ...form, hiredAt: e.target.value })} /></div>
+            <div><label>Годишен платен отпуск (дни)</label><input type="number" min="0" value={form.paidLeaveDays} onChange={(e) => setForm({ ...form, paidLeaveDays: e.target.value })} /></div>
             <div style={{ gridColumn: "1 / -1" }}><label>Адрес</label><input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
             <div style={{ gridColumn: "1 / -1" }}><label>Бележки</label><textarea rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></div>
           </div>
@@ -156,16 +159,33 @@ function LeavePanel({ employee }: { employee: Employee }) {
     if (res.ok) setLeaves((p) => p.filter((x) => x.id !== id));
   }
 
-  const totalLeave = leaves.filter((l) => l.type === "leave").reduce((s, l) => s + (l.days ?? 0), 0);
+  const usedPaid = leaves.filter((l) => l.type === "leave").reduce((s, l) => s + (l.days ?? 0), 0);
+  const usedUnpaid = leaves.filter((l) => l.type === "unpaid").reduce((s, l) => s + (l.days ?? 0), 0);
   const totalSick = leaves.filter((l) => l.type === "sick").reduce((s, l) => s + (l.days ?? 0), 0);
+  const entitlement = employee.paidLeaveDays ?? 20;
+  const remaining = entitlement - usedPaid;
 
   return (
     <div>
       {employee.address && <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginBottom: 6 }}>Адрес: {employee.address}</div>}
       {employee.notes && <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginBottom: 10 }}>Бележки: {employee.notes}</div>}
-      <div style={{ display: "flex", gap: 16, fontSize: 12.5, marginBottom: 10 }}>
-        <span>Отпуск общо: <strong className="num">{totalLeave}</strong> дни</span>
-        <span>Болничен общо: <strong className="num">{totalSick}</strong> дни</span>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px,1fr))", gap: 10, marginBottom: 12 }}>
+        <div style={{ background: "var(--emerald-soft)", borderRadius: 8, padding: "8px 10px" }}>
+          <div style={{ fontSize: 11, color: "var(--muted)" }}>Полагаем платен отпуск</div>
+          <div className="num" style={{ fontSize: 16, fontWeight: 700 }}>{entitlement} дни</div>
+        </div>
+        <div style={{ background: "rgba(255,255,255,.5)", borderRadius: 8, padding: "8px 10px" }}>
+          <div style={{ fontSize: 11, color: "var(--muted)" }}>Използван платен</div>
+          <div className="num" style={{ fontSize: 16, fontWeight: 700 }}>{usedPaid} дни</div>
+        </div>
+        <div style={{ background: remaining < 0 ? "var(--brick-soft)" : "var(--brass-soft)", borderRadius: 8, padding: "8px 10px" }}>
+          <div style={{ fontSize: 11, color: "var(--muted)" }}>Оставащ платен</div>
+          <div className="num" style={{ fontSize: 16, fontWeight: 700, color: remaining < 0 ? "var(--brick)" : "var(--brass)" }}>{remaining} дни</div>
+        </div>
+        <div style={{ background: "rgba(255,255,255,.5)", borderRadius: 8, padding: "8px 10px" }}>
+          <div style={{ fontSize: 11, color: "var(--muted)" }}>Неплатен / Болничен</div>
+          <div className="num" style={{ fontSize: 14, fontWeight: 700 }}>{usedUnpaid} / {totalSick} дни</div>
+        </div>
       </div>
       <div style={{ display: "flex", gap: 8, alignItems: "flex-end", flexWrap: "wrap", marginBottom: 10 }}>
         <div><label style={{ fontSize: 11 }}>Вид</label><select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} style={{ padding: "6px 8px", fontSize: 12.5 }}>{Object.entries(LEAVE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></div>

@@ -297,18 +297,19 @@ model RecipeItem {
 
 // Служители
 model Employee {
-  id        String   @id @default(cuid())
-  companyId String
-  name      String
-  position  String?
-  phone     String?
-  email     String?
-  address   String?
-  salary    Float?
-  hiredAt   DateTime?
-  active    Boolean  @default(true)
-  notes     String?  @db.Text
-  createdAt DateTime @default(now())
+  id             String   @id @default(cuid())
+  companyId      String
+  name           String
+  position       String?
+  phone          String?
+  email          String?
+  address        String?
+  salary         Float?
+  hiredAt        DateTime?
+  paidLeaveDays  Int      @default(20) // годишен платен отпуск (мин. по закон 20 раб. дни)
+  active         Boolean  @default(true)
+  notes          String?  @db.Text
+  createdAt      DateTime @default(now())
 
   company Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
   leaves  EmployeeLeave[]
