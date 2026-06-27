@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES } from "@/lib/constants";
+import { CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, allowedTemplateCount, type PlanId } from "@/lib/constants";
 import { TemplatePreview } from "@/components/app/TemplatePreview";
 
 type Company = {
@@ -12,7 +12,7 @@ type Company = {
   bankIban: string | null; bankName: string | null; bankBic: string | null;
   logoUrl: string | null; brandColor: string | null;
   defaultCurrency: string; defaultLanguage: string; invoiceTemplate: string;
-  invoiceNumberStart: number;
+  invoiceNumberStart: number; plan?: string;
 };
 
 export default function SettingsPage() {
@@ -180,33 +180,50 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <label style={{ marginTop: 18 }}>Дизайн на фактурата — изберете от 10 шаблона</label>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px,1fr))", gap: 12, marginTop: 6 }}>
-          {INVOICE_TEMPLATES.map((t) => (
-            <div
-              key={t.id}
-              style={{
-                border: c.invoiceTemplate === t.id ? `2px solid ${t.accent}` : "1px solid var(--border)",
-                borderRadius: 10, padding: 8, background: c.invoiceTemplate === t.id ? "var(--emerald-soft)" : "rgba(255,255,255,.5)", textAlign: "left",
-              }}
-            >
-              <div onClick={() => set("invoiceTemplate", t.id)} style={{ cursor: "pointer" }}>
-                <TemplatePreview templateId={t.id} showLogo={!!c.logoUrl} />
-                <div style={{ fontSize: 12.5, fontWeight: 600, marginTop: 6, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  {t.name}
-                  {c.invoiceTemplate === t.id && <span style={{ color: "var(--emerald)" }}>✓</span>}
-                </div>
+        {(() => {
+          const allowed = allowedTemplateCount((c.plan ?? "free") as PlanId);
+          const allowedLabel = allowed === Infinity ? "всички" : `първите ${allowed}`;
+          return (
+            <>
+              <label style={{ marginTop: 18 }}>Дизайн на фактурата — вашият план включва {allowedLabel} шаблона</label>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px,1fr))", gap: 12, marginTop: 6 }}>
+                {INVOICE_TEMPLATES.map((t, i) => {
+                  const locked = allowed !== Infinity && i >= allowed;
+                  return (
+                    <div
+                      key={t.id}
+                      style={{
+                        border: c.invoiceTemplate === t.id ? `2px solid ${t.accent}` : "1px solid var(--border)",
+                        borderRadius: 10, padding: 8, background: c.invoiceTemplate === t.id ? "var(--emerald-soft)" : "rgba(255,255,255,.5)", textAlign: "left",
+                        opacity: locked ? 0.55 : 1, position: "relative",
+                      }}
+                    >
+                      <div onClick={() => !locked && set("invoiceTemplate", t.id)} style={{ cursor: locked ? "not-allowed" : "pointer" }}>
+                        <TemplatePreview templateId={t.id} showLogo={!!c.logoUrl} />
+                        <div style={{ fontSize: 12.5, fontWeight: 600, marginTop: 6, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          {t.name}
+                          {locked ? <span title="Заключен шаблон">🔒</span> : (c.invoiceTemplate === t.id && <span style={{ color: "var(--emerald)" }}>✓</span>)}
+                        </div>
+                      </div>
+                      <a href={`/dashboard/settings/preview?template=${t.id}`} target="_blank" rel="noopener noreferrer"
+                        style={{ display: "block", textAlign: "center", marginTop: 6, fontSize: 11.5, fontWeight: 600, color: "var(--navy)", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 0", textDecoration: "none" }}>
+                        👁 Преглед
+                      </a>
+                    </div>
+                  );
+                })}
               </div>
-              <a href={`/dashboard/settings/preview?template=${t.id}`} target="_blank" rel="noopener noreferrer"
-                style={{ display: "block", textAlign: "center", marginTop: 6, fontSize: 11.5, fontWeight: 600, color: "var(--navy)", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 0", textDecoration: "none" }}>
-                👁 Преглед
-              </a>
-            </div>
-          ))}
-        </div>
-        <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 10 }}>
-          Логото във фактурата е достъпно само за платените планове (Старт, Бизнес, Про).
-        </p>
+              {allowed !== Infinity && (
+                <p style={{ fontSize: 11.5, color: "var(--brass)", marginTop: 10 }}>
+                  🔒 Повече шаблони са достъпни в по-висок план. <Link href="/dashboard/subscription" style={{ color: "var(--navy)", fontWeight: 600 }}>Надгради</Link>
+                </p>
+              )}
+              <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 8 }}>
+                Логото във фактурата е достъпно само за платените планове (Старт, Бизнес, Про).
+              </p>
+            </>
+          );
+        })()}
       </div>
 
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, position: "sticky", bottom: 0, padding: "12px 0" }}>

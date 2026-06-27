@@ -29,8 +29,8 @@ const schema = z.object({
 export async function GET() {
   try {
     const { companyId } = await requireCompany();
-    const company = await prisma.company.findUnique({ where: { id: companyId } });
-    return NextResponse.json(company);
+    const company = await prisma.company.findUnique({ where: { id: companyId }, include: { subscription: true } });
+    return NextResponse.json({ ...company, plan: company?.subscription?.plan ?? "free" });
   } catch {
     return NextResponse.json({ error: "Неоторизиран достъп." }, { status: 401 });
   }

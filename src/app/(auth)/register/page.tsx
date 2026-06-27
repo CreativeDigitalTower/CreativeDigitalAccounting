@@ -4,7 +4,7 @@ import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PLAN_DETAILS, BILLING_PERIODS } from "@/components/marketing/Pricing";
-import { EUR_TO_BGN } from "@/lib/constants";
+import { EUR_TO_BGN, isPromoActive } from "@/lib/constants";
 
 const SECTORS = ["Търговия", "Услуги", "Производство", "IT / Софтуер", "Строителство", "Транспорт", "Туризъм / Ресторантьорство", "Земеделие", "Здравеопазване", "Образование", "Финанси", "Свободна професия", "Друг"];
 
@@ -16,6 +16,7 @@ function RegisterForm() {
     BILLING_PERIODS.find((p) => p.id === params.get("period")) ?? BILLING_PERIODS[0]
   );
   const [step, setStep] = useState<"account" | "company">("account");
+  const promo = isPromoActive();
   const [acc, setAcc] = useState({ name: "", representativeRole: "", email: "", email2: "", password: "", password2: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -117,21 +118,25 @@ function RegisterForm() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 {PLAN_DETAILS.map((p) => {
                   const monthlyEff = p.price * (1 - period.discount);
+                  const regularMonthly = p.regularPrice * (1 - period.discount);
                   const total = p.price * period.months * (1 - period.discount);
                   const active = plan === p.id;
+                  const hasPromo = promo && p.regularPrice > p.price;
                   const Icon = p.Icon;
                   return (
                     <button type="button" key={p.id} onClick={() => setPlan(p.id)}
                       style={{ textAlign: "left", padding: "12px 14px", borderRadius: 10, cursor: "pointer", position: "relative",
                         background: active ? "var(--emerald-soft)" : "rgba(255,255,255,.5)", border: active ? "2px solid var(--emerald)" : "1px solid var(--border)" }}>
                       {p.recommended && <span style={{ position: "absolute", top: -8, right: 10, background: "var(--brass)", color: "#fff", fontSize: 9.5, fontWeight: 700, padding: "2px 7px", borderRadius: 10 }}>Препоръчан</span>}
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                      {hasPromo && <span style={{ position: "absolute", top: -8, left: 10, background: "var(--brick)", color: "#fff", fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 10 }}>Специална цена</span>}
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, marginTop: hasPromo ? 6 : 0 }}>
                         <span className="icon-tile" style={{ width: 30, height: 30 }}><Icon /></span>
                         <span style={{ fontWeight: 700, fontSize: 14, fontFamily: "'Fraunces', serif" }}>{p.name}</span>
                         {active && <span style={{ marginLeft: "auto", color: "var(--emerald)", fontWeight: 700 }}>✓</span>}
                       </div>
-                      <div className="num" style={{ fontSize: 19, fontWeight: 700 }}>
-                        {p.price === 0 ? "0" : monthlyEff.toFixed(monthlyEff % 1 === 0 ? 0 : 2)}
+                      <div style={{ fontSize: 19, fontWeight: 700 }}>
+                        {hasPromo && <span className="num" style={{ fontSize: 12, color: "var(--muted)", textDecoration: "line-through", marginRight: 5 }}>{regularMonthly.toFixed(regularMonthly % 1 === 0 ? 0 : 2)}</span>}
+                        <span className="num" style={{ color: hasPromo ? "var(--emerald-dark)" : "var(--ink)" }}>{p.price === 0 ? "0" : monthlyEff.toFixed(monthlyEff % 1 === 0 ? 0 : 2)}</span>
                         <span style={{ fontSize: 11, color: "var(--muted)", fontWeight: 500 }}> € / мес</span>
                       </div>
                       {p.price > 0 && period.months > 1 && (

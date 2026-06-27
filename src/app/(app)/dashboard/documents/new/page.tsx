@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   isDualCurrencyActive, toBGN, formatCurrency, EUR_TO_BGN,
-  CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, PAYMENT_METHODS,
+  CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, PAYMENT_METHODS, allowedTemplateCount, type PlanId,
 } from "@/lib/constants";
 
 type ClientFull = { id: string; name: string; eik: string | null; vatNumber: string | null; city: string | null; address: string | null; contactEmail: string | null };
@@ -49,6 +49,8 @@ function NewDocumentForm() {
   const [notes, setNotes] = useState("");
   const [internalComment, setInternalComment] = useState("");
   const [companyReady, setCompanyReady] = useState(true);
+  const [plan, setPlan] = useState<PlanId>("free");
+  const allowedTpls = (() => { const n = allowedTemplateCount(plan); return n === Infinity ? INVOICE_TEMPLATES : INVOICE_TEMPLATES.slice(0, n); })();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -84,6 +86,7 @@ function NewDocumentForm() {
       if (c?.defaultCurrency) setCurrency(c.defaultCurrency);
       if (c?.defaultLanguage) setLanguage(c.defaultLanguage);
       if (c?.invoiceTemplate) setTemplate(c.invoiceTemplate);
+      if (c?.plan) setPlan(c.plan as PlanId);
       // Изисква попълнени фирмени данни преди фактуриране
       setCompanyReady(!!(c?.name && c?.eik && c?.address));
     }).catch(() => {});
@@ -233,7 +236,7 @@ function NewDocumentForm() {
           <div>
             <label>Дизайн на фактурата</label>
             <select value={template} onChange={(e) => setTemplate(e.target.value)}>
-              {INVOICE_TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+              {allowedTpls.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
             </select>
           </div>
           <div>
