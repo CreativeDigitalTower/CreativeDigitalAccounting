@@ -28,17 +28,21 @@ export default async function DeclarationsPage() {
           </div>
         ) : (
           <table>
-            <thead><tr><th>Номер</th><th>Дата</th><th>Продукт</th><th>Партида</th><th></th></tr></thead>
+            <thead><tr><th>Номер</th><th>Дата</th><th>Клиент</th><th>Продукти</th><th></th></tr></thead>
             <tbody>
-              {decs.map((d) => (
-                <tr key={d.id}>
-                  <td className="num" style={{ color: "var(--muted)", fontSize: 12 }}>{d.number}</td>
-                  <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>{new Date(d.date).toLocaleDateString("bg-BG")}</td>
-                  <td style={{ fontSize: 13, fontWeight: 600 }}>{d.productName}</td>
-                  <td style={{ fontSize: 13 }}>{d.batchNumber ?? "—"}</td>
-                  <td><Link href={`/dashboard/documents/declarations/${d.id}`} className="btn btn-ghost btn-sm">Преглед</Link></td>
-                </tr>
-              ))}
+              {decs.map((d) => {
+                let count = 0;
+                try { count = d.products ? JSON.parse(d.products).length : 0; } catch { count = 0; }
+                return (
+                  <tr key={d.id}>
+                    <td className="num" style={{ color: "var(--muted)", fontSize: 12 }}>{d.number}</td>
+                    <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>{new Date(d.date).toLocaleDateString("bg-BG")}</td>
+                    <td style={{ fontSize: 13, fontWeight: 600 }}>{d.clientName ?? d.productName ?? "—"}</td>
+                    <td style={{ fontSize: 13 }}>{count || "—"}</td>
+                    <td><Link href={`/dashboard/documents/declarations/${d.id}`} className="btn btn-ghost btn-sm">Преглед</Link></td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}

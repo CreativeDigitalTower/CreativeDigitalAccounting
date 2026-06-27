@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Stamp } from "@/components/Stamp";
 import { DocumentActions } from "@/components/app/DocumentActions";
 import { InvoiceDocument } from "@/components/app/InvoiceDocument";
+import { OfferDocument } from "@/components/app/OfferDocument";
 
 export default async function DocumentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { companyId } = await requireCompany();
@@ -36,8 +37,8 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
         </div>
       </div>
 
-      <InvoiceDocument
-        data={{
+      {(() => {
+        const docData = {
           type: doc.type, number: doc.number, issueDate: doc.issueDate, taxEventDate: doc.taxEventDate, dueDate: doc.dueDate,
           currency: doc.currency, paymentMethod: doc.paymentMethod, notes: doc.notes, template: doc.template,
           logoUrl: showLogo ? doc.company.logoUrl : null,
@@ -47,12 +48,13 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
             bankName: doc.company.bankName, bankBic: doc.company.bankBic,
           },
           client: doc.client ? {
-            name: doc.client.name, address: doc.client.address, city: doc.client.city,
+            name: doc.client.name, mol: doc.client.mol, address: doc.client.address, city: doc.client.city,
             eik: doc.client.eik, vatNumber: doc.client.vatNumber,
           } : null,
           lines: doc.lines.map((l) => ({ id: l.id, description: l.description, quantity: l.quantity, unitPrice: l.unitPrice, vatRate: l.vatRate, lineTotal: l.lineTotal })),
-        }}
-      />
+        };
+        return doc.type === "quote" ? <OfferDocument data={docData} /> : <InvoiceDocument data={docData} />;
+      })()}
 
       {/* Вътрешен коментар — само за вашия екип, НЕ е част от документа */}
       {doc.internalComment && (

@@ -3,16 +3,31 @@ import { prisma } from "@/lib/prisma";
 import { requireFeature } from "@/lib/session";
 import { z } from "zod";
 
-const schema = z.object({
+const opt = z.string().optional().nullable();
+export const tdSchema = z.object({
+  docNumber: opt,
   productName: z.string().min(1),
-  ingredients: z.string().optional().nullable(),
-  preparation: z.string().optional().nullable(),
-  bakingTime: z.string().optional().nullable(),
-  bakingTemp: z.string().optional().nullable(),
-  cooling: z.string().optional().nullable(),
-  storage: z.string().optional().nullable(),
-  shelfLife: z.string().optional().nullable(),
-  notes: z.string().optional().nullable(),
+  purpose: opt,
+  classification: opt,
+  ingredients: opt,
+  rawMaterials: opt,
+  packaging: opt,
+  preparation: opt,
+  process: opt,
+  bakingTime: opt,
+  bakingTemp: opt,
+  cooling: opt,
+  organoleptic: opt,
+  physicochemical: opt,
+  microbiological: opt,
+  samplingMethods: opt,
+  labeling: opt,
+  storage: opt,
+  storageConditions: opt,
+  transport: opt,
+  shelfLife: opt,
+  productionControl: opt,
+  notes: opt,
 });
 
 export async function GET() {
@@ -28,7 +43,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const { companyId } = await requireFeature("haccp");
-    const data = schema.parse(await req.json());
+    const data = tdSchema.parse(await req.json());
     const doc = await prisma.technologicalDoc.create({ data: { companyId, ...data } });
     return NextResponse.json(doc);
   } catch (err) {

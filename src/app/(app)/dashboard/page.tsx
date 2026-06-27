@@ -5,6 +5,7 @@ import { Stamp } from "@/components/Stamp";
 import { WelcomeWizard } from "@/components/app/WelcomeWizard";
 import { formatCurrency, toBGN, isDualCurrencyActive, FREE_PLAN_LIMIT, getYearMonth, planHasFeature, type PlanId } from "@/lib/constants";
 import { TopClientsChart, aggregateClientRevenue } from "@/components/app/TopClientsChart";
+import { upcomingStandard } from "@/lib/taxCalendar";
 
 export default async function DashboardPage() {
   const { companyId, userId } = await requireCompany();
@@ -101,6 +102,9 @@ export default async function DashboardPage() {
     select: { client: { select: { name: true } }, lines: { select: { lineTotal: true } } },
   });
   const clientRevenue = aggregateClientRevenue(clientRevenueInvoices);
+
+  const hasTaxCalendar = planHasFeature((subscription?.plan ?? "free") as PlanId, "tax_calendar");
+  const taxDeadlines = hasTaxCalendar ? upcomingStandard(6) : [];
 
   // Бизнес здравен индекс + напомняния за плащане (Бизнес + Про)
   const hasHealth = planHasFeature((subscription?.plan ?? "free") as PlanId, "health_index");
@@ -363,6 +367,31 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Данъчен и осигурителен календар — предстоящи срокове */}
+      {hasTaxCalendar && taxDeadlines.length > 0 && (
+        <div className="glass panel" style={{ marginTop: 18 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>📅 Данъчен и осигурителен календар</h3>
+            <Link href="/dashboard/tax-calendar" style={{ fontSize: 12.5, color: "var(--navy)", fontWeight: 600 }}>Пълен календар →</Link>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 10 }}>
+            {taxDeadlines.map((d, i) => {
+              const days = Math.round((d.date.getTime() - new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()) / 86400000);
+              const soon = days <= 7;
+              return (
+                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "8px 10px", background: soon ? "var(--brick-soft)" : "rgba(255,255,255,.5)", borderRadius: 8, border: "1px solid var(--border)" }}>
+                  <div style={{ textAlign: "center", flexShrink: 0 }}>
+                    <div className="num" style={{ fontSize: 15, fontWeight: 700, color: soon ? "var(--brick)" : "var(--navy)" }}>{d.date.getDate()}.{d.date.getMonth() + 1}</div>
+                    <div style={{ fontSize: 10, color: "var(--muted)" }}>{days === 0 ? "днес" : `${days} дни`}</div>
+                  </div>
+                  <div style={{ fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.4 }}>{d.title} <span style={{ color: "var(--muted)" }}>· {d.law}</span></div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </>
   );
 }

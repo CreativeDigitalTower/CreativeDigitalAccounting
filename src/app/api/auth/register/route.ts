@@ -29,21 +29,37 @@ export async function POST(req: Request) {
     const body = await req.json();
     const data = schema.parse(body);
 
-    const existing = await prisma.user.findUnique({ where: { email: data.email } });
-    if (existing) {
+    const existing = await prisma.user.findUnique({
+      where: { email: data.email },
+      include: { companyUsers: { select: { companyId: true } } },
+    });
+    if (existing?.passwordHash) {
       return NextResponse.json({ error: "Имейл адресът вече е регистриран." }, { status: 400 });
     }
 
     const passwordHash = await bcrypt.hash(data.password, 12);
 
-    const result = await prisma.$transaction(async (tx) => {
-      const user = await tx.user.create({
+    // Поканен потребител (placeholder без парола), който вече е член на фирма —
+    // активира акаунта си без да създава нова фирма.
+    if (existing && existing.companyUsers.length > 0) {
+      await prisma.user.update({
+        where: { id: existing.id },
         data: {
-          email: data.email, name: data.name, passwordHash,
-          representativeRole: data.representativeRole || null,
+          name: data.name, passwordHash, representativeRole: data.representativeRole || null,
           marketingConsent: !!data.marketingConsent, termsAcceptedAt: new Date(),
         },
       });
+      return NextResponse.json({ success: true, joinedExisting: true });
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const userData = {
+        name: data.name, passwordHash, representativeRole: data.representativeRole || null,
+        marketingConsent: !!data.marketingConsent, termsAcceptedAt: new Date(),
+      };
+      const user = existing
+        ? await tx.user.update({ where: { id: existing.id }, data: userData })
+        : await tx.user.create({ data: { email: data.email, ...userData } });
 
       const company = await tx.company.create({
         data: {

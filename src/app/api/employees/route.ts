@@ -11,6 +11,7 @@ const schema = z.object({
   address: z.string().optional().nullable(),
   salary: z.number().optional().nullable(),
   hiredAt: z.string().optional().nullable(),
+  paidLeaveDays: z.number().int().min(0).optional(),
   notes: z.string().optional().nullable(),
   active: z.boolean().optional(),
 });
@@ -33,7 +34,8 @@ export async function POST(req: Request) {
       data: {
         companyId, name: data.name, position: data.position ?? null, phone: data.phone ?? null,
         email: data.email ?? null, address: data.address ?? null, salary: data.salary ?? null,
-        hiredAt: data.hiredAt ? new Date(data.hiredAt) : null, notes: data.notes ?? null,
+        hiredAt: data.hiredAt ? new Date(data.hiredAt) : null,
+        paidLeaveDays: data.paidLeaveDays ?? 20, notes: data.notes ?? null,
         active: data.active ?? true,
       },
     });

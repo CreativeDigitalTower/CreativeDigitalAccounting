@@ -6,11 +6,15 @@ import { z } from "zod";
 
 const schema = z.object({
   number: z.string().optional(),
-  productName: z.string().min(1),
-  batchNumber: z.string().optional().nullable(),
+  clientName: z.string().optional().nullable(),
+  clientEik: z.string().optional().nullable(),
+  clientAddress: z.string().optional().nullable(),
+  clientMol: z.string().optional().nullable(),
+  products: z.array(z.object({ name: z.string(), kg: z.string(), batch: z.string(), bestBefore: z.string() })).default([]),
+  labResults: z.array(z.object({ indicator: z.string(), method: z.string(), result: z.string() })).default([]),
+  declarationText: z.string().optional().nullable(),
+  storageNote: z.string().optional().nullable(),
   standards: z.string().optional().nullable(),
-  description: z.string().optional().nullable(),
-  issuedFor: z.string().optional().nullable(),
   date: z.string(),
   signedBy: z.string().optional().nullable(),
 });
@@ -26,9 +30,11 @@ export async function POST(req: Request) {
     }
     const dec = await prisma.conformityDeclaration.create({
       data: {
-        companyId, number, productName: data.productName, batchNumber: data.batchNumber ?? null,
-        standards: data.standards ?? null, description: data.description ?? null,
-        issuedFor: data.issuedFor ?? null, date: new Date(data.date), signedBy: data.signedBy ?? null,
+        companyId, number, clientName: data.clientName ?? null, clientEik: data.clientEik ?? null,
+        clientAddress: data.clientAddress ?? null, clientMol: data.clientMol ?? null,
+        products: JSON.stringify(data.products), labResults: JSON.stringify(data.labResults),
+        declarationText: data.declarationText ?? null, storageNote: data.storageNote ?? null,
+        standards: data.standards ?? null, date: new Date(data.date), signedBy: data.signedBy ?? null,
       },
     });
     await audit(companyId, userId, "create", "ConformityDeclaration", dec.id, number);

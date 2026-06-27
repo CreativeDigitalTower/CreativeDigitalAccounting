@@ -6,6 +6,8 @@ import { z } from "zod";
 
 const schema = z.object({
   email: z.string().email(),
+  firstName: z.string().optional().nullable(),
+  lastName: z.string().optional().nullable(),
   role: z.enum(["owner", "manager", "accountant", "sales", "warehouse", "viewer"]),
 });
 
@@ -22,14 +24,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Нямате права да каните потребители." }, { status: 403 });
     }
 
-    const { email, role } = schema.parse(await req.json());
+    const { email, firstName, lastName, role } = schema.parse(await req.json());
+    const fullName = [firstName, lastName].filter(Boolean).join(" ").trim() || null;
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    let user = await prisma.user.findUnique({ where: { email } });
+    let created = false;
     if (!user) {
-      return NextResponse.json(
-        { error: "Потребител с този имейл още няма акаунт. Помолете го първо да се регистрира, след което го добавете." },
-        { status: 404 }
-      );
+      // Създаваме placeholder акаунт; лицето активира достъпа си чрез регистрация със същия имейл.
+      user = await prisma.user.create({ data: { email, name: fullName } });
+      created = true;
+    } else if (fullName && !user.name) {
+      await prisma.user.update({ where: { id: user.id }, data: { name: fullName } });
     }
 
     const existing = await prisma.companyUser.findUnique({
@@ -45,7 +50,7 @@ export async function POST(req: Request) {
     }
 
     await audit(companyId, userId, "create", "CompanyUser", user.id, `${email} → ${role}`);
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, pending: created });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: "Невалидни данни." }, { status: 400 });
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });

@@ -1,8 +1,8 @@
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { StatusSelect } from "@/components/app/StatusSelect";
-import { formatCurrency, toBGN, isDualCurrencyActive, DOC_STATUSES, groupByMonth } from "@/lib/constants";
+import { InvoicesTable } from "@/components/app/InvoicesTable";
+import { formatCurrency, toBGN, isDualCurrencyActive, DOC_STATUSES } from "@/lib/constants";
 
 export default async function InvoicesPage({
   searchParams,
@@ -70,35 +70,13 @@ export default async function InvoicesPage({
           <Link href="/dashboard/documents/new?type=invoice" className="btn btn-primary btn-sm">Издай първата фактура</Link>
         </div>
       ) : (
-        groupByMonth(invoices).map((group) => (
-          <div key={group.key} style={{ marginBottom: 18 }}>
-            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 8px", textTransform: "capitalize" }}>{group.label}</h3>
-            <div className="glass panel" style={{ padding: "8px 0" }}>
-              <table>
-                <thead><tr><th>№</th><th>Клиент</th><th>Дата</th><th>Падеж</th><th className="num">Сума</th><th>Статус</th><th></th></tr></thead>
-                <tbody>
-                  {group.items.map((doc) => {
-                    const total = doc.lines.reduce((s, l) => s + l.lineTotal, 0);
-                    return (
-                      <tr key={doc.id}>
-                        <td className="num" style={{ fontSize: 12.5 }}>{doc.number}</td>
-                        <td style={{ fontWeight: 600 }}>{doc.client?.name ?? "—"}</td>
-                        <td style={{ fontSize: 13, color: "var(--ink-soft)" }}>{new Date(doc.issueDate).toLocaleDateString("bg-BG")}</td>
-                        <td style={{ fontSize: 13, color: "var(--ink-soft)" }}>{doc.dueDate ? new Date(doc.dueDate).toLocaleDateString("bg-BG") : "—"}</td>
-                        <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(total, doc.currency)}</td>
-                        <td><StatusSelect id={doc.id} status={doc.status} /></td>
-                        <td style={{ display: "flex", gap: 6 }}>
-                          <Link href={`/dashboard/documents/${doc.id}`} className="btn btn-ghost btn-sm">Отвори</Link>
-                          <Link href={`/dashboard/documents/${doc.id}/edit`} className="btn btn-ghost btn-sm">✎</Link>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        ))
+        <InvoicesTable
+          invoices={invoices.map((doc) => ({
+            id: doc.id, number: doc.number, clientName: doc.client?.name ?? "—",
+            issueDate: doc.issueDate.toISOString(), dueDate: doc.dueDate ? doc.dueDate.toISOString() : null,
+            total: doc.lines.reduce((s, l) => s + l.lineTotal, 0), currency: doc.currency, status: doc.status,
+          }))}
+        />
       )}
     </>
   );

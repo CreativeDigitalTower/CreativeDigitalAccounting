@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { formatCurrency } from "@/lib/constants";
 
 type Client = {
@@ -12,7 +12,8 @@ type Client = {
 
 export function ClientInfoCard({ client, totalInvoiced }: { client: Client; totalInvoiced: number }) {
   const router = useRouter();
-  const [editing, setEditing] = useState(false);
+  const searchParams = useSearchParams();
+  const [editing, setEditing] = useState(searchParams.get("edit") === "1");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState(client);

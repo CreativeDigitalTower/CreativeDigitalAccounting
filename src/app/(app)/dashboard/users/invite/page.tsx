@@ -16,7 +16,7 @@ export default function InviteUserPage() {
     const fd = new FormData(e.currentTarget);
     const res = await fetch("/api/users/invite", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: fd.get("email"), role: fd.get("role") }),
+      body: JSON.stringify({ email: fd.get("email"), firstName: fd.get("firstName"), lastName: fd.get("lastName"), role: fd.get("role") }),
     });
     setSaving(false);
     if (res.ok) { setOk(true); setTimeout(() => router.push("/dashboard/users"), 1200); }
@@ -34,9 +34,12 @@ export default function InviteUserPage() {
       <form onSubmit={handleSubmit}>
         <div className="glass panel" style={{ padding: 28, marginBottom: 16 }}>
           <p style={{ fontSize: 13, color: "var(--ink-soft)", margin: "0 0 18px" }}>
-            Потребителят трябва първо да има регистриран акаунт. Въведете имейла му и изберете роля — той ще получи достъп до тази фирма.
+            Въведете имена, имейл и роля на потребителя. Ако още няма акаунт, ще бъде създаден профил —
+            лицето активира достъпа си, като се регистрира със същия имейл.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px,1fr))", gap: 14 }}>
+            <div><label>Име *</label><input type="text" name="firstName" required placeholder="Иван" /></div>
+            <div><label>Фамилия *</label><input type="text" name="lastName" required placeholder="Иванов" /></div>
             <div><label>Имейл *</label><input type="email" name="email" required placeholder="kolega@firma.bg" /></div>
             <div><label>Роля *</label>
               <select name="role" required defaultValue="viewer">

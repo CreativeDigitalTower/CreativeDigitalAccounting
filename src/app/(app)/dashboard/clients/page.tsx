@@ -99,6 +99,7 @@ export default async function ClientsPage() {
                   <td className="num">{client._count.documents}</td>
                   <td style={{ display: "flex", gap: 6 }}>
                     <Link href={`/dashboard/clients/${client.id}`} className="btn btn-ghost btn-sm">Досие</Link>
+                    <Link href={`/dashboard/clients/${client.id}?edit=1`} className="btn btn-ghost btn-sm">✎ Редактирай</Link>
                     <Link href={`/dashboard/documents/new?clientId=${client.id}`} className="btn btn-primary btn-sm">+ Фактура</Link>
                   </td>
                 </tr>
