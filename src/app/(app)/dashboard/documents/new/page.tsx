@@ -385,8 +385,8 @@ function NewDocumentForm() {
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 20 }}>
           <div>
-            <label>Забележки (видими за клиента)</label>
-            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Напр. условия, благодарност, допълнителна информация…" />
+            <label>{type === "quote" ? "Описание на офертата (видимо за клиента)" : "Забележки (видими за клиента)"}</label>
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder={type === "quote" ? "Опишете какво включва офертата, обхват, условия, валидност…" : "Напр. условия, благодарност, допълнителна информация…"} />
           </div>
           <div>
             <label>Коментари (вътрешни, НЕ се виждат от клиента)</label>
