@@ -6,31 +6,19 @@ interface LogoProps {
 }
 
 export function Logo({ dark = false, size = "md" }: LogoProps) {
-  const sealSize = size === "sm" ? 28 : size === "lg" ? 48 : 36;
+  const sealSize = size === "sm" ? 30 : size === "lg" ? 52 : 40;
   const textSize = size === "sm" ? "text-sm" : size === "lg" ? "text-xl" : "text-base";
 
   return (
     <div className="flex items-center gap-2.5">
-      <div
-        style={{
-          width: sealSize,
-          height: sealSize,
-          borderRadius: "50%",
-          border: "2px solid var(--brass)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-          color: "var(--brass)",
-          fontFamily: "'Fraunces', serif",
-          fontWeight: 700,
-          fontSize: sealSize * 0.38,
-          transform: "rotate(-6deg)",
-          background: "rgba(166,130,47,.12)",
-        }}
-      >
-        CD
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/cda-logo.png"
+        alt="Creative Digital Accounting"
+        width={sealSize}
+        height={sealSize}
+        style={{ width: sealSize, height: sealSize, borderRadius: "50%", flexShrink: 0, objectFit: "contain", background: dark ? "#fff" : "transparent" }}
+      />
       <div>
         <div
           className={clsx("font-serif font-semibold leading-tight", textSize)}
@@ -41,7 +29,7 @@ export function Logo({ dark = false, size = "md" }: LogoProps) {
         <div
           style={{
             fontSize: 9.5,
-            color: "var(--brass)",
+            color: dark ? "var(--brass)" : "var(--emerald)",
             letterSpacing: "1.6px",
             fontWeight: 600,
             marginTop: 1,
