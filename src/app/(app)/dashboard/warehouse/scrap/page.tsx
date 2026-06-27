@@ -49,7 +49,7 @@ export default function ScrapStockPage() {
           {selected && <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>Налично: <strong>{selected.quantity} {selected.unit}</strong></div>}
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-          <div><label>Количество за брак *</label><input type="number" name="quantity" step="any" min="0" max={selected?.quantity} required /></div>
+          <div><label>Количество за брак{selected ? ` (в ${selected.unit})` : ""} *</label><input type="number" name="quantity" step="any" min="0" max={selected?.quantity} required placeholder={selected ? `напр. 2 ${selected.unit}` : "количество"} /></div>
           <div><label>Дата *</label><input type="date" name="date" defaultValue={new Date().toISOString().slice(0, 10)} required /></div>
         </div>
         <div><label>Причина за брак</label><input type="text" name="note" placeholder="напр. изтекъл срок, повреда, нестандартна продукция…" /></div>

@@ -18,6 +18,7 @@ export function ProductionPanel({ initialRecipes, items }: { initialRecipes: Rec
   const [note, setNote] = useState("");
   const [ings, setIngs] = useState<{ stockItemId: string; quantity: string }[]>([{ stockItemId: "", quantity: "" }]);
   const itemName = (id: string | null) => items.find((i) => i.id === id)?.name ?? "—";
+  const itemUnit = (id: string | null) => items.find((i) => i.id === id)?.unit ?? "";
 
   async function reload() { const r = await fetch("/api/recipes"); if (r.ok) setRecipes(await r.json()); }
 
@@ -71,8 +72,8 @@ export function ProductionPanel({ initialRecipes, items }: { initialRecipes: Rec
           {error && <div style={{ background: "var(--brick-soft)", color: "var(--brick)", borderRadius: 6, padding: "8px 12px", fontSize: 12.5, marginBottom: 12 }}>{error}</div>}
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 12, marginBottom: 12 }}>
             <div><label>Име на продукта/рецептата *</label><input value={name} onChange={(e) => setName(e.target.value)} placeholder="напр. Хляб бял 500г" /></div>
-            <div><label>Готов продукт (склад)</label><select value={outputItemId} onChange={(e) => setOutputItemId(e.target.value)}><option value="">— без заприходяване —</option>{items.map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}</select></div>
-            <div><label>Добив (бройки)</label><input type="number" step="any" value={outputQuantity} onChange={(e) => setOutputQuantity(e.target.value)} /></div>
+            <div><label>Готов продукт (склад)</label><select value={outputItemId} onChange={(e) => setOutputItemId(e.target.value)}><option value="">— без заприходяване —</option>{items.map((i) => <option key={i.id} value={i.id}>{i.name} ({i.unit})</option>)}</select></div>
+            <div><label>Добив{outputItemId ? ` (в ${items.find((i) => i.id === outputItemId)?.unit ?? ""})` : ""}</label><input type="number" step="any" value={outputQuantity} onChange={(e) => setOutputQuantity(e.target.value)} /></div>
           </div>
           <label>Съставки (от склада) *</label>
           {ings.map((ing, idx) => (
@@ -80,7 +81,7 @@ export function ProductionPanel({ initialRecipes, items }: { initialRecipes: Rec
               <select value={ing.stockItemId} onChange={(e) => setIngs(ings.map((x, i) => i === idx ? { ...x, stockItemId: e.target.value } : x))} style={{ flex: 2 }}>
                 <option value="">— съставка —</option>{items.map((i) => <option key={i.id} value={i.id}>{i.name} ({i.unit})</option>)}
               </select>
-              <input type="number" step="any" placeholder="к-во" value={ing.quantity} onChange={(e) => setIngs(ings.map((x, i) => i === idx ? { ...x, quantity: e.target.value } : x))} style={{ flex: 1 }} />
+              <input type="number" step="any" placeholder={ing.stockItemId ? `к-во (${items.find((i) => i.id === ing.stockItemId)?.unit ?? ""})` : "к-во"} value={ing.quantity} onChange={(e) => setIngs(ings.map((x, i) => i === idx ? { ...x, quantity: e.target.value } : x))} style={{ flex: 1 }} />
               {ings.length > 1 && <button onClick={() => setIngs(ings.filter((_, i) => i !== idx))} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer" }}>×</button>}
             </div>
           ))}
@@ -102,9 +103,9 @@ export function ProductionPanel({ initialRecipes, items }: { initialRecipes: Rec
               <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 4px" }}>{r.name}</h3>
               <button onClick={() => deleteRecipe(r.id)} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer" }}>×</button>
             </div>
-            <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 8 }}>Добив: {r.outputQuantity} × {itemName(r.outputItemId)}</div>
+            <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 8 }}>Добив: {r.outputQuantity} {itemUnit(r.outputItemId)} × {itemName(r.outputItemId)}</div>
             <ul style={{ listStyle: "none", padding: 0, margin: "0 0 12px", fontSize: 12.5 }}>
-              {r.ingredients.map((i) => <li key={i.id} style={{ color: "var(--ink-soft)" }}>• {itemName(i.stockItemId)} — {i.quantity}</li>)}
+              {r.ingredients.map((i) => <li key={i.id} style={{ color: "var(--ink-soft)" }}>• {itemName(i.stockItemId)} — {i.quantity} {itemUnit(i.stockItemId)}</li>)}
             </ul>
             <button className="btn btn-primary btn-sm" style={{ width: "100%", justifyContent: "center" }} onClick={() => run(r)}>▶ Произведи</button>
           </div>

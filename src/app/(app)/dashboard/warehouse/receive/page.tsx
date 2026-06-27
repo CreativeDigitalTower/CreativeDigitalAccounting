@@ -11,8 +11,10 @@ export default function ReceiveStockPage() {
   const router = useRouter();
   const [items, setItems] = useState<Item[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [selectedId, setSelectedId] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const selectedUnit = items.find((i) => i.id === selectedId)?.unit ?? "";
 
   useEffect(() => {
     fetch("/api/warehouse/items/list").then((r) => r.json()).then((d) => setItems(Array.isArray(d) ? d : [])).catch(() => {});
@@ -52,9 +54,9 @@ export default function ReceiveStockPage() {
         <div className="glass panel" style={{ padding: 28, marginBottom: 16 }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px,1fr))", gap: 14 }}>
             <div style={{ gridColumn: "1 / -1" }}><label>Артикул *</label>
-              <select name="stockItemId" required><option value="">— Изберете —</option>{items.map((i)=><option key={i.id} value={i.id}>{i.name} (наличност: {i.quantity} {i.unit})</option>)}</select>
+              <select name="stockItemId" required value={selectedId} onChange={(e) => setSelectedId(e.target.value)}><option value="">— Изберете —</option>{items.map((i)=><option key={i.id} value={i.id}>{i.name} (наличност: {i.quantity} {i.unit})</option>)}</select>
             </div>
-            <div><label>Количество *</label><input type="number" name="quantity" step="0.01" min="0.01" required /></div>
+            <div><label>Количество{selectedUnit ? ` (в ${selectedUnit})` : ""} *</label><input type="number" name="quantity" step="0.01" min="0.01" required placeholder={selectedUnit ? `напр. 10 ${selectedUnit}` : "количество"} /></div>
             <div><label>Ед. цена (EUR)</label><input type="number" name="unitPrice" step="0.01" min="0" /></div>
             <div><label>Доставчик</label><select name="supplierId"><option value="">—</option>{suppliers.map((s)=><option key={s.id} value={s.id}>{s.name}</option>)}</select></div>
             <div><label>Партиден номер</label><input type="text" name="batchNumber" placeholder="напр. L2026-0617" /></div>

@@ -1,6 +1,7 @@
 import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { ProductionPanel } from "@/components/app/ProductionPanel";
+import { CostCalculator } from "@/components/app/CostCalculator";
 
 export default async function ProductionPage() {
   const { companyId } = await requireFeature("production");
@@ -13,5 +14,10 @@ export default async function ProductionPage() {
     ingredients: r.ingredients.map((i) => ({ id: i.id, stockItemId: i.stockItemId, quantity: i.quantity })),
   }));
   const items = itemRows.map((i) => ({ id: i.id, name: i.name, unit: i.unit, quantity: i.quantity }));
-  return <ProductionPanel initialRecipes={recipes} items={items} />;
+  return (
+    <>
+      <ProductionPanel initialRecipes={recipes} items={items} />
+      <CostCalculator />
+    </>
+  );
 }
