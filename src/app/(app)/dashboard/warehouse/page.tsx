@@ -2,6 +2,7 @@ import { requireCompany, getPlan } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { planHasFeature } from "@/lib/constants";
 import { CategoriesManager } from "@/components/app/CategoriesManager";
+import { FeatureLink } from "@/components/app/FeatureLink";
 import Link from "next/link";
 
 export default async function WarehousePage() {
@@ -34,8 +35,8 @@ export default async function WarehousePage() {
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <Link href="/dashboard/warehouse/receive" className="btn btn-ghost">+ Заприходяване</Link>
           <Link href="/dashboard/warehouse/issue" className="btn btn-ghost">− Изписване</Link>
-          {extended && <Link href="/dashboard/warehouse/scrap" className="btn btn-ghost">🗑 Брак</Link>}
-          {extended && <Link href="/dashboard/warehouse/revision" className="btn btn-ghost">📋 Ревизия</Link>}
+          <FeatureLink plan={plan} feature="revision" href="/dashboard/warehouse/scrap">🗑 Брак</FeatureLink>
+          <FeatureLink plan={plan} feature="revision" href="/dashboard/warehouse/revision">📋 Ревизия</FeatureLink>
           <Link href="/dashboard/warehouse/items/new" className="btn btn-primary">+ Нов артикул</Link>
         </div>
       </div>

@@ -152,7 +152,7 @@ export const OFFICIAL_DOC_TYPES = ["invoice", "proforma", "quote", "credit_note"
 
 // Кои функции са достъпни за кой план (за заключване в UI и сървъра)
 const FREE_FEATURES = ["documents", "clients", "suppliers", "warehouse", "dashboard", "cash", "tax_calendar"];
-const START_FEATURES = [...FREE_FEATURES, "expenses", "recurring", "analytics", "archive", "invoice_logo"];
+const START_FEATURES = [...FREE_FEATURES, "expenses", "recurring", "analytics", "archive", "invoice_logo", "protocols", "bank_statements"];
 const BUSINESS_FEATURES = [
   ...START_FEATURES,
   "projects", "contracts", "assets", "users", "audit",
@@ -176,6 +176,7 @@ export const FEATURE_LABELS: Record<string, string> = {
   health_index: "Бизнес здравен индекс", declarations: "Декларации за съответствие",
   tax_calendar: "Данъчен календар", multicompany: "Многофирмен режим", ai: "AI CFO Assistant",
   api: "API достъп", invoice_logo: "Лого във фактурите", protocols: "Приемо-предавателни протоколи",
+  bank_statements: "Банкови извлечения",
 };
 
 const PLAN_RANK: Record<PlanId, number> = { free: 0, start: 1, business: 2, pro: 3 };

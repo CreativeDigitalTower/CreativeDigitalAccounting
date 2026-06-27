@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireCompany } from "@/lib/session";
+import { requireCompany, getPlan } from "@/lib/session";
+import { SUBSCRIPTION_PLANS } from "@/lib/constants";
 import { z } from "zod";
 
 const schema = z.object({
@@ -30,6 +31,14 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const { companyId } = await requireCompany();
+    const plan = await getPlan(companyId);
+    const limit = SUBSCRIPTION_PLANS[plan].suppliers;
+    if (limit !== Infinity) {
+      const count = await prisma.supplier.count({ where: { companyId } });
+      if (count >= limit) {
+        return NextResponse.json({ error: `Достигнат лимит от ${limit} доставчици за вашия план. Надградете, за да добавите повече.` }, { status: 403 });
+      }
+    }
     const body = await req.json();
     const data = schema.parse(body);
     const supplier = await prisma.supplier.create({

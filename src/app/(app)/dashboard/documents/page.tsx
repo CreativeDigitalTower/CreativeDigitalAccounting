@@ -1,7 +1,8 @@
-import { requireCompany } from "@/lib/session";
+import { requireCompany, getPlan } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { StatusSelect } from "@/components/app/StatusSelect";
+import { FeatureLink, FeatureTab } from "@/components/app/FeatureLink";
 import { formatCurrency, toBGN, isDualCurrencyActive, groupByMonth } from "@/lib/constants";
 
 const TYPE_LABELS: Record<string, string> = {
@@ -18,6 +19,7 @@ export default async function DocumentsPage({
   searchParams: Promise<{ type?: string; status?: string }>;
 }) {
   const { companyId } = await requireCompany();
+  const plan = await getPlan(companyId);
   const params = await searchParams;
   const dual = isDualCurrencyActive();
 
@@ -39,8 +41,8 @@ export default async function DocumentsPage({
           <div style={{ color: "var(--muted)", fontSize: 13 }}>{docs.length} документа</div>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <Link href="/dashboard/documents/protocols" className="btn btn-ghost">📋 ППП</Link>
-          <Link href="/dashboard/documents/declarations" className="btn btn-ghost">📜 Декларации</Link>
+          <FeatureLink plan={plan} feature="protocols" href="/dashboard/documents/protocols">📋 ППП</FeatureLink>
+          <FeatureLink plan={plan} feature="declarations" href="/dashboard/documents/declarations">📜 Декларации</FeatureLink>
           <Link href="/dashboard/documents/new" className="btn btn-primary">+ Нов документ</Link>
         </div>
       </div>
@@ -48,10 +50,10 @@ export default async function DocumentsPage({
       {/* Категории документи */}
       <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
         <span className="filter-tab active">Изходящи документи</span>
-        <Link href="/dashboard/documents/protocols" className="filter-tab">Протоколи (ППП)</Link>
-        <Link href="/dashboard/documents/declarations" className="filter-tab">Декларации за съответствие</Link>
-        <Link href="/dashboard/expenses" className="filter-tab">Разходни фактури</Link>
-        <Link href="/dashboard/bank-statements" className="filter-tab">Банкови извлечения</Link>
+        <FeatureTab plan={plan} feature="protocols" href="/dashboard/documents/protocols">Протоколи (ППП)</FeatureTab>
+        <FeatureTab plan={plan} feature="declarations" href="/dashboard/documents/declarations">Декларации за съответствие</FeatureTab>
+        <FeatureTab plan={plan} feature="expenses" href="/dashboard/expenses">Разходни фактури</FeatureTab>
+        <FeatureTab plan={plan} feature="bank_statements" href="/dashboard/bank-statements">Банкови извлечения</FeatureTab>
       </div>
 
       {/* Filter tabs */}

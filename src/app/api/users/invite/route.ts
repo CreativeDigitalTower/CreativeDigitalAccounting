@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireFeature } from "@/lib/session";
+import { requireFeature, getPlan } from "@/lib/session";
+import { SUBSCRIPTION_PLANS } from "@/lib/constants";
 import { audit } from "@/lib/documents";
 import { z } from "zod";
 
@@ -26,6 +27,17 @@ export async function POST(req: Request) {
 
     const { email, firstName, lastName, role } = schema.parse(await req.json());
     const fullName = [firstName, lastName].filter(Boolean).join(" ").trim() || null;
+
+    // Лимит на потребители по план
+    const plan = await getPlan(companyId);
+    const seatLimit = SUBSCRIPTION_PLANS[plan].users;
+    if (seatLimit !== Infinity) {
+      const seats = await prisma.companyUser.count({ where: { companyId } });
+      const alreadyMember = await prisma.user.findUnique({ where: { email }, select: { companyUsers: { where: { companyId }, select: { userId: true } } } });
+      if (seats >= seatLimit && !alreadyMember?.companyUsers.length) {
+        return NextResponse.json({ error: `Достигнат лимит от ${seatLimit} потребители за вашия план. Надградете, за да добавите повече.` }, { status: 403 });
+      }
+    }
 
     let user = await prisma.user.findUnique({ where: { email } });
     let created = false;

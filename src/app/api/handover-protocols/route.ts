@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requirePaidPlan } from "@/lib/session";
-import { audit } from "@/lib/documents";
+import { audit, checkInvoiceLimit, incrementInvoiceCounter } from "@/lib/documents";
 import { z } from "zod";
 
 const schema = z.object({
@@ -22,6 +22,9 @@ const schema = z.object({
 export async function POST(req: Request) {
   try {
     const { companyId, userId } = await requirePaidPlan();
+    if (!(await checkInvoiceLimit(companyId))) {
+      return NextResponse.json({ error: "Достигнат месечен лимит за документи за вашия план." }, { status: 403 });
+    }
     const data = schema.parse(await req.json());
 
     let number = data.number?.trim();
@@ -39,6 +42,7 @@ export async function POST(req: Request) {
         items: data.items ?? null, date: new Date(data.date), description: data.description ?? null,
       },
     });
+    await incrementInvoiceCounter(companyId);
     await audit(companyId, userId, "create", "HandoverProtocol", p.id, number);
     return NextResponse.json(p);
   } catch (err) {

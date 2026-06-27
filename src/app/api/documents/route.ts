@@ -43,11 +43,12 @@ export async function POST(req: Request) {
     const data = schema.parse(body);
     const issued = data.status === "issued" || data.status === "sent";
 
-    if (data.type === "invoice" && issued) {
+    // Всеки официално издаден изходящ документ се брои към месечния лимит
+    if (issued) {
       const allowed = await checkInvoiceLimit(companyId);
       if (!allowed) {
         return NextResponse.json(
-          { error: "Достигнат месечен лимит за документи. Надградете плана си." },
+          { error: "Достигнат месечен лимит за документи за вашия план. Надградете плана си, за да издавате повече." },
           { status: 403 }
         );
       }
@@ -100,7 +101,7 @@ export async function POST(req: Request) {
       include: { lines: true },
     });
 
-    if (data.type === "invoice" && issued) {
+    if (issued) {
       await incrementInvoiceCounter(companyId);
     }
 
