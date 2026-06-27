@@ -1,21 +1,10 @@
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { FREE_PLAN_LIMIT, getYearMonth } from "@/lib/constants";
+import { getYearMonth, SUBSCRIPTION_PLANS, planLabel, type PlanId } from "@/lib/constants";
 
 import { BANK_DETAILS, EUR_TO_BGN } from "@/lib/constants";
 import { SubscriptionPlans } from "@/components/app/SubscriptionPlans";
-
-const PLANS = [
-  { id: "free", name: "Безплатен", price: 0, docs: "5 документа/месец",
-    features: ["5 фактури/месец", "Неограничени клиенти", "Склад", "Базов анализ"] },
-  { id: "start", name: "Старт", price: 9, docs: "50 документа/месец",
-    features: ["50 фактури/месец", "Повтарящи се фактури", "Разходи", "CRM бележки"] },
-  { id: "business", name: "Бизнес", price: 29, docs: "300 документа/месец",
-    features: ["300 фактури/месец", "Проекти", "Договори", "PDF отчет"], recommended: true },
-  { id: "pro", name: "Про", price: 59, docs: "Неограничени",
-    features: ["Неограничени фактури", "Активи", "Многофирмен достъп", "Приоритетна поддръжка"] },
-].map((p) => ({ ...p, priceBGN: +(p.price * EUR_TO_BGN).toFixed(2) }));
 
 export default async function SubscriptionPage() {
   const { companyId } = await requireCompany();
@@ -27,8 +16,9 @@ export default async function SubscriptionPage() {
     }),
   ]);
 
-  const currentPlan = subscription?.plan ?? "free";
+  const currentPlan = (subscription?.plan ?? "free") as PlanId;
   const docsUsed = counter?.documentsIssuedCount ?? 0;
+  const docsLimit = SUBSCRIPTION_PLANS[currentPlan].docsPerMonth;
 
   return (
     <>
@@ -43,7 +33,7 @@ export default async function SubscriptionPage() {
           <div>
             <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 4 }}>ТЕКУЩ ПЛАН</div>
             <div style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600 }}>
-              {PLANS.find((p) => p.id === currentPlan)?.name ?? currentPlan}
+              {planLabel(currentPlan)}
             </div>
             {subscription?.currentPeriodEnd && (
               <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginTop: 4 }}>
@@ -55,18 +45,10 @@ export default async function SubscriptionPage() {
             <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Документи този месец</div>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 140, height: 8, background: "var(--brass-soft)", borderRadius: 6, overflow: "hidden" }}>
-                <div
-                  style={{
-                    height: "100%",
-                    background: "var(--brass)",
-                    width: currentPlan === "free"
-                      ? `${Math.min(100, (docsUsed / FREE_PLAN_LIMIT) * 100)}%`
-                      : `${Math.min(100, (docsUsed / (currentPlan === "start" ? 50 : currentPlan === "business" ? 200 : 500)) * 100)}%`,
-                  }}
-                />
+                <div style={{ height: "100%", background: "var(--brass)", width: docsLimit === Infinity ? "12%" : `${Math.min(100, (docsUsed / docsLimit) * 100)}%` }} />
               </div>
               <span className="num" style={{ fontSize: 13, color: "var(--muted)" }}>
-                {docsUsed} / {currentPlan === "free" ? FREE_PLAN_LIMIT : currentPlan === "start" ? 50 : currentPlan === "business" ? 200 : "∞"}
+                {docsUsed} / {docsLimit === Infinity ? "∞" : docsLimit}
               </span>
             </div>
           </div>

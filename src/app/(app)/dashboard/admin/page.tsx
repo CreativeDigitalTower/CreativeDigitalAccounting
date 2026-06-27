@@ -2,6 +2,7 @@ import { requireSuperAdmin } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { AdminCompanyRow } from "@/components/app/AdminCompanyRow";
+import { SUBSCRIPTION_PLANS, planPrice } from "@/lib/constants";
 
 const RANGES = [
   { id: "7d", label: "7 дни", days: 7, bucket: "day" as const },
@@ -11,7 +12,7 @@ const RANGES = [
   { id: "all", label: "Цял период", days: null, bucket: "month" as const },
 ];
 const MONTH_NAMES = ["Ян", "Фев", "Мар", "Апр", "Май", "Юни", "Юли", "Авг", "Сеп", "Окт", "Ное", "Дек"];
-const PLAN_PRICE: Record<string, number> = { free: 0, start: 9, business: 29, pro: 59 };
+const PLAN_PRICE: Record<string, number> = { free: planPrice("free"), start: planPrice("start"), business: planPrice("business"), pro: planPrice("pro") };
 
 export default async function AdminPage({ searchParams }: { searchParams: Promise<{ range?: string }> }) {
   await requireSuperAdmin();
@@ -118,7 +119,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   // ─── Lead scoring / Revenue opportunities ───
   const usageCounters = await prisma.usageCounter.findMany({ where: { yearMonth: `${nowD.getFullYear()}-${String(nowD.getMonth() + 1).padStart(2, "0")}` } });
   const usageByCompany = new Map(usageCounters.map((u) => [u.companyId, u.documentsIssuedCount]));
-  const planLimit: Record<string, number> = { free: 5, start: 50, business: 300, pro: Infinity };
+  const planLimit: Record<string, number> = { free: SUBSCRIPTION_PLANS.free.docsPerMonth, start: SUBSCRIPTION_PLANS.start.docsPerMonth, business: SUBSCRIPTION_PLANS.business.docsPerMonth, pro: SUBSCRIPTION_PLANS.pro.docsPerMonth };
 
   const leads = companies.map((c) => {
     const plan = c.subscription?.plan ?? "free";

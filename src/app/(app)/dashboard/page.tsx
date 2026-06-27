@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Stamp } from "@/components/Stamp";
 import { WelcomeWizard } from "@/components/app/WelcomeWizard";
-import { formatCurrency, toBGN, isDualCurrencyActive, FREE_PLAN_LIMIT, getYearMonth, planHasFeature, type PlanId } from "@/lib/constants";
+import { formatCurrency, toBGN, isDualCurrencyActive, getYearMonth, planHasFeature, SUBSCRIPTION_PLANS, type PlanId } from "@/lib/constants";
 import { TopClientsChart, aggregateClientRevenue } from "@/components/app/TopClientsChart";
 import { upcomingStandard } from "@/lib/taxCalendar";
 
@@ -91,7 +91,9 @@ export default async function DashboardPage() {
   const profit = monthRevenue - monthExpenses;
 
   const docsUsed = usageCounter?.documentsIssuedCount ?? 0;
-  const docsLimit = subscription?.plan === "free" ? FREE_PLAN_LIMIT : subscription?.plan === "start" ? 50 : subscription?.plan === "business" ? 200 : Infinity;
+  const currentPlanId = (subscription?.plan ?? "free") as PlanId;
+  const docsLimit = SUBSCRIPTION_PLANS[currentPlanId].docsPerMonth;
+  const docsRemaining = docsLimit === Infinity ? Infinity : Math.max(0, docsLimit - docsUsed);
 
   const lowStockItems = lowStock.filter((i) => i.minQuantity !== null && i.quantity <= (i.minQuantity ?? 0));
   const dual = isDualCurrencyActive();
@@ -164,21 +166,31 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {/* Usage banner (free plan) */}
-      {subscription?.plan === "free" && (
-        <div className="glass usage-banner" style={{ borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 16, marginBottom: 20, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 12.5, color: "var(--ink-soft)", fontWeight: 600 }}>Документи този месец</span>
-          <div style={{ flex: 1, minWidth: 140, height: 7, background: "var(--brass-soft)", borderRadius: 6, overflow: "hidden" }}>
-            <div style={{ height: "100%", background: "var(--brass)", width: `${Math.min(100, (docsUsed / FREE_PLAN_LIMIT) * 100)}%` }} />
-          </div>
-          <span className="num" style={{ fontSize: 12.5, color: "var(--muted)" }}>
-            {docsUsed} / {FREE_PLAN_LIMIT}
-          </span>
-          <Link href="/dashboard/subscription" className="btn btn-ghost btn-sm">
-            Upgrade
-          </Link>
-        </div>
-      )}
+      {/* Usage banner — за всички планове */}
+      <div className="glass usage-banner" style={{ borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 16, marginBottom: 20, flexWrap: "wrap" }}>
+        <span style={{ fontSize: 12.5, color: "var(--ink-soft)", fontWeight: 600 }}>
+          Документи този месец <span style={{ color: "var(--muted)", fontWeight: 400 }}>({SUBSCRIPTION_PLANS[currentPlanId].name} план)</span>
+        </span>
+        {docsLimit === Infinity ? (
+          <>
+            <span className="num" style={{ fontSize: 12.5, color: "var(--emerald-dark)", fontWeight: 600 }}>{docsUsed} генерирани · неограничено</span>
+            <span style={{ flex: 1 }} />
+          </>
+        ) : (
+          <>
+            <div style={{ flex: 1, minWidth: 140, height: 7, background: "var(--brass-soft)", borderRadius: 6, overflow: "hidden" }}>
+              <div style={{ height: "100%", background: docsRemaining === 0 ? "var(--brick)" : "var(--brass)", width: `${Math.min(100, (docsUsed / docsLimit) * 100)}%` }} />
+            </div>
+            <span className="num" style={{ fontSize: 12.5, color: "var(--muted)" }}>{docsUsed} / {docsLimit}</span>
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: docsRemaining === 0 ? "var(--brick)" : "var(--emerald-dark)" }}>
+              Остават: {docsRemaining}
+            </span>
+          </>
+        )}
+        {currentPlanId !== "pro" && (
+          <Link href="/dashboard/subscription" className="btn btn-ghost btn-sm">Надгради</Link>
+        )}
+      </div>
 
       {/* KPI Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 24 }}>

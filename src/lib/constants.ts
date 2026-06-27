@@ -125,31 +125,57 @@ export const DOC_STATUSES = [
 ] as const;
 
 // ─── Абонаментни планове (нови цени) ─────────────────────────────────────
+// Промоционален период — промо цените важат при абониране до тази дата
+export const PROMO_UNTIL = new Date("2026-12-31T23:59:59");
+export function isPromoActive(): boolean {
+  return new Date() <= PROMO_UNTIL;
+}
+
+// Лимити и цени по план.
+// price = промоционална (launch) цена; regularPrice = редовна цена.
 export const SUBSCRIPTION_PLANS = {
-  free: { name: "Безплатен", price: 0, docsPerMonth: 5, users: 1, companies: 1 },
-  start: { name: "Старт", price: 9, docsPerMonth: 50, users: 1, companies: 1 },
-  business: { name: "Бизнес", price: 29, docsPerMonth: 300, users: 5, companies: 1 },
-  pro: { name: "Про", price: 59, docsPerMonth: Infinity, users: Infinity, companies: Infinity },
+  free:     { name: "Безплатен", regularPrice: 0,  price: 0,  docsPerMonth: 5,        users: 1,        companies: 1,        clients: 5,        suppliers: 5,        pdfTemplates: 2 },
+  start:    { name: "Старт",     regularPrice: 15, price: 9,  docsPerMonth: 30,       users: 2,        companies: 1,        clients: Infinity, suppliers: Infinity, pdfTemplates: 3 },
+  business: { name: "Бизнес",    regularPrice: 39, price: 29, docsPerMonth: 300,      users: 5,        companies: 1,        clients: Infinity, suppliers: Infinity, pdfTemplates: Infinity },
+  pro:      { name: "Про",       regularPrice: 79, price: 59, docsPerMonth: Infinity, users: Infinity, companies: Infinity, clients: Infinity, suppliers: Infinity, pdfTemplates: Infinity },
 } as const;
 
 export type PlanId = keyof typeof SUBSCRIPTION_PLANS;
 
-// Кои функции са достъпни за кой план (за заключване в UI)
+// Цена за изобразяване според промо периода
+export function planPrice(plan: PlanId): number {
+  return isPromoActive() ? SUBSCRIPTION_PLANS[plan].price : SUBSCRIPTION_PLANS[plan].regularPrice;
+}
+
+// Видове официални изходящи документи, които се броят към месечния лимит
+export const OFFICIAL_DOC_TYPES = ["invoice", "proforma", "quote", "credit_note", "debit_note"] as const;
+
+// Кои функции са достъпни за кой план (за заключване в UI и сървъра)
+const FREE_FEATURES = ["documents", "clients", "suppliers", "warehouse", "dashboard", "cash", "tax_calendar"];
+const START_FEATURES = [...FREE_FEATURES, "expenses", "recurring", "analytics", "archive", "invoice_logo"];
+const BUSINESS_FEATURES = [
+  ...START_FEATURES,
+  "projects", "contracts", "assets", "users", "audit",
+  "production", "employees", "haccp", "revision", "stock_categories", "health_index", "declarations",
+];
+const PRO_FEATURES = [...BUSINESS_FEATURES, "multicompany", "ai", "api"];
+
 export const PLAN_FEATURES: Record<PlanId, string[]> = {
-  free: ["documents", "clients", "suppliers", "warehouse", "dashboard", "cash"],
-  start: ["documents", "clients", "suppliers", "warehouse", "dashboard", "cash", "expenses", "recurring"],
-  business: [
-    "documents", "clients", "suppliers", "warehouse", "dashboard", "cash", "expenses",
-    "recurring", "projects", "contracts", "analytics", "archive", "assets", "users", "audit",
-    // Разширени модули (Бизнес + Про)
-    "production", "employees", "haccp", "revision", "stock_categories", "tax_calendar", "health_index", "declarations",
-  ],
-  pro: [
-    "documents", "clients", "suppliers", "warehouse", "dashboard", "cash", "expenses",
-    "recurring", "projects", "contracts", "analytics", "archive", "assets", "users", "audit",
-    "production", "employees", "haccp", "revision", "stock_categories", "tax_calendar", "health_index", "declarations",
-    "multicompany", "ai", "api",
-  ],
+  free: FREE_FEATURES,
+  start: START_FEATURES,
+  business: BUSINESS_FEATURES,
+  pro: PRO_FEATURES,
+};
+
+// Човешки етикети на функциите (за locked съобщения)
+export const FEATURE_LABELS: Record<string, string> = {
+  expenses: "Разходи и входящи документи", recurring: "Повтарящи се фактури", analytics: "Анализи",
+  archive: "Документен архив", projects: "Проекти", contracts: "Договори", assets: "Активи",
+  users: "Потребители и роли", audit: "Одит лог", production: "Производство", employees: "Служители",
+  haccp: "HACCP / ТД", revision: "Ревизия", stock_categories: "Складови категории",
+  health_index: "Бизнес здравен индекс", declarations: "Декларации за съответствие",
+  tax_calendar: "Данъчен календар", multicompany: "Многофирмен режим", ai: "AI CFO Assistant",
+  api: "API достъп", invoice_logo: "Лого във фактурите", protocols: "Приемо-предавателни протоколи",
 };
 
 const PLAN_RANK: Record<PlanId, number> = { free: 0, start: 1, business: 2, pro: 3 };
@@ -169,6 +195,26 @@ export function minPlanForFeature(feature: string): PlanId {
 
 export function planRank(plan: PlanId): number {
   return PLAN_RANK[plan] ?? 0;
+}
+
+export function planLabel(plan: string): string {
+  return SUBSCRIPTION_PLANS[plan as PlanId]?.name ?? plan;
+}
+
+// Съобщение за заключена функция, насочващо към правилния по-висок план
+export function featureUpgradeMessage(feature: string): string {
+  const min = minPlanForFeature(feature);
+  const label = FEATURE_LABELS[feature] ?? "Тази функция";
+  return `${label} е достъпна в план „${planLabel(min)}" и по-висок.`;
+}
+
+// Кои шаблони за фактури са позволени за плана (първите N по ред)
+export function allowedTemplateCount(plan: PlanId): number {
+  return SUBSCRIPTION_PLANS[plan]?.pdfTemplates ?? 2;
+}
+export function isTemplateAllowed(plan: PlanId, index: number): boolean {
+  const n = allowedTemplateCount(plan);
+  return n === Infinity || index < n;
 }
 
 export function isDualCurrencyActive(): boolean {
