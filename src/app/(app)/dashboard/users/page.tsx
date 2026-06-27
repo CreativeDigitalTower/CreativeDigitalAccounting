@@ -1,6 +1,7 @@
 import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { UserRowActions } from "@/components/app/UserRowActions";
 
 const ROLE_LABELS: Record<string, string> = {
   owner: "Собственик",
@@ -114,8 +115,10 @@ export default async function UsersPage() {
                 </td>
                 {canManage && (
                   <td>
-                    {cu.userId !== userId && (
-                      <button className="btn btn-ghost btn-sm">Промени роля</button>
+                    {cu.userId !== userId ? (
+                      <UserRowActions targetUserId={cu.userId} role={cu.role} canManageOwner={myRole === "owner"} />
+                    ) : (
+                      <span style={{ fontSize: 11.5, color: "var(--muted)" }}>—</span>
                     )}
                   </td>
                 )}
