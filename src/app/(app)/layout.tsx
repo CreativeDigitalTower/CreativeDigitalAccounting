@@ -7,6 +7,8 @@ import { BlobBackground } from "@/components/Backgrounds";
 import { Sidebar } from "@/components/app/Sidebar";
 import { ImpersonationBanner } from "@/components/app/ImpersonationBanner";
 import { VisitTracker } from "@/components/VisitTracker";
+import { TrialEndedPopup } from "@/components/app/TrialEndedPopup";
+import { enforceSubscription } from "@/lib/subscription";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -15,15 +17,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const userId = session.user.id;
   const companyId = await getCompanyId(userId);
 
-  const [company, me, jar] = await Promise.all([
+  const [company, me, jar, sub] = await Promise.all([
     prisma.company.findUnique({ where: { id: companyId }, include: { subscription: true } }),
     prisma.user.findUnique({ where: { id: userId }, select: { isSuperAdmin: true } }),
     cookies(),
+    enforceSubscription(companyId), // авто-връщане към БЕЗПЛАТЕН при изтекъл абонамент
   ]);
 
   if (!company) redirect("/onboarding");
 
-  const plan = company.subscription?.plan ?? "free";
+  const plan = sub.plan;
   const isSuperAdmin = !!me?.isSuperAdmin;
   const impersonating = isSuperAdmin && !!jar.get(IMPERSONATE_COOKIE)?.value;
 
@@ -35,6 +38,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <Sidebar companyName={company.name} plan={plan} isSuperAdmin={isSuperAdmin} logoUrl={plan !== "free" ? company.logoUrl : null} />
         <main style={{ flex: 1, minWidth: 0, maxWidth: 1180 }}>
           {impersonating && <ImpersonationBanner companyName={company.name} />}
+          {sub.justExpired && <TrialEndedPopup wasTrial={sub.wasTrial} periodEnd={sub.currentPeriodEnd ? new Date(sub.currentPeriodEnd).toISOString() : ""} />}
           <div style={{ padding: "28px 36px 60px" }}>{children}</div>
         </main>
       </div>

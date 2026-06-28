@@ -55,36 +55,13 @@ export default async function SubscriptionPage() {
         </div>
       </div>
 
-      {/* Plans grid — същите като на началната страница, с месечно/6м/годишно */}
-      <SubscriptionPlans currentPlan={currentPlan} />
+      {/* Plans grid + плащане по банков път (със СУМА) */}
+      <SubscriptionPlans currentPlan={currentPlan} trialUsed={subscription?.trialUsed ?? false} bank={BANK_DETAILS} />
 
-      {/* Банков превод */}
-      <div id="bank-transfer" className="glass panel" style={{ marginTop: 24, padding: "24px 28px", borderLeft: "4px solid var(--emerald)" }}>
-        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, margin: "0 0 6px" }}>💳 Плащане по банков път</h3>
-        <p style={{ fontSize: 13, color: "var(--ink-soft)", margin: "0 0 16px", maxWidth: 680 }}>
-          Към момента абонаментите се заплащат само по банков път. За да активирате избран план,
-          преведете съответната сума по сметката по-долу. <strong>Скоро ще добавим и други методи на
-          плащане (карта и др.), които ще бъдат налични директно в платформата.</strong> След като
-          получим плащането, ще активираме плана ви и ще ви изпратим фактура за направеното плащане.
-        </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))", gap: 14 }}>
-          {[
-            { label: "Получател", value: BANK_DETAILS.recipient },
-            { label: "IBAN", value: BANK_DETAILS.iban },
-            { label: "Банка", value: BANK_DETAILS.bank },
-            { label: "Основание", value: BANK_DETAILS.reason },
-          ].map((b) => (
-            <div key={b.label} style={{ background: "rgba(255,255,255,.5)", borderRadius: 8, padding: "12px 14px", border: "1px solid var(--border)" }}>
-              <div style={{ fontSize: 11, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>{b.label}</div>
-              <div className="num" style={{ fontSize: 14, fontWeight: 600 }}>{b.value}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 16, maxWidth: 640 }}>
-        Всички цени са без ДДС. 1 EUR = {EUR_TO_BGN} лв. При смяна на план, промяната влиза в сила
-        след потвърждаване на плащането. 14 дни безплатен тест на Бизнес и Про плановете.
+      <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 16, maxWidth: 680 }}>
+        Към момента абонаментите се заплащат само по банков път; скоро ще добавим и плащане с карта.
+        При смяна на план промяната влиза в сила след потвърждаване на плащането. След изтичане на платения период
+        профилът автоматично се връща към Безплатен. 7 дни безплатен тест (еднократно) на Бизнес и Про плановете.
       </p>
     </>
   );

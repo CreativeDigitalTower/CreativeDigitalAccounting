@@ -1,12 +1,33 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { PLAN_DETAILS, BILLING_PERIODS } from "@/components/marketing/Pricing";
 import { EUR_TO_BGN, isPromoActive } from "@/lib/constants";
 
-export function SubscriptionPlans({ currentPlan }: { currentPlan: string }) {
+type Bank = { recipient: string; iban: string; bank: string; reason: string };
+
+export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPlan: string; trialUsed: boolean; bank: Bank }) {
+  const router = useRouter();
   const [period, setPeriod] = useState<(typeof BILLING_PERIODS)[number]>(BILLING_PERIODS[0]);
+  const [payPlanId, setPayPlanId] = useState<string | null>(null);
+  const [trialMsg, setTrialMsg] = useState("");
   const promo = isPromoActive();
+
+  async function startTrial(planId: string) {
+    setTrialMsg("");
+    const res = await fetch("/api/subscription/trial", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: planId }) });
+    if (res.ok) { router.refresh(); }
+    else setTrialMsg((await res.json()).error ?? "Грешка при активиране на теста.");
+  }
+
+  function choosePay(planId: string) {
+    setPayPlanId(planId);
+    setTimeout(() => document.getElementById("pay-box")?.scrollIntoView({ behavior: "smooth" }), 50);
+  }
+
+  const payPlan = PLAN_DETAILS.find((p) => p.id === payPlanId);
+  const payAmount = payPlan ? payPlan.price * period.months * (1 - period.discount) : 0;
 
   return (
     <div>
@@ -82,20 +103,54 @@ export function SubscriptionPlans({ currentPlan }: { currentPlan: string }) {
               ) : plan.price === 0 ? (
                 <button className="btn btn-ghost" style={{ width: "100%", justifyContent: "center" }} disabled>Безплатен</button>
               ) : (
-                <a href="#bank-transfer" className={plan.recommended ? "btn btn-primary" : "btn btn-ghost"} style={{ width: "100%", justifyContent: "center" }}>
-                  {currentPlan === "free" ? "Надгради" : "Смени план"}
-                </a>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <button onClick={() => choosePay(plan.id)} className={plan.recommended ? "btn btn-primary" : "btn btn-ghost"} style={{ width: "100%", justifyContent: "center" }}>
+                    {currentPlan === "free" ? "Надгради" : "Смени план"}
+                  </button>
+                  {(plan.id === "business" || plan.id === "pro") && !trialUsed && currentPlan === "free" && (
+                    <button onClick={() => startTrial(plan.id)} className="btn btn-ghost btn-sm" style={{ width: "100%", justifyContent: "center", fontSize: 11.5 }}>
+                      ▶ 7 дни безплатно
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           );
         })}
       </div>
 
+      {trialMsg && <div style={{ marginTop: 12, background: "var(--brick-soft)", color: "var(--brick)", borderRadius: 8, padding: "10px 14px", fontSize: 13 }}>{trialMsg}</div>}
+
       {promo && (
         <div className="glass panel" style={{ marginTop: 16, padding: "14px 20px", textAlign: "center", borderLeft: "4px solid var(--brick)", background: "var(--brick-soft)", fontSize: 13 }}>
-          <strong style={{ color: "var(--brick)" }}>СПЕЦИАЛНО ПРЕДЛОЖЕНИЕ:</strong> Абонирайте се до 31.12.2026 и запазете промоционалната си цена за целия период, през който абонаментът ви остава активен.
+          <strong style={{ color: "var(--brick)" }}>Спестете до 20 € всеки месец.</strong> Регистрирайте се до 31.12.2026 г. и се възползвайте от специалните стартови цени на Creative Digital Accounting.
         </div>
       )}
+
+      {/* Плащане по банков път — със СУМА според избрания план и период */}
+      <div id="pay-box" className="glass panel" style={{ marginTop: 16, padding: "20px 24px", borderLeft: "4px solid var(--emerald)" }}>
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 17, margin: "0 0 6px" }}>💳 Плащане по банков път</h3>
+        <p style={{ fontSize: 12.5, color: "var(--ink-soft)", margin: "0 0 14px", maxWidth: 700 }}>
+          {payPlan
+            ? <>Избран план: <strong>{payPlan.name}</strong> · {period.label.toLowerCase()}. Преведете сумата по сметката по-долу. След получаване на плащането ще активираме плана Ви.</>
+            : <>Изберете план по-горе с бутона „Надгради/Смени план", за да видите точната сума за плащане. Скоро ще добавим и плащане с карта.</>}
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px,1fr))", gap: 12 }}>
+          {[
+            { label: "Получател", value: bank.recipient },
+            { label: "IBAN", value: bank.iban },
+            { label: "Банка", value: bank.bank },
+            { label: "Основание", value: payPlan ? `Абонамент CDA — ${payPlan.name} (${period.label})` : bank.reason },
+            ...(payPlan ? [{ label: "Сума за превод", value: `${payAmount.toFixed(2)} € (≈ ${(payAmount * EUR_TO_BGN).toFixed(2)} лв)`, highlight: true }] : []),
+          ].map((b) => (
+            <div key={b.label} style={{ background: (b as { highlight?: boolean }).highlight ? "var(--emerald-soft)" : "rgba(255,255,255,.5)", borderRadius: 8, padding: "12px 14px", border: `1px solid ${(b as { highlight?: boolean }).highlight ? "var(--emerald)" : "var(--border)"}` }}>
+              <div style={{ fontSize: 11, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>{b.label}</div>
+              <div className="num" style={{ fontSize: 14, fontWeight: 700, color: (b as { highlight?: boolean }).highlight ? "var(--emerald-dark)" : "var(--ink)" }}>{b.value}</div>
+            </div>
+          ))}
+        </div>
+        <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 10 }}>Всички цени са без ДДС. 1 EUR = {EUR_TO_BGN} лв.</p>
+      </div>
     </div>
   );
 }

@@ -128,9 +128,9 @@ export function Pricing() {
       {/* Специално предложение */}
       {promo && (
         <div className="glass panel" style={{ marginTop: 18, padding: "16px 24px", textAlign: "center", borderLeft: "4px solid var(--brick)", background: "var(--brick-soft)" }}>
-          <strong style={{ color: "var(--brick)" }}>СПЕЦИАЛНО ПРЕДЛОЖЕНИЕ:</strong>{" "}
+          <strong style={{ color: "var(--brick)", fontSize: 15 }}>Спестете до 20 € всеки месец.</strong>{" "}
           <span style={{ fontSize: 13.5, color: "var(--ink-soft)" }}>
-            Абонирайте се до 31.12.2026 и запазете промоционалната си цена за целия период, през който абонаментът ви остава активен.
+            Регистрирайте се до 31.12.2026 г. и се възползвайте от специалните стартови цени на Creative Digital Accounting.
           </span>
         </div>
       )}
@@ -151,7 +151,7 @@ export function Pricing() {
 
       <div style={{ marginTop: 24, textAlign: "center", display: "flex", flexDirection: "column", gap: 8 }}>
         <p style={{ fontSize: 13.5, color: "var(--ink-soft)", margin: 0 }}>
-          <strong>14 дни безплатен тест</strong> на Бизнес и Про плановете.
+          <strong>7 дни безплатен тест</strong> (еднократно) на Бизнес и Про плановете.
         </p>
         <p style={{ fontSize: 13, color: "var(--emerald)", margin: 0, fontWeight: 600 }}>
           Автоматично преминаване към еврото и пълна готовност за въвеждането на EUR в България

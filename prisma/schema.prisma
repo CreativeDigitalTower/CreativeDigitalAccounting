@@ -768,7 +768,9 @@ model Subscription {
   status               SubscriptionStatus @default(active)
   stripeSubscriptionId String?
   stripeCustomerId     String?
+  currentPeriodStart   DateTime?
   currentPeriodEnd     DateTime?
+  trialUsed            Boolean            @default(false)
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }

@@ -28,6 +28,7 @@ type Props = {
     name: string | null; email: string; representativeRole: string | null;
     marketingConsent: boolean; termsAcceptedAt: string | null; createdAt: string;
   }[];
+  sub: { status: string; periodStart: string | null; periodEnd: string | null; trialUsed: boolean };
 };
 
 export function AdminCompanyRow(props: Props) {
@@ -36,6 +37,22 @@ export function AdminCompanyRow(props: Props) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [open, setOpen] = useState(false);
+  // Управление на абонаментния период
+  const [mPlan, setMPlan] = useState(props.plan);
+  const [mStart, setMStart] = useState(props.sub.periodStart?.slice(0, 10) ?? "");
+  const [mEnd, setMEnd] = useState(props.sub.periodEnd?.slice(0, 10) ?? "");
+  const [mStatus, setMStatus] = useState(props.sub.status);
+  const [subMsg, setSubMsg] = useState("");
+
+  async function saveSubscription() {
+    setSubMsg("");
+    const res = await fetch("/api/admin/plan", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ companyId: props.id, plan: mPlan, status: mStatus, periodStart: mStart || null, periodEnd: mEnd || null }),
+    });
+    if (res.ok) { setSubMsg("✓ Запазено"); setPlan(mPlan); router.refresh(); setTimeout(() => setSubMsg(""), 2500); }
+    else setSubMsg((await res.json()).error ?? "Грешка");
+  }
 
   async function changePlan(next: string) {
     setSaving(true);
@@ -100,6 +117,23 @@ export function AdminCompanyRow(props: Props) {
       {open && (
         <tr>
           <td colSpan={7} style={{ background: "rgba(0,0,0,.02)", padding: "16px 20px" }}>
+            {/* Управление на абонамент */}
+            <div style={{ marginBottom: 16, padding: "12px 14px", background: "rgba(255,255,255,.6)", borderRadius: 8, border: "1px solid var(--border)" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--brass)", letterSpacing: 1, marginBottom: 8 }}>УПРАВЛЕНИЕ НА АБОНАМЕНТ</div>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
+                <div><label style={{ fontSize: 11 }}>План</label><select value={mPlan} onChange={(e) => setMPlan(e.target.value)} style={{ padding: "5px 8px", fontSize: 12.5 }}>{PLANS.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}</select></div>
+                <div><label style={{ fontSize: 11 }}>Статус</label><select value={mStatus} onChange={(e) => setMStatus(e.target.value)} style={{ padding: "5px 8px", fontSize: 12.5 }}>{["active", "trialing", "past_due", "cancelled"].map((s) => <option key={s} value={s}>{s}</option>)}</select></div>
+                <div><label style={{ fontSize: 11 }}>В сила от</label><input type="date" value={mStart} onChange={(e) => setMStart(e.target.value)} style={{ padding: "5px 8px", fontSize: 12.5 }} /></div>
+                <div><label style={{ fontSize: 11 }}>В сила до</label><input type="date" value={mEnd} onChange={(e) => setMEnd(e.target.value)} style={{ padding: "5px 8px", fontSize: 12.5 }} /></div>
+                <button className="btn btn-primary btn-sm" onClick={saveSubscription}>Запази абонамент</button>
+                {subMsg && <span style={{ fontSize: 12, color: subMsg.startsWith("✓") ? "var(--emerald)" : "var(--brick)" }}>{subMsg}</span>}
+              </div>
+              <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 8 }}>
+                Безплатен пробен период използван: <strong>{props.sub.trialUsed ? "Да" : "Не"}</strong>
+                {props.sub.periodEnd && <> · Текущ период до: <strong>{new Date(props.sub.periodEnd).toLocaleDateString("bg-BG")}</strong></>}
+                <span style={{ marginLeft: 8 }}>· След изтичане профилът автоматично се връща към Безплатен.</span>
+              </div>
+            </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
               <div>
                 <div style={{ fontSize: 11, fontWeight: 700, color: "var(--brass)", letterSpacing: 1, marginBottom: 8 }}>ДАННИ НА ФИРМАТА</div>

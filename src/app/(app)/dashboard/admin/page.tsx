@@ -470,6 +470,12 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                   marketingConsent: cu.user.marketingConsent, termsAcceptedAt: cu.user.termsAcceptedAt?.toISOString() ?? null,
                   createdAt: cu.user.createdAt.toISOString(),
                 }))}
+                sub={{
+                  status: c.subscription?.status ?? "active",
+                  periodStart: c.subscription?.currentPeriodStart?.toISOString() ?? null,
+                  periodEnd: c.subscription?.currentPeriodEnd?.toISOString() ?? null,
+                  trialUsed: c.subscription?.trialUsed ?? false,
+                }}
               />
             ))}
           </tbody>
