@@ -201,11 +201,14 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
   return (
     <>
-      <div style={{ marginBottom: 20 }}>
-        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>
-          🛡️ Супер Админ
-        </h1>
-        <div style={{ color: "var(--muted)", fontSize: 13 }}>{companies.length} регистрирани фирми</div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20, gap: 12, flexWrap: "wrap" }}>
+        <div>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>
+            🛡️ Супер Админ
+          </h1>
+          <div style={{ color: "var(--muted)", fontSize: 13 }}>{companies.length} регистрирани фирми</div>
+        </div>
+        <Link href="/dashboard/admin/businesses" className="btn btn-ghost btn-sm">📁 Бизнеси (филтри по сектор/план)</Link>
       </div>
 
       {/* Plan distribution */}

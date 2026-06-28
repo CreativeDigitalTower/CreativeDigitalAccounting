@@ -6,9 +6,23 @@ import { WelcomeWizard } from "@/components/app/WelcomeWizard";
 import { formatCurrency, toBGN, isDualCurrencyActive, getYearMonth, planHasFeature, SUBSCRIPTION_PLANS, type PlanId } from "@/lib/constants";
 import { TopClientsChart, aggregateClientRevenue } from "@/components/app/TopClientsChart";
 import { upcomingStandard } from "@/lib/taxCalendar";
+import { BusinessProfileWizard } from "@/components/app/BusinessProfileWizard";
+import { PersonalizedDashboard } from "@/components/app/PersonalizedDashboard";
+import { resolveLayout, SECTOR_TITLE } from "@/lib/workspaces";
 
 export default async function DashboardPage() {
   const { companyId, userId } = await requireCompany();
+
+  // Бизнес профил (Smart Workspace) — определя подреждането на бързите действия
+  const profile = await prisma.company.findUnique({
+    where: { id: companyId },
+    select: { businessSector: true, companySize: true, dashboardLayout: true, isCustomLayout: true },
+  });
+  const needsProfile = !profile?.businessSector;
+  const layoutOrder = resolveLayout(profile?.businessSector, profile?.dashboardLayout, profile?.isCustomLayout ?? false);
+  const hiddenCards = (() => {
+    try { return profile?.dashboardLayout ? (JSON.parse(profile.dashboardLayout).hidden ?? []) : []; } catch { return []; }
+  })();
 
   const me = await prisma.user.findUnique({ where: { id: userId }, select: { onboardedAt: true } });
   let onboarding = null;
@@ -149,6 +163,7 @@ export default async function DashboardPage() {
 
   return (
     <>
+      {needsProfile && <BusinessProfileWizard />}
       {onboarding && <WelcomeWizard status={onboarding} />}
 
       {/* Topbar */}
@@ -403,6 +418,15 @@ export default async function DashboardPage() {
             })}
           </div>
         </div>
+      )}
+
+      {/* Smart Workspace — персонализирани бързи действия (ПОД текущото съдържание) */}
+      {!needsProfile && (
+        <PersonalizedDashboard
+          initialOrder={layoutOrder}
+          initialHidden={hiddenCards}
+          sectorTitle={SECTOR_TITLE(profile?.businessSector)}
+        />
       )}
     </>
   );

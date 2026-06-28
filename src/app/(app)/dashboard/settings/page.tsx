@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, allowedTemplateCount, type PlanId } from "@/lib/constants";
 import { TemplatePreview } from "@/components/app/TemplatePreview";
+import { BusinessProfileSettings } from "@/components/app/BusinessProfileSettings";
 
 type Company = {
   name: string; eik: string | null; vatNumber: string | null; vatRegistered: boolean;
@@ -71,6 +72,8 @@ export default function SettingsPage() {
 
       {error && <div style={{ background: "var(--brick-soft)", border: "1px solid var(--brick)", color: "var(--brick)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 16 }}>{error}</div>}
       {saved && <div style={{ background: "var(--emerald-soft)", border: "1px solid var(--emerald)", color: "var(--emerald)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 16 }}>✓ Данните са запазени.</div>}
+
+      <BusinessProfileSettings />
 
       {/* Лого + основни данни */}
       <div className="glass panel" style={{ padding: "24px 28px", marginBottom: 16 }}>
