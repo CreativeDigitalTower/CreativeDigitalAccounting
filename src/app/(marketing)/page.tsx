@@ -1,30 +1,42 @@
 import Link from "next/link";
 import { Pricing } from "@/components/marketing/Pricing";
-import {
-  IconInvoice, IconWarehouse, IconUsers, IconExpense, IconChart, IconProjects,
-  IconBuilding, IconDoc, IconShield, IconCash, IconCalculator, IconBank,
-} from "@/components/Icons";
 
 const features = [
-  { Icon: IconInvoice, title: "Фактуриране", desc: "Фактури, проформи, оферти, кредитни и дебитни известия, приемо-предавателни протоколи и декларации за съответствие — с автоматична номерация, 10 професионални шаблона, печат и сваляне в PDF, двойно EUR/BGN обозначаване и надпис ОРИГИНАЛ." },
-  { Icon: IconWarehouse, title: "Склад с проследяемост", desc: "Наличности в множество складове, категории, партидни номера, заприходяване, изписване, бракуване и ревизия (инвентаризация). Складът се обновява автоматично при фактуриране." },
-  { Icon: IconBuilding, title: "Производство и рецепти", desc: "Създавайте рецепти със суровини и произвеждайте готова продукция — системата изписва съставките по метод FIFO и заприходява готовия продукт с партиден номер." },
-  { Icon: IconUsers, title: "Клиенти, Доставчици и CRM", desc: "Досиета, контактни лица, CRM бележки, история на документите, приходи по клиент и топ клиенти. Редактируеми профили и автоматично предложение при въвеждане." },
-  { Icon: IconExpense, title: "Разходи и Каса", desc: "Входящи фактури от доставчици по категории, каса и банкови извлечения за пълна картина на паричния поток." },
-  { Icon: IconChart, title: "Финансови анализи", desc: "Оборот, печалба, марж, паричен поток, финансова цел, бизнес здравен индекс и диаграми за топ клиенти — на таблото и в детайлни справки." },
-  { Icon: IconProjects, title: "Проекти и Договори", desc: "Приходи, разходи и печалба по проект, управление на договори с напомняния за изтичащи срокове." },
-  { Icon: IconShield, title: "HACCP и хранителна безопасност", desc: "Технологична документация (ТД) за всеки продукт — рецептура, режими на изпичане, охлаждане, съхранение и срок на годност, съгласно изискванията на БАБХ." },
-  { Icon: IconUsers, title: "Служители", desc: "Пълно досие на персонала — позиция, заплата, контакти, плюс отчет на отпуски и болнични с натрупани дни." },
-  { Icon: IconDoc, title: "Документен архив", desc: "Качвайте и съхранявайте сканирани документи, договори и файлове по категории на едно сигурно място." },
-  { Icon: IconCash, title: "Данъчен календар", desc: "Срокове по ЗДДС, ЗКПО, ЗДДФЛ, КСО и ГФО с предупреждения, плюс собствени напомняния, за да не пропускате задължения." },
-  { Icon: IconCalculator, title: "Безплатни бизнес инструменти", desc: "Калкулатори за ДДС, заплати, валута, лихви и надценка — достъпни за всички регистрирани потребители." },
+  { emoji: "📄", title: "Фактуриране", desc: "Издавайте фактури, проформи, оферти, кредитни и дебитни известия, приемо-предавателни протоколи и други бизнес документи за секунди с автоматична номерация и професионални PDF шаблони." },
+  { emoji: "📦", title: "Склад и наличности", desc: "Следете наличности, партиди, движения между складове и ревизии в реално време. Автоматизирайте заприхождаването, изписването и управлението на инвентара." },
+  { emoji: "💰", title: "Разходи и паричен поток", desc: "Следете всички фирмени разходи, входящи фактури, касови операции и банкови движения с ясна финансова картина." },
+  { emoji: "📊", title: "Финансови анализи", desc: "Проследявайте приходи, печалба, паричен поток, KPI показатели и бизнес здравен индекс чрез интерактивни справки и графики." },
+  { emoji: "👥", title: "Клиенти, доставчици и CRM", desc: "Поддържайте пълни досиета, история на документите, приходи, договори, бележки и контакти на едно място." },
+  { emoji: "🏭", title: "Производство и себестойност", desc: "Създавайте рецепти, калкулирайте себестойност, управлявайте суровини и автоматично заприхождавайте готовата продукция." },
+  { emoji: "📁", title: "Документен архив", desc: "Съхранявайте всички фирмени документи, договори и файлове сигурно, организирано и винаги достъпни." },
+  { emoji: "📋", title: "Проекти и договори", desc: "Управлявайте проекти, договори, бюджети, приходи, разходи и автоматични напомняния за важни срокове." },
+  { emoji: "👔", title: "Служители", desc: "Управлявайте екипа си с информация за позиции, отпуски, болнични, заплати и натрупани дни в едно централизирано досие." },
+  { emoji: "🛡", title: "HACCP документация", desc: "Създавайте технологични документи, рецепти и HACCP документация, съобразена с изискванията на БАБХ." },
+  { emoji: "📅", title: "Данъчен календар", desc: "Получавайте автоматични напомняния за данъчни и осигурителни срокове, за да не пропускате важни задължения." },
+  { emoji: "🧮", title: "Безплатни бизнес инструменти", desc: "Използвайте калкулатори за ДДС, заплати, валута, надценка, лихви и други полезни инструменти без допълнително заплащане." },
+  { emoji: "🗎", title: "Генериране на бизнес документи", desc: "Готови шаблони за трудови и граждански договори, пълномощни, декларации и други фирмени документи (Бизнес и Про — очаквайте скоро)." },
 ];
 
 const highlights = [
-  { Icon: IconBank, title: "Готовност за еврото", desc: "Двойно EUR/BGN обозначаване и автоматичен преход към еврото по фиксирания курс." },
-  { Icon: IconShield, title: "Сигурност и роли", desc: "Потребителски роли и права, одит лог на всички действия и контрол на достъпа." },
-  { Icon: IconChart, title: "Бизнес здравен индекс", desc: "Автоматична оценка 0–100 на финансовото състояние с конкретни препоръки." },
-  { Icon: IconInvoice, title: "Автоматични напомняния", desc: "Известия за неплатени и просрочени фактури, за да си получавате парите навреме." },
+  { emoji: "🧩", title: "Всичко в една платформа", desc: "Забравете за множество отделни програми. Управлявайте фактуриране, склад, производство, финанси, CRM, документи и анализи в една система." },
+  { emoji: "📈", title: "Бизнес здравен индекс", desc: "Следете финансовите резултати с графики, KPI показатели и бизнес анализи." },
+  { emoji: "🔐", title: "Сигурност и контрол", desc: "Потребителски роли, контрол на достъпа, журнал на всички действия и защита на фирмените данни за максимална сигурност." },
+  { emoji: "🔔", title: "Автоматични напомняния", desc: "Следете плащания, данъчни срокове, договори и важни събития без риск от пропуски." },
+];
+
+const stats = [
+  { num: "17+", label: "бизнес модула" },
+  { num: "100+", label: "функции" },
+  { num: "15", label: "PDF шаблона" },
+  { num: "12+", label: "типа документи" },
+  { num: "6", label: "потребителски роли" },
+  { num: "4", label: "абонаментни плана" },
+];
+
+const steps = [
+  { n: "1", title: "Регистрирайте се", desc: "Създайте фирмения си профил за по-малко от 2 минути." },
+  { n: "2", title: "Подгответе", desc: "Персонализирайте платформата според нуждите на вашия бизнес." },
+  { n: "3", title: "Управлявайте", desc: "Фактурирайте, следете финансите и управлявайте бизнеса си от едно място." },
 ];
 
 export default function HomePage() {
@@ -61,22 +73,22 @@ export default function HomePage() {
             margin: "0 0 24px",
           }}
         >
-          Бизнес платформата,<br />
-          <span style={{ color: "var(--emerald)" }}>която расте с вас</span>
+          Управлявайте целия си<br />
+          <span style={{ color: "var(--emerald)" }}>бизнес от едно място</span>
         </h1>
 
         <p
           style={{
             fontSize: "clamp(16px, 2vw, 20px)",
             color: "var(--ink-soft)",
-            maxWidth: 580,
+            maxWidth: 660,
             margin: "0 auto 40px",
             lineHeight: 1.6,
           }}
         >
-          Фактуриране, склад с проследяемост, производство, HACCP, служители,
-          разходи и финансови анализи — всичко в една система. Проектирано за фирми с всякакъв
-          капацитет в България: от фрийлансъри и малки фирми до производство и хранителна индустрия.
+          Creative Digital Accounting е модерна ERP платформа, която обединява фактуриране, склад,
+          производство, разходи, клиенти, договори, служители и финансови анализи в една система,
+          създадена специално за нуждите на българския бизнес.
         </p>
 
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
@@ -114,7 +126,7 @@ export default function HomePage() {
               className="glass panel"
               style={{ padding: "22px 24px" }}
             >
-              <div className="icon-tile" style={{ marginBottom: 14 }}><f.Icon /></div>
+              <div style={{ fontSize: 26, marginBottom: 10 }}>{f.emoji}</div>
               <h3 style={{ margin: "0 0 8px", fontSize: 17, fontFamily: "'Fraunces', serif", fontWeight: 700 }}>
                 {f.title}
               </h3>
@@ -126,20 +138,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Highlights */}
+      {/* Защо да изберете */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 70px" }}>
         <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 30, fontWeight: 700, textAlign: "center", marginBottom: 8 }}>
-          Защо Creative Digital Accounting
+          Защо да изберете Creative Digital Accounting
         </h2>
-        <p style={{ textAlign: "center", color: "var(--muted)", marginBottom: 32, fontSize: 14, maxWidth: 640, marginInline: "auto" }}>
-          Една платформа вместо пет отделни програми — спестявате време, пари и грешки.
+        <p style={{ textAlign: "center", color: "var(--muted)", marginBottom: 32, fontSize: 14, maxWidth: 720, marginInline: "auto", lineHeight: 1.6 }}>
+          Обединете всички основни бизнес процеси в една ERP платформа и автоматизирайте ежедневната работа на фирмата си.
+          По-малко администрация. По-добър контрол. Повече време за развитие на бизнеса.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 18 }}>
           {highlights.map((h) => (
             <div key={h.title} className="glass panel" style={{ padding: "22px 24px", textAlign: "center" }}>
-              <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
-                <div className="icon-tile" style={{ width: 50, height: 50 }}><h.Icon /></div>
-              </div>
+              <div style={{ fontSize: 30, marginBottom: 10 }}>{h.emoji}</div>
               <h3 style={{ margin: "0 0 8px", fontSize: 16, fontFamily: "'Fraunces', serif", fontWeight: 700 }}>{h.title}</h3>
               <p style={{ margin: 0, color: "var(--ink-soft)", fontSize: 13, lineHeight: 1.55 }}>{h.desc}</p>
             </div>
@@ -147,15 +158,44 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* За кого е */}
+      {/* Подходящ за всяка компания */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 70px" }}>
-        <div className="glass panel" style={{ padding: "28px 32px" }}>
-          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 700, margin: "0 0 14px", textAlign: "center" }}>Подходящ за всеки бизнес</h2>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
-            {["Търговия и онлайн магазини", "Производство", "Пекарни и хранителна индустрия (HACCP)", "Услуги и агенции", "Фрийлансъри и консултанти", "Ресторанти и кетъринг", "Строителство", "Счетоводни кантори"].map((t) => (
-              <span key={t} style={{ background: "var(--emerald-soft)", color: "var(--emerald-dark)", borderRadius: 20, padding: "7px 16px", fontSize: 13, fontWeight: 600 }}>{t}</span>
-            ))}
-          </div>
+        <div className="glass panel" style={{ padding: "28px 32px", textAlign: "center" }}>
+          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 700, margin: "0 0 10px" }}>Подходящ за всяка компания</h2>
+          <p style={{ color: "var(--ink-soft)", fontSize: 14, lineHeight: 1.6, maxWidth: 760, margin: "0 auto" }}>
+            Независимо дали сте фрийлансър, търговска фирма, производител, ресторант, счетоводна кантора или развиващ се бизнес,
+            Creative Digital Accounting се адаптира към вашите процеси.
+          </p>
+        </div>
+      </section>
+
+      {/* Какво получавате */}
+      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 70px" }}>
+        <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 30, fontWeight: 700, textAlign: "center", marginBottom: 24 }}>Какво получавате?</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 16 }}>
+          {stats.map((s) => (
+            <div key={s.label} className="glass panel" style={{ padding: "22px 14px", textAlign: "center" }}>
+              <div className="num" style={{ fontSize: 30, fontWeight: 700, color: "var(--emerald)" }}>{s.num}</div>
+              <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginTop: 4 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+        <p style={{ textAlign: "center", color: "var(--muted)", marginTop: 18, fontSize: 13.5, maxWidth: 720, marginInline: "auto" }}>
+          Непрекъснато надграждане и обновяване на системата с още допълнителни функции с цел подпомагане развитието на вашия бизнес.
+        </p>
+      </section>
+
+      {/* Как работи */}
+      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 70px" }}>
+        <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 30, fontWeight: 700, textAlign: "center", marginBottom: 24 }}>Как работи Creative Digital Accounting</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 18 }}>
+          {steps.map((s) => (
+            <div key={s.n} className="glass panel" style={{ padding: "24px", textAlign: "center" }}>
+              <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--emerald)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 20, margin: "0 auto 12px" }}>{s.n}</div>
+              <h3 style={{ margin: "0 0 8px", fontSize: 17, fontFamily: "'Fraunces', serif", fontWeight: 700 }}>{s.title}</h3>
+              <p style={{ margin: 0, color: "var(--ink-soft)", fontSize: 13.5, lineHeight: 1.55 }}>{s.desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 
