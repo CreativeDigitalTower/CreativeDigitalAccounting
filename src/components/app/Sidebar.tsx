@@ -15,7 +15,7 @@ const navItems = [
   { href: "/dashboard/production", label: "Производство", icon: "🏭", feature: "production" },
   { href: "/dashboard/employees", label: "Служители", icon: "🧑‍💼", feature: "employees" },
   { href: "/dashboard/haccp", label: "HACCP", icon: "🥗", feature: "haccp" },
-  { href: "/dashboard/business-docs", label: "Бизнес документи", icon: "🗎", feature: "dashboard" },
+  { href: "/dashboard/business-docs", label: "Бизнес документи", icon: "📃", feature: "dashboard" },
   { href: "/dashboard/cash", label: "Каса", icon: "🏦", feature: "cash" },
   { href: "/dashboard/expenses", label: "Разходи", icon: "💰", feature: "expenses" },
   { href: "/dashboard/contracts", label: "Договори", icon: "📑", feature: "contracts" },

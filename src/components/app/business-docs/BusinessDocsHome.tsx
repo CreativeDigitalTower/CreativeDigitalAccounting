@@ -44,11 +44,16 @@ export function BusinessDocsHome({ categories, templates, recent, favorites, rec
       </div>
 
       {/* Бързи действия */}
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 24 }}>
-        <Link href="/dashboard/business-docs/category/contracts" className="btn btn-primary btn-sm">📝 Нов договор</Link>
-        <Link href="/dashboard/business-docs/category/company" className="btn btn-ghost btn-sm">🏢 Заповед / Решение</Link>
-        <Link href="/dashboard/business-docs/category/hr" className="btn btn-ghost btn-sm">👔 Документ за персонал</Link>
-        <Link href="/dashboard/business-docs/all" className="btn btn-ghost btn-sm">📚 Всички документи</Link>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
+        <Link href="/dashboard/business-docs/category/contracts" className="btn btn-primary btn-sm">Нов договор</Link>
+        <Link href="/dashboard/business-docs/category/company" className="btn btn-ghost btn-sm">Заповед / Решение</Link>
+        <Link href="/dashboard/business-docs/category/hr" className="btn btn-ghost btn-sm">Документ за персонал</Link>
+        <Link href="/dashboard/business-docs/all" className="btn btn-ghost btn-sm">Създадени документи →</Link>
+      </div>
+
+      {/* Дисклеймър */}
+      <div className="glass panel" style={{ padding: "12px 16px", marginBottom: 24, fontSize: 12.5, color: "var(--ink-soft)", borderLeft: "4px solid var(--brass)" }}>
+        ℹ Това са предложени <strong>стандартни шаблони</strong> за улеснение на вашата работа. За конкретни юридически казуси препоръчваме да се консултирате със специалист (юрист/счетоводител), преди да използвате документа.
       </div>
 
       {/* Последни + любими */}

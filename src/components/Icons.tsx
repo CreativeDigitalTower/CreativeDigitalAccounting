@@ -55,3 +55,12 @@ export const IconDoc = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base(p)}><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" /><path d="M14 2v6h6" /></svg>
 );
 export const IconCalculator = IconCalc;
+export const IconFactory = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><path d="M3 21V11l5 3V11l5 3V8l5 3v10z" /><path d="M3 21h18M7 21v-3M11 21v-3M15 21v-3" /></svg>
+);
+export const IconCalendar = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><rect x="3" y="4.5" width="18" height="16" rx="2" /><path d="M3 9h18M8 2.5v4M16 2.5v4M7.5 13h2M11 13h2M14.5 13h2M7.5 16.5h2M11 16.5h2" /></svg>
+);
+export const IconFileStack = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}><path d="M8 2h7l4 4v10a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" /><path d="M15 2v5h4" /><path d="M4 7v13a1 1 0 0 0 1 1h10" /></svg>
+);

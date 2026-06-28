@@ -1,8 +1,9 @@
 import Link from "next/link";
+import { IconInvoice, IconUsers, IconWarehouse, IconExpense, IconChart, IconProjects, IconDoc, IconBuilding, IconBank } from "@/components/Icons";
 
 const modules = [
   {
-    icon: "📄",
+    Icon: IconInvoice,
     title: "Документи",
     items: [
       "Фактури, проформи, оферти, кредитни и дебитни известия",
@@ -17,7 +18,7 @@ const modules = [
     ],
   },
   {
-    icon: "👥",
+    Icon: IconUsers,
     title: "Клиенти и Доставчици",
     items: [
       "Пълно досие на клиент с история на документи",
@@ -28,7 +29,7 @@ const modules = [
     ],
   },
   {
-    icon: "📦",
+    Icon: IconWarehouse,
     title: "Склад",
     items: [
       "Множество локации/складове",
@@ -39,7 +40,7 @@ const modules = [
     ],
   },
   {
-    icon: "💰",
+    Icon: IconExpense,
     title: "Разходи",
     items: [
       "Ръчно въвеждане с категории",
@@ -50,7 +51,7 @@ const modules = [
     ],
   },
   {
-    icon: "📊",
+    Icon: IconChart,
     title: "Финансови Анализи",
     items: [
       "Оборот и разходи по период",
@@ -62,7 +63,7 @@ const modules = [
     ],
   },
   {
-    icon: "🏗️",
+    Icon: IconProjects,
     title: "Проекти",
     items: [
       "Приходи и разходи по проект",
@@ -73,7 +74,7 @@ const modules = [
     ],
   },
   {
-    icon: "📑",
+    Icon: IconDoc,
     title: "Договори",
     items: [
       "Клиентски и доставчически договори",
@@ -83,7 +84,7 @@ const modules = [
     ],
   },
   {
-    icon: "🏭",
+    Icon: IconBuilding,
     title: "Активи",
     items: [
       "Регистър на дълготрайните активи",
@@ -93,7 +94,7 @@ const modules = [
     ],
   },
   {
-    icon: "💳",
+    Icon: IconBank,
     title: "Абонамент",
     items: [
       "Freemium модел — 5 документа/месец безплатно",
@@ -130,8 +131,8 @@ export default function SoftwarePage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 18 }}>
         {modules.map((mod) => (
-          <div key={mod.title} className="glass panel" style={{ padding: "24px" }}>
-            <div style={{ fontSize: 28, marginBottom: 10 }}>{mod.icon}</div>
+          <div key={mod.title} className="glass panel hover-lift" style={{ padding: "24px" }}>
+            <div className="icon-tile" style={{ marginBottom: 12 }}><mod.Icon /></div>
             <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, margin: "0 0 14px" }}>
               {mod.title}
             </h3>
