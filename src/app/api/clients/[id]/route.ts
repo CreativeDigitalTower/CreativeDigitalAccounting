@@ -13,6 +13,12 @@ const schema = z.object({
   contactPerson: z.string().optional().nullable(),
   contactEmail: z.string().email().optional().or(z.literal("")).nullable(),
   phone: z.string().optional().nullable(),
+  status: z.string().optional(),
+  stage: z.string().optional(),
+  dealValue: z.number().optional().nullable(),
+  birthday: z.string().optional().nullable(),
+  website: z.string().optional().nullable(),
+  tags: z.string().optional().nullable(),
 });
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -26,9 +32,10 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ error: "Не е намерен." }, { status: 404 });
     }
 
+    const { birthday, ...rest } = data;
     const client = await prisma.client.update({
       where: { id },
-      data: { ...data, contactEmail: data.contactEmail || null },
+      data: { ...rest, contactEmail: data.contactEmail || null, ...(birthday !== undefined ? { birthday: birthday ? new Date(birthday) : null } : {}) },
     });
     return NextResponse.json(client);
   } catch (err) {

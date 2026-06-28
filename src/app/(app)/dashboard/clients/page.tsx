@@ -2,9 +2,12 @@ import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/constants";
+import { ClientPipeline } from "@/components/app/ClientPipeline";
+import { STATUSES } from "@/components/app/ClientCrm";
 
-export default async function ClientsPage() {
+export default async function ClientsPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
   const { companyId } = await requireCompany();
+  const view = (await searchParams).view === "pipeline" ? "pipeline" : "list";
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -12,7 +15,7 @@ export default async function ClientsPage() {
   const [clients, invoices] = await Promise.all([
     prisma.client.findMany({
       where: { companyId },
-      include: { _count: { select: { documents: true, notes: true } } },
+      include: { _count: { select: { documents: true, notes: true, tasks: { where: { done: false } } } } },
       orderBy: { name: "asc" },
     }),
     prisma.document.findMany({
@@ -38,14 +41,24 @@ export default async function ClientsPage() {
 
   return (
     <>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
         <div>
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>Клиенти</h1>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>Клиенти (CRM)</h1>
           <div style={{ color: "var(--muted)", fontSize: 13 }}>{clients.length} клиента</div>
         </div>
         <Link href="/dashboard/clients/new" className="btn btn-primary">+ Нов клиент</Link>
       </div>
 
+      {/* Изглед: списък / pipeline */}
+      <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
+        <Link href="/dashboard/clients" className={`filter-tab${view === "list" ? " active" : ""}`}>Списък</Link>
+        <Link href="/dashboard/clients?view=pipeline" className={`filter-tab${view === "pipeline" ? " active" : ""}`}>Pipeline (фуния)</Link>
+      </div>
+
+      {view === "pipeline" ? (
+        <ClientPipeline initial={sorted.map((c) => ({ id: c.id, name: c.name, stage: c.stage, dealValue: c.dealValue, total: totalByClient.get(c.id) ?? 0 }))} />
+      ) : (
+      <>
       {/* Общо приходи */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
         <div className="glass panel" style={{ padding: "16px 20px" }}>
@@ -70,11 +83,11 @@ export default async function ClientsPage() {
             <thead>
               <tr>
                 <th>Клиент</th>
-                <th>ЕИК</th>
+                <th>Статус</th>
                 <th>Телефон</th>
                 <th className="num">Приход (месец)</th>
                 <th className="num">Приход (общо)</th>
-                <th className="num">Документи</th>
+                <th className="num">Задачи</th>
                 <th></th>
               </tr>
             </thead>
@@ -92,11 +105,11 @@ export default async function ClientsPage() {
                       </div>
                     </div>
                   </td>
-                  <td className="num" style={{ color: "var(--muted)", fontSize: 12.5 }}>{client.eik ?? "—"}</td>
+                  <td>{(() => { const s = STATUSES.find((x) => x.id === client.status) ?? STATUSES[1]; return <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: s.color, borderRadius: 14, padding: "2px 9px" }}>{s.label}</span>; })()}</td>
                   <td style={{ fontSize: 13 }}>{client.phone ?? "—"}</td>
                   <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(monthByClient.get(client.id) ?? 0)}</td>
                   <td className="num" style={{ fontWeight: 600, color: "var(--emerald-dark)" }}>{formatCurrency(totalByClient.get(client.id) ?? 0)}</td>
-                  <td className="num">{client._count.documents}</td>
+                  <td className="num">{client._count.tasks > 0 ? <span style={{ color: "var(--brass)", fontWeight: 700 }}>{client._count.tasks}</span> : "—"}</td>
                   <td style={{ display: "flex", gap: 6 }}>
                     <Link href={`/dashboard/clients/${client.id}`} className="btn btn-ghost btn-sm">Досие</Link>
                     <Link href={`/dashboard/clients/${client.id}?edit=1`} className="btn btn-ghost btn-sm">✎ Редактирай</Link>
@@ -119,6 +132,8 @@ export default async function ClientsPage() {
       <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 10 }}>
         Приходите се изчисляват автоматично на база издадените фактури. Сортирано по общ приход (топ клиенти най-горе).
       </p>
+      </>
+      )}
     </>
   );
 }

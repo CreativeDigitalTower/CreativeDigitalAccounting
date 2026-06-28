@@ -195,13 +195,61 @@ model Client {
   contactPerson String?
   contactEmail  String?
   phone         String?
+  // CRM
+  status        String   @default("active") // lead | active | vip | inactive | lost
+  stage         String   @default("new")    // pipeline: new | contacted | proposal | negotiation | won | lost
+  dealValue     Float?
+  birthday      DateTime?
+  website       String?
+  tags          String?  // CSV
   createdAt     DateTime @default(now())
 
-  company   Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company   Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
   notes     ClientNote[]
   documents Document[]
   contracts Contract[]
   projects  Project[]
+  contacts  ClientContact[]
+  tasks     ClientTask[]
+  files     ClientFile[]
+}
+
+model ClientContact {
+  id        String  @id @default(cuid())
+  clientId  String
+  name      String
+  position  String?
+  phone     String?
+  email     String?
+  isPrimary Boolean @default(false)
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+model ClientTask {
+  id        String    @id @default(cuid())
+  clientId  String
+  title     String
+  type      String?   // call | email | offer | contract | followup | meeting | other
+  dueDate   DateTime?
+  done      Boolean   @default(false)
+  createdAt DateTime  @default(now())
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, done])
+}
+
+model ClientFile {
+  id         String   @id @default(cuid())
+  clientId   String
+  name       String
+  mimeType   String
+  size       Int
+  dataUrl    String   @db.Text
+  uploadedAt DateTime @default(now())
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 }
 
 model ClientNote {

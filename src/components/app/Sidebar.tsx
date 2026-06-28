@@ -9,7 +9,7 @@ const navItems = [
   { href: "/dashboard", label: "Табло", icon: "⊞", feature: "dashboard" },
   { href: "/dashboard/invoices", label: "Фактури", icon: "🧾", feature: "documents" },
   { href: "/dashboard/documents", label: "Документи", icon: "📄", feature: "documents" },
-  { href: "/dashboard/clients", label: "Клиенти", icon: "👥", feature: "clients" },
+  { href: "/dashboard/clients", label: "Клиенти (CRM)", icon: "👥", feature: "clients" },
   { href: "/dashboard/suppliers", label: "Доставчици", icon: "🚚", feature: "suppliers" },
   { href: "/dashboard/warehouse", label: "Склад", icon: "📦", feature: "warehouse" },
   { href: "/dashboard/production", label: "Производство", icon: "🏭", feature: "production" },
