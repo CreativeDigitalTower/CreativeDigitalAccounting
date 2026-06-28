@@ -134,6 +134,7 @@ model Company {
   conformityDeclarations ConformityDeclaration[]
   stocktakes        Stocktake[]
   taxReminders      TaxReminder[]
+  businessDocuments BusinessDocument[]
 }
 
 enum CompanyRole {
@@ -685,6 +686,26 @@ model SiteVisit {
 
   @@index([createdAt])
   @@index([visitorId])
+}
+
+// Модул „Бизнес документи" — генерирани от шаблони документи (DMS)
+model BusinessDocument {
+  id              String   @id @default(cuid())
+  companyId       String
+  templateId      String
+  templateVersion Int      @default(1)
+  category        String
+  title           String
+  contentHtml     String   @db.Text
+  status          String   @default("draft") // draft | final | archived
+  favorite        Boolean  @default(false)
+  pinned          Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, updatedAt])
 }
 
 model ArchiveFile {
