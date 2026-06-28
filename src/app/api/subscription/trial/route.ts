@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireCompany } from "@/lib/session";
 import { audit } from "@/lib/documents";
 import { TRIAL_DAYS } from "@/lib/subscription";
+import { logSubscriptionEvent } from "@/lib/subscriptionEvents";
 import { z } from "zod";
 
 const schema = z.object({ plan: z.enum(["business", "pro"]) });
@@ -25,6 +26,7 @@ export async function POST(req: Request) {
       create: { companyId, plan, status: "trialing", currentPeriodStart: start, currentPeriodEnd: end, trialUsed: true },
     });
 
+    await logSubscriptionEvent(companyId, "trial", { plan, status: "trialing", note: `${TRIAL_DAYS}-дневен пробен период` });
     await audit(companyId, userId, "update", "Subscription", companyId, `Активиран ${TRIAL_DAYS}-дневен тест на ${plan}`);
     return NextResponse.json({ success: true });
   } catch (err) {

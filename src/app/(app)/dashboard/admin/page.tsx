@@ -22,6 +22,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const companies = await prisma.company.findMany({
     include: {
       subscription: true,
+      subscriptionEvents: { orderBy: { createdAt: "desc" }, take: 10 },
       companyUsers: { include: { user: true } },
       _count: { select: { documents: true, companyUsers: true, clients: true, stockItems: true } },
     },
@@ -476,6 +477,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                   periodEnd: c.subscription?.currentPeriodEnd?.toISOString() ?? null,
                   trialUsed: c.subscription?.trialUsed ?? false,
                 }}
+                events={c.subscriptionEvents.map((e) => ({ type: e.type, plan: e.plan, status: e.status, period: e.period, amount: e.amount, note: e.note, createdAt: e.createdAt.toISOString() }))}
               />
             ))}
           </tbody>

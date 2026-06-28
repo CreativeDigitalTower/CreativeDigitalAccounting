@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireSuperAdmin } from "@/lib/session";
 import { audit } from "@/lib/documents";
+import { logSubscriptionEvent } from "@/lib/subscriptionEvents";
 import { z } from "zod";
 
 const schema = z.object({
@@ -31,6 +32,9 @@ export async function POST(req: Request) {
       create: { companyId, status: status ?? "active", ...data },
     });
 
+    await logSubscriptionEvent(companyId, plan !== "free" ? "payment" : "plan_change", {
+      plan, status: status ?? "active", note: `Админ: план ${plan}${periodEnd ? ` валиден до ${periodEnd}` : ""}`,
+    });
     await audit(companyId, userId, "update", "Subscription", companyId, `Админ: план ${plan}${periodEnd ? ` до ${periodEnd}` : ""}`);
     return NextResponse.json({ success: true });
   } catch (err) {

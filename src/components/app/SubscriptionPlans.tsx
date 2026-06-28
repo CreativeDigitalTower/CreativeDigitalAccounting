@@ -23,6 +23,10 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
 
   function choosePay(planId: string) {
     setPayPlanId(planId);
+    const plan = PLAN_DETAILS.find((p) => p.id === planId);
+    const amount = plan ? +(plan.price * period.months * (1 - period.discount)).toFixed(2) : 0;
+    // регистрираме заявка за плащане (видима в Супер Админ историята)
+    fetch("/api/subscription/request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: planId, period: period.label, amount }) }).catch(() => {});
     setTimeout(() => document.getElementById("pay-box")?.scrollIntoView({ behavior: "smooth" }), 50);
   }
 

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { logSubscriptionEvent } from "@/lib/subscriptionEvents";
 
 export const TRIAL_DAYS = 7;
 
@@ -20,6 +21,7 @@ export async function enforceSubscription(companyId: string) {
       where: { companyId },
       data: { plan: "free", status: "active" },
     });
+    await logSubscriptionEvent(companyId, "expiry", { plan: "free", status: "active", note: wasTrial ? "Изтекъл пробен период" : "Изтекъл платен период" });
     return {
       plan: "free" as const, status: "active", justExpired: true, trialUsed: sub.trialUsed,
       currentPeriodEnd: sub.currentPeriodEnd, currentPeriodStart: sub.currentPeriodStart, wasTrial,

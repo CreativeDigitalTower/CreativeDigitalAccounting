@@ -91,6 +91,13 @@ model Company {
   city            String?
   mol             String?
   sector          String?
+  country         String?  @default("България")
+  // Business Profile & Smart Workspace
+  businessSector   String?
+  businessCategory String?
+  companySize      String?
+  dashboardLayout  String?  @db.Text
+  isCustomLayout   Boolean  @default(false)
   logoUrl         String?
   brandColor      String?
   defaultCurrency String   @default("EUR")
@@ -135,6 +142,24 @@ model Company {
   stocktakes        Stocktake[]
   taxReminders      TaxReminder[]
   businessDocuments BusinessDocument[]
+  subscriptionEvents SubscriptionEvent[]
+}
+
+// История на абонаментите (заявки, плащания, промени на статус/план)
+model SubscriptionEvent {
+  id        String   @id @default(cuid())
+  companyId String
+  type      String   // request | payment | plan_change | status_change | trial | expiry
+  plan      String?
+  status    String?
+  period    String?
+  amount    Float?
+  note      String?
+  createdAt DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, createdAt])
 }
 
 enum CompanyRole {

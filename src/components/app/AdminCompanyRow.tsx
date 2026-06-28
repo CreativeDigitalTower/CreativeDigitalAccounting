@@ -29,6 +29,16 @@ type Props = {
     marketingConsent: boolean; termsAcceptedAt: string | null; createdAt: string;
   }[];
   sub: { status: string; periodStart: string | null; periodEnd: string | null; trialUsed: boolean };
+  events: { type: string; plan: string | null; status: string | null; period: string | null; amount: number | null; note: string | null; createdAt: string }[];
+};
+
+const EVENT_LABEL: Record<string, string> = {
+  request: "Заявка за плащане", payment: "Получено плащане", plan_change: "Смяна на план",
+  status_change: "Промяна на статус", trial: "Пробен период", expiry: "Изтекъл → Безплатен",
+};
+const EVENT_COLOR: Record<string, string> = {
+  request: "var(--brass)", payment: "var(--emerald)", plan_change: "var(--navy)",
+  status_change: "var(--navy)", trial: "var(--brass)", expiry: "var(--brick)",
 };
 
 export function AdminCompanyRow(props: Props) {
@@ -132,6 +142,26 @@ export function AdminCompanyRow(props: Props) {
                 Безплатен пробен период използван: <strong>{props.sub.trialUsed ? "Да" : "Не"}</strong>
                 {props.sub.periodEnd && <> · Текущ период до: <strong>{new Date(props.sub.periodEnd).toLocaleDateString("bg-BG")}</strong></>}
                 <span style={{ marginLeft: 8 }}>· След изтичане профилът автоматично се връща към Безплатен.</span>
+              </div>
+
+              {/* История на абонамента */}
+              <div style={{ marginTop: 12, borderTop: "1px solid var(--border)", paddingTop: 10 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--brass)", letterSpacing: 1, marginBottom: 6 }}>ИСТОРИЯ НА АБОНАМЕНТА</div>
+                {props.events.length === 0 ? (
+                  <div style={{ fontSize: 12, color: "var(--muted)" }}>Няма записани събития.</div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    {props.events.map((e, i) => (
+                      <div key={i} style={{ display: "flex", gap: 10, alignItems: "baseline", fontSize: 12 }}>
+                        <span style={{ color: "var(--muted)", whiteSpace: "nowrap", minWidth: 120 }}>{new Date(e.createdAt).toLocaleString("bg-BG")}</span>
+                        <span style={{ fontWeight: 700, color: EVENT_COLOR[e.type] ?? "var(--ink)", minWidth: 130 }}>{EVENT_LABEL[e.type] ?? e.type}</span>
+                        <span style={{ color: "var(--ink-soft)" }}>
+                          {e.plan ? `план: ${e.plan}` : ""}{e.amount != null ? ` · ${e.amount} €` : ""}{e.period ? ` · ${e.period}` : ""}{e.note ? ` · ${e.note}` : ""}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
