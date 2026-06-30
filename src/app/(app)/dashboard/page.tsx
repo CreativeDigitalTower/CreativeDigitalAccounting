@@ -14,7 +14,27 @@ import { DashboardPeriodSelector } from "@/components/app/DashboardPeriodSelecto
 import { WidgetBoard, type WidgetData } from "@/components/app/WidgetBoard";
 import { resolveLayout, SECTOR_TITLE } from "@/lib/workspaces";
 
-export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ period?: string; from?: string; to?: string }> }) {
+export default async function DashboardPage(props: { searchParams: Promise<{ period?: string; from?: string; to?: string }> }) {
+  try {
+    return await DashboardInner(props);
+  } catch (e) {
+    const err = e as Error & { code?: string };
+    return (
+      <div style={{ padding: 24 }}>
+        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600 }}>Табло — диагностика</h1>
+        <p style={{ color: "var(--brick)", fontSize: 13 }}>Възникна грешка при зареждане. Техническа информация:</p>
+        <pre style={{ whiteSpace: "pre-wrap", fontSize: 12, background: "#1e1e1e", color: "#f88", padding: 16, borderRadius: 8, overflow: "auto" }}>
+{String(err?.name)}: {String(err?.message)}
+{err?.code ? `\ncode: ${err.code}` : ""}
+{"\n"}{String(err?.stack ?? "").slice(0, 1800)}
+        </pre>
+        <p style={{ fontSize: 12.5, color: "var(--muted)" }}>Ако виждате „column/table does not exist“ → изпълнете <code>npx prisma db push</code> на сървъра.</p>
+      </div>
+    );
+  }
+}
+
+async function DashboardInner({ searchParams }: { searchParams: Promise<{ period?: string; from?: string; to?: string }> }) {
   const { companyId, userId } = await requireCompany();
   const sp = await searchParams;
 

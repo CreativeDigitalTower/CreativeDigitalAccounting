@@ -19,7 +19,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const companyId = await getCompanyId(userId);
 
   const [company, me, jar, sub, inboxUnread] = await Promise.all([
-    prisma.company.findUnique({ where: { id: companyId }, include: { subscription: true } }),
+    prisma.company.findUnique({ where: { id: companyId }, select: { name: true, logoUrl: true } }),
     prisma.user.findUnique({ where: { id: userId }, select: { isSuperAdmin: true } }),
     cookies(),
     enforceSubscription(companyId), // авто-връщане към БЕЗПЛАТЕН при изтекъл абонамент
