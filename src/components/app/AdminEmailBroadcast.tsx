@@ -13,6 +13,18 @@ export function AdminEmailBroadcast({ companies }: { companies: Company[] }) {
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState("");
   const [filter, setFilter] = useState("");
+  const [files, setFiles] = useState<{ filename: string; dataUrl: string; size: number }[]>([]);
+
+  async function addFiles(e: React.ChangeEvent<HTMLInputElement>) {
+    const list = Array.from(e.target.files ?? []);
+    e.target.value = "";
+    for (const file of list) {
+      if (file.size > 8 * 1024 * 1024) { setResult(`„${file.name}“ е над 8MB и е пропуснат.`); continue; }
+      const dataUrl = await new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result as string); r.onerror = rej; r.readAsDataURL(file); });
+      setFiles((prev) => [...prev, { filename: file.name, dataUrl, size: file.size }]);
+    }
+  }
+  const fmtSize = (b: number) => b < 1024 * 1024 ? `${(b / 1024).toFixed(0)} KB` : `${(b / 1024 / 1024).toFixed(1)} MB`;
 
   function toggleSel(id: string) {
     setSelected((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -25,11 +37,11 @@ export function AdminEmailBroadcast({ companies }: { companies: Company[] }) {
     setBusy(true); setResult("");
     const res = await fetch("/api/admin/broadcast", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ subject, message, target, companyIds: [...selected] }),
+      body: JSON.stringify({ subject, message, target, companyIds: [...selected], attachments: files.map(({ filename, dataUrl }) => ({ filename, dataUrl })) }),
     });
     const d = await res.json();
     setBusy(false);
-    if (res.ok) { setResult(`Изпратено до ${d.sent}/${d.recipients} фирми.`); setSubject(""); setMessage(""); }
+    if (res.ok) { setResult(`Изпратено до ${d.sent}/${d.recipients} фирми.`); setSubject(""); setMessage(""); setFiles([]); }
     else setResult(d.error ?? "Грешка");
   }
 
@@ -51,6 +63,24 @@ export function AdminEmailBroadcast({ companies }: { companies: Company[] }) {
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <input placeholder="Тема" value={subject} onChange={(e) => setSubject(e.target.value)} />
         <textarea placeholder="Съобщение… (всеки нов ред е нов абзац)" value={message} onChange={(e) => setMessage(e.target.value)} rows={5} style={{ width: "100%" }} />
+        {/* Прикачени файлове (напр. фактури за абонамент) */}
+        <div>
+          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12.5, cursor: "pointer", color: "var(--navy)", fontWeight: 600 }}>
+            📎 Прикачи файл(ове)
+            <input type="file" multiple onChange={addFiles} style={{ display: "none" }} />
+          </label>
+          {files.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
+              {files.map((f, i) => (
+                <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, background: "rgba(255,255,255,.6)", border: "1px solid var(--border)", borderRadius: 16, padding: "3px 10px" }}>
+                  {f.filename} <span style={{ color: "var(--muted)" }}>{fmtSize(f.size)}</span>
+                  <button type="button" onClick={() => setFiles(files.filter((_, j) => j !== i))} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer" }}>×</button>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
         <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
           <label style={{ display: "flex", gap: 6, alignItems: "center", fontSize: 13, margin: 0 }}>
             <input type="radio" checked={target === "all"} onChange={() => setTarget("all")} style={{ width: "auto" }} /> Всички фирми ({companies.length})

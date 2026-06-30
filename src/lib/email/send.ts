@@ -63,18 +63,35 @@ function getTransport(): Transporter | null {
   return _transport;
 }
 
+export interface MailAttachment {
+  filename: string;
+  /** base64 data URL (data:...;base64,...) или чист base64 */
+  dataUrl: string;
+}
+
 export interface SendArgs {
   to: string;
   toName?: string | null;
   subject: string;
   html: string;
-  category: string; // account | subscription | document | reminder | admin | system | client_decision | product
+  category: string; // account | subscription | document | reminder | admin | system | client_decision | product | announcement
   type: string; // machine key
   companyId?: string | null;
   /** schedule for later (used by reminders); if set in the future, queued */
   scheduledFor?: Date | null;
   /** bypass preference check (critical mails). default false */
   force?: boolean;
+  /** прикачени файлове (base64) */
+  attachments?: MailAttachment[];
+}
+
+function toNodemailerAttachments(atts?: MailAttachment[]) {
+  if (!atts?.length) return undefined;
+  return atts.map((a) => {
+    const m = a.dataUrl.match(/^data:([^;]+);base64,([\s\S]+)$/);
+    const base64 = m ? m[2] : a.dataUrl.replace(/^data:[^,]*,/, "");
+    return { filename: a.filename, content: Buffer.from(base64, "base64") };
+  });
 }
 
 /**
@@ -128,13 +145,13 @@ export async function sendEmail(args: SendArgs): Promise<{ id: string; status: s
     return { id: log.id, status: "queued" };
   }
 
-  await deliver(log.id, to, args.subject, args.html);
+  await deliver(log.id, to, args.subject, args.html, args.attachments);
   const fresh = await prisma.emailLog.findUnique({ where: { id: log.id }, select: { status: true } });
   return { id: log.id, status: fresh?.status ?? "queued" };
 }
 
 /** Inject open-tracking pixel + footer unsubscribe link, then attempt SMTP send. */
-async function deliver(logId: string, to: string, subject: string, html: string): Promise<boolean> {
+async function deliver(logId: string, to: string, subject: string, html: string, attachments?: MailAttachment[]): Promise<boolean> {
   const pixel = `<img src="${APP_URL}/api/email/open/${logId}" width="1" height="1" alt="" style="display:none">`;
   const unsub = `Не желаете тези имейли? <a href="${APP_URL}/api/email/unsubscribe/${logId}" style="color:#0F8A6A;">Отпишете се</a>.`;
   let finalHtml = html.replace("{{UNSUB}}", unsub).replace("</body>", `${pixel}</body>`);
@@ -155,7 +172,7 @@ async function deliver(logId: string, to: string, subject: string, html: string)
   }
 
   try {
-    await transport.sendMail({ from: FROM, replyTo: REPLY_TO, to, subject, html: finalHtml });
+    await transport.sendMail({ from: FROM, replyTo: REPLY_TO, to, subject, html: finalHtml, attachments: toNodemailerAttachments(attachments) });
     await prisma.emailLog.update({
       where: { id: logId },
       data: { status: "sent", sentAt: new Date(), error: null, nextRetryAt: null, attempts: { increment: 1 } },

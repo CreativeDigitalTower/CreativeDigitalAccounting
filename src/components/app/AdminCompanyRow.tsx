@@ -90,6 +90,17 @@ export function AdminCompanyRow(props: Props) {
     if (res.ok) window.location.href = "/dashboard";
   }
 
+  async function deleteCompany() {
+    const comment = prompt(`Изтриване на фирма „${props.name}".\nПосочете коментар/причина (по избор) — действието е необратимо:`);
+    if (comment === null) return;
+    if (!confirm(`Сигурни ли сте? Всички данни на „${props.name}" ще бъдат изтрити завинаги.`)) return;
+    const res = await fetch(`/api/admin/company/${props.id}`, {
+      method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ comment }),
+    });
+    if (res.ok) router.refresh();
+    else alert((await res.json()).error ?? "Грешка при изтриване.");
+  }
+
   const d = props.details;
   const info: [string, string | null][] = [
     ["ДДС №", d.vatNumber], ["Сектор", d.sector], ["Град", d.city],
@@ -121,7 +132,10 @@ export function AdminCompanyRow(props: Props) {
           </div>
         </td>
         <td>
-          <button onClick={impersonate} className="btn btn-ghost btn-sm">Влез в акаунта →</button>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            <button onClick={impersonate} className="btn btn-ghost btn-sm">Влез в акаунта →</button>
+            <button onClick={deleteCompany} className="btn btn-ghost btn-sm" style={{ color: "var(--brick)", borderColor: "var(--brick)" }} title="Изтрий фирмата">🗑</button>
+          </div>
         </td>
       </tr>
       {open && (

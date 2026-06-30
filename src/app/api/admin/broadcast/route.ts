@@ -9,11 +9,12 @@ import { z } from "zod";
 export async function POST(req: Request) {
   await requireSuperAdmin();
   try {
-    const { subject, message, target, companyIds } = z.object({
+    const { subject, message, target, companyIds, attachments } = z.object({
       subject: z.string().min(2),
       message: z.string().min(2),
       target: z.enum(["all", "selected"]),
       companyIds: z.array(z.string()).optional(),
+      attachments: z.array(z.object({ filename: z.string(), dataUrl: z.string() })).optional(),
     }).parse(await req.json());
 
     const where = target === "selected" && companyIds?.length ? { id: { in: companyIds } } : {};
@@ -33,8 +34,9 @@ export async function POST(req: Request) {
     for (const c of companies) {
       const owner = c.companyUsers[0]?.user;
       if (!owner?.email) continue;
-      // force:false → уважава отписаните фирми; blacklist винаги се уважава
-      const res = await sendEmail({ to: owner.email, toName: owner.name, subject, html, category: "product", type: "admin_broadcast", companyId: c.id });
+      // категория "announcement" → по подразбиране разрешена; уважава глобално отписаните
+      // фирми (настройка на Супер Админ) и черния списък.
+      const res = await sendEmail({ to: owner.email, toName: owner.name, subject, html, category: "announcement", type: "admin_broadcast", companyId: c.id, attachments });
       if (res.status === "sent" || res.status === "queued") sent++;
     }
     return NextResponse.json({ ok: true, recipients: companies.length, sent });
