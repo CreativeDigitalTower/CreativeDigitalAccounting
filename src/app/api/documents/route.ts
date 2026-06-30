@@ -137,9 +137,37 @@ export async function POST(req: Request) {
       }
     }
 
-    await audit(companyId, userId, "create", "Document", document.id, `${data.type} ${number}${stockNote ? ` · ${stockNote}` : ""}`);
+    // ─── #4 Обмен между регистрирани фирми ───
+    // Ако документът е към клиент, чийто ЕИК съвпада с регистрирана фирма,
+    // и подателят споделя през платформата → връзваме документа и известяваме получателя.
+    let sharedWith: string | null = null;
+    try {
+      const sender = await prisma.company.findUnique({ where: { id: companyId }, select: { name: true, shareDocsInternally: true } });
+      if (sender?.shareDocsInternally && data.clientId) {
+        const client = await prisma.client.findFirst({ where: { id: data.clientId, companyId }, select: { eik: true } });
+        const eik = client?.eik?.trim();
+        if (eik) {
+          const recipient = await prisma.company.findFirst({ where: { eik, id: { not: companyId } }, select: { id: true, name: true } });
+          if (recipient) {
+            await prisma.document.update({ where: { id: document.id }, data: { recipientCompanyId: recipient.id } });
+            const DOC_LABEL: Record<string, string> = { invoice: "фактура", proforma: "проформа", quote: "оферта", credit_note: "кредитно известие", debit_note: "дебитно известие" };
+            await prisma.notification.create({
+              data: {
+                companyId: recipient.id, type: "incoming_document",
+                title: `Нов входящ документ от ${sender.name}`,
+                body: `${sender.name} Ви издаде ${DOC_LABEL[data.type] ?? "документ"} № ${number}.`,
+                link: `/dashboard/inbox/${document.id}`,
+              },
+            });
+            sharedWith = recipient.name;
+          }
+        }
+      }
+    } catch (e) { console.error("inter-company share", e); }
 
-    return NextResponse.json({ ...document, stockNote });
+    await audit(companyId, userId, "create", "Document", document.id, `${data.type} ${number}${stockNote ? ` · ${stockNote}` : ""}${sharedWith ? ` · споделен с ${sharedWith}` : ""}`);
+
+    return NextResponse.json({ ...document, stockNote, sharedWith });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: "Невалидни данни.", issues: err.issues }, { status: 400 });

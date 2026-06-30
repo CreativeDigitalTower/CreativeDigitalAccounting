@@ -10,6 +10,7 @@ const navItems = [
   { href: "/dashboard/invoices", label: "Фактури", icon: "🧾", feature: "documents" },
   { href: "/dashboard/documents", label: "Документи", icon: "📄", feature: "documents" },
   { href: "/dashboard/clients", label: "Клиенти (CRM)", icon: "👥", feature: "clients" },
+  { href: "/dashboard/inbox", label: "Входящи документи", icon: "📥", feature: "dashboard" },
   { href: "/dashboard/suppliers", label: "Доставчици", icon: "🚚", feature: "suppliers" },
   { href: "/dashboard/warehouse", label: "Склад", icon: "📦", feature: "warehouse" },
   { href: "/dashboard/production", label: "Производство", icon: "🏭", feature: "production" },
@@ -37,9 +38,10 @@ interface SidebarProps {
   plan: string;
   isSuperAdmin?: boolean;
   logoUrl?: string | null;
+  inboxUnread?: number;
 }
 
-export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl }: SidebarProps) {
+export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread = 0 }: SidebarProps) {
   const pathname = usePathname();
   const planId = plan as PlanId;
 
@@ -132,6 +134,9 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl }: SidebarPro
             >
               <span style={{ fontSize: 15, opacity: isActive ? 1 : 0.8 }}>{item.icon}</span>
               {item.label}
+              {item.href === "/dashboard/inbox" && inboxUnread > 0 && !locked && (
+                <span style={{ marginLeft: "auto", fontSize: 10.5, fontWeight: 700, color: "#fff", background: "var(--brass)", borderRadius: 10, padding: "1px 7px", minWidth: 18, textAlign: "center" }}>{inboxUnread}</span>
+              )}
               {locked && (
                 <span style={{ marginLeft: "auto", fontSize: 11, opacity: 0.6 }} aria-label="заключено">🔒</span>
               )}

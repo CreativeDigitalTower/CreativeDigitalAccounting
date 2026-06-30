@@ -17,11 +17,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const userId = session.user.id;
   const companyId = await getCompanyId(userId);
 
-  const [company, me, jar, sub] = await Promise.all([
+  const [company, me, jar, sub, inboxUnread] = await Promise.all([
     prisma.company.findUnique({ where: { id: companyId }, include: { subscription: true } }),
     prisma.user.findUnique({ where: { id: userId }, select: { isSuperAdmin: true } }),
     cookies(),
     enforceSubscription(companyId), // авто-връщане към БЕЗПЛАТЕН при изтекъл абонамент
+    prisma.notification.count({ where: { companyId, read: false } }).catch(() => 0),
   ]);
 
   if (!company) redirect("/onboarding");
@@ -35,7 +36,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <VisitTracker area="app" />
       <BlobBackground />
       <div style={{ position: "relative", zIndex: 1, display: "flex", width: "100%" }}>
-        <Sidebar companyName={company.name} plan={plan} isSuperAdmin={isSuperAdmin} logoUrl={plan !== "free" ? company.logoUrl : null} />
+        <Sidebar companyName={company.name} plan={plan} isSuperAdmin={isSuperAdmin} logoUrl={plan !== "free" ? company.logoUrl : null} inboxUnread={inboxUnread} />
         <main style={{ flex: 1, minWidth: 0, maxWidth: 1180 }}>
           {impersonating && <ImpersonationBanner companyName={company.name} />}
           {sub.justExpired && <TrialEndedPopup wasTrial={sub.wasTrial} periodEnd={sub.currentPeriodEnd ? new Date(sub.currentPeriodEnd).toISOString() : ""} />}

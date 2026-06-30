@@ -118,6 +118,8 @@ model Company {
   emailPrefs      String?  @db.Text
   // Откъде е дошла регистрацията (напр. "invoice_portal" — клиент, получил фактура)
   referralSource  String?
+  // Споделяне на документи към други регистрирани фирми през платформата (по подразбиране включено)
+  shareDocsInternally Boolean @default(true)
   createdAt       DateTime @default(now())
 
   auditLogs         AuditLog[]
@@ -576,6 +578,8 @@ model Document {
   clientDecision     String?        // accepted | rejected
   clientDecisionAt   DateTime?
   sentToClientAt     DateTime?
+  // Inter-company sharing — ако получателят е регистрирана фирма в платформата
+  recipientCompanyId String?
   createdAt          DateTime       @default(now())
 
   company        Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
@@ -583,6 +587,22 @@ model Document {
   parentDocument Document?      @relation("DocumentChain", fields: [parentDocumentId], references: [id])
   childDocuments Document[]     @relation("DocumentChain")
   lines          DocumentLine[]
+
+  @@index([recipientCompanyId])
+}
+
+// In-app нотификации (вкл. получени документи между фирми)
+model Notification {
+  id        String   @id @default(cuid())
+  companyId String
+  type      String   // incoming_document | system | info
+  title     String
+  body      String?  @db.Text
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([companyId, read])
 }
 
 model DocumentLine {

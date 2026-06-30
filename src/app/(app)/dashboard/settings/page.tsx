@@ -6,6 +6,7 @@ import { CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, allowedTemplateCount, typ
 import { TemplatePreview } from "@/components/app/TemplatePreview";
 import { BusinessProfileSettings } from "@/components/app/BusinessProfileSettings";
 import { EmailPreferences } from "@/components/app/EmailPreferences";
+import { DocSharingSetting } from "@/components/app/DocSharingSetting";
 
 type Company = {
   name: string; eik: string | null; vatNumber: string | null; vatRegistered: boolean;
@@ -231,6 +232,8 @@ export default function SettingsPage() {
       </div>
 
       <EmailPreferences />
+
+      <DocSharingSetting />
 
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, position: "sticky", bottom: 0, padding: "12px 0" }}>
         <Link href="/dashboard" className="btn btn-ghost">Назад</Link>
