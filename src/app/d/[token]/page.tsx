@@ -54,6 +54,19 @@ export default async function PublicDocumentPage({ params }: { params: Promise<{
         <div className="printable" style={{ marginTop: 16 }}>
           {isOffer ? <OfferDocument data={docData} /> : <InvoiceDocument data={docData} />}
         </div>
+
+        {/* Покана за присъединяване към платформата */}
+        <div className="no-print" style={{ marginTop: 18, background: "#fff", border: "1px solid #E7ECE9", borderRadius: 14, padding: "22px 26px", textAlign: "center" }}>
+          <div style={{ fontFamily: "Georgia,serif", fontWeight: 700, fontSize: 18, color: "#1A2B26", marginBottom: 6 }}>
+            Издавайте и Вие фактури онлайн за минути
+          </div>
+          <div style={{ fontSize: 13.5, color: "#384842", maxWidth: 460, margin: "0 auto 14px", lineHeight: 1.6 }}>
+            {PLATFORM_NAME} е платформа за фактуриране, CRM и управление на бизнеса. Започнете безплатно.
+          </div>
+          <a href="/register?ref=invoice_portal" style={{ display: "inline-block", padding: "12px 28px", borderRadius: 10, background: "#0F8A6A", color: "#fff", fontWeight: 700, textDecoration: "none", fontSize: 14 }}>
+            Създай безплатен акаунт
+          </a>
+        </div>
       </div>
     </div>
   );

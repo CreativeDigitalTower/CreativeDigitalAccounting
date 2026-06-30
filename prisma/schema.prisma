@@ -116,6 +116,8 @@ model Company {
   invoiceNumberStart Int   @default(1)
   // JSON map of email-automation preferences (which automated emails the company receives)
   emailPrefs      String?  @db.Text
+  // Откъде е дошла регистрацията (напр. "invoice_portal" — клиент, получил фактура)
+  referralSource  String?
   createdAt       DateTime @default(now())
 
   auditLogs         AuditLog[]

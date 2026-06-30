@@ -55,6 +55,8 @@ export default async function AdminEmailsPage({ searchParams }: { searchParams: 
     prisma.emailBlacklist.findMany({ orderBy: { createdAt: "desc" }, take: 50 }),
   ]);
 
+  const joinedFromInvoice = await prisma.company.count({ where: { referralSource: "invoice_portal" } });
+
   const deliveryRate = sent + failed > 0 ? Math.round((sent / (sent + failed)) * 100) : 100;
   const openRate = sent > 0 ? Math.round((opened / sent) * 100) : 0;
   const clickRate = sent > 0 ? Math.round((clicked / sent) * 100) : 0;
@@ -83,6 +85,7 @@ export default async function AdminEmailsPage({ searchParams }: { searchParams: 
         <Stat label="Bounce" value={String(bounced)} color={bounced ? "var(--brick)" : undefined} />
         <Stat label="Unsubscribe" value={String(unsub)} />
         <Stat label="Неуспешни" value={String(failed)} color={failed ? "var(--brick)" : undefined} />
+        <Stat label="Присъединили се от фактура" value={String(joinedFromInvoice)} sub="чрез клиентския портал" color="var(--navy)" />
       </div>
 
       {/* Филтри */}

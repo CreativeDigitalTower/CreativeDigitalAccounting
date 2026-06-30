@@ -21,6 +21,7 @@ const schema = z.object({
   mol: z.string().optional(),
   sector: z.string().optional(),
   plan: z.enum(["free", "start", "business", "pro"]).default("free"),
+  referralSource: z.string().max(60).optional(),
   acceptTerms: z.literal(true),
   marketingConsent: z.boolean().optional(),
 });
@@ -69,6 +70,7 @@ export async function POST(req: Request) {
         data: {
           name: data.companyName, eik: data.eik, vatNumber: data.vatNumber,
           address: data.address, city: data.city, mol: data.mol, sector: data.sector,
+          referralSource: data.referralSource ?? null,
         },
       });
 

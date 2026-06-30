@@ -43,6 +43,7 @@ function RegisterForm() {
         companyName: fd.get("companyName"), eik: fd.get("eik"), vatNumber: fd.get("vatNumber") || undefined,
         address: fd.get("address") || undefined, city: fd.get("city") || undefined, mol: fd.get("mol") || undefined,
         sector: fd.get("sector") || undefined, plan,
+        referralSource: params.get("ref") || undefined,
         acceptTerms: true, marketingConsent: !!fd.get("marketingConsent"),
       }),
     });
