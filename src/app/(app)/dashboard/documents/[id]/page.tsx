@@ -48,6 +48,7 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
             name: doc.company.name, mol: doc.company.mol, address: doc.company.address, city: doc.company.city,
             eik: doc.company.eik, vatNumber: doc.company.vatNumber, bankIban: doc.company.bankIban,
             bankName: doc.company.bankName, bankBic: doc.company.bankBic,
+            phone: doc.company.phone, email: doc.company.email, website: doc.company.website,
           },
           client: doc.client ? {
             name: doc.client.name, mol: doc.client.mol, address: doc.client.address, city: doc.client.city,

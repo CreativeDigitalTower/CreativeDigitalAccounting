@@ -13,6 +13,7 @@ export default async function TemplatePreviewPage({ searchParams }: { searchPara
     company: {
       name: "Вашата Фирма ЕООД", mol: "Иван Иванов", address: "ул. Примерна 12", city: "София 1000",
       eik: "201234567", vatNumber: "BG201234567", bankIban: "BG80BNBG96611020345678", bankName: "Примерна Банка", bankBic: "EXMPBGSF",
+      phone: "+359 2 123 4567", email: "office@vashata-firma.bg", website: "www.vashata-firma.bg",
     },
     client: {
       name: "Клиент ООД", mol: "Петър Петров", address: "бул. Клиентски 88", city: "Пловдив 4000",

@@ -12,6 +12,7 @@ export type InvoiceParty = {
   name: string; mol?: string | null; address?: string | null; city?: string | null;
   eik?: string | null; vatNumber?: string | null;
   bankIban?: string | null; bankName?: string | null; bankBic?: string | null;
+  phone?: string | null; email?: string | null; website?: string | null;
 };
 export type InvoiceLineData = { id?: string; description: string; quantity: number; unitPrice: number; vatRate: number; lineTotal: number };
 export type InvoiceData = {
@@ -44,6 +45,9 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
       {company.city && <div>{company.city}</div>}
       {company.eik && <div>ЕИК: {company.eik}</div>}
       {company.vatNumber && <div>ДДС №: {company.vatNumber}</div>}
+      {company.phone && <div>Телефон: {company.phone}</div>}
+      {company.email && <div>E-mail: {company.email}</div>}
+      {company.website && <div>Website: {company.website}</div>}
       {company.bankIban && <div>IBAN: {company.bankIban}</div>}
     </div>
   );
@@ -305,9 +309,21 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
             <div>IBAN: <span className="num">{company.bankIban}</span></div>
             {company.bankName && <div>Банка: {company.bankName}</div>}
             {company.bankBic && <div>BIC: {company.bankBic}</div>}
-            <div>Основание: {data.number}</div>
+            <div>Основание за плащане: {data.number}</div>
           </div>
         )}
+      </div>
+
+      {/* Съставил / Получил — с имената на МОЛ-овете */}
+      <div style={{ marginTop: 26, display: "flex", gap: 24, justifyContent: "space-between", fontSize: 12.5, color: "var(--ink-soft)" }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ color: "var(--muted)", marginBottom: 24 }}>Съставил:</div>
+          <div style={{ borderTop: "1px solid var(--border)", paddingTop: 4 }}>{company.mol || company.name}</div>
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ color: "var(--muted)", marginBottom: 24 }}>Получател:</div>
+          <div style={{ borderTop: "1px solid var(--border)", paddingTop: 4 }}>{data.client?.mol || data.client?.name || ""}</div>
+        </div>
       </div>
 
       {data.notes && (

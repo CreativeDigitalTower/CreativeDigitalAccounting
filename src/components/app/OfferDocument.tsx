@@ -25,8 +25,12 @@ export function OfferDocument({ data }: { data: InvoiceData }) {
               : <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 20, color: accent, marginBottom: 6 }}>{c.name}</div>}
             <div style={{ fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.7 }}>
               <div style={{ fontWeight: 600 }}>{c.name}</div>
+              {c.mol && <div>МОЛ: {c.mol}</div>}
               {c.eik && <div>ЕИК: {c.eik}{c.vatNumber ? ` · ДДС ${c.vatNumber}` : ""}</div>}
               {c.address && <div>{c.address}{c.city ? `, ${c.city}` : ""}</div>}
+              {c.phone && <div>Телефон: {c.phone}</div>}
+              {c.email && <div>E-mail: {c.email}</div>}
+              {c.website && <div>Website: {c.website}</div>}
             </div>
           </div>
           <div style={{ textAlign: "right" }}>
@@ -113,6 +117,18 @@ export function OfferDocument({ data }: { data: InvoiceData }) {
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 30 }}>
           <div style={{ textAlign: "center", minWidth: 220 }}>
             <div style={{ borderTop: "1px solid var(--ink)", paddingTop: 6, fontSize: 12.5 }}>С уважение, {c.name}</div>
+          </div>
+        </div>
+
+        {/* Съставил / Получил — с имената на МОЛ-овете */}
+        <div style={{ marginTop: 26, display: "flex", gap: 24, justifyContent: "space-between", fontSize: 12.5, color: "var(--ink-soft)" }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ color: "var(--muted)", marginBottom: 24 }}>Съставил:</div>
+            <div style={{ borderTop: "1px solid var(--border)", paddingTop: 4 }}>{c.mol || c.name}</div>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ color: "var(--muted)", marginBottom: 24 }}>Получател:</div>
+            <div style={{ borderTop: "1px solid var(--border)", paddingTop: 4 }}>{data.client?.mol || data.client?.name || ""}</div>
           </div>
         </div>
 
