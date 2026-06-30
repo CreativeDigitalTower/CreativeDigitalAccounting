@@ -1,4 +1,4 @@
-import { formatCurrency, toBGN, isDualCurrencyActive, EUR_TO_BGN, getTemplate, paymentMethodLabel, PLATFORM_CREDIT } from "@/lib/constants";
+import { formatCurrency, toBGN, isDualCurrencyActive, EUR_TO_BGN, getTemplate, paymentMethodLabel, PLATFORM_NAME, PLATFORM_URL_DISPLAY } from "@/lib/constants";
 
 const TYPE_LABELS: Record<string, string> = {
   invoice: "ФАКТУРА",
@@ -317,7 +317,8 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
       )}
 
       <div style={{ marginTop: 22, paddingTop: 12, borderTop: "1px solid var(--border)", fontSize: 10.5, color: "var(--muted)", textAlign: "center" }}>
-        {PLATFORM_CREDIT}
+        Документът е създаден с платформата {PLATFORM_NAME} ·{" "}
+        <a href="https://www.creativedigitalaccounting.com" style={{ color: "inherit", textDecoration: "none" }}>{PLATFORM_URL_DISPLAY}</a>
       </div>
     </>
   );

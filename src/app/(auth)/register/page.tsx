@@ -3,6 +3,7 @@
 import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { PLAN_DETAILS, BILLING_PERIODS } from "@/components/marketing/Pricing";
 import { EUR_TO_BGN, isPromoActive } from "@/lib/constants";
 
@@ -47,9 +48,16 @@ function RegisterForm() {
         acceptTerms: true, marketingConsent: !!fd.get("marketingConsent"),
       }),
     });
-    setLoading(false);
-    if (res.ok) router.push("/login?registered=1");
-    else setError((await res.json()).error ?? "Грешка при регистрацията.");
+    if (res.ok) {
+      // Автоматичен вход след успешна регистрация
+      const login = await signIn("credentials", { email: acc.email, password: acc.password, redirect: false });
+      setLoading(false);
+      if (login?.error) router.push("/login?registered=1");
+      else router.push("/dashboard");
+    } else {
+      setLoading(false);
+      setError((await res.json()).error ?? "Грешка при регистрацията.");
+    }
   }
 
   return (
@@ -94,13 +102,13 @@ function RegisterForm() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <div><label>Наименование на фирмата *</label><input type="text" name="companyName" required placeholder="ЕООД Примерна" /></div>
               <div><label>ЕИК / Булстат *</label><input type="text" name="eik" required /></div>
-              <div><label>ДДС номер</label><input type="text" name="vatNumber" placeholder="BG..." /></div>
-              <div><label>МОЛ</label><input type="text" name="mol" /></div>
-              <div><label>Град</label><input type="text" name="city" /></div>
-              <div><label>Сектор на дейност</label>
-                <select name="sector" defaultValue=""><option value="">Изберете</option>{SECTORS.map((s) => <option key={s}>{s}</option>)}</select>
+              <div><label>ДДС номер (ако е приложимо)</label><input type="text" name="vatNumber" placeholder="BG..." /></div>
+              <div><label>МОЛ *</label><input type="text" name="mol" required /></div>
+              <div><label>Град *</label><input type="text" name="city" required /></div>
+              <div><label>Сектор на дейност *</label>
+                <select name="sector" required defaultValue=""><option value="" disabled>Изберете</option>{SECTORS.map((s) => <option key={s}>{s}</option>)}</select>
               </div>
-              <div style={{ gridColumn: "1 / -1" }}><label>Адрес на регистрация</label><input type="text" name="address" /></div>
+              <div style={{ gridColumn: "1 / -1" }}><label>Адрес на регистрация *</label><input type="text" name="address" required /></div>
             </div>
 
             <div>

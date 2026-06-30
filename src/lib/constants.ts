@@ -12,7 +12,9 @@ export const FACEBOOK_PAGE_ID = "CreativeDigitalAccounting";
 // Платформа (изписва се на всеки генериран документ)
 export const PLATFORM_NAME = "Creative Digital Accounting";
 export const PLATFORM_URL = "www.creativedigitalaccounting.com";
-export const PLATFORM_CREDIT = `Документът е създаден с платформата ${PLATFORM_NAME} · ${PLATFORM_URL}`;
+// Изписване с главни букви за визуализация (документи, имейли)
+export const PLATFORM_URL_DISPLAY = "www.CreativeDigitalAccounting.com";
+export const PLATFORM_CREDIT = `Документът е създаден с платформата ${PLATFORM_NAME} · ${PLATFORM_URL_DISPLAY}`;
 
 // Банкови данни за абонаменти (само банков превод засега)
 export const BANK_DETAILS = {

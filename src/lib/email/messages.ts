@@ -1,5 +1,5 @@
 import { baseTemplate, APP_URL, type EmailButton } from "./templates";
-import { formatCurrency } from "@/lib/constants";
+import { formatCurrency, BANK_DETAILS } from "@/lib/constants";
 
 type Msg = { subject: string; html: string; category: string };
 
@@ -111,13 +111,21 @@ export function subscriptionSelectedEmail(company: string, plan: string, period:
     html: baseTemplate({
       eyebrow: "Абонамент",
       title: "Получихме Вашата заявка",
-      intro: [`Здравейте,`, `Регистрирахме заявка за план <strong>${planName(plan)}</strong> за фирма ${company}. След потвърждение на плащането, абонаментът ще бъде активиран.`],
+      intro: [
+        `Здравейте,`,
+        `Регистрирахме заявка за план <strong>${planName(plan)}</strong> за фирма ${company}. За да активираме абонамента, моля извършете плащане по банков път със следните данни:`,
+      ],
       details: [
         { label: "План", value: planName(plan) },
         { label: "Период", value: period === "yearly" ? "Годишен" : "Месечен" },
-        ...(amount ? [{ label: "Сума", value: formatCurrency(amount) }] : []),
+        ...(amount ? [{ label: "Сума за плащане", value: formatCurrency(amount) }] : []),
+        { label: "Получател", value: BANK_DETAILS.recipient },
+        { label: "IBAN", value: BANK_DETAILS.iban },
+        { label: "Банка", value: BANK_DETAILS.bank },
+        { label: "Основание", value: `Абонамент ${planName(plan)} — ${company}` },
       ],
       button: { label: "Виж абонамента", url: `${APP_URL}/dashboard/subscription` },
+      footnote: "След като получим плащането, ще активираме абонамента Ви и ще получите потвърждение по имейл.",
     }),
   };
 }

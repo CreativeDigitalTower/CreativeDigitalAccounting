@@ -8,7 +8,7 @@ import { sendEmail, notifyAdmin } from "@/lib/email/send";
 import { subscriptionActivatedEmail, adminSimpleEmail } from "@/lib/email/messages";
 import { z } from "zod";
 
-const schema = z.object({ plan: z.enum(["business", "pro"]) });
+const schema = z.object({ plan: z.enum(["start", "business"]) });
 
 export async function POST(req: Request) {
   try {

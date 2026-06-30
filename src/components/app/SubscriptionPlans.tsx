@@ -111,7 +111,7 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
                   <button onClick={() => choosePay(plan.id)} className={plan.recommended ? "btn btn-primary" : "btn btn-ghost"} style={{ width: "100%", justifyContent: "center" }}>
                     {currentPlan === "free" ? "Надгради" : "Смени план"}
                   </button>
-                  {(plan.id === "business" || plan.id === "pro") && !trialUsed && currentPlan === "free" && (
+                  {(plan.id === "start" || plan.id === "business") && !trialUsed && currentPlan === "free" && (
                     <button onClick={() => startTrial(plan.id)} className="btn btn-ghost btn-sm" style={{ width: "100%", justifyContent: "center", fontSize: 11.5 }}>
                       ▶ 7 дни безплатно
                     </button>

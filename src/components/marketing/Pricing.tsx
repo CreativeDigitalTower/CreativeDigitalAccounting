@@ -151,7 +151,7 @@ export function Pricing() {
 
       <div style={{ marginTop: 24, textAlign: "center", display: "flex", flexDirection: "column", gap: 8 }}>
         <p style={{ fontSize: 13.5, color: "var(--ink-soft)", margin: 0 }}>
-          <strong>7 дни безплатен тест</strong> (еднократно) на Бизнес и Про плановете.
+          <strong>7 дни безплатен тест</strong> (еднократно) на плановете Старт и Бизнес.
         </p>
         <p style={{ fontSize: 13, color: "var(--emerald)", margin: 0, fontWeight: 600 }}>
           Автоматично преминаване към еврото и пълна готовност за въвеждането на EUR в България
