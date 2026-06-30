@@ -656,7 +656,9 @@ model Contract {
   endDate          DateTime?
   autoRenew        Boolean                  @default(false)
   status           ContractStatus           @default(active)
-  attachmentUrl    String?
+  value            Float?
+  notes            String?                  @db.Text
+  attachmentUrl    String?                  @db.Text
 
   company  Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   client   Client?   @relation(fields: [clientId], references: [id])
