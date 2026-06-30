@@ -1,6 +1,7 @@
 import { requireSuperAdmin } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { SmtpStatusPanel } from "@/components/app/SmtpStatusPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -56,6 +57,9 @@ export default async function AdminEmailsPage({ searchParams }: { searchParams: 
           <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 600, margin: "4px 0 0" }}>Имейли & Notification Center</h1>
         </div>
       </div>
+
+      {/* SMTP статус + тестов имейл */}
+      <SmtpStatusPanel />
 
       {/* Статистики */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12, marginBottom: 18 }}>

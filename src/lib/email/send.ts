@@ -5,6 +5,38 @@ import { APP_URL } from "./templates";
 
 export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "office@creativedigitalaccounting.com";
 const FROM = process.env.SMTP_FROM || `Creative Digital Accounting <${ADMIN_EMAIL}>`;
+const REPLY_TO = process.env.SMTP_REPLY_TO || ADMIN_EMAIL;
+
+/** Дали SMTP е конфигуриран (има host). */
+export function isSmtpConfigured(): boolean {
+  return !!process.env.SMTP_HOST;
+}
+
+/** Текущата SMTP конфигурация (без паролата) — за индикатора в Super Admin. */
+export function smtpConfigSummary() {
+  return {
+    configured: isSmtpConfigured(),
+    host: process.env.SMTP_HOST || null,
+    port: Number(process.env.SMTP_PORT || 587),
+    secure: process.env.SMTP_SECURE === "true" || Number(process.env.SMTP_PORT) === 465,
+    user: process.env.SMTP_USER || null,
+    from: FROM,
+    replyTo: REPLY_TO,
+    hasPassword: !!process.env.SMTP_PASS,
+  };
+}
+
+/** Проверка на SMTP връзката (login + handshake) без да изпраща имейл. */
+export async function verifyTransport(): Promise<{ ok: boolean; error?: string }> {
+  const transport = getTransport();
+  if (!transport) return { ok: false, error: "SMTP не е конфигуриран (липсва SMTP_HOST)." };
+  try {
+    await transport.verify();
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: String((err as Error)?.message ?? err) };
+  }
+}
 
 // Retry backoff schedule (минути): 5м, 30м, 2ч, 24ч
 export const RETRY_STEPS_MIN = [5, 30, 120, 1440];
@@ -123,7 +155,7 @@ async function deliver(logId: string, to: string, subject: string, html: string)
   }
 
   try {
-    await transport.sendMail({ from: FROM, to, subject, html: finalHtml });
+    await transport.sendMail({ from: FROM, replyTo: REPLY_TO, to, subject, html: finalHtml });
     await prisma.emailLog.update({
       where: { id: logId },
       data: { status: "sent", sentAt: new Date(), error: null, nextRetryAt: null, attempts: { increment: 1 } },
