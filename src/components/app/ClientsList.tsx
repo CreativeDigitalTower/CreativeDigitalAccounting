@@ -2,8 +2,10 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/constants";
 import { STATUSES } from "@/lib/crm";
+import { ContextMenu, type MenuItem } from "@/components/app/ContextMenu";
 
 export type ClientRow = {
   id: string; name: string; contactPerson: string | null; phone: string | null;
@@ -11,8 +13,20 @@ export type ClientRow = {
 };
 
 export function ClientsList({ clients, grandMonth, grandTotal }: { clients: ClientRow[]; grandMonth: number; grandTotal: number }) {
+  const router = useRouter();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<string>("all");
+  const [menu, setMenu] = useState<{ x: number; y: number; client: ClientRow } | null>(null);
+
+  function menuItems(c: ClientRow): MenuItem[] {
+    return [
+      { label: "Отвори досие", icon: "👤", onClick: () => router.push(`/dashboard/clients/${c.id}`) },
+      { label: "Нова фактура", icon: "🧾", onClick: () => router.push(`/dashboard/documents/new?clientId=${c.id}`) },
+      { label: "Нова оферта", icon: "📄", onClick: () => router.push(`/dashboard/documents/new?clientId=${c.id}&type=quote`) },
+      { divider: true, label: "", onClick: () => {} },
+      { label: "Копирай име", icon: "⧉", onClick: () => navigator.clipboard?.writeText(c.name) },
+    ];
+  }
 
   const counts = useMemo(() => {
     const m: Record<string, number> = {};
@@ -79,7 +93,7 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
               {filtered.map((client) => {
                 const s = STATUSES.find((x) => x.id === client.status) ?? STATUSES[1];
                 return (
-                  <tr key={client.id}>
+                  <tr key={client.id} onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY, client }); }}>
                     <td>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <div style={{ width: 30, height: 30, borderRadius: "50%", background: "var(--navy-soft)", color: "var(--navy)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11.5, fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>
@@ -115,6 +129,8 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
           </table>
         )}
       </div>
+
+      {menu && <ContextMenu x={menu.x} y={menu.y} items={menuItems(menu.client)} onClose={() => setMenu(null)} />}
     </>
   );
 }

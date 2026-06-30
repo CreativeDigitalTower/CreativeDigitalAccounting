@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { StatusSelect, statusMeta } from "@/components/app/StatusSelect";
+import { ContextMenu, type MenuItem } from "@/components/app/ContextMenu";
 import { formatCurrency, groupByMonth } from "@/lib/constants";
 import { downloadInvoicesPdf } from "@/lib/invoicePdf";
 
@@ -12,9 +14,27 @@ export type InvoiceRow = {
 };
 
 export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
+  const router = useRouter();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [downloading, setDownloading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [menu, setMenu] = useState<{ x: number; y: number; doc: InvoiceRow } | null>(null);
+
+  async function setStatus(id: string, status: string) {
+    await fetch(`/api/documents/${id}/status`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+    router.refresh();
+  }
+  function menuItems(doc: InvoiceRow): MenuItem[] {
+    return [
+      { label: "Отвори", icon: "📄", onClick: () => router.push(`/dashboard/documents/${doc.id}`) },
+      { label: "Редактирай", icon: "✎", onClick: () => router.push(`/dashboard/documents/${doc.id}/edit`) },
+      { label: "Изтегли PDF", icon: "↓", onClick: () => downloadOne(doc) },
+      { label: "Копирай номер", icon: "⧉", onClick: () => navigator.clipboard?.writeText(doc.number) },
+      { divider: true, label: "", onClick: () => {} },
+      { label: "Маркирай като платена", icon: "✓", onClick: () => setStatus(doc.id, "paid") },
+      { label: "Маркирай като просрочена", icon: "⚠", onClick: () => setStatus(doc.id, "overdue") },
+    ];
+  }
 
   const groups = groupByMonth(invoices);
   const allIds = invoices.map((i) => i.id);
@@ -100,7 +120,9 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
                   const rem = reminder(doc);
                   const sm = statusMeta(doc.status);
                   return (
-                  <tr key={doc.id} style={selected.has(doc.id)
+                  <tr key={doc.id}
+                    onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY, doc }); }}
+                    style={selected.has(doc.id)
                     ? { background: "var(--emerald-soft)", boxShadow: `inset 4px 0 0 ${sm.dot}` }
                     : { boxShadow: `inset 4px 0 0 ${sm.dot}` }}>
                     <td><input type="checkbox" checked={selected.has(doc.id)} onChange={() => toggle(doc.id)} style={{ width: "auto" }} /></td>
@@ -132,6 +154,8 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
           </div>
         </div>
       ))}
+
+      {menu && <ContextMenu x={menu.x} y={menu.y} items={menuItems(menu.doc)} onClose={() => setMenu(null)} />}
     </>
   );
 }
