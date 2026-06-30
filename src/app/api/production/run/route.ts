@@ -8,6 +8,17 @@ const schema = z.object({
   recipeId: z.string(),
   multiplier: z.number().positive().default(1),
   batchNumber: z.string().optional().nullable(),
+  // #14 — фирмата избира дали готовата продукция да се заприходи в склада
+  addToWarehouse: z.boolean().default(true),
+  // данни за заприходяване, когато рецептата няма зададен готов продукт
+  output: z.object({
+    name: z.string().min(1),
+    warehouseId: z.string(),
+    unit: z.string().min(1),
+    quantity: z.number().positive(),
+    unitCost: z.number().min(0).optional(),
+    sku: z.string().optional().nullable(),
+  }).optional(),
 });
 
 export async function POST(req: Request) {
@@ -37,16 +48,39 @@ export async function POST(req: Request) {
       await prisma.stockItem.update({ where: { id: ing.stockItemId }, data: { quantity: { decrement: need } } });
     }
 
-    // Заприходяване на готовата продукция
+    // Заприходяване на готовата продукция (само ако фирмата го е избрала)
     let producedQty = 0;
-    if (recipe.outputItemId) {
-      producedQty = recipe.outputQuantity * data.multiplier;
-      const out = await prisma.stockItem.findFirst({ where: { id: recipe.outputItemId, companyId } });
-      if (out) {
-        await prisma.stockMovement.create({ data: { stockItemId: out.id, type: "production", quantity: producedQty, date: now, note: data.batchNumber ? `Произведено (партида ${data.batchNumber})` : "Произведено" } });
-        await prisma.stockItem.update({ where: { id: out.id }, data: { quantity: { increment: producedQty } } });
+    let outputItemId: string | null = null;
+    if (data.addToWarehouse) {
+      if (recipe.outputItemId) {
+        // Готовият продукт е зададен в рецептата
+        producedQty = recipe.outputQuantity * data.multiplier;
+        const out = await prisma.stockItem.findFirst({ where: { id: recipe.outputItemId, companyId } });
+        if (out) outputItemId = out.id;
+      } else if (data.output) {
+        // Създаване/намиране на артикул в избрания склад по подадените данни
+        producedQty = data.output.quantity;
+        const existing = await prisma.stockItem.findFirst({ where: { companyId, warehouseId: data.output.warehouseId, name: data.output.name } });
+        if (existing) {
+          outputItemId = existing.id;
+        } else {
+          const created = await prisma.stockItem.create({
+            data: {
+              companyId, warehouseId: data.output.warehouseId, name: data.output.name, unit: data.output.unit,
+              quantity: 0, sku: data.output.sku ?? null, unitCost: data.output.unitCost ?? null,
+            },
+          });
+          outputItemId = created.id;
+        }
+      } else {
+        return NextResponse.json({ error: "Изберете склад и данни за заприходяване на готовата продукция." }, { status: 400 });
+      }
+
+      if (outputItemId && producedQty > 0) {
+        await prisma.stockMovement.create({ data: { stockItemId: outputItemId, type: "production", quantity: producedQty, date: now, note: data.batchNumber ? `Произведено (партида ${data.batchNumber})` : "Произведено" } });
+        await prisma.stockItem.update({ where: { id: outputItemId }, data: { quantity: { increment: producedQty } } });
         if (data.batchNumber) {
-          await prisma.stockBatch.create({ data: { stockItemId: out.id, batchNumber: data.batchNumber, quantity: producedQty, note: `Производство: ${recipe.name}` } });
+          await prisma.stockBatch.create({ data: { stockItemId: outputItemId, batchNumber: data.batchNumber, quantity: producedQty, note: `Производство: ${recipe.name}` } });
         }
       }
     }

@@ -5,9 +5,10 @@ import { CostCalculator } from "@/components/app/CostCalculator";
 
 export default async function ProductionPage() {
   const { companyId } = await requireFeature("production");
-  const [recipeRows, itemRows] = await Promise.all([
+  const [recipeRows, itemRows, warehouseRows] = await Promise.all([
     prisma.recipe.findMany({ where: { companyId }, include: { ingredients: true }, orderBy: { name: "asc" } }),
     prisma.stockItem.findMany({ where: { companyId }, orderBy: { name: "asc" } }),
+    prisma.warehouse.findMany({ where: { companyId }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
   ]);
   const recipes = recipeRows.map((r) => ({
     id: r.id, name: r.name, outputItemId: r.outputItemId, outputQuantity: r.outputQuantity, note: r.note,
@@ -16,7 +17,7 @@ export default async function ProductionPage() {
   const items = itemRows.map((i) => ({ id: i.id, name: i.name, unit: i.unit, quantity: i.quantity }));
   return (
     <>
-      <ProductionPanel initialRecipes={recipes} items={items} />
+      <ProductionPanel initialRecipes={recipes} items={items} warehouses={warehouseRows} />
       <CostCalculator />
     </>
   );
