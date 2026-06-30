@@ -36,5 +36,12 @@ export function parsePrefs(json: string | null | undefined): Record<string, bool
 export function allowsCategory(prefsJson: string | null | undefined, category: string): boolean {
   if (CRITICAL.has(category)) return true;
   const prefs = parsePrefs(prefsJson);
+  // Супер Админ може да изключи всички автоматични имейли за дадена фирма.
+  if (prefs.enabled === false) return false;
   return prefs[category] !== false;
+}
+
+/** Дали фирмата е глобално абонирана (от гледна точка на Супер Админ). */
+export function companyEmailsEnabled(prefsJson: string | null | undefined): boolean {
+  return parsePrefs(prefsJson).enabled !== false;
 }

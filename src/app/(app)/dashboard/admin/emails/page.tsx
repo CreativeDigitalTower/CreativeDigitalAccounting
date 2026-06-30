@@ -2,6 +2,8 @@ import { requireSuperAdmin } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { SmtpStatusPanel } from "@/components/app/SmtpStatusPanel";
+import { AdminEmailBroadcast } from "@/components/app/AdminEmailBroadcast";
+import { companyEmailsEnabled } from "@/lib/email/prefs";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +35,14 @@ export default async function AdminEmailsPage({ searchParams }: { searchParams: 
     ...(sp.cat ? { category: sp.cat } : {}),
   };
 
+  const companiesRaw = await prisma.company.findMany({
+    select: { id: true, name: true, emailPrefs: true, companyUsers: { where: { role: "owner" }, select: { user: { select: { email: true } } } } },
+    orderBy: { name: "asc" },
+  });
+  const companies = companiesRaw.map((c) => ({
+    id: c.id, name: c.name, ownerEmail: c.companyUsers[0]?.user.email ?? null, enabled: companyEmailsEnabled(c.emailPrefs),
+  }));
+
   const [logs, total, sent, opened, clicked, failed, bounced, unsub, blacklist] = await Promise.all([
     prisma.emailLog.findMany({ where, orderBy: { createdAt: "desc" }, take: 200 }),
     prisma.emailLog.count(),
@@ -60,6 +70,9 @@ export default async function AdminEmailsPage({ searchParams }: { searchParams: 
 
       {/* SMTP статус + тестов имейл */}
       <SmtpStatusPanel />
+
+      {/* Масов имейл до фирмите + абониране/отписване */}
+      <AdminEmailBroadcast companies={companies} />
 
       {/* Статистики */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12, marginBottom: 18 }}>
