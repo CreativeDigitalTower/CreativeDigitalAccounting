@@ -5,7 +5,26 @@ import { formatCurrency } from "@/lib/constants";
 import { ClientPipeline } from "@/components/app/ClientPipeline";
 import { STATUSES } from "@/components/app/ClientCrm";
 
-export default async function ClientsPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
+export default async function ClientsPage(props: { searchParams: Promise<{ view?: string }> }) {
+  try {
+    return await ClientsPageInner(props);
+  } catch (e) {
+    const err = e as Error;
+    return (
+      <div style={{ padding: 20 }}>
+        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600 }}>Клиенти (CRM) — диагностика</h1>
+        <p style={{ color: "var(--brick)", fontSize: 13 }}>Възникна грешка при зареждане. Техническа информация:</p>
+        <pre style={{ whiteSpace: "pre-wrap", fontSize: 12, background: "#1e1e1e", color: "#f88", padding: 16, borderRadius: 8, overflow: "auto" }}>
+{String(err?.name)}: {String(err?.message)}
+{"\n"}{String((err as { code?: string })?.code ?? "")}
+{"\n"}{String(err?.stack ?? "").slice(0, 2000)}
+        </pre>
+      </div>
+    );
+  }
+}
+
+async function ClientsPageInner({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
   const { companyId } = await requireCompany();
   const view = (await searchParams).view === "pipeline" ? "pipeline" : "list";
 
