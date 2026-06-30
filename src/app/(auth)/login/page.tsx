@@ -62,7 +62,10 @@ export default function LoginPage() {
             <input type="email" name="email" required placeholder="ivan@firma.bg" autoComplete="email" />
           </div>
           <div>
-            <label>Парола</label>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+              <label>Парола</label>
+              <Link href="/forgot-password" style={{ fontSize: 12, color: "var(--navy)", fontWeight: 600 }}>Забравена парола?</Link>
+            </div>
             <input type="password" name="password" required placeholder="••••••••" autoComplete="current-password" />
           </div>
           <button

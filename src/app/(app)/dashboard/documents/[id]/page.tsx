@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Stamp } from "@/components/Stamp";
 import { DocumentActions } from "@/components/app/DocumentActions";
+import { SendToClient } from "@/components/app/SendToClient";
 import { InvoiceDocument } from "@/components/app/InvoiceDocument";
 import { OfferDocument } from "@/components/app/OfferDocument";
 
@@ -30,7 +31,8 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
           <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, fontWeight: 600, margin: 0 }}>{doc.number}</h1>
           <Stamp status={doc.status} />
         </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }} className="no-print">
+        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", position: "relative" }} className="no-print">
+          <SendToClient id={doc.id} defaultEmail={doc.clientEmail ?? doc.client?.contactEmail} decision={doc.clientDecision} sentAt={doc.sentToClientAt?.toISOString() ?? null} />
           {doc.type === "quote" && <Link href={`/dashboard/documents/new?type=proforma&parent=${doc.id}`} className="btn btn-ghost btn-sm">→ Проформа</Link>}
           {doc.type === "proforma" && <Link href={`/dashboard/documents/new?type=invoice&parent=${doc.id}`} className="btn btn-ghost btn-sm">→ Фактура</Link>}
           <DocumentActions id={doc.id} status={doc.status} number={doc.number} />

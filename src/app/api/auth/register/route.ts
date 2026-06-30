@@ -3,6 +3,10 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { z } from "zod";
+import crypto from "crypto";
+import { sendEmail, notifyAdmin } from "@/lib/email/send";
+import { welcomeEmail, adminNewRegistrationEmail } from "@/lib/email/messages";
+import { APP_URL } from "@/lib/email/templates";
 
 const schema = z.object({
   name: z.string().min(2),
@@ -100,6 +104,22 @@ export async function POST(req: Request) {
 
       return { userId: user.id, companyId: company.id };
     });
+
+    // ─── Имейл автоматизация (не блокира регистрацията) ───
+    try {
+      const token = crypto.randomBytes(32).toString("hex");
+      await prisma.verificationToken.create({
+        data: { identifier: data.email, token, expires: new Date(Date.now() + 24 * 60 * 60 * 1000) },
+      });
+      const verifyUrl = `${APP_URL}/verify-email?token=${token}`;
+      const w = welcomeEmail(data.name, verifyUrl);
+      await sendEmail({ to: data.email, toName: data.name, subject: w.subject, html: w.html, category: w.category, type: "welcome", companyId: result.companyId, force: true });
+
+      const a = adminNewRegistrationEmail({ name: data.name, company: data.companyName, eik: data.eik, email: data.email, plan: data.plan });
+      await notifyAdmin(a.subject, a.html, data.plan === "free" ? "admin_new_free" : "admin_new_registration");
+    } catch (e) {
+      console.error("registration email error", e);
+    }
 
     return NextResponse.json({ success: true, ...result });
   } catch (err) {

@@ -25,6 +25,7 @@ const navItems = [
   { href: "/dashboard/analytics", label: "Анализи", icon: "📊", feature: "analytics" },
   { href: "/dashboard/tax-calendar", label: "Данъчен календар", icon: "📅", feature: "tax_calendar" },
   { href: "/dashboard/tools", label: "Безплатни инструменти", icon: "🧮", feature: "dashboard" },
+  { href: "/dashboard/training", label: "Обучения", icon: "🎓", feature: "dashboard" },
   { href: "/dashboard/users", label: "Потребители", icon: "👤", feature: "users" },
   { href: "/dashboard/audit", label: "Одит лог", icon: "📜", feature: "audit" },
   { href: "/dashboard/settings", label: "Профил на фирмата", icon: "⚙️", feature: "dashboard" },

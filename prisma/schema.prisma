@@ -19,12 +19,15 @@ model User {
   representativeRole String?
   marketingConsent   Boolean   @default(false)
   termsAcceptedAt    DateTime?
+  failedLogins       Int       @default(0)
+  lockedUntil        DateTime?
   createdAt          DateTime  @default(now())
 
   accounts     Account[]
   sessions     Session[]
   companyUsers CompanyUser[]
   auditLogs    AuditLog[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 // ─── Audit log (кой / кога / какво) ──────────────────────────────────────
@@ -111,6 +114,8 @@ model Company {
   website         String?
   // Per-type number start values (next number = max(start, count)+1)
   invoiceNumberStart Int   @default(1)
+  // JSON map of email-automation preferences (which automated emails the company receives)
+  emailPrefs      String?  @db.Text
   createdAt       DateTime @default(now())
 
   auditLogs         AuditLog[]
@@ -560,6 +565,12 @@ model Document {
   parentDocumentId   String?
   notes              String?        @db.Text
   internalComment    String?        @db.Text
+  // External client sharing (email + accept/reject portal)
+  clientEmail        String?
+  publicToken        String?        @unique
+  clientDecision     String?        // accepted | rejected
+  clientDecisionAt   DateTime?
+  sentToClientAt     DateTime?
   createdAt          DateTime       @default(now())
 
   company        Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
@@ -902,4 +913,72 @@ model FinancialHistory {
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([companyId, year])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Email automation: log, blacklist, password reset, trainings
+// ─────────────────────────────────────────────────────────────
+
+model EmailLog {
+  id          String    @id @default(cuid())
+  companyId   String?   // null = platform/admin email
+  toEmail     String
+  toName      String?
+  category    String    @default("system") // account | subscription | document | reminder | admin | system
+  type        String    // machine key, e.g. "welcome", "password_reset"
+  subject     String
+  status      String    @default("queued") // queued | sent | failed | skipped
+  error       String?   @db.Text
+  attempts    Int       @default(0)
+  nextRetryAt DateTime?
+  opensCount  Int       @default(0)
+  openedAt    DateTime?
+  clicksCount Int       @default(0)
+  clickedAt   DateTime?
+  bounced     Boolean   @default(false)
+  scheduledFor DateTime?
+  createdAt   DateTime  @default(now())
+  sentAt      DateTime?
+
+  @@index([companyId])
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model EmailBlacklist {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  reason    String?
+  bounces   Int      @default(0)
+  unsubscribed Boolean @default(false)
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expires   DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model TrainingVideo {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  category    String?
+  videoUrl    String?
+  thumbnail   String?  @db.Text
+  duration    String?
+  order       Int      @default(0)
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([category])
 }

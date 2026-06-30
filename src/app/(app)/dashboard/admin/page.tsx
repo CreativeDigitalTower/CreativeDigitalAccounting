@@ -208,7 +208,10 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           </h1>
           <div style={{ color: "var(--muted)", fontSize: 13 }}>{companies.length} регистрирани фирми</div>
         </div>
-        <Link href="/dashboard/admin/businesses" className="btn btn-ghost btn-sm">📁 Бизнеси (филтри по сектор/план)</Link>
+        <div style={{ display: "flex", gap: 8 }}>
+          <Link href="/dashboard/admin/emails" className="btn btn-ghost btn-sm">✉️ Имейли & известия</Link>
+          <Link href="/dashboard/admin/businesses" className="btn btn-ghost btn-sm">📁 Бизнеси (филтри по сектор/план)</Link>
+        </div>
       </div>
 
       {/* Plan distribution */}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, allowedTemplateCount, type PlanId } from "@/lib/constants";
 import { TemplatePreview } from "@/components/app/TemplatePreview";
 import { BusinessProfileSettings } from "@/components/app/BusinessProfileSettings";
+import { EmailPreferences } from "@/components/app/EmailPreferences";
 
 type Company = {
   name: string; eik: string | null; vatNumber: string | null; vatRegistered: boolean;
@@ -228,6 +229,8 @@ export default function SettingsPage() {
           );
         })()}
       </div>
+
+      <EmailPreferences />
 
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, position: "sticky", bottom: 0, padding: "12px 0" }}>
         <Link href="/dashboard" className="btn btn-ghost">Назад</Link>
