@@ -16,7 +16,8 @@ const schema = z.object({
   metaTitle: z.string().optional().nullable(),
   metaDescription: z.string().optional().nullable(),
   keywords: z.string().optional().nullable(),
-  published: z.boolean().default(false),
+  status: z.enum(["draft", "published", "hidden"]).default("draft"),
+  publishedAt: z.string().optional().nullable(),
 });
 
 export async function GET() {
@@ -38,7 +39,8 @@ export async function POST(req: Request) {
         slug, title: d.title, excerpt: d.excerpt ?? null, content: d.content, coverImage: d.coverImage ?? null,
         author: d.author || undefined, category: d.category ?? null, tags: d.tags ?? null,
         metaTitle: d.metaTitle ?? null, metaDescription: d.metaDescription ?? null, keywords: d.keywords ?? null,
-        published: d.published, publishedAt: d.published ? new Date() : null,
+        status: d.status, published: d.status === "published",
+        publishedAt: d.publishedAt ? new Date(d.publishedAt) : (d.status === "published" ? new Date() : null),
       },
     });
     return NextResponse.json(post);

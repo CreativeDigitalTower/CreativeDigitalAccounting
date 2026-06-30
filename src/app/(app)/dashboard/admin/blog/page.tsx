@@ -35,11 +35,11 @@ export default async function AdminBlogPage() {
                 <tr key={p.id}>
                   <td style={{ fontWeight: 600 }}>{p.title}<div style={{ fontSize: 11.5, color: "var(--muted)" }}>/blog/{p.slug}</div></td>
                   <td style={{ fontSize: 12.5 }}>{p.category ?? "—"}</td>
-                  <td><span style={{ fontSize: 11.5, fontWeight: 700, color: p.published ? "var(--emerald-dark)" : "var(--muted)" }}>{p.published ? "Публикувана" : "Чернова"}</span></td>
+                  <td><span style={{ fontSize: 11.5, fontWeight: 700, color: p.status === "published" ? "var(--emerald-dark)" : p.status === "hidden" ? "var(--brass)" : "var(--muted)" }}>{p.status === "published" ? "Публикувана" : p.status === "hidden" ? "Скрита" : "Чернова"}</span></td>
                   <td className="num">{p.views}</td>
                   <td style={{ fontSize: 12, color: "var(--muted)" }}>{new Date(p.createdAt).toLocaleDateString("bg-BG")}</td>
                   <td style={{ display: "flex", gap: 6 }}>
-                    {p.published && <a href={`/blog/${p.slug}`} target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm">👁</a>}
+                    {p.status === "published" && <a href={`/blog/${p.slug}`} target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm">👁</a>}
                     <Link href={`/dashboard/admin/blog/${p.id}`} className="btn btn-ghost btn-sm">✎ Редактирай</Link>
                   </td>
                 </tr>

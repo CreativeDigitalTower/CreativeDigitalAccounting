@@ -1049,12 +1049,13 @@ model BlogPost {
   metaTitle       String?
   metaDescription String?   @db.Text
   keywords        String?   @db.Text
-  published       Boolean   @default(false)
+  published       Boolean   @default(false)  // = (status == "published"), за съвместимост
+  status          String    @default("draft") // draft | published | hidden
   publishedAt     DateTime?
   views           Int       @default(0)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  @@index([published, publishedAt])
+  @@index([status, publishedAt])
   @@index([category])
 }

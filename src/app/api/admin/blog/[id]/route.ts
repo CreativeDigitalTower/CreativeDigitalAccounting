@@ -16,7 +16,8 @@ const schema = z.object({
   metaTitle: z.string().nullable().optional(),
   metaDescription: z.string().nullable().optional(),
   keywords: z.string().nullable().optional(),
-  published: z.boolean().optional(),
+  status: z.enum(["draft", "published", "hidden"]).optional(),
+  publishedAt: z.string().nullable().optional(),
 });
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -32,7 +33,10 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       slug = slugify(d.slug); let n = 1; const base = slug;
       while (await prisma.blogPost.findFirst({ where: { slug, NOT: { id } } })) slug = `${base}-${++n}`;
     }
-    const becomingPublished = d.published === true && !existing.published;
+    // ръчна дата на публикуване, иначе при първо публикуване → сега
+    let publishedAt = existing.publishedAt;
+    if (d.publishedAt !== undefined) publishedAt = d.publishedAt ? new Date(d.publishedAt) : null;
+    if (d.status === "published" && !publishedAt) publishedAt = new Date();
 
     const post = await prisma.blogPost.update({
       where: { id },
@@ -48,8 +52,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         ...(d.metaTitle !== undefined ? { metaTitle: d.metaTitle } : {}),
         ...(d.metaDescription !== undefined ? { metaDescription: d.metaDescription } : {}),
         ...(d.keywords !== undefined ? { keywords: d.keywords } : {}),
-        ...(d.published !== undefined ? { published: d.published } : {}),
-        ...(becomingPublished ? { publishedAt: new Date() } : {}),
+        ...(d.status !== undefined ? { status: d.status, published: d.status === "published" } : {}),
+        publishedAt,
       },
     });
     return NextResponse.json(post);

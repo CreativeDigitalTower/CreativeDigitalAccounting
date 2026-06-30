@@ -14,7 +14,7 @@ export async function POST() {
       data: {
         slug: p.slug, title: p.title, excerpt: p.excerpt, content: p.content, category: p.category, tags: p.tags,
         metaTitle: p.metaTitle, metaDescription: p.metaDescription, keywords: p.keywords,
-        published: true, publishedAt: new Date(),
+        published: true, status: "published", publishedAt: new Date(),
       },
     });
     created++;

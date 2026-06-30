@@ -11,7 +11,7 @@ const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.creativedigitalacco
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const post = await prisma.blogPost.findUnique({ where: { slug } });
-  if (!post || !post.published) return { title: "Статия не е намерена" };
+  if (!post || post.status !== "published") return { title: "Статия не е намерена" };
   const title = post.metaTitle || post.title;
   const description = post.metaDescription || post.excerpt || undefined;
   return {
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function BlogArticle({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const post = await prisma.blogPost.findUnique({ where: { slug } });
-  if (!post || !post.published) notFound();
+  if (!post || post.status !== "published") notFound();
 
   // увеличаваме броя прегледи (best-effort)
   prisma.blogPost.update({ where: { id: post.id }, data: { views: { increment: 1 } } }).catch(() => {});
@@ -63,6 +63,17 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
         // eslint-disable-next-line @next/next/no-img-element
         <img src={post.coverImage} alt={post.title} style={{ width: "100%", borderRadius: 14, marginBottom: 28, objectFit: "cover" }} />
       )}
+      <style>{`
+        .blog-content img { max-width: 100%; height: auto; border-radius: 10px; margin: 14px 0; }
+        .blog-content h2 { font-family: 'Fraunces', serif; font-size: 26px; margin: 28px 0 10px; line-height: 1.25; }
+        .blog-content h3 { font-family: 'Fraunces', serif; font-size: 21px; margin: 22px 0 8px; }
+        .blog-content p { margin: 0 0 14px; }
+        .blog-content ul, .blog-content ol { padding-left: 24px; margin: 10px 0 16px; }
+        .blog-content li { margin-bottom: 6px; }
+        .blog-content blockquote { border-left: 3px solid var(--emerald); margin: 16px 0; padding: 8px 18px; background: rgba(15,138,106,.05); border-radius: 8px; color: var(--ink-soft); }
+        .blog-content a { color: var(--emerald-dark); }
+        .blog-content iframe { max-width: 100%; }
+      `}</style>
       <div className="blog-content" style={{ fontSize: 16.5, lineHeight: 1.75, color: "var(--ink)" }} dangerouslySetInnerHTML={{ __html: post.content }} />
 
       <div className="glass panel" style={{ marginTop: 40, padding: "26px 28px", textAlign: "center" }}>
