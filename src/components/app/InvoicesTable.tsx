@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { StatusSelect } from "@/components/app/StatusSelect";
+import { StatusSelect, statusMeta } from "@/components/app/StatusSelect";
 import { formatCurrency, groupByMonth } from "@/lib/constants";
 import { downloadInvoicesPdf } from "@/lib/invoicePdf";
 
@@ -98,10 +98,13 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
               <tbody>
                 {group.items.map((doc) => {
                   const rem = reminder(doc);
+                  const sm = statusMeta(doc.status);
                   return (
-                  <tr key={doc.id} style={selected.has(doc.id) ? { background: "var(--emerald-soft)" } : undefined}>
+                  <tr key={doc.id} style={selected.has(doc.id)
+                    ? { background: "var(--emerald-soft)", boxShadow: `inset 4px 0 0 ${sm.dot}` }
+                    : { boxShadow: `inset 4px 0 0 ${sm.dot}` }}>
                     <td><input type="checkbox" checked={selected.has(doc.id)} onChange={() => toggle(doc.id)} style={{ width: "auto" }} /></td>
-                    <td className="num" style={{ fontSize: 12.5 }}>{doc.number}</td>
+                    <td className="num" style={{ fontSize: 12.5, fontWeight: 600 }}>{doc.number}</td>
                     <td style={{ fontWeight: 600 }}>{doc.clientName}</td>
                     <td style={{ fontSize: 13, color: "var(--ink-soft)" }}>{new Date(doc.issueDate).toLocaleDateString("bg-BG")}</td>
                     <td style={{ fontSize: 13, color: "var(--ink-soft)" }}>

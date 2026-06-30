@@ -1,0 +1,45 @@
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+const PRESETS = [
+  { id: "this_month", label: "Текущ месец" },
+  { id: "last_month", label: "Минал месец" },
+  { id: "year", label: "Тази година" },
+];
+
+export function DashboardPeriodSelector({ active }: { active: string }) {
+  const router = useRouter();
+  const [showRange, setShowRange] = useState(active === "custom");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+
+  function pick(id: string) {
+    setShowRange(false);
+    router.push(id === "this_month" ? "/dashboard" : `/dashboard?period=${id}`);
+  }
+  function applyRange() {
+    if (from && to) router.push(`/dashboard?from=${from}&to=${to}`);
+  }
+
+  return (
+    <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+      {PRESETS.map((p) => (
+        <button key={p.id} onClick={() => pick(p.id)} className={`filter-tab${active === p.id ? " active" : ""}`} style={{ fontSize: 12.5 }}>
+          {p.label}
+        </button>
+      ))}
+      <button onClick={() => setShowRange((v) => !v)} className={`filter-tab${active === "custom" ? " active" : ""}`} style={{ fontSize: 12.5 }}>
+        📅 Период
+      </button>
+      {showRange && (
+        <div className="glass pop-in" style={{ display: "flex", gap: 8, alignItems: "center", padding: "8px 10px", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,.12)" }}>
+          <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} style={{ width: "auto", fontSize: 12.5, padding: "5px 8px" }} />
+          <span style={{ color: "var(--muted)" }}>–</span>
+          <input type="date" value={to} onChange={(e) => setTo(e.target.value)} style={{ width: "auto", fontSize: 12.5, padding: "5px 8px" }} />
+          <button onClick={applyRange} className="btn btn-primary btn-sm" disabled={!from || !to}>Покажи</button>
+        </div>
+      )}
+    </div>
+  );
+}

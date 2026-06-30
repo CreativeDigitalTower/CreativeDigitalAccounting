@@ -10,10 +10,12 @@ import { BusinessProfileWizard } from "@/components/app/BusinessProfileWizard";
 import { PersonalizedDashboard } from "@/components/app/PersonalizedDashboard";
 import { SmartGreeting, type TodayItem } from "@/components/app/SmartGreeting";
 import { KpiStrip, type Kpi } from "@/components/app/KpiStrip";
+import { DashboardPeriodSelector } from "@/components/app/DashboardPeriodSelector";
 import { resolveLayout, SECTOR_TITLE } from "@/lib/workspaces";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ period?: string; from?: string; to?: string }> }) {
   const { companyId, userId } = await requireCompany();
+  const sp = await searchParams;
 
   // Бизнес профил (Smart Workspace) — определя подреждането на бързите действия
   const profile = await prisma.company.findUnique({
@@ -47,22 +49,42 @@ export default async function DashboardPage() {
   const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const yearStart = new Date(now.getFullYear(), 0, 1);
 
+  // ─── Избран период за KPI данните (по подразбиране: текущ месец) ───
+  let periodStart: Date, periodEnd: Date, periodLabel: string, periodId: string;
+  if (sp.from && sp.to) {
+    periodStart = new Date(sp.from); periodStart.setHours(0, 0, 0, 0);
+    periodEnd = new Date(sp.to); periodEnd.setHours(23, 59, 59, 999);
+    periodLabel = `${periodStart.toLocaleDateString("bg-BG")} – ${periodEnd.toLocaleDateString("bg-BG")}`;
+    periodId = "custom";
+  } else if (sp.period === "last_month") {
+    periodStart = lastMonthStart;
+    periodEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+    periodLabel = "Минал месец"; periodId = "last_month";
+  } else if (sp.period === "year") {
+    periodStart = yearStart; periodEnd = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
+    periodLabel = "Тази година"; periodId = "year";
+  } else {
+    periodStart = monthStart;
+    periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+    periodLabel = "Текущ месец"; periodId = "this_month";
+  }
+
   // KPIs
   const [revenueResult, expenseResult, overdueInvoices, recentDocs, usageCounter, subscription, lowStock, expiringContracts] =
     await Promise.all([
-      // Monthly revenue (sum of paid+sent invoices this month)
+      // Приходи за избрания период (платени + изпратени фактури)
       prisma.document.findMany({
         where: {
           companyId,
           type: "invoice",
           status: { in: ["paid", "sent"] },
-          issueDate: { gte: monthStart },
+          issueDate: { gte: periodStart, lte: periodEnd },
         },
         include: { lines: true },
       }),
-      // Monthly expenses
+      // Разходи за избрания период
       prisma.expense.aggregate({
-        where: { companyId, date: { gte: monthStart } },
+        where: { companyId, date: { gte: periodStart, lte: periodEnd } },
         _sum: { amount: true },
       }),
       // Overdue invoices
@@ -219,17 +241,21 @@ export default async function DashboardPage() {
         dateLabel={now.toLocaleDateString("bg-BG", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
       />
 
-      {/* Topbar */}
+      {/* Topbar + избор на период */}
       <div className="topbar">
         <div>
           <h1 style={{ fontSize: 22, fontFamily: "'Fraunces', serif", fontWeight: 600, margin: "0 0 3px" }}>
             Табло
           </h1>
-          <div style={{ color: "var(--muted)", fontSize: 13 }}>Преглед на бизнеса</div>
+          <div style={{ color: "var(--muted)", fontSize: 13 }}>Данни за: <strong style={{ color: "var(--ink-soft)" }}>{periodLabel}</strong></div>
         </div>
         <Link href="/dashboard/documents/new" className="btn btn-primary">
           + Нов документ
         </Link>
+      </div>
+
+      <div style={{ marginBottom: 18 }}>
+        <DashboardPeriodSelector active={periodId} />
       </div>
 
       {/* Usage banner — за всички планове */}
@@ -262,14 +288,14 @@ export default async function DashboardPage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 24 }}>
         {[
           {
-            label: "Приходи (месец)",
+            label: `Приходи (${periodLabel.toLowerCase()})`,
             value: formatCurrency(monthRevenue),
             bgn: dual ? `≈ ${formatCurrency(toBGN(monthRevenue), "BGN")}` : null,
             delta: null,
             color: "var(--emerald)",
           },
           {
-            label: "Разходи (месец)",
+            label: `Разходи (${periodLabel.toLowerCase()})`,
             value: formatCurrency(monthExpenses),
             bgn: dual ? `≈ ${formatCurrency(toBGN(monthExpenses), "BGN")}` : null,
             delta: null,
