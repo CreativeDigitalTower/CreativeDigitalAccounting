@@ -12,17 +12,24 @@ export default async function ClientsPage({ searchParams }: { searchParams: Prom
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const [clients, invoices] = await Promise.all([
+  const [clients, invoices, openTaskGroups] = await Promise.all([
     prisma.client.findMany({
       where: { companyId },
-      include: { _count: { select: { documents: true, notes: true, tasks: { where: { done: false } } } } },
+      include: { _count: { select: { documents: true, notes: true } } },
       orderBy: { name: "asc" },
     }),
     prisma.document.findMany({
       where: { companyId, type: "invoice", clientId: { not: null } },
       select: { clientId: true, issueDate: true, lines: { select: { lineTotal: true } } },
     }),
+    // Брой отворени задачи по клиент (без filtered _count, който изисква preview feature)
+    prisma.clientTask.groupBy({
+      by: ["clientId"],
+      where: { done: false, client: { companyId } },
+      _count: { _all: true },
+    }),
   ]);
+  const openTasksByClient = new Map(openTaskGroups.map((g) => [g.clientId, g._count._all]));
 
   // Приходи на база генерираните фактури
   const totalByClient = new Map<string, number>();
@@ -109,7 +116,7 @@ export default async function ClientsPage({ searchParams }: { searchParams: Prom
                   <td style={{ fontSize: 13 }}>{client.phone ?? "—"}</td>
                   <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(monthByClient.get(client.id) ?? 0)}</td>
                   <td className="num" style={{ fontWeight: 600, color: "var(--emerald-dark)" }}>{formatCurrency(totalByClient.get(client.id) ?? 0)}</td>
-                  <td className="num">{client._count.tasks > 0 ? <span style={{ color: "var(--brass)", fontWeight: 700 }}>{client._count.tasks}</span> : "—"}</td>
+                  <td className="num">{(openTasksByClient.get(client.id) ?? 0) > 0 ? <span style={{ color: "var(--brass)", fontWeight: 700 }}>{openTasksByClient.get(client.id)}</span> : "—"}</td>
                   <td style={{ display: "flex", gap: 6 }}>
                     <Link href={`/dashboard/clients/${client.id}`} className="btn btn-ghost btn-sm">Досие</Link>
                     <Link href={`/dashboard/clients/${client.id}?edit=1`} className="btn btn-ghost btn-sm">✎ Редактирай</Link>
