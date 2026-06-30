@@ -134,15 +134,17 @@ input[type=file]::file-selector-button:hover{background:var(--emerald-dark);}
 }
 
 /* ─── Модерни анимации и hover (визуален ъпгрейд) ─── */
-@keyframes cardIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-.kpi-anim{animation:cardIn .35s ease both;}
-.kpi-card{transition:transform .18s ease, box-shadow .18s ease;}
-.kpi-card:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(20,30,25,.12);}
-.today-chip:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(20,30,25,.12);}
-.dash-greeting{animation:cardIn .4s ease both;}
-.glass.panel{transition:box-shadow .2s ease;}
+/* само opacity, за да остане transform свободен за :hover */
+@keyframes cardIn{from{opacity:0;}to{opacity:1;}}
+.kpi-anim{animation:cardIn .4s ease both;transition:transform .2s cubic-bezier(.22,1,.36,1), box-shadow .2s ease;}
+.kpi-card{transition:transform .18s cubic-bezier(.22,1,.36,1), box-shadow .18s ease;}
+.kpi-card:hover,.kpi-anim:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(20,30,25,.13);}
+.today-chip{transition:transform .18s cubic-bezier(.22,1,.36,1), box-shadow .18s ease;}
+.today-chip:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 10px 26px rgba(20,30,25,.14);}
+.dash-greeting{animation:cardIn .45s ease both;}
+.glass.panel{transition:box-shadow .2s ease, transform .2s ease;}
 tbody tr{transition:background .12s ease;}
-tbody tr:hover{background:rgba(15,138,106,.04);}
+tbody tr:hover{background:rgba(15,138,106,.05);}
 .btn{transition:background .15s, transform .12s, box-shadow .15s;}
 .btn:hover{transform:translateY(-1px);}
 .btn:active{transform:translateY(0);}

@@ -22,13 +22,29 @@ export function StatusSelect({ id, status }: { id: string; status: string }) {
   const [current, setCurrent] = useState(status);
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
   const ref = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     function onClick(e: MouseEvent) { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); }
+    function onScroll() { setOpen(false); }
     document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
+    window.addEventListener("scroll", onScroll, true);
+    return () => { document.removeEventListener("mousedown", onClick); window.removeEventListener("scroll", onScroll, true); };
   }, []);
+
+  function openMenu() {
+    if (open) { setOpen(false); return; }
+    const r = btnRef.current?.getBoundingClientRect();
+    if (r) {
+      const menuH = DOC_STATUSES.length * 34 + 12;
+      const below = r.bottom + 6;
+      const top = below + menuH > window.innerHeight ? Math.max(8, r.top - menuH - 6) : below;
+      setPos({ left: Math.min(r.left, window.innerWidth - 190), top });
+    }
+    setOpen(true);
+  }
 
   async function change(next: string) {
     setOpen(false);
@@ -47,7 +63,8 @@ export function StatusSelect({ id, status }: { id: string; status: string }) {
   return (
     <div ref={ref} style={{ position: "relative", display: "inline-block" }} onClick={(e) => e.stopPropagation()}>
       <button
-        type="button" disabled={saving} onClick={() => setOpen((v) => !v)} title="Смени статус"
+        ref={btnRef}
+        type="button" disabled={saving} onClick={openMenu} title="Смени статус"
         style={{
           display: "inline-flex", alignItems: "center", gap: 7, padding: "4px 11px", borderRadius: 20,
           background: m.bg, color: m.fg, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700,
@@ -58,8 +75,8 @@ export function StatusSelect({ id, status }: { id: string; status: string }) {
         {saving ? "…" : m.label}
         <span style={{ fontSize: 9, opacity: 0.6 }}>▾</span>
       </button>
-      {open && (
-        <div className="glass pop-in" style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, zIndex: 60, borderRadius: 10, padding: 5, minWidth: 170, boxShadow: "0 10px 30px rgba(0,0,0,.14)" }}>
+      {open && pos && (
+        <div className="glass pop-in" style={{ position: "fixed", top: pos.top, left: pos.left, zIndex: 1000, borderRadius: 10, padding: 5, minWidth: 180, boxShadow: "0 12px 36px rgba(0,0,0,.18)" }}>
           {DOC_STATUSES.map((s) => {
             const st = STATUS_STYLE[s.color] ?? STATUS_STYLE.muted;
             return (

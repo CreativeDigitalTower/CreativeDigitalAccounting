@@ -40,7 +40,7 @@ export function TopClientsChart({ data, title = "Топ 5 клиента по п
       <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>{title}</h3>
       <div style={{ display: "flex", gap: 20, alignItems: "center", flexWrap: "wrap" }}>
         <div style={{ position: "relative", width: 120, height: 120, flexShrink: 0 }}>
-          <div style={{ width: 120, height: 120, borderRadius: "50%", background: gradient, transition: "transform .25s", transform: hover !== null ? "scale(1.04)" : "scale(1)" }} />
+          <div style={{ width: 120, height: 120, borderRadius: "50%", background: gradient, transition: "transform .35s cubic-bezier(.22,1,.36,1), box-shadow .3s", transform: hover !== null ? "scale(1.07) rotate(3deg)" : "scale(1)", boxShadow: hover !== null ? `0 8px 26px ${COLORS[hover % COLORS.length]}55` : "none" }} />
           <div style={{ position: "absolute", inset: 18, borderRadius: "50%", background: "var(--paper, #fff)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: 6 }}>
             {hover !== null ? (
               <>
@@ -62,16 +62,16 @@ export function TopClientsChart({ data, title = "Топ 5 клиента по п
             const dim = hover !== null && hover !== i;
             return (
               <div key={c.name} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}
-                style={{ opacity: dim ? 0.4 : 1, transition: "opacity .15s", cursor: "default" }}>
+                style={{ opacity: dim ? 0.45 : 1, transition: "opacity .15s, transform .2s", cursor: "pointer", transform: hover === i ? "translateX(3px)" : "none" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
                   <span style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 600 }}>
-                    <span style={{ width: 9, height: 9, borderRadius: 2, background: COLORS[i % COLORS.length] }} />
+                    <span style={{ width: 9, height: 9, borderRadius: 2, background: COLORS[i % COLORS.length], transition: "transform .2s", transform: hover === i ? "scale(1.4)" : "scale(1)" }} />
                     {c.name}
                   </span>
                   <span className="num" style={{ color: "var(--ink-soft)" }}>{formatCurrency(c.total)} · {pct.toFixed(1)}%</span>
                 </div>
-                <div style={{ height: 6, background: "rgba(217,215,200,.5)", borderRadius: 3, overflow: "hidden" }}>
-                  <div style={{ width: mounted ? `${(c.total / max) * 100}%` : "0%", height: "100%", background: COLORS[i % COLORS.length], borderRadius: 3, transition: "width .6s cubic-bezier(.22,1,.36,1)" }} />
+                <div style={{ height: hover === i ? 9 : 6, background: "rgba(217,215,200,.5)", borderRadius: 4, overflow: "hidden", transition: "height .2s" }}>
+                  <div style={{ width: mounted ? `${(c.total / max) * 100}%` : "0%", height: "100%", background: COLORS[i % COLORS.length], borderRadius: 4, transition: "width .6s cubic-bezier(.22,1,.36,1), box-shadow .2s", boxShadow: hover === i ? `0 0 12px ${COLORS[i % COLORS.length]}` : "none" }} />
                 </div>
               </div>
             );

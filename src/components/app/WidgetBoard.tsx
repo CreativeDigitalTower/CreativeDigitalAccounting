@@ -25,11 +25,10 @@ const CATALOG: WidgetDef[] = [
   { id: "tasks", title: "Задачи", icon: "✅" },
   { id: "stock", title: "Склад", icon: "📦" },
   { id: "low_stock", title: "Ниски наличности", icon: "⚠️" },
-  { id: "tax", title: "Данъчни задължения", icon: "📅" },
   { id: "ai", title: "AI препоръки", icon: "🤖" },
 ];
-const DEFAULT_ORDER = ["recent_invoices", "revenue_expense", "top_clients", "reminders", "tasks", "tax"];
-const KEY = "cda_widgets_v1";
+const DEFAULT_ORDER = ["recent_invoices", "revenue_expense", "top_clients", "reminders", "tasks", "stock"];
+const KEY = "cda_widgets_v2";
 
 export function WidgetBoard({ data }: { data: WidgetData }) {
   const [order, setOrder] = useState<string[]>(DEFAULT_ORDER);
@@ -125,7 +124,7 @@ function Widget({ id, data }: { id: string; data: WidgetData }) {
       const Bar = ({ label, v, c }: { label: string; v: number; c: string }) => (
         <div style={{ marginBottom: 10 }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 4 }}><span>{label}</span><span className="num" style={{ fontWeight: 700, color: c }}>{formatCurrency(v)}</span></div>
-          <div style={{ height: 8, background: "rgba(217,215,200,.5)", borderRadius: 4, overflow: "hidden" }}><div style={{ height: "100%", width: `${(v / max) * 100}%`, background: c, borderRadius: 4, transition: "width .4s" }} /></div>
+          <div style={{ height: 8, background: "rgba(217,215,200,.5)", borderRadius: 4, overflow: "hidden" }}><div className="chart-bar" style={{ height: "100%", width: `${(v / max) * 100}%`, background: c, borderRadius: 4, transition: "width .5s cubic-bezier(.22,1,.36,1)" }} /></div>
         </div>
       );
       return <>

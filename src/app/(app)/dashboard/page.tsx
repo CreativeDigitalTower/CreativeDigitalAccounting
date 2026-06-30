@@ -263,19 +263,19 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       />
 
       {/* Topbar + избор на период */}
-      <div className="topbar">
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, marginBottom: 16, flexWrap: "wrap" }}>
         <div>
           <h1 style={{ fontSize: 22, fontFamily: "'Fraunces', serif", fontWeight: 600, margin: "0 0 3px" }}>
             Табло
           </h1>
           <div style={{ color: "var(--muted)", fontSize: 13 }}>Данни за: <strong style={{ color: "var(--ink-soft)" }}>{periodLabel}</strong></div>
         </div>
-        <Link href="/dashboard/documents/new" className="btn btn-primary">
+        <Link href="/dashboard/documents/new" className="btn btn-primary" style={{ flexShrink: 0 }}>
           + Нов документ
         </Link>
       </div>
 
-      <div style={{ marginBottom: 18 }}>
+      <div style={{ marginBottom: 22 }}>
         <DashboardPeriodSelector active={periodId} />
       </div>
 
