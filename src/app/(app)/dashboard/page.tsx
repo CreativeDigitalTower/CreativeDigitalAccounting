@@ -11,6 +11,7 @@ import { PersonalizedDashboard } from "@/components/app/PersonalizedDashboard";
 import { SmartGreeting, type TodayItem } from "@/components/app/SmartGreeting";
 import { KpiStrip, type Kpi } from "@/components/app/KpiStrip";
 import { DashboardPeriodSelector } from "@/components/app/DashboardPeriodSelector";
+import { WidgetBoard, type WidgetData } from "@/components/app/WidgetBoard";
 import { resolveLayout, SECTOR_TITLE } from "@/lib/workspaces";
 
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ period?: string; from?: string; to?: string }> }) {
@@ -227,6 +228,25 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     { label: "Брой продажби", value: String(allInvoiceTotals.length), hint: "издадени фактури", color: "var(--ink)" },
     { label: "Общ оборот", value: formatCurrency(totalRevenueAll), color: "var(--navy)" },
   ];
+
+  // ─── Данни за персонализируемото widget табло ───
+  const allStock = await prisma.stockItem.findMany({ where: { companyId }, select: { quantity: true, unitCost: true } });
+  const stockValue = allStock.reduce((s, i) => s + i.quantity * (i.unitCost ?? 0), 0);
+  const widgetData: WidgetData = {
+    recentInvoices: recentDocs.filter((d) => d.type === "invoice").slice(0, 6).map((d) => ({
+      id: d.id, number: d.number, client: d.client?.name ?? "—",
+      total: d.lines.reduce((s, l) => s + l.lineTotal, 0), currency: d.currency, status: d.status,
+    })),
+    topClients: [...clientRevenue].sort((a, b) => b.total - a.total).slice(0, 5).map((c) => ({ name: c.name, revenue: c.total })),
+    taxDeadlines: taxDeadlines.map((t) => ({ label: t.title, date: new Date(t.date).toLocaleDateString("bg-BG") })),
+    lowStock: lowStockItems.slice(0, 6).map((i) => ({ name: i.name, quantity: i.quantity, unit: i.unit })),
+    reminders: paymentReminders.map((r) => ({ id: r.id, number: r.number, client: r.client, total: r.total, daysOverdue: r.daysOverdue })),
+    openTasks: openTasksCount,
+    stockValue,
+    revenue: monthRevenue,
+    expenses: monthExpenses,
+    clientsCount,
+  };
 
   return (
     <>
@@ -499,6 +519,9 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           </div>
         </div>
       )}
+
+      {/* Персонализируемо widget табло (drag & drop, избор на widget-и) */}
+      <WidgetBoard data={widgetData} />
 
       {/* Smart Workspace — персонализирани бързи действия (ПОД текущото съдържание) */}
       {!needsProfile && (
