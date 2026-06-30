@@ -19,6 +19,7 @@ const toolsLinks = [
 
 const linksAfter = [
   { href: "/accountants", label: "За счетоводители" },
+  { href: "/blog", label: "Блог" },
   { href: "/about", label: "За Нас" },
   { href: "/contact", label: "Контакти" },
 ];

@@ -989,3 +989,30 @@ model TrainingVideo {
 
   @@index([category])
 }
+
+// ─────────────────────────────────────────────────────────────
+// Блог (SEO) — публични статии, управлявани от Супер Админ
+// ─────────────────────────────────────────────────────────────
+model BlogPost {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  title           String
+  excerpt         String?   @db.Text
+  content         String    @db.Text          // HTML съдържание (снимки/видеа/линкове)
+  coverImage      String?   @db.Text          // URL или base64 data URL
+  author          String    @default("Екипът на Creative Digital Accounting")
+  category        String?
+  tags            String?                       // CSV
+  // SEO
+  metaTitle       String?
+  metaDescription String?   @db.Text
+  keywords        String?   @db.Text
+  published       Boolean   @default(false)
+  publishedAt     DateTime?
+  views           Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([published, publishedAt])
+  @@index([category])
+}
