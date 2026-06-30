@@ -12,24 +12,22 @@ export default async function ClientsPage({ searchParams }: { searchParams: Prom
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const [clients, invoices, openTaskGroups] = await Promise.all([
+  const [clients, invoices] = await Promise.all([
     prisma.client.findMany({
       where: { companyId },
-      include: { _count: { select: { documents: true, notes: true } } },
+      // filtered include (GA) за отворените задачи — без filtered _count / groupBy
+      include: {
+        _count: { select: { documents: true, notes: true } },
+        tasks: { where: { done: false }, select: { id: true } },
+      },
       orderBy: { name: "asc" },
     }),
     prisma.document.findMany({
       where: { companyId, type: "invoice", clientId: { not: null } },
       select: { clientId: true, issueDate: true, lines: { select: { lineTotal: true } } },
     }),
-    // Брой отворени задачи по клиент (без filtered _count, който изисква preview feature)
-    prisma.clientTask.groupBy({
-      by: ["clientId"],
-      where: { done: false, client: { companyId } },
-      _count: { _all: true },
-    }),
   ]);
-  const openTasksByClient = new Map(openTaskGroups.map((g) => [g.clientId, g._count._all]));
+  const openTasksByClient = new Map(clients.map((c) => [c.id, c.tasks.length]));
 
   // Приходи на база генерираните фактури
   const totalByClient = new Map<string, number>();
