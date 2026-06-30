@@ -1,6 +1,6 @@
 import { requireCompany, getPlan } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
-import { planHasFeature } from "@/lib/constants";
+import { planHasFeature, formatCurrency } from "@/lib/constants";
 import { CategoriesManager } from "@/components/app/CategoriesManager";
 import { FeatureLink } from "@/components/app/FeatureLink";
 import Link from "next/link";
@@ -25,6 +25,12 @@ export default async function WarehousePage() {
 
   const lowStock = stockItems.filter((i) => i.minQuantity !== null && i.quantity <= (i.minQuantity ?? 0));
 
+  // Обща стойност на наличността (количество × ед. цена)
+  const itemValue = (i: { quantity: number; unitCost: number | null }) => i.quantity * (i.unitCost ?? 0);
+  const totalStockValue = stockItems.reduce((s, i) => s + itemValue(i), 0);
+  const valueByWarehouse = new Map<string, number>();
+  for (const i of stockItems) valueByWarehouse.set(i.warehouseId, (valueByWarehouse.get(i.warehouseId) ?? 0) + itemValue(i));
+
   return (
     <>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
@@ -43,13 +49,22 @@ export default async function WarehousePage() {
 
       {extended && <CategoriesManager initial={categories.map((c) => ({ id: c.id, name: c.name }))} />}
 
+      {/* Обща стойност на склада */}
+      <div className="glass panel" style={{ padding: "16px 20px", marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, background: "linear-gradient(135deg, rgba(15,138,106,.08), rgba(11,94,74,.04))" }}>
+        <div>
+          <div style={{ fontSize: 12.5, color: "var(--muted)" }}>Обща стойност на наличността по склад</div>
+          <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>Изчислено като количество × единична цена</div>
+        </div>
+        <div className="num" style={{ fontSize: 28, fontWeight: 700, color: "var(--emerald-dark)" }}>{formatCurrency(totalStockValue)}</div>
+      </div>
+
       {/* Warehouses overview */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 20 }}>
         {warehouses.map((w) => (
           <div key={w.id} className="glass kpi-card">
             <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>📦 {w.name}</div>
             <div className="num" style={{ fontSize: 22, fontWeight: 600 }}>{w._count.stockItems}</div>
-            <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 2 }}>артикула</div>
+            <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 2 }}>артикула · <strong style={{ color: "var(--emerald-dark)" }}>{formatCurrency(valueByWarehouse.get(w.id) ?? 0)}</strong></div>
           </div>
         ))}
       </div>
@@ -81,6 +96,7 @@ export default async function WarehousePage() {
                 <th className="num">Наличност</th>
                 <th className="num">Мин. наличност</th>
                 <th className="num">Ед. цена</th>
+                <th className="num">Стойност</th>
                 <th>Статус</th>
                 <th></th>
               </tr>
@@ -104,6 +120,9 @@ export default async function WarehousePage() {
                     <td className="num" style={{ fontSize: 13 }}>
                       {item.unitCost != null ? `${item.unitCost.toFixed(2)} EUR` : "—"}
                     </td>
+                    <td className="num" style={{ fontSize: 13, fontWeight: 600, color: "var(--emerald-dark)" }}>
+                      {item.unitCost != null ? formatCurrency(itemValue(item)) : "—"}
+                    </td>
                     <td>
                       {isLow ? (
                         <span style={{ color: "var(--brick)", fontSize: 12, fontWeight: 600 }}>⚠ Ниска</span>
@@ -120,6 +139,13 @@ export default async function WarehousePage() {
                 );
               })}
             </tbody>
+            <tfoot>
+              <tr style={{ borderTop: "2px solid var(--border)", fontWeight: 700 }}>
+                <td colSpan={extended ? 8 : 7} style={{ textAlign: "right" }}>Обща стойност на склада:</td>
+                <td className="num" style={{ color: "var(--emerald-dark)" }}>{formatCurrency(totalStockValue)}</td>
+                <td colSpan={2}></td>
+              </tr>
+            </tfoot>
           </table>
         )}
       </div>

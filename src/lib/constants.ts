@@ -5,7 +5,7 @@ export const FREE_PLAN_LIMIT = 5; // документа/месец
 export const COMPANY_NAME = "Криейтив Диджитъл Тауър ЕООД";
 export const COMPANY_EIK = "205748188";
 export const COMPANY_WEBSITE = "https://creativedigitaltower.com/";
-export const COMPANY_EMAIL = "office@creativedigitaltower.com";
+export const COMPANY_EMAIL = "office@creativedigitalaccounting.com";
 export const FACEBOOK_PAGE = "https://www.facebook.com/CreativeDigitalAccounting";
 export const FACEBOOK_PAGE_ID = "CreativeDigitalAccounting";
 

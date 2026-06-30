@@ -27,7 +27,7 @@ export default function SalaryCalc() {
     { l: `Осигуровки (служител, ${(EMPLOYEE_INS * 100).toFixed(2)}%)`, v: -empIns, strong: false },
     { l: "Облагаема сума", v: taxable, strong: false },
     { l: "Данък общ доход (10%)", v: -tax, strong: false },
-    { l: "Нето заплата (на ръка)", v: net, strong: true },
+    { l: "Нето заплата (сума за получаване)", v: net, strong: true },
   ];
 
   return (

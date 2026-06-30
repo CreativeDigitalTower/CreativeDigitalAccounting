@@ -37,10 +37,10 @@ export default function ContactPage() {
       </p>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 24 }}>
-        <a href="mailto:office@creativedigitaltower.com" className="glass panel" style={{ padding: "20px 24px", textDecoration: "none", color: "inherit" }}>
+        <a href="mailto:office@creativedigitalaccounting.com" className="glass panel" style={{ padding: "20px 24px", textDecoration: "none", color: "inherit" }}>
           <div style={{ fontSize: 24, marginBottom: 8 }}>✉️</div>
           <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Имейл</div>
-          <div style={{ fontSize: 14, color: "var(--navy)", fontWeight: 600 }}>office@creativedigitaltower.com</div>
+          <div style={{ fontSize: 14, color: "var(--navy)", fontWeight: 600 }}>office@creativedigitalaccounting.com</div>
         </a>
         <a href="https://www.facebook.com/CreativeDigitalAccounting" target="_blank" rel="noopener noreferrer" className="glass panel" style={{ padding: "20px 24px", textDecoration: "none", color: "inherit" }}>
           <div style={{ fontSize: 24, marginBottom: 8 }}>
