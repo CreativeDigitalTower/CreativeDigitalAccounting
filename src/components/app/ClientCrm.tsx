@@ -4,31 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/constants";
+import { STATUSES, STAGES, TASK_TYPES } from "@/lib/crm";
 
-export const STATUSES = [
-  { id: "lead", label: "Потенциален", color: "var(--brass)" },
-  { id: "active", label: "Активен", color: "var(--emerald)" },
-  { id: "vip", label: "VIP", color: "var(--navy)" },
-  { id: "inactive", label: "Неактивен", color: "var(--muted)" },
-  { id: "lost", label: "Загубен", color: "var(--brick)" },
-];
-export const STAGES = [
-  { id: "new", label: "Нов" },
-  { id: "contacted", label: "Осъществен контакт" },
-  { id: "proposal", label: "Изпратена оферта" },
-  { id: "negotiation", label: "Преговори" },
-  { id: "won", label: "Спечелен" },
-  { id: "lost", label: "Загубен" },
-];
-const TASK_TYPES = [
-  { id: "call", label: "Обади се", icon: "☎" },
-  { id: "email", label: "Изпрати имейл", icon: "✉" },
-  { id: "offer", label: "Изпрати оферта", icon: "📄" },
-  { id: "contract", label: "Изпрати договор", icon: "📑" },
-  { id: "followup", label: "Потърси клиента", icon: "🔔" },
-  { id: "meeting", label: "Среща", icon: "🤝" },
-  { id: "other", label: "Друго", icon: "•" },
-];
+// Реекспорт за обратна съвместимост (стари импорти от този модул).
+export { STATUSES, STAGES } from "@/lib/crm";
 
 type Client = {
   id: string; name: string; eik: string | null; vatNumber: string | null; address: string | null; city: string | null;

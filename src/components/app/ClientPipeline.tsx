@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/constants";
-import { STAGES } from "@/components/app/ClientCrm";
+import { STAGES } from "@/lib/crm";
 
 type PClient = { id: string; name: string; stage: string; dealValue: number | null; total: number };
 
