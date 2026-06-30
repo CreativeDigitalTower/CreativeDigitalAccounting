@@ -28,18 +28,25 @@ export function SendToClient({ id, defaultEmail, decision, sentAt }: {
 
   return (
     <>
-      <button onClick={() => setOpen((v) => !v)} className="btn btn-ghost btn-sm">✉ Изпрати на клиент</button>
+      <button onClick={() => setOpen(true)} className="btn btn-ghost btn-sm">✉ Изпрати на клиент</button>
       {decisionBadge}
       {open && (
-        <div className="glass" style={{ position: "absolute", marginTop: 40, right: 24, zIndex: 30, padding: 16, borderRadius: 12, width: 320, boxShadow: "0 8px 30px rgba(0,0,0,.12)" }}>
-          <div style={{ fontSize: 12.5, fontWeight: 600, marginBottom: 8 }}>Имейл на клиента</div>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="client@firma.bg" style={{ width: "100%", marginBottom: 10 }} />
-          <p style={{ fontSize: 11.5, color: "var(--muted)", margin: "0 0 10px" }}>Клиентът ще получи линк за преглед, изтегляне и приемане/отхвърляне.</p>
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <button onClick={send} disabled={busy} className="btn btn-primary btn-sm">{busy ? "Изпращане…" : "Изпрати"}</button>
-            {done && <span style={{ fontSize: 12, color: "var(--emerald-dark)" }}>{done}</span>}
+        <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 }}>
+          <div onClick={(e) => e.stopPropagation()} className="glass panel" style={{ width: 380, maxWidth: "100%", padding: 22, borderRadius: 14, boxShadow: "0 12px 40px rgba(0,0,0,.18)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 16, margin: 0 }}>Изпрати на клиент</h3>
+              <button onClick={() => setOpen(false)} style={{ background: "none", border: "none", fontSize: 20, color: "var(--muted)", cursor: "pointer", lineHeight: 1 }}>×</button>
+            </div>
+            <label style={{ fontSize: 12.5, fontWeight: 600, display: "block", marginBottom: 6 }}>Имейл на клиента</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="client@firma.bg" style={{ width: "100%", marginBottom: 10 }} autoFocus />
+            <p style={{ fontSize: 11.5, color: "var(--muted)", margin: "0 0 14px" }}>Клиентът ще получи линк за преглед, изтегляне и приемане/отхвърляне на документа.</p>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <button onClick={send} disabled={busy} className="btn btn-primary btn-sm">{busy ? "Изпращане…" : "Изпрати"}</button>
+              <button onClick={() => setOpen(false)} className="btn btn-ghost btn-sm">Отказ</button>
+              {done && <span style={{ fontSize: 12, color: done.includes("✓") ? "var(--emerald-dark)" : "var(--brick)" }}>{done}</span>}
+            </div>
+            {sentAt && <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 10 }}>Последно изпратено: {new Date(sentAt).toLocaleString("bg-BG")}</p>}
           </div>
-          {sentAt && <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 8 }}>Последно изпратено: {new Date(sentAt).toLocaleString("bg-BG")}</p>}
         </div>
       )}
     </>

@@ -7,6 +7,7 @@ import {
   isDualCurrencyActive, toBGN, formatCurrency, EUR_TO_BGN,
   CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, PAYMENT_METHODS, allowedTemplateCount, type PlanId,
 } from "@/lib/constants";
+import { TemplateGallery } from "@/components/app/TemplateGallery";
 
 type ClientFull = { id: string; name: string; eik: string | null; vatNumber: string | null; city: string | null; address: string | null; contactEmail: string | null };
 type Line = { description: string; quantity: number; unitPrice: number; vatRate: number };
@@ -396,6 +397,9 @@ function NewDocumentForm() {
             <textarea value={internalComment} onChange={(e) => setInternalComment(e.target.value)} rows={3} placeholder="Вътрешни бележки само за вашия екип…" style={{ background: "rgba(166,130,47,.06)" }} />
           </div>
         </div>
+
+        {/* Галерия с шаблони — избор + преглед */}
+        <TemplateGallery plan={plan} selected={template} onSelect={setTemplate} title="Изберете дизайн на документа" />
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 24, flexWrap: "wrap" }}>
           <Link href="/dashboard/documents" className="btn btn-ghost">Отказ</Link>

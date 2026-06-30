@@ -1,8 +1,9 @@
-import { requireCompany } from "@/lib/session";
+import { requireCompany, getPlan } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { InvoicesTable } from "@/components/app/InvoicesTable";
-import { formatCurrency, toBGN, isDualCurrencyActive, DOC_STATUSES } from "@/lib/constants";
+import { TemplateGallery } from "@/components/app/TemplateGallery";
+import { formatCurrency, toBGN, isDualCurrencyActive, DOC_STATUSES, type PlanId } from "@/lib/constants";
 
 export default async function InvoicesPage({
   searchParams,
@@ -10,6 +11,7 @@ export default async function InvoicesPage({
   searchParams: Promise<{ status?: string }>;
 }) {
   const { companyId } = await requireCompany();
+  const plan = await getPlan(companyId);
   const params = await searchParams;
   const dual = isDualCurrencyActive();
 
@@ -78,6 +80,9 @@ export default async function InvoicesPage({
           }))}
         />
       )}
+
+      {/* Шаблони за фактури — преглед на дизайните */}
+      <TemplateGallery plan={plan as PlanId} title="Шаблони за фактури — преглед на дизайните" />
     </>
   );
 }
