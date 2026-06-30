@@ -12,6 +12,8 @@ const schema = z.object({
   deadline: z.string().optional().nullable(),
   progressPercent: z.number().int().min(0).max(100).default(0),
   status: z.enum(["active", "completed", "on_hold", "cancelled"]).default("active"),
+  description: z.string().optional().nullable(),
+  parentProjectId: z.string().optional().nullable(),
 });
 
 export async function POST(req: Request) {
@@ -24,6 +26,8 @@ export async function POST(req: Request) {
         budget: data.budget ?? null, plannedBudget: data.plannedBudget ?? null,
         deadline: data.deadline ? new Date(data.deadline) : null,
         progressPercent: data.progressPercent, status: data.status,
+        description: data.description ?? null,
+        parentProjectId: data.parentProjectId ?? null,
       },
     });
     await audit(companyId, userId, "create", "Project", p.id, data.name);

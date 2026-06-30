@@ -7,8 +7,8 @@ export default async function ProjectsPage() {
   const { companyId } = await requireFeature("projects");
 
   const projects = await prisma.project.findMany({
-    where: { companyId },
-    include: { client: true, _count: { select: { entries: true } } },
+    where: { companyId, parentProjectId: null },
+    include: { client: true, _count: { select: { entries: true, subProjects: true } } },
     orderBy: { progressPercent: "desc" },
   });
 

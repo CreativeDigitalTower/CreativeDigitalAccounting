@@ -682,6 +682,7 @@ model Project {
   id                String        @id @default(cuid())
   companyId         String
   name              String
+  description       String?       @db.Text
   clientId          String?
   responsibleUserId String?
   budget            Float?
@@ -690,20 +691,41 @@ model Project {
   status            ProjectStatus @default(active)
   deadline          DateTime?
   progressPercent   Int           @default(0)
+  parentProjectId   String?
+  createdAt         DateTime      @default(now())
 
   company Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
   client  Client?        @relation(fields: [clientId], references: [id])
   entries ProjectEntry[]
   files   ProjectFile[]
+  notes   ProjectNote[]
+  parentProject Project?  @relation("ProjectTree", fields: [parentProjectId], references: [id])
+  subProjects   Project[] @relation("ProjectTree")
+
+  @@index([parentProjectId])
+}
+
+model ProjectNote {
+  id        String   @id @default(cuid())
+  projectId String
+  note      String   @db.Text
+  author    String?
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
 }
 
 model ProjectEntry {
-  id        String           @id @default(cuid())
-  projectId String
-  refType   String
-  refId     String
-  amount    Float
-  type      ProjectEntryType
+  id          String           @id @default(cuid())
+  projectId   String
+  refType     String           @default("manual")
+  refId       String?
+  description String?
+  amount      Float
+  type        ProjectEntryType
+  date        DateTime         @default(now())
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
