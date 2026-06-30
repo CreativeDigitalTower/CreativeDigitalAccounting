@@ -8,6 +8,8 @@ import { TopClientsChart, aggregateClientRevenue } from "@/components/app/TopCli
 import { upcomingStandard } from "@/lib/taxCalendar";
 import { BusinessProfileWizard } from "@/components/app/BusinessProfileWizard";
 import { PersonalizedDashboard } from "@/components/app/PersonalizedDashboard";
+import { SmartGreeting, type TodayItem } from "@/components/app/SmartGreeting";
+import { KpiStrip, type Kpi } from "@/components/app/KpiStrip";
 import { resolveLayout, SECTOR_TITLE } from "@/lib/workspaces";
 
 export default async function DashboardPage() {
@@ -161,20 +163,69 @@ export default async function DashboardPage() {
       .slice(0, 8);
   }
 
+  // ─── Smart Dashboard: поздрав + днешни задачи ───
+  const next7 = new Date(now.getTime() + 7 * 24 * 3600 * 1000);
+  const [meUser, openTasksCount, allInvoices, bdayClients, expiringOffersCount, unpaidInvoices, clientsCount] = await Promise.all([
+    prisma.user.findUnique({ where: { id: userId }, select: { name: true } }),
+    prisma.clientTask.count({ where: { done: false, client: { companyId } } }),
+    prisma.document.findMany({ where: { companyId, type: "invoice" }, select: { issueDate: true, dueDate: true, lines: { select: { lineTotal: true } } } }),
+    prisma.client.findMany({ where: { companyId, birthday: { not: null } }, select: { birthday: true } }),
+    prisma.document.count({ where: { companyId, type: "quote", dueDate: { gte: now, lte: next7 }, clientDecision: null } }),
+    prisma.document.findMany({ where: { companyId, type: "invoice", status: { in: ["sent", "overdue", "issued"] } }, select: { lines: { select: { lineTotal: true } } } }),
+    prisma.client.count({ where: { companyId } }),
+  ]);
+
+  const birthdaysToday = bdayClients.filter((c) => {
+    const b = c.birthday!; return b.getMonth() === now.getMonth() && b.getDate() === now.getDate();
+  }).length;
+  const unpaidTotal = unpaidInvoices.reduce((s, d) => s + d.lines.reduce((ss, l) => ss + l.lineTotal, 0), 0);
+  const expiringContractsCount = expiringContracts.length;
+
+  const todayItems: TodayItem[] = [
+    { icon: "🧾", label: "неплатени фактури", href: "/dashboard/invoices?status=overdue", count: unpaidInvoices.length, tone: "warn" },
+    { icon: "📑", label: "изтичащи договори", href: "/dashboard/contracts", count: expiringContractsCount, tone: "info" },
+    { icon: "✅", label: "отворени задачи", href: "/dashboard/clients", count: openTasksCount, tone: "info" },
+    { icon: "📤", label: "изтичащи оферти", href: "/dashboard/documents", count: expiringOffersCount, tone: "info" },
+    { icon: "🎂", label: "клиенти с рожден ден", href: "/dashboard/clients", count: birthdaysToday, tone: "ok" },
+  ];
+
+  // ─── KPI показатели ───
+  const allInvoiceTotals = allInvoices.map((d) => d.lines.reduce((s, l) => s + l.lineTotal, 0));
+  const totalRevenueAll = allInvoiceTotals.reduce((s, v) => s + v, 0);
+  const avgInvoice = allInvoiceTotals.length ? totalRevenueAll / allInvoiceTotals.length : 0;
+  const ltv = clientsCount ? totalRevenueAll / clientsCount : 0;
+  const termDays = allInvoices.filter((d) => d.dueDate).map((d) => Math.round((new Date(d.dueDate!).getTime() - new Date(d.issueDate).getTime()) / 86400000)).filter((n) => n >= 0);
+  const avgTerm = termDays.length ? Math.round(termDays.reduce((s, v) => s + v, 0) / termDays.length) : 0;
+  const marginPct = monthRevenue > 0 ? Math.round((profit / monthRevenue) * 100) : 0;
+  const businessKpis: Kpi[] = [
+    { label: "Средна фактура", value: formatCurrency(avgInvoice), color: "var(--navy)" },
+    { label: "Lifetime Value / клиент", value: formatCurrency(ltv), hint: `${clientsCount} клиента`, color: "var(--emerald-dark)" },
+    { label: "Среден срок за плащане", value: `${avgTerm} дни`, color: "var(--ink)" },
+    { label: "Марж на печалба (месец)", value: `${marginPct}%`, color: marginPct >= 0 ? "var(--emerald-dark)" : "var(--brick)" },
+    { label: "Брой продажби", value: String(allInvoiceTotals.length), hint: "издадени фактури", color: "var(--ink)" },
+    { label: "Общ оборот", value: formatCurrency(totalRevenueAll), color: "var(--navy)" },
+  ];
+
   return (
     <>
       {needsProfile && <BusinessProfileWizard />}
       {onboarding && <WelcomeWizard status={onboarding} />}
 
+      {/* Smart greeting + днешни задачи */}
+      <SmartGreeting
+        name={meUser?.name ?? ""}
+        items={todayItems}
+        expectedRevenue={unpaidTotal}
+        dateLabel={now.toLocaleDateString("bg-BG", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+      />
+
       {/* Topbar */}
       <div className="topbar">
         <div>
-          <h1 style={{ fontSize: 25, fontFamily: "'Fraunces', serif", fontWeight: 600, margin: "0 0 3px" }}>
+          <h1 style={{ fontSize: 22, fontFamily: "'Fraunces', serif", fontWeight: 600, margin: "0 0 3px" }}>
             Табло
           </h1>
-          <div style={{ color: "var(--muted)", fontSize: 13 }}>
-            {now.toLocaleDateString("bg-BG", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
-          </div>
+          <div style={{ color: "var(--muted)", fontSize: 13 }}>Преглед на бизнеса</div>
         </div>
         <Link href="/dashboard/documents/new" className="btn btn-primary">
           + Нов документ
@@ -253,6 +304,9 @@ export default async function DashboardPage() {
           </div>
         ))}
       </div>
+
+      {/* Разширени KPI показатели */}
+      <KpiStrip title="Бизнес показатели" kpis={businessKpis} />
 
       {/* Бизнес здравен индекс + Напомняния за плащане */}
       {hasHealth && health && (

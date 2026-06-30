@@ -132,3 +132,20 @@ input[type=file]::file-selector-button:hover{background:var(--emerald-dark);}
   body.printing-doc .printable{position:absolute!important;left:0;top:0;width:100%;max-width:none!important;box-shadow:none!important;border:none!important;}
   body.printing-doc .blob{display:none!important;}
 }
+
+/* ─── Модерни анимации и hover (визуален ъпгрейд) ─── */
+@keyframes cardIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.kpi-anim{animation:cardIn .35s ease both;}
+.kpi-card{transition:transform .18s ease, box-shadow .18s ease;}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(20,30,25,.12);}
+.today-chip:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(20,30,25,.12);}
+.dash-greeting{animation:cardIn .4s ease both;}
+.glass.panel{transition:box-shadow .2s ease;}
+tbody tr{transition:background .12s ease;}
+tbody tr:hover{background:rgba(15,138,106,.04);}
+.btn{transition:background .15s, transform .12s, box-shadow .15s;}
+.btn:hover{transform:translateY(-1px);}
+.btn:active{transform:translateY(0);}
+/* по-плавно появяване на падащи менюта */
+@keyframes popIn{from{opacity:0;transform:translateY(-6px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+.pop-in{animation:popIn .16s ease both;}
