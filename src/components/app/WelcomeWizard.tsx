@@ -14,14 +14,30 @@ const steps = (s: Status) => [
 
 export function WelcomeWizard({ status }: { status: Status }) {
   const [hidden, setHidden] = useState(false);
-  if (hidden) return null;
-
   const items = steps(status);
   const doneCount = items.filter((i) => i.done).length;
+  const allDone = doneCount === items.length;
 
   async function skip() {
     await fetch("/api/onboarding", { method: "POST" });
     setHidden(true);
+  }
+
+  if (hidden) return null;
+
+  // Всичко е попълнено → еднократно поздравление, после балончето изчезва завинаги.
+  if (allDone) {
+    return (
+      <div className="glass panel" style={{ padding: "22px 26px", marginBottom: 20, borderLeft: "4px solid var(--emerald)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+        <div>
+          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, margin: "0 0 4px" }}>🎉 Всичко е готово!</h2>
+          <p style={{ color: "var(--ink-soft)", fontSize: 13.5, margin: 0 }}>
+            Профилът Ви е напълно настроен. Пожелаваме Ви успех и развитие с Creative Digital Accounting!
+          </p>
+        </div>
+        <button onClick={skip} className="btn btn-primary btn-sm">Към работа →</button>
+      </div>
+    );
   }
 
   return (

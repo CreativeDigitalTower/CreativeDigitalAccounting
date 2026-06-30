@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getCompanyId, IMPERSONATE_COOKIE } from "@/lib/session";
 import { BlobBackground } from "@/components/Backgrounds";
 import { Sidebar } from "@/components/app/Sidebar";
+import { AppTopBar } from "@/components/app/AppTopBar";
 import { ImpersonationBanner } from "@/components/app/ImpersonationBanner";
 import { VisitTracker } from "@/components/VisitTracker";
 import { TrialEndedPopup } from "@/components/app/TrialEndedPopup";
@@ -40,7 +41,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <main style={{ flex: 1, minWidth: 0, maxWidth: 1180 }}>
           {impersonating && <ImpersonationBanner companyName={company.name} />}
           {sub.justExpired && <TrialEndedPopup wasTrial={sub.wasTrial} periodEnd={sub.currentPeriodEnd ? new Date(sub.currentPeriodEnd).toISOString() : ""} />}
-          <div style={{ padding: "28px 36px 60px" }}>{children}</div>
+          <AppTopBar initialUnread={inboxUnread} />
+          <div style={{ padding: "14px 36px 60px" }}>{children}</div>
         </main>
       </div>
     </div>
