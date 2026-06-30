@@ -2,6 +2,7 @@ import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { formatCurrency, toBGN, isDualCurrencyActive } from "@/lib/constants";
+import { AttachmentCell } from "@/components/app/AttachmentCell";
 
 export default async function ExpensesPage() {
   const { companyId } = await requireFeature("expenses");
@@ -74,6 +75,7 @@ export default async function ExpensesPage() {
                 <th className="num">ДДС</th>
                 <th className="num">Бруто</th>
                 {dual && <th className="num">BGN</th>}
+                <th>Файл</th>
               </tr>
             </thead>
             <tbody>
@@ -98,6 +100,7 @@ export default async function ExpensesPage() {
                   <td className="num">{formatCurrency(exp.vatAmount)}</td>
                   <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(exp.amount)}</td>
                   {dual && <td className="num" style={{ fontSize: 11.5, color: "var(--muted)" }}>{formatCurrency(toBGN(exp.amount), "BGN")}</td>}
+                  <td><AttachmentCell endpoint={`/api/expenses/${exp.id}`} hasFile={!!exp.attachmentUrl} maxMB={3} /></td>
                 </tr>
               ))}
             </tbody>

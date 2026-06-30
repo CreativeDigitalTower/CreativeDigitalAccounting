@@ -274,8 +274,11 @@ model Supplier {
   eik          String?
   vatNumber    String?
   address      String?
+  city         String?
+  contactPerson String?
   contactEmail String?
   phone        String?
+  website      String?
   rating       Int?
   notes        String?  @db.Text
   createdAt    DateTime @default(now())

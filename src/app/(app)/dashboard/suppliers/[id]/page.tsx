@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/constants";
+import { SupplierInfoCard } from "@/components/app/SupplierInfoCard";
 
 export default async function SupplierDossierPage({ params }: { params: Promise<{ id: string }> }) {
   const { companyId } = await requireCompany();
@@ -25,18 +26,14 @@ export default async function SupplierDossierPage({ params }: { params: Promise<
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1.6fr", gap: 18, alignItems: "start" }}>
-        <div className="glass panel">
-          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 12px" }}>Данни</h3>
-          <dl style={{ margin: 0, fontSize: 13, display: "grid", gridTemplateColumns: "auto 1fr", gap: "8px 12px" }}>
-            {[["ЕИК", supplier.eik], ["ДДС №", supplier.vatNumber], ["Адрес", supplier.address], ["Имейл", supplier.contactEmail], ["Телефон", supplier.phone]]
-              .filter(([, v]) => v).map(([k, v]) => (
-              <div key={k as string} style={{ display: "contents" }}>
-                <dt style={{ color: "var(--muted)" }}>{k}</dt><dd style={{ margin: 0, fontWeight: 500 }}>{v}</dd>
-              </div>
-            ))}
-          </dl>
-          {supplier.notes && <p style={{ fontSize: 12.5, color: "var(--ink-soft)", marginTop: 12 }}>{supplier.notes}</p>}
-          <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid var(--border)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <SupplierInfoCard supplier={{
+            id: supplier.id, name: supplier.name, eik: supplier.eik, vatNumber: supplier.vatNumber,
+            address: supplier.address, city: supplier.city, contactPerson: supplier.contactPerson,
+            contactEmail: supplier.contactEmail, phone: supplier.phone, website: supplier.website,
+            rating: supplier.rating, notes: supplier.notes,
+          }} />
+          <div className="glass panel">
             <div style={{ fontSize: 12, color: "var(--muted)" }}>Общо разходи</div>
             <div className="num" style={{ fontSize: 20, fontWeight: 700 }}>{formatCurrency(totalSpent)}</div>
           </div>
