@@ -1,8 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { formatCurrency } from "@/lib/constants";
-
-export type ClientRevenue = { name: string; total: number };
+import type { ClientRevenue } from "@/lib/clientRevenue";
 
 const COLORS = ["#0F8A6A", "#2C4A66", "#A5812E", "#3F9C82", "#A23B2B"];
 
@@ -83,15 +82,3 @@ export function TopClientsChart({ data, title = "Топ 5 клиента по п
   );
 }
 
-/** Помощна функция: агрегира приходите по клиент от фактури. */
-export function aggregateClientRevenue(
-  invoices: { client: { name: string } | null; lines: { lineTotal: number }[] }[]
-): ClientRevenue[] {
-  const map = new Map<string, number>();
-  for (const inv of invoices) {
-    if (!inv.client) continue;
-    const sum = inv.lines.reduce((s, l) => s + l.lineTotal, 0);
-    map.set(inv.client.name, (map.get(inv.client.name) ?? 0) + sum);
-  }
-  return [...map.entries()].map(([name, total]) => ({ name, total }));
-}

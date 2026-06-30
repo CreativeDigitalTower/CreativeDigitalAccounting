@@ -1,7 +1,8 @@
 import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { FinancialHistoryForm } from "@/components/app/FinancialHistoryForm";
-import { TopClientsChart, aggregateClientRevenue } from "@/components/app/TopClientsChart";
+import { TopClientsChart } from "@/components/app/TopClientsChart";
+import { aggregateClientRevenue } from "@/lib/clientRevenue";
 import { formatCurrency, toBGN, isDualCurrencyActive } from "@/lib/constants";
 
 export default async function AnalyticsPage() {
