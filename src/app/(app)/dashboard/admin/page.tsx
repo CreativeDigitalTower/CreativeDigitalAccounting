@@ -14,7 +14,15 @@ const RANGES = [
 const MONTH_NAMES = ["Ян", "Фев", "Мар", "Апр", "Май", "Юни", "Юли", "Авг", "Сеп", "Окт", "Ное", "Дек"];
 const PLAN_PRICE: Record<string, number> = { free: planPrice("free"), start: planPrice("start"), business: planPrice("business"), pro: planPrice("pro") };
 
-export default async function AdminPage({ searchParams }: { searchParams: Promise<{ range?: string }> }) {
+const PV_RANGES = [
+  { id: "today", label: "Днес", days: 1 },
+  { id: "7d", label: "7 дни", days: 7 },
+  { id: "30d", label: "30 дни", days: 30 },
+  { id: "12m", label: "12 месеца", days: 365 },
+  { id: "all", label: "Цял период", days: null as number | null },
+];
+
+export default async function AdminPage({ searchParams }: { searchParams: Promise<{ range?: string; pvRange?: string; pvFrom?: string; pvTo?: string }> }) {
   await requireSuperAdmin();
   const sp = await searchParams;
   const range = RANGES.find((r) => r.id === sp?.range) ?? RANGES[1]; // по подразбиране 30 дни
@@ -110,11 +118,22 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
   // Използване на публичните инструменти
   const toolNames: Record<string, string> = { currency: "Валутен", salary: "Заплати", vat: "ДДС", interest: "Лихвен", markup: "Надценка" };
-  const publicVisits = await prisma.siteVisit.findMany({ where: { area: "public" }, select: { path: true } });
 
-  // ─── Преглеждания по страници (вкл. началната) (#14) ───
+  // ─── Преглеждания по страници с избор на период (#14 + Вход/Регистрация) ───
+  const pvRange = PV_RANGES.find((r) => r.id === sp?.pvRange) ?? PV_RANGES[2]; // по подразбиране 30 дни
+  let pvFrom: Date | null = null, pvTo: Date | null = null, pvLabel = pvRange.label;
+  if (sp?.pvFrom && sp?.pvTo) {
+    pvFrom = new Date(sp.pvFrom); pvFrom.setHours(0, 0, 0, 0);
+    pvTo = new Date(sp.pvTo); pvTo.setHours(23, 59, 59, 999);
+    pvLabel = `${pvFrom.toLocaleDateString("bg-BG")} – ${pvTo.toLocaleDateString("bg-BG")}`;
+  } else if (pvRange.days != null) {
+    pvFrom = pvRange.id === "today" ? new Date(new Date().setHours(0, 0, 0, 0)) : new Date(Date.now() - pvRange.days * 86400000);
+  }
+  const pvWhere = { area: "public", ...(pvFrom || pvTo ? { createdAt: { ...(pvFrom ? { gte: pvFrom } : {}), ...(pvTo ? { lte: pvTo } : {}) } } : {}) };
+  const publicVisits = await prisma.siteVisit.findMany({ where: pvWhere, select: { path: true } });
+
   const pageLabels: Record<string, string> = {
-    "/": "🏠 Начална страница", "/blog": "Блог", "/faq": "ЧЗВ", "/contact": "Контакти", "/about": "За нас",
+    "/": "Начална страница", "/blog": "Блог", "/faq": "ЧЗВ", "/contact": "Контакти", "/about": "За нас",
     "/software": "За софтуера", "/accountants": "За счетоводители", "/register": "Регистрация", "/login": "Вход",
     "/terms": "Общи условия", "/privacy": "Поверителност", "/security": "Сигурност", "/tools": "Инструменти",
   };
@@ -122,8 +141,10 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   for (const v of publicVisits) pageViews.set(v.path, (pageViews.get(v.path) ?? 0) + 1);
   const pagesSorted = [...pageViews.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
   const totalPublicViews = publicVisits.length;
-  const totalAppViews = appVisits.length;
   const homeViews = pageViews.get("/") ?? 0;
+  const loginViews = pageViews.get("/login") ?? 0;
+  const registerViews = pageViews.get("/register") ?? 0;
+  const totalAppViews = appVisits.length;
   const toolUsage = new Map<string, number>();
   for (const v of publicVisits) {
     const parts = v.path.split("/");
@@ -319,13 +340,33 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
       {/* Преглеждания по страници (#14) */}
       <div className="glass panel" style={{ marginBottom: 20 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 10 }}>
-          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>Преглеждания по страници</h3>
-          <div style={{ display: "flex", gap: 16, fontSize: 12.5 }}>
-            <span>🏠 Начална: <strong className="num" style={{ color: "var(--emerald-dark)" }}>{homeViews}</strong></span>
-            <span>Публични: <strong className="num">{totalPublicViews}</strong></span>
-            <span>В приложението: <strong className="num">{totalAppViews}</strong></span>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, flexWrap: "wrap", gap: 10 }}>
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>Преглеждания по страници <span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 400 }}>· {pvLabel}</span></h3>
+          <div style={{ display: "flex", gap: 5, flexWrap: "wrap", alignItems: "center" }}>
+            {PV_RANGES.map((r) => (
+              <Link key={r.id} href={`/dashboard/admin?pvRange=${r.id}`} className={`filter-tab${!sp?.pvFrom && pvRange.id === r.id ? " active" : ""}`} style={{ fontSize: 11.5 }}>{r.label}</Link>
+            ))}
+            <form method="get" action="/dashboard/admin" style={{ display: "inline-flex", gap: 4, alignItems: "center", marginLeft: 4 }}>
+              <input type="date" name="pvFrom" defaultValue={sp?.pvFrom} required style={{ width: "auto", padding: "4px 6px", fontSize: 11.5 }} />
+              <span style={{ color: "var(--muted)" }}>–</span>
+              <input type="date" name="pvTo" defaultValue={sp?.pvTo} required style={{ width: "auto", padding: "4px 6px", fontSize: 11.5 }} />
+              <button type="submit" className="btn btn-ghost btn-sm" style={{ fontSize: 11.5 }}>Покажи</button>
+            </form>
           </div>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px,1fr))", gap: 12, marginBottom: 14 }}>
+          {[
+            { l: "Начална страница", v: homeViews, c: "var(--emerald-dark)" },
+            { l: "Страница Вход", v: loginViews, c: "var(--navy)" },
+            { l: "Страница Регистрация", v: registerViews, c: "var(--brass)" },
+            { l: "Всички публични", v: totalPublicViews, c: "var(--ink)" },
+            { l: "В приложението", v: totalAppViews, c: "var(--muted)" },
+          ].map((s) => (
+            <div key={s.l} className="glass kpi-card" style={{ padding: "12px 14px" }}>
+              <div style={{ fontSize: 11.5, color: "var(--muted)" }}>{s.l}</div>
+              <div className="num" style={{ fontSize: 22, fontWeight: 700, color: s.c }}>{s.v}</div>
+            </div>
+          ))}
         </div>
         {pagesSorted.length === 0 ? <div style={{ fontSize: 13, color: "var(--muted)" }}>Все още няма данни.</div> : (
           <table>
