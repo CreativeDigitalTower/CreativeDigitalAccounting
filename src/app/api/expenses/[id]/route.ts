@@ -12,6 +12,7 @@ const schema = z.object({
   date: z.string().optional(),
   categoryId: z.string().optional(),
   supplierId: z.string().nullable().optional(),
+  isRecurring: z.boolean().optional(),
 });
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -32,6 +33,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         ...(d.date !== undefined ? { date: new Date(d.date) } : {}),
         ...(d.categoryId !== undefined ? { categoryId: d.categoryId } : {}),
         ...(d.supplierId !== undefined ? { supplierId: d.supplierId } : {}),
+        ...(d.isRecurring !== undefined ? { isRecurring: d.isRecurring } : {}),
       },
     });
     return NextResponse.json(expense);

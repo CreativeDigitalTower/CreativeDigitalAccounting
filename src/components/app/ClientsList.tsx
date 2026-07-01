@@ -17,6 +17,20 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<string>("all");
   const [menu, setMenu] = useState<{ x: number; y: number; client: ClientRow } | null>(null);
+  const [mergeSource, setMergeSource] = useState<ClientRow | null>(null);
+  const [mergeTarget, setMergeTarget] = useState("");
+  const [merging, setMerging] = useState(false);
+
+  async function doMerge() {
+    if (!mergeSource || !mergeTarget) return;
+    setMerging(true);
+    const res = await fetch(`/api/clients/${mergeSource.id}/merge`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ intoId: mergeTarget }),
+    });
+    setMerging(false);
+    if (res.ok) { setMergeSource(null); setMergeTarget(""); router.refresh(); }
+    else alert((await res.json()).error ?? "Грешка при обединяване.");
+  }
 
   async function deleteClient(c: ClientRow) {
     if (!confirm(`Изтриване на клиент „${c.name}"?\nТова действие е необратимо.`)) return;
@@ -32,6 +46,7 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
       { label: "Нова оферта", icon: "📄", onClick: () => router.push(`/dashboard/documents/new?clientId=${c.id}&type=quote`) },
       { divider: true, label: "", onClick: () => {} },
       { label: "Копирай име", icon: "⧉", onClick: () => navigator.clipboard?.writeText(c.name) },
+      { label: "Обедини с друг клиент", icon: "⇄", onClick: () => { setMergeSource(c); setMergeTarget(""); } },
       { label: "Изтрий клиент", icon: "🗑", danger: true, onClick: () => deleteClient(c) },
     ];
   }
@@ -140,6 +155,26 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
       </div>
 
       {menu && <ContextMenu x={menu.x} y={menu.y} items={menuItems(menu.client)} onClose={() => setMenu(null)} />}
+
+      {mergeSource && (
+        <div onClick={() => setMergeSource(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 }}>
+          <div onClick={(e) => e.stopPropagation()} className="glass panel" style={{ width: 440, maxWidth: "100%", padding: 24, borderRadius: 14 }}>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 17, margin: "0 0 6px" }}>Обединяване на клиенти</h3>
+            <p style={{ fontSize: 12.5, color: "var(--muted)", margin: "0 0 14px" }}>
+              „{mergeSource.name}" ще бъде обединен в избрания клиент. Всички фактури, суми и данни се прехвърлят, а дублиращият профил се изтрива.
+            </p>
+            <label style={{ fontSize: 12, fontWeight: 600 }}>Обедини в:</label>
+            <select value={mergeTarget} onChange={(e) => setMergeTarget(e.target.value)} style={{ marginBottom: 14 }}>
+              <option value="">— Изберете клиент —</option>
+              {clients.filter((c) => c.id !== mergeSource.id).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+              <button className="btn btn-ghost btn-sm" onClick={() => setMergeSource(null)}>Отказ</button>
+              <button className="btn btn-primary btn-sm" disabled={!mergeTarget || merging} onClick={doMerge}>{merging ? "Обединяване…" : "Обедини"}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

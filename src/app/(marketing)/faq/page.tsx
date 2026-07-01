@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { IconRocket, IconInvoice, IconCash, IconShield } from "@/components/Icons";
+import type { ComponentType } from "react";
 
 export const metadata: Metadata = {
   title: "Често задавани въпроси (ЧЗВ) | Creative Digital Accounting",
@@ -8,9 +10,9 @@ export const metadata: Metadata = {
 
 type QA = { q: string; a: string[]; highlight?: boolean };
 
-const GROUPS: { title: string; icon: string; items: QA[] }[] = [
+const GROUPS: { title: string; Icon: ComponentType; items: QA[] }[] = [
   {
-    title: "Започване и миграция", icon: "🚀",
+    title: "Започване и миграция", Icon: IconRocket,
     items: [
       { highlight: true, q: "Вече използвам друг софтуер за фактуриране. Мога ли да премина към Creative Digital Accounting без проблеми?",
         a: [
@@ -25,7 +27,7 @@ const GROUPS: { title: string; icon: string; items: QA[] }[] = [
     ],
   },
   {
-    title: "Фактуриране и документи", icon: "🧾",
+    title: "Фактуриране и документи", Icon: IconInvoice,
     items: [
       { q: "Как започва номерацията на фактурите за нов акаунт?",
         a: ["Номерацията е автоматична и започва от началото (0000000001). До всяка фактура има опция за отключване и ръчна редакция на поредния номер — ако зададете номер X, номерацията продължава оттам нататък."] },
@@ -36,7 +38,7 @@ const GROUPS: { title: string; icon: string; items: QA[] }[] = [
     ],
   },
   {
-    title: "Абонаменти и плащания", icon: "💳",
+    title: "Абонаменти и плащания", Icon: IconCash,
     items: [
       { q: "Има ли безплатен план и безплатен тест?",
         a: ["Да. Има безплатен план завинаги, а плановете Старт и Бизнес имат еднократен 7-дневен безплатен тест."] },
@@ -49,7 +51,7 @@ const GROUPS: { title: string; icon: string; items: QA[] }[] = [
     ],
   },
   {
-    title: "Сигурност и профил", icon: "🔒",
+    title: "Сигурност и профил", Icon: IconShield,
     items: [
       { q: "Сигурни ли са данните ми?",
         a: ["Да. Данните се съхраняват криптирано, паролите се хешират, а достъпът е изолиран между отделните фирми. Повече в Политиката за информационна сигурност."] },
@@ -75,8 +77,8 @@ export default function FaqPage() {
       <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
         {GROUPS.map((g) => (
           <section key={g.title}>
-            <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, fontWeight: 700, margin: "0 0 14px", display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 22 }}>{g.icon}</span> {g.title}
+            <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, fontWeight: 700, margin: "0 0 14px", display: "flex", alignItems: "center", gap: 11 }}>
+              <span className="icon-tile" style={{ width: 34, height: 34 }}><g.Icon /></span> {g.title}
             </h2>
             <div style={{ display: "grid", gap: 12 }}>
               {g.items.map((qa, i) => (

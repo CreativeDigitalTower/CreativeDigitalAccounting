@@ -1,14 +1,14 @@
 import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { formatCurrency, toBGN, isDualCurrencyActive } from "@/lib/constants";
-import { AttachmentCell } from "@/components/app/AttachmentCell";
+import { formatCurrency, toBGN, isDualCurrencyActive, EUR_TO_BGN } from "@/lib/constants";
+import { ExpensesList } from "@/components/app/ExpensesList";
 
 export default async function ExpensesPage() {
   const { companyId } = await requireFeature("expenses");
   const dual = isDualCurrencyActive();
 
-  const [expenses, totalResult] = await Promise.all([
+  const [expenses, totalResult, categories, suppliers] = await Promise.all([
     prisma.expense.findMany({
       where: { companyId },
       include: { category: true, supplier: true },
@@ -18,6 +18,8 @@ export default async function ExpensesPage() {
       where: { companyId },
       _sum: { amount: true, vatAmount: true },
     }),
+    prisma.expenseCategory.findMany({ where: { companyId }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    prisma.supplier.findMany({ where: { companyId }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
   ]);
 
   const total = totalResult._sum.amount ?? 0;
@@ -55,58 +57,24 @@ export default async function ExpensesPage() {
         </div>
       </div>
 
-      <div className="glass panel" style={{ padding: "8px 0" }}>
-        {expenses.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>💰</div>
-            <div style={{ fontSize: 14, marginBottom: 16 }}>Няма въведени разходи</div>
-            <Link href="/dashboard/expenses/new" className="btn btn-primary btn-sm">Добави разход</Link>
-          </div>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Описание</th>
-                <th>Категория</th>
-                <th>Доставчик</th>
-                <th>Дата</th>
-                <th>Тип</th>
-                <th className="num">Нето</th>
-                <th className="num">ДДС</th>
-                <th className="num">Бруто</th>
-                {dual && <th className="num">BGN</th>}
-                <th>Файл</th>
-              </tr>
-            </thead>
-            <tbody>
-              {expenses.map((exp) => (
-                <tr key={exp.id}>
-                  <td style={{ fontWeight: 600 }}>{exp.description}</td>
-                  <td>
-                    <span style={{ background: "var(--navy-soft)", color: "var(--navy)", borderRadius: 20, padding: "3px 10px", fontSize: 12, fontWeight: 600 }}>
-                      {exp.category.name}
-                    </span>
-                  </td>
-                  <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>{exp.supplier?.name ?? "—"}</td>
-                  <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>
-                    {new Date(exp.date).toLocaleDateString("bg-BG")}
-                  </td>
-                  <td>
-                    <span style={{ fontSize: 11.5, color: exp.source === "incoming_invoice" ? "var(--navy)" : "var(--muted)" }}>
-                      {exp.source === "incoming_invoice" ? "Вх. фактура" : "Ръчно"}
-                    </span>
-                  </td>
-                  <td className="num">{formatCurrency(exp.amount - exp.vatAmount)}</td>
-                  <td className="num">{formatCurrency(exp.vatAmount)}</td>
-                  <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(exp.amount)}</td>
-                  {dual && <td className="num" style={{ fontSize: 11.5, color: "var(--muted)" }}>{formatCurrency(toBGN(exp.amount), "BGN")}</td>}
-                  <td><AttachmentCell endpoint={`/api/expenses/${exp.id}`} hasFile={!!exp.attachmentUrl} maxMB={3} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      {expenses.length === 0 ? (
+        <div className="glass panel" style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
+          <div style={{ fontSize: 14, marginBottom: 16 }}>Няма въведени разходи</div>
+          <Link href="/dashboard/expenses/new" className="btn btn-primary btn-sm">Добави разход</Link>
+        </div>
+      ) : (
+        <ExpensesList
+          dual={dual}
+          toBGNRate={EUR_TO_BGN}
+          categories={categories}
+          suppliers={suppliers}
+          expenses={expenses.map((e) => ({
+            id: e.id, description: e.description, category: e.category.name, categoryId: e.categoryId,
+            supplier: e.supplier?.name ?? null, supplierId: e.supplierId, date: e.date.toISOString(),
+            amount: e.amount, vatAmount: e.vatAmount, source: e.source, isRecurring: e.isRecurring, hasFile: !!e.attachmentUrl,
+          }))}
+        />
+      )}
     </>
   );
 }
