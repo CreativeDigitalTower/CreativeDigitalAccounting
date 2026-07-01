@@ -18,9 +18,18 @@ export async function generateDocumentNumber(
 ): Promise<string> {
   const prefix = DOC_PREFIXES[type] ?? "";
 
-  const count = await prisma.document.count({
+  // Продължаваме от най-големия използван номер за този тип (+1).
+  // Така при редакция на номер (напр. до 100) следващата фактура е 101 —
+  // номерацията продължава оттам, без грешки/дублиране.
+  const docs = await prisma.document.findMany({
     where: { companyId, type },
+    select: { number: true },
   });
+  let maxNum = 0;
+  for (const d of docs) {
+    const n = parseInt(d.number.replace(/\D/g, ""), 10);
+    if (!isNaN(n) && n > maxNum) maxNum = n;
+  }
 
   let startBase = 1;
   if (type === "invoice") {
@@ -31,7 +40,7 @@ export async function generateDocumentNumber(
     startBase = company?.invoiceNumberStart ?? 1;
   }
 
-  const next = Math.max(startBase, count + 1);
+  const next = Math.max(startBase, maxNum + 1);
 
   if (type === "invoice") {
     return String(next).padStart(10, "0"); // 0000000001

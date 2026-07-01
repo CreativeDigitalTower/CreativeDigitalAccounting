@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Stamp } from "@/components/Stamp";
 import { DocumentActions } from "@/components/app/DocumentActions";
 import { SendToClient } from "@/components/app/SendToClient";
+import { EditableDocNumber } from "@/components/app/EditableDocNumber";
 import { InvoiceDocument } from "@/components/app/InvoiceDocument";
 import { OfferDocument } from "@/components/app/OfferDocument";
 
@@ -28,7 +29,9 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <Link href="/dashboard/documents" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← Документи</Link>
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, fontWeight: 600, margin: 0 }}>{doc.number}</h1>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, fontWeight: 600, margin: 0 }}>
+            <EditableDocNumber id={doc.id} initial={doc.number} />
+          </h1>
           <Stamp status={doc.status} />
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", position: "relative" }} className="no-print">
