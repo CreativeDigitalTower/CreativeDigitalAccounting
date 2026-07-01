@@ -56,6 +56,7 @@ export default function NewExpensePage() {
         date: fd.get("date"),
         source: (fd.get("invoiceNumber") as string) ? "incoming_invoice" : "manual",
         attachmentUrl: attachment,
+        isRecurring: !!fd.get("isRecurring"),
       }),
     });
 
@@ -130,6 +131,12 @@ export default function NewExpensePage() {
               <label>Прикачи разходна фактура (PDF/снимка)</label>
               <input type="file" accept="application/pdf,image/*" onChange={handleFile} style={{ fontSize: 13 }} />
               {attachmentName && <div style={{ fontSize: 12, color: "var(--emerald)", marginTop: 6 }}>✓ Прикачен: {attachmentName}</div>}
+            </div>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label style={{ display: "flex", gap: 8, alignItems: "center", fontWeight: 400 }}>
+                <input type="checkbox" name="isRecurring" style={{ width: "auto" }} /> Повтарящ се месечен разход (наем, заплати, поддръжка…)
+              </label>
+              <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 4 }}>Използва се за изчисляване на фиксираните месечни разходи в Анализи.</div>
             </div>
           </div>
         </div>

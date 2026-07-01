@@ -31,6 +31,19 @@ export default async function AnalyticsPage() {
     prisma.document.count({ where: { companyId, type: "invoice", status: "paid" } }),
   ]);
 
+  // Очаквани месечни приходи (абонаментни договори) + фиксирани месечни разходи
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const [retainerAgg, recurringExpenses, monthInvoices] = await Promise.all([
+    prisma.client.aggregate({ where: { companyId, monthlyRetainer: { not: null } }, _sum: { monthlyRetainer: true } }),
+    prisma.expense.findMany({ where: { companyId, isRecurring: true }, include: { category: true } }),
+    prisma.document.findMany({ where: { companyId, type: "invoice", issueDate: { gte: monthStart } }, include: { lines: true } }),
+  ]);
+  const expectedRetainer = retainerAgg._sum.monthlyRetainer ?? 0;
+  const monthInvoiced = monthInvoices.reduce((s, d) => s + d.lines.reduce((ss, l) => ss + l.lineTotal, 0), 0);
+  const expectedMonthlyRevenue = expectedRetainer + monthInvoiced;
+  const fixedMonthlyExpenses = recurringExpenses.reduce((s, e) => s + e.amount, 0);
+  const expectedMonthlyResult = expectedMonthlyRevenue - fixedMonthlyExpenses;
+
   const yearRevenue = invoices.reduce((s, d) => s + d.lines.reduce((ss, l) => ss + l.lineTotal, 0), 0);
   const yearExpenses = expenses._sum.amount ?? 0;
   const yearProfit = yearRevenue - yearExpenses;
@@ -83,6 +96,37 @@ export default async function AnalyticsPage() {
             )}
           </div>
         ))}
+      </div>
+
+      {/* Месечна прогноза — очаквани приходи (абонаменти + фактури) vs фиксирани разходи */}
+      <div className="glass panel" style={{ marginBottom: 18 }}>
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 4px" }}>Месечна прогноза</h3>
+        <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 14px" }}>Очаквани месечни приходи (абонаментни договори + издадени фактури този месец) спрямо фиксираните месечни разходи.</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px,1fr))", gap: 14 }}>
+          {[
+            { l: "Очаквани месечни приходи", v: expectedMonthlyRevenue, c: "var(--emerald-dark)", sub: `${formatCurrency(expectedRetainer)} абонаменти + ${formatCurrency(monthInvoiced)} фактури` },
+            { l: "Фиксирани месечни разходи", v: fixedMonthlyExpenses, c: "var(--brick)", sub: `${recurringExpenses.length} повтарящи се разхода` },
+            { l: "Очакван месечен резултат", v: expectedMonthlyResult, c: expectedMonthlyResult >= 0 ? "var(--emerald-dark)" : "var(--brick)", sub: "приходи − фиксирани разходи" },
+          ].map((k) => (
+            <div key={k.l}>
+              <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 4 }}>{k.l}</div>
+              <div className="num" style={{ fontSize: 20, fontWeight: 700, color: k.c }}>{formatCurrency(k.v)}</div>
+              <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>{k.sub}</div>
+            </div>
+          ))}
+        </div>
+        {recurringExpenses.length > 0 && (
+          <div style={{ marginTop: 14, paddingTop: 12, borderTop: "1px solid var(--border)" }}>
+            <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 8 }}>Фиксирани месечни разходи:</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {recurringExpenses.map((e) => (
+                <span key={e.id} style={{ fontSize: 12, background: "var(--brick-soft)", color: "var(--brick)", borderRadius: 14, padding: "3px 11px", fontWeight: 600 }}>
+                  {e.category?.name ? `${e.category.name}: ` : ""}{e.description} — {formatCurrency(e.amount)}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div style={{ marginBottom: 18 }}>
@@ -158,6 +202,16 @@ export default async function AnalyticsPage() {
             Въведете оборотите и печалбата от предходни години, за да следите реалния растеж на бизнеса.
           </div>
         ) : (
+          <>
+          {/* Диаграма на приходите по години (#12) */}
+          <div style={{ marginBottom: 16 }}>
+            <MonthlyBarChart
+              months={financialHistory.map((h) => String(h.year))}
+              values={financialHistory.map((h) => h.revenue)}
+              currentIndex={financialHistory.length - 1}
+              title="Приходи по години"
+            />
+          </div>
           <table>
             <thead>
               <tr>
@@ -186,6 +240,7 @@ export default async function AnalyticsPage() {
               })}
             </tbody>
           </table>
+          </>
         )}
       </div>
     </>

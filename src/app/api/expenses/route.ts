@@ -13,6 +13,7 @@ const schema = z.object({
   date: z.string(),
   source: z.enum(["manual", "incoming_invoice"]).default("manual"),
   attachmentUrl: z.string().optional().nullable(),
+  isRecurring: z.boolean().optional(),
 });
 
 export async function POST(req: Request) {
@@ -33,6 +34,7 @@ export async function POST(req: Request) {
         date: new Date(data.date),
         source: data.source,
         attachmentUrl: data.attachmentUrl ?? null,
+        isRecurring: data.isRecurring ?? false,
       },
     });
     return NextResponse.json(expense);

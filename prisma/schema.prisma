@@ -652,6 +652,7 @@ model Expense {
   date          DateTime
   source        ExpenseSource @default(manual)
   attachmentUrl String?
+  isRecurring   Boolean       @default(false) // повтарящ се месечен разход (наем, заплати…)
   createdAt     DateTime      @default(now())
 
   company  Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
