@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { metaTrack } from "@/lib/metaClient";
 import { PLAN_DETAILS, BILLING_PERIODS } from "@/components/marketing/Pricing";
 import { EUR_TO_BGN, isPromoActive } from "@/lib/constants";
 
@@ -49,6 +50,16 @@ function RegisterForm() {
       }),
     });
     if (res.ok) {
+      // ─── Meta: регистрация ───
+      try {
+        const data = await res.clone().json().catch(() => ({}));
+        const [firstName, ...rest] = acc.name.trim().split(" ");
+        const user = { email: acc.email, firstName, lastName: rest.join(" "), externalId: data?.companyId };
+        metaTrack("CompleteRegistration", { content_name: "Registration", plan_name: plan }, { user });
+        metaTrack("UserRegistered", { plan_name: plan }, { user });
+        metaTrack("Lead", { content_name: "Registration" }, { user });
+      } catch { /* tracking не бива да чупи регистрацията */ }
+
       // Автоматичен вход след успешна регистрация
       const login = await signIn("credentials", { email: acc.email, password: acc.password, redirect: false });
       setLoading(false);

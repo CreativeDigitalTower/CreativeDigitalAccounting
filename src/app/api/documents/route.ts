@@ -167,6 +167,23 @@ export async function POST(req: Request) {
 
     await audit(companyId, userId, "create", "Document", document.id, `${data.type} ${number}${stockNote ? ` · ${stockNote}` : ""}${sharedWith ? ` · споделен с ${sharedWith}` : ""}`);
 
+    // ─── Meta: първа издадена фактура ───
+    if (data.type === "invoice" && issued) {
+      try {
+        const invoiceCount = await prisma.document.count({ where: { companyId, type: "invoice" } });
+        if (invoiceCount === 1) {
+          const { sendMetaEvent, metaContextFromRequest, newEventId } = await import("@/lib/meta");
+          const owner = await prisma.companyUser.findFirst({ where: { companyId, role: "owner" }, select: { user: { select: { email: true, name: true } } } });
+          const total = document.lines.reduce((s, l) => s + l.lineTotal, 0);
+          await sendMetaEvent({
+            eventName: "FirstInvoiceCreated", eventId: newEventId(), actionSource: "system_generated",
+            user: { email: owner?.user.email, firstName: owner?.user.name?.split(" ")[0], externalId: companyId, ...metaContextFromRequest(req) },
+            custom: { company_id: companyId, value: total, currency: data.currency },
+          });
+        }
+      } catch { /* ignore */ }
+    }
+
     return NextResponse.json({ ...document, stockNote, sharedWith });
   } catch (err) {
     if (err instanceof z.ZodError) {

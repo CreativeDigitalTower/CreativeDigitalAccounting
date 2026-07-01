@@ -58,6 +58,26 @@ export async function POST(req: Request) {
       }
     } catch (e) { console.error("admin plan email", e); }
 
+    // ─── Meta: активиране/промяна на абонамент (Purchase) ───
+    try {
+      if (plan !== "free") {
+        const { sendMetaEvent, newEventId } = await import("@/lib/meta");
+        const { planPrice, PLAN_ORDER } = await import("@/lib/constants").then((m) => ({ planPrice: m.planPrice, PLAN_ORDER: ["free", "start", "business", "pro"] }));
+        const owner = await prisma.companyUser.findFirst({ where: { companyId, role: "owner" }, select: { user: { select: { email: true, name: true } } } });
+        const prevPlan = prev?.plan ?? "free";
+        const value = planPrice(plan);
+        const user = { email: owner?.user.email, firstName: owner?.user.name?.split(" ")[0], externalId: companyId };
+        const custom = { value, currency: "EUR", plan_name: plan, company_id: companyId };
+        await sendMetaEvent({ eventName: "SubscriptionActivated", eventId: newEventId(), actionSource: "system_generated", user, custom });
+        await sendMetaEvent({ eventName: "Purchase", eventId: newEventId(), actionSource: "system_generated", user, custom });
+        if (prevPlan !== "free" && PLAN_ORDER.indexOf(plan) > PLAN_ORDER.indexOf(prevPlan)) {
+          await sendMetaEvent({ eventName: "SubscriptionUpgraded", eventId: newEventId(), actionSource: "system_generated", user, custom: { ...custom, from_plan: prevPlan } });
+        } else if (prevPlan === plan) {
+          await sendMetaEvent({ eventName: "SubscriptionRenewed", eventId: newEventId(), actionSource: "system_generated", user, custom });
+        }
+      }
+    } catch (e) { console.error("meta plan", e); }
+
     return NextResponse.json({ success: true });
   } catch (err) {
     if (err instanceof z.ZodError) {

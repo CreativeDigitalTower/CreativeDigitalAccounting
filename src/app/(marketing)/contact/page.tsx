@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { metaTrack } from "@/lib/metaClient";
 
 export default function ContactPage() {
   const [sent, setSent] = useState(false);
@@ -23,8 +24,14 @@ export default function ContactPage() {
       }),
     });
     setLoading(false);
-    if (res.ok) setSent(true);
-    else setError("Възникна грешка. Опитайте отново или ни пишете директно.");
+    if (res.ok) {
+      try {
+        const user = { email: String(fd.get("email") || ""), firstName: String(fd.get("name") || "").split(" ")[0] };
+        metaTrack("Contact", { content_name: "Contact form" }, { user });
+        metaTrack("Lead", { content_name: "Contact form" }, { user });
+      } catch {}
+      setSent(true);
+    } else setError("Възникна грешка. Опитайте отново или ни пишете директно.");
   }
 
   return (

@@ -46,6 +46,21 @@ export async function POST(req: Request) {
     const client = await prisma.client.create({
       data: { companyId, ...data, contactEmail: data.contactEmail || null },
     });
+
+    // ─── Meta: първи създаден клиент ───
+    try {
+      const total = await prisma.client.count({ where: { companyId } });
+      if (total === 1) {
+        const { sendMetaEvent, metaContextFromRequest, newEventId } = await import("@/lib/meta");
+        const owner = await prisma.companyUser.findFirst({ where: { companyId, role: "owner" }, select: { user: { select: { email: true, name: true } } } });
+        await sendMetaEvent({
+          eventName: "FirstClientCreated", eventId: newEventId(), actionSource: "system_generated",
+          user: { email: owner?.user.email, firstName: owner?.user.name?.split(" ")[0], externalId: companyId, ...metaContextFromRequest(req) },
+          custom: { company_id: companyId },
+        });
+      }
+    } catch { /* tracking не бива да чупи */ }
+
     return NextResponse.json(client);
   } catch (err) {
     if (err instanceof z.ZodError) {

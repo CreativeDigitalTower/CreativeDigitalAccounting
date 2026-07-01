@@ -7,9 +7,17 @@ export default async function VerifyEmailPage({ searchParams }: { searchParams: 
   if (token) {
     const rec = await prisma.verificationToken.findUnique({ where: { token } });
     if (rec && rec.expires > new Date()) {
-      await prisma.user.update({ where: { email: rec.identifier }, data: { emailVerified: new Date() } }).catch(() => {});
+      const user = await prisma.user.update({ where: { email: rec.identifier }, data: { emailVerified: new Date() }, select: { id: true, name: true } }).catch(() => null);
       await prisma.verificationToken.delete({ where: { token } }).catch(() => {});
       ok = true;
+      // ─── Meta: потвърден имейл ───
+      try {
+        const { sendMetaEvent, newEventId } = await import("@/lib/meta");
+        await sendMetaEvent({
+          eventName: "EmailVerified", eventId: newEventId(), actionSource: "system_generated",
+          user: { email: rec.identifier, firstName: user?.name?.split(" ")[0], externalId: user?.id },
+        });
+      } catch { /* ignore */ }
     }
   }
   return (

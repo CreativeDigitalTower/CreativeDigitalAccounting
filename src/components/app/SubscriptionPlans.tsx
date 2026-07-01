@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { PLAN_DETAILS, BILLING_PERIODS } from "@/components/marketing/Pricing";
 import { EUR_TO_BGN, isPromoActive } from "@/lib/constants";
+import { metaTrack } from "@/lib/metaClient";
 
 type Bank = { recipient: string; iban: string; bank: string; reason: string };
 
@@ -14,17 +15,26 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
   const [trialMsg, setTrialMsg] = useState("");
   const promo = isPromoActive();
 
+  useEffect(() => { try { metaTrack("ViewContent", { content_name: "Pricing", content_category: "subscription" }); } catch {} }, []);
+
   async function startTrial(planId: string) {
     setTrialMsg("");
     const res = await fetch("/api/subscription/trial", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: planId }) });
-    if (res.ok) { router.refresh(); }
-    else setTrialMsg((await res.json()).error ?? "Грешка при активиране на теста.");
+    if (res.ok) {
+      try { metaTrack("StartTrial", { plan_name: planId, currency: "EUR", value: 0 }); } catch {}
+      router.refresh();
+    } else setTrialMsg((await res.json()).error ?? "Грешка при активиране на теста.");
   }
 
   function choosePay(planId: string) {
     setPayPlanId(planId);
     const plan = PLAN_DETAILS.find((p) => p.id === planId);
     const amount = plan ? +(plan.price * period.months * (1 - period.discount)).toFixed(2) : 0;
+    // ─── Meta: избор на абонамент ───
+    try {
+      metaTrack("SubscriptionSelected", { value: amount, currency: "EUR", plan_name: planId, billing_period: period.label });
+      metaTrack("Subscribe", { value: amount, currency: "EUR", plan_name: planId, billing_period: period.label });
+    } catch {}
     // регистрираме заявка за плащане (видима в Супер Админ историята)
     fetch("/api/subscription/request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: planId, period: period.label, amount }) }).catch(() => {});
     setTimeout(() => document.getElementById("pay-box")?.scrollIntoView({ behavior: "smooth" }), 50);

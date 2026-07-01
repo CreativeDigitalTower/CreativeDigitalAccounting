@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { MetaPixel } from "@/components/MetaPixel";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://creativedigitalaccounting.com";
 
@@ -37,9 +38,13 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const metaPixelId = process.env.META_PIXEL_ID;
   return (
     <html lang="bg">
-      <body>{children}</body>
+      <body>
+        {metaPixelId && <MetaPixel pixelId={metaPixelId} />}
+        {children}
+      </body>
     </html>
   );
 }
