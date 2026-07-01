@@ -37,6 +37,8 @@ export function MarketingFooter() {
             {[
               { href: "/about", label: "За Нас" },
               { href: "/accountants", label: "За счетоводители" },
+              { href: "/faq", label: "Често задавани въпроси" },
+              { href: "/blog", label: "Блог" },
               { href: "/contact", label: "Контакти" },
             ].map((l) => (
               <Link key={l.href} href={l.href} style={{ display: "block", color: "#C9C7B6", textDecoration: "none", fontSize: 13.5, marginBottom: 8 }}>
