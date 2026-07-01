@@ -43,6 +43,13 @@ export async function POST(req: Request) {
     const body = await req.json();
     const data = schema.parse(body);
 
+    // Без дублиране: ако вече има клиент със същия ЕИК (или същото име), връщаме него.
+    const eik = data.eik?.trim();
+    const dup = await prisma.client.findFirst({
+      where: { companyId, OR: [...(eik ? [{ eik }] : []), { name: { equals: data.name.trim(), mode: "insensitive" as const } }] },
+    });
+    if (dup) return NextResponse.json(dup);
+
     const client = await prisma.client.create({
       data: { companyId, ...data, contactEmail: data.contactEmail || null },
     });

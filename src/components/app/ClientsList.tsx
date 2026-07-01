@@ -18,6 +18,13 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
   const [status, setStatus] = useState<string>("all");
   const [menu, setMenu] = useState<{ x: number; y: number; client: ClientRow } | null>(null);
 
+  async function deleteClient(c: ClientRow) {
+    if (!confirm(`Изтриване на клиент „${c.name}"?\nТова действие е необратимо.`)) return;
+    const res = await fetch(`/api/clients/${c.id}`, { method: "DELETE" });
+    if (res.ok) router.refresh();
+    else alert((await res.json()).error ?? "Грешка при изтриване.");
+  }
+
   function menuItems(c: ClientRow): MenuItem[] {
     return [
       { label: "Отвори досие", icon: "👤", onClick: () => router.push(`/dashboard/clients/${c.id}`) },
@@ -25,6 +32,7 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
       { label: "Нова оферта", icon: "📄", onClick: () => router.push(`/dashboard/documents/new?clientId=${c.id}&type=quote`) },
       { divider: true, label: "", onClick: () => {} },
       { label: "Копирай име", icon: "⧉", onClick: () => navigator.clipboard?.writeText(c.name) },
+      { label: "Изтрий клиент", icon: "🗑", danger: true, onClick: () => deleteClient(c) },
     ];
   }
 
@@ -113,6 +121,7 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
                     <td style={{ display: "flex", gap: 6 }}>
                       <Link href={`/dashboard/clients/${client.id}`} className="btn btn-ghost btn-sm">Досие</Link>
                       <Link href={`/dashboard/documents/new?clientId=${client.id}`} className="btn btn-primary btn-sm">+ Фактура</Link>
+                      <button onClick={() => deleteClient(client)} className="btn btn-ghost btn-sm" title="Изтрий клиент" style={{ color: "var(--brick)", borderColor: "var(--brick)" }}>🗑</button>
                     </td>
                   </tr>
                 );

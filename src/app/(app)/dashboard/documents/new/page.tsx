@@ -97,9 +97,11 @@ function NewDocumentForm() {
       if (c && c.vatRegistered === false) {
         setVatExempt(true);
         setVatReasonCode(c.defaultVatExemptReason || "art113_9");
+        setLines((p) => p.map((l) => ({ ...l, vatRate: 0 })));
       } else if (c?.defaultVatExempt) {
         setVatExempt(true);
         setVatReasonCode(c.defaultVatExemptReason || "");
+        setLines((p) => p.map((l) => ({ ...l, vatRate: 0 })));
       }
       // Изисква попълнени фирмени данни преди фактуриране
       setCompanyReady(!!(c?.name && c?.eik && c?.address));
@@ -121,7 +123,7 @@ function NewDocumentForm() {
       return next;
     });
   }
-  const addLine = () => setLines((p) => [...p, { description: "", quantity: 1, unitPrice: 0, vatRate: 20 }]);
+  const addLine = () => setLines((p) => [...p, { description: "", quantity: 1, unitPrice: 0, vatRate: vatExempt ? 0 : 20 }]);
   const removeLine = (idx: number) => setLines((p) => p.filter((_, i) => i !== idx));
 
   const subtotal = lines.reduce((s, l) => s + l.quantity * l.unitPrice, 0);
@@ -167,14 +169,21 @@ function NewDocumentForm() {
     setSaving(true);
     let finalClientId: string | null = clientId || null;
 
-    // Ръчно въведен клиент без избор от списъка → създай нов и запиши в базата
+    // Ръчно въведен клиент → без дублиране: първо търсим съществуващ по ЕИК или по име
     if (clientMode === "manual" && !clientId && mClient.name.trim()) {
-      const cRes = await fetch("/api/clients", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(mClient),
-      });
-      if (cRes.ok) finalClientId = (await cRes.json()).id;
-      else { setSaving(false); setError("Грешка при запис на клиента."); return; }
+      const eik = mClient.eik.trim();
+      const nameL = mClient.name.trim().toLowerCase();
+      const existing = clients.find((c) => (eik && c.eik && c.eik.trim() === eik) || c.name.trim().toLowerCase() === nameL);
+      if (existing) {
+        finalClientId = existing.id; // ползваме съществуващия — само сумите по фактурата се добавят към него
+      } else {
+        const cRes = await fetch("/api/clients", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(mClient),
+        });
+        if (cRes.ok) finalClientId = (await cRes.json()).id;
+        else { setSaving(false); setError("Грешка при запис на клиента."); return; }
+      }
     }
 
     const res = await fetch("/api/documents", {
@@ -312,21 +321,27 @@ function NewDocumentForm() {
                 )}
                 {clientId && <div style={{ fontSize: 11.5, color: "var(--emerald)", marginTop: 4 }}>✓ Избран съществуващ клиент — данните са попълнени автоматично.</div>}
               </div>
-              <div>
-                <label>ЕИК / Булстат *</label>
-                <input type="text" value={mClient.eik} onChange={(e) => { setMClient({ ...mClient, eik: e.target.value }); setClientId(""); setSuggestOpen(true); }} />
-              </div>
-              <div>
-                <label>ДДС номер</label>
-                <input type="text" value={mClient.vatNumber} onChange={(e) => setMClient({ ...mClient, vatNumber: e.target.value })} placeholder="BG..." />
-              </div>
-              <div>
-                <label>Регистрация по ЗДДС</label>
-                <select value={mClient.vatRegistered ? "1" : "0"} onChange={(e) => setMClient({ ...mClient, vatRegistered: e.target.value === "1" })}>
-                  <option value="0">Без ДДС регистрация</option>
-                  <option value="1">Регистриран по ЗДДС</option>
-                </select>
-              </div>
+              {!clientIsIndividual && (
+                <div>
+                  <label>ЕИК / Булстат *</label>
+                  <input type="text" value={mClient.eik} onChange={(e) => { setMClient({ ...mClient, eik: e.target.value }); setClientId(""); setSuggestOpen(true); }} />
+                </div>
+              )}
+              {!clientIsIndividual && (
+                <div>
+                  <label>ДДС номер</label>
+                  <input type="text" value={mClient.vatNumber} onChange={(e) => setMClient({ ...mClient, vatNumber: e.target.value })} placeholder="BG..." />
+                </div>
+              )}
+              {!clientIsIndividual && (
+                <div>
+                  <label>Регистрация по ЗДДС</label>
+                  <select value={mClient.vatRegistered ? "1" : "0"} onChange={(e) => setMClient({ ...mClient, vatRegistered: e.target.value === "1" })}>
+                    <option value="0">Без ДДС регистрация</option>
+                    <option value="1">Регистриран по ЗДДС</option>
+                  </select>
+                </div>
+              )}
               <div>
                 <label>МОЛ</label>
                 <input type="text" value={mClient.mol} onChange={(e) => setMClient({ ...mClient, mol: e.target.value })} />
@@ -417,7 +432,7 @@ function NewDocumentForm() {
         {type !== "quote" && (
           <div style={{ borderTop: "1px solid var(--border)", paddingTop: 16, marginTop: 20 }}>
             <label style={{ display: "flex", gap: 8, alignItems: "center", fontWeight: 600, cursor: "pointer" }}>
-              <input type="checkbox" checked={vatExempt} onChange={(e) => setVatExempt(e.target.checked)} style={{ width: "auto" }} />
+              <input type="checkbox" checked={vatExempt} onChange={(e) => { setVatExempt(e.target.checked); if (e.target.checked) setLines((p) => p.map((l) => ({ ...l, vatRate: 0 }))); }} style={{ width: "auto" }} />
               Не начислявай ДДС по тази фактура
             </label>
             {vatExempt && (

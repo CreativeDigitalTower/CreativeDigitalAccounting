@@ -161,7 +161,7 @@ export default function EditDocumentPage({ params }: { params: Promise<{ id: str
         {/* ДДС — неначисляване */}
         <div style={{ borderTop: "1px solid var(--border)", paddingTop: 16, marginTop: 18 }}>
           <label style={{ display: "flex", gap: 8, alignItems: "center", fontWeight: 600, cursor: "pointer" }}>
-            <input type="checkbox" checked={vatExempt} onChange={(e) => setVatExempt(e.target.checked)} style={{ width: "auto" }} /> Не начислявай ДДС по тази фактура
+            <input type="checkbox" checked={vatExempt} onChange={(e) => { setVatExempt(e.target.checked); if (e.target.checked) setLines((p) => p.map((l) => ({ ...l, vatRate: 0 }))); }} style={{ width: "auto" }} /> Не начислявай ДДС по тази фактура
           </label>
           {vatExempt && (
             <div style={{ marginTop: 10, maxWidth: 640 }}>

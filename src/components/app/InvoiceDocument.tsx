@@ -49,7 +49,6 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
       {company.phone && <div>Телефон: {company.phone}</div>}
       {company.email && <div>E-mail: {company.email}</div>}
       {company.website && <div>Website: {company.website}</div>}
-      {company.bankIban && <div>IBAN: {company.bankIban}</div>}
     </div>
   );
   const logoOrName = data.logoUrl

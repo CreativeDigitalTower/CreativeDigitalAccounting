@@ -59,6 +59,14 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     if (!existing || existing.companyId !== companyId) {
       return NextResponse.json({ error: "Не е намерен." }, { status: 404 });
     }
+    // Клиент с издадени документи не се трие (документите трябва да пазят получателя).
+    const docCount = await prisma.document.count({ where: { clientId: id } });
+    if (docCount > 0) {
+      return NextResponse.json({ error: `Клиентът има ${docCount} свързани документа и не може да бъде изтрит. Можете да го маркирате като „Неактивен".` }, { status: 400 });
+    }
+    // Разкачаме договори/проекти (по избор свързани), после трием (бележки/контакти/задачи/файлове са с каскада).
+    await prisma.contract.updateMany({ where: { clientId: id }, data: { clientId: null } });
+    await prisma.project.updateMany({ where: { clientId: id }, data: { clientId: null } });
     await prisma.client.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch {

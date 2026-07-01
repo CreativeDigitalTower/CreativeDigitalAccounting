@@ -2,11 +2,12 @@
 
 import { createRoot } from "react-dom/client";
 import { InvoiceDocument, type InvoiceData } from "@/components/app/InvoiceDocument";
+import { vatExemptReasonText } from "@/lib/constants";
 
 type Company = {
   name: string; mol: string | null; address: string | null; city: string | null;
-  eik: string | null; vatNumber: string | null; bankIban: string | null; bankName: string | null; bankBic: string | null;
-  logoUrl: string | null;
+  eik: string | null; vatNumber: string | null; vatRegistered?: boolean; bankIban: string | null; bankName: string | null; bankBic: string | null;
+  phone?: string | null; email?: string | null; website?: string | null; logoUrl: string | null;
 };
 
 let cachedCompany: Company | null = null;
@@ -28,12 +29,14 @@ async function buildData(id: string): Promise<InvoiceData | null> {
     logoUrl: company.logoUrl,
     company: {
       name: company.name, mol: company.mol, address: company.address, city: company.city,
-      eik: company.eik, vatNumber: company.vatNumber, bankIban: company.bankIban, bankName: company.bankName, bankBic: company.bankBic,
+      eik: company.eik, vatNumber: company.vatRegistered ? company.vatNumber : null, bankIban: company.bankIban, bankName: company.bankName, bankBic: company.bankBic,
+      phone: company.phone, email: company.email, website: company.website,
     },
     client: doc.client ? {
       name: doc.client.name, mol: doc.client.mol, address: doc.client.address, city: doc.client.city,
-      eik: doc.client.eik, vatNumber: doc.client.vatNumber,
+      eik: doc.clientIsIndividual ? null : doc.client.eik, vatNumber: doc.clientIsIndividual ? null : doc.client.vatNumber,
     } : null,
+    vatExempt: doc.vatExempt, vatExemptReasonText: vatExemptReasonText(doc.vatExemptReason),
     lines: (doc.lines ?? []).map((l: { id: string; description: string; quantity: number; unitPrice: number; vatRate: number; lineTotal: number }) => ({
       id: l.id, description: l.description, quantity: l.quantity, unitPrice: l.unitPrice, vatRate: l.vatRate, lineTotal: l.lineTotal,
     })),
@@ -63,19 +66,30 @@ function addCanvas(pdf: any, canvas: HTMLCanvasElement, isFirst: boolean) {
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
   const margin = 8;
+  const availH = pageH - margin * 2;
   const imgW = pageW - margin * 2;
   const imgH = (canvas.height * imgW) / canvas.width;
   const img = canvas.toDataURL("image/jpeg", 0.95);
+  if (!isFirst) pdf.addPage();
+
+  // Събира се (или почти) на един лист → само един лист (без празен втори).
+  if (imgH <= availH * 1.06) {
+    let w = imgW, h = imgH;
+    if (h > availH) { const s = availH / h; h = availH; w = imgW * s; }
+    pdf.addImage(img, "JPEG", (pageW - w) / 2, margin, w, h);
+    return;
+  }
+
+  // Наистина дълъг документ → разделяне на страници
   let heightLeft = imgH;
   let position = margin;
-  if (!isFirst) pdf.addPage();
   pdf.addImage(img, "JPEG", margin, position, imgW, imgH);
-  heightLeft -= (pageH - margin * 2);
-  while (heightLeft > 0) {
+  heightLeft -= availH;
+  while (heightLeft > 2) {
     position = margin - (imgH - heightLeft);
     pdf.addPage();
     pdf.addImage(img, "JPEG", margin, position, imgW, imgH);
-    heightLeft -= (pageH - margin * 2);
+    heightLeft -= availH;
   }
 }
 
