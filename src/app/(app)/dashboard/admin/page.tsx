@@ -111,6 +111,19 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   // Използване на публичните инструменти
   const toolNames: Record<string, string> = { currency: "Валутен", salary: "Заплати", vat: "ДДС", interest: "Лихвен", markup: "Надценка" };
   const publicVisits = await prisma.siteVisit.findMany({ where: { area: "public" }, select: { path: true } });
+
+  // ─── Преглеждания по страници (вкл. началната) (#14) ───
+  const pageLabels: Record<string, string> = {
+    "/": "🏠 Начална страница", "/blog": "Блог", "/faq": "ЧЗВ", "/contact": "Контакти", "/about": "За нас",
+    "/software": "За софтуера", "/accountants": "За счетоводители", "/register": "Регистрация", "/login": "Вход",
+    "/terms": "Общи условия", "/privacy": "Поверителност", "/security": "Сигурност", "/tools": "Инструменти",
+  };
+  const pageViews = new Map<string, number>();
+  for (const v of publicVisits) pageViews.set(v.path, (pageViews.get(v.path) ?? 0) + 1);
+  const pagesSorted = [...pageViews.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
+  const totalPublicViews = publicVisits.length;
+  const totalAppViews = appVisits.length;
+  const homeViews = pageViews.get("/") ?? 0;
   const toolUsage = new Map<string, number>();
   for (const v of publicVisits) {
     const parts = v.path.split("/");
@@ -302,6 +315,33 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             );
           })}
         </div>
+      </div>
+
+      {/* Преглеждания по страници (#14) */}
+      <div className="glass panel" style={{ marginBottom: 20 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 10 }}>
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>Преглеждания по страници</h3>
+          <div style={{ display: "flex", gap: 16, fontSize: 12.5 }}>
+            <span>🏠 Начална: <strong className="num" style={{ color: "var(--emerald-dark)" }}>{homeViews}</strong></span>
+            <span>Публични: <strong className="num">{totalPublicViews}</strong></span>
+            <span>В приложението: <strong className="num">{totalAppViews}</strong></span>
+          </div>
+        </div>
+        {pagesSorted.length === 0 ? <div style={{ fontSize: 13, color: "var(--muted)" }}>Все още няма данни.</div> : (
+          <table>
+            <thead><tr><th>Страница</th><th>Път</th><th className="num">Преглеждания</th></tr></thead>
+            <tbody>
+              {pagesSorted.map(([path, n]) => (
+                <tr key={path}>
+                  <td style={{ fontWeight: 600 }}>{pageLabels[path] ?? path}</td>
+                  <td style={{ fontSize: 12, color: "var(--muted)" }}>{path}</td>
+                  <td className="num" style={{ fontWeight: 700 }}>{n}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 8 }}>Броят са всички преглеждания (page views), включително повторни от един и същ посетител.</p>
       </div>
 
       {/* Модули + инструменти */}
