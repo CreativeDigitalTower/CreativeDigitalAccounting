@@ -46,67 +46,61 @@ const steps = [
 export default function HomePage() {
   return (
     <>
-      {/* Hero */}
-      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "80px 32px 60px", textAlign: "center" }}>
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            background: "var(--brass-soft)",
-            border: "1px solid rgba(166,130,47,.3)",
-            borderRadius: 20,
-            padding: "5px 14px",
-            fontSize: 12.5,
-            fontWeight: 600,
-            color: "var(--brass)",
-            marginBottom: 28,
-          }}
-        >
-          ✦ Ново — двойно EUR/BGN обозначаване до 08.08.2026 включено
+      {/* Hero — асиметричен, оригинален layout */}
+      <section className="home-hero" style={{ maxWidth: 1200, margin: "0 auto", padding: "68px 32px 56px", display: "grid", gridTemplateColumns: "1.05fr .95fr", gap: 48, alignItems: "center" }}>
+        {/* Ляво: редакционен текст с вертикален акцент */}
+        <div style={{ position: "relative", paddingLeft: 24 }}>
+          <div style={{ position: "absolute", left: 0, top: 6, bottom: 6, width: 4, borderRadius: 4, background: "linear-gradient(var(--emerald), var(--brass))" }} />
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--brass-soft)", border: "1px solid rgba(166,130,47,.3)", borderRadius: 20, padding: "5px 14px", fontSize: 12.5, fontWeight: 600, color: "var(--brass)", marginBottom: 22 }}>
+            ✦ Ново — двойно EUR/BGN обозначаване до 08.08.2026
+          </div>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(36px, 5vw, 62px)", fontWeight: 700, lineHeight: 1.08, letterSpacing: "-1px", color: "var(--ink)", margin: "0 0 20px" }}>
+            Целият Ви бизнес,<br /><span style={{ color: "var(--emerald)" }}>подреден на едно място.</span>
+          </h1>
+          <p style={{ fontSize: "clamp(15px, 1.4vw, 18px)", color: "var(--ink-soft)", maxWidth: 520, margin: "0 0 30px", lineHeight: 1.6 }}>
+            Фактури, склад, производство, разходи, CRM, договори и финансови анализи —
+            обединени в една модерна платформа за българския бизнес.
+          </p>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            <Link href="/register" className="btn btn-primary" style={{ fontSize: 15, padding: "13px 28px" }}>Започни безплатно →</Link>
+            <Link href="/software" className="btn btn-ghost" style={{ fontSize: 15, padding: "13px 28px" }}>Разгледай функциите</Link>
+          </div>
+          <div style={{ marginTop: 22, display: "flex", gap: 22, flexWrap: "wrap", fontSize: 12.5, color: "var(--muted)" }}>
+            <span>✓ Безплатен план завинаги</span>
+            <span>✓ Без карта при регистрация</span>
+            <span>✓ Готово за 2 минути</span>
+          </div>
         </div>
 
-        <h1
-          style={{
-            fontFamily: "'Fraunces', serif",
-            fontSize: "clamp(38px, 6vw, 72px)",
-            fontWeight: 700,
-            lineHeight: 1.1,
-            letterSpacing: "-1px",
-            color: "var(--ink)",
-            margin: "0 0 24px",
-          }}
-        >
-          Управлявайте целия си<br />
-          <span style={{ color: "var(--emerald)" }}>бизнес от едно място</span>
-        </h1>
-
-        <p
-          style={{
-            fontSize: "clamp(16px, 2vw, 20px)",
-            color: "var(--ink-soft)",
-            maxWidth: 660,
-            margin: "0 auto 40px",
-            lineHeight: 1.6,
-          }}
-        >
-          Creative Digital Accounting е модерна ERP платформа, която обединява фактуриране, склад,
-          производство, разходи, клиенти, договори, служители и финансови анализи в една система,
-          създадена специално за нуждите на българския бизнес.
-        </p>
-
-        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-          <Link href="/register" className="btn btn-primary" style={{ fontSize: 15, padding: "12px 28px" }}>
-            Започни безплатно →
-          </Link>
-          <Link href="/software" className="btn btn-ghost" style={{ fontSize: 15, padding: "12px 28px" }}>
-            Разгледай функциите
-          </Link>
+        {/* Дясно: композиция от „плаващи“ карти — собствена илюстрация */}
+        <div className="home-hero-art" style={{ position: "relative", minHeight: 380 }}>
+          <div className="glass panel" style={{ position: "absolute", top: 0, right: 0, width: "88%", padding: "18px 20px", borderRadius: 16, boxShadow: "0 20px 50px rgba(20,30,25,.14)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <span style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 14 }}>Табло</span>
+              <span style={{ fontSize: 10.5, color: "var(--muted)" }}>този месец</span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              {[["Приходи", "12 480 €", "var(--emerald-dark)"], ["Разходи", "4 210 €", "var(--brick)"], ["Печалба", "8 270 €", "var(--navy)"], ["Фактури", "37", "var(--brass)"]].map(([l, v, c]) => (
+                <div key={l} style={{ background: "rgba(255,255,255,.5)", borderRadius: 10, padding: "10px 12px", border: "1px solid var(--border)" }}>
+                  <div style={{ fontSize: 10.5, color: "var(--muted)" }}>{l}</div>
+                  <div className="num" style={{ fontSize: 17, fontWeight: 700, color: c as string }}>{v}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 14, display: "flex", alignItems: "flex-end", gap: 5, height: 54 }}>
+              {[40, 62, 48, 75, 58, 88, 70, 96].map((h, i) => (
+                <div key={i} style={{ flex: 1, height: `${h}%`, background: i === 7 ? "var(--emerald)" : "rgba(15,138,106,.28)", borderRadius: "3px 3px 0 0" }} />
+              ))}
+            </div>
+          </div>
+          <div className="glass" style={{ position: "absolute", bottom: 8, left: 0, width: "62%", padding: "14px 16px", borderRadius: 14, boxShadow: "0 16px 40px rgba(20,30,25,.16)" }}>
+            <div style={{ fontSize: 10.5, color: "var(--brass)", fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>ФАКТУРА · 0000000037</div>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}><span style={{ color: "var(--muted)" }}>Консултация</span><span className="num">500,00 €</span></div>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 8 }}><span style={{ color: "var(--muted)" }}>Хостинг</span><span className="num">90,00 €</span></div>
+            <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, borderTop: "1px solid var(--border)", paddingTop: 6 }}><span>Общо</span><span className="num" style={{ color: "var(--emerald-dark)" }}>590,00 €</span></div>
+            <div style={{ marginTop: 8, display: "inline-block", fontSize: 10.5, fontWeight: 700, color: "#fff", background: "var(--emerald)", borderRadius: 12, padding: "2px 10px" }}>● Платена</div>
+          </div>
         </div>
-
-        <p style={{ marginTop: 16, fontSize: 12.5, color: "var(--muted)" }}>
-          5 документа/месец безплатно завинаги
-        </p>
       </section>
 
       {/* Features grid */}

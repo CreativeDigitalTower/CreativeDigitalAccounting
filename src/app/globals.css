@@ -214,3 +214,9 @@ tbody tr:hover{background:rgba(15,138,106,.05);}
   backdrop-filter:blur(24px) saturate(180%);
   -webkit-backdrop-filter:blur(24px) saturate(180%);
 }
+
+/* Начална страница — hero */
+@media(max-width:860px){
+  .home-hero{ grid-template-columns:1fr !important; gap:32px !important; }
+  .home-hero-art{ min-height:340px; margin-top:8px; }
+}
