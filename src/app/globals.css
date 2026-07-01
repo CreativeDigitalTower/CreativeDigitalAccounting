@@ -234,3 +234,6 @@ tbody tr:hover{background:rgba(15,138,106,.05);}
   .legal-grid{ grid-template-columns:1fr !important; }
   .legal-toc{ display:none !important; }
 }
+
+/* Бизнес документи — скрий жълтите placeholder подсветки при сваляне/печат */
+.exporting-doc .cda-fill, body.printing-doc .cda-fill{ background:transparent !important; }
