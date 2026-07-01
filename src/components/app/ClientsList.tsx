@@ -154,6 +154,32 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
         )}
       </div>
 
+      {/* Диаграма с приходите по клиенти */}
+      {(() => {
+        const top = [...filtered].filter((c) => c.total > 0).sort((a, b) => b.total - a.total).slice(0, 10);
+        if (top.length === 0) return null;
+        const max = top[0].total || 1;
+        const COLORS = ["#0F8A6A", "#2C4A66", "#A5812E", "#3F9C82", "#A23B2B", "#0B5E4A", "#6B7C76", "#C9A227", "#245C4A", "#8A4B3B"];
+        return (
+          <div className="glass panel" style={{ marginTop: 16, padding: "18px 20px" }}>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>Приходи по клиенти (топ {top.length})</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {top.map((c, i) => (
+                <div key={c.id}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 3 }}>
+                    <span style={{ fontWeight: 600 }}>{c.name}</span>
+                    <span className="num" style={{ color: "var(--ink-soft)" }}>{formatCurrency(c.total)}</span>
+                  </div>
+                  <div style={{ height: 8, background: "rgba(217,215,200,.5)", borderRadius: 4, overflow: "hidden" }}>
+                    <div className="chart-bar" style={{ width: `${(c.total / max) * 100}%`, height: "100%", background: COLORS[i % COLORS.length], borderRadius: 4, transition: "width .6s cubic-bezier(.22,1,.36,1)" }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
       {menu && <ContextMenu x={menu.x} y={menu.y} items={menuItems(menu.client)} onClose={() => setMenu(null)} />}
 
       {mergeSource && (

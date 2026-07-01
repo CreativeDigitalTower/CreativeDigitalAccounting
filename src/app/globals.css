@@ -228,3 +228,9 @@ tbody tr:hover{background:rgba(15,138,106,.05);}
 .faq-card[open] summary > span:last-child{ transform:rotate(45deg); }
 .faq-card{ transition:box-shadow .2s ease; }
 .faq-card[open]{ box-shadow:0 10px 30px rgba(20,30,25,.10); }
+
+/* Правни страници — TOC */
+@media(max-width:820px){
+  .legal-grid{ grid-template-columns:1fr !important; }
+  .legal-toc{ display:none !important; }
+}
