@@ -14,6 +14,7 @@ export default function NewStockItemPage() {
   const [categories, setCategories] = useState<Cat[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [noExpiry, setNoExpiry] = useState(true);
 
   useEffect(() => {
     fetch("/api/warehouses").then((r) => r.json()).then((d) => setWarehouses(Array.isArray(d) ? d : [])).catch(() => {});
@@ -34,6 +35,7 @@ export default function NewStockItemPage() {
         minQuantity: fd.get("minQuantity") ? Number(fd.get("minQuantity")) : null,
         unit: fd.get("unit") || "бр",
         unitCost: fd.get("unitCost") ? Number(fd.get("unitCost")) : null,
+        expiryDate: noExpiry ? null : (fd.get("expiryDate") || null),
       }),
     });
     setSaving(false);
@@ -62,6 +64,14 @@ export default function NewStockItemPage() {
             <div><label>Начална наличност</label><input type="number" name="quantity" step="0.01" min="0" defaultValue={0} /></div>
             <div><label>Мин. наличност</label><input type="number" name="minQuantity" step="0.01" min="0" /></div>
             <div><label>Ед. цена (EUR)</label><input type="number" name="unitCost" step="0.01" min="0" /></div>
+            <div style={{ gridColumn: "1 / -1", borderTop: "1px solid var(--border)", paddingTop: 12 }}>
+              <label>Срок на годност</label>
+              <label style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13, fontWeight: 400, marginBottom: 8 }}>
+                <input type="checkbox" checked={noExpiry} onChange={(e) => setNoExpiry(e.target.checked)} style={{ width: "auto" }} /> Безсрочно (без срок на годност)
+              </label>
+              {!noExpiry && <input type="date" name="expiryDate" required style={{ maxWidth: 220 }} />}
+              <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 4 }}>При наближаване на срока ще получите известие (7 дни — жълто, изтекъл — червено).</div>
+            </div>
           </div>
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>

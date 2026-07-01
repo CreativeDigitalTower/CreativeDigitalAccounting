@@ -324,6 +324,7 @@ model StockItem {
   minQuantity Float?
   unit        String  @default("бр")
   unitCost    Float?
+  expiryDate  DateTime?  // null = безсрочно
 
   company   Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
   warehouse Warehouse       @relation(fields: [warehouseId], references: [id])

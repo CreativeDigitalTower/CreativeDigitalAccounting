@@ -13,6 +13,7 @@ const schema = z.object({
   minQuantity: z.number().min(0).optional().nullable(),
   unit: z.string().default("бр"),
   unitCost: z.number().min(0).optional().nullable(),
+  expiryDate: z.string().optional().nullable(),
 });
 
 export async function POST(req: Request) {
@@ -28,6 +29,7 @@ export async function POST(req: Request) {
         companyId, warehouseId: data.warehouseId, categoryId: data.categoryId ?? null, name: data.name,
         sku: data.sku ?? null, quantity: data.quantity,
         minQuantity: data.minQuantity ?? null, unit: data.unit, unitCost: data.unitCost ?? null,
+        expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
       },
     });
     await audit(companyId, userId, "create", "StockItem", item.id, data.name);

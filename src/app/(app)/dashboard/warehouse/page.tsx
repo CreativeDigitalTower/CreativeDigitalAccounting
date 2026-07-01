@@ -25,6 +25,18 @@ export default async function WarehousePage() {
 
   const lowStock = stockItems.filter((i) => i.minQuantity !== null && i.quantity <= (i.minQuantity ?? 0));
 
+  // Срок на годност — статус (жълто ≤7 дни, червено изтекъл)
+  const now = new Date(); now.setHours(0, 0, 0, 0);
+  function expiryStatus(exp: Date | null): { label: string; color: string; days: number } | null {
+    if (!exp) return null;
+    const d = new Date(exp); d.setHours(0, 0, 0, 0);
+    const days = Math.round((d.getTime() - now.getTime()) / 86400000);
+    if (days < 0) return { label: `Изтекъл (${-days}д)`, color: "var(--brick)", days };
+    if (days <= 7) return { label: `След ${days}д`, color: "var(--brass)", days };
+    return { label: d.toLocaleDateString("bg-BG"), color: "var(--ink-soft)", days };
+  }
+  const expiringItems = stockItems.map((i) => ({ i, s: expiryStatus(i.expiryDate) })).filter((x) => x.s && x.s.days <= 7);
+
   // Обща стойност на наличността (количество × ед. цена)
   const itemValue = (i: { quantity: number; unitCost: number | null }) => i.quantity * (i.unitCost ?? 0);
   const totalStockValue = stockItems.reduce((s, i) => s + itemValue(i), 0);
@@ -77,6 +89,14 @@ export default async function WarehousePage() {
         </div>
       )}
 
+      {/* Изтичащ срок на годност */}
+      {expiringItems.length > 0 && (
+        <div style={{ background: "var(--brass-soft)", border: "1px solid rgba(165,129,46,.35)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, fontSize: 13 }}>
+          <strong style={{ color: "var(--brass)" }}>⏰ Срок на годност:</strong>{" "}
+          {expiringItems.map(({ i, s }) => <span key={i.id} style={{ color: s!.color, fontWeight: 600, marginRight: 10 }}>{i.name} — {s!.label}</span>)}
+        </div>
+      )}
+
       <div className="glass panel" style={{ padding: "8px 0" }}>
         {stockItems.length === 0 ? (
           <div style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
@@ -97,6 +117,7 @@ export default async function WarehousePage() {
                 <th className="num">Мин. наличност</th>
                 <th className="num">Ед. цена</th>
                 <th className="num">Стойност</th>
+                <th>Срок</th>
                 <th>Статус</th>
                 <th></th>
               </tr>
@@ -123,6 +144,9 @@ export default async function WarehousePage() {
                     <td className="num" style={{ fontSize: 13, fontWeight: 600, color: "var(--emerald-dark)" }}>
                       {item.unitCost != null ? formatCurrency(itemValue(item)) : "—"}
                     </td>
+                    <td>{(() => { const s = expiryStatus(item.expiryDate); return s
+                      ? <span style={{ fontSize: 11.5, fontWeight: 700, color: "#fff", background: s.color, borderRadius: 12, padding: "2px 9px" }}>{s.label}</span>
+                      : <span style={{ fontSize: 12, color: "var(--muted)" }}>Безсрочно</span>; })()}</td>
                     <td>
                       {isLow ? (
                         <span style={{ color: "var(--brick)", fontSize: 12, fontWeight: 600 }}>⚠ Ниска</span>
@@ -143,7 +167,7 @@ export default async function WarehousePage() {
               <tr style={{ borderTop: "2px solid var(--border)", fontWeight: 700 }}>
                 <td colSpan={extended ? 8 : 7} style={{ textAlign: "right" }}>Обща стойност на склада:</td>
                 <td className="num" style={{ color: "var(--emerald-dark)" }}>{formatCurrency(totalStockValue)}</td>
-                <td colSpan={2}></td>
+                <td colSpan={3}></td>
               </tr>
             </tfoot>
           </table>
