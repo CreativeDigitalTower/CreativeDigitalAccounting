@@ -138,7 +138,16 @@ function InfoCard({ client, onSave }: { client: Client; onSave: (p: Partial<Clie
     <div className="glass panel">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
         <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>Данни за клиента</h3>
-        <button className="btn btn-ghost btn-sm" onClick={() => { if (edit) onSave(f); setEdit(!edit); }}>{edit ? "Запази" : "✎ Редактирай"}</button>
+        <button className="btn btn-ghost btn-sm" onClick={() => {
+          if (edit) {
+            // Записваме само полетата от този формуляр — НЕ status/stage/dealValue,
+            // за да не се презапише статус, сменен от падащото меню в друг момент.
+            const { status: _s, stage: _st, dealValue: _dv, ...info } = f;
+            void _s; void _st; void _dv;
+            onSave(info);
+          }
+          setEdit(!edit);
+        }}>{edit ? "Запази" : "✎ Редактирай"}</button>
       </div>
       {edit ? (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
