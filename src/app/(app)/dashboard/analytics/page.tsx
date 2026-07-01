@@ -1,6 +1,6 @@
 import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
-import { FinancialHistoryForm } from "@/components/app/FinancialHistoryForm";
+import { FinancialHistorySection } from "@/components/app/FinancialHistorySection";
 import { TopClientsChart } from "@/components/app/TopClientsChart";
 import { MonthlyBarChart } from "@/components/app/MonthlyBarChart";
 import { aggregateClientRevenue } from "@/lib/clientRevenue";
@@ -166,82 +166,17 @@ export default async function AnalyticsPage() {
             </div>
           </div>
 
-          {/* Financial goal */}
-          <div className="glass panel">
-            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>Финансова цел {year}</h3>
-            {goal ? (
-              <>
-                <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>
-                  Цел: <strong className="num">{formatCurrency(goal.targetRevenue)}</strong>
-                </div>
-                <div style={{ height: 8, background: "var(--brass-soft)", borderRadius: 6, overflow: "hidden", marginBottom: 6 }}>
-                  <div style={{ height: "100%", width: `${goalPercent}%`, background: "var(--brass)", borderRadius: 6 }} />
-                </div>
-                <div className="num" style={{ fontSize: 12.5, color: "var(--muted)" }}>
-                  {goalPercent}% изпълнение
-                </div>
-              </>
-            ) : (
-              <div style={{ fontSize: 13, color: "var(--muted)" }}>
-                Не е зададена цел за {year} г.
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
-      {/* Historical data */}
-      <div className="glass panel" style={{ marginTop: 18 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, gap: 12, flexWrap: "wrap" }}>
-          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>Историческа справка (многогодишен тренд)</h3>
-          <FinancialHistoryForm />
-        </div>
-
-        {financialHistory.length === 0 ? (
-          <div style={{ fontSize: 13, color: "var(--muted)", padding: "12px 0" }}>
-            Въведете оборотите и печалбата от предходни години, за да следите реалния растеж на бизнеса.
-          </div>
-        ) : (
-          <>
-          {/* Диаграма на приходите по години (#12) */}
-          <div style={{ marginBottom: 16 }}>
-            <MonthlyBarChart
-              months={financialHistory.map((h) => String(h.year))}
-              values={financialHistory.map((h) => h.revenue)}
-              currentIndex={financialHistory.length - 1}
-              title="Приходи по години"
-            />
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Година</th>
-                <th className="num">Приходи</th>
-                <th className="num">Печалба</th>
-                <th className="num">Растеж</th>
-                <th className="num">Служители</th>
-              </tr>
-            </thead>
-            <tbody>
-              {financialHistory.map((h, i) => {
-                const prev = i > 0 ? financialHistory[i - 1].revenue : null;
-                const growth = prev && prev > 0 ? ((h.revenue - prev) / prev) * 100 : null;
-                return (
-                  <tr key={h.id}>
-                    <td style={{ fontWeight: 600 }}>{h.year}</td>
-                    <td className="num">{formatCurrency(h.revenue)}</td>
-                    <td className="num">{h.profit != null ? formatCurrency(h.profit) : "—"}</td>
-                    <td className="num" style={{ color: growth == null ? "var(--muted)" : growth >= 0 ? "var(--emerald)" : "var(--brick)" }}>
-                      {growth == null ? "—" : `${growth >= 0 ? "▲" : "▼"} ${Math.abs(growth).toFixed(1)}%`}
-                    </td>
-                    <td className="num">{h.employeeCount ?? "—"}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          </>
-        )}
+      {/* Финансова цел + Историческа справка (редакция, разходи, диаграма) */}
+      <div style={{ marginTop: 18 }}>
+        <FinancialHistorySection
+          initial={financialHistory.map((h) => ({ year: h.year, revenue: h.revenue, expenses: h.expenses, profit: h.profit, employeeCount: h.employeeCount }))}
+          goalYear={year}
+          goalTarget={goal?.targetRevenue ?? null}
+          goalRevenue={yearRevenue}
+        />
       </div>
     </>
   );

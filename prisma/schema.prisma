@@ -973,6 +973,7 @@ model FinancialHistory {
   companyId     String
   year          Int
   revenue       Float
+  expenses      Float?
   profit        Float?
   employeeCount Int?
 

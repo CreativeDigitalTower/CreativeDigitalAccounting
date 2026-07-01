@@ -30,7 +30,12 @@ export function MonthlyBarChart({ months, values, currentIndex, title }: {
           const active = hover === i;
           return (
             <div key={month} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}
-              style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, cursor: "pointer" }}>
+              style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, cursor: "pointer", justifyContent: "flex-end" }}>
+              {val > 0 && (
+                <span className="num" style={{ fontSize: 10, fontWeight: 700, color: active ? "var(--emerald-dark)" : "var(--ink-soft)", whiteSpace: "nowrap" }}>
+                  {val >= 1000 ? `${(val / 1000).toFixed(val >= 10000 ? 0 : 1)}k` : Math.round(val)}
+                </span>
+              )}
               <div className="chart-bar" title={formatCurrency(val)}
                 style={{
                   width: "100%",

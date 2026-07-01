@@ -4,25 +4,20 @@ import { requireFeature } from "@/lib/session";
 import { z } from "zod";
 
 const schema = z.object({
-  year: z.number().int().min(1990).max(2100),
-  revenue: z.number().min(0),
-  expenses: z.number().min(0).optional().nullable(),
-  profit: z.number().optional().nullable(),
-  employeeCount: z.number().int().min(0).optional().nullable(),
+  year: z.number().int().min(2000).max(2100),
+  targetRevenue: z.number().min(0),
 });
 
 export async function POST(req: Request) {
   try {
     const { companyId } = await requireFeature("analytics");
-    const data = schema.parse(await req.json());
-    const profit = data.profit ?? (data.expenses != null ? data.revenue - data.expenses : null);
-    const fields = { revenue: data.revenue, expenses: data.expenses ?? null, profit, employeeCount: data.employeeCount ?? null };
-    const row = await prisma.financialHistory.upsert({
-      where: { companyId_year: { companyId, year: data.year } },
-      update: fields,
-      create: { companyId, year: data.year, ...fields },
+    const { year, targetRevenue } = schema.parse(await req.json());
+    const goal = await prisma.financialGoal.upsert({
+      where: { companyId_year: { companyId, year } },
+      update: { targetRevenue },
+      create: { companyId, year, targetRevenue },
     });
-    return NextResponse.json(row);
+    return NextResponse.json(goal);
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: "Невалидни данни." }, { status: 400 });
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
@@ -34,8 +29,8 @@ export async function DELETE(req: Request) {
     const { companyId } = await requireFeature("analytics");
     const year = Number(new URL(req.url).searchParams.get("year"));
     if (!year) return NextResponse.json({ error: "Липсва година." }, { status: 400 });
-    await prisma.financialHistory.deleteMany({ where: { companyId, year } });
-    return NextResponse.json({ success: true });
+    await prisma.financialGoal.deleteMany({ where: { companyId, year } });
+    return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
   }

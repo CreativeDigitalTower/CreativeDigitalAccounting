@@ -9,6 +9,7 @@ export function FinancialHistoryForm() {
   const [saving, setSaving] = useState(false);
   const [year, setYear] = useState(new Date().getFullYear() - 1);
   const [revenue, setRevenue] = useState("");
+  const [expenses, setExpenses] = useState("");
   const [profit, setProfit] = useState("");
   const [employees, setEmployees] = useState("");
 
@@ -20,13 +21,14 @@ export function FinancialHistoryForm() {
       body: JSON.stringify({
         year: Number(year),
         revenue: parseFloat(revenue) || 0,
+        expenses: expenses ? parseFloat(expenses) : null,
         profit: profit ? parseFloat(profit) : null,
         employeeCount: employees ? parseInt(employees) : null,
       }),
     });
     setSaving(false);
     if (res.ok) {
-      setRevenue(""); setProfit(""); setEmployees("");
+      setRevenue(""); setExpenses(""); setProfit(""); setEmployees("");
       setOpen(false);
       router.refresh();
     }
@@ -53,8 +55,12 @@ export function FinancialHistoryForm() {
           <input type="number" value={revenue} onChange={(e) => setRevenue(e.target.value)} step="0.01" placeholder="0.00" />
         </div>
         <div>
+          <label>Разходи (EUR)</label>
+          <input type="number" value={expenses} onChange={(e) => setExpenses(e.target.value)} step="0.01" placeholder="по избор" />
+        </div>
+        <div>
           <label>Печалба (EUR)</label>
-          <input type="number" value={profit} onChange={(e) => setProfit(e.target.value)} step="0.01" placeholder="по избор" />
+          <input type="number" value={profit} onChange={(e) => setProfit(e.target.value)} step="0.01" placeholder="авто = приход − разход" />
         </div>
         <div>
           <label>Служители</label>
