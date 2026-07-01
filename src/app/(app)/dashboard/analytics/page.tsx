@@ -2,6 +2,7 @@ import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { FinancialHistoryForm } from "@/components/app/FinancialHistoryForm";
 import { TopClientsChart } from "@/components/app/TopClientsChart";
+import { MonthlyBarChart } from "@/components/app/MonthlyBarChart";
 import { aggregateClientRevenue } from "@/lib/clientRevenue";
 import { formatCurrency, toBGN, isDualCurrencyActive } from "@/lib/constants";
 
@@ -89,34 +90,8 @@ export default async function AnalyticsPage() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 18 }}>
-        {/* Monthly chart */}
-        <div className="glass panel">
-          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 18px" }}>Приходи по месеци ({year})</h3>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 120 }}>
-            {MONTHS.map((month, i) => {
-              const val = monthlyData[i] ?? 0;
-              const height = maxMonth > 0 ? Math.max(4, (val / maxMonth) * 110) : 4;
-              return (
-                <div key={month} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                  <div
-                    title={formatCurrency(val)}
-                    style={{
-                      width: "100%",
-                      height,
-                      background: i === now.getMonth()
-                        ? "var(--emerald)"
-                        : "rgba(31,111,84,.3)",
-                      borderRadius: "3px 3px 0 0",
-                      cursor: "pointer",
-                      transition: "background .2s",
-                    }}
-                  />
-                  <span style={{ fontSize: 9.5, color: "var(--muted)" }}>{month}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        {/* Monthly chart — интерактивна */}
+        <MonthlyBarChart months={MONTHS} values={MONTHS.map((_, i) => monthlyData[i] ?? 0)} currentIndex={now.getMonth()} title={`Приходи по месеци (${year})`} />
 
         {/* Right column */}
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>

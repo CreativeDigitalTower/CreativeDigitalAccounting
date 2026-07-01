@@ -61,6 +61,14 @@ export function MarketingFooter() {
             ))}
           </div>
         </div>
+        {/* Скоро: мобилно приложение */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 12, padding: "12px 16px", marginBottom: 20, flexWrap: "wrap" }}>
+          <span style={{ fontSize: 20 }}>📱</span>
+          <span style={{ fontSize: 13, color: "#C9C7B6" }}>
+            <strong style={{ color: "#E9E7DA" }}>Скоро:</strong> мобилно приложение за iOS и Android, както и още нови функционалности към платформата.
+          </span>
+          <span style={{ marginLeft: "auto", fontSize: 10.5, fontWeight: 700, letterSpacing: 1, color: "var(--brass)", border: "1px solid var(--brass)", borderRadius: 12, padding: "2px 10px" }}>СКОРО</span>
+        </div>
         <div style={{ borderTop: "1px solid rgba(255,255,255,.08)", paddingTop: 20, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
           <span style={{ fontSize: 12.5, color: "#8A8878" }}>
             © {new Date().getFullYear()} Creative Digital Accounting. Всички права запазени.

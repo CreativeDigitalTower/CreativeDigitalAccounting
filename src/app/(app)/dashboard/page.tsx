@@ -279,6 +279,15 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         <DashboardPeriodSelector active={periodId} />
       </div>
 
+      {/* Скоро: мобилно приложение */}
+      <div className="glass" style={{ display: "flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", marginBottom: 20, flexWrap: "wrap", borderLeft: "3px solid var(--brass)" }}>
+        <span style={{ fontSize: 17 }}>📱</span>
+        <span style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>
+          <strong>Скоро:</strong> мобилно приложение за iOS и Android и още нови функционалности.
+        </span>
+        <span style={{ marginLeft: "auto", fontSize: 10, fontWeight: 700, letterSpacing: 1, color: "var(--brass)", border: "1px solid var(--brass)", borderRadius: 12, padding: "1px 9px" }}>СКОРО</span>
+      </div>
+
       {/* Usage banner — за всички планове */}
       <div className="glass usage-banner" style={{ borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 16, marginBottom: 20, flexWrap: "wrap" }}>
         <span style={{ fontSize: 12.5, color: "var(--ink-soft)", fontWeight: 600 }}>
