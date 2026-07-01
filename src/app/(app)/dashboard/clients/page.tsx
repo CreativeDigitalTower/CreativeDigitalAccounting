@@ -38,7 +38,7 @@ export default async function ClientsPage({ searchParams }: { searchParams: Prom
       monthByClient.set(inv.clientId!, (monthByClient.get(inv.clientId!) ?? 0) + sum);
     }
   }
-  const grandTotal = [...totalByClient.values()].reduce((s, v) => s + v, 0);
+  const grandTotal = [...totalByClient.values()].reduce((s, v) => s + v, 0) + clients.reduce((s, c) => s + (c.openingRevenue ?? 0), 0);
   const grandMonth = [...monthByClient.values()].reduce((s, v) => s + v, 0);
 
   const sorted = [...clients].sort((a, b) => (totalByClient.get(b.id) ?? 0) - (totalByClient.get(a.id) ?? 0));
@@ -67,7 +67,7 @@ export default async function ClientsPage({ searchParams }: { searchParams: Prom
           grandTotal={grandTotal}
           clients={sorted.map((c) => ({
             id: c.id, name: c.name, contactPerson: c.contactPerson, phone: c.phone, status: c.status,
-            month: monthByClient.get(c.id) ?? 0, total: totalByClient.get(c.id) ?? 0, openTasks: openTasksByClient.get(c.id) ?? 0,
+            month: monthByClient.get(c.id) ?? 0, total: (totalByClient.get(c.id) ?? 0) + (c.openingRevenue ?? 0), openTasks: openTasksByClient.get(c.id) ?? 0,
           }))}
         />
       )}

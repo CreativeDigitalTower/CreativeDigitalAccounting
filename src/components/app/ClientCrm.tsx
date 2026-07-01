@@ -13,6 +13,7 @@ type Client = {
   id: string; name: string; eik: string | null; vatNumber: string | null; address: string | null; city: string | null;
   mol: string | null; contactPerson: string | null; contactEmail: string | null; phone: string | null;
   status: string; stage: string; dealValue: number | null; birthday: string | null; website: string | null; tags: string | null;
+  clientSince: string | null; openingRevenue: number | null; monthlyRetainer: number | null;
 };
 type Doc = { id: string; type: string; number: string; issueDate: string; total: number; currency: string; status: string };
 type Named = { id: string; label: string; sub?: string };
@@ -43,6 +44,7 @@ export function ClientCrm(props: {
         name: next.name, eik: next.eik, vatNumber: next.vatNumber, address: next.address, city: next.city,
         mol: next.mol, contactPerson: next.contactPerson, contactEmail: next.contactEmail, phone: next.phone,
         status: next.status, stage: next.stage, dealValue: next.dealValue, birthday: next.birthday, website: next.website, tags: next.tags,
+        clientSince: next.clientSince, openingRevenue: next.openingRevenue, monthlyRetainer: next.monthlyRetainer,
       }),
     });
     router.refresh();
@@ -76,8 +78,9 @@ export function ClientCrm(props: {
         <label style={{ margin: 0, display: "flex", alignItems: "center", gap: 6, fontSize: 12.5 }}>Стойност на сделка (€):
           <input type="number" defaultValue={client.dealValue ?? ""} onBlur={(e) => saveClient({ dealValue: e.target.value ? Number(e.target.value) : null })} style={{ width: 110, padding: "4px 8px", fontSize: 12.5 }} />
         </label>
-        <div style={{ marginLeft: "auto", display: "flex", gap: 18 }}>
-          <Kpi label="Общо фактурирано" value={formatCurrency(props.totalInvoiced)} color="var(--navy)" />
+        <div style={{ marginLeft: "auto", display: "flex", gap: 18, flexWrap: "wrap" }}>
+          <Kpi label="Оборот от клиента" value={formatCurrency(props.totalInvoiced + (client.openingRevenue ?? 0))} color="var(--emerald-dark)" />
+          <Kpi label="Фактурирано (в системата)" value={formatCurrency(props.totalInvoiced)} color="var(--navy)" />
           <Kpi label="Платено" value={formatCurrency(props.paidTotal)} color="var(--emerald-dark)" />
           <Kpi label="Документи" value={String(props.documents.length)} color="var(--ink)" />
         </div>
@@ -144,10 +147,13 @@ function InfoCard({ client, onSave }: { client: Client; onSave: (p: Partial<Clie
             <div key={k}><label style={{ fontSize: 12 }}>{l}</label><input value={(f[k] as string) ?? ""} onChange={(e) => setF({ ...f, [k]: e.target.value })} style={{ padding: "6px 9px", fontSize: 13 }} /></div>
           ))}
           <div><label style={{ fontSize: 12 }}>Рожден ден</label><input type="date" value={f.birthday?.slice(0, 10) ?? ""} onChange={(e) => setF({ ...f, birthday: e.target.value })} style={{ padding: "6px 9px", fontSize: 13 }} /></div>
+          <div><label style={{ fontSize: 12 }}>Клиент от (дата)</label><input type="date" value={f.clientSince?.slice(0, 10) ?? ""} onChange={(e) => setF({ ...f, clientSince: e.target.value })} style={{ padding: "6px 9px", fontSize: 13 }} /></div>
+          <div><label style={{ fontSize: 12 }}>Пренесен оборот (€)</label><input type="number" value={f.openingRevenue ?? ""} onChange={(e) => setF({ ...f, openingRevenue: e.target.value ? Number(e.target.value) : 0 })} placeholder="оборот преди системата" style={{ padding: "6px 9px", fontSize: 13 }} /></div>
+          <div><label style={{ fontSize: 12 }}>Месечен абонамент (€)</label><input type="number" value={f.monthlyRetainer ?? ""} onChange={(e) => setF({ ...f, monthlyRetainer: e.target.value ? Number(e.target.value) : null })} placeholder="по избор" style={{ padding: "6px 9px", fontSize: 13 }} /></div>
         </div>
       ) : (
         <dl style={{ margin: 0, fontSize: 13, display: "grid", gridTemplateColumns: "auto 1fr", gap: "7px 12px" }}>
-          {([["ЕИК", client.eik], ["ДДС №", client.vatNumber], ["МОЛ", client.mol], ["Контактно лице", client.contactPerson], ["Имейл", client.contactEmail], ["Телефон", client.phone], ["Уебсайт", client.website], ["Град", client.city], ["Адрес", client.address], ["Рожден ден", client.birthday ? new Date(client.birthday).toLocaleDateString("bg-BG") : null], ["Тагове", client.tags]] as [string, string | null][])
+          {([["ЕИК", client.eik], ["ДДС №", client.vatNumber], ["МОЛ", client.mol], ["Контактно лице", client.contactPerson], ["Имейл", client.contactEmail], ["Телефон", client.phone], ["Уебсайт", client.website], ["Град", client.city], ["Адрес", client.address], ["Клиент от", client.clientSince ? new Date(client.clientSince).toLocaleDateString("bg-BG") : null], ["Пренесен оборот", client.openingRevenue ? formatCurrency(client.openingRevenue) : null], ["Месечен абонамент", client.monthlyRetainer ? formatCurrency(client.monthlyRetainer) : null], ["Рожден ден", client.birthday ? new Date(client.birthday).toLocaleDateString("bg-BG") : null], ["Тагове", client.tags]] as [string, string | null][])
             .filter(([, v]) => v).map(([k, v]) => (
               <div key={k} style={{ display: "contents" }}><dt style={{ color: "var(--muted)" }}>{k}</dt><dd style={{ margin: 0, fontWeight: 500 }}>{v}</dd></div>
             ))}

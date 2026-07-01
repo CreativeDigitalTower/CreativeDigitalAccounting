@@ -211,6 +211,11 @@ model Client {
   birthday      DateTime?
   website       String?
   tags          String?  // CSV
+  // От коя дата се работи с клиента + пренесен оборот със задна дата (миграция от друга система)
+  clientSince   DateTime?
+  openingRevenue Float?  @default(0)
+  // Абонаментен договор (по избор) — очаквани месечни приходи
+  monthlyRetainer Float?
   createdAt     DateTime @default(now())
 
   company   Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)

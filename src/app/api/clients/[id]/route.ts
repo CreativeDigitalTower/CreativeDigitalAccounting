@@ -19,6 +19,9 @@ const schema = z.object({
   birthday: z.string().optional().nullable(),
   website: z.string().optional().nullable(),
   tags: z.string().optional().nullable(),
+  clientSince: z.string().optional().nullable(),
+  openingRevenue: z.number().optional().nullable(),
+  monthlyRetainer: z.number().optional().nullable(),
 });
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -32,10 +35,14 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ error: "Не е намерен." }, { status: 404 });
     }
 
-    const { birthday, ...rest } = data;
+    const { birthday, clientSince, ...rest } = data;
     const client = await prisma.client.update({
       where: { id },
-      data: { ...rest, contactEmail: data.contactEmail || null, ...(birthday !== undefined ? { birthday: birthday ? new Date(birthday) : null } : {}) },
+      data: {
+        ...rest, contactEmail: data.contactEmail || null,
+        ...(birthday !== undefined ? { birthday: birthday ? new Date(birthday) : null } : {}),
+        ...(clientSince !== undefined ? { clientSince: clientSince ? new Date(clientSince) : null } : {}),
+      },
     });
     return NextResponse.json(client);
   } catch (err) {

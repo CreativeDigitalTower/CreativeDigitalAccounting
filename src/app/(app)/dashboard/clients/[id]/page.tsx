@@ -48,6 +48,7 @@ export default async function ClientDossierPage({ params }: { params: Promise<{ 
         mol: client.mol, contactPerson: client.contactPerson, contactEmail: client.contactEmail, phone: client.phone,
         status: client.status, stage: client.stage, dealValue: client.dealValue, birthday: client.birthday?.toISOString() ?? null,
         website: client.website, tags: client.tags,
+        clientSince: client.clientSince?.toISOString() ?? null, openingRevenue: client.openingRevenue, monthlyRetainer: client.monthlyRetainer,
       }}
       totalInvoiced={totalInvoiced}
       paidTotal={paidTotal}
