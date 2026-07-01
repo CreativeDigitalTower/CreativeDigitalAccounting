@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
     const stocktake = await prisma.stocktake.create({
       data: {
-        companyId, note: data.note ?? null, status: "applied",
+        companyId, userId, note: data.note ?? null, status: "applied",
         lines: {
           create: data.lines.filter((l) => byId.has(l.stockItemId)).map((l) => ({
             stockItemId: l.stockItemId, itemName: byId.get(l.stockItemId)!.name,

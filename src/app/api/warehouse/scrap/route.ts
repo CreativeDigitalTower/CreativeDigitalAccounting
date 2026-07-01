@@ -33,3 +33,23 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
   }
 }
+
+// Архив с бракуванията
+export async function GET() {
+  try {
+    const { companyId } = await requireFeature("revision");
+    const movements = await prisma.stockMovement.findMany({
+      where: { type: "scrap", stockItem: { companyId } },
+      include: { stockItem: { select: { name: true, unit: true } } },
+      orderBy: { date: "desc" },
+      take: 100,
+    });
+    return NextResponse.json(movements.map((m) => ({
+      id: m.id, name: m.stockItem.name, unit: m.stockItem.unit,
+      quantity: Math.abs(m.quantity), date: m.date, note: m.note,
+      value: m.unitPrice ? Math.abs(m.quantity) * m.unitPrice : null,
+    })));
+  } catch {
+    return NextResponse.json([]);
+  }
+}

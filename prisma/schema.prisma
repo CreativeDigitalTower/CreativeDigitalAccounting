@@ -482,6 +482,7 @@ model ConformityDeclaration {
 model Stocktake {
   id        String          @id @default(cuid())
   companyId String
+  userId    String?         // кой е направил ревизията
   date      DateTime        @default(now())
   note      String?
   status    String          @default("applied") // draft | applied

@@ -5,16 +5,19 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 type Item = { id: string; name: string; quantity: number; unit: string };
+type ScrapRow = { id: string; name: string; unit: string; quantity: number; date: string; note: string | null; value: number | null };
 
 export default function ScrapStockPage() {
   const router = useRouter();
   const [items, setItems] = useState<Item[]>([]);
+  const [history, setHistory] = useState<ScrapRow[]>([]);
   const [selectedId, setSelectedId] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     fetch("/api/warehouse/items/list").then((r) => r.json()).then((d) => setItems(Array.isArray(d) ? d : [])).catch(() => {});
+    fetch("/api/warehouse/scrap").then((r) => r.json()).then((d) => setHistory(Array.isArray(d) ? d : [])).catch(() => {});
   }, []);
 
   const selected = items.find((i) => i.id === selectedId);
@@ -58,6 +61,30 @@ export default function ScrapStockPage() {
           <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? "Записване…" : "Бракувай"}</button>
         </div>
       </form>
+
+      {/* Архив с бракуванията */}
+      <div style={{ marginTop: 24, maxWidth: 760 }}>
+        <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, fontWeight: 600, margin: "0 0 10px" }}>Архив с бракуванията ({history.length})</h2>
+        <div className="glass panel" style={{ padding: "8px 0" }}>
+          {history.length === 0 ? (
+            <div style={{ fontSize: 13, color: "var(--muted)", padding: "16px" }}>Все още няма бракувания.</div>
+          ) : (
+            <table>
+              <thead><tr><th>Дата</th><th>Артикул</th><th className="num">Количество</th><th>Причина</th></tr></thead>
+              <tbody>
+                {history.map((h) => (
+                  <tr key={h.id}>
+                    <td style={{ fontSize: 13 }}>{new Date(h.date).toLocaleDateString("bg-BG")}</td>
+                    <td style={{ fontWeight: 600 }}>{h.name}</td>
+                    <td className="num" style={{ color: "var(--brick)", fontWeight: 600 }}>−{h.quantity} {h.unit}</td>
+                    <td style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>{h.note ?? "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
     </>
   );
 }
