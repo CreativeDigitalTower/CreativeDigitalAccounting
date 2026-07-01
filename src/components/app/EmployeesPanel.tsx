@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState, Fragment } from "react";
+import { formatCurrency } from "@/lib/constants";
+import { calcPayroll, sumPayroll, EMPLOYEE_SSC_RATE, EMPLOYER_SSC_RATE } from "@/lib/payroll";
 
 type Leave = { id: string; type: string; startDate: string; endDate: string; days: number | null; note: string | null };
+type EmpFile = { id: string; name: string; docType: string | null; mimeType: string; size: number; uploadedAt: string };
 type Employee = {
   id: string; name: string; position: string | null; phone: string | null; email: string | null;
   address: string | null; salary: number | null; hiredAt: string | null; paidLeaveDays: number; notes: string | null; active: boolean;
@@ -67,6 +70,34 @@ export function EmployeesPanel({ initial }: { initial: Employee[] }) {
         </div>
         <button className="btn btn-primary" onClick={startAdd}>+ Нов служител</button>
       </div>
+
+      {(() => {
+        const gross = employees.filter((e) => e.active).map((e) => e.salary ?? 0);
+        const t = sumPayroll(gross);
+        if (gross.length === 0 || t.gross === 0) return null;
+        const cards: [string, number, string][] = [
+          ["Общ разход за работодателя", t.employerCost, "var(--brick)"],
+          ["Общо бруто заплати", t.gross, "var(--navy)"],
+          ["Общо осигуровки", t.insurancesTotal, "var(--brass)"],
+          ["Общо чисто за служителите", t.net, "var(--emerald-dark)"],
+        ];
+        return (
+          <div className="glass panel" style={{ marginBottom: 16 }}>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 4px" }}>Разходи за заплати (общо)</h3>
+            <p style={{ fontSize: 11.5, color: "var(--muted)", margin: "0 0 12px" }}>
+              По ставки за 3-та категория труд: осигуровки служител {(EMPLOYEE_SSC_RATE * 100).toFixed(2)}% + работодател {(EMPLOYER_SSC_RATE * 100).toFixed(2)}%, данък 10%.
+            </p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px,1fr))", gap: 12 }}>
+              {cards.map(([l, v, c]) => (
+                <div key={l}>
+                  <div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 3 }}>{l}</div>
+                  <div className="num" style={{ fontSize: 19, fontWeight: 700, color: c }}>{formatCurrency(v)}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       {showForm && (
         <div className="glass panel" style={{ padding: 24, marginBottom: 16 }}>
@@ -165,10 +196,37 @@ function LeavePanel({ employee }: { employee: Employee }) {
   const entitlement = employee.paidLeaveDays ?? 20;
   const remaining = entitlement - usedPaid;
 
+  const pay = calcPayroll(employee.salary ?? 0);
+
   return (
     <div>
       {employee.address && <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginBottom: 6 }}>Адрес: {employee.address}</div>}
       {employee.notes && <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginBottom: 10 }}>Бележки: {employee.notes}</div>}
+
+      {/* Разбивка на заплатата */}
+      {(employee.salary ?? 0) > 0 && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--ink)", marginBottom: 8 }}>Разбивка на заплатата (месечно)</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px,1fr))", gap: 10 }}>
+            {([
+              ["Бруто заплата", pay.gross, "var(--navy)"],
+              ["Осигуровки (служител)", pay.employeeSSC, "var(--brass)"],
+              ["Данък (10%)", pay.tax, "var(--brass)"],
+              ["Чиста сума", pay.net, "var(--emerald-dark)"],
+              ["Осигуровки (работодател)", pay.employerSSC, "var(--brass)"],
+              ["Общ разход за фирмата", pay.employerCost, "var(--brick)"],
+            ] as [string, number, string][]).map(([l, v, c]) => (
+              <div key={l} style={{ background: "rgba(255,255,255,.5)", borderRadius: 8, padding: "8px 10px" }}>
+                <div style={{ fontSize: 11, color: "var(--muted)" }}>{l}</div>
+                <div className="num" style={{ fontSize: 15, fontWeight: 700, color: c }}>{formatCurrency(v)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Архив с документи */}
+      <FilesPanel employeeId={employee.id} />
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px,1fr))", gap: 10, marginBottom: 12 }}>
         <div style={{ background: "var(--emerald-soft)", borderRadius: 8, padding: "8px 10px" }}>
           <div style={{ fontSize: 11, color: "var(--muted)" }}>Полагаем платен отпуск</div>
@@ -194,6 +252,7 @@ function LeavePanel({ employee }: { employee: Employee }) {
         <div style={{ flex: 1, minWidth: 120 }}><label style={{ fontSize: 11 }}>Бележка</label><input value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} style={{ padding: "6px 8px", fontSize: 12.5 }} /></div>
         <button className="btn btn-primary btn-sm" onClick={add}>+ Добави</button>
       </div>
+      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--ink)", margin: "4px 0 6px" }}>Отпуски / болнични</div>
       {!loaded ? <div style={{ fontSize: 12, color: "var(--muted)" }}>Зареждане…</div> : leaves.length === 0 ? (
         <div style={{ fontSize: 12.5, color: "var(--muted)" }}>Няма записани отпуски/болнични.</div>
       ) : (
@@ -202,6 +261,89 @@ function LeavePanel({ employee }: { employee: Employee }) {
             <div key={l.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, padding: "4px 0", borderBottom: "1px solid rgba(217,215,200,.4)" }}>
               <span><strong>{LEAVE_LABELS[l.type]}</strong> · {new Date(l.startDate).toLocaleDateString("bg-BG")} – {new Date(l.endDate).toLocaleDateString("bg-BG")} ({l.days} дни){l.note ? ` · ${l.note}` : ""}</span>
               <button onClick={() => del(l.id)} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer" }}>×</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const DOC_TYPES = ["Трудов договор", "Допълнително споразумение", "Молба за отпуск", "Молба за напускане", "Болничен лист", "Длъжностна характеристика", "Друго"];
+
+function FilesPanel({ employeeId }: { employeeId: string }) {
+  const [files, setFiles] = useState<EmpFile[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const [docType, setDocType] = useState(DOC_TYPES[0]);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+
+  useEffect(() => {
+    fetch(`/api/employees/${employeeId}/files`).then(async (r) => {
+      if (r.ok) setFiles(await r.json());
+      setLoaded(true);
+    }).catch(() => setLoaded(true));
+  }, [employeeId]);
+
+  async function upload(file: File) {
+    setErr("");
+    if (file.size > 5 * 1024 * 1024) { setErr("Файлът е твърде голям (макс. 5 MB)."); return; }
+    setBusy(true);
+    try {
+      const dataUrl: string = await new Promise((res, rej) => {
+        const fr = new FileReader();
+        fr.onload = () => res(String(fr.result));
+        fr.onerror = rej;
+        fr.readAsDataURL(file);
+      });
+      const r = await fetch(`/api/employees/${employeeId}/files`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: file.name, docType, mimeType: file.type || "application/octet-stream", size: file.size, dataUrl }),
+      });
+      if (r.ok) { const f = await r.json(); setFiles((p) => [f, ...p]); }
+      else setErr((await r.json()).error ?? "Грешка при качване.");
+    } finally { setBusy(false); }
+  }
+
+  async function del(id: string) {
+    if (!confirm("Изтриване на документа?")) return;
+    const r = await fetch(`/api/employees/${employeeId}/files?fileId=${id}`, { method: "DELETE" });
+    if (r.ok) setFiles((p) => p.filter((x) => x.id !== id));
+  }
+
+  return (
+    <div style={{ marginTop: 14, paddingTop: 12, borderTop: "1px solid rgba(217,215,200,.5)" }}>
+      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--ink)", marginBottom: 8 }}>Архив с документи</div>
+      {err && <div style={{ background: "var(--brick-soft)", color: "var(--brick)", borderRadius: 6, padding: "6px 10px", fontSize: 12, marginBottom: 8 }}>{err}</div>}
+      <div style={{ display: "flex", gap: 8, alignItems: "flex-end", flexWrap: "wrap", marginBottom: 10 }}>
+        <div>
+          <label style={{ fontSize: 11 }}>Вид документ</label>
+          <select value={docType} onChange={(e) => setDocType(e.target.value)} style={{ padding: "6px 8px", fontSize: 12.5 }}>
+            {DOC_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+          </select>
+        </div>
+        <label className="btn btn-primary btn-sm" style={{ cursor: busy ? "wait" : "pointer" }}>
+          {busy ? "Качване…" : "+ Прикачи файл"}
+          <input type="file" hidden disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = ""; }} />
+        </label>
+        <span style={{ fontSize: 11, color: "var(--muted)" }}>макс. 5 MB</span>
+      </div>
+      {!loaded ? <div style={{ fontSize: 12, color: "var(--muted)" }}>Зареждане…</div> : files.length === 0 ? (
+        <div style={{ fontSize: 12.5, color: "var(--muted)" }}>Няма прикачени документи.</div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          {files.map((f) => (
+            <div key={f.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12.5, padding: "5px 0", borderBottom: "1px solid rgba(217,215,200,.4)" }}>
+              <span>
+                {f.docType && <strong style={{ color: "var(--navy)" }}>{f.docType}</strong>}
+                {f.docType ? " · " : ""}
+                <a href={`/api/employees/${employeeId}/files/${f.id}`} style={{ color: "var(--ink)" }}>{f.name}</a>
+                <span style={{ color: "var(--muted)" }}> · {(f.size / 1024).toFixed(0)} KB · {new Date(f.uploadedAt).toLocaleDateString("bg-BG")}</span>
+              </span>
+              <span style={{ display: "flex", gap: 8 }}>
+                <a href={`/api/employees/${employeeId}/files/${f.id}`} className="btn btn-ghost btn-sm">↓</a>
+                <button onClick={() => del(f.id)} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer" }}>×</button>
+              </span>
             </div>
           ))}
         </div>

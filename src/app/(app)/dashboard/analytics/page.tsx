@@ -3,8 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { FinancialHistorySection } from "@/components/app/FinancialHistorySection";
 import { TopClientsChart } from "@/components/app/TopClientsChart";
 import { MonthlyBarChart } from "@/components/app/MonthlyBarChart";
+import { MonthlyBackfill } from "@/components/app/MonthlyBackfill";
 import { aggregateClientRevenue } from "@/lib/clientRevenue";
 import { formatCurrency, toBGN, isDualCurrencyActive } from "@/lib/constants";
+import { sumPayroll } from "@/lib/payroll";
 
 export default async function AnalyticsPage() {
   const { companyId } = await requireFeature("analytics");
@@ -31,6 +33,23 @@ export default async function AnalyticsPage() {
     prisma.document.count({ where: { companyId, type: "invoice", status: "paid" } }),
   ]);
 
+  // Заплати (разход) + ръчно въведени месечни данни за текущата година
+  const [activeEmployees, payrollMonths, monthlyEntries] = await Promise.all([
+    prisma.employee.findMany({ where: { companyId, active: true }, select: { salary: true } }),
+    prisma.payrollMonth.findMany({ where: { companyId, year } }),
+    prisma.monthlyEntry.findMany({ where: { companyId, year } }),
+  ]);
+  const defaultMonthlyPayroll = sumPayroll(activeEmployees.map((e) => e.salary ?? 0)).employerCost;
+  const payrollByMonth = new Map(payrollMonths.map((p) => [p.month, p.amount]));
+  const manualRevByMonth = new Map(monthlyEntries.map((m) => [m.month, m.revenue]));
+  const manualExpByMonth = new Map(monthlyEntries.map((m) => [m.month, m.expenses]));
+  const curMonth = now.getMonth();
+  // Разход за заплати: за месеците от началото на годината до текущия (или ръчна корекция)
+  let payrollExpense = 0;
+  for (let m = 0; m <= curMonth; m++) payrollExpense += payrollByMonth.get(m) ?? defaultMonthlyPayroll;
+  const manualRevenueTotal = monthlyEntries.reduce((s, m) => s + m.revenue, 0);
+  const manualExpenseTotal = monthlyEntries.reduce((s, m) => s + m.expenses, 0);
+
   // Очаквани месечни приходи (абонаментни договори) + фиксирани месечни разходи
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const [retainerAgg, recurringExpenses, monthInvoices] = await Promise.all([
@@ -41,11 +60,13 @@ export default async function AnalyticsPage() {
   const expectedRetainer = retainerAgg._sum.monthlyRetainer ?? 0;
   const monthInvoiced = monthInvoices.reduce((s, d) => s + d.lines.reduce((ss, l) => ss + l.lineTotal, 0), 0);
   const expectedMonthlyRevenue = expectedRetainer + monthInvoiced;
-  const fixedMonthlyExpenses = recurringExpenses.reduce((s, e) => s + e.amount, 0);
+  const currentMonthPayroll = payrollByMonth.get(now.getMonth()) ?? defaultMonthlyPayroll;
+  const fixedMonthlyExpenses = recurringExpenses.reduce((s, e) => s + e.amount, 0) + currentMonthPayroll;
   const expectedMonthlyResult = expectedMonthlyRevenue - fixedMonthlyExpenses;
 
-  const yearRevenue = invoices.reduce((s, d) => s + d.lines.reduce((ss, l) => ss + l.lineTotal, 0), 0);
-  const yearExpenses = expenses._sum.amount ?? 0;
+  const invoiceRevenue = invoices.reduce((s, d) => s + d.lines.reduce((ss, l) => ss + l.lineTotal, 0), 0);
+  const yearRevenue = invoiceRevenue + manualRevenueTotal;
+  const yearExpenses = (expenses._sum.amount ?? 0) + payrollExpense + manualExpenseTotal;
   const yearProfit = yearRevenue - yearExpenses;
 
   const goalPercent = goal ? Math.min(100, Math.round((yearRevenue / goal.targetRevenue) * 100)) : null;
@@ -57,6 +78,8 @@ export default async function AnalyticsPage() {
     const total = doc.lines.reduce((s, l) => s + l.lineTotal, 0);
     monthlyData[m] = (monthlyData[m] ?? 0) + total;
   }
+  // добавяме ръчно въведените приходи по месеци
+  for (const [m, rev] of manualRevByMonth) monthlyData[m] = (monthlyData[m] ?? 0) + rev;
 
   const MONTHS = ["Яну", "Фев", "Мар", "Апр", "Май", "Юни", "Юли", "Авг", "Сеп", "Окт", "Ное", "Дек"];
   const maxMonth = Math.max(...Object.values(monthlyData), 1);
@@ -105,7 +128,7 @@ export default async function AnalyticsPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px,1fr))", gap: 14 }}>
           {[
             { l: "Очаквани месечни приходи", v: expectedMonthlyRevenue, c: "var(--emerald-dark)", sub: `${formatCurrency(expectedRetainer)} абонаменти + ${formatCurrency(monthInvoiced)} фактури` },
-            { l: "Фиксирани месечни разходи", v: fixedMonthlyExpenses, c: "var(--brick)", sub: `${recurringExpenses.length} повтарящи се разхода` },
+            { l: "Фиксирани месечни разходи", v: fixedMonthlyExpenses, c: "var(--brick)", sub: `${recurringExpenses.length} повтарящи се + ${formatCurrency(currentMonthPayroll)} заплати` },
             { l: "Очакван месечен резултат", v: expectedMonthlyResult, c: expectedMonthlyResult >= 0 ? "var(--emerald-dark)" : "var(--brick)", sub: "приходи − фиксирани разходи" },
           ].map((k) => (
             <div key={k.l}>
@@ -167,6 +190,21 @@ export default async function AnalyticsPage() {
           </div>
 
         </div>
+      </div>
+
+      {/* Заплати по месеци + ръчно въведени приходи/разходи (текуща година) */}
+      <div style={{ marginTop: 18 }}>
+        <MonthlyBackfill
+          year={year}
+          currentMonth={curMonth}
+          defaultPayroll={defaultMonthlyPayroll}
+          months={Array.from({ length: 12 }, (_, m) => ({
+            month: m,
+            payroll: payrollByMonth.has(m) ? (payrollByMonth.get(m) as number) : null,
+            revenue: manualRevByMonth.get(m) ?? 0,
+            expenses: manualExpByMonth.get(m) ?? 0,
+          }))}
+        />
       </div>
 
       {/* Финансова цел + Историческа справка (редакция, разходи, диаграма) */}
