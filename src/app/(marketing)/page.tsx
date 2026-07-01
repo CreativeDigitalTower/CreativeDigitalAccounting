@@ -105,6 +105,7 @@ export default function HomePage() {
 
       {/* Features grid */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 80px" }}>
+        <div style={{ textAlign: "center", fontSize: 12, fontWeight: 700, letterSpacing: 1.6, color: "var(--brass)", textTransform: "uppercase", marginBottom: 10 }}>Платформата</div>
         <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 30, fontWeight: 700, textAlign: "center", marginBottom: 8 }}>
           Всичко за вашия бизнес на едно място
         </h2>
@@ -138,6 +139,7 @@ export default function HomePage() {
 
       {/* Защо да изберете */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 70px" }}>
+        <div style={{ textAlign: "center", fontSize: 12, fontWeight: 700, letterSpacing: 1.6, color: "var(--brass)", textTransform: "uppercase", marginBottom: 10 }}>Предимства</div>
         <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 30, fontWeight: 700, textAlign: "center", marginBottom: 8 }}>
           Защо да изберете Creative Digital Accounting
         </h2>
@@ -171,12 +173,13 @@ export default function HomePage() {
 
       {/* Какво получавате */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 70px" }}>
+        <div style={{ textAlign: "center", fontSize: 12, fontWeight: 700, letterSpacing: 1.6, color: "var(--brass)", textTransform: "uppercase", marginBottom: 10 }}>Резултати</div>
         <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 30, fontWeight: 700, textAlign: "center", marginBottom: 24 }}>Какво получавате?</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 16 }}>
           {stats.map((s) => (
-            <div key={s.label} className="glass panel" style={{ padding: "22px 14px", textAlign: "center" }}>
-              <div className="num" style={{ fontSize: 30, fontWeight: 700, color: "var(--emerald)" }}>{s.num}</div>
-              <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginTop: 4 }}>{s.label}</div>
+            <div key={s.label} className="glass panel hover-lift" style={{ padding: "24px 14px", textAlign: "center" }}>
+              <div className="num" style={{ fontSize: 34, fontWeight: 700, background: "linear-gradient(120deg, var(--emerald), var(--brass))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>{s.num}</div>
+              <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginTop: 6 }}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -187,13 +190,15 @@ export default function HomePage() {
 
       {/* Как работи */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 70px" }}>
-        <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 30, fontWeight: 700, textAlign: "center", marginBottom: 24 }}>Как работи Creative Digital Accounting</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 18 }}>
-          {steps.map((s) => (
-            <div key={s.n} className="glass panel" style={{ padding: "24px", textAlign: "center" }}>
-              <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--emerald)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 20, margin: "0 auto 12px" }}>{s.n}</div>
-              <h3 style={{ margin: "0 0 8px", fontSize: 17, fontFamily: "'Fraunces', serif", fontWeight: 700 }}>{s.title}</h3>
-              <p style={{ margin: 0, color: "var(--ink-soft)", fontSize: 13.5, lineHeight: 1.55 }}>{s.desc}</p>
+        <div style={{ textAlign: "center", fontSize: 12, fontWeight: 700, letterSpacing: 1.6, color: "var(--brass)", textTransform: "uppercase", marginBottom: 10 }}>Лесно начало</div>
+        <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 30, fontWeight: 700, textAlign: "center", marginBottom: 28 }}>Как работи Creative Digital Accounting</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 18, position: "relative" }}>
+          {steps.map((s, i) => (
+            <div key={s.n} className="glass panel hover-lift" style={{ padding: "26px 24px", position: "relative", overflow: "hidden" }}>
+              <div style={{ position: "absolute", top: -14, right: -6, fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 90, color: "rgba(15,138,106,.07)", lineHeight: 1 }}>{s.n}</div>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: "linear-gradient(135deg, var(--emerald), var(--emerald-dark))", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 19, marginBottom: 14, boxShadow: "0 6px 16px rgba(15,138,106,.3)" }}>{s.n}</div>
+              <h3 style={{ margin: "0 0 8px", fontSize: 17, fontFamily: "'Fraunces', serif", fontWeight: 700, position: "relative" }}>{s.title}</h3>
+              <p style={{ margin: 0, color: "var(--ink-soft)", fontSize: 13.5, lineHeight: 1.55, position: "relative" }}>{s.desc}</p>
             </div>
           ))}
         </div>

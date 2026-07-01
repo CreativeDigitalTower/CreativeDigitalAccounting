@@ -220,3 +220,11 @@ tbody tr:hover{background:rgba(15,138,106,.05);}
   .home-hero{ grid-template-columns:1fr !important; gap:32px !important; }
   .home-hero-art{ min-height:340px; margin-top:8px; }
 }
+
+/* FAQ карти */
+.faq-card summary{ list-style:none; }
+.faq-card summary::-webkit-details-marker{ display:none; }
+.faq-card summary > span:last-child{ transition:transform .2s ease; }
+.faq-card[open] summary > span:last-child{ transform:rotate(45deg); }
+.faq-card{ transition:box-shadow .2s ease; }
+.faq-card[open]{ box-shadow:0 10px 30px rgba(20,30,25,.10); }
