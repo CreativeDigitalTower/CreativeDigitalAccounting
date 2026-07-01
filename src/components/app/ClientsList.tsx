@@ -73,7 +73,7 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
     <>
       {/* Приходи */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 14 }}>
-        <Kpi label="Приход (този месец)" value={formatCurrency(grandMonth)} color="var(--emerald-dark)" />
+        <Kpi label="Месечни абонаменти" value={formatCurrency(grandMonth)} color="var(--emerald-dark)" />
         <Kpi label="Приход (общо)" value={formatCurrency(grandTotal)} color="var(--navy)" />
         <Kpi label="Активни клиенти" value={String(clients.length)} color="var(--ink)" />
         <Kpi label="Отворени задачи" value={String(clients.reduce((s, c) => s + c.openTasks, 0))} color="var(--brass)" />
@@ -109,7 +109,7 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
             <thead>
               <tr>
                 <th>Клиент</th><th>Статус</th><th>Телефон</th>
-                <th className="num">Приход (месец)</th><th className="num">Приход (общо)</th><th className="num">Задачи</th><th></th>
+                <th className="num">Месечен абонамент</th><th className="num">Приход (общо)</th><th className="num">Задачи</th><th></th>
               </tr>
             </thead>
             <tbody>
