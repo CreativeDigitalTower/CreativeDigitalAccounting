@@ -40,6 +40,31 @@ export async function POST(req: Request) {
   }
 }
 
+export async function PUT(req: Request) {
+  try {
+    const { companyId } = await requireFeature("production");
+    const body = await req.json();
+    const id = z.string().parse(body.id);
+    const data = schema.parse(body);
+    const existing = await prisma.recipe.findFirst({ where: { id, companyId }, select: { id: true } });
+    if (!existing) return NextResponse.json({ error: "Не е намерена." }, { status: 404 });
+    await prisma.recipeItem.deleteMany({ where: { recipeId: id } });
+    const recipe = await prisma.recipe.update({
+      where: { id },
+      data: {
+        name: data.name, outputItemId: data.outputItemId ?? null,
+        outputQuantity: data.outputQuantity, note: data.note ?? null,
+        ingredients: { create: data.ingredients.map((i) => ({ stockItemId: i.stockItemId, quantity: i.quantity })) },
+      },
+      include: { ingredients: true },
+    });
+    return NextResponse.json(recipe);
+  } catch (err) {
+    if (err instanceof z.ZodError) return NextResponse.json({ error: "Невалидни данни." }, { status: 400 });
+    return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
+  }
+}
+
 export async function DELETE(req: Request) {
   try {
     const { companyId } = await requireFeature("production");

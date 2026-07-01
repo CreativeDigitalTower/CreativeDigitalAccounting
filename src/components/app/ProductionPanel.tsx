@@ -13,6 +13,7 @@ export function ProductionPanel({ initialRecipes, items, warehouses }: { initial
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
   const [runRecipe, setRunRecipe] = useState<Recipe | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [name, setName] = useState("");
   const [outputItemId, setOutputItemId] = useState("");
@@ -24,18 +25,25 @@ export function ProductionPanel({ initialRecipes, items, warehouses }: { initial
 
   async function reload() { const r = await fetch("/api/recipes"); if (r.ok) setRecipes(await r.json()); }
 
+  function resetForm() { setEditId(null); setName(""); setOutputItemId(""); setOutputQuantity("1"); setNote(""); setIngs([{ stockItemId: "", quantity: "" }]); }
+  function startEdit(r: Recipe) {
+    setEditId(r.id); setName(r.name); setOutputItemId(r.outputItemId ?? ""); setOutputQuantity(String(r.outputQuantity)); setNote(r.note ?? "");
+    setIngs(r.ingredients.length ? r.ingredients.map((i) => ({ stockItemId: i.stockItemId, quantity: String(i.quantity) })) : [{ stockItemId: "", quantity: "" }]);
+    setShowForm(true); setError("");
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   async function saveRecipe() {
     setError("");
     const ingredients = ings.filter((i) => i.stockItemId && i.quantity).map((i) => ({ stockItemId: i.stockItemId, quantity: Number(i.quantity) }));
     if (!name.trim() || ingredients.length === 0) { setError("Въведете име и поне една съставка."); return; }
+    const payload = { name, outputItemId: outputItemId || null, outputQuantity: Number(outputQuantity) || 1, note: note || null, ingredients };
     const res = await fetch("/api/recipes", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, outputItemId: outputItemId || null, outputQuantity: Number(outputQuantity) || 1, note: note || null, ingredients }),
+      method: editId ? "PUT" : "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(editId ? { id: editId, ...payload } : payload),
     });
-    if (res.ok) {
-      setShowForm(false); setName(""); setOutputItemId(""); setOutputQuantity("1"); setNote(""); setIngs([{ stockItemId: "", quantity: "" }]);
-      reload();
-    } else setError((await res.json()).error ?? "Грешка.");
+    if (res.ok) { setShowForm(false); resetForm(); reload(); }
+    else setError((await res.json()).error ?? "Грешка.");
   }
 
   async function deleteRecipe(id: string) {
@@ -55,12 +63,12 @@ export function ProductionPanel({ initialRecipes, items, warehouses }: { initial
           <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>Производство</h1>
           <div style={{ color: "var(--muted)", fontSize: 13 }}>Рецепти и производство — изписва съставките и заприходява готовата продукция</div>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>+ Нова рецепта</button>
+        <button className="btn btn-primary" onClick={() => { if (showForm) { setShowForm(false); resetForm(); } else { resetForm(); setShowForm(true); } }}>{showForm ? "Затвори" : "+ Нова рецепта"}</button>
       </div>
 
       {showForm && (
         <div className="glass panel" style={{ padding: 24, marginBottom: 16 }}>
-          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>Нова рецепта</h3>
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>{editId ? "Редакция на рецепта" : "Нова рецепта"}</h3>
           {error && <div style={{ background: "var(--brick-soft)", color: "var(--brick)", borderRadius: 6, padding: "8px 12px", fontSize: 12.5, marginBottom: 12 }}>{error}</div>}
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 12, marginBottom: 12 }}>
             <div><label>Име на продукта/рецептата *</label><input value={name} onChange={(e) => setName(e.target.value)} placeholder="напр. Хляб бял 500г" /></div>
@@ -80,8 +88,8 @@ export function ProductionPanel({ initialRecipes, items, warehouses }: { initial
           <button onClick={() => setIngs([...ings, { stockItemId: "", quantity: "" }])} style={{ fontSize: 12.5, color: "var(--navy)", background: "none", border: "1px dashed var(--border)", padding: "6px 12px", borderRadius: 6, cursor: "pointer", marginTop: 4 }}>+ Съставка</button>
           <div style={{ marginTop: 12 }}><label>Бележка</label><input value={note} onChange={(e) => setNote(e.target.value)} /></div>
           <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-            <button className="btn btn-ghost btn-sm" onClick={() => setShowForm(false)}>Отказ</button>
-            <button className="btn btn-primary btn-sm" onClick={saveRecipe}>Запази рецепта</button>
+            <button className="btn btn-ghost btn-sm" onClick={() => { setShowForm(false); resetForm(); }}>Отказ</button>
+            <button className="btn btn-primary btn-sm" onClick={saveRecipe}>{editId ? "Запази промените" : "Запази рецепта"}</button>
           </div>
         </div>
       )}
@@ -93,7 +101,10 @@ export function ProductionPanel({ initialRecipes, items, warehouses }: { initial
           <div key={r.id} className="glass panel" style={{ padding: 18 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
               <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 4px" }}>{r.name}</h3>
-              <button onClick={() => deleteRecipe(r.id)} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer" }}>×</button>
+              <span style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => startEdit(r)} title="Редактирай" style={{ background: "none", border: "none", color: "var(--navy)", cursor: "pointer", fontSize: 13 }}>✎</button>
+                <button onClick={() => deleteRecipe(r.id)} title="Изтрий" style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer" }}>×</button>
+              </span>
             </div>
             <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 8 }}>Добив: {r.outputQuantity} {itemUnit(r.outputItemId)} × {itemName(r.outputItemId)}</div>
             <ul style={{ listStyle: "none", padding: 0, margin: "0 0 12px", fontSize: 12.5 }}>
