@@ -6,6 +6,7 @@ export default async function RevisionPage() {
   const { companyId } = await requireFeature("revision");
   const rows = await prisma.stockItem.findMany({ where: { companyId }, orderBy: { name: "asc" } });
   const items = rows.map((i) => ({ id: i.id, name: i.name, unit: i.unit, quantity: i.quantity }));
+  const warehouses = await prisma.warehouse.findMany({ where: { companyId }, orderBy: { name: "asc" }, select: { id: true, name: true } });
 
   // ─── Архив с ревизии (протоколи) ───
   const stocktakes = await prisma.stocktake.findMany({
@@ -17,7 +18,7 @@ export default async function RevisionPage() {
 
   return (
     <>
-      <RevisionForm items={items} />
+      <RevisionForm items={items} warehouses={warehouses} />
 
       <div style={{ marginTop: 24 }}>
         <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, fontWeight: 600, margin: "0 0 10px" }}>Архив с ревизии ({stocktakes.length})</h2>
