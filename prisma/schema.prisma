@@ -777,6 +777,8 @@ model Asset {
   bookValue          Float
   warrantyUntil      DateTime?
   insuranceUntil     DateTime?
+  status             String    @default("in_use") // in_use | maintenance | sold | scrapped | written_off
+  notes              String?   @db.Text
 
   company     Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
   serviceLogs AssetServiceLog[]
