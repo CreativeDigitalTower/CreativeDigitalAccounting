@@ -34,6 +34,9 @@ const schema = z.object({
   lines: z.array(lineSchema).min(1),
   status: z.enum(["draft", "issued", "sent"]).default("draft"),
   parentDocumentId: z.string().optional(),
+  vatExempt: z.boolean().optional(),
+  vatExemptReason: z.string().optional().nullable(),
+  clientIsIndividual: z.boolean().optional(),
 });
 
 export async function POST(req: Request) {
@@ -42,6 +45,11 @@ export async function POST(req: Request) {
     const body = await req.json();
     const data = schema.parse(body);
     const issued = data.status === "issued" || data.status === "sent";
+
+    // Валидация: ако не се начислява ДДС, трябва да има основание
+    if (data.vatExempt && !data.vatExemptReason?.trim()) {
+      return NextResponse.json({ error: "Моля изберете основание за неначисляване на ДДС." }, { status: 400 });
+    }
 
     // Всеки официално издаден изходящ документ се брои към месечния лимит
     if (issued) {
@@ -88,6 +96,9 @@ export async function POST(req: Request) {
         internalComment: data.internalComment,
         status: data.status,
         parentDocumentId: data.parentDocumentId ?? null,
+        vatExempt: data.vatExempt ?? false,
+        vatExemptReason: data.vatExempt ? (data.vatExemptReason ?? null) : null,
+        clientIsIndividual: data.clientIsIndividual ?? false,
         lines: {
           create: data.lines.map((l) => ({
             description: l.description,

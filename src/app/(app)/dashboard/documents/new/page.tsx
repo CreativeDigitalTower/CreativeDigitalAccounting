@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   isDualCurrencyActive, toBGN, formatCurrency, EUR_TO_BGN,
-  CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, PAYMENT_METHODS, allowedTemplateCount, type PlanId,
+  CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, PAYMENT_METHODS, allowedTemplateCount, VAT_EXEMPT_REASONS, type PlanId,
 } from "@/lib/constants";
 import { TemplateGallery } from "@/components/app/TemplateGallery";
 
@@ -51,6 +51,11 @@ function NewDocumentForm() {
   const [internalComment, setInternalComment] = useState("");
   const [companyReady, setCompanyReady] = useState(true);
   const [plan, setPlan] = useState<PlanId>("free");
+  // ДДС освобождаване
+  const [vatExempt, setVatExempt] = useState(false);
+  const [vatReasonCode, setVatReasonCode] = useState("");
+  const [vatReasonCustom, setVatReasonCustom] = useState("");
+  const [clientIsIndividual, setClientIsIndividual] = useState(false);
   const allowedTpls = (() => { const n = allowedTemplateCount(plan); return n === Infinity ? INVOICE_TEMPLATES : INVOICE_TEMPLATES.slice(0, n); })();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -88,6 +93,14 @@ function NewDocumentForm() {
       if (c?.defaultLanguage) setLanguage(c.defaultLanguage);
       if (c?.invoiceTemplate) setTemplate(c.invoiceTemplate);
       if (c?.plan) setPlan(c.plan as PlanId);
+      // ДДС по подразбиране: нерегистрирана фирма → авто освобождаване (чл.113 ал.9)
+      if (c && c.vatRegistered === false) {
+        setVatExempt(true);
+        setVatReasonCode(c.defaultVatExemptReason || "art113_9");
+      } else if (c?.defaultVatExempt) {
+        setVatExempt(true);
+        setVatReasonCode(c.defaultVatExemptReason || "");
+      }
       // Изисква попълнени фирмени данни преди фактуриране
       setCompanyReady(!!(c?.name && c?.eik && c?.address));
     }).catch(() => {});
@@ -125,12 +138,20 @@ function NewDocumentForm() {
       return;
     }
 
+    // ДДС освобождаване — задължително основание
+    const vatReason = vatReasonCode === "other" ? vatReasonCustom.trim() : vatReasonCode;
+    if (vatExempt && !vatReason) {
+      setError("Моля изберете основание за неначисляване на ДДС.");
+      return;
+    }
+
     // Валидация на получателя (при издаване)
     if (status !== "draft") {
       if (clientMode === "manual") {
-        const req = [mClient.name, mClient.eik, mClient.city, mClient.address];
+        // За физическо лице ЕИК не е задължителен
+        const req = clientIsIndividual ? [mClient.name, mClient.city, mClient.address] : [mClient.name, mClient.eik, mClient.city, mClient.address];
         if (req.some((v) => !v.trim())) {
-          setError("Попълнете задължителните данни на клиента: име, ЕИК, град и адрес.");
+          setError(clientIsIndividual ? "Попълнете име, град и адрес на получателя." : "Попълнете задължителните данни на клиента: име, ЕИК, град и адрес.");
           return;
         }
       } else if (!clientId) {
@@ -163,6 +184,7 @@ function NewDocumentForm() {
         type, number: number || undefined, clientId: finalClientId,
         issueDate, taxEventDate, dueDate, currency, language, template, paymentMethod,
         notes, internalComment, lines, status,
+        vatExempt, vatExemptReason: vatExempt ? vatReason : null, clientIsIndividual,
       }),
     });
     setSaving(false);
@@ -250,12 +272,16 @@ function NewDocumentForm() {
 
         {/* Клиент: избор / ръчно */}
         <div style={{ borderTop: "1px solid var(--border)", paddingTop: 16, marginBottom: 20 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, flexWrap: "wrap" }}>
             <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 14, margin: 0 }}>Получател</h3>
             <div style={{ display: "flex", gap: 6, marginLeft: "auto" }}>
               <button type="button" className={`filter-tab${clientMode === "select" ? " active" : ""}`} style={{ fontSize: 11.5 }} onClick={() => setClientMode("select")}>От списък</button>
               <button type="button" className={`filter-tab${clientMode === "manual" ? " active" : ""}`} style={{ fontSize: 11.5 }} onClick={() => setClientMode("manual")}>Въведи ръчно</button>
             </div>
+          </div>
+          <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
+            <button type="button" className={`filter-tab${!clientIsIndividual ? " active" : ""}`} style={{ fontSize: 11.5 }} onClick={() => setClientIsIndividual(false)}>Фирма (с ЕИК/ДДС)</button>
+            <button type="button" className={`filter-tab${clientIsIndividual ? " active" : ""}`} style={{ fontSize: 11.5 }} onClick={() => setClientIsIndividual(true)}>Физическо лице</button>
           </div>
 
           {clientMode === "select" ? (
@@ -385,6 +411,31 @@ function NewDocumentForm() {
           <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 12 }}>
             Двойно EUR/BGN обозначаване е задължително до 08.08.2026 г. (1 EUR = {EUR_TO_BGN} лв)
           </p>
+        )}
+
+        {/* ДДС — неначисляване */}
+        {type !== "quote" && (
+          <div style={{ borderTop: "1px solid var(--border)", paddingTop: 16, marginTop: 20 }}>
+            <label style={{ display: "flex", gap: 8, alignItems: "center", fontWeight: 600, cursor: "pointer" }}>
+              <input type="checkbox" checked={vatExempt} onChange={(e) => setVatExempt(e.target.checked)} style={{ width: "auto" }} />
+              Не начислявай ДДС по тази фактура
+            </label>
+            {vatExempt && (
+              <div style={{ marginTop: 10, maxWidth: 640 }}>
+                <label style={{ fontSize: 12 }}>Основание за неначисляване на ДДС *</label>
+                <select value={vatReasonCode} onChange={(e) => setVatReasonCode(e.target.value)}>
+                  <option value="">— Изберете основание —</option>
+                  {VAT_EXEMPT_REASONS.map((r) => <option key={r.code} value={r.code}>{r.label}</option>)}
+                </select>
+                {vatReasonCode === "other" && (
+                  <input value={vatReasonCustom} onChange={(e) => setVatReasonCustom(e.target.value)} placeholder="Въведете основание…" style={{ marginTop: 8 }} />
+                )}
+                <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 6 }}>
+                  Основанието се визуализира във фактурата под реда за ДДС. Стойността по подразбиране идва от ДДС настройките на фирмата и може да се промени само за тази фактура.
+                </div>
+              </div>
+            )}
+          </div>
         )}
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 20 }}>

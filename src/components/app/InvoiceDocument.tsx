@@ -19,6 +19,7 @@ export type InvoiceData = {
   type: string; number: string; issueDate: string | Date; taxEventDate?: string | Date | null; dueDate?: string | Date | null;
   currency: string; paymentMethod: string; notes?: string | null; template: string;
   company: InvoiceParty; client?: InvoiceParty | null; lines: InvoiceLineData[]; logoUrl?: string | null;
+  vatExempt?: boolean; vatExemptReasonText?: string | null;
 };
 
 function fmtDate(d: string | Date) { return new Date(d).toLocaleDateString("bg-BG"); }
@@ -301,7 +302,13 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
         </p>
       )}
 
-      <div style={{ marginTop: 20, borderTop: "1px solid var(--border)", paddingTop: 14, fontSize: 12.5, color: "var(--ink-soft)" }}>
+      {data.vatExempt && data.vatExemptReasonText && (
+        <div style={{ marginTop: 14, fontSize: 12, color: "var(--ink-soft)", fontStyle: "italic" }}>
+          <strong style={{ color: accent, fontStyle: "normal" }}>Основание за неначисляване на ДДС:</strong> {data.vatExemptReasonText}
+        </div>
+      )}
+
+      <div style={{ marginTop: 16, borderTop: "1px solid var(--border)", paddingTop: 14, fontSize: 12.5, color: "var(--ink-soft)" }}>
         <strong style={{ color: accent }}>Начин на плащане:</strong> {paymentMethodLabel(data.paymentMethod)}
         {data.paymentMethod === "bank_transfer" && company.bankIban && (
           <div style={{ marginTop: 8, lineHeight: 1.7 }}>
@@ -309,7 +316,7 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
             <div>IBAN: <span className="num">{company.bankIban}</span></div>
             {company.bankName && <div>Банка: {company.bankName}</div>}
             {company.bankBic && <div>BIC: {company.bankBic}</div>}
-            <div>Основание за плащане: {data.number}</div>
+            <div>Основание за плащане: Плащане по фактура №{data.number}</div>
           </div>
         )}
       </div>

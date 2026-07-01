@@ -24,6 +24,9 @@ const schema = z.object({
   notes: z.string().optional().nullable(),
   internalComment: z.string().optional().nullable(),
   lines: z.array(lineSchema).min(1),
+  vatExempt: z.boolean().optional(),
+  vatExemptReason: z.string().optional().nullable(),
+  clientIsIndividual: z.boolean().optional(),
 });
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -52,6 +55,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (data.number && data.number !== existing.number && (await isNumberTaken(companyId, data.number, id))) {
       return NextResponse.json({ error: "Този номер вече е използван." }, { status: 400 });
     }
+    if (data.vatExempt && !data.vatExemptReason?.trim()) {
+      return NextResponse.json({ error: "Моля изберете основание за неначисляване на ДДС." }, { status: 400 });
+    }
 
     await prisma.$transaction([
       prisma.documentLine.deleteMany({ where: { documentId: id } }),
@@ -69,6 +75,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
           paymentMethod: data.paymentMethod,
           notes: data.notes ?? null,
           internalComment: data.internalComment ?? null,
+          vatExempt: data.vatExempt ?? false,
+          vatExemptReason: data.vatExempt ? (data.vatExemptReason ?? null) : null,
+          clientIsIndividual: data.clientIsIndividual ?? false,
           lines: {
             create: data.lines.map((l) => ({
               description: l.description, quantity: l.quantity, unitPrice: l.unitPrice,

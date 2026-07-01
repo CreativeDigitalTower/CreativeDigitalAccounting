@@ -6,6 +6,7 @@ import { CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, allowedTemplateCount, typ
 import { TemplatePreview } from "@/components/app/TemplatePreview";
 import { BusinessProfileSettings } from "@/components/app/BusinessProfileSettings";
 import { EmailPreferences } from "@/components/app/EmailPreferences";
+import { VatSettings } from "@/components/app/VatSettings";
 import { DocSharingSetting } from "@/components/app/DocSharingSetting";
 import { DangerZone } from "@/components/app/DangerZone";
 
@@ -231,6 +232,8 @@ export default function SettingsPage() {
           );
         })()}
       </div>
+
+      <VatSettings />
 
       <EmailPreferences />
 

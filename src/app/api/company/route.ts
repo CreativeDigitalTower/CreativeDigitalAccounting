@@ -24,6 +24,8 @@ const schema = z.object({
   defaultLanguage: z.string().optional(),
   invoiceTemplate: z.string().optional(),
   invoiceNumberStart: z.number().int().min(1).optional(),
+  defaultVatExempt: z.boolean().optional(),
+  defaultVatExemptReason: z.string().optional().nullable(),
 });
 
 export async function GET() {

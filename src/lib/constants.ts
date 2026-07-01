@@ -26,6 +26,28 @@ export const BANK_DETAILS = {
 
 export const VAT_RATES = [0, 9, 20] as const;
 
+// Основания за неначисляване на ДДС (конфигурация — лесно разширяема без промяна на логиката).
+// `code` се пази в базата; `label` е за визуализация; `text` се изписва във фактурата.
+export const VAT_EXEMPT_REASONS: { code: string; label: string; text: string }[] = [
+  { code: "art113_9", label: "чл. 113, ал. 9 от ЗДДС – Лицето не е регистрирано по ЗДДС", text: "чл. 113, ал. 9 от ЗДДС – Лицето не е регистрирано по ЗДДС." },
+  { code: "art86_3", label: "чл. 86, ал. 3 от ЗДДС", text: "чл. 86, ал. 3 от ЗДДС." },
+  { code: "art21", label: "чл. 21 от ЗДДС – Място на изпълнение извън територията на България", text: "чл. 21 от ЗДДС – Мястото на изпълнение е извън територията на страната." },
+  { code: "art82", label: "чл. 82 от ЗДДС – Обратно начисляване (reverse charge)", text: "чл. 82, ал. 2 от ЗДДС – Данъкът е изискуем от получателя (обратно начисляване)." },
+  { code: "art28", label: "чл. 28 от ЗДДС – Вътреобщностна доставка", text: "чл. 28 от ЗДДС – Вътреобщностна доставка на стоки." },
+  { code: "art31", label: "чл. 31 от ЗДДС – Международен транспорт", text: "чл. 31 от ЗДДС – Международен транспорт." },
+  { code: "art39", label: "чл. 39 от ЗДДС – Освободена доставка", text: "чл. 39 от ЗДДС – Освободена доставка." },
+  { code: "art50", label: "чл. 50 от ЗДДС", text: "чл. 50 от ЗДДС." },
+  { code: "art173", label: "чл. 173 от ЗДДС", text: "чл. 173 от ЗДДС." },
+  { code: "other", label: "Друго основание…", text: "" },
+];
+
+export function vatExemptReasonText(codeOrText: string | null | undefined): string {
+  if (!codeOrText) return "";
+  const found = VAT_EXEMPT_REASONS.find((r) => r.code === codeOrText);
+  if (found) return found.text || codeOrText;
+  return codeOrText; // свободен текст (Друго основание)
+}
+
 export const DOC_PREFIXES: Record<string, string> = {
   invoice: "", // фактурите са с чисто число: 0000000001
   proforma: "PF-",

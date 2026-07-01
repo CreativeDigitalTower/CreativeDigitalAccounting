@@ -114,6 +114,9 @@ model Company {
   website         String?
   // Per-type number start values (next number = max(start, count)+1)
   invoiceNumberStart Int   @default(1)
+  // ДДС настройки по подразбиране
+  defaultVatExempt       Boolean @default(false) // по подразбиране не начислявай ДДС
+  defaultVatExemptReason String?                 // основание по подразбиране (код)
   // JSON map of email-automation preferences (which automated emails the company receives)
   emailPrefs      String?  @db.Text
   // Откъде е дошла регистрацията (напр. "invoice_portal" — клиент, получил фактура)
@@ -579,6 +582,10 @@ model Document {
   parentDocumentId   String?
   notes              String?        @db.Text
   internalComment    String?        @db.Text
+  // ДДС освобождаване (за конкретната фактура)
+  vatExempt          Boolean        @default(false)
+  vatExemptReason    String?        // код/текст на основанието
+  clientIsIndividual Boolean        @default(false) // получателят е физическо лице (без ЕИК/ДДС)
   // External client sharing (email + accept/reject portal)
   clientEmail        String?
   publicToken        String?        @unique
