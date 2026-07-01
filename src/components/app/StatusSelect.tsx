@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { DOC_STATUSES } from "@/lib/constants";
 
@@ -24,10 +25,15 @@ export function StatusSelect({ id, status }: { id: string; status: string }) {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
   const ref = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    function onClick(e: MouseEvent) { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); }
+    function onClick(e: MouseEvent) {
+      const t = e.target as Node;
+      if (ref.current?.contains(t) || menuRef.current?.contains(t)) return;
+      setOpen(false);
+    }
     function onScroll() { setOpen(false); }
     document.addEventListener("mousedown", onClick);
     window.addEventListener("scroll", onScroll, true);
@@ -75,13 +81,14 @@ export function StatusSelect({ id, status }: { id: string; status: string }) {
         {saving ? "…" : m.label}
         <span style={{ fontSize: 9, opacity: 0.6 }}>▾</span>
       </button>
-      {open && pos && (
-        <div className="glass pop-in" style={{ position: "fixed", top: pos.top, left: pos.left, zIndex: 1000, borderRadius: 10, padding: 5, minWidth: 180, boxShadow: "0 12px 36px rgba(0,0,0,.18)" }}>
+      {open && pos && typeof document !== "undefined" && createPortal(
+        <div ref={menuRef} className="glass pop-in" onClick={(e) => e.stopPropagation()}
+          style={{ position: "fixed", top: pos.top, left: pos.left, zIndex: 4000, borderRadius: 10, padding: 5, minWidth: 180, boxShadow: "0 12px 36px rgba(0,0,0,.22)" }}>
           {DOC_STATUSES.map((s) => {
             const st = STATUS_STYLE[s.color] ?? STATUS_STYLE.muted;
             return (
               <button key={s.value} type="button" onClick={() => change(s.value)}
-                style={{ display: "flex", alignItems: "center", gap: 9, width: "100%", padding: "7px 10px", border: "none", background: s.value === current ? "rgba(15,138,106,.06)" : "transparent", cursor: "pointer", borderRadius: 7, fontSize: 12.5, textAlign: "left", fontWeight: s.value === current ? 700 : 500 }}
+                style={{ display: "flex", alignItems: "center", gap: 9, width: "100%", padding: "8px 11px", border: "none", background: s.value === current ? "rgba(15,138,106,.06)" : "transparent", cursor: "pointer", borderRadius: 7, fontSize: 12.5, textAlign: "left", fontWeight: s.value === current ? 700 : 500 }}
                 onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(15,138,106,.08)")}
                 onMouseLeave={(e) => (e.currentTarget.style.background = s.value === current ? "rgba(15,138,106,.06)" : "transparent")}>
                 <span style={{ width: 8, height: 8, borderRadius: "50%", background: st.dot }} />
@@ -89,7 +96,8 @@ export function StatusSelect({ id, status }: { id: string; status: string }) {
               </button>
             );
           })}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 export type MenuItem = { label: string; icon?: string; onClick: () => void; danger?: boolean; divider?: boolean };
 
@@ -25,8 +26,9 @@ export function ContextMenu({ x, y, items, onClose }: { x: number; y: number; it
   const left = Math.min(x, (typeof window !== "undefined" ? window.innerWidth : 9999) - 210);
   const top = Math.min(y, (typeof window !== "undefined" ? window.innerHeight : 9999) - items.length * 36 - 16);
 
-  return (
-    <div ref={ref} className="glass pop-in" style={{ position: "fixed", left, top, zIndex: 1000, minWidth: 190, borderRadius: 10, padding: 5, boxShadow: "0 12px 36px rgba(0,0,0,.18)" }}>
+  if (typeof document === "undefined") return null;
+  return createPortal(
+    <div ref={ref} className="glass pop-in" style={{ position: "fixed", left, top, zIndex: 4000, minWidth: 190, borderRadius: 10, padding: 5, boxShadow: "0 12px 36px rgba(0,0,0,.22)" }}>
       {items.map((it, i) => it.divider ? (
         <div key={i} style={{ height: 1, background: "var(--border)", margin: "4px 6px" }} />
       ) : (
@@ -38,6 +40,7 @@ export function ContextMenu({ x, y, items, onClose }: { x: number; y: number; it
           {it.label}
         </button>
       ))}
-    </div>
+    </div>,
+    document.body
   );
 }

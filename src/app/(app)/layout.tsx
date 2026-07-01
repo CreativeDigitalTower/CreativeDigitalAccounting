@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getCompanyId, IMPERSONATE_COOKIE } from "@/lib/session";
 import { BlobBackground } from "@/components/Backgrounds";
-import { Sidebar } from "@/components/app/Sidebar";
+import { SidebarShell } from "@/components/app/SidebarShell";
 import { AppTopBar } from "@/components/app/AppTopBar";
 import { ImpersonationBanner } from "@/components/app/ImpersonationBanner";
 import { VisitTracker } from "@/components/VisitTracker";
@@ -37,12 +37,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <VisitTracker area="app" />
       <BlobBackground />
       <div style={{ position: "relative", zIndex: 1, display: "flex", width: "100%" }}>
-        <Sidebar companyName={company.name} plan={plan} isSuperAdmin={isSuperAdmin} logoUrl={plan !== "free" ? company.logoUrl : null} inboxUnread={inboxUnread} />
+        <SidebarShell companyName={company.name} plan={plan} isSuperAdmin={isSuperAdmin} logoUrl={plan !== "free" ? company.logoUrl : null} inboxUnread={inboxUnread} />
         <main style={{ flex: 1, minWidth: 0, maxWidth: 1180 }}>
           {impersonating && <ImpersonationBanner companyName={company.name} />}
           {sub.justExpired && <TrialEndedPopup wasTrial={sub.wasTrial} periodEnd={sub.currentPeriodEnd ? new Date(sub.currentPeriodEnd).toISOString() : ""} />}
           <AppTopBar initialUnread={inboxUnread} />
-          <div style={{ padding: "14px 36px 60px" }}>{children}</div>
+          <div className="app-content" style={{ padding: "14px 36px 60px" }}>{children}</div>
         </main>
       </div>
     </div>
