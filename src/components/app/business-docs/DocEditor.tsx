@@ -37,7 +37,7 @@ export function DocEditor({ doc, logoUrl, companyName }: { doc: Doc; logoUrl: st
       body: JSON.stringify({ title, contentHtml: editorRef.current?.innerHTML ?? "", status }),
     });
     setSaving(false);
-    if (res.ok) { setSavedAt(new Date().toLocaleTimeString("bg-BG")); router.refresh(); }
+    if (res.ok) { router.push("/dashboard/business-docs/all"); }
   }
 
   async function patch(data: Record<string, unknown>) {
@@ -60,22 +60,30 @@ export function DocEditor({ doc, logoUrl, companyName }: { doc: Doc; logoUrl: st
     const el = document.querySelector(".bizdoc-page") as HTMLElement | null;
     if (!el) return;
     setBusy(true);
+    document.body.classList.add("exporting-doc"); // скрива жълтите подсветки
     try {
       const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import("html2canvas-pro"), import("jspdf")]);
       const canvas = await html2canvas(el, { scale: 2, backgroundColor: "#ffffff", useCORS: true, logging: false });
       const img = canvas.toDataURL("image/jpeg", 0.95);
       const pdf = new jsPDF("p", "mm", "a4");
       const pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight(), m = 8;
-      const iw = pw - m * 2, ih = (canvas.height * iw) / canvas.width;
-      let left = ih, pos = m;
-      pdf.addImage(img, "JPEG", m, pos, iw, ih); left -= ph - m * 2;
-      while (left > 0) { pos = m - (ih - left); pdf.addPage(); pdf.addImage(img, "JPEG", m, pos, iw, ih); left -= ph - m * 2; }
+      const availH = ph - m * 2, iw = pw - m * 2, ih = (canvas.height * iw) / canvas.width;
+      // събира се (или почти) на един лист → без празен втори лист
+      if (ih <= availH * 1.06) {
+        let w = iw, h = ih; if (h > availH) { const s = availH / h; h = availH; w = iw * s; }
+        pdf.addImage(img, "JPEG", (pw - w) / 2, m, w, h);
+      } else {
+        let left = ih, pos = m;
+        pdf.addImage(img, "JPEG", m, pos, iw, ih); left -= availH;
+        while (left > 2) { pos = m - (ih - left); pdf.addPage(); pdf.addImage(img, "JPEG", m, pos, iw, ih); left -= availH; }
+      }
       pdf.save(`${title || "document"}.pdf`);
-    } catch { printDoc(); } finally { setBusy(false); }
+    } catch { printDoc(); } finally { document.body.classList.remove("exporting-doc"); setBusy(false); }
   }
 
   function downloadDocx() {
-    const content = document.querySelector(".bizdoc-page")?.innerHTML ?? "";
+    const raw = document.querySelector(".bizdoc-page")?.innerHTML ?? "";
+    const content = raw.replace(/background:\s*#FCEFC7;?/gi, ""); // премахва жълтите подсветки
     const html = `<!DOCTYPE html><html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>${title}</title></head><body>${content}</body></html>`;
     const blob = new Blob(["﻿", html], { type: "application/msword" });
     const url = URL.createObjectURL(blob);

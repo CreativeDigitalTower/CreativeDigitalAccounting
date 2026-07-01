@@ -155,6 +155,8 @@ model Company {
   taxReminders      TaxReminder[]
   businessDocuments BusinessDocument[]
   subscriptionEvents SubscriptionEvent[]
+  payrollMonths     PayrollMonth[]
+  monthlyEntries    MonthlyEntry[]
 }
 
 // История на абонаментите (заявки, плащания, промени на статус/план)
@@ -408,6 +410,51 @@ model Employee {
 
   company Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
   leaves  EmployeeLeave[]
+  files   EmployeeFile[]
+}
+
+model EmployeeFile {
+  id         String   @id @default(cuid())
+  employeeId String
+  name       String
+  docType    String?  // трудов договор | молба за отпуск | допълнително споразумение | ...
+  mimeType   String
+  size       Int
+  dataUrl    String   @db.Text
+  uploadedAt DateTime @default(now())
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+}
+
+// Месечна корекция на разхода за заплати (отпуски, болнични, бонуси, промяна на заплата)
+model PayrollMonth {
+  id        String   @id @default(cuid())
+  companyId String
+  year      Int
+  month     Int      // 0-11
+  amount    Float    // общ разход за работодателя за месеца (коригиран)
+  note      String?
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, year, month])
+}
+
+// Ръчно въведени месечни приходи/разходи (за прехвърляне назад в текущата година)
+model MonthlyEntry {
+  id        String   @id @default(cuid())
+  companyId String
+  year      Int
+  month     Int      // 0-11
+  revenue   Float    @default(0)
+  expenses  Float    @default(0)
+  note      String?
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, year, month])
 }
 
 model EmployeeLeave {

@@ -45,7 +45,9 @@ export default function ContactPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 24 }}>
         <a href="mailto:office@creativedigitalaccounting.com" className="glass panel" style={{ padding: "20px 24px", textDecoration: "none", color: "inherit" }}>
-          <div style={{ fontSize: 24, marginBottom: 8 }}>✉️</div>
+          <div style={{ marginBottom: 8, lineHeight: 0 }}>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5" /><path d="m3 6 9 6 9-6" /></svg>
+          </div>
           <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Имейл</div>
           <div style={{ fontSize: 14, color: "var(--navy)", fontWeight: 600 }}>office@creativedigitalaccounting.com</div>
         </a>
@@ -60,7 +62,9 @@ export default function ContactPage() {
 
       {sent ? (
         <div className="glass" style={{ padding: "32px", borderRadius: 14, textAlign: "center", borderLeft: "4px solid var(--emerald)" }}>
-          <div style={{ fontSize: 32, marginBottom: 12 }}>✓</div>
+          <div style={{ marginBottom: 12, lineHeight: 0 }}>
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block" }}><circle cx="12" cy="12" r="9.5" /><path d="m8 12 2.5 2.5L16 9" /></svg>
+          </div>
           <h3 style={{ fontFamily: "'Fraunces', serif", margin: "0 0 8px" }}>Съобщението е изпратено!</h3>
           <p style={{ color: "var(--ink-soft)", margin: 0 }}>Ще ви отговорим до 1 работен ден на посочения имейл.</p>
         </div>

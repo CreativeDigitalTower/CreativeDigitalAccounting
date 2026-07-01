@@ -187,13 +187,24 @@ const CUSTOM: Record<string, (v: Record<string, string>) => string> = {
     <p style="margin-top:40px;text-align:right;">{{Фирма.Управител}}, {{Фирма.Име}}</p>
   `,
   "Молба за отпуск": () => `
-    <p style="${P}text-align:right;">До Управителя на<br/>{{Фирма.Име}}</p>
-    <h1 style="${H}">Молба за отпуск</h1>
-    ${meta()}
-    <p style="${P}">От {{Служител.Име}}, на длъжност {{Служител.Длъжност}}.</p>
-    <p style="${P}">Моля да ми бъде разрешен платен годишен отпуск в размер на <span class="cda-fill" style="background:#FCEFC7;">[брой]</span> работни дни, считано от <span class="cda-fill" style="background:#FCEFC7;">[дата]</span> до <span class="cda-fill" style="background:#FCEFC7;">[дата]</span>.</p>
-    <p style="${P}">Дата: {{ТекущаДата}}</p>
-    <p style="margin-top:36px;text-align:right;">Подпис: ............................</p>
+    <p style="${P}text-align:right;line-height:1.5;">До Управителя<br/>на {{Фирма.Име}}<br/>ЕИК {{Фирма.ЕИК}}</p>
+    <h1 style="${H}text-align:center;letter-spacing:2px;">М О Л Б А</h1>
+    <p style="${P}text-align:center;margin-top:-6px;">за ползване на платен годишен отпуск</p>
+    <p style="${P}margin-top:18px;">от <strong>{{Служител.Име}}</strong>, ЕГН <span class="cda-fill" style="background:#FCEFC7;">[ЕГН]</span>, на длъжност <strong>{{Служител.Длъжност}}</strong>${""}<span class="cda-fill" style="background:#FCEFC7;"> [отдел/звено]</span>.</p>
+    <p style="${P}margin-top:14px;">УВАЖАЕМИ ГОСПОДИН/ГОСПОЖО УПРАВИТЕЛ,</p>
+    <p style="${P}">Моля да ми бъде разрешено да ползвам платен годишен отпуск за <span class="cda-fill" style="background:#FCEFC7;">[година]</span> г. в размер на <span class="cda-fill" style="background:#FCEFC7;">[брой]</span> работни дни, считано от <span class="cda-fill" style="background:#FCEFC7;">[дата]</span> г. до <span class="cda-fill" style="background:#FCEFC7;">[дата]</span> г. включително, като се задължавам да се явя на работа на <span class="cda-fill" style="background:#FCEFC7;">[дата]</span> г.</p>
+    <p style="${P}">Правно основание: чл. 155 и чл. 173 от Кодекса на труда.</p>
+    <table style="width:100%;margin-top:40px;border:none;">
+      <tr>
+        <td style="border:none;vertical-align:top;">Дата: {{ТекущаДата}} г.<br/>гр. <span class="cda-fill" style="background:#FCEFC7;">[населено място]</span></td>
+        <td style="border:none;text-align:right;vertical-align:top;">С уважение,<br/><br/>........................................<br/>({{Служител.Име}})</td>
+      </tr>
+    </table>
+    <div style="margin-top:44px;border-top:1px dashed #bbb;padding-top:14px;font-size:13px;">
+      <strong>Резолюция на работодателя:</strong>
+      <p style="${P}margin-top:8px;">☐ Разрешавам&nbsp;&nbsp;&nbsp;☐ Не разрешавам</p>
+      <p style="${P}margin-top:16px;text-align:right;">Управител: ........................................ / {{Фирма.Управител}} /</p>
+    </div>
   `,
   "SWOT анализ": () => `
     <h1 style="${H}">SWOT анализ — {{Фирма.Име}}</h1>

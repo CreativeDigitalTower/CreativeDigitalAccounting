@@ -32,7 +32,8 @@ export async function POST(req: Request) {
     if (!template) return NextResponse.json({ error: "Невалиден шаблон." }, { status: 400 });
 
     const company = await prisma.company.findUnique({ where: { id: companyId } });
-    const count = await prisma.businessDocument.count({ where: { companyId } });
+    // Индивидуална номерация ПО КАТЕГОРИЯ, започваща от 0001 за всяка категория
+    const count = await prisma.businessDocument.count({ where: { companyId, category: template.categoryId } });
     const docNumber = `${template.categoryId.toUpperCase()}-${new Date().getFullYear()}-${String(count + 1).padStart(4, "0")}`;
     const contentHtml = buildDocumentHtml(template, { company, docNumber, docDate: new Date() });
 
