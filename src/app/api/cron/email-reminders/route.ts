@@ -19,7 +19,9 @@ const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDat
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const key = req.headers.get("authorization")?.replace("Bearer ", "") || url.searchParams.get("key");
-  if (process.env.CRON_SECRET && key !== process.env.CRON_SECRET) {
+  // Fail-closed: ако CRON_SECRET не е конфигуриран, ендпойнтът е недостъпен
+  // (иначе всеки би могъл да задейства масово изпращане на имейли).
+  if (!process.env.CRON_SECRET || key !== process.env.CRON_SECRET) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 

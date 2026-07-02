@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { PLATFORM_NAME } from "@/lib/constants";
+import { safeJsonLd } from "@/lib/jsonLd";
 
 export const dynamic = "force-dynamic";
 
@@ -52,7 +53,7 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
 
   return (
     <article style={{ maxWidth: 760, margin: "0 auto", padding: "40px 20px" }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
       <Link href="/blog" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← Всички статии</Link>
       {post.category && <div style={{ fontSize: 12, fontWeight: 700, color: "var(--brass)", textTransform: "uppercase", letterSpacing: 1, margin: "18px 0 8px" }}>{post.category}</div>}
       <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 34, fontWeight: 700, margin: "0 0 12px", lineHeight: 1.2 }}>{post.title}</h1>
