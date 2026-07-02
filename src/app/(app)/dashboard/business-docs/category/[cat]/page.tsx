@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getCategory, TEMPLATES } from "@/lib/businessDocs/templates";
 import { LockedScreen } from "@/components/app/business-docs/LockedScreen";
+import { docCategoryIcon } from "@/components/app/NavIcons";
 
 const COMPLEXITY: Record<string, { label: string; color: string }> = {
   easy: { label: "Лесен", color: "var(--emerald)" },
@@ -25,7 +26,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ cat: 
     <>
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
         <Link href="/dashboard/business-docs" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← Бизнес документи</Link>
-        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 700, margin: 0 }}>{category.icon} {category.title}</h1>
+        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 700, margin: 0, display: "flex", alignItems: "center", gap: 10 }}>{docCategoryIcon(category.id, 22)} {category.title}</h1>
       </div>
       <p style={{ color: "var(--ink-soft)", fontSize: 13.5, marginBottom: 20 }}>{category.description}</p>
 
