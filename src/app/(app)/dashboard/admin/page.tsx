@@ -2,6 +2,7 @@ import { requireSuperAdmin } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { AdminCompanyRow } from "@/components/app/AdminCompanyRow";
+import { AdminArchivedCompanies } from "@/components/app/AdminArchivedCompanies";
 import { SUBSCRIPTION_PLANS, planPrice } from "@/lib/constants";
 import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 
@@ -14,6 +15,24 @@ const RANGES = [
 ];
 const MONTH_NAMES = ["Ян", "Фев", "Мар", "Апр", "Май", "Юни", "Юли", "Авг", "Сеп", "Окт", "Ное", "Дек"];
 const PLAN_PRICE: Record<string, number> = { free: planPrice("free"), start: planPrice("start"), business: planPrice("business"), pro: planPrice("pro") };
+
+// Български етикети на типовете документи и статусите на абонамента
+const DOC_TYPE_BG: Record<string, string> = {
+  invoice: "Фактури", quote: "Оферти", proforma: "Проформи", credit_note: "Кредитни известия",
+  debit_note: "Дебитни известия", receipt: "Разписки", protocol: "Протоколи", declaration: "Декларации",
+};
+const SUB_STATUS_BG: Record<string, string> = {
+  active: "Активен", trialing: "Пробен период", past_due: "Просрочен", cancelled: "Отказан",
+};
+
+// Малка информационна иконка с пояснение (tooltip)
+function Info({ text }: { text: string }) {
+  return (
+    <span title={text} style={{ display: "inline-flex", verticalAlign: "-2px", marginLeft: 5, color: "var(--muted)", cursor: "help" }}>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 7.5h.01" /></svg>
+    </span>
+  );
+}
 
 const PV_RANGES = [
   { id: "today", label: "Днес", days: 1 },
@@ -29,6 +48,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const range = RANGES.find((r) => r.id === sp?.range) ?? RANGES[1]; // по подразбиране 30 дни
 
   const companies = await prisma.company.findMany({
+    where: { archivedAt: null }, // архивираните се показват в отделен раздел долу
     include: {
       subscription: true,
       subscriptionEvents: { orderBy: { createdAt: "desc" }, take: 10 },
@@ -36,6 +56,12 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
       _count: { select: { documents: true, companyUsers: true, clients: true, stockItems: true } },
     },
     orderBy: { createdAt: "desc" },
+  });
+
+  const archivedCompanies = await prisma.company.findMany({
+    where: { archivedAt: { not: null } },
+    select: { id: true, name: true, eik: true, archivedAt: true, subscription: { select: { plan: true } }, companyUsers: { select: { user: { select: { email: true } } }, take: 1 } },
+    orderBy: { archivedAt: "desc" },
   });
 
   const planLabels: Record<string, string> = { free: "Безплатен", start: "Старт", business: "Бизнес", pro: "Про" };
@@ -198,6 +224,16 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const inactive = companies.map((c) => ({ id: c.id, name: c.name, plan: c.subscription?.plan ?? "free", days: daysSince(lastActivity.get(c.id)) }))
     .filter((c) => c.days >= 7).sort((a, b) => b.days - a.days).slice(0, 8);
 
+  // ─── Допълнителни показатели за растеж и активност ───
+  const growthMonthStart = new Date(nowD.getFullYear(), nowD.getMonth(), 1);
+  const growthPrevStart = new Date(nowD.getFullYear(), nowD.getMonth() - 1, 1);
+  const newThisMonth = companies.filter((c) => new Date(c.createdAt) >= growthMonthStart).length;
+  const newPrevMonth = companies.filter((c) => new Date(c.createdAt) >= growthPrevStart && new Date(c.createdAt) < growthMonthStart).length;
+  const avgDocsPerCompany = companies.length ? Math.round(totalDocuments / companies.length) : 0;
+  const active30 = companies.filter((c) => daysSince(lastActivity.get(c.id)) <= 30).length;
+  const activationRate = companies.length ? Math.round((activatedCompanies / companies.length) * 100) : 0;
+  const churnRisk = companies.filter((c) => (c.subscription?.plan ?? "free") !== "free" && daysSince(lastActivity.get(c.id)) >= 21).length;
+
   // ─── Автоматични известия ───
   const adminAlerts: string[] = [];
   for (const o of upgradeOpportunities) adminAlerts.push(`${o.name} е близо до лимита (${o.used}/${o.limit === Infinity ? "∞" : o.limit}) — вероятен ъпгрейд.`);
@@ -289,12 +325,12 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           <div className="num" style={{ fontSize: 22, fontWeight: 600 }}>{totalDocuments.toLocaleString("bg-BG")}</div>
         </div>
         <div className="glass kpi-card">
-          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Очакван месечен приход (MRR)</div>
+          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Очакван месечен приход (MRR)<Info text="MRR (Monthly Recurring Revenue) = сумарният месечен приход от абонаменти на фирмите с ПОТВЪРДЕНО плащане. Пробните периоди и непотвърдените плащания НЕ се броят." /></div>
           <div className="num" style={{ fontSize: 22, fontWeight: 600, color: "var(--emerald-dark)" }}>{mrr.toLocaleString("bg-BG")} €</div>
           <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>{payingCount} с потвърдено плащане{awaitingPaymentCount > 0 ? ` · ${awaitingPaymentCount} чакат плащане` : ""}{trialingCount > 0 ? ` · ${trialingCount} пробен период` : ""}</div>
         </div>
         <div className="glass kpi-card">
-          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Конверсия към платен план</div>
+          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Конверсия към платен план<Info text="Процент фирми с платен план (Старт/Бизнес/Про) спрямо всички регистрирани фирми." /></div>
           <div className="num" style={{ fontSize: 22, fontWeight: 600, color: "var(--navy)" }}>{conversion}%</div>
           <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>{paidCount} от {companies.length} фирми</div>
         </div>
@@ -302,11 +338,20 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
       {/* Приходи */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, marginBottom: 20 }}>
-        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>MRR</div><div className="num" style={{ fontSize: 20, fontWeight: 700, color: "var(--emerald-dark)" }}>{mrr.toLocaleString("bg-BG")} €</div></div>
-        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>ARR</div><div className="num" style={{ fontSize: 20, fontWeight: 700, color: "var(--emerald-dark)" }}>{arr.toLocaleString("bg-BG")} €</div></div>
-        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>Фактурирано (този месец)</div><div className="num" style={{ fontSize: 18, fontWeight: 700 }}>{Math.round(invThisMonth).toLocaleString("bg-BG")} €</div></div>
-        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>Фактурирано (миналия месец)</div><div className="num" style={{ fontSize: 18, fontWeight: 700, color: "var(--muted)" }}>{Math.round(invLastMonth).toLocaleString("bg-BG")} €</div></div>
-        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>Ръст</div><div className="num" style={{ fontSize: 20, fontWeight: 700, color: invGrowth >= 0 ? "var(--emerald-dark)" : "var(--brick)" }}>{invGrowth >= 0 ? "+" : ""}{invGrowth}%</div></div>
+        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>MRR<Info text="Месечен приход от абонаменти с потвърдено плащане (нашият приход)." /></div><div className="num" style={{ fontSize: 20, fontWeight: 700, color: "var(--emerald-dark)" }}>{mrr.toLocaleString("bg-BG")} €</div></div>
+        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>ARR<Info text="ARR (Annual Recurring Revenue) = годишен приход от абонаменти = MRR × 12." /></div><div className="num" style={{ fontSize: 20, fontWeight: 700, color: "var(--emerald-dark)" }}>{arr.toLocaleString("bg-BG")} €</div></div>
+        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>Оборот на фирмите (този месец)<Info text="Общата стойност на фактурите, издадени от ФИРМИТЕ в платформата този месец — това е техният бизнес оборот, НЕ нашият приход от абонаменти. (Напр. тестова фактура също влиза тук.)" /></div><div className="num" style={{ fontSize: 18, fontWeight: 700 }}>{Math.round(invThisMonth).toLocaleString("bg-BG")} €</div></div>
+        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>Оборот на фирмите (миналия месец)</div><div className="num" style={{ fontSize: 18, fontWeight: 700, color: "var(--muted)" }}>{Math.round(invLastMonth).toLocaleString("bg-BG")} €</div></div>
+        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>Ръст на оборота<Info text="Промяна на оборота на фирмите спрямо миналия месец." /></div><div className="num" style={{ fontSize: 20, fontWeight: 700, color: invGrowth >= 0 ? "var(--emerald-dark)" : "var(--brick)" }}>{invGrowth >= 0 ? "+" : ""}{invGrowth}%</div></div>
+      </div>
+
+      {/* Растеж и активност */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 20 }}>
+        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>Нови фирми (този месец)<Info text="Регистрирани фирми от началото на текущия месец." /></div><div className="num" style={{ fontSize: 20, fontWeight: 700 }}>{newThisMonth}<span style={{ fontSize: 12, color: newThisMonth >= newPrevMonth ? "var(--emerald-dark)" : "var(--brick)", marginLeft: 6 }}>({newPrevMonth} мин. м.)</span></div></div>
+        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>Активни фирми (30 дни)<Info text="Фирми с вход в приложението през последните 30 дни." /></div><div className="num" style={{ fontSize: 20, fontWeight: 700 }}>{active30}</div></div>
+        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>Активирани фирми<Info text="Дял фирми, които реално са започнали работа (имат клиент или документ)." /></div><div className="num" style={{ fontSize: 20, fontWeight: 700 }}>{activationRate}%</div></div>
+        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>Ср. документи/фирма<Info text="Средно издадени документи на регистрирана фирма." /></div><div className="num" style={{ fontSize: 20, fontWeight: 700 }}>{avgDocsPerCompany}</div></div>
+        <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>Риск от отпадане<Info text="Платени фирми без активност 21+ дни — потенциален churn. Обмислете връзка с тях." /></div><div className="num" style={{ fontSize: 20, fontWeight: 700, color: churnRisk > 0 ? "var(--brick)" : "var(--emerald-dark)" }}>{churnRisk}</div></div>
       </div>
 
       {/* Документи по тип + обща стойност */}
@@ -315,11 +360,11 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>
             {docsByType.map((d) => (
               <div key={d.type} style={{ fontSize: 13 }}>
-                <span style={{ color: "var(--muted)" }}>{d.type}:</span> <strong className="num">{d._count._all}</strong>
+                <span style={{ color: "var(--muted)" }}>{DOC_TYPE_BG[d.type] ?? d.type}:</span> <strong className="num">{d._count._all}</strong>
               </div>
             ))}
           </div>
-          <div style={{ fontSize: 13 }}>Обща стойност на всички фактури: <strong className="num" style={{ color: "var(--emerald-dark)" }}>{Math.round(totalInvoiceValue).toLocaleString("bg-BG")} €</strong></div>
+          <div style={{ fontSize: 13 }}>Обща стойност на всички фактури<Info text="Сборът от всички фактури, издадени от фирмите в платформата (техен оборот, не наш приход)." />: <strong className="num" style={{ color: "var(--emerald-dark)" }}>{Math.round(totalInvoiceValue).toLocaleString("bg-BG")} €</strong></div>
         </div>
       </div>
 
@@ -595,7 +640,17 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
       <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 14 }}>
         Смяната на абонамент влиза в сила веднага — функционалностите се отключват/заключват автоматично за съответната фирма.
         „Влез в акаунта" ви дава технически достъп до акаунта на фирмата за съдействие.
+        Изтриването архивира фирмата (виж раздела долу) — данните се пазят и могат да се възстановят.
       </p>
+
+      {/* ─── Архивирани / изтрити фирми ─── */}
+      <AdminArchivedCompanies
+        companies={archivedCompanies.map((c) => ({
+          id: c.id, name: c.name, eik: c.eik, plan: c.subscription?.plan ?? "free",
+          owner: c.companyUsers[0]?.user.email ?? "—",
+          archivedAt: c.archivedAt ? c.archivedAt.toLocaleDateString("bg-BG") : "",
+        }))}
+      />
     </>
   );
 }
