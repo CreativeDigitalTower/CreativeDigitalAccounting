@@ -19,7 +19,7 @@ export async function GET() {
     ]);
 
     const alerts: { icon: string; title: string; body?: string; href: string; tone: string }[] = [];
-    if (overdue > 0) alerts.push({ icon: "⚠️", title: `${overdue} просрочени фактури`, href: "/dashboard/invoices?status=overdue", tone: "warn" });
+    if (overdue > 0) alerts.push({ icon: "warn", title: `${overdue} просрочени фактури`, href: "/dashboard/invoices?status=overdue", tone: "warn" });
     if (expiredStock > 0) alerts.push({ icon: "warn", title: `${expiredStock} артикула с изтекъл срок на годност`, href: "/dashboard/warehouse", tone: "warn" });
     if (expiringStock > 0) alerts.push({ icon: "⏰", title: `${expiringStock} артикула с изтичащ срок (до 14 дни)`, href: "/dashboard/warehouse", tone: "info" });
     if (expiringContracts > 0) alerts.push({ icon: "info", title: `${expiringContracts} изтичащи договора`, href: "/dashboard/contracts", tone: "info" });

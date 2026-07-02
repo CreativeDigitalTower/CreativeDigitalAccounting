@@ -39,7 +39,7 @@ export default async function AuditPage() {
       <div className="glass panel" style={{ padding: "8px 0" }}>
         {logs.length === 0 ? (
           <div style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>📜</div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, color: "var(--muted)" }}><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2.5h8l4 4V21a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 6 21V2.5Z"/><path d="M14 2.5v4h4M9 11h6M9 14.5h6M9 18h3"/></svg></div>
             <div style={{ fontSize: 14 }}>Все още няма записани действия</div>
           </div>
         ) : (

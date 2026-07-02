@@ -40,7 +40,7 @@ export function EditableDocNumber({ id, initial }: { id: string; initial: string
       <span className="num">{number}</span>
       <button onClick={() => { setVal(number); setEdit(true); }} title="Редактирай номера (заключен по подразбиране)"
         style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", fontSize: 14, padding: 2 }}>
-        🔒✎
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
       </button>
     </span>
   );

@@ -32,7 +32,7 @@ export default async function InboxPage() {
       <div className="glass panel" style={{ padding: "8px 0", marginBottom: 20 }}>
         {docs.length === 0 ? (
           <div style={{ textAlign: "center", padding: "44px 0", color: "var(--muted)" }}>
-            <div style={{ fontSize: 30, marginBottom: 10 }}>📥</div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, color: "var(--muted)" }}><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 13.5 5.5 5A2 2 0 0 1 7.4 3.5h9.2A2 2 0 0 1 18.5 5L21 13.5V19a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 19v-5.5Z"/><path d="M3 13.5h5l1.5 2.5h5L16 13.5h5"/></svg></div>
             <div style={{ fontSize: 14 }}>Все още нямате входящи документи</div>
           </div>
         ) : (

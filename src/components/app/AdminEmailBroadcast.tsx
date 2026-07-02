@@ -66,7 +66,7 @@ export function AdminEmailBroadcast({ companies }: { companies: Company[] }) {
         {/* Прикачени файлове (напр. фактури за абонамент) */}
         <div>
           <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12.5, cursor: "pointer", color: "var(--navy)", fontWeight: 600 }}>
-            📎 Прикачи файл(ове)
+            <span style={{display:"inline-flex",alignItems:"center",gap:5}}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><path d="M21 12.5 12.5 21a5 5 0 0 1-7-7l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7L9 18.7a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg> Прикачи файл(ове)</span>
             <input type="file" multiple onChange={addFiles} style={{ display: "none" }} />
           </label>
           {files.length > 0 && (

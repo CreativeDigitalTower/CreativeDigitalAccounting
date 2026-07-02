@@ -81,7 +81,7 @@ export function ArchiveManager() {
           <div style={{ padding: "32px", color: "var(--muted)", fontSize: 13 }}>Зареждане…</div>
         ) : files.length === 0 ? (
           <div style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>🗂️</div>
+            <div style={{ display:"flex",justifyContent:"center",marginBottom: 12, color:"var(--muted)" }}><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg></div>
             <div style={{ fontSize: 14 }}>Няма качени файлове</div>
           </div>
         ) : (

@@ -39,7 +39,7 @@ export default async function AdminBlogPage() {
                   <td className="num">{p.views}</td>
                   <td style={{ fontSize: 12, color: "var(--muted)" }}>{new Date(p.createdAt).toLocaleDateString("bg-BG")}</td>
                   <td style={{ display: "flex", gap: 6 }}>
-                    {p.status === "published" && <a href={`/blog/${p.slug}`} target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm">👁</a>}
+                    {p.status === "published" && <a href={`/blog/${p.slug}`} target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm" style={{display:"inline-flex",alignItems:"center"}}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></a>}
                     <Link href={`/dashboard/admin/blog/${p.id}`} className="btn btn-ghost btn-sm">✎ Редактирай</Link>
                   </td>
                 </tr>

@@ -82,7 +82,7 @@ export function BusinessProfileWizard() {
 
         {step === 4 && (
           <div style={{ textAlign: "center", padding: "10px 0" }}>
-            <div style={{ fontSize: 42, marginBottom: 6 }}>🎉</div>
+            <div style={{ display:"flex",justifyContent:"center",marginBottom: 6, color:"var(--brass)" }}><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><path d="M3 21 8 8l8 8-13 5Z"/><path d="M14 4c1.5 0 2 1 3 1M18 8c0 1.5 1 2 1 3M13.5 2.5l.5 2"/></svg></div>
             <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 700, margin: "0 0 12px" }}>Вашето работно пространство е готово</h2>
             <p style={{ color: "var(--ink-soft)", fontSize: 14, lineHeight: 1.6, maxWidth: 520, margin: "0 auto 8px" }}>
               Подредихме началното табло според дейността на Вашата фирма, за да откривате най-често използваните инструменти още с първото влизане.
