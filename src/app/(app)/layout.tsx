@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getCompanyId, IMPERSONATE_COOKIE } from "@/lib/session";
+import { getCompanyId, getMyRole, IMPERSONATE_COOKIE } from "@/lib/session";
 import { BlobBackground } from "@/components/Backgrounds";
 import { SidebarShell } from "@/components/app/SidebarShell";
 import { AppTopBar } from "@/components/app/AppTopBar";
@@ -17,6 +17,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const userId = session.user.id;
   const companyId = await getCompanyId(userId);
+
+  // Служителите виждат само своя портал, не бизнес частта.
+  const role = await getMyRole(userId, companyId);
+  if (role === "employee") redirect("/portal");
 
   const [company, me, jar, sub, inboxUnread] = await Promise.all([
     prisma.company.findUnique({ where: { id: companyId }, select: { name: true, logoUrl: true } }),

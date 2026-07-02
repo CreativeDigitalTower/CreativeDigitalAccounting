@@ -32,11 +32,38 @@ export async function getCompanyId(userId: string): Promise<string> {
   return cu.companyId;
 }
 
+/** Ролята на текущия потребител в дадена фирма. */
+export async function getMyRole(userId: string, companyId: string): Promise<string | null> {
+  const cu = await prisma.companyUser.findUnique({
+    where: { userId_companyId: { userId, companyId } },
+    select: { role: true },
+  });
+  return cu?.role ?? null;
+}
+
 export async function requireCompany() {
   const session = await getSession();
   const userId = session.user!.id as string;
   const companyId = await getCompanyId(userId);
+  // Служителите (роля employee) НЯМАТ достъп до бизнес частта — само до своя портал.
+  // Централна точка: всички бизнес страници и API маршрути минават оттук.
+  const role = await getMyRole(userId, companyId);
+  if (role === "employee") redirect("/portal");
   return { userId, companyId };
+}
+
+/** Достъп само за роля employee (порталът за самообслужване). Връща свързания служител. */
+export async function requireEmployee() {
+  const session = await getSession();
+  const userId = session.user!.id as string;
+  const employee = await prisma.employee.findFirst({
+    where: { userId },
+    include: { company: { include: { subscription: true } } },
+  });
+  if (!employee) redirect("/dashboard");
+  const plan = (employee.company.subscription?.plan ?? "free") as PlanId;
+  if (!planHasFeature(plan, "employee_portal")) redirect("/login?portal=unavailable");
+  return { userId, employee, companyId: employee.companyId };
 }
 
 export async function requireSuperAdmin() {

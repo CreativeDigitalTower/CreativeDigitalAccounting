@@ -181,6 +181,7 @@ const BUSINESS_FEATURES = [
   ...START_FEATURES,
   "projects", "contracts", "assets", "users", "audit",
   "production", "employees", "haccp", "revision", "stock_categories", "health_index", "declarations", "doc_templates",
+  "employee_portal",
 ];
 const PRO_FEATURES = [...BUSINESS_FEATURES, "multicompany", "ai", "api"];
 
@@ -201,6 +202,7 @@ export const FEATURE_LABELS: Record<string, string> = {
   tax_calendar: "Данъчен календар", multicompany: "Многофирмен режим", ai: "AI CFO Assistant",
   api: "API достъп", invoice_logo: "Лого във фактурите", protocols: "Приемо-предавателни протоколи",
   bank_statements: "Банкови извлечения", doc_templates: "Генериране на бизнес документи",
+  employee_portal: "Портал за служители (самообслужване)",
 };
 
 const PLAN_RANK: Record<PlanId, number> = { free: 0, start: 1, business: 2, pro: 3 };

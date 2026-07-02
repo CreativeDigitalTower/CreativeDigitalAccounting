@@ -5,8 +5,9 @@ import { formatCurrency } from "@/lib/constants";
 import { calcPayroll, sumPayroll, EMPLOYEE_SSC_RATE, EMPLOYER_SSC_RATE } from "@/lib/payroll";
 import { confirmDelete } from "@/lib/confirmDelete";
 import { UiIcon } from "@/components/app/NavIcons";
+import { EMPLOYEE_ACCESS_MODULES, type EmployeeAccess } from "@/lib/employeeAccess";
 
-type Leave = { id: string; type: string; startDate: string; endDate: string; days: number | null; note: string | null; docName?: string | null };
+type Leave = { id: string; type: string; startDate: string; endDate: string; days: number | null; note: string | null; docName?: string | null; status?: string; requestedByEmployee?: boolean; reviewNote?: string | null };
 
 function fileToDataUrl(file: File): Promise<string> {
   return new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result)); fr.onerror = rej; fr.readAsDataURL(file); });
@@ -16,6 +17,7 @@ type Employee = {
   id: string; name: string; position: string | null; phone: string | null; email: string | null;
   address: string | null; salary: number | null; hiredAt: string | null; paidLeaveDays: number; notes: string | null; active: boolean;
   department?: string | null; contractType?: string | null; paymentMethod?: string | null; iban?: string | null; bankName?: string | null;
+  userId?: string | null;
   leaves?: Leave[];
 };
 
@@ -24,7 +26,7 @@ const CONTRACT_LABELS: Record<string, string> = { permanent: "Безсрочен
 const BONUS_LABELS: Record<string, string> = { cash: "Паричен", voucher: "Ваучер", performance: "За резултати", holiday: "Празничен", other: "Друго" };
 const empty = { name: "", position: "", phone: "", email: "", address: "", salary: "", hiredAt: "", paidLeaveDays: "20", notes: "", department: "", contractType: "permanent", paymentMethod: "bank", iban: "", bankName: "" };
 
-export function EmployeesPanel({ initial }: { initial: Employee[] }) {
+export function EmployeesPanel({ initial, access }: { initial: Employee[]; access: EmployeeAccess }) {
   const [employees, setEmployees] = useState<Employee[]>(initial);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
@@ -81,6 +83,8 @@ export function EmployeesPanel({ initial }: { initial: Employee[] }) {
         </div>
         <button className="btn btn-primary" onClick={startAdd}>+ Нов служител</button>
       </div>
+
+      <EmployeeAccessSettings initial={access} />
 
       {(() => {
         const gross = employees.filter((e) => e.active).map((e) => e.salary ?? 0);
@@ -242,9 +246,19 @@ function LeavePanel({ employee }: { employee: Employee }) {
     if (res.ok) setLeaves((p) => p.filter((x) => x.id !== id));
   }
 
-  const usedPaid = leaves.filter((l) => l.type === "leave").reduce((s, l) => s + (l.days ?? 0), 0);
-  const usedUnpaid = leaves.filter((l) => l.type === "unpaid").reduce((s, l) => s + (l.days ?? 0), 0);
-  const totalSick = leaves.filter((l) => l.type === "sick").reduce((s, l) => s + (l.days ?? 0), 0);
+  // В използваните дни се броят само ОДОБРЕНИТЕ отпуски (чакащите заявки — не).
+  const approved = (l: Leave) => (l.status ?? "approved") === "approved";
+  const usedPaid = leaves.filter((l) => l.type === "leave" && approved(l)).reduce((s, l) => s + (l.days ?? 0), 0);
+  const usedUnpaid = leaves.filter((l) => l.type === "unpaid" && approved(l)).reduce((s, l) => s + (l.days ?? 0), 0);
+  const totalSick = leaves.filter((l) => l.type === "sick" && approved(l)).reduce((s, l) => s + (l.days ?? 0), 0);
+  const pending = leaves.filter((l) => l.status === "pending");
+
+  async function review(id: string, action: "approve" | "reject") {
+    const r = await fetch(`/api/employees/${employee.id}/leaves/${id}/review`, {
+      method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action }),
+    });
+    if (r.ok) setLeaves((p) => p.map((x) => x.id === id ? { ...x, status: action === "approve" ? "approved" : "rejected" } : x));
+  }
   const entitlement = employee.paidLeaveDays ?? 20;
   const remaining = entitlement - usedPaid;
 
@@ -261,6 +275,9 @@ function LeavePanel({ employee }: { employee: Employee }) {
       </div>
       {employee.address && <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginBottom: 6 }}>Адрес: {employee.address}</div>}
       {employee.notes && <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginBottom: 10 }}>Бележки: {employee.notes}</div>}
+
+      {/* Достъп до портала за служители */}
+      <PortalInvite employee={employee} />
 
       {/* Бонуси */}
       <BonusesPanel employeeId={employee.id} />
@@ -325,6 +342,22 @@ function LeavePanel({ employee }: { employee: Employee }) {
       </div>
       {err && <div style={{ background: "var(--brick-soft)", color: "var(--brick)", borderRadius: 6, padding: "6px 10px", fontSize: 12, marginBottom: 8 }}>{err}</div>}
       <div style={{ fontSize: 12, fontWeight: 600, color: "var(--ink)", margin: "4px 0 6px" }}>Отпуски / болнични</div>
+      {/* Чакащи заявки от служителя за одобрение */}
+      {pending.length > 0 && (
+        <div style={{ marginBottom: 12, padding: "10px 12px", background: "var(--brass-soft)", borderRadius: 8, border: "1px solid rgba(166,130,47,.35)" }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--brass)", marginBottom: 6 }}>Заявки за одобрение ({pending.length})</div>
+          {pending.map((l) => (
+            <div key={l.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, fontSize: 12.5, padding: "5px 0" }}>
+              <span><strong>{LEAVE_LABELS[l.type]}</strong> · {new Date(l.startDate).toLocaleDateString("bg-BG")} – {new Date(l.endDate).toLocaleDateString("bg-BG")} ({l.days} дни){l.note ? ` · ${l.note}` : ""}</span>
+              <span style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                <button className="btn btn-primary btn-sm" onClick={() => review(l.id, "approve")}>Одобри</button>
+                <button className="btn btn-ghost btn-sm" style={{ color: "var(--brick)", borderColor: "var(--brick)" }} onClick={() => review(l.id, "reject")}>Откажи</button>
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
       {!loaded ? <div style={{ fontSize: 12, color: "var(--muted)" }}>Зареждане…</div> : leaves.length === 0 ? (
         <div style={{ fontSize: 12.5, color: "var(--muted)" }}>Няма записани отпуски/болнични.</div>
       ) : (
@@ -333,6 +366,8 @@ function LeavePanel({ employee }: { employee: Employee }) {
             <div key={l.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, fontSize: 12.5, padding: "5px 0", borderBottom: "1px solid rgba(217,215,200,.4)" }}>
               <span>
                 <strong>{LEAVE_LABELS[l.type]}</strong> · {new Date(l.startDate).toLocaleDateString("bg-BG")} – {new Date(l.endDate).toLocaleDateString("bg-BG")} ({l.days} дни){l.note ? ` · ${l.note}` : ""}
+                {l.status === "pending" && <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 700, color: "var(--brass)" }}>· чака одобрение</span>}
+                {l.status === "rejected" && <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 700, color: "var(--brick)" }}>· отхвърлена</span>}
                 {l.docName && (
                   <a href={`/api/employees/${employee.id}/leaves/${l.id}/doc`} style={{ marginLeft: 8, color: "var(--navy)", fontWeight: 600 }}>↓ {l.docName}</a>
                 )}
@@ -357,6 +392,94 @@ const DOC_TYPES = ["Трудов договор", "Допълнително сп
 
 const MONTHS_BG = ["Януари", "Февруари", "Март", "Април", "Май", "Юни", "Юли", "Август", "Септември", "Октомври", "Ноември", "Декември"];
 type Bonus = { id: string; year: number; month: number; amount: number; kind: string; note: string | null };
+
+function EmployeeAccessSettings({ initial }: { initial: EmployeeAccess }) {
+  const [acc, setAcc] = useState<EmployeeAccess>(initial);
+  const [open, setOpen] = useState(false);
+  const [msg, setMsg] = useState("");
+  const enabledCount = Object.values(acc).filter(Boolean).length;
+
+  async function save(next: EmployeeAccess) {
+    setAcc(next); setMsg("");
+    const r = await fetch("/api/company/employee-access", {
+      method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(next),
+    });
+    setMsg(r.ok ? "Запазено ✓" : ((await r.json().catch(() => ({}))).error ?? "Грешка"));
+    setTimeout(() => setMsg(""), 2000);
+  }
+
+  return (
+    <div className="glass panel" style={{ marginBottom: 16 }}>
+      <button onClick={() => setOpen((v) => !v)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, width: "100%", textAlign: "left", padding: 0 }}>
+        <span style={{ color: "var(--muted)" }}>{open ? "▼" : "▶"}</span>
+        <span style={{ fontFamily: "'Fraunces', serif", fontSize: 15, fontWeight: 700 }}>Достъп на служителите до модули</span>
+        <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--muted)" }}>{enabledCount === 0 ? "нищо споделено" : `${enabledCount} модула`}{msg && <strong style={{ color: "var(--emerald-dark)", marginLeft: 8 }}>{msg}</strong>}</span>
+      </button>
+      {open && (
+        <div style={{ marginTop: 12 }}>
+          <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 12px" }}>
+            Изберете кои модули да виждат служителите в портала си. Достъпът е <strong>само за четене</strong> и с <strong>скрити чувствителни данни</strong> (финанси, контакти на клиенти), за да не изтичат данни.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))", gap: 10 }}>
+            {EMPLOYEE_ACCESS_MODULES.map((m) => (
+              <label key={m.key} style={{ display: "flex", gap: 10, alignItems: "flex-start", background: "rgba(255,255,255,.5)", borderRadius: 8, padding: "10px 12px", cursor: "pointer", fontWeight: 400 }}>
+                <input type="checkbox" checked={acc[m.key]} onChange={(e) => save({ ...acc, [m.key]: e.target.checked })} style={{ width: "auto", marginTop: 2 }} />
+                <span>
+                  <span style={{ fontSize: 13, fontWeight: 600, display: "block" }}>{m.label}</span>
+                  <span style={{ fontSize: 11.5, color: "var(--muted)" }}>{m.note}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PortalInvite({ employee }: { employee: Employee }) {
+  const [linked, setLinked] = useState(!!employee.userId);
+  const [email, setEmail] = useState(employee.email ?? "");
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState("");
+
+  async function invite() {
+    if (!email) { setMsg("Посочете имейл."); return; }
+    setBusy(true); setMsg("");
+    const r = await fetch(`/api/employees/${employee.id}/invite`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }),
+    });
+    setBusy(false);
+    if (r.ok) { setLinked(true); setMsg("Поканата е изпратена. Служителят се регистрира със същия имейл."); }
+    else setMsg((await r.json().catch(() => ({}))).error ?? "Грешка.");
+  }
+  async function revoke() {
+    if (!(await confirmDelete("достъпа до портала за този служител"))) return;
+    setBusy(true);
+    const r = await fetch(`/api/employees/${employee.id}/invite`, { method: "DELETE" });
+    setBusy(false);
+    if (r.ok) { setLinked(false); setMsg("Достъпът е оттеглен."); }
+  }
+
+  return (
+    <div style={{ marginBottom: 14, padding: "10px 12px", background: "rgba(15,138,106,.06)", borderRadius: 8, border: "1px solid rgba(15,138,106,.2)" }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--emerald-dark)", marginBottom: 6 }}>Портал за служителя</div>
+      {linked ? (
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", fontSize: 12.5 }}>
+          <span>✓ Активен достъп ({employee.email})</span>
+          <button className="btn btn-ghost btn-sm" disabled={busy} onClick={revoke} style={{ color: "var(--brick)", borderColor: "var(--brick)" }}>Оттегли достъп</button>
+        </div>
+      ) : (
+        <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="имейл на служителя" style={{ padding: "6px 9px", fontSize: 12.5, flex: 1, minWidth: 180 }} />
+          <button className="btn btn-primary btn-sm" disabled={busy} onClick={invite}>Покани за портал</button>
+        </div>
+      )}
+      {msg && <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 6 }}>{msg}</div>}
+      <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>Служителят вижда само своите данни — заплата, осигуровки, отпуски и подадени документи.</div>
+    </div>
+  );
+}
 
 function BonusesPanel({ employeeId }: { employeeId: string }) {
   const [list, setList] = useState<Bonus[]>([]);
