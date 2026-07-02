@@ -75,10 +75,10 @@ export function RichTextEditor({ value, onChange }: { value: string; onChange: (
         {sep}
         <Btn on={() => cmd("justifyLeft")} label="⬅" title="Ляво" />
         <Btn on={() => cmd("justifyCenter")} label="⬌" title="Центрирано" />
-        <Btn on={() => cmd("justifyRight")} label="➡" title="Дясно" />
+        <Btn on={() => cmd("justifyRight")} label={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M8 7h13M4 12h17M8 17h13" /></svg>} title="Дясно" />
         {sep}
-        <Btn on={addLink} label="🔗" title="Линк" />
-        <Btn on={addImage} label="🖼" title="Снимка" />
+        <Btn on={addLink} label={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a3 3 0 0 1 3-3h3a3 3 0 0 1 0 6h-1.5M15 12a3 3 0 0 1-3 3H9a3 3 0 0 1 0-6h1.5" /></svg>} title="Линк" />
+        <Btn on={addImage} label={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8.5" cy="9.5" r="1.5" /><path d="m4 17 5-5 4 4 3-3 4 4" /></svg>} title="Снимка" />
         {sep}
         <Btn on={() => cmd("removeFormat")} label="✕" title="Изчисти форматирането" />
       </div>

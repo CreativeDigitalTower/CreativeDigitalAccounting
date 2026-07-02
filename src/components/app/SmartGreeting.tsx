@@ -17,7 +17,7 @@ export function SmartGreeting({ name, items, expectedRevenue, dateLabel }: {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
           <div>
             <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 26, fontWeight: 700, margin: "0 0 2px" }}>
-              {greet}{name ? `, ${name.split(" ")[0]}` : ""} 👋
+              {greet}{name ? `, ${name.split(" ")[0]}` : ""}
             </h1>
             <div style={{ color: "var(--muted)", fontSize: 13 }}>{dateLabel}</div>
           </div>
@@ -31,7 +31,7 @@ export function SmartGreeting({ name, items, expectedRevenue, dateLabel }: {
 
         <div style={{ marginTop: 16 }}>
           {active.length === 0 ? (
-            <div style={{ fontSize: 14, color: "var(--ink-soft)" }}>Всичко е изчистено за днес. Чудесна работа! ✨</div>
+            <div style={{ fontSize: 14, color: "var(--ink-soft)" }}>Всичко е изчистено за днес. Чудесна работа!</div>
           ) : (
             <>
               <div style={{ fontSize: 13.5, color: "var(--ink-soft)", marginBottom: 10 }}>Днес имате:</div>

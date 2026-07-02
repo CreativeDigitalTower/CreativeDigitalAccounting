@@ -56,4 +56,23 @@ export const UiIcon: Record<string, (p?: SVGProps<SVGSVGElement>) => React.React
   check: (p = {}) => <svg {...base({ width: 15, height: 15, ...p })}><path d="m5 12 4.5 4.5L19 7" /></svg>,
   dot: (p = {}) => <svg {...base({ width: 12, height: 12, fill: "currentColor", stroke: "none", ...p })}><circle cx="12" cy="12" r="6" /></svg>,
   truck: (p = {}) => <svg {...base({ width: 26, height: 26, ...p })}><path d="M2.5 6.5h10v9h-10z" /><path d="M12.5 9.5h4l3 3v3h-7z" /><circle cx="6" cy="17.5" r="1.8" /><circle cx="16.5" cy="17.5" r="1.8" /></svg>,
+  phone: (p = {}) => <svg {...base({ width: 15, height: 15, ...p })}><path d="M6.5 3h3l1.5 4-2 1.5a11 11 0 0 0 5 5l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A16 16 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3Z" /></svg>,
+  mail: (p = {}) => <svg {...base({ width: 15, height: 15, ...p })}><rect x="2.5" y="4.5" width="19" height="15" rx="2.5" /><path d="m3 6 9 6 9-6" /></svg>,
+  handshake: (p = {}) => <svg {...base({ width: 15, height: 15, ...p })}><path d="m11 6 3 3 3-3 4 3v5l-5 5-3-3-3 3-2-2 4-4-2-2-3 1-2-2 4-4Z" /></svg>,
+  download: (p = {}) => <svg {...base({ width: 15, height: 15, ...p })}><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 20h16" /></svg>,
+  lock: (p = {}) => <svg {...base({ width: 15, height: 15, ...p })}><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>,
+  eye: (p = {}) => <svg {...base({ width: 15, height: 15, ...p })}><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>,
 };
+
+/** Пиктограма за категория бизнес документи (по id), без емоджита. */
+export function docCategoryIcon(id: string, size = 26): React.ReactElement {
+  const p = { width: size, height: size };
+  const map: Record<string, (q?: SVGProps<SVGSVGElement>) => React.ReactElement> = {
+    company: NavIcon.dashboard, contracts: NavIcon.contracts, hr: UiIcon.people, finance: NavIcon.expenses,
+    clients: UiIcon.handshake, suppliers: UiIcon.truck, gdpr: UiIcon.lock, inventory: NavIcon.warehouse,
+    vehicles: UiIcon.truck, construction: NavIcon.projects, production: NavIcon.production, projects: NavIcon.projects,
+    marketing: UiIcon.bell, bank: NavIcon.cash, policies: NavIcon.audit, analysis: NavIcon.analytics,
+    protocols: UiIcon.doc, forms: UiIcon.doc, declarations: NavIcon.document, correspondence: UiIcon.mail,
+  };
+  return (map[id] ?? UiIcon.doc)(p);
+}

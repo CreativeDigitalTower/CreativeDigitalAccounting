@@ -18,9 +18,9 @@ export async function GET(req: Request) {
     ]);
 
     const results = [
-      ...clients.map((c) => ({ type: "Клиент", label: c.name, sub: c.eik ?? "", href: `/dashboard/clients/${c.id}`, icon: "👥" })),
-      ...docs.map((d) => ({ type: DOC_LABEL[d.type] ?? "Документ", label: `${d.number}`, sub: d.client?.name ?? "", href: `/dashboard/documents/${d.id}`, icon: "🧾" })),
-      ...suppliers.map((s) => ({ type: "Доставчик", label: s.name, sub: "", href: `/dashboard/suppliers/${s.id}`, icon: "🚚" })),
+      ...clients.map((c) => ({ type: "Клиент", label: c.name, sub: c.eik ?? "", href: `/dashboard/clients/${c.id}`, icon: "" })),
+      ...docs.map((d) => ({ type: DOC_LABEL[d.type] ?? "Документ", label: `${d.number}`, sub: d.client?.name ?? "", href: `/dashboard/documents/${d.id}`, icon: "" })),
+      ...suppliers.map((s) => ({ type: "Доставчик", label: s.name, sub: "", href: `/dashboard/suppliers/${s.id}`, icon: "" })),
     ];
     return NextResponse.json({ results });
   } catch {

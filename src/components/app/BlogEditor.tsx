@@ -119,7 +119,7 @@ export function BlogEditor({ post }: { post?: Post }) {
             <input type="file" accept="image/png,image/jpeg,image/webp" onChange={uploadCover} style={{ fontSize: 12.5, marginBottom: 6 }} />
             <input value={f.coverImage ?? ""} onChange={(e) => set("coverImage", e.target.value)} placeholder="или постави URL на снимка" style={{ fontSize: 12 }} />
             <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 6, lineHeight: 1.5 }}>
-              📐 Препоръчителен размер: <strong>1200 × 630 px</strong> (съотношение 1.91:1).<br />
+              Препоръчителен размер: <strong>1200 × 630 px</strong> (съотношение 1.91:1).<br />
               Формат: JPG, PNG или WebP · до 3 MB.
             </div>
             {f.coverImage && <button type="button" className="btn btn-ghost btn-sm" style={{ marginTop: 8 }} onClick={() => set("coverImage", null)}>Премахни</button>}

@@ -27,7 +27,7 @@ export function CostCalculator() {
   return (
     <div className="glass panel" style={{ padding: "18px 22px", marginTop: 18 }}>
       <button onClick={() => setOpen(!open)} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'Fraunces', serif", fontSize: 16, fontWeight: 700 }}>
-        {open ? "▼" : "▶"} 🧮 Калкулатор за себестойност на продукт
+        {open ? "▼" : "▶"} Калкулатор за себестойност на продукт
       </button>
       {open && (
         <div style={{ marginTop: 14 }}>
@@ -76,7 +76,7 @@ export function CostCalculator() {
           </div>
 
           <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 12, lineHeight: 1.5 }}>
-            ⚠ Калкулацията включва само вложените суровини. В нея <strong>не влизат</strong> консумативи и допълнителни разходи —
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><path d="M12 3 1.5 21h21L12 3Z"/><path d="M12 10v5M12 18h.01"/></svg> Калкулацията включва само вложените суровини. В нея <strong>не влизат</strong> консумативи и допълнителни разходи —
             вода, ток, отопление, наем, заплати на служители, опаковки, амортизация и др. За пълна себестойност добавете и тези разходи отделно.
           </p>
         </div>

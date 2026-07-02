@@ -67,7 +67,7 @@ export default async function InvoicesPage({
 
       {invoices.length === 0 ? (
         <div className="glass panel" style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
-          <div style={{ fontSize: 32, marginBottom: 12 }}>🧾</div>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, color: "var(--muted)" }}><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2.5h9l3 3V21l-2-1.2-2 1.2-2-1.2-2 1.2-2-1.2L6 21V2.5Z"/><path d="M8.5 7.5h7M8.5 11h7M8.5 14.5h4"/></svg></div>
           <div style={{ fontSize: 14, marginBottom: 16 }}>Няма фактури</div>
           <Link href="/dashboard/documents/new?type=invoice" className="btn btn-primary btn-sm">Издай първата фактура</Link>
         </div>

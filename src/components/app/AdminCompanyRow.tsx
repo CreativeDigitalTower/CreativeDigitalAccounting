@@ -134,7 +134,7 @@ export function AdminCompanyRow(props: Props) {
         <td>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             <button onClick={impersonate} className="btn btn-ghost btn-sm">Влез в акаунта →</button>
-            <button onClick={deleteCompany} className="btn btn-ghost btn-sm" style={{ color: "var(--brick)", borderColor: "var(--brick)" }} title="Изтрий фирмата">🗑</button>
+            <button onClick={deleteCompany} className="btn btn-ghost btn-sm" title="Изтрий фирмата" style={{ color: "var(--brick)", borderColor: "var(--brick)", display: "inline-flex", alignItems: "center" }}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><path d="M4 7h16M9 7V4.5h6V7M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13M10 11v6M14 11v6"/></svg></button>
           </div>
         </td>
       </tr>

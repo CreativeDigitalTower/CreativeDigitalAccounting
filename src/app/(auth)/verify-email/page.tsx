@@ -23,7 +23,7 @@ export default async function VerifyEmailPage({ searchParams }: { searchParams: 
   return (
     <div style={{ width: "100%", maxWidth: 420 }}>
       <div className="glass panel" style={{ padding: "40px 36px", textAlign: "center" }}>
-        <div style={{ fontSize: 40, marginBottom: 12 }}>{ok ? "✓" : "⚠️"}</div>
+        <div style={{ display:"flex",justifyContent:"center",marginBottom: 12, color: ok ? "var(--emerald)" : "var(--brick)" }}>{ok ? <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 4.5 4.5L19 7"/></svg> : <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3 1.5 21h21L12 3Z"/><path d="M12 10v5M12 18h.01"/></svg>}</div>
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 24, fontWeight: 700, margin: "0 0 10px" }}>
           {ok ? "Имейлът е потвърден" : "Невалиден линк"}
         </h1>

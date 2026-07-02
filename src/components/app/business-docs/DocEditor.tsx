@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { UiIcon } from "@/components/app/NavIcons";
 
 type Doc = { id: string; title: string; contentHtml: string; status: string; favorite: boolean; pinned: boolean };
 
@@ -107,9 +108,9 @@ export function DocEditor({ doc, logoUrl, companyName }: { doc: Doc; logoUrl: st
         <select value={status} onChange={(e) => setStatus(e.target.value)} style={{ width: "auto", padding: "6px 10px", fontSize: 12.5 }}>
           {STATUSES.map((s) => <option key={s.v} value={s.v}>{s.l}</option>)}
         </select>
-        <button className="btn btn-ghost btn-sm" onClick={() => { setFavorite(!favorite); patch({ favorite: !favorite }); }} title="Любим">{favorite ? "⭐" : "☆"}</button>
-        <button className="btn btn-ghost btn-sm" onClick={() => { setPinned(!pinned); patch({ pinned: !pinned }); }} title="Закачи">{pinned ? "📌" : "📍"}</button>
-        <button className="btn btn-primary btn-sm" onClick={save} disabled={saving}>{saving ? "Запазване…" : "💾 Запази"}</button>
+        <button className="btn btn-ghost btn-sm" onClick={() => { setFavorite(!favorite); patch({ favorite: !favorite }); }} title="Любим" style={{ display: "inline-flex", alignItems: "center", color: favorite ? "var(--brass)" : undefined }}>{favorite ? <UiIcon.starFill /> : <UiIcon.star />}</button>
+        <button className="btn btn-ghost btn-sm" onClick={() => { setPinned(!pinned); patch({ pinned: !pinned }); }} title="Закачи" style={{ display: "inline-flex", alignItems: "center", color: pinned ? "var(--navy)" : undefined }}><UiIcon.pin /></button>
+        <button className="btn btn-primary btn-sm" onClick={save} disabled={saving} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>{saving ? "Запазване…" : <><UiIcon.save /> Запази</>}</button>
         {savedAt && <span style={{ fontSize: 11.5, color: "var(--emerald)" }}>Запазено {savedAt}</span>}
       </div>
 
@@ -117,7 +118,7 @@ export function DocEditor({ doc, logoUrl, companyName }: { doc: Doc; logoUrl: st
       <div className="no-print" style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
         <button className="btn btn-ghost btn-sm" onClick={downloadPdf} disabled={busy}>{busy ? "…" : "↓ PDF"}</button>
         <button className="btn btn-ghost btn-sm" onClick={downloadDocx}>↓ DOCX</button>
-        <button className="btn btn-ghost btn-sm" onClick={printDoc}>🖨 Печат</button>
+        <button className="btn btn-ghost btn-sm" onClick={printDoc} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><UiIcon.print /> Печат</button>
         <button className="btn btn-ghost btn-sm" style={{ marginLeft: "auto", color: "var(--brick)" }} onClick={remove}>Изтрий</button>
       </div>
 
@@ -145,7 +146,7 @@ export function DocEditor({ doc, logoUrl, companyName }: { doc: Doc; logoUrl: st
         <Btn onClick={() => cmd("justifyRight")} title="Дясно">⯈</Btn>
         <Sep />
         <Btn onClick={() => insertHtml('<table style="width:100%;border-collapse:collapse;margin:8px 0;"><tr><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td></tr><tr><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td></tr></table>')} title="Таблица">▦</Btn>
-        <Btn onClick={() => { const url = prompt("URL на изображение:"); if (url) insertHtml(`<img src="${url}" style="max-width:100%;" />`); }} title="Изображение">🖼</Btn>
+        <Btn onClick={() => { const url = prompt("URL на изображение:"); if (url) insertHtml(`<img src="${url}" style="max-width:100%;" />`); }} title="Изображение"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8.5" cy="9.5" r="1.5" /><path d="m4 17 5-5 4 4 3-3 4 4" /></svg></Btn>
         <Btn onClick={() => insertHtml('<div style="page-break-after:always;border-top:1px dashed #bbb;margin:18px 0;"></div>')} title="Нова страница">⤓</Btn>
       </div>
 

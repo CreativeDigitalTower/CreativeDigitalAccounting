@@ -30,7 +30,7 @@ export function DashboardPeriodSelector({ active }: { active: string }) {
         </button>
       ))}
       <button onClick={() => setShowRange((v) => !v)} className={`filter-tab${active === "custom" ? " active" : ""}`} style={{ fontSize: 12.5 }}>
-        📅 Период
+        <span style={{display:"inline-flex",alignItems:"center",gap:5}}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><rect x="3.5" y="4.5" width="17" height="16" rx="2"/><path d="M3.5 9h17M8 2.5v4M16 2.5v4"/></svg> Период</span>
       </button>
       {showRange && (
         <div className="glass pop-in" style={{ display: "flex", gap: 8, alignItems: "center", padding: "8px 10px", borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,.12)" }}>

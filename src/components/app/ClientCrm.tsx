@@ -6,6 +6,21 @@ import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/constants";
 import { STATUSES, STAGES, TASK_TYPES } from "@/lib/crm";
 import { confirmDelete } from "@/lib/confirmDelete";
+import { NavIcon, UiIcon } from "@/components/app/NavIcons";
+
+// Рендерира иконата на CRM задача (ключ → SVG пиктограма)
+function taskIcon(key: string | null | undefined) {
+  const s = { width: 13, height: 13 };
+  switch (key) {
+    case "phone": return <UiIcon.phone {...s} />;
+    case "mail": return <UiIcon.mail {...s} />;
+    case "doc": return <UiIcon.doc {...s} />;
+    case "contracts": return <NavIcon.contracts {...s} />;
+    case "bell": return <UiIcon.bell {...s} />;
+    case "handshake": return <UiIcon.handshake {...s} />;
+    default: return <UiIcon.dot {...s} />;
+  }
+}
 
 // Реекспорт за обратна съвместимост (стари импорти от този модул).
 export { STATUSES, STAGES } from "@/lib/crm";
@@ -215,13 +230,13 @@ function TasksCard({ clientId, initial }: { clientId: string; initial: Task[] })
   }
   async function toggle(t: Task) { await fetch(`/api/clients/${clientId}/tasks`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ taskId: t.id, done: !t.done }) }); setList(list.map((x) => x.id === t.id ? { ...x, done: !x.done } : x)); }
   async function del(id: string) { if (!(await confirmDelete("тази задача"))) return; const r = await fetch(`/api/clients/${clientId}/tasks?taskId=${id}`, { method: "DELETE" }); if (r.ok) setList(list.filter((t) => t.id !== id)); }
-  const tIcon = (t: string | null) => TASK_TYPES.find((x) => x.id === t)?.icon ?? "•";
+  const tIcon = (t: string | null) => taskIcon(TASK_TYPES.find((x) => x.id === t)?.icon);
   return (
     <div className="glass panel">
       <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 10px" }}>CRM задачи</h3>
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
         {TASK_TYPES.slice(0, 5).map((t) => (
-          <button key={t.id} onClick={() => setType(t.id)} className={`filter-tab${type === t.id ? " active" : ""}`} style={{ fontSize: 11 }}>{t.icon} {t.label}</button>
+          <button key={t.id} onClick={() => setType(t.id)} className={`filter-tab${type === t.id ? " active" : ""}`} style={{ fontSize: 11, display: "inline-flex", alignItems: "center", gap: 5 }}>{taskIcon(t.icon)} {t.label}</button>
         ))}
       </div>
       <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>

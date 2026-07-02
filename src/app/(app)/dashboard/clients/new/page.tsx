@@ -80,7 +80,7 @@ export default function NewClientPage() {
       {match && (
         <div style={{ background: "var(--emerald-soft, rgba(15,138,106,.1))", border: "1px solid var(--emerald)", borderRadius: 8, padding: "12px 16px", marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <div style={{ fontSize: 13 }}>
-            🔎 Тази фирма е регистрирана в платформата: <strong>{match.name}</strong>. Документите към нея ще се доставят автоматично в профила ѝ.
+            Тази фирма е регистрирана в платформата: <strong>{match.name}</strong>. Документите към нея ще се доставят автоматично в профила ѝ.
           </div>
           <button type="button" className="btn btn-primary btn-sm" onClick={applyMatch}>Попълни данните автоматично</button>
         </div>
