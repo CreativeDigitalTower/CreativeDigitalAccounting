@@ -25,7 +25,7 @@ export async function POST(req: Request) {
         { label: "Фирма", value: company?.name ?? "—" },
         { label: "ЕИК", value: company?.eik ?? "—" },
         { label: "Причина", value: reason },
-      ], "🗑");
+      ], "");
       await notifyAdmin(a.subject, a.html, "admin_account_deleted");
     } catch {}
 

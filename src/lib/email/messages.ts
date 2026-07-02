@@ -6,7 +6,7 @@ type Msg = { subject: string; html: string; category: string };
 const PLAN_LABEL: Record<string, string> = { free: "Безплатен", start: "Старт", business: "Бизнес", pro: "Про" };
 const planName = (p?: string | null) => (p ? PLAN_LABEL[p] ?? p : "—");
 
-// ─────────────────────────── 👤 АКАУНТ ───────────────────────────
+// ─────────────────────────── АКАУНТ ───────────────────────────
 
 export function welcomeEmail(name: string, verifyUrl?: string): Msg {
   return {
@@ -102,7 +102,7 @@ export function newLoginEmail(name: string, info: { ip?: string; device?: string
   };
 }
 
-// ─────────────────────────── 💳 АБОНАМЕНТИ ───────────────────────────
+// ─────────────────────────── АБОНАМЕНТИ ───────────────────────────
 
 export function subscriptionSelectedEmail(company: string, plan: string, period: string, amount?: number): Msg {
   return {
@@ -237,7 +237,7 @@ export function planChangedEmail(company: string, from: string, to: string): Msg
   };
 }
 
-// ─────────────────────────── 📄 ДОКУМЕНТИ ───────────────────────────
+// ─────────────────────────── ДОКУМЕНТИ ───────────────────────────
 
 const DOC_LABEL: Record<string, string> = {
   invoice: "Фактура", proforma: "Проформа фактура", quote: "Оферта",
@@ -294,7 +294,7 @@ export function clientDecisionEmail(opts: { docLabel: string; number: string; cl
   };
 }
 
-// ─────────────────────────── 🔔 НАПОМНЯНИЯ ───────────────────────────
+// ─────────────────────────── НАПОМНЯНИЯ ───────────────────────────
 
 export function unpaidInvoiceEmail(company: string, number: string, daysOverdue: number, amount: string, url: string): Msg {
   return {
@@ -324,12 +324,12 @@ export function expiringEntityEmail(kind: "contract" | "project" | "warranty" | 
   };
 }
 
-// ─────────────────────────── 🛡️ АДМИН (office@) ───────────────────────────
+// ─────────────────────────── АДМИН (office@) ───────────────────────────
 
 export function adminNewRegistrationEmail(d: { name: string; company: string; eik?: string | null; email: string; phone?: string | null; plan: string }): Msg {
   return {
     category: "admin",
-    subject: `🟢 Нова регистрация: ${d.company}`,
+    subject: `Нова регистрация: ${d.company}`,
     html: baseTemplate({
       eyebrow: "Notification Center",
       title: "Нова регистрация",
@@ -350,7 +350,7 @@ export function adminNewRegistrationEmail(d: { name: string; company: string; ei
 export function adminPaidSubEmail(d: { company: string; plan: string; amount: number; method: string }): Msg {
   return {
     category: "admin",
-    subject: `💳 Нов платен абонамент: ${d.company}`,
+    subject: `Нов платен абонамент: ${d.company}`,
     html: baseTemplate({
       eyebrow: "Notification Center",
       title: "Нов платен абонамент",
@@ -365,7 +365,7 @@ export function adminPaidSubEmail(d: { company: string; plan: string; amount: nu
   };
 }
 
-export function adminSimpleEmail(title: string, lines: { label: string; value: string }[], emoji = "🔔"): Msg {
+export function adminSimpleEmail(title: string, lines: { label: string; value: string }[], emoji = ""): Msg {
   return {
     category: "admin",
     subject: `${emoji} ${title}`,
@@ -376,7 +376,7 @@ export function adminSimpleEmail(title: string, lines: { label: string; value: s
 export function contactFormEmail(d: { name: string; email: string; message: string; phone?: string }): Msg {
   return {
     category: "admin",
-    subject: `✉️ Ново съобщение от контактната форма`,
+    subject: `Ново съобщение от контактната форма`,
     html: baseTemplate({
       eyebrow: "Notification Center",
       title: "Ново съобщение от контактната форма",

@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { UiIcon, docCategoryIcon } from "@/components/app/NavIcons";
 
 type Cat = { id: string; title: string; icon: string; description: string; count: number };
 type Tpl = { id: string; title: string; categoryId: string; categoryTitle: string; complexity: string };
@@ -29,7 +30,7 @@ export function BusinessDocsHome({ categories, templates, recent, favorites, rec
 
       {/* Търсене */}
       <div style={{ position: "relative", marginBottom: 22 }}>
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={'🔍 Търсете документ… (напр. договор, пълномощно, заповед)'}
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={'Търсете документ… (напр. договор, пълномощно, заповед)'}
           style={{ fontSize: 15, padding: "13px 16px" }} />
         {results.length > 0 && (
           <div className="glass" style={{ position: "absolute", top: "100%", left: 0, right: 0, zIndex: 30, marginTop: 6, borderRadius: 10, maxHeight: 360, overflowY: "auto", boxShadow: "0 12px 32px rgba(0,0,0,.14)" }}>
@@ -59,8 +60,8 @@ export function BusinessDocsHome({ categories, templates, recent, favorites, rec
       {/* Последни + любими */}
       {(recent.length > 0 || favorites.length > 0) && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 26 }}>
-          <Panel title="🕒 Последно използвани" docs={recent} empty="Все още нямате генерирани документи." />
-          <Panel title="⭐ Любими" docs={favorites} empty="Маркирайте документи като любими за бърз достъп." />
+          <Panel title="Последно използвани" docs={recent} empty="Все още нямате генерирани документи." />
+          <Panel title="Любими" docs={favorites} empty="Маркирайте документи като любими за бърз достъп." />
         </div>
       )}
 
@@ -69,7 +70,7 @@ export function BusinessDocsHome({ categories, templates, recent, favorites, rec
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 14, marginBottom: 28 }}>
         {categories.map((c) => (
           <Link key={c.id} href={`/dashboard/business-docs/category/${c.id}`} className="glass panel" style={{ padding: "18px 20px", textDecoration: "none", color: "inherit", transition: "transform .12s" }}>
-            <div style={{ fontSize: 28, marginBottom: 8 }}>{c.icon}</div>
+            <div style={{ marginBottom: 8, color: "var(--emerald-dark)" }}>{docCategoryIcon(c.id, 26)}</div>
             <div style={{ fontFamily: "'Fraunces', serif", fontSize: 16, fontWeight: 700, marginBottom: 4 }}>{c.title}</div>
             <div style={{ fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.5, marginBottom: 8 }}>{c.description}</div>
             <div style={{ fontSize: 11.5, color: "var(--brass)", fontWeight: 600 }}>{c.count} шаблона →</div>
@@ -79,7 +80,7 @@ export function BusinessDocsHome({ categories, templates, recent, favorites, rec
         {/* AI — coming soon */}
         <div className="glass panel" style={{ padding: "18px 20px", position: "relative", opacity: 0.85, border: "1px dashed var(--brass)" }}>
           <span style={{ position: "absolute", top: 12, right: 12, background: "var(--brass)", color: "#fff", fontSize: 9.5, fontWeight: 700, padding: "2px 8px", borderRadius: 20, letterSpacing: .5 }}>COMING SOON</span>
-          <div style={{ fontSize: 28, marginBottom: 8 }}>✨</div>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 8, color: "var(--brass)" }}><UiIcon.star width={26} height={26} /></div>
           <div style={{ fontFamily: "'Fraunces', serif", fontSize: 16, fontWeight: 700, marginBottom: 4 }}>AI Бизнес документи</div>
           <div style={{ fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.5 }}>Очаквайте скоро — генериране на документи чрез изкуствен интелект.</div>
         </div>

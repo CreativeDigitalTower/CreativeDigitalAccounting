@@ -44,7 +44,7 @@ export async function POST(req: Request) {
         const a = adminSimpleEmail("Активиран безплатен пробен период", [
           { label: "Фирма", value: company.name }, { label: "План", value: plan }, { label: "Дни", value: String(TRIAL_DAYS) },
           { label: "Валиден до", value: end.toLocaleDateString("bg-BG") },
-        ], "🆓");
+        ], "");
         await notifyAdmin(a.subject, a.html, "admin_trial_started");
       }
     } catch (e) { console.error("trial email", e); }

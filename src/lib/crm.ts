@@ -18,12 +18,13 @@ export const STAGES = [
   { id: "lost", label: "Загубен" },
 ];
 
+// icon = ключ към UiIcon/NavIcon (рендерира се като SVG в ClientCrm), без емоджита
 export const TASK_TYPES = [
-  { id: "call", label: "Обади се", icon: "☎" },
-  { id: "email", label: "Изпрати имейл", icon: "✉" },
-  { id: "offer", label: "Изпрати оферта", icon: "📄" },
-  { id: "contract", label: "Изпрати договор", icon: "📑" },
-  { id: "followup", label: "Потърси клиента", icon: "🔔" },
-  { id: "meeting", label: "Среща", icon: "🤝" },
-  { id: "other", label: "Друго", icon: "•" },
+  { id: "call", label: "Обади се", icon: "phone" },
+  { id: "email", label: "Изпрати имейл", icon: "mail" },
+  { id: "offer", label: "Изпрати оферта", icon: "doc" },
+  { id: "contract", label: "Изпрати договор", icon: "contracts" },
+  { id: "followup", label: "Потърси клиента", icon: "bell" },
+  { id: "meeting", label: "Среща", icon: "handshake" },
+  { id: "other", label: "Друго", icon: "dot" },
 ];

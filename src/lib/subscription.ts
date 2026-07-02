@@ -35,7 +35,7 @@ export async function enforceSubscription(companyId: string) {
       if (owner?.email && company) {
         const m = subscriptionExpiredEmail(company.name, sub.plan);
         await sendEmail({ to: owner.email, toName: owner.name, subject: m.subject, html: m.html, category: m.category, type: "subscription_expired", companyId });
-        const a = adminSimpleEmail("Изтекъл абонамент", [{ label: "Фирма", value: company.name }, { label: "Предишен план", value: sub.plan }], "🔴");
+        const a = adminSimpleEmail("Изтекъл абонамент", [{ label: "Фирма", value: company.name }, { label: "Предишен план", value: sub.plan }], "");
         await notifyAdmin(a.subject, a.html, "admin_expired_sub");
       }
     } catch (e) { console.error("expiry email", e); }

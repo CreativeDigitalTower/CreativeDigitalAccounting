@@ -18,7 +18,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
         { label: "Фирма", value: company.name },
         { label: "ЕИК", value: company.eik ?? "—" },
         { label: "Коментар", value: comment || "—" },
-      ], "🛡");
+      ], "");
       await notifyAdmin(a.subject, a.html, "admin_company_removed");
     } catch {}
 
