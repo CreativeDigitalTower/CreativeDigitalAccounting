@@ -68,7 +68,7 @@ export function SmtpStatusPanel() {
 
       {!loading && v && !v.ok && v.error && (
         <div style={{ background: "var(--brick-soft)", border: "1px solid var(--brick)", color: "var(--brick)", borderRadius: 8, padding: "9px 13px", fontSize: 12.5, marginBottom: 14 }}>
-          ⚠ {v.error}
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><path d="M12 3 1.5 21h21L12 3Z"/><path d="M12 10v5M12 18h.01"/></svg> {v.error}
         </div>
       )}
 
