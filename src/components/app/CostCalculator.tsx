@@ -27,7 +27,7 @@ export function CostCalculator() {
   return (
     <div className="glass panel" style={{ padding: "18px 22px", marginTop: 18 }}>
       <button onClick={() => setOpen(!open)} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'Fraunces', serif", fontSize: 16, fontWeight: 700 }}>
-        {open ? "▼" : "▶"} 🧮 Калкулатор за себестойност на продукт
+        {open ? "▼" : "▶"} Калкулатор за себестойност на продукт
       </button>
       {open && (
         <div style={{ marginTop: 14 }}>

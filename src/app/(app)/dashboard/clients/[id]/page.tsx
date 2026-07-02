@@ -33,7 +33,7 @@ export default async function ClientDossierPage({ params }: { params: Promise<{ 
   timeline.push({ date: client.createdAt.toISOString(), kind: "added", label: "Клиентът е добавен в CRM", icon: "+", color: "var(--navy)" });
   for (const d of client.documents) {
     const label = `Издадена ${DOC_LABEL[d.type] ?? d.type} № ${d.number}`;
-    timeline.push({ date: d.issueDate.toISOString(), kind: d.type, label, icon: d.type === "quote" ? "✓" : "📄", color: d.type === "quote" ? "var(--brass)" : "var(--navy)" });
+    timeline.push({ date: d.issueDate.toISOString(), kind: d.type, label, icon: d.type === "quote" ? "✓" : "•", color: d.type === "quote" ? "var(--brass)" : "var(--navy)" });
     if (d.status === "paid") timeline.push({ date: d.issueDate.toISOString(), kind: "payment", label: `Плащане по ${d.number} (${docTotal(d).toFixed(2)} €)`, icon: "€", color: "var(--emerald)" });
   }
   for (const c of client.contracts) timeline.push({ date: c.startDate.toISOString(), kind: "contract", label: `Договор: ${c.title}`, icon: "§", color: "var(--navy)" });

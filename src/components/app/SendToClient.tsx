@@ -28,7 +28,7 @@ export function SendToClient({ id, defaultEmail, decision, sentAt }: {
 
   return (
     <>
-      <button onClick={() => setOpen(true)} className="btn btn-ghost btn-sm">✉ Изпрати на клиент</button>
+      <button onClick={() => setOpen(true)} className="btn btn-ghost btn-sm"style={{display:"inline-flex",alignItems:"center",gap:6}}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3 6 9 6 9-6"/></svg> Изпрати на клиент</button>
       {decisionBadge}
       {open && (
         <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 }}>

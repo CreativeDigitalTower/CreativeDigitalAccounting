@@ -25,7 +25,7 @@ export function MessengerBubble() {
           </div>
           <div style={{ padding: "16px 18px" }}>
             <div style={{ background: "#F0F2F5", borderRadius: 12, padding: "10px 14px", fontSize: 13.5, color: "#1c1e21", marginBottom: 14 }}>
-              👋 Здравейте! С какво можем да помогнем? Пишете ни директно в Messenger.
+              Здравейте! С какво можем да помогнем? Пишете ни директно в Messenger.
             </div>
             <a
               href={`https://m.me/CreativeDigitalAccounting`}

@@ -50,7 +50,7 @@ export function DownloadButtons({ filename = "document", selector = ".printable"
 
   return (
     <div style={{ display: "flex", gap: 8 }} className="no-print">
-      <button onClick={printDoc} className="btn btn-ghost btn-sm">🖨 Отпечатай</button>
+      <button onClick={printDoc} className="btn btn-ghost btn-sm"style={{display:"inline-flex",alignItems:"center",gap:6}}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><path d="M7 9V3h10v6M7 18H5a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-2"/><rect x="7" y="15" width="10" height="6"/></svg> Отпечатай</button>
       <button onClick={downloadPdf} className="btn btn-primary btn-sm" disabled={busy}>
         {busy ? "Генериране…" : "↓ Изтегли PDF"}
       </button>

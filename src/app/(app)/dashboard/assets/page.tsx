@@ -28,7 +28,7 @@ export default async function AssetsPage() {
       <div className="glass panel" style={{ padding: "8px 0" }}>
         {assets.length === 0 ? (
           <div style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>🏭</div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, color: "var(--muted)" }}><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 20V9l6 4V9l6 4V6l3 2v12H3Z"/><path d="M6.5 20v-3M12 20v-3M17 20v-3"/></svg></div>
             <div style={{ fontSize: 14, marginBottom: 16 }}>Няма регистрирани активи</div>
             <Link href="/dashboard/assets/new" className="btn btn-primary btn-sm">Добави актив</Link>
           </div>

@@ -28,7 +28,7 @@ export function PublicDocDecision({ token, decision, docLabel, from }: {
         <div style={{ fontWeight: 700, color: state === "accepted" ? "#0B5E4A" : "#B23B3B", fontSize: 16 }}>
           {state === "accepted" ? `Приехте ${docLabel}` : `Отхвърлихте ${docLabel}`}
         </div>
-        <button onClick={download} className="no-print" style={{ marginTop: 14, padding: "9px 20px", borderRadius: 9, border: "1px solid #0B5E4A", background: "transparent", color: "#0B5E4A", fontWeight: 600, cursor: "pointer" }}>⬇ Изтегли PDF</button>
+        <button onClick={download} className="no-print" style={{ marginTop: 14, padding: "9px 20px", borderRadius: 9, border: "1px solid #0B5E4A", background: "transparent", color: "#0B5E4A", fontWeight: 600, cursor: "pointer", display:"inline-flex",alignItems:"center",gap:6 }}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 20h16"/></svg> Изтегли PDF</button>
       </div>
     );
   }
@@ -41,7 +41,7 @@ export function PublicDocDecision({ token, decision, docLabel, from }: {
       <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
         <button onClick={() => decide("accepted")} disabled={busy} style={{ padding: "11px 26px", borderRadius: 10, border: "none", background: "#0F8A6A", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 14 }}>✓ Приемам</button>
         <button onClick={() => decide("rejected")} disabled={busy} style={{ padding: "11px 26px", borderRadius: 10, border: "1px solid #D9534F", background: "transparent", color: "#D9534F", fontWeight: 700, cursor: "pointer", fontSize: 14 }}>✕ Отхвърлям</button>
-        <button onClick={download} style={{ padding: "11px 22px", borderRadius: 10, border: "1px solid #C9D2CE", background: "transparent", color: "#384842", fontWeight: 600, cursor: "pointer", fontSize: 14 }}>⬇ Изтегли PDF</button>
+        <button onClick={download} style={{ padding: "11px 22px", borderRadius: 10, border: "1px solid #C9D2CE", background: "transparent", color: "#384842", fontWeight: 600, cursor: "pointer", fontSize: 14, display:"inline-flex",alignItems:"center",gap:6 }}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 20h16"/></svg> Изтегли PDF</button>
       </div>
     </div>
   );

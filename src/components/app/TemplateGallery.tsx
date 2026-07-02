@@ -38,7 +38,7 @@ export function TemplateGallery({ plan, selected, onSelect, title = "Шабло�
               </button>
               <a href={`/dashboard/settings/preview?template=${t.id}`} target="_blank" rel="noreferrer"
                 style={{ textAlign: "center", fontSize: 11.5, fontWeight: 600, color: "var(--navy)", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 0", textDecoration: "none" }}>
-                👁 Преглед
+                <span style={{display:"inline-flex",alignItems:"center",gap:5}}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Преглед</span>
               </a>
             </div>
           );

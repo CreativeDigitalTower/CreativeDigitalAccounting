@@ -127,7 +127,7 @@ export default function BankStatementsPage() {
           <div style={{ padding: 30, color: "var(--muted)" }}>Зареждане…</div>
         ) : items.length === 0 ? (
           <div style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>🏦</div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, color: "var(--muted)" }}><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg></div>
             <div style={{ fontSize: 14 }}>Няма качени банкови извлечения</div>
           </div>
         ) : (

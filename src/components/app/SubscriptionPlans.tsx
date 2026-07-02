@@ -143,7 +143,7 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
 
       {/* Плащане по банков път — със СУМА според избрания план и период */}
       <div id="pay-box" className="glass panel" style={{ marginTop: 16, padding: "20px 24px", borderLeft: "4px solid var(--emerald)" }}>
-        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 17, margin: "0 0 6px" }}>💳 Плащане по банков път</h3>
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 17, margin: "0 0 6px", display: "flex", alignItems: "center", gap: 8 }}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19M6 15h4"/></svg> Плащане по банков път</h3>
         <p style={{ fontSize: 12.5, color: "var(--ink-soft)", margin: "0 0 14px", maxWidth: 700 }}>
           {payPlan
             ? <>Избран план: <strong>{payPlan.name}</strong> · {period.label.toLowerCase()}. Преведете сумата по сметката по-долу. След получаване на плащането ще активираме плана Ви.</>

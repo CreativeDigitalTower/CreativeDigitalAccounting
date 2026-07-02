@@ -66,7 +66,7 @@ export function MarketingFooter() {
         </div>
         {/* Скоро: мобилно приложение */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 12, padding: "12px 16px", marginBottom: 20, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 20 }}>📱</span>
+          <span style={{ display:"inline-flex", color:"var(--brass)" }}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></span>
           <span style={{ fontSize: 13, color: "#C9C7B6" }}>
             <strong style={{ color: "#E9E7DA" }}>Скоро:</strong> мобилно приложение за iOS и Android, както и още нови функционалности към платформата.
           </span>

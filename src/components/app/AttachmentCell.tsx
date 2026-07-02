@@ -41,7 +41,7 @@ export function AttachmentCell({ endpoint, hasFile, maxMB = 5 }: { endpoint: str
     <span style={{ display: "inline-flex", gap: 8, alignItems: "center", whiteSpace: "nowrap" }}>
       {hasFile ? (
         <>
-          <a href={`${endpoint}/attachment?view=1`} target="_blank" rel="noreferrer" style={labelStyle} title="Преглед">👁</a>
+          <a href={`${endpoint}/attachment?view=1`} target="_blank" rel="noreferrer" style={labelStyle} title="Преглед"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></a>
           <a href={`${endpoint}/attachment`} style={labelStyle} title="Свали">↓</a>
           <label style={labelStyle} title="Замени">↻<input type="file" accept="application/pdf,image/*" onChange={upload} style={{ display: "none" }} /></label>
           <button onClick={remove} title="Премахни" style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer", fontSize: 13 }}>×</button>
