@@ -28,7 +28,7 @@ type Props = {
     name: string | null; email: string; representativeRole: string | null;
     marketingConsent: boolean; termsAcceptedAt: string | null; createdAt: string;
   }[];
-  sub: { status: string; periodStart: string | null; periodEnd: string | null; trialUsed: boolean };
+  sub: { status: string; paymentStatus: string; periodStart: string | null; periodEnd: string | null; trialUsed: boolean };
   events: { type: string; plan: string | null; status: string | null; period: string | null; amount: number | null; note: string | null; createdAt: string }[];
 };
 
@@ -39,6 +39,15 @@ const EVENT_LABEL: Record<string, string> = {
 const EVENT_COLOR: Record<string, string> = {
   request: "var(--brass)", payment: "var(--emerald)", plan_change: "var(--navy)",
   status_change: "var(--navy)", trial: "var(--brass)", expiry: "var(--brick)",
+};
+// Статус на плащане — само „received" се брои като продаден абонамент в статистиката
+const PAY_OPTS = [
+  { id: "received", label: "Получено плащане" },
+  { id: "pending", label: "Изчаква се плащане" },
+  { id: "not_received", label: "Не е получено плащане" },
+];
+const PAY_META: Record<string, { color: string }> = {
+  received: { color: "var(--emerald)" }, pending: { color: "var(--brass)" }, not_received: { color: "var(--brick)" },
 };
 
 export function AdminCompanyRow(props: Props) {
@@ -52,16 +61,27 @@ export function AdminCompanyRow(props: Props) {
   const [mStart, setMStart] = useState(props.sub.periodStart?.slice(0, 10) ?? "");
   const [mEnd, setMEnd] = useState(props.sub.periodEnd?.slice(0, 10) ?? "");
   const [mStatus, setMStatus] = useState(props.sub.status);
+  const [pay, setPay] = useState(props.sub.paymentStatus);
   const [subMsg, setSubMsg] = useState("");
 
   async function saveSubscription() {
     setSubMsg("");
     const res = await fetch("/api/admin/plan", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ companyId: props.id, plan: mPlan, status: mStatus, periodStart: mStart || null, periodEnd: mEnd || null }),
+      body: JSON.stringify({ companyId: props.id, plan: mPlan, status: mStatus, paymentStatus: pay, periodStart: mStart || null, periodEnd: mEnd || null }),
     });
     if (res.ok) { setSubMsg("✓ Запазено"); setPlan(mPlan); router.refresh(); setTimeout(() => setSubMsg(""), 2500); }
     else setSubMsg((await res.json()).error ?? "Грешка");
+  }
+
+  // Бърза промяна на статуса на плащане директно (потвърждение на реален приход)
+  async function changePayment(next: string) {
+    setPay(next);
+    const res = await fetch("/api/admin/plan", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ companyId: props.id, plan, paymentStatus: next }),
+    });
+    if (res.ok) router.refresh();
   }
 
   async function changePlan(next: string) {
@@ -124,11 +144,19 @@ export function AdminCompanyRow(props: Props) {
         <td className="num">{props.docs}</td>
         <td style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>{props.createdAt}</td>
         <td>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
             <select value={plan} onChange={(e) => changePlan(e.target.value)} disabled={saving} style={{ width: "auto", padding: "5px 8px", fontSize: 12.5 }}>
               {PLANS.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
             </select>
             {saved && <span style={{ color: "var(--emerald)", fontSize: 12 }}>✓</span>}
+            {plan !== "free" && (
+              <select value={pay} onChange={(e) => changePayment(e.target.value)}
+                title="Статус на плащане — само Получено плащане се брои като продажба"
+                style={{ width: "auto", padding: "5px 8px", fontSize: 12, fontWeight: 600, borderRadius: 6,
+                  color: "#fff", border: "none", background: PAY_META[pay]?.color ?? "var(--muted)" }}>
+                {PAY_OPTS.map((p) => <option key={p.id} value={p.id} style={{ color: "#16201C" }}>{p.label}</option>)}
+              </select>
+            )}
           </div>
         </td>
         <td>
@@ -147,6 +175,7 @@ export function AdminCompanyRow(props: Props) {
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
                 <div><label style={{ fontSize: 11 }}>План</label><select value={mPlan} onChange={(e) => setMPlan(e.target.value)} style={{ padding: "5px 8px", fontSize: 12.5 }}>{PLANS.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}</select></div>
                 <div><label style={{ fontSize: 11 }}>Статус</label><select value={mStatus} onChange={(e) => setMStatus(e.target.value)} style={{ padding: "5px 8px", fontSize: 12.5 }}>{["active", "trialing", "past_due", "cancelled"].map((s) => <option key={s} value={s}>{s}</option>)}</select></div>
+                <div><label style={{ fontSize: 11 }}>Плащане</label><select value={pay} onChange={(e) => setPay(e.target.value)} style={{ padding: "5px 8px", fontSize: 12.5 }}>{PAY_OPTS.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}</select></div>
                 <div><label style={{ fontSize: 11 }}>В сила от</label><input type="date" value={mStart} onChange={(e) => setMStart(e.target.value)} style={{ padding: "5px 8px", fontSize: 12.5 }} /></div>
                 <div><label style={{ fontSize: 11 }}>В сила до</label><input type="date" value={mEnd} onChange={(e) => setMEnd(e.target.value)} style={{ padding: "5px 8px", fontSize: 12.5 }} /></div>
                 <button className="btn btn-primary btn-sm" onClick={saveSubscription}>Запази абонамент</button>

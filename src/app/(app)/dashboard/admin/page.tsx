@@ -59,13 +59,17 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const OWN_ACCOUNT_EMAIL = "office@creativedigitaltower.com";
   const isOwnAccount = (c: (typeof companies)[number]) =>
     c.companyUsers.some((cu) => cu.user?.email?.toLowerCase() === OWN_ACCOUNT_EMAIL);
-  // Реален платящ абонат: платен план + статус „active" (НЕ пробен/безплатен период,
-  // НЕ отменен/просрочен) и да не е собственият акаунт. Само тези влизат в MRR/ARR.
+  // Реален платящ абонат: платен план + статус „active" + РЪЧНО потвърдено
+  // получено плащане (paymentStatus === "received") и да не е собственият акаунт.
+  // Само тези влизат в MRR/ARR — така статистиката отчита реални продажби.
   const isPaying = (c: (typeof companies)[number]) => {
     const plan = c.subscription?.plan ?? "free";
-    return plan !== "free" && c.subscription?.status === "active" && !isOwnAccount(c);
+    return plan !== "free" && c.subscription?.status === "active"
+      && c.subscription?.paymentStatus === "received" && !isOwnAccount(c);
   };
   const payingCount = companies.filter(isPaying).length;
+  // Платен план, но плащането още не е потвърдено (изчаква се / не е получено) — не влиза в приход.
+  const awaitingPaymentCount = companies.filter((c) => (c.subscription?.plan ?? "free") !== "free" && c.subscription?.status === "active" && c.subscription?.paymentStatus !== "received" && !isOwnAccount(c)).length;
   // Фирми в пробен (безплатен) период — показваме ги отделно, но НЕ като приход.
   const trialingCount = companies.filter((c) => c.subscription?.status === "trialing" && (c.subscription?.plan ?? "free") !== "free").length;
   const mrr = companies.reduce((s, c) => s + (isPaying(c) ? (PLAN_PRICE[c.subscription?.plan ?? "free"] ?? 0) : 0), 0);
@@ -287,7 +291,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         <div className="glass kpi-card">
           <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Очакван месечен приход (MRR)</div>
           <div className="num" style={{ fontSize: 22, fontWeight: 600, color: "var(--emerald-dark)" }}>{mrr.toLocaleString("bg-BG")} €</div>
-          <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>{payingCount} платящи{trialingCount > 0 ? ` · ${trialingCount} в пробен период (не се броят)` : ""}</div>
+          <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>{payingCount} с потвърдено плащане{awaitingPaymentCount > 0 ? ` · ${awaitingPaymentCount} чакат плащане` : ""}{trialingCount > 0 ? ` · ${trialingCount} пробен период` : ""}</div>
         </div>
         <div className="glass kpi-card">
           <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Конверсия към платен план</div>
@@ -576,6 +580,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                 }))}
                 sub={{
                   status: c.subscription?.status ?? "active",
+                  paymentStatus: c.subscription?.paymentStatus ?? "pending",
                   periodStart: c.subscription?.currentPeriodStart?.toISOString() ?? null,
                   periodEnd: c.subscription?.currentPeriodEnd?.toISOString() ?? null,
                   trialUsed: c.subscription?.trialUsed ?? false,
