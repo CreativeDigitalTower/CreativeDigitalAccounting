@@ -239,6 +239,27 @@ export default function HomePage() {
       {/* Pricing */}
       <Pricing />
 
+      {/* Дигитални услуги + фирми, които ни се довериха */}
+      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "10px 32px 80px" }}>
+        <div className="glass panel" style={{ padding: "40px 32px", textAlign: "center" }}>
+          <div style={{ display: "inline-block", background: "var(--emerald-soft)", color: "var(--emerald-dark)", borderRadius: 20, padding: "5px 16px", fontSize: 12.5, fontWeight: 700, letterSpacing: 1, marginBottom: 18 }}>
+            И ОЩЕ НЕЩО
+          </div>
+          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 700, margin: "0 0 16px" }}>
+            Предлагаме и всички дигитални услуги за развитието на вашия бизнес
+          </h2>
+          <p style={{ fontSize: 16, color: "var(--ink-soft)", lineHeight: 1.7, maxWidth: 720, margin: "0 auto 22px" }}>
+            Изработка и поддръжка на сайт, маркетинг, графичен дизайн, създаване и управление на реклами,
+            поддръжка на социалните мрежи и цялостно маркетингово и дигитално обслужване. Ние сме фирма с
+            <strong> дългогодишен и доказан опит</strong> в тази сфера. Ако желаете да се възползвате от нашите услуги — свържете се с нас.
+          </p>
+          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+            <Link href="/services" className="btn btn-primary" style={{ fontSize: 15, padding: "12px 26px" }}>Разгледай услугите →</Link>
+            <Link href="/contact" className="btn btn-ghost" style={{ fontSize: 15, padding: "12px 26px" }}>Свържи се с нас</Link>
+          </div>
+        </div>
+      </section>
+
       {/* JSON-LD структурирани данни за SEO */}
       <script
         type="application/ld+json"

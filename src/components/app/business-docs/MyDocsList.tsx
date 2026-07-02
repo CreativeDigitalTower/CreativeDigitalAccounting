@@ -37,7 +37,12 @@ export function MyDocsList({ docs }: { docs: Doc[] }) {
     setBusy(true);
     try {
       const res = await fetch("/api/business-docs/bulk", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids }) });
-      const items: { title: string; contentHtml: string }[] = await res.json();
+      const data: { logoUrl: string | null; companyName: string; docs: { title: string; contentHtml: string }[] } = await res.json();
+      const items = data.docs;
+      const logoHtml = data.logoUrl
+        ? `<div style="text-align:right;margin-bottom:18px;"><img src="${data.logoUrl}" alt="${data.companyName}" style="max-height:48px;max-width:160px;object-fit:contain;" crossorigin="anonymous" /></div>`
+        : "";
+      const footerHtml = `<div style="margin-top:40px;padding-top:10px;border-top:1px solid #eee;display:flex;align-items:center;justify-content:center;gap:8px;font-size:10px;color:#9a9a90;"><img src="/cda-logo.png" alt="CDA" style="width:16px;height:16px;border-radius:50%;" crossorigin="anonymous" /><span>Генерирано чрез Creative Digital Accounting · www.CreativeDigitalAccounting.com</span></div>`;
       const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import("html2canvas-pro"), import("jspdf")]);
       const pdf = new jsPDF("p", "mm", "a4");
       const pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight(), m = 8, availH = ph - m * 2, iw = pw - m * 2;
@@ -49,7 +54,7 @@ export function MyDocsList({ docs }: { docs: Doc[] }) {
         const page = document.createElement("div");
         page.className = "bizdoc-page";
         page.style.cssText = "background:#fff;width:820px;padding:48px 56px;color:#16201C;";
-        page.innerHTML = it.contentHtml;
+        page.innerHTML = logoHtml + it.contentHtml + footerHtml;
         host.appendChild(page);
         await new Promise((r) => setTimeout(r, 60));
         const canvas = await html2canvas(page, { scale: 2, backgroundColor: "#ffffff", useCORS: true, logging: false });

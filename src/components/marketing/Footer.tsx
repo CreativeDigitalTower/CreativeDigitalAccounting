@@ -24,6 +24,7 @@ export function MarketingFooter() {
             <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--brass)", letterSpacing: 1, marginBottom: 14 }}>ПРОДУКТ</div>
             {[
               { href: "/software", label: "За Софтуера" },
+              { href: "/services", label: "Услуги" },
               { href: "/register", label: "Безплатна регистрация" },
               { href: "/login", label: "Вход за фирми" },
             ].map((l) => (

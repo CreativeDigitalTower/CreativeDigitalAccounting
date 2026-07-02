@@ -21,10 +21,11 @@ export async function POST(req: Request) {
       }
     }
 
-    // Записваме само ЕДНО посещение на посетител за деня (брой хора, не презареждания).
+    // Записваме само ЕДНО посещение на посетител за СТРАНИЦА за деня — така
+    // прегледите се броят по страници (вкл. /login и /register), без презарежданията.
     const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
     const existing = await prisma.siteVisit.findFirst({
-      where: { visitorId, area, createdAt: { gte: dayStart } },
+      where: { visitorId, area, path, createdAt: { gte: dayStart } },
       select: { id: true, userId: true },
     });
     if (existing) {

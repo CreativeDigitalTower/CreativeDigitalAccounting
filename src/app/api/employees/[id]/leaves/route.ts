@@ -8,6 +8,9 @@ const schema = z.object({
   startDate: z.string(),
   endDate: z.string(),
   note: z.string().optional().nullable(),
+  docName: z.string().optional().nullable(),
+  docMimeType: z.string().optional().nullable(),
+  docDataUrl: z.string().optional().nullable(),
 });
 
 function daysBetween(a: Date, b: Date) {
@@ -24,7 +27,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const start = new Date(data.startDate);
     const end = new Date(data.endDate);
     const leave = await prisma.employeeLeave.create({
-      data: { employeeId: id, type: data.type, startDate: start, endDate: end, days: daysBetween(start, end), note: data.note ?? null },
+      data: {
+        employeeId: id, type: data.type, startDate: start, endDate: end, days: daysBetween(start, end), note: data.note ?? null,
+        docName: data.docName ?? null, docMimeType: data.docMimeType ?? null, docDataUrl: data.docDataUrl ?? null,
+      },
+      select: { id: true, type: true, startDate: true, endDate: true, days: true, note: true, docName: true },
     });
     return NextResponse.json(leave);
   } catch (err) {

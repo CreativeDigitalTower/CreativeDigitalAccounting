@@ -4,7 +4,11 @@ import { useEffect, useState, Fragment } from "react";
 import { formatCurrency } from "@/lib/constants";
 import { calcPayroll, sumPayroll, EMPLOYEE_SSC_RATE, EMPLOYER_SSC_RATE } from "@/lib/payroll";
 
-type Leave = { id: string; type: string; startDate: string; endDate: string; days: number | null; note: string | null };
+type Leave = { id: string; type: string; startDate: string; endDate: string; days: number | null; note: string | null; docName?: string | null };
+
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result)); fr.onerror = rej; fr.readAsDataURL(file); });
+}
 type EmpFile = { id: string; name: string; docType: string | null; mimeType: string; size: number; uploadedAt: string };
 type Employee = {
   id: string; name: string; position: string | null; phone: string | null; email: string | null;
@@ -169,6 +173,8 @@ function LeavePanel({ employee }: { employee: Employee }) {
   const [leaves, setLeaves] = useState<Leave[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [form, setForm] = useState({ type: "leave", startDate: "", endDate: "", note: "" });
+  const [file, setFile] = useState<File | null>(null);
+  const [err, setErr] = useState("");
 
   useEffect(() => {
     // зареждане на отпуски за служителя
@@ -180,10 +186,31 @@ function LeavePanel({ employee }: { employee: Employee }) {
 
   async function add() {
     if (!form.startDate || !form.endDate) return;
+    setErr("");
+    let doc: { docName: string; docMimeType: string; docDataUrl: string } | null = null;
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { setErr("Файлът е твърде голям (макс. 5 MB)."); return; }
+      doc = { docName: file.name, docMimeType: file.type || "application/octet-stream", docDataUrl: await fileToDataUrl(file) };
+    }
     const res = await fetch(`/api/employees/${employee.id}/leaves`, {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form),
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, ...doc }),
     });
-    if (res.ok) { const l = await res.json(); setLeaves((p) => [l, ...p]); setForm({ type: "leave", startDate: "", endDate: "", note: "" }); }
+    if (res.ok) { const l = await res.json(); setLeaves((p) => [l, ...p]); setForm({ type: "leave", startDate: "", endDate: "", note: "" }); setFile(null); }
+    else setErr((await res.json()).error ?? "Грешка при запис.");
+  }
+
+  // Замяна/прикачване на документ към съществуващ отпуск
+  async function attachDoc(leaveId: string, f: File) {
+    if (f.size > 5 * 1024 * 1024) { setErr("Файлът е твърде голям (макс. 5 MB)."); return; }
+    const r = await fetch(`/api/employees/${employee.id}/leaves/${leaveId}/doc`, {
+      method: "PUT", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ docName: f.name, docMimeType: f.type || "application/octet-stream", docDataUrl: await fileToDataUrl(f) }),
+    });
+    if (r.ok) setLeaves((p) => p.map((x) => x.id === leaveId ? { ...x, docName: f.name } : x));
+  }
+  async function removeDoc(leaveId: string) {
+    const r = await fetch(`/api/employees/${employee.id}/leaves/${leaveId}/doc`, { method: "DELETE" });
+    if (r.ok) setLeaves((p) => p.map((x) => x.id === leaveId ? { ...x, docName: null } : x));
   }
   async function del(id: string) {
     const res = await fetch(`/api/employees/${employee.id}/leaves?leaveId=${id}`, { method: "DELETE" });
@@ -250,17 +277,39 @@ function LeavePanel({ employee }: { employee: Employee }) {
         <div><label style={{ fontSize: 11 }}>От</label><input type="date" value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} style={{ padding: "6px 8px", fontSize: 12.5 }} /></div>
         <div><label style={{ fontSize: 11 }}>До</label><input type="date" value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} style={{ padding: "6px 8px", fontSize: 12.5 }} /></div>
         <div style={{ flex: 1, minWidth: 120 }}><label style={{ fontSize: 11 }}>Бележка</label><input value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} style={{ padding: "6px 8px", fontSize: 12.5 }} /></div>
+        <div>
+          <label style={{ fontSize: 11 }}>Документ (по избор)</label>
+          <div>
+            <label className="btn btn-ghost btn-sm" style={{ cursor: "pointer" }}>
+              {file ? file.name.slice(0, 18) : "Прикачи…"}
+              <input type="file" hidden onChange={(e) => { setFile(e.target.files?.[0] ?? null); }} />
+            </label>
+          </div>
+        </div>
         <button className="btn btn-primary btn-sm" onClick={add}>+ Добави</button>
       </div>
+      {err && <div style={{ background: "var(--brick-soft)", color: "var(--brick)", borderRadius: 6, padding: "6px 10px", fontSize: 12, marginBottom: 8 }}>{err}</div>}
       <div style={{ fontSize: 12, fontWeight: 600, color: "var(--ink)", margin: "4px 0 6px" }}>Отпуски / болнични</div>
       {!loaded ? <div style={{ fontSize: 12, color: "var(--muted)" }}>Зареждане…</div> : leaves.length === 0 ? (
         <div style={{ fontSize: 12.5, color: "var(--muted)" }}>Няма записани отпуски/болнични.</div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           {leaves.map((l) => (
-            <div key={l.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, padding: "4px 0", borderBottom: "1px solid rgba(217,215,200,.4)" }}>
-              <span><strong>{LEAVE_LABELS[l.type]}</strong> · {new Date(l.startDate).toLocaleDateString("bg-BG")} – {new Date(l.endDate).toLocaleDateString("bg-BG")} ({l.days} дни){l.note ? ` · ${l.note}` : ""}</span>
-              <button onClick={() => del(l.id)} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer" }}>×</button>
+            <div key={l.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, fontSize: 12.5, padding: "5px 0", borderBottom: "1px solid rgba(217,215,200,.4)" }}>
+              <span>
+                <strong>{LEAVE_LABELS[l.type]}</strong> · {new Date(l.startDate).toLocaleDateString("bg-BG")} – {new Date(l.endDate).toLocaleDateString("bg-BG")} ({l.days} дни){l.note ? ` · ${l.note}` : ""}
+                {l.docName && (
+                  <a href={`/api/employees/${employee.id}/leaves/${l.id}/doc`} style={{ marginLeft: 8, color: "var(--navy)", fontWeight: 600 }}>↓ {l.docName}</a>
+                )}
+              </span>
+              <span style={{ display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
+                <label style={{ cursor: "pointer", color: "var(--muted)", fontSize: 11.5 }} title={l.docName ? "Замени документа" : "Прикачи документ"}>
+                  {l.docName ? "Замени" : "+ Документ"}
+                  <input type="file" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) attachDoc(l.id, f); e.target.value = ""; }} />
+                </label>
+                {l.docName && <button onClick={() => removeDoc(l.id)} style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: 11.5 }}>изтрий док.</button>}
+                <button onClick={() => del(l.id)} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer" }}>×</button>
+              </span>
             </div>
           ))}
         </div>
