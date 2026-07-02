@@ -11,6 +11,7 @@ const schema = z.object({
   companyId: z.string(),
   plan: z.enum(["free", "start", "business", "pro"]),
   status: z.enum(["active", "cancelled", "past_due", "trialing"]).optional(),
+  paymentStatus: z.enum(["received", "pending", "not_received"]).optional(),
   periodStart: z.string().optional().nullable(),
   periodEnd: z.string().optional().nullable(),
   trialUsed: z.boolean().optional(),
@@ -19,13 +20,14 @@ const schema = z.object({
 export async function POST(req: Request) {
   try {
     const { userId } = await requireSuperAdmin();
-    const { companyId, plan, status, periodStart, periodEnd, trialUsed } = schema.parse(await req.json());
+    const { companyId, plan, status, paymentStatus, periodStart, periodEnd, trialUsed } = schema.parse(await req.json());
 
     const prev = await prisma.subscription.findUnique({ where: { companyId }, select: { plan: true } });
 
     const data = {
       plan,
       ...(status ? { status } : {}),
+      ...(paymentStatus ? { paymentStatus } : {}),
       ...(periodStart !== undefined ? { currentPeriodStart: periodStart ? new Date(periodStart) : null } : {}),
       ...(periodEnd !== undefined ? { currentPeriodEnd: periodEnd ? new Date(periodEnd) : null } : {}),
       ...(trialUsed !== undefined ? { trialUsed } : {}),

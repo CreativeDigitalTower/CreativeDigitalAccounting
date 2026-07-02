@@ -987,6 +987,9 @@ model Subscription {
   companyId            String             @unique
   plan                 SubscriptionPlan   @default(free)
   status               SubscriptionStatus @default(active)
+  // Ръчно потвърждение от Супер Админ за реално получено плащане.
+  // Само „received" се отчита като продаден абонамент в статистиките (MRR/ARR).
+  paymentStatus        PaymentStatus      @default(pending)
   stripeSubscriptionId String?
   stripeCustomerId     String?
   currentPeriodStart   DateTime?
@@ -994,6 +997,12 @@ model Subscription {
   trialUsed            Boolean            @default(false)
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+enum PaymentStatus {
+  received      // Получено плащане
+  pending       // Изчаква се плащане
+  not_received  // Не е получено плащане
 }
 
 model UsageCounter {
