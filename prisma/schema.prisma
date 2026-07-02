@@ -121,6 +121,8 @@ model Company {
   emailPrefs      String?  @db.Text
   // JSON конфиг какви модули виждат служителите (роля employee): { projects, clients, suppliers, warehouse }
   employeeAccess  String?  @db.Text
+  // Меко изтриване (архив) от Супер Админ — фирмата се скрива, но данните се пазят.
+  archivedAt      DateTime?
   // Откъде е дошла регистрацията (напр. "invoice_portal" — клиент, получил фактура)
   referralSource  String?
   // Споделяне на документи към други регистрирани фирми през платформата (по подразбиране включено)
