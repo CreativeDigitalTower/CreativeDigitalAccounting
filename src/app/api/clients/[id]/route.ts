@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCompany } from "@/lib/session";
+import { validateEik } from "@/lib/validation/eik";
 import { z } from "zod";
 
 const schema = z.object({
@@ -29,6 +30,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const { companyId } = await requireCompany();
     const { id } = await params;
     const data = schema.parse(await req.json());
+
+    // Валидация на ЕИК/БУЛСТАT (ако е попълнен)
+    if (data.eik && data.eik.trim() !== "") {
+      const c = validateEik(data.eik);
+      if (!c.isValid) return NextResponse.json({ error: c.error ?? "Невалиден ЕИК/БУЛСТАТ." }, { status: 400 });
+      data.eik = c.normalized;
+    }
 
     const existing = await prisma.client.findUnique({ where: { id } });
     if (!existing || existing.companyId !== companyId) {

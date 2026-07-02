@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCompany } from "@/lib/session";
 import { audit } from "@/lib/documents";
+import { validateEik } from "@/lib/validation/eik";
 import { z } from "zod";
 
 const schema = z.object({
@@ -52,6 +53,23 @@ export async function PUT(req: Request) {
     }
 
     const data = schema.parse(await req.json());
+
+    // ── Валидация на ЕИК/БУЛСТАT + уникалност (ако е попълнен) ──
+    if (data.eik != null && String(data.eik).trim() !== "") {
+      const eikCheck = validateEik(data.eik);
+      if (!eikCheck.isValid) {
+        return NextResponse.json({ error: eikCheck.error ?? "Невалиден ЕИК/БУЛСТАТ." }, { status: 400 });
+      }
+      data.eik = eikCheck.normalized;
+      const dup = await prisma.company.findFirst({
+        where: { eik: eikCheck.normalized, id: { not: companyId } },
+        select: { id: true },
+      });
+      if (dup) {
+        return NextResponse.json({ error: "Фирма с този ЕИК/БУЛСТАТ вече е регистрирана." }, { status: 400 });
+      }
+    }
+
     const company = await prisma.company.update({
       where: { id: companyId },
       data,
