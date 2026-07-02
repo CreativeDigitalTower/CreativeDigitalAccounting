@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { UiIcon } from "@/components/app/NavIcons";
+import { confirmDelete } from "@/lib/confirmDelete";
 
 type Supplier = {
   id: string; name: string; eik: string | null; vatNumber: string | null; address: string | null; city: string | null;
@@ -15,7 +17,8 @@ const ROWS: [string, keyof Supplier][] = [
 
 export function SupplierInfoCard({ supplier }: { supplier: Supplier }) {
   const router = useRouter();
-  const [edit, setEdit] = useState(false);
+  const searchParams = useSearchParams();
+  const [edit, setEdit] = useState(searchParams.get("edit") === "1");
   const [f, setF] = useState(supplier);
   const [busy, setBusy] = useState(false);
 
@@ -33,11 +36,23 @@ export function SupplierInfoCard({ supplier }: { supplier: Supplier }) {
     if (res.ok) { setEdit(false); router.refresh(); }
   }
 
+  async function remove() {
+    if (!(await confirmDelete(`доставчика „${supplier.name}"`))) return;
+    setBusy(true);
+    const res = await fetch(`/api/suppliers/${supplier.id}`, { method: "DELETE" });
+    setBusy(false);
+    if (res.ok) router.push("/dashboard/suppliers");
+    else alert((await res.json().catch(() => ({}))).error ?? "Грешка при изтриване.");
+  }
+
   return (
     <div className="glass panel">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, gap: 8 }}>
         <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>Данни за доставчика</h3>
-        <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => (edit ? save() : setEdit(true))}>{edit ? (busy ? "Запазване…" : "Запази") : "✎ Редактирай"}</button>
+        <div style={{ display: "flex", gap: 6 }}>
+          <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => (edit ? save() : setEdit(true))} style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>{edit ? (busy ? "Запазване…" : "Запази") : <><UiIcon.edit /> Редактирай</>}</button>
+          {!edit && <button className="btn btn-ghost btn-sm" disabled={busy} onClick={remove} title="Изтрий доставчик" style={{ color: "var(--brick)", borderColor: "var(--brick)", display: "inline-flex", alignItems: "center" }}><UiIcon.trash /></button>}
+        </div>
       </div>
 
       {edit ? (

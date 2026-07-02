@@ -3,6 +3,8 @@
 import { useEffect, useState, Fragment } from "react";
 import { formatCurrency } from "@/lib/constants";
 import { calcPayroll, sumPayroll, EMPLOYEE_SSC_RATE, EMPLOYER_SSC_RATE } from "@/lib/payroll";
+import { confirmDelete } from "@/lib/confirmDelete";
+import { UiIcon } from "@/components/app/NavIcons";
 
 type Leave = { id: string; type: string; startDate: string; endDate: string; days: number | null; note: string | null; docName?: string | null };
 
@@ -128,7 +130,7 @@ export function EmployeesPanel({ initial }: { initial: Employee[] }) {
       <div className="glass panel" style={{ padding: "8px 0" }}>
         {employees.length === 0 ? (
           <div style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>🧑‍💼</div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, color: "var(--muted)" }}><UiIcon.people width={34} height={34} /></div>
             <div style={{ fontSize: 14 }}>Няма въведени служители</div>
           </div>
         ) : (
@@ -148,7 +150,7 @@ export function EmployeesPanel({ initial }: { initial: Employee[] }) {
                     <td style={{ fontSize: 13 }}>{e.email ?? "—"}</td>
                     <td className="num">{e.salary != null ? e.salary.toFixed(2) : "—"}</td>
                     <td style={{ display: "flex", gap: 6 }}>
-                      <button className="btn btn-ghost btn-sm" onClick={() => startEdit(e)}>✎</button>
+                      <button className="btn btn-ghost btn-sm" onClick={() => startEdit(e)} title="Редактирай" style={{ display: "inline-flex", alignItems: "center" }}><UiIcon.edit /></button>
                       <button className="btn btn-ghost btn-sm" style={{ color: "var(--brick)" }} onClick={() => remove(e.id)}>Изтрий</button>
                     </td>
                   </tr>
@@ -209,10 +211,12 @@ function LeavePanel({ employee }: { employee: Employee }) {
     if (r.ok) setLeaves((p) => p.map((x) => x.id === leaveId ? { ...x, docName: f.name } : x));
   }
   async function removeDoc(leaveId: string) {
+    if (!(await confirmDelete("прикачения документ"))) return;
     const r = await fetch(`/api/employees/${employee.id}/leaves/${leaveId}/doc`, { method: "DELETE" });
     if (r.ok) setLeaves((p) => p.map((x) => x.id === leaveId ? { ...x, docName: null } : x));
   }
   async function del(id: string) {
+    if (!(await confirmDelete("този запис за отпуск/болничен"))) return;
     const res = await fetch(`/api/employees/${employee.id}/leaves?leaveId=${id}`, { method: "DELETE" });
     if (res.ok) setLeaves((p) => p.filter((x) => x.id !== id));
   }

@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/constants";
 import { STATUSES } from "@/lib/crm";
 import { ContextMenu, type MenuItem } from "@/components/app/ContextMenu";
+import { UiIcon } from "@/components/app/NavIcons";
+import { confirmDelete } from "@/lib/confirmDelete";
 
 export type ClientRow = {
   id: string; name: string; contactPerson: string | null; phone: string | null;
@@ -34,7 +36,7 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
   }
 
   async function deleteClient(c: ClientRow) {
-    if (!confirm(`Изтриване на клиент „${c.name}"?\nТова действие е необратимо.`)) return;
+    if (!(await confirmDelete(`клиент „${c.name}"`))) return;
     const res = await fetch(`/api/clients/${c.id}`, { method: "DELETE" });
     if (res.ok) router.refresh();
     else alert((await res.json()).error ?? "Грешка при изтриване.");
@@ -42,13 +44,13 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
 
   function menuItems(c: ClientRow): MenuItem[] {
     return [
-      { label: "Отвори досие", icon: "👤", onClick: () => router.push(`/dashboard/clients/${c.id}`) },
-      { label: "Нова фактура", icon: "🧾", onClick: () => router.push(`/dashboard/documents/new?clientId=${c.id}`) },
-      { label: "Нова оферта", icon: "📄", onClick: () => router.push(`/dashboard/documents/new?clientId=${c.id}&type=quote`) },
+      { label: "Отвори досие", icon: <UiIcon.people width={15} height={15} />, onClick: () => router.push(`/dashboard/clients/${c.id}`) },
+      { label: "Нова фактура", icon: <UiIcon.doc width={15} height={15} />, onClick: () => router.push(`/dashboard/documents/new?clientId=${c.id}`) },
+      { label: "Нова оферта", icon: <UiIcon.doc width={15} height={15} />, onClick: () => router.push(`/dashboard/documents/new?clientId=${c.id}&type=quote`) },
       { divider: true, label: "", onClick: () => {} },
       { label: "Копирай име", icon: "⧉", onClick: () => navigator.clipboard?.writeText(c.name) },
       { label: "Обедини с друг клиент", icon: "⇄", onClick: () => { setMergeSource(c); setMergeTarget(""); } },
-      { label: "Изтрий клиент", icon: "🗑", danger: true, onClick: () => deleteClient(c) },
+      { label: "Изтрий клиент", icon: <UiIcon.trash width={15} height={15} />, danger: true, onClick: () => deleteClient(c) },
     ];
   }
 
@@ -83,7 +85,7 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
       {/* Търсене + филтри по статус */}
       <div className="glass panel" style={{ padding: "12px 16px", marginBottom: 14, display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
         <input
-          placeholder="🔍 Търси по име, лице за контакт или телефон…"
+          placeholder="Търси по име, лице за контакт или телефон…"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           style={{ flex: "1 1 280px", minWidth: 220, padding: "8px 12px" }}
@@ -122,7 +124,7 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
               <td style={{ display: "flex", gap: 6 }}>
                 <Link href={`/dashboard/clients/${client.id}`} className="btn btn-ghost btn-sm">Досие</Link>
                 <Link href={`/dashboard/documents/new?clientId=${client.id}`} className="btn btn-primary btn-sm">+ Фактура</Link>
-                <button onClick={() => deleteClient(client)} className="btn btn-ghost btn-sm" title="Изтрий клиент" style={{ color: "var(--brick)", borderColor: "var(--brick)" }}>🗑</button>
+                <button onClick={() => deleteClient(client)} className="btn btn-ghost btn-sm" title="Изтрий клиент" style={{ color: "var(--brick)", borderColor: "var(--brick)", display: "inline-flex", alignItems: "center" }}><UiIcon.trash /></button>
               </td>
             </tr>
           );
@@ -147,7 +149,7 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
             <div className="glass panel" style={{ padding: "8px 0" }}>
               {filtered.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "40px 0", color: "var(--muted)" }}>
-                  <div style={{ fontSize: 30, marginBottom: 10 }}>👥</div>
+                  <div style={{ display: "flex", justifyContent: "center", marginBottom: 10, color: "var(--muted)" }}><UiIcon.people width={32} height={32} /></div>
                   <div style={{ fontSize: 14, marginBottom: 14 }}>{clients.length === 0 ? "Няма клиенти" : "Няма съвпадения по търсенето"}</div>
                   {clients.length === 0 && <Link href="/dashboard/clients/new" className="btn btn-primary btn-sm">Добави клиент</Link>}
                 </div>

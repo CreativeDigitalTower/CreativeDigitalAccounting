@@ -58,7 +58,16 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const OWN_ACCOUNT_EMAIL = "office@creativedigitaltower.com";
   const isOwnAccount = (c: (typeof companies)[number]) =>
     c.companyUsers.some((cu) => cu.user?.email?.toLowerCase() === OWN_ACCOUNT_EMAIL);
-  const mrr = companies.reduce((s, c) => s + (isOwnAccount(c) ? 0 : (PLAN_PRICE[c.subscription?.plan ?? "free"] ?? 0)), 0);
+  // Реален платящ абонат: платен план + статус „active" (НЕ пробен/безплатен период,
+  // НЕ отменен/просрочен) и да не е собственият акаунт. Само тези влизат в MRR/ARR.
+  const isPaying = (c: (typeof companies)[number]) => {
+    const plan = c.subscription?.plan ?? "free";
+    return plan !== "free" && c.subscription?.status === "active" && !isOwnAccount(c);
+  };
+  const payingCount = companies.filter(isPaying).length;
+  // Фирми в пробен (безплатен) период — показваме ги отделно, но НЕ като приход.
+  const trialingCount = companies.filter((c) => c.subscription?.status === "trialing" && (c.subscription?.plan ?? "free") !== "free").length;
+  const mrr = companies.reduce((s, c) => s + (isPaying(c) ? (PLAN_PRICE[c.subscription?.plan ?? "free"] ?? 0) : 0), 0);
   const conversion = companies.length ? Math.round((paidCount / companies.length) * 100) : 0;
 
   // Сектори
@@ -277,6 +286,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         <div className="glass kpi-card">
           <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Очакван месечен приход (MRR)</div>
           <div className="num" style={{ fontSize: 22, fontWeight: 600, color: "var(--emerald-dark)" }}>{mrr.toLocaleString("bg-BG")} €</div>
+          <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>{payingCount} платящи{trialingCount > 0 ? ` · ${trialingCount} в пробен период (не се броят)` : ""}</div>
         </div>
         <div className="glass kpi-card">
           <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Конверсия към платен план</div>

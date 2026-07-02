@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/constants";
 import { STATUSES, STAGES, TASK_TYPES } from "@/lib/crm";
+import { confirmDelete } from "@/lib/confirmDelete";
 
 // Реекспорт за обратна съвместимост (стари импорти от този модул).
 export { STATUSES, STAGES } from "@/lib/crm";
@@ -180,7 +181,7 @@ function ContactsCard({ clientId, initial }: { clientId: string; initial: Contac
     const res = await fetch(`/api/clients/${clientId}/contacts`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(f) });
     if (res.ok) { setList([...list, await res.json()]); setF({ name: "", position: "", phone: "", email: "" }); }
   }
-  async function del(id: string) { const r = await fetch(`/api/clients/${clientId}/contacts?contactId=${id}`, { method: "DELETE" }); if (r.ok) setList(list.filter((c) => c.id !== id)); }
+  async function del(id: string) { if (!(await confirmDelete("този контакт"))) return; const r = await fetch(`/api/clients/${clientId}/contacts?contactId=${id}`, { method: "DELETE" }); if (r.ok) setList(list.filter((c) => c.id !== id)); }
   return (
     <div className="glass panel">
       <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 10px" }}>Контактни лица</h3>
@@ -213,7 +214,7 @@ function TasksCard({ clientId, initial }: { clientId: string; initial: Task[] })
     if (res.ok) { setList([await res.json(), ...list]); setTitle(""); setDue(""); }
   }
   async function toggle(t: Task) { await fetch(`/api/clients/${clientId}/tasks`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ taskId: t.id, done: !t.done }) }); setList(list.map((x) => x.id === t.id ? { ...x, done: !x.done } : x)); }
-  async function del(id: string) { const r = await fetch(`/api/clients/${clientId}/tasks?taskId=${id}`, { method: "DELETE" }); if (r.ok) setList(list.filter((t) => t.id !== id)); }
+  async function del(id: string) { if (!(await confirmDelete("тази задача"))) return; const r = await fetch(`/api/clients/${clientId}/tasks?taskId=${id}`, { method: "DELETE" }); if (r.ok) setList(list.filter((t) => t.id !== id)); }
   const tIcon = (t: string | null) => TASK_TYPES.find((x) => x.id === t)?.icon ?? "•";
   return (
     <div className="glass panel">
@@ -344,7 +345,7 @@ function FilesCard({ clientId, initial }: { clientId: string; initial: FileRow[]
     if (resp.ok) { const f = await resp.json(); setList([{ id: f.id, name: f.name, size: file.size, uploadedAt: new Date().toISOString() }, ...list]); }
     else setErr((await resp.json()).error ?? "Грешка при качване.");
   }
-  async function del(id: string) { const r = await fetch(`/api/clients/${clientId}/files?fileId=${id}`, { method: "DELETE" }); if (r.ok) setList(list.filter((f) => f.id !== id)); }
+  async function del(id: string) { if (!(await confirmDelete("този файл"))) return; const r = await fetch(`/api/clients/${clientId}/files?fileId=${id}`, { method: "DELETE" }); if (r.ok) setList(list.filter((f) => f.id !== id)); }
   const fmt = (b: number) => b < 1024 * 1024 ? `${(b / 1024).toFixed(1)} KB` : `${(b / 1024 / 1024).toFixed(1)} MB`;
   return (
     <div className="glass panel">
