@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/constants";
+import { UiIcon } from "@/components/app/NavIcons";
+import { confirmDelete } from "@/lib/confirmDelete";
 
 export const ASSET_STATUSES = [
   { id: "in_use", label: "В употреба", color: "var(--emerald)" },
@@ -40,6 +42,15 @@ export function AssetDetail({ asset, children }: { asset: Asset; children?: Reac
     setBusy(false); router.refresh();
   }
 
+  async function remove() {
+    if (!(await confirmDelete(`актива „${a.name}"`))) return;
+    setBusy(true);
+    const res = await fetch(`/api/assets/${a.id}`, { method: "DELETE" });
+    setBusy(false);
+    if (res.ok) router.push("/dashboard/assets");
+    else alert((await res.json().catch(() => ({}))).error ?? "Грешка при изтриване.");
+  }
+
   const F = ({ label, k, type = "text" }: { label: string; k: keyof Asset; type?: string }) => (
     <div><label style={{ fontSize: 12 }}>{label}</label>
       <input type={type} value={type === "date" ? ((a[k] as string)?.slice(0, 10) ?? "") : ((a[k] as string | number) ?? "")}
@@ -60,7 +71,8 @@ export function AssetDetail({ asset, children }: { asset: Asset; children?: Reac
               {ASSET_STATUSES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
             </select>
           </label>
-          <button className="btn btn-ghost btn-sm" onClick={() => setEdit(!edit)}>{edit ? "Затвори" : "✎ Редактирай"}</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => setEdit(!edit)} style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>{edit ? "Затвори" : <><UiIcon.edit /> Редактирай</>}</button>
+          <button className="btn btn-ghost btn-sm" onClick={remove} disabled={busy} title="Изтрий актив" style={{ color: "var(--brick)", borderColor: "var(--brick)", display: "inline-flex", alignItems: "center" }}><UiIcon.trash /></button>
         </div>
       </div>
 
