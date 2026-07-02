@@ -5,6 +5,7 @@ import { formatCurrency } from "@/lib/constants";
 import { calcPayroll, sumPayroll, EMPLOYEE_SSC_RATE, EMPLOYER_SSC_RATE } from "@/lib/payroll";
 import { confirmDelete } from "@/lib/confirmDelete";
 import { UiIcon } from "@/components/app/NavIcons";
+import { EMPLOYEE_ACCESS_MODULES, type EmployeeAccess } from "@/lib/employeeAccess";
 
 type Leave = { id: string; type: string; startDate: string; endDate: string; days: number | null; note: string | null; docName?: string | null; status?: string; requestedByEmployee?: boolean; reviewNote?: string | null };
 
@@ -25,7 +26,7 @@ const CONTRACT_LABELS: Record<string, string> = { permanent: "Безсрочен
 const BONUS_LABELS: Record<string, string> = { cash: "Паричен", voucher: "Ваучер", performance: "За резултати", holiday: "Празничен", other: "Друго" };
 const empty = { name: "", position: "", phone: "", email: "", address: "", salary: "", hiredAt: "", paidLeaveDays: "20", notes: "", department: "", contractType: "permanent", paymentMethod: "bank", iban: "", bankName: "" };
 
-export function EmployeesPanel({ initial }: { initial: Employee[] }) {
+export function EmployeesPanel({ initial, access }: { initial: Employee[]; access: EmployeeAccess }) {
   const [employees, setEmployees] = useState<Employee[]>(initial);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
@@ -82,6 +83,8 @@ export function EmployeesPanel({ initial }: { initial: Employee[] }) {
         </div>
         <button className="btn btn-primary" onClick={startAdd}>+ Нов служител</button>
       </div>
+
+      <EmployeeAccessSettings initial={access} />
 
       {(() => {
         const gross = employees.filter((e) => e.active).map((e) => e.salary ?? 0);
@@ -389,6 +392,50 @@ const DOC_TYPES = ["Трудов договор", "Допълнително сп
 
 const MONTHS_BG = ["Януари", "Февруари", "Март", "Април", "Май", "Юни", "Юли", "Август", "Септември", "Октомври", "Ноември", "Декември"];
 type Bonus = { id: string; year: number; month: number; amount: number; kind: string; note: string | null };
+
+function EmployeeAccessSettings({ initial }: { initial: EmployeeAccess }) {
+  const [acc, setAcc] = useState<EmployeeAccess>(initial);
+  const [open, setOpen] = useState(false);
+  const [msg, setMsg] = useState("");
+  const enabledCount = Object.values(acc).filter(Boolean).length;
+
+  async function save(next: EmployeeAccess) {
+    setAcc(next); setMsg("");
+    const r = await fetch("/api/company/employee-access", {
+      method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(next),
+    });
+    setMsg(r.ok ? "Запазено ✓" : ((await r.json().catch(() => ({}))).error ?? "Грешка"));
+    setTimeout(() => setMsg(""), 2000);
+  }
+
+  return (
+    <div className="glass panel" style={{ marginBottom: 16 }}>
+      <button onClick={() => setOpen((v) => !v)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, width: "100%", textAlign: "left", padding: 0 }}>
+        <span style={{ color: "var(--muted)" }}>{open ? "▼" : "▶"}</span>
+        <span style={{ fontFamily: "'Fraunces', serif", fontSize: 15, fontWeight: 700 }}>Достъп на служителите до модули</span>
+        <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--muted)" }}>{enabledCount === 0 ? "нищо споделено" : `${enabledCount} модула`}{msg && <strong style={{ color: "var(--emerald-dark)", marginLeft: 8 }}>{msg}</strong>}</span>
+      </button>
+      {open && (
+        <div style={{ marginTop: 12 }}>
+          <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 12px" }}>
+            Изберете кои модули да виждат служителите в портала си. Достъпът е <strong>само за четене</strong> и с <strong>скрити чувствителни данни</strong> (финанси, контакти на клиенти), за да не изтичат данни.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))", gap: 10 }}>
+            {EMPLOYEE_ACCESS_MODULES.map((m) => (
+              <label key={m.key} style={{ display: "flex", gap: 10, alignItems: "flex-start", background: "rgba(255,255,255,.5)", borderRadius: 8, padding: "10px 12px", cursor: "pointer", fontWeight: 400 }}>
+                <input type="checkbox" checked={acc[m.key]} onChange={(e) => save({ ...acc, [m.key]: e.target.checked })} style={{ width: "auto", marginTop: 2 }} />
+                <span>
+                  <span style={{ fontSize: 13, fontWeight: 600, display: "block" }}>{m.label}</span>
+                  <span style={{ fontSize: 11.5, color: "var(--muted)" }}>{m.note}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function PortalInvite({ employee }: { employee: Employee }) {
   const [linked, setLinked] = useState(!!employee.userId);
