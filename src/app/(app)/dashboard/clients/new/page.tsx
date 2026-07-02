@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { validateEik } from "@/lib/validation/eik";
 
 type Form = { name: string; eik: string; vatNumber: string; contactPerson: string; mol: string; address: string; city: string; contactEmail: string; phone: string };
 const EMPTY: Form = { name: "", eik: "", vatNumber: "", contactPerson: "", mol: "", address: "", city: "", contactEmail: "", phone: "" };
@@ -13,12 +14,18 @@ export default function NewClientPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [match, setMatch] = useState<{ name: string; eik: string; vatNumber: string | null; address: string | null; city: string | null; mol: string | null } | null>(null);
+  const [eikErr, setEikErr] = useState("");
 
   function set<K extends keyof Form>(k: K, v: string) { setF((p) => ({ ...p, [k]: v })); }
 
   async function lookupEik() {
     const eik = f.eik.trim();
     setMatch(null);
+    if (!eik) { setEikErr(""); return; }
+    // Валидация на формат + контролна цифра (ЕИК не е задължителен за клиент)
+    const v = validateEik(eik, { required: false });
+    setEikErr(v.isValid ? "" : (v.error ?? "Невалиден ЕИК/БУЛСТАТ."));
+    if (!v.isValid) return;
     if (eik.length < 5) return;
     try {
       const res = await fetch(`/api/companies/lookup?eik=${encodeURIComponent(eik)}`);
@@ -42,6 +49,10 @@ export default function NewClientPage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (f.eik.trim()) {
+      const v = validateEik(f.eik, { required: false });
+      if (!v.isValid) { setEikErr(v.error ?? "Невалиден ЕИК/БУЛСТАТ."); setError(v.error ?? "Невалиден ЕИК/БУЛСТАТ."); return; }
+    }
     setSaving(true);
     setError("");
     const res = await fetch("/api/clients", {
@@ -80,7 +91,11 @@ export default function NewClientPage() {
           <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 16, margin: "0 0 18px" }}>Основни данни</h3>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14 }}>
             <div style={{ gridColumn: "1 / -1" }}><label>Наименование / Пълно име *</label><input value={f.name} onChange={(e) => set("name", e.target.value)} required placeholder="ЕООД Примерна" /></div>
-            <div><label>ЕИК / Булстат</label><input value={f.eik} onChange={(e) => set("eik", e.target.value)} onBlur={lookupEik} placeholder="123456789" /></div>
+            <div>
+              <label>ЕИК / Булстат</label>
+              <input value={f.eik} onChange={(e) => { set("eik", e.target.value); if (eikErr) setEikErr(""); }} onBlur={lookupEik} placeholder="123456789" style={eikErr ? { borderColor: "var(--brick)" } : undefined} />
+              {eikErr && <div style={{ color: "var(--brick)", fontSize: 11.5, marginTop: 3 }}>{eikErr}</div>}
+            </div>
             <div><label>ДДС номер</label><input value={f.vatNumber} onChange={(e) => set("vatNumber", e.target.value)} placeholder="BG123456789" /></div>
             <div><label>Контактно лице</label><input value={f.contactPerson} onChange={(e) => set("contactPerson", e.target.value)} placeholder="Иван Иванов" /></div>
             <div><label>МОЛ</label><input value={f.mol} onChange={(e) => set("mol", e.target.value)} placeholder="Иван Иванов" /></div>

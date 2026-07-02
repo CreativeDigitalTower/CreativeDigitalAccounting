@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCompany, getPlan } from "@/lib/session";
 import { SUBSCRIPTION_PLANS } from "@/lib/constants";
+import { validateEik } from "@/lib/validation/eik";
 import { z } from "zod";
 
 const schema = z.object({
@@ -42,6 +43,13 @@ export async function POST(req: Request) {
     }
     const body = await req.json();
     const data = schema.parse(body);
+
+    // ── Валидация на ЕИК/БУЛСТАT (формат + контролна цифра), ако е попълнен ──
+    if (data.eik && data.eik.trim() !== "") {
+      const c = validateEik(data.eik);
+      if (!c.isValid) return NextResponse.json({ error: c.error ?? "Невалиден ЕИК/БУЛСТАТ." }, { status: 400 });
+      data.eik = c.normalized;
+    }
 
     // Без дублиране: ако вече има клиент със същия ЕИК (или същото име), връщаме него.
     const eik = data.eik?.trim();

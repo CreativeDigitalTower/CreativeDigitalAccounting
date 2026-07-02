@@ -7,6 +7,7 @@ import { signIn } from "next-auth/react";
 import { metaTrack } from "@/lib/metaClient";
 import { PLAN_DETAILS, BILLING_PERIODS } from "@/components/marketing/Pricing";
 import { EUR_TO_BGN, isPromoActive } from "@/lib/constants";
+import { validateEik } from "@/lib/validation/eik";
 
 const SECTORS = ["Търговия", "Услуги", "Производство", "IT / Софтуер", "Строителство", "Транспорт", "Туризъм / Ресторантьорство", "Земеделие", "Здравеопазване", "Образование", "Финанси", "Свободна професия", "Друг"];
 
@@ -20,8 +21,17 @@ function RegisterForm() {
   const [step, setStep] = useState<"account" | "company">("account");
   const promo = isPromoActive();
   const [acc, setAcc] = useState({ name: "", representativeRole: "", email: "", email2: "", password: "", password2: "" });
+  const [eik, setEik] = useState("");
+  const [eikErr, setEikErr] = useState("");
+  const [companyPhone, setCompanyPhone] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  function checkEik() {
+    const r = validateEik(eik);
+    setEikErr(r.isValid ? "" : (r.error ?? "Невалиден ЕИК/БУЛСТАТ."));
+    return r;
+  }
 
   function nextStep(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -38,11 +48,15 @@ function RegisterForm() {
     const fd = new FormData(e.currentTarget);
     if (!fd.get("acceptTerms")) { setLoading(false); setError("Трябва да приемете Общите условия и Политиката за поверителност."); return; }
 
+    // Валидация на ЕИК/БУЛСТАT преди изпращане
+    const eikCheck = checkEik();
+    if (!eikCheck.isValid) { setLoading(false); setError(eikCheck.error ?? "Невалиден ЕИК/БУЛСТАТ."); return; }
+
     const res = await fetch("/api/auth/register", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: acc.name, email: acc.email, password: acc.password, representativeRole: acc.representativeRole,
-        companyName: fd.get("companyName"), eik: fd.get("eik"), vatNumber: fd.get("vatNumber") || undefined,
+        companyName: fd.get("companyName"), eik: eikCheck.normalized, phone: companyPhone || undefined, vatNumber: fd.get("vatNumber") || undefined,
         address: fd.get("address") || undefined, city: fd.get("city") || undefined, mol: fd.get("mol") || undefined,
         sector: fd.get("sector") || undefined, plan,
         referralSource: params.get("ref") || undefined,
@@ -112,7 +126,16 @@ function RegisterForm() {
           <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 13 }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <div><label>Наименование на фирмата *</label><input type="text" name="companyName" required placeholder="ЕООД Примерна" /></div>
-              <div><label>ЕИК / Булстат *</label><input type="text" name="eik" required /></div>
+              <div>
+                <label>ЕИК / Булстат *</label>
+                <input type="text" name="eik" required value={eik} inputMode="numeric"
+                  onChange={(e) => { setEik(e.target.value); if (eikErr) setEikErr(""); }}
+                  onBlur={checkEik}
+                  style={eikErr ? { borderColor: "var(--brick)" } : undefined}
+                  placeholder="9 или 13 цифри" />
+                {eikErr && <div style={{ color: "var(--brick)", fontSize: 11.5, marginTop: 3 }}>{eikErr}</div>}
+              </div>
+              <div><label>Телефон на фирмата *</label><input type="tel" required value={companyPhone} onChange={(e) => setCompanyPhone(e.target.value)} placeholder="+359..." /></div>
               <div><label>ДДС номер (ако е приложимо)</label><input type="text" name="vatNumber" placeholder="BG..." /></div>
               <div><label>МОЛ *</label><input type="text" name="mol" required /></div>
               <div><label>Град *</label><input type="text" name="city" required /></div>

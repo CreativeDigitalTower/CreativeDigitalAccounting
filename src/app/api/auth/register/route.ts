@@ -7,6 +7,7 @@ import crypto from "crypto";
 import { sendEmail, notifyAdmin } from "@/lib/email/send";
 import { welcomeEmail, adminNewRegistrationEmail } from "@/lib/email/messages";
 import { APP_URL } from "@/lib/email/templates";
+import { validateEik } from "@/lib/validation/eik";
 
 const schema = z.object({
   name: z.string().min(2),
@@ -15,6 +16,7 @@ const schema = z.object({
   representativeRole: z.string().optional(),
   companyName: z.string().min(2),
   eik: z.string().min(1),
+  phone: z.string().optional(),
   vatNumber: z.string().optional(),
   address: z.string().optional(),
   city: z.string().optional(),
@@ -33,6 +35,18 @@ export async function POST(req: Request) {
     }
     const body = await req.json();
     const data = schema.parse(body);
+
+    // ── Валидация на ЕИК/БУЛСТАT (формат + контролна цифра, само локално) ──
+    const eikCheck = validateEik(data.eik);
+    if (!eikCheck.isValid) {
+      return NextResponse.json({ error: eikCheck.error ?? "Невалиден ЕИК/БУЛСТАТ." }, { status: 400 });
+    }
+    const eik = eikCheck.normalized;
+    // ── Уникалност: да няма вече регистрирана фирма със същия ЕИК ──
+    const dup = await prisma.company.findFirst({ where: { eik }, select: { id: true } });
+    if (dup) {
+      return NextResponse.json({ error: "Фирма с този ЕИК/БУЛСТАТ вече е регистрирана." }, { status: 400 });
+    }
 
     const existing = await prisma.user.findUnique({
       where: { email: data.email },
@@ -68,7 +82,7 @@ export async function POST(req: Request) {
 
       const company = await tx.company.create({
         data: {
-          name: data.companyName, eik: data.eik, vatNumber: data.vatNumber,
+          name: data.companyName, eik, phone: data.phone || null, vatNumber: data.vatNumber,
           address: data.address, city: data.city, mol: data.mol, sector: data.sector,
           referralSource: data.referralSource ?? null,
         },
