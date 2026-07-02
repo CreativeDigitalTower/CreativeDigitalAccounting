@@ -10,6 +10,7 @@ export default async function EmployeesPage() {
     address: e.address, salary: e.salary, hiredAt: e.hiredAt?.toISOString() ?? null,
     paidLeaveDays: e.paidLeaveDays, notes: e.notes, active: e.active,
     department: e.department, contractType: e.contractType, paymentMethod: e.paymentMethod, iban: e.iban, bankName: e.bankName,
+    userId: e.userId,
   }));
   return <EmployeesPanel initial={employees} />;
 }
