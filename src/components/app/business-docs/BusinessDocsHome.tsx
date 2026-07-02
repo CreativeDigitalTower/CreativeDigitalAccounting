@@ -44,17 +44,30 @@ export function BusinessDocsHome({ categories, templates, recent, favorites, rec
         )}
       </div>
 
+      {/* Открояваща се връзка към създадените документи — за да е ясно къде са генерираните договори */}
+      <Link href="/dashboard/business-docs/all" className="glass panel" style={{
+        display: "flex", alignItems: "center", gap: 14, marginBottom: 16, padding: "16px 20px", textDecoration: "none", color: "inherit",
+        borderLeft: "4px solid var(--emerald)", background: "linear-gradient(120deg, rgba(15,138,106,.10), rgba(15,138,106,.02))",
+      }}>
+        <span className="icon-tile" style={{ width: 42, height: 42, borderRadius: 12, flexShrink: 0 }}>{docCategoryIcon("policies", 22)}</span>
+        <span style={{ flex: 1 }}>
+          <span style={{ display: "block", fontFamily: "'Fraunces', serif", fontSize: 16, fontWeight: 700 }}>Моите създадени документи</span>
+          <span style={{ display: "block", fontSize: 12.5, color: "var(--ink-soft)" }}>Всички генерирани от вас договори и документи — на едно място.</span>
+        </span>
+        <span className="btn btn-primary btn-sm">Отвори →</span>
+      </Link>
+
       {/* Бързи действия */}
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 16 }}>
         <Link href="/dashboard/business-docs/category/contracts" className="btn btn-primary btn-sm">Нов договор</Link>
         <Link href="/dashboard/business-docs/category/company" className="btn btn-ghost btn-sm">Заповед / Решение</Link>
         <Link href="/dashboard/business-docs/category/hr" className="btn btn-ghost btn-sm">Документ за персонал</Link>
-        <Link href="/dashboard/business-docs/all" className="btn btn-ghost btn-sm">Създадени документи →</Link>
       </div>
 
       {/* Дисклеймър */}
       <div className="glass panel" style={{ padding: "12px 16px", marginBottom: 24, fontSize: 12.5, color: "var(--ink-soft)", borderLeft: "4px solid var(--brass)" }}>
-        ℹ Това са предложени <strong>стандартни шаблони</strong> за улеснение на вашата работа. За конкретни юридически казуси препоръчваме да се консултирате със специалист (юрист/счетоводител), преди да използвате документа.
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: "-2px", marginRight: 4 }}><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 7.5h.01" /></svg>
+        Това са предложени <strong>стандартни шаблони</strong> за улеснение на вашата работа. За конкретни юридически казуси препоръчваме да се консултирате със специалист (юрист/счетоводител), преди да използвате документа.
       </div>
 
       {/* Последни + любими */}

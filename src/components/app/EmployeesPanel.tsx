@@ -15,11 +15,14 @@ type EmpFile = { id: string; name: string; docType: string | null; mimeType: str
 type Employee = {
   id: string; name: string; position: string | null; phone: string | null; email: string | null;
   address: string | null; salary: number | null; hiredAt: string | null; paidLeaveDays: number; notes: string | null; active: boolean;
+  department?: string | null; contractType?: string | null; paymentMethod?: string | null; iban?: string | null; bankName?: string | null;
   leaves?: Leave[];
 };
 
 const LEAVE_LABELS: Record<string, string> = { leave: "Платен отпуск", sick: "Болничен", unpaid: "Неплатен отпуск", other: "Друго" };
-const empty = { name: "", position: "", phone: "", email: "", address: "", salary: "", hiredAt: "", paidLeaveDays: "20", notes: "" };
+const CONTRACT_LABELS: Record<string, string> = { permanent: "Безсрочен трудов", fixed_term: "Срочен трудов", civil: "Граждански" };
+const BONUS_LABELS: Record<string, string> = { cash: "Паричен", voucher: "Ваучер", performance: "За резултати", holiday: "Празничен", other: "Друго" };
+const empty = { name: "", position: "", phone: "", email: "", address: "", salary: "", hiredAt: "", paidLeaveDays: "20", notes: "", department: "", contractType: "permanent", paymentMethod: "bank", iban: "", bankName: "" };
 
 export function EmployeesPanel({ initial }: { initial: Employee[] }) {
   const [employees, setEmployees] = useState<Employee[]>(initial);
@@ -44,6 +47,8 @@ export function EmployeesPanel({ initial }: { initial: Employee[] }) {
       name: e.name, position: e.position ?? "", phone: e.phone ?? "", email: e.email ?? "",
       address: e.address ?? "", salary: e.salary != null ? String(e.salary) : "", hiredAt: e.hiredAt?.slice(0, 10) ?? "",
       paidLeaveDays: String(e.paidLeaveDays ?? 20), notes: e.notes ?? "",
+      department: e.department ?? "", contractType: e.contractType ?? "permanent",
+      paymentMethod: e.paymentMethod ?? "bank", iban: e.iban ?? "", bankName: e.bankName ?? "",
     });
     setEditing(e.id); setShowForm(true); setError("");
   }
@@ -117,6 +122,22 @@ export function EmployeesPanel({ initial }: { initial: Employee[] }) {
             <div><label>Заплата (бруто)</label><input type="number" value={form.salary} onChange={(e) => setForm({ ...form, salary: e.target.value })} /></div>
             <div><label>Дата на назначаване</label><input type="date" value={form.hiredAt} onChange={(e) => setForm({ ...form, hiredAt: e.target.value })} /></div>
             <div><label>Годишен платен отпуск (дни)</label><input type="number" min="0" value={form.paidLeaveDays} onChange={(e) => setForm({ ...form, paidLeaveDays: e.target.value })} /></div>
+            <div><label>Отдел / звено</label><input value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} /></div>
+            <div><label>Вид договор</label>
+              <select value={form.contractType} onChange={(e) => setForm({ ...form, contractType: e.target.value })}>
+                {Object.entries(CONTRACT_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              </select>
+            </div>
+            <div><label>Метод на получаване</label>
+              <select value={form.paymentMethod} onChange={(e) => setForm({ ...form, paymentMethod: e.target.value })}>
+                <option value="bank">По банкова сметка</option>
+                <option value="cash">В брой</option>
+              </select>
+            </div>
+            {form.paymentMethod === "bank" && <>
+              <div><label>IBAN</label><input value={form.iban} onChange={(e) => setForm({ ...form, iban: e.target.value })} placeholder="BG.." /></div>
+              <div><label>Банка</label><input value={form.bankName} onChange={(e) => setForm({ ...form, bankName: e.target.value })} /></div>
+            </>}
             <div style={{ gridColumn: "1 / -1" }}><label>Адрес</label><input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
             <div style={{ gridColumn: "1 / -1" }}><label>Бележки</label><textarea rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></div>
           </div>
@@ -231,8 +252,18 @@ function LeavePanel({ employee }: { employee: Employee }) {
 
   return (
     <div>
+      {/* Основни данни */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10, fontSize: 12 }}>
+        {employee.department && <span style={{ background: "rgba(255,255,255,.5)", borderRadius: 12, padding: "2px 10px" }}>Отдел: <strong>{employee.department}</strong></span>}
+        {employee.contractType && <span style={{ background: "rgba(255,255,255,.5)", borderRadius: 12, padding: "2px 10px" }}>Договор: <strong>{CONTRACT_LABELS[employee.contractType] ?? employee.contractType}</strong></span>}
+        <span style={{ background: "rgba(255,255,255,.5)", borderRadius: 12, padding: "2px 10px" }}>Заплата: <strong>{employee.paymentMethod === "cash" ? "в брой" : "по банкова сметка"}</strong></span>
+        {employee.paymentMethod !== "cash" && employee.iban && <span style={{ background: "rgba(255,255,255,.5)", borderRadius: 12, padding: "2px 10px" }}>IBAN: <strong>{employee.iban}</strong>{employee.bankName ? ` (${employee.bankName})` : ""}</span>}
+      </div>
       {employee.address && <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginBottom: 6 }}>Адрес: {employee.address}</div>}
       {employee.notes && <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginBottom: 10 }}>Бележки: {employee.notes}</div>}
+
+      {/* Бонуси */}
+      <BonusesPanel employeeId={employee.id} />
 
       {/* Разбивка на заплатата */}
       {(employee.salary ?? 0) > 0 && (
@@ -323,6 +354,65 @@ function LeavePanel({ employee }: { employee: Employee }) {
 }
 
 const DOC_TYPES = ["Трудов договор", "Допълнително споразумение", "Молба за отпуск", "Молба за напускане", "Болничен лист", "Длъжностна характеристика", "Друго"];
+
+const MONTHS_BG = ["Януари", "Февруари", "Март", "Април", "Май", "Юни", "Юли", "Август", "Септември", "Октомври", "Ноември", "Декември"];
+type Bonus = { id: string; year: number; month: number; amount: number; kind: string; note: string | null };
+
+function BonusesPanel({ employeeId }: { employeeId: string }) {
+  const [list, setList] = useState<Bonus[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const now = new Date();
+  const [f, setF] = useState({ year: String(now.getFullYear()), month: String(now.getMonth()), amount: "", kind: "cash", note: "" });
+
+  useEffect(() => {
+    fetch(`/api/employees/${employeeId}/bonuses`).then(async (r) => {
+      if (r.ok) setList(await r.json());
+      setLoaded(true);
+    }).catch(() => setLoaded(true));
+  }, [employeeId]);
+
+  async function add() {
+    if (!f.amount) return;
+    const r = await fetch(`/api/employees/${employeeId}/bonuses`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ year: Number(f.year), month: Number(f.month), amount: Number(f.amount), kind: f.kind, note: f.note || null }),
+    });
+    if (r.ok) { const b = await r.json(); setList((p) => [b, ...p]); setF({ ...f, amount: "", note: "" }); }
+  }
+  async function del(id: string) {
+    if (!(await confirmDelete("този бонус"))) return;
+    const r = await fetch(`/api/employees/${employeeId}/bonuses?bonusId=${id}`, { method: "DELETE" });
+    if (r.ok) setList((p) => p.filter((x) => x.id !== id));
+  }
+
+  const total = list.reduce((s, b) => s + b.amount, 0);
+
+  return (
+    <div style={{ marginBottom: 14, paddingBottom: 12, borderBottom: "1px solid rgba(217,215,200,.5)" }}>
+      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--ink)", marginBottom: 8 }}>Бонуси {total > 0 && <span style={{ color: "var(--emerald-dark)", fontWeight: 700 }}>· общо {formatCurrency(total)}</span>}</div>
+      <div style={{ display: "flex", gap: 8, alignItems: "flex-end", flexWrap: "wrap", marginBottom: 10 }}>
+        <div><label style={{ fontSize: 11 }}>Месец</label><select value={f.month} onChange={(e) => setF({ ...f, month: e.target.value })} style={{ padding: "6px 8px", fontSize: 12.5 }}>{MONTHS_BG.map((m, i) => <option key={i} value={i}>{m}</option>)}</select></div>
+        <div><label style={{ fontSize: 11 }}>Година</label><input type="number" value={f.year} onChange={(e) => setF({ ...f, year: e.target.value })} style={{ width: 80, padding: "6px 8px", fontSize: 12.5 }} /></div>
+        <div><label style={{ fontSize: 11 }}>Сума (€)</label><input type="number" value={f.amount} onChange={(e) => setF({ ...f, amount: e.target.value })} style={{ width: 90, padding: "6px 8px", fontSize: 12.5 }} /></div>
+        <div><label style={{ fontSize: 11 }}>Вид</label><select value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })} style={{ padding: "6px 8px", fontSize: 12.5 }}>{Object.entries(BONUS_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></div>
+        <div style={{ flex: 1, minWidth: 100 }}><label style={{ fontSize: 11 }}>Бележка</label><input value={f.note} onChange={(e) => setF({ ...f, note: e.target.value })} style={{ padding: "6px 8px", fontSize: 12.5 }} /></div>
+        <button className="btn btn-primary btn-sm" onClick={add}>+ Добави</button>
+      </div>
+      {!loaded ? <div style={{ fontSize: 12, color: "var(--muted)" }}>Зареждане…</div> : list.length === 0 ? (
+        <div style={{ fontSize: 12.5, color: "var(--muted)" }}>Няма въведени бонуси.</div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          {list.map((b) => (
+            <div key={b.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12.5, padding: "4px 0", borderBottom: "1px solid rgba(217,215,200,.4)" }}>
+              <span><strong>{MONTHS_BG[b.month]} {b.year}</strong> · {formatCurrency(b.amount)} · {BONUS_LABELS[b.kind] ?? b.kind}{b.note ? ` · ${b.note}` : ""}</span>
+              <button onClick={() => del(b.id)} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer" }}>×</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function FilesPanel({ employeeId }: { employeeId: string }) {
   const [files, setFiles] = useState<EmpFile[]>([]);

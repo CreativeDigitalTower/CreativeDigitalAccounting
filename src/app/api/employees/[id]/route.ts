@@ -14,6 +14,11 @@ const schema = z.object({
   paidLeaveDays: z.number().int().min(0).optional(),
   notes: z.string().optional().nullable(),
   active: z.boolean().optional(),
+  department: z.string().optional().nullable(),
+  contractType: z.string().optional().nullable(),
+  paymentMethod: z.enum(["bank", "cash"]).optional(),
+  iban: z.string().optional().nullable(),
+  bankName: z.string().optional().nullable(),
 });
 
 async function owned(companyId: string, id: string) {
@@ -35,6 +40,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         hiredAt: data.hiredAt ? new Date(data.hiredAt) : null,
         paidLeaveDays: data.paidLeaveDays ?? 20, notes: data.notes ?? null,
         active: data.active ?? true,
+        department: data.department ?? null, contractType: data.contractType ?? null,
+        paymentMethod: data.paymentMethod ?? "bank", iban: data.iban ?? null, bankName: data.bankName ?? null,
       },
     });
     return NextResponse.json(employee);

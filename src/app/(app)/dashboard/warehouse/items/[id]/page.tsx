@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/constants";
+import { StockItemActions } from "@/components/app/StockItemActions";
 
 const MTYPE: Record<string, string> = { receive: "Заприходяване", issue: "Изписване", production: "Производство", transfer: "Трансфер" };
 
@@ -20,7 +21,8 @@ export default async function StockItemDetailPage({ params }: { params: Promise<
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20, flexWrap: "wrap" }}>
         <Link href="/dashboard/warehouse" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← Склад</Link>
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{item.name}</h1>
-        <Link href="/dashboard/warehouse/receive" className="btn btn-ghost btn-sm" style={{ marginLeft: "auto" }}>+ Заприходяване</Link>
+        <StockItemActions item={{ id: item.id, name: item.name, sku: item.sku, unit: item.unit, quantity: item.quantity, minQuantity: item.minQuantity, unitCost: item.unitCost, expiryDate: item.expiryDate ? item.expiryDate.toISOString() : null }} />
+        <Link href="/dashboard/warehouse/receive" className="btn btn-ghost btn-sm">+ Заприходяване</Link>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px,1fr))", gap: 14, marginBottom: 18 }}>

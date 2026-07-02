@@ -406,11 +406,34 @@ model Employee {
   paidLeaveDays  Int      @default(20) // годишен платен отпуск (мин. по закон 20 раб. дни)
   active         Boolean  @default(true)
   notes          String?  @db.Text
+  // Разширени данни
+  department     String?  // отдел / звено
+  contractType   String?  // permanent | fixed_term | civil
+  paymentMethod  String   @default("bank") // bank | cash
+  iban           String?  // банкова сметка за заплата
+  bankName       String?
   createdAt      DateTime @default(now())
 
   company Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
   leaves  EmployeeLeave[]
   files   EmployeeFile[]
+  bonuses EmployeeBonus[]
+}
+
+// Бонуси на служител — по месец, със сума, вид и бележка
+model EmployeeBonus {
+  id         String   @id @default(cuid())
+  employeeId String
+  year       Int
+  month      Int      // 0-11
+  amount     Float
+  kind       String   @default("cash") // cash | voucher | performance | holiday | other
+  note       String?
+  createdAt  DateTime @default(now())
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
 }
 
 model EmployeeFile {

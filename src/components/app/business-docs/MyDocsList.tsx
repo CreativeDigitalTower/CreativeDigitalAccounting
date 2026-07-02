@@ -2,6 +2,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { UiIcon } from "@/components/app/NavIcons";
+import { confirmDelete } from "@/lib/confirmDelete";
 
 type Doc = { id: string; title: string; category: string; categoryLabel: string; status: string; createdAt: string; updatedAt: string };
 const STATUS_LABEL: Record<string, string> = { draft: "Чернова", final: "Завършен", archived: "Архивиран" };
@@ -13,8 +15,21 @@ export function MyDocsList({ docs }: { docs: Doc[] }) {
   const [sel, setSel] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
   const [q, setQ] = useState("");
+  // Готовите документи по подразбиране; черновите са в отделен таб, за да не е дълга страницата.
+  const [tab, setTab] = useState<"ready" | "draft">("ready");
 
-  const filtered = docs.filter((d) => !q.trim() || [d.title, d.categoryLabel].some((v) => v.toLowerCase().includes(q.toLowerCase())));
+  const draftCount = docs.filter((d) => d.status === "draft").length;
+  const readyCount = docs.length - draftCount;
+
+  const byTab = docs.filter((d) => (tab === "draft" ? d.status === "draft" : d.status !== "draft"));
+  const filtered = byTab.filter((d) => !q.trim() || [d.title, d.categoryLabel].some((v) => v.toLowerCase().includes(q.toLowerCase())));
+
+  async function remove(d: Doc) {
+    if (!(await confirmDelete(`документа „${d.title}"`))) return;
+    const res = await fetch(`/api/business-docs/${d.id}`, { method: "DELETE" });
+    if (res.ok) router.refresh();
+    else alert((await res.json().catch(() => ({}))).error ?? "Грешка при изтриване.");
+  }
 
   // групиране по година → месец
   const groups = new Map<string, Doc[]>();
@@ -73,11 +88,22 @@ export function MyDocsList({ docs }: { docs: Doc[] }) {
 
   return (
     <>
+      <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
+        <button className={`filter-tab${tab === "ready" ? " active" : ""}`} onClick={() => { setTab("ready"); setSel(new Set()); }}>Готови документи ({readyCount})</button>
+        <button className={`filter-tab${tab === "draft" ? " active" : ""}`} onClick={() => { setTab("draft"); setSel(new Set()); }}>Чернови ({draftCount})</button>
+      </div>
+
       <div className="glass panel" style={{ padding: "12px 16px", marginBottom: 14, display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
         <input placeholder="Търси документ…" value={q} onChange={(e) => setQ(e.target.value)} style={{ flex: "1 1 240px", minWidth: 200, padding: "8px 12px" }} />
         <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => downloadIds([...sel])}>{busy ? "Сваляне…" : `Свали избраните (${sel.size})`}</button>
         <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => downloadIds(filtered.map((d) => d.id))}>Свали всички</button>
       </div>
+
+      {filtered.length === 0 && (
+        <div className="glass panel" style={{ textAlign: "center", padding: "34px 0", color: "var(--muted)", fontSize: 13 }}>
+          {tab === "draft" ? "Няма чернови." : "Няма готови документи."}
+        </div>
+      )}
 
       {sortedGroups.map(([key, rows]) => {
         const [y, m] = key.split("-");
@@ -99,8 +125,9 @@ export function MyDocsList({ docs }: { docs: Doc[] }) {
                       <td style={{ fontSize: 12.5 }}>{d.categoryLabel}</td>
                       <td><span style={{ fontSize: 11.5, fontWeight: 700, color: STATUS_COLOR[d.status] }}>{STATUS_LABEL[d.status] ?? d.status}</span></td>
                       <td style={{ display: "flex", gap: 6 }}>
-                        <Link href={`/dashboard/business-docs/doc/${d.id}`} className="btn btn-ghost btn-sm">Отвори</Link>
+                        <Link href={`/dashboard/business-docs/doc/${d.id}`} className="btn btn-ghost btn-sm" title="Отвори / редактирай">Отвори</Link>
                         <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => downloadIds([d.id])}>↓ PDF</button>
+                        <button className="btn btn-ghost btn-sm" title="Изтрий" onClick={() => remove(d)} style={{ color: "var(--brick)", borderColor: "var(--brick)", display: "inline-flex", alignItems: "center" }}><UiIcon.trash /></button>
                       </td>
                     </tr>
                   ))}

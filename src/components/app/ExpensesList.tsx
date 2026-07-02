@@ -3,6 +3,8 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/constants";
 import { AttachmentCell } from "@/components/app/AttachmentCell";
+import { UiIcon } from "@/components/app/NavIcons";
+import { confirmDelete } from "@/lib/confirmDelete";
 
 export type ExpenseRow = {
   id: string; description: string; category: string; categoryId: string; supplier: string | null; supplierId: string | null;
@@ -20,6 +22,13 @@ export function ExpensesList({ expenses, categories, suppliers, dual, toBGNRate 
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"all" | "recurring" | "single">("all");
   const [edit, setEdit] = useState<ExpenseRow | null>(null);
+
+  async function remove(e: ExpenseRow) {
+    if (!(await confirmDelete(`разхода „${e.description}"`))) return;
+    const res = await fetch(`/api/expenses/${e.id}`, { method: "DELETE" });
+    if (res.ok) router.refresh();
+    else alert((await res.json().catch(() => ({}))).error ?? "Грешка при изтриване.");
+  }
 
   const filtered = useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -82,7 +91,10 @@ export function ExpensesList({ expenses, categories, suppliers, dual, toBGNRate 
                       <td style={{ fontSize: 13, color: "var(--ink-soft)" }}>{new Date(e.date).toLocaleDateString("bg-BG")}</td>
                       <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(e.amount)}{dual && <div style={{ fontSize: 10.5, color: "var(--muted)" }}>≈ {formatCurrency(e.amount * toBGNRate, "BGN")}</div>}</td>
                       <td><AttachmentCell endpoint={`/api/expenses/${e.id}`} hasFile={e.hasFile} maxMB={3} /></td>
-                      <td><button className="btn btn-ghost btn-sm" onClick={() => setEdit(e)}>✎</button></td>
+                      <td style={{ display: "flex", gap: 6 }}>
+                        <button className="btn btn-ghost btn-sm" title="Редактирай" onClick={() => setEdit(e)} style={{ display: "inline-flex", alignItems: "center" }}><UiIcon.edit /></button>
+                        <button className="btn btn-ghost btn-sm" title="Изтрий" onClick={() => remove(e)} style={{ color: "var(--brick)", borderColor: "var(--brick)", display: "inline-flex", alignItems: "center" }}><UiIcon.trash /></button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
