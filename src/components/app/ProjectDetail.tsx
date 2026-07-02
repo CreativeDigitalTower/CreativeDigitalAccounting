@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/constants";
+import { confirmDelete } from "@/lib/confirmDelete";
 
 const STATUS: Record<string, string> = { active: "Активен", completed: "Завършен", on_hold: "Пауза", cancelled: "Анулиран" };
 
@@ -116,6 +117,7 @@ function EntriesCard({ projectId, entries, setEntries, onChange }: { projectId: 
     if (res.ok) { const e = await res.json(); setEntries([{ id: e.id, type, amount: a, description: desc || null, date: new Date().toISOString() }, ...entries]); setAmount(""); setDesc(""); onChange(); }
   }
   async function del(id: string) {
+    if (!(await confirmDelete("това движение"))) return;
     const r = await fetch(`/api/projects/${projectId}/entries?entryId=${id}`, { method: "DELETE" });
     if (r.ok) { setEntries(entries.filter((e) => e.id !== id)); onChange(); }
   }
@@ -182,6 +184,7 @@ function NotesCard({ projectId, notes, setNotes }: { projectId: string; notes: N
     if (res.ok) { const n = await res.json(); setNotes([{ id: n.id, note: text, author: null, createdAt: new Date().toISOString() }, ...notes]); setText(""); }
   }
   async function del(id: string) {
+    if (!(await confirmDelete("тази бележка"))) return;
     const r = await fetch(`/api/projects/${projectId}/notes?noteId=${id}`, { method: "DELETE" });
     if (r.ok) setNotes(notes.filter((n) => n.id !== id));
   }

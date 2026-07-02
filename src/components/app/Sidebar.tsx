@@ -4,33 +4,34 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { planHasFeature, type PlanId } from "@/lib/constants";
+import { NavIcon } from "@/components/app/NavIcons";
 
 const navItems = [
-  { href: "/dashboard", label: "Табло", icon: "⊞", feature: "dashboard" },
-  { href: "/dashboard/invoices", label: "Фактури", icon: "🧾", feature: "documents" },
-  { href: "/dashboard/documents", label: "Документи", icon: "📄", feature: "documents" },
-  { href: "/dashboard/clients", label: "Клиенти (CRM)", icon: "👥", feature: "clients" },
-  { href: "/dashboard/inbox", label: "Входящи документи", icon: "📥", feature: "dashboard" },
-  { href: "/dashboard/suppliers", label: "Доставчици", icon: "🚚", feature: "suppliers" },
-  { href: "/dashboard/warehouse", label: "Склад", icon: "📦", feature: "warehouse" },
-  { href: "/dashboard/production", label: "Производство", icon: "🏭", feature: "production" },
-  { href: "/dashboard/employees", label: "Служители", icon: "🧑‍💼", feature: "employees" },
-  { href: "/dashboard/haccp", label: "HACCP", icon: "🥗", feature: "haccp" },
-  { href: "/dashboard/business-docs", label: "Бизнес документи", icon: "📃", feature: "dashboard" },
-  { href: "/dashboard/cash", label: "Каса", icon: "🏦", feature: "cash" },
-  { href: "/dashboard/expenses", label: "Разходи", icon: "💰", feature: "expenses" },
-  { href: "/dashboard/contracts", label: "Договори", icon: "📑", feature: "contracts" },
-  { href: "/dashboard/projects", label: "Проекти", icon: "🏗️", feature: "projects" },
-  { href: "/dashboard/archive", label: "Архив", icon: "🗂️", feature: "archive" },
-  { href: "/dashboard/assets", label: "Активи", icon: "🏭", feature: "assets" },
-  { href: "/dashboard/analytics", label: "Анализи", icon: "📊", feature: "analytics" },
-  { href: "/dashboard/tax-calendar", label: "Данъчен календар", icon: "📅", feature: "tax_calendar" },
-  { href: "/dashboard/tools", label: "Безплатни инструменти", icon: "🧮", feature: "dashboard" },
-  { href: "/dashboard/training", label: "Обучения", icon: "🎓", feature: "dashboard" },
-  { href: "/dashboard/users", label: "Потребители", icon: "👤", feature: "users" },
-  { href: "/dashboard/audit", label: "Одит лог", icon: "📜", feature: "audit" },
-  { href: "/dashboard/settings", label: "Профил на фирмата", icon: "⚙️", feature: "dashboard" },
-  { href: "/dashboard/subscription", label: "Абонамент", icon: "💳", feature: "dashboard" },
+  { href: "/dashboard", label: "Табло", icon: "dashboard", feature: "dashboard" },
+  { href: "/dashboard/invoices", label: "Фактури", icon: "invoice", feature: "documents" },
+  { href: "/dashboard/documents", label: "Документи", icon: "document", feature: "documents" },
+  { href: "/dashboard/clients", label: "Клиенти (CRM)", icon: "clients", feature: "clients" },
+  { href: "/dashboard/inbox", label: "Входящи документи", icon: "inbox", feature: "dashboard" },
+  { href: "/dashboard/suppliers", label: "Доставчици", icon: "suppliers", feature: "suppliers" },
+  { href: "/dashboard/warehouse", label: "Склад", icon: "warehouse", feature: "warehouse" },
+  { href: "/dashboard/production", label: "Производство", icon: "production", feature: "production" },
+  { href: "/dashboard/employees", label: "Служители", icon: "employees", feature: "employees" },
+  { href: "/dashboard/haccp", label: "HACCP", icon: "haccp", feature: "haccp" },
+  { href: "/dashboard/business-docs", label: "Бизнес документи", icon: "businessDocs", feature: "dashboard" },
+  { href: "/dashboard/cash", label: "Каса", icon: "cash", feature: "cash" },
+  { href: "/dashboard/expenses", label: "Разходи", icon: "expenses", feature: "expenses" },
+  { href: "/dashboard/contracts", label: "Договори", icon: "contracts", feature: "contracts" },
+  { href: "/dashboard/projects", label: "Проекти", icon: "projects", feature: "projects" },
+  { href: "/dashboard/archive", label: "Архив", icon: "archive", feature: "archive" },
+  { href: "/dashboard/assets", label: "Активи", icon: "assets", feature: "assets" },
+  { href: "/dashboard/analytics", label: "Анализи", icon: "analytics", feature: "analytics" },
+  { href: "/dashboard/tax-calendar", label: "Данъчен календар", icon: "calendar", feature: "tax_calendar" },
+  { href: "/dashboard/tools", label: "Безплатни инструменти", icon: "tools", feature: "dashboard" },
+  { href: "/dashboard/training", label: "Обучения", icon: "training", feature: "dashboard" },
+  { href: "/dashboard/users", label: "Потребители", icon: "users", feature: "users" },
+  { href: "/dashboard/audit", label: "Одит лог", icon: "audit", feature: "audit" },
+  { href: "/dashboard/settings", label: "Профил на фирмата", icon: "settings", feature: "dashboard" },
+  { href: "/dashboard/subscription", label: "Абонамент", icon: "subscription", feature: "dashboard" },
 ];
 
 interface SidebarProps {
@@ -84,7 +85,8 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
         onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.06)")}
       >
         <div style={{ fontSize: 10.5, color: "var(--brass)", fontWeight: 600, letterSpacing: 1, marginBottom: 6, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          АКТИВНА ФИРМА <span style={{ opacity: .7 }}>✎</span>
+          АКТИВНА ФИРМА
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: .7 }}><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
         </div>
         {logoUrl && (
           <div style={{ background: "#fff", borderRadius: 6, padding: 6, marginBottom: 8, display: "flex", justifyContent: "center" }}>
@@ -132,13 +134,15 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
                 }
               }}
             >
-              <span style={{ fontSize: 15, opacity: isActive ? 1 : 0.8 }}>{item.icon}</span>
+              <span style={{ display: "inline-flex", opacity: isActive ? 1 : 0.8 }}>{NavIcon[item.icon]?.({ width: 17, height: 17 })}</span>
               {item.label}
               {item.href === "/dashboard/inbox" && inboxUnread > 0 && !locked && (
                 <span style={{ marginLeft: "auto", fontSize: 10.5, fontWeight: 700, color: "#fff", background: "var(--brass)", borderRadius: 10, padding: "1px 7px", minWidth: 18, textAlign: "center" }}>{inboxUnread}</span>
               )}
               {locked && (
-                <span style={{ marginLeft: "auto", fontSize: 11, opacity: 0.6 }} aria-label="заключено">🔒</span>
+                <span style={{ marginLeft: "auto", display: "inline-flex", opacity: 0.6 }} aria-label="заключено">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
+                </span>
               )}
             </Link>
           );
@@ -156,7 +160,9 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
               border: "1px solid rgba(166,130,47,.4)",
             }}
           >
-            <span style={{ fontSize: 15 }}>🛡️</span>
+            <span style={{ display: "inline-flex" }}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2.5 4.5 5.5V11c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V5.5L12 2.5Z" /><path d="m9 12 2 2 4-4" /></svg>
+            </span>
             Супер Админ
           </Link>
         )}
@@ -177,7 +183,9 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
             position: "relative",
           }}
         >
-          <span style={{ fontSize: 15, opacity: 0.4 }}>🤖</span>
+          <span style={{ display: "inline-flex", opacity: 0.4 }}>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="4.5" y="7.5" width="15" height="11" rx="2.5" /><path d="M12 4.5v3M9 12.5h.01M15 12.5h.01M9.5 16h5" /><path d="M2.5 11.5v3M21.5 11.5v3" /></svg>
+          </span>
           AI Асистент
           <span
             style={{

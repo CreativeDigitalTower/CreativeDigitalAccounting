@@ -2,14 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 
 type Status = { hasCompanyData: boolean; hasLogo: boolean; hasClient: boolean; hasInvoice: boolean };
 
+const si = { width: 18, height: 18 };
 const steps = (s: Status) => [
-  { done: s.hasCompanyData, label: "Попълнете данните на фирмата", href: "/dashboard/settings", icon: "🏢" },
-  { done: s.hasLogo, label: "Качете лого", href: "/dashboard/settings", icon: "🖼️" },
-  { done: s.hasClient, label: "Добавете първи клиент", href: "/dashboard/clients/new", icon: "👥" },
-  { done: s.hasInvoice, label: "Издайте първа фактура", href: "/dashboard/documents/new?type=invoice", icon: "🧾" },
+  { done: s.hasCompanyData, label: "Попълнете данните на фирмата", href: "/dashboard/settings", icon: <NavIcon.settings {...si} /> },
+  { done: s.hasLogo, label: "Качете лого", href: "/dashboard/settings", icon: <UiIcon.star {...si} /> },
+  { done: s.hasClient, label: "Добавете първи клиент", href: "/dashboard/clients/new", icon: <UiIcon.people {...si} /> },
+  { done: s.hasInvoice, label: "Издайте първа фактура", href: "/dashboard/documents/new?type=invoice", icon: <NavIcon.invoice {...si} /> },
 ];
 
 export function WelcomeWizard({ status }: { status: Status }) {
@@ -30,7 +32,7 @@ export function WelcomeWizard({ status }: { status: Status }) {
     return (
       <div className="glass panel" style={{ padding: "22px 26px", marginBottom: 20, borderLeft: "4px solid var(--emerald)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
         <div>
-          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, margin: "0 0 4px" }}>🎉 Всичко е готово!</h2>
+          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, margin: "0 0 4px", display: "flex", alignItems: "center", gap: 8 }}><UiIcon.party width={20} height={20} /> Всичко е готово!</h2>
           <p style={{ color: "var(--ink-soft)", fontSize: 13.5, margin: 0 }}>
             Профилът Ви е напълно настроен. Пожелаваме Ви успех и развитие с Creative Digital Accounting!
           </p>
@@ -44,7 +46,7 @@ export function WelcomeWizard({ status }: { status: Status }) {
     <div className="glass panel" style={{ padding: "22px 26px", marginBottom: 20, borderLeft: "4px solid var(--brass)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
         <div>
-          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, margin: "0 0 4px" }}>👋 Добре дошли в Creative Digital Accounting</h2>
+          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, margin: "0 0 4px" }}>Добре дошли в Creative Digital Accounting</h2>
           <p style={{ color: "var(--ink-soft)", fontSize: 13.5, margin: 0 }}>Завършете тези стъпки, за да започнете да фактурирате професионално.</p>
         </div>
         <button onClick={skip} className="btn btn-ghost btn-sm">Пропусни</button>
@@ -66,7 +68,7 @@ export function WelcomeWizard({ status }: { status: Status }) {
               border: `1px solid ${step.done ? "rgba(31,111,84,.3)" : "var(--border)"}`,
             }}
           >
-            <span style={{ fontSize: 20 }}>{step.done ? "✅" : step.icon}</span>
+            <span style={{ display: "inline-flex", color: step.done ? "var(--emerald)" : "var(--muted)" }}>{step.done ? <UiIcon.check width={18} height={18} /> : step.icon}</span>
             <div>
               <div style={{ fontSize: 11, color: "var(--muted)" }}>Стъпка {i + 1}</div>
               <div style={{ fontSize: 13, fontWeight: 600, color: step.done ? "var(--emerald)" : "var(--ink)" }}>{step.label}</div>

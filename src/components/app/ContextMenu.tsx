@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
-export type MenuItem = { label: string; icon?: string; onClick: () => void; danger?: boolean; divider?: boolean };
+export type MenuItem = { label: string; icon?: React.ReactNode; onClick: () => void; danger?: boolean; divider?: boolean };
 
 export function ContextMenu({ x, y, items, onClose }: { x: number; y: number; items: MenuItem[]; onClose: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -36,7 +36,7 @@ export function ContextMenu({ x, y, items, onClose }: { x: number; y: number; it
           style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "8px 11px", border: "none", background: "transparent", cursor: "pointer", borderRadius: 7, fontSize: 13, textAlign: "left", color: it.danger ? "var(--brick)" : "var(--ink)", fontFamily: "inherit" }}
           onMouseEnter={(e) => (e.currentTarget.style.background = it.danger ? "var(--brick-soft)" : "rgba(15,138,106,.08)")}
           onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
-          {it.icon && <span style={{ fontSize: 14, width: 18, textAlign: "center" }}>{it.icon}</span>}
+          {it.icon && <span style={{ width: 18, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{it.icon}</span>}
           {it.label}
         </button>
       ))}

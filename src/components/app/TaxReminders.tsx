@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { confirmDelete } from "@/lib/confirmDelete";
 
 type Reminder = { id: string; title: string; dueDate: string; done: boolean };
 
@@ -22,6 +23,7 @@ export function TaxReminders() {
     load();
   }
   async function remove(id: string) {
+    if (!(await confirmDelete("това напомняне"))) return;
     await fetch(`/api/tax-reminders?id=${id}`, { method: "DELETE" });
     setItems((p) => p.filter((x) => x.id !== id));
   }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { confirmDelete } from "@/lib/confirmDelete";
 
 type Cat = { id: string; name: string };
 
@@ -17,6 +18,7 @@ export function CategoriesManager({ initial }: { initial: Cat[] }) {
     if (res.ok) { setCats([...cats, await res.json()]); setName(""); }
   }
   async function remove(id: string) {
+    if (!(await confirmDelete("тази категория"))) return;
     const res = await fetch(`/api/stock-categories?id=${id}`, { method: "DELETE" });
     if (res.ok) setCats(cats.filter((c) => c.id !== id));
   }

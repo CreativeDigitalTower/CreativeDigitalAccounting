@@ -2,6 +2,7 @@ import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/constants";
+import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 
 export default async function ProjectsPage() {
   const { companyId } = await requireFeature("projects");
@@ -31,7 +32,7 @@ export default async function ProjectsPage() {
 
       {projects.length === 0 ? (
         <div className="glass panel" style={{ textAlign: "center", padding: "48px 0" }}>
-          <div style={{ fontSize: 32, marginBottom: 12 }}>🏗️</div>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, color: "var(--muted)" }}><NavIcon.projects width={34} height={34} /></div>
           <div style={{ fontSize: 14, color: "var(--muted)", marginBottom: 16 }}>Няма проекти</div>
           <Link href="/dashboard/projects/new" className="btn btn-primary btn-sm">Добави проект</Link>
         </div>
@@ -47,7 +48,7 @@ export default async function ProjectsPage() {
                       {statusLabel[p.status]}
                     </span>
                   </div>
-                  {p.client && <div style={{ fontSize: 13, color: "var(--ink-soft)", marginBottom: 10 }}>👥 {p.client.name}</div>}
+                  {p.client && <div style={{ fontSize: 13, color: "var(--ink-soft)", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}><UiIcon.people width={13} height={13} /> {p.client.name}</div>}
 
                   {/* Progress bar */}
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { StatusSelect } from "@/components/app/StatusSelect";
 import { FeatureLink, FeatureTab } from "@/components/app/FeatureLink";
 import { formatCurrency, toBGN, isDualCurrencyActive, groupByMonth } from "@/lib/constants";
+import { UiIcon } from "@/components/app/NavIcons";
 
 const TYPE_LABELS: Record<string, string> = {
   invoice: "Фактура",
@@ -41,8 +42,8 @@ export default async function DocumentsPage({
           <div style={{ color: "var(--muted)", fontSize: 13 }}>{docs.length} документа</div>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <FeatureLink plan={plan} feature="protocols" href="/dashboard/documents/protocols">📋 ППП</FeatureLink>
-          <FeatureLink plan={plan} feature="declarations" href="/dashboard/documents/declarations">📜 Декларации</FeatureLink>
+          <FeatureLink plan={plan} feature="protocols" href="/dashboard/documents/protocols">ППП</FeatureLink>
+          <FeatureLink plan={plan} feature="declarations" href="/dashboard/documents/declarations">Декларации</FeatureLink>
           <Link href="/dashboard/documents/new" className="btn btn-primary">+ Нов документ</Link>
         </div>
       </div>
@@ -98,7 +99,7 @@ export default async function DocumentsPage({
 
       {docs.length === 0 ? (
         <div className="glass panel" style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
-          <div style={{ fontSize: 32, marginBottom: 12 }}>📄</div>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, color: "var(--muted)" }}><UiIcon.doc width={34} height={34} /></div>
           <div style={{ fontSize: 14, marginBottom: 16 }}>Няма документи</div>
           <Link href="/dashboard/documents/new" className="btn btn-primary btn-sm">Създай първия документ</Link>
         </div>
@@ -129,7 +130,7 @@ export default async function DocumentsPage({
                         <td><StatusSelect id={doc.id} status={doc.status} /></td>
                         <td style={{ display: "flex", gap: 6 }}>
                           <Link href={`/dashboard/documents/${doc.id}`} className="btn btn-ghost btn-sm">Преглед</Link>
-                          <Link href={`/dashboard/documents/${doc.id}/edit`} className="btn btn-ghost btn-sm">✎</Link>
+                          <Link href={`/dashboard/documents/${doc.id}/edit`} className="btn btn-ghost btn-sm" title="Редактирай" style={{ display: "inline-flex", alignItems: "center" }}><UiIcon.edit /></Link>
                         </td>
                       </tr>
                     );

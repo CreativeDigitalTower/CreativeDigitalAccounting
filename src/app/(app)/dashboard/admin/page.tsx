@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { AdminCompanyRow } from "@/components/app/AdminCompanyRow";
 import { SUBSCRIPTION_PLANS, planPrice } from "@/lib/constants";
+import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 
 const RANGES = [
   { id: "7d", label: "7 дни", days: 7, bucket: "day" as const },
@@ -58,7 +59,16 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const OWN_ACCOUNT_EMAIL = "office@creativedigitaltower.com";
   const isOwnAccount = (c: (typeof companies)[number]) =>
     c.companyUsers.some((cu) => cu.user?.email?.toLowerCase() === OWN_ACCOUNT_EMAIL);
-  const mrr = companies.reduce((s, c) => s + (isOwnAccount(c) ? 0 : (PLAN_PRICE[c.subscription?.plan ?? "free"] ?? 0)), 0);
+  // Реален платящ абонат: платен план + статус „active" (НЕ пробен/безплатен период,
+  // НЕ отменен/просрочен) и да не е собственият акаунт. Само тези влизат в MRR/ARR.
+  const isPaying = (c: (typeof companies)[number]) => {
+    const plan = c.subscription?.plan ?? "free";
+    return plan !== "free" && c.subscription?.status === "active" && !isOwnAccount(c);
+  };
+  const payingCount = companies.filter(isPaying).length;
+  // Фирми в пробен (безплатен) период — показваме ги отделно, но НЕ като приход.
+  const trialingCount = companies.filter((c) => c.subscription?.status === "trialing" && (c.subscription?.plan ?? "free") !== "free").length;
+  const mrr = companies.reduce((s, c) => s + (isPaying(c) ? (PLAN_PRICE[c.subscription?.plan ?? "free"] ?? 0) : 0), 0);
   const conversion = companies.length ? Math.round((paidCount / companies.length) * 100) : 0;
 
   // Сектори
@@ -186,9 +196,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
   // ─── Автоматични известия ───
   const adminAlerts: string[] = [];
-  for (const o of upgradeOpportunities) adminAlerts.push(`🔥 ${o.name} е близо до лимита (${o.used}/${o.limit === Infinity ? "∞" : o.limit}) — вероятен ъпгрейд.`);
-  for (const l of hotLeads.filter((x) => x.score >= 70)) adminAlerts.push(`🔥 Горещ lead: ${l.name} (score ${l.score}/100) — готов за платен план.`);
-  if (invThisMonth > 100000) adminAlerts.push(`🔥 Платформен оборот този месец: ${Math.round(invThisMonth).toLocaleString("bg-BG")} €.`);
+  for (const o of upgradeOpportunities) adminAlerts.push(`${o.name} е близо до лимита (${o.used}/${o.limit === Infinity ? "∞" : o.limit}) — вероятен ъпгрейд.`);
+  for (const l of hotLeads.filter((x) => x.score >= 70)) adminAlerts.push(`Горещ lead: ${l.name} (score ${l.score}/100) — готов за платен план.`);
+  if (invThisMonth > 100000) adminAlerts.push(`Платформен оборот този месец: ${Math.round(invThisMonth).toLocaleString("bg-BG")} €.`);
 
   // ─── Посещения (по избран период; броим ХОРА, не презареждания) ───
   const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
@@ -241,15 +251,15 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     <>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20, gap: 12, flexWrap: "wrap" }}>
         <div>
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>
-            🛡️ Супер Админ
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px", display: "flex", alignItems: "center", gap: 10 }}>
+            <NavIcon.subscription width={22} height={22} /> Супер Админ
           </h1>
           <div style={{ color: "var(--muted)", fontSize: 13 }}>{companies.length} регистрирани фирми</div>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <Link href="/dashboard/admin/emails" className="btn btn-ghost btn-sm">✉️ Имейли & известия</Link>
-          <Link href="/dashboard/admin/blog" className="btn btn-ghost btn-sm">📝 Блог</Link>
-          <Link href="/dashboard/admin/businesses" className="btn btn-ghost btn-sm">📁 Бизнеси (филтри по сектор/план)</Link>
+          <Link href="/dashboard/admin/emails" className="btn btn-ghost btn-sm">Имейли & известия</Link>
+          <Link href="/dashboard/admin/blog" className="btn btn-ghost btn-sm">Блог</Link>
+          <Link href="/dashboard/admin/businesses" className="btn btn-ghost btn-sm">Бизнеси (филтри по сектор/план)</Link>
         </div>
       </div>
 
@@ -277,6 +287,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         <div className="glass kpi-card">
           <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Очакван месечен приход (MRR)</div>
           <div className="num" style={{ fontSize: 22, fontWeight: 600, color: "var(--emerald-dark)" }}>{mrr.toLocaleString("bg-BG")} €</div>
+          <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>{payingCount} платящи{trialingCount > 0 ? ` · ${trialingCount} в пробен период (не се броят)` : ""}</div>
         </div>
         <div className="glass kpi-card">
           <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Конверсия към платен план</div>
@@ -414,7 +425,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
       {/* Lead scoring + Revenue opportunities + Customer success */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 20, alignItems: "start" }}>
         <div className="glass panel">
-          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 12px" }}>🔥 Горещи lead-ове (free)</h3>
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 12px", display: "flex", alignItems: "center", gap: 8 }}><UiIcon.warning width={15} height={15}/> Горещи lead-ове (free)</h3>
           {hotLeads.length === 0 ? <div style={{ fontSize: 12.5, color: "var(--muted)" }}>—</div> : hotLeads.map((l) => (
             <div key={l.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, padding: "5px 0", borderBottom: "1px solid rgba(217,215,200,.4)" }}>
               <span>{l.name}</span><strong className="num" style={{ color: l.score >= 70 ? "var(--emerald-dark)" : "var(--ink)" }}>{l.score}/100</strong>
@@ -422,7 +433,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           ))}
         </div>
         <div className="glass panel">
-          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 12px" }}>💰 Възможности за ъпгрейд</h3>
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 12px", display: "flex", alignItems: "center", gap: 8 }}><NavIcon.expenses width={15} height={15}/> Възможности за ъпгрейд</h3>
           {upgradeOpportunities.length === 0 ? <div style={{ fontSize: 12.5, color: "var(--muted)" }}>—</div> : upgradeOpportunities.map((o) => (
             <div key={o.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, padding: "5px 0", borderBottom: "1px solid rgba(217,215,200,.4)" }}>
               <span>{o.name} <span style={{ color: "var(--muted)" }}>({o.plan})</span></span><strong className="num" style={{ color: "var(--brick)" }}>{o.used}/{o.limit === Infinity ? "∞" : o.limit}</strong>
@@ -431,7 +442,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         </div>
         <div className="glass panel">
           <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 12px" }}>Неактивни фирми</h3>
-          {inactive.length === 0 ? <div style={{ fontSize: 12.5, color: "var(--muted)" }}>Всички са активни 🎉</div> : inactive.map((c) => (
+          {inactive.length === 0 ? <div style={{ fontSize: 12.5, color: "var(--muted)" }}>Всички са активни</div> : inactive.map((c) => (
             <div key={c.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, padding: "5px 0", borderBottom: "1px solid rgba(217,215,200,.4)" }}>
               <span>{c.name}</span><span style={{ color: c.days >= 30 ? "var(--brick)" : "var(--muted)" }}>{c.days === Infinity ? "никога" : `${c.days} дни`}</span>
             </div>
@@ -486,13 +497,13 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                       style={{ height: `${(b.visitorSet.size / maxBucket) * 100}%`, minHeight: 2, background: i === buckets.length - 1 ? "var(--emerald)" : "var(--navy)", borderRadius: "4px 4px 0 0" }} />
                   </div>
                   <div style={{ fontSize: 9, color: "var(--muted)", whiteSpace: "nowrap" }}>{b.label}</div>
-                  <div style={{ fontSize: 9, color: "var(--emerald-dark)", fontWeight: 600 }} className="num">{b.userSet.size}👤</div>
+                  <div style={{ fontSize: 9, color: "var(--emerald-dark)", fontWeight: 600 }} className="num">{b.userSet.size}</div>
                 </div>
               ))}
             </div>
             <div style={{ display: "flex", gap: 18, marginTop: 14, fontSize: 11.5, color: "var(--muted)" }}>
               <span><span style={{ display: "inline-block", width: 9, height: 9, background: "var(--navy)", borderRadius: 2, marginRight: 5 }} />Посетители (хора)</span>
-              <span>👤 Активни регистрирани потребители</span>
+              <span style={{display:"inline-flex",alignItems:"center",gap:6}}><UiIcon.people width={14} height={14}/> Активни регистрирани потребители</span>
               <span style={{ marginLeft: "auto" }}>Общо за периода на сайта: {allTimeVisitors.toLocaleString("bg-BG")} посетители · {allTimeUsers.toLocaleString("bg-BG")} активни</span>
             </div>
           </>

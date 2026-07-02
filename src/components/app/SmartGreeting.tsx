@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { formatCurrency } from "@/lib/constants";
 
-export type TodayItem = { icon: string; label: string; href: string; count: number; tone?: "warn" | "info" | "ok" };
+export type TodayItem = { icon: React.ReactNode; label: string; href: string; count: number; tone?: "warn" | "info" | "ok" };
 
 export function SmartGreeting({ name, items, expectedRevenue, dateLabel }: {
   name: string; items: TodayItem[]; expectedRevenue: number; dateLabel: string;
@@ -44,7 +44,7 @@ export function SmartGreeting({ name, items, expectedRevenue, dateLabel }: {
                       border: `1px solid ${i.tone === "warn" ? "rgba(178,59,59,.3)" : "var(--border)"}`,
                       color: "var(--ink)", transition: "transform .15s, box-shadow .15s",
                     }}>
-                    <span style={{ fontSize: 18 }}>{i.icon}</span>
+                    <span style={{ display: "inline-flex" }}>{i.icon}</span>
                     <span style={{ fontWeight: 700, fontSize: 15, color: i.tone === "warn" ? "var(--brick)" : "var(--emerald-dark)" }}>{i.count}</span>
                     <span style={{ fontSize: 13 }}>{i.label}</span>
                   </Link>

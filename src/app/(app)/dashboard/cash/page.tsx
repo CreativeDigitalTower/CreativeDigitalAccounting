@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CURRENCIES, formatCurrency } from "@/lib/constants";
+import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 
 type Register = { id: string; name: string; currency: string; balance: number };
 
@@ -132,10 +133,10 @@ function CashCard({ register, onChange }: { register: Register; onChange: () => 
         ) : (
           <>
             <div style={{ fontWeight: 600, fontSize: 15, display: "flex", alignItems: "center", gap: 8 }}>
-              🏦 {register.name}
-              <button onClick={() => setEditingName(true)} title="Преименувай" style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, color: "var(--muted)" }}>✎</button>
+              <NavIcon.cash width={16} height={16} /> {register.name}
+              <button onClick={() => setEditingName(true)} title="Преименувай" style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", display: "inline-flex", alignItems: "center" }}><UiIcon.edit width={13} height={13} /></button>
             </div>
-            <button onClick={remove} title="Изтрий" style={{ background: "none", border: "none", cursor: "pointer", color: "var(--brick)", fontSize: 14 }}>🗑</button>
+            <button onClick={remove} title="Изтрий" style={{ background: "none", border: "none", cursor: "pointer", color: "var(--brick)", display: "inline-flex", alignItems: "center" }}><UiIcon.trash width={15} height={15} /></button>
           </>
         )}
       </div>

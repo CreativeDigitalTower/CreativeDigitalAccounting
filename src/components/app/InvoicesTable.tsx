@@ -7,6 +7,7 @@ import { StatusSelect, statusMeta } from "@/components/app/StatusSelect";
 import { ContextMenu, type MenuItem } from "@/components/app/ContextMenu";
 import { formatCurrency, groupByMonth } from "@/lib/constants";
 import { downloadInvoicesPdf } from "@/lib/invoicePdf";
+import { UiIcon } from "@/components/app/NavIcons";
 
 export type InvoiceRow = {
   id: string; number: string; clientName: string; issueDate: string; dueDate: string | null;
@@ -26,13 +27,13 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
   }
   function menuItems(doc: InvoiceRow): MenuItem[] {
     return [
-      { label: "Отвори", icon: "📄", onClick: () => router.push(`/dashboard/documents/${doc.id}`) },
-      { label: "Редактирай", icon: "✎", onClick: () => router.push(`/dashboard/documents/${doc.id}/edit`) },
+      { label: "Отвори", icon: <UiIcon.doc width={15} height={15} />, onClick: () => router.push(`/dashboard/documents/${doc.id}`) },
+      { label: "Редактирай", icon: <UiIcon.edit width={15} height={15} />, onClick: () => router.push(`/dashboard/documents/${doc.id}/edit`) },
       { label: "Изтегли PDF", icon: "↓", onClick: () => downloadOne(doc) },
       { label: "Копирай номер", icon: "⧉", onClick: () => navigator.clipboard?.writeText(doc.number) },
       { divider: true, label: "", onClick: () => {} },
-      { label: "Маркирай като платена", icon: "✓", onClick: () => setStatus(doc.id, "paid") },
-      { label: "Маркирай като просрочена", icon: "⚠", onClick: () => setStatus(doc.id, "overdue") },
+      { label: "Маркирай като платена", icon: <UiIcon.check width={15} height={15} />, onClick: () => setStatus(doc.id, "paid") },
+      { label: "Маркирай като просрочена", icon: <UiIcon.warning width={15} height={15} />, onClick: () => setStatus(doc.id, "overdue") },
     ];
   }
 
@@ -83,12 +84,12 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
         <div style={{ display: "flex", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
           {overdueCount > 0 && (
             <div style={{ flex: 1, minWidth: 240, background: "var(--brick-soft)", border: "1px solid var(--brick)", color: "var(--brick)", borderRadius: 10, padding: "10px 14px", fontSize: 13, fontWeight: 600 }}>
-              🔴 {overdueCount} просрочени фактури — потърсете плащане от клиентите.
+              <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "currentColor", marginRight: 7 }} />{overdueCount} просрочени фактури — потърсете плащане от клиентите.
             </div>
           )}
           {soonCount > 0 && (
             <div style={{ flex: 1, minWidth: 240, background: "var(--brass-soft)", border: "1px solid var(--brass)", color: "var(--brass)", borderRadius: 10, padding: "10px 14px", fontSize: 13, fontWeight: 600 }}>
-              🟡 {soonCount} фактури с наближаващ падеж (до 5 дни).
+              <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "currentColor", marginRight: 7 }} />{soonCount} фактури с наближаващ падеж (до 5 дни).
             </div>
           )}
         </div>
@@ -132,8 +133,9 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
                     <td style={{ fontSize: 13, color: "var(--ink-soft)" }}>
                       {doc.dueDate ? new Date(doc.dueDate).toLocaleDateString("bg-BG") : "—"}
                       {rem && (
-                        <div style={{ fontSize: 11, fontWeight: 700, marginTop: 2, color: rem.kind === "overdue" ? "var(--brick)" : "var(--brass)" }}>
-                          {rem.kind === "overdue" ? `🔴 просрочена с ${rem.days} дни` : `🟡 до падеж: ${rem.days} дни`}
+                        <div style={{ fontSize: 11, fontWeight: 700, marginTop: 2, color: rem.kind === "overdue" ? "var(--brick)" : "var(--brass)", display: "flex", alignItems: "center", gap: 5 }}>
+                          <span style={{ display: "inline-block", width: 7, height: 7, borderRadius: "50%", background: "currentColor" }} />
+                          {rem.kind === "overdue" ? `просрочена с ${rem.days} дни` : `до падеж: ${rem.days} дни`}
                         </div>
                       )}
                     </td>
@@ -141,7 +143,7 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
                     <td><StatusSelect id={doc.id} status={doc.status} /></td>
                     <td style={{ display: "flex", gap: 6 }}>
                       <Link href={`/dashboard/documents/${doc.id}`} className="btn btn-ghost btn-sm">Отвори</Link>
-                      <Link href={`/dashboard/documents/${doc.id}/edit`} className="btn btn-ghost btn-sm">✎</Link>
+                      <Link href={`/dashboard/documents/${doc.id}/edit`} className="btn btn-ghost btn-sm" title="Редактирай" style={{ display: "inline-flex", alignItems: "center" }}><UiIcon.edit /></Link>
                       <button className="btn btn-ghost btn-sm" onClick={() => downloadOne(doc)} disabled={busyId === doc.id} title="Изтегли PDF">
                         {busyId === doc.id ? "…" : "↓ PDF"}
                       </button>

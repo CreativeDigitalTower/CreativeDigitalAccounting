@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { planHasFeature, formatCurrency } from "@/lib/constants";
 import { CategoriesManager } from "@/components/app/CategoriesManager";
 import { FeatureLink } from "@/components/app/FeatureLink";
+import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 import Link from "next/link";
 
 export default async function WarehousePage() {
@@ -53,8 +54,8 @@ export default async function WarehousePage() {
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <Link href="/dashboard/warehouse/receive" className="btn btn-ghost">+ Заприходяване</Link>
           <Link href="/dashboard/warehouse/issue" className="btn btn-ghost">− Изписване</Link>
-          <FeatureLink plan={plan} feature="revision" href="/dashboard/warehouse/scrap">🗑 Брак</FeatureLink>
-          <FeatureLink plan={plan} feature="revision" href="/dashboard/warehouse/revision">📋 Ревизия</FeatureLink>
+          <FeatureLink plan={plan} feature="revision" href="/dashboard/warehouse/scrap">Брак</FeatureLink>
+          <FeatureLink plan={plan} feature="revision" href="/dashboard/warehouse/revision">Ревизия</FeatureLink>
           <Link href="/dashboard/warehouse/items/new" className="btn btn-primary">+ Нов артикул</Link>
         </div>
       </div>
@@ -74,7 +75,7 @@ export default async function WarehousePage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 20 }}>
         {warehouses.map((w) => (
           <div key={w.id} className="glass kpi-card">
-            <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>📦 {w.name}</div>
+            <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}><NavIcon.warehouse width={14} height={14} /> {w.name}</div>
             <div className="num" style={{ fontSize: 22, fontWeight: 600 }}>{w._count.stockItems}</div>
             <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 2 }}>артикула · <strong style={{ color: "var(--emerald-dark)" }}>{formatCurrency(valueByWarehouse.get(w.id) ?? 0)}</strong></div>
           </div>
@@ -84,7 +85,7 @@ export default async function WarehousePage() {
       {/* Low stock alert */}
       {lowStock.length > 0 && (
         <div style={{ background: "var(--brick-soft)", border: "1px solid rgba(162,59,43,.3)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, fontSize: 13 }}>
-          <strong style={{ color: "var(--brick)" }}>⚠ Ниска наличност ({lowStock.length} артикула):</strong>{" "}
+          <strong style={{ color: "var(--brick)", display: "inline-flex", alignItems: "center", gap: 6 }}><UiIcon.warning width={14} height={14} /> Ниска наличност ({lowStock.length} артикула):</strong>{" "}
           {lowStock.map((i) => i.name).join(", ")}
         </div>
       )}
@@ -100,7 +101,7 @@ export default async function WarehousePage() {
       <div className="glass panel" style={{ padding: "8px 0" }}>
         {stockItems.length === 0 ? (
           <div style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>📦</div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, color: "var(--muted)" }}><NavIcon.warehouse width={34} height={34} /></div>
             <div style={{ fontSize: 14, marginBottom: 16 }}>Складът е празен</div>
             <Link href="/dashboard/warehouse/items/new" className="btn btn-primary btn-sm">Добави артикул</Link>
           </div>
@@ -149,7 +150,7 @@ export default async function WarehousePage() {
                       : <span style={{ fontSize: 12, color: "var(--muted)" }}>Безсрочно</span>; })()}</td>
                     <td>
                       {isLow ? (
-                        <span style={{ color: "var(--brick)", fontSize: 12, fontWeight: 600 }}>⚠ Ниска</span>
+                        <span style={{ color: "var(--brick)", fontSize: 12, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4 }}><UiIcon.warning width={12} height={12} /> Ниска</span>
                       ) : (
                         <span style={{ color: "var(--emerald)", fontSize: 12, fontWeight: 600 }}>✓ Норма</span>
                       )}

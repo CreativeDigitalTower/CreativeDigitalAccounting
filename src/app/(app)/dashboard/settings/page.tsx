@@ -209,12 +209,12 @@ export default function SettingsPage() {
                         <TemplatePreview templateId={t.id} showLogo={!!c.logoUrl} />
                         <div style={{ fontSize: 12.5, fontWeight: 600, marginTop: 6, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                           {t.name}
-                          {locked ? <span title="Заключен шаблон">🔒</span> : (c.invoiceTemplate === t.id && <span style={{ color: "var(--emerald)" }}>✓</span>)}
+                          {locked ? <span title="Заключен шаблон" style={{ display: "inline-flex", color: "var(--muted)" }}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg></span> : (c.invoiceTemplate === t.id && <span style={{ color: "var(--emerald)" }}>✓</span>)}
                         </div>
                       </div>
                       <a href={`/dashboard/settings/preview?template=${t.id}`} target="_blank" rel="noopener noreferrer"
-                        style={{ display: "block", textAlign: "center", marginTop: 6, fontSize: 11.5, fontWeight: 600, color: "var(--navy)", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 0", textDecoration: "none" }}>
-                        👁 Преглед
+                        style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, textAlign: "center", marginTop: 6, fontSize: 11.5, fontWeight: 600, color: "var(--navy)", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 0", textDecoration: "none" }}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg> Преглед
                       </a>
                     </div>
                   );
@@ -222,7 +222,7 @@ export default function SettingsPage() {
               </div>
               {allowed !== Infinity && (
                 <p style={{ fontSize: 11.5, color: "var(--brass)", marginTop: 10 }}>
-                  🔒 Повече шаблони са достъпни в по-висок план. <Link href="/dashboard/subscription" style={{ color: "var(--navy)", fontWeight: 600 }}>Надгради</Link>
+                  Повече шаблони са достъпни в по-висок план. <Link href="/dashboard/subscription" style={{ color: "var(--navy)", fontWeight: 600 }}>Надгради</Link>
                 </p>
               )}
               <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 8 }}>

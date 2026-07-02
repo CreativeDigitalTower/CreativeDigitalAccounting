@@ -1,6 +1,7 @@
 import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 
 export default async function ContractsPage() {
   const { companyId } = await requireFeature("contracts");
@@ -28,7 +29,7 @@ export default async function ContractsPage() {
       <div className="glass panel" style={{ padding: "8px 0" }}>
         {contracts.length === 0 ? (
           <div style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>📑</div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, color: "var(--muted)" }}><NavIcon.contracts width={34} height={34} /></div>
             <div style={{ fontSize: 14, marginBottom: 16 }}>Няма договори</div>
             <Link href="/dashboard/contracts/new" className="btn btn-primary btn-sm">Добави договор</Link>
           </div>
@@ -65,7 +66,7 @@ export default async function ContractsPage() {
                     <td style={{ fontSize: 13 }}>
                       {c.endDate ? (
                         <span style={{ color: expiring ? "var(--brick)" : "var(--ink-soft)" }}>
-                          {expiring && "⚠ "}{new Date(c.endDate).toLocaleDateString("bg-BG")}
+                          {expiring && <UiIcon.warning width={12} height={12} />} {new Date(c.endDate).toLocaleDateString("bg-BG")}
                         </span>
                       ) : "—"}
                     </td>
