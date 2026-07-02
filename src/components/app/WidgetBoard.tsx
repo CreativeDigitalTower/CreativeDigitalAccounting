@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/constants";
+import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 
 export type WidgetData = {
   recentInvoices: { id: string; number: string; client: string; total: number; currency: string; status: string }[];
@@ -16,16 +17,17 @@ export type WidgetData = {
   clientsCount: number;
 };
 
-type WidgetDef = { id: string; title: string; icon: string };
+type WidgetDef = { id: string; title: string; icon: React.ReactNode };
+const wi = { width: 15, height: 15 };
 const CATALOG: WidgetDef[] = [
-  { id: "recent_invoices", title: "Последни фактури", icon: "🧾" },
-  { id: "revenue_expense", title: "Приходи / Разходи", icon: "📊" },
-  { id: "top_clients", title: "Най-добри клиенти", icon: "🏆" },
-  { id: "reminders", title: "Напомняния за плащане", icon: "🔔" },
-  { id: "tasks", title: "Задачи", icon: "✅" },
-  { id: "stock", title: "Склад", icon: "📦" },
-  { id: "low_stock", title: "Ниски наличности", icon: "⚠️" },
-  { id: "ai", title: "AI препоръки", icon: "🤖" },
+  { id: "recent_invoices", title: "Последни фактури", icon: <NavIcon.invoice {...wi} /> },
+  { id: "revenue_expense", title: "Приходи / Разходи", icon: <NavIcon.analytics {...wi} /> },
+  { id: "top_clients", title: "Най-добри клиенти", icon: <UiIcon.star {...wi} /> },
+  { id: "reminders", title: "Напомняния за плащане", icon: <UiIcon.bell {...wi} /> },
+  { id: "tasks", title: "Задачи", icon: <UiIcon.check {...wi} /> },
+  { id: "stock", title: "Склад", icon: <NavIcon.warehouse {...wi} /> },
+  { id: "low_stock", title: "Ниски наличности", icon: <UiIcon.warning {...wi} /> },
+  { id: "ai", title: "AI препоръки", icon: <NavIcon.dashboard {...wi} /> },
 ];
 const DEFAULT_ORDER = ["recent_invoices", "revenue_expense", "top_clients", "reminders", "tasks", "stock"];
 const KEY = "cda_widgets_v2";
@@ -61,7 +63,7 @@ export function WidgetBoard({ data }: { data: WidgetData }) {
     <div style={{ marginTop: 28 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
         <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 16, fontWeight: 700, margin: 0 }}>Моето табло <span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 400 }}>· персонализируемо</span></h3>
-        <button onClick={() => setEdit((v) => !v)} className="btn btn-ghost btn-sm">{edit ? "Готово" : "⚙ Персонализирай"}</button>
+        <button onClick={() => setEdit((v) => !v)} className="btn btn-ghost btn-sm" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>{edit ? "Готово" : <><UiIcon.edit width={14} height={14} /> Персонализирай</>}</button>
       </div>
 
       {edit && (
@@ -72,8 +74,8 @@ export function WidgetBoard({ data }: { data: WidgetData }) {
               const on = !hidden.includes(w.id);
               return (
                 <button key={w.id} onClick={() => (on ? hide(w.id) : show(w.id))}
-                  className={`filter-tab${on ? " active" : ""}`} style={{ fontSize: 12 }}>
-                  {on ? "☑" : "☐"} {w.icon} {w.title}
+                  className={`filter-tab${on ? " active" : ""}`} style={{ fontSize: 12, display: "inline-flex", alignItems: "center", gap: 6 }}>
+                  {on ? <UiIcon.check width={13} height={13} /> : <span style={{ width: 13, height: 13, border: "1.5px solid currentColor", borderRadius: 3, display: "inline-block", opacity: .5 }} />} {w.icon} {w.title}
                 </button>
               );
             })}
@@ -91,7 +93,7 @@ export function WidgetBoard({ data }: { data: WidgetData }) {
               className="glass panel kpi-anim" style={{ padding: "16px 18px", cursor: edit ? "grab" : "default", border: drag === idx ? "2px dashed var(--emerald)" : undefined }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                 <h4 style={{ fontFamily: "'Fraunces', serif", fontSize: 14.5, margin: 0, display: "flex", alignItems: "center", gap: 7 }}>
-                  <span>{def.icon}</span> {def.title}
+                  <span style={{ display: "inline-flex" }}>{def.icon}</span> {def.title}
                 </h4>
                 {edit ? <button onClick={() => hide(id)} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer", fontSize: 15 }} title="Скрий">×</button>
                       : <span style={{ color: "var(--muted)", fontSize: 12 }}>⠿</span>}
@@ -174,7 +176,7 @@ function Widget({ id, data }: { id: string; data: WidgetData }) {
       </>;
     case "ai":
       return <div style={{ textAlign: "center", padding: "14px 0" }}>
-        <div style={{ fontSize: 30, marginBottom: 6 }}>🤖</div>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 6, color: "var(--muted)" }}><NavIcon.dashboard width={28} height={28} /></div>
         <div style={{ display: "inline-block", fontSize: 10.5, fontWeight: 700, letterSpacing: 1, color: "var(--brass)", border: "1px solid var(--brass)", borderRadius: 12, padding: "2px 10px" }}>СКОРО</div>
         <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 8 }}>Интелигентни препоръки за бизнеса Ви.</div>
       </div>;

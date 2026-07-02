@@ -14,6 +14,7 @@ import { KpiStrip, type Kpi } from "@/components/app/KpiStrip";
 import { DashboardPeriodSelector } from "@/components/app/DashboardPeriodSelector";
 import { WidgetBoard, type WidgetData } from "@/components/app/WidgetBoard";
 import { resolveLayout, SECTOR_TITLE } from "@/lib/workspaces";
+import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ period?: string; from?: string; to?: string }> }) {
   const { companyId, userId } = await requireCompany();
@@ -206,11 +207,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const expiringContractsCount = expiringContracts.length;
 
   const todayItems: TodayItem[] = [
-    { icon: "🧾", label: "неплатени фактури", href: "/dashboard/invoices?status=overdue", count: unpaidInvoices.length, tone: "warn" },
-    { icon: "📑", label: "изтичащи договори", href: "/dashboard/contracts", count: expiringContractsCount, tone: "info" },
-    { icon: "✅", label: "отворени задачи", href: "/dashboard/clients", count: openTasksCount, tone: "info" },
-    { icon: "📤", label: "изтичащи оферти", href: "/dashboard/documents", count: expiringOffersCount, tone: "info" },
-    { icon: "🎂", label: "клиенти с рожден ден", href: "/dashboard/clients", count: birthdaysToday, tone: "ok" },
+    { icon: <NavIcon.invoice width={17} height={17} />, label: "неплатени фактури", href: "/dashboard/invoices?status=overdue", count: unpaidInvoices.length, tone: "warn" },
+    { icon: <NavIcon.contracts width={17} height={17} />, label: "изтичащи договори", href: "/dashboard/contracts", count: expiringContractsCount, tone: "info" },
+    { icon: <UiIcon.check width={17} height={17} />, label: "отворени задачи", href: "/dashboard/clients", count: openTasksCount, tone: "info" },
+    { icon: <NavIcon.document width={17} height={17} />, label: "изтичащи оферти", href: "/dashboard/documents", count: expiringOffersCount, tone: "info" },
+    { icon: <UiIcon.party width={17} height={17} />, label: "клиенти с рожден ден", href: "/dashboard/clients", count: birthdaysToday, tone: "ok" },
   ];
 
   // ─── KPI показатели ───
@@ -281,7 +282,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
       {/* Скоро: мобилно приложение */}
       <div className="glass" style={{ display: "flex", alignItems: "center", gap: 10, borderRadius: 12, padding: "10px 16px", marginBottom: 20, flexWrap: "wrap", borderLeft: "3px solid var(--brass)" }}>
-        <span style={{ fontSize: 17 }}>📱</span>
+        <span style={{ display: "inline-flex", color: "var(--brass)" }}><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5" /><path d="M11 18.5h2" /></svg></span>
         <span style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>
           <strong>Скоро:</strong> мобилно приложение за iOS и Android и още нови функционалности.
         </span>
@@ -457,7 +458,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
               <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>Известия</h3>
               {lowStockItems.slice(0, 3).map((item) => (
                 <div key={item.id} style={{ fontSize: 13, padding: "7px 0", borderBottom: "1px solid rgba(217,215,200,.5)", display: "flex", gap: 10, alignItems: "center" }}>
-                  <span style={{ color: "var(--brick)", fontSize: 16 }}>⚠</span>
+                  <span style={{ color: "var(--brick)", display: "inline-flex" }}><UiIcon.warning width={15} height={15} /></span>
                   <span>Ниска наличност: <strong>{item.name}</strong> ({item.quantity} {item.unit})</span>
                 </div>
               ))}
@@ -475,13 +476,13 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>Бързи действия</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {[
-                { href: "/dashboard/documents/new?type=invoice", label: "📄 Нова фактура" },
-                { href: "/dashboard/clients/new", label: "👥 Нов клиент" },
-                { href: "/dashboard/expenses/new", label: "💰 Нов разход" },
-                { href: "/dashboard/warehouse/receive", label: "📦 Заприходяване" },
+                { href: "/dashboard/documents/new?type=invoice", label: "Нова фактура", icon: <NavIcon.invoice width={15} height={15} /> },
+                { href: "/dashboard/clients/new", label: "Нов клиент", icon: <UiIcon.people width={15} height={15} /> },
+                { href: "/dashboard/expenses/new", label: "Нов разход", icon: <NavIcon.expenses width={15} height={15} /> },
+                { href: "/dashboard/warehouse/receive", label: "Заприходяване", icon: <NavIcon.warehouse width={15} height={15} /> },
               ].map((a) => (
-                <Link key={a.href} href={a.href} className="btn btn-ghost btn-sm" style={{ justifyContent: "flex-start" }}>
-                  {a.label}
+                <Link key={a.href} href={a.href} className="btn btn-ghost btn-sm" style={{ justifyContent: "flex-start", display: "inline-flex", alignItems: "center", gap: 8 }}>
+                  {a.icon} {a.label}
                 </Link>
               ))}
             </div>
@@ -509,7 +510,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       {hasTaxCalendar && taxDeadlines.length > 0 && (
         <div className="glass panel" style={{ marginTop: 18 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>📅 Данъчен и осигурителен календар</h3>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0, display: "flex", alignItems: "center", gap: 8 }}><NavIcon.calendar width={16} height={16} /> Данъчен и осигурителен календар</h3>
             <Link href="/dashboard/tax-calendar" style={{ fontSize: 12.5, color: "var(--navy)", fontWeight: 600 }}>Пълен календар →</Link>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 10 }}>
