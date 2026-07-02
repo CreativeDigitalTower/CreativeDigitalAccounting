@@ -4,6 +4,7 @@ import { FinancialHistorySection } from "@/components/app/FinancialHistorySectio
 import { TopClientsChart } from "@/components/app/TopClientsChart";
 import { MonthlyBarChart } from "@/components/app/MonthlyBarChart";
 import { MonthlyBackfill } from "@/components/app/MonthlyBackfill";
+import { PriceIncreaseSimulator } from "@/components/app/PriceIncreaseSimulator";
 import { aggregateClientRevenue } from "@/lib/clientRevenue";
 import { formatCurrency, toBGN, isDualCurrencyActive } from "@/lib/constants";
 import { sumPayroll } from "@/lib/payroll";
@@ -192,6 +193,11 @@ export default async function AnalyticsPage() {
         </div>
       </div>
 
+      {/* Симулация на увеличение на цените (абонаменти) */}
+      <div style={{ marginTop: 18 }}>
+        <PriceIncreaseSimulator monthlyRetainer={expectedRetainer} goalTarget={goal?.targetRevenue ?? null} />
+      </div>
+
       {/* Заплати по месеци + ръчно въведени приходи/разходи (текуща година) */}
       <div style={{ marginTop: 18 }}>
         <MonthlyBackfill
@@ -214,6 +220,8 @@ export default async function AnalyticsPage() {
           goalYear={year}
           goalTarget={goal?.targetRevenue ?? null}
           goalRevenue={yearRevenue}
+          currentExpenses={yearExpenses}
+          currentProfit={yearProfit}
         />
       </div>
     </>

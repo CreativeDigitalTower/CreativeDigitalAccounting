@@ -16,6 +16,7 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
   const router = useRouter();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<string>("all");
+  const [showInactive, setShowInactive] = useState(false);
   const [menu, setMenu] = useState<{ x: number; y: number; client: ClientRow } | null>(null);
   const [mergeSource, setMergeSource] = useState<ClientRow | null>(null);
   const [mergeTarget, setMergeTarget] = useState("");
@@ -97,62 +98,102 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
         </div>
       </div>
 
-      <div className="glass panel" style={{ padding: "8px 0" }}>
-        {filtered.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "40px 0", color: "var(--muted)" }}>
-            <div style={{ fontSize: 30, marginBottom: 10 }}>👥</div>
-            <div style={{ fontSize: 14, marginBottom: 14 }}>{clients.length === 0 ? "Няма клиенти" : "Няма съвпадения по търсенето"}</div>
-            {clients.length === 0 && <Link href="/dashboard/clients/new" className="btn btn-primary btn-sm">Добави клиент</Link>}
-          </div>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Клиент</th><th>Статус</th><th>Телефон</th>
-                <th className="num">Месечен абонамент</th><th className="num">Приход (общо)</th><th className="num">Задачи</th><th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((client) => {
-                const s = STATUSES.find((x) => x.id === client.status) ?? STATUSES[1];
-                return (
-                  <tr key={client.id} onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY, client }); }}>
-                    <td>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div style={{ width: 30, height: 30, borderRadius: "50%", background: "var(--navy-soft)", color: "var(--navy)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11.5, fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>
-                          {client.name.slice(0, 2).toUpperCase()}
-                        </div>
-                        <div>
-                          <Link href={`/dashboard/clients/${client.id}`} style={{ fontWeight: 600, fontSize: 13.5, color: "inherit", textDecoration: "none" }}>{client.name}</Link>
-                          {client.contactPerson && <div style={{ fontSize: 12, color: "var(--muted)" }}>{client.contactPerson}</div>}
-                        </div>
-                      </div>
-                    </td>
-                    <td><span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: s.color, borderRadius: 14, padding: "2px 9px" }}>{s.label}</span></td>
-                    <td style={{ fontSize: 13 }}>{client.phone ?? "—"}</td>
-                    <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(client.month)}</td>
-                    <td className="num" style={{ fontWeight: 600, color: "var(--emerald-dark)" }}>{formatCurrency(client.total)}</td>
-                    <td className="num">{client.openTasks > 0 ? <span style={{ color: "var(--brass)", fontWeight: 700 }}>{client.openTasks}</span> : "—"}</td>
-                    <td style={{ display: "flex", gap: 6 }}>
-                      <Link href={`/dashboard/clients/${client.id}`} className="btn btn-ghost btn-sm">Досие</Link>
-                      <Link href={`/dashboard/documents/new?clientId=${client.id}`} className="btn btn-primary btn-sm">+ Фактура</Link>
-                      <button onClick={() => deleteClient(client)} className="btn btn-ghost btn-sm" title="Изтрий клиент" style={{ color: "var(--brick)", borderColor: "var(--brick)" }}>🗑</button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-            <tfoot>
-              <tr style={{ borderTop: "2px solid var(--border)", fontWeight: 700 }}>
-                <td colSpan={3} style={{ textAlign: "right" }}>{filtered.length === clients.length ? "Общо:" : `Показани ${filtered.length}:`}</td>
-                <td className="num">{formatCurrency(fMonth)}</td>
-                <td className="num" style={{ color: "var(--emerald-dark)" }}>{formatCurrency(fTotal)}</td>
-                <td colSpan={2}></td>
-              </tr>
-            </tfoot>
-          </table>
-        )}
-      </div>
+      {(() => {
+        const renderRow = (client: ClientRow) => {
+          const s = STATUSES.find((x) => x.id === client.status) ?? STATUSES[1];
+          return (
+            <tr key={client.id} onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY, client }); }}>
+              <td>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 30, height: 30, borderRadius: "50%", background: "var(--navy-soft)", color: "var(--navy)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11.5, fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace", flexShrink: 0 }}>
+                    {client.name.slice(0, 2).toUpperCase()}
+                  </div>
+                  <div>
+                    <Link href={`/dashboard/clients/${client.id}`} style={{ fontWeight: 600, fontSize: 13.5, color: "inherit", textDecoration: "none" }}>{client.name}</Link>
+                    {client.contactPerson && <div style={{ fontSize: 12, color: "var(--muted)" }}>{client.contactPerson}</div>}
+                  </div>
+                </div>
+              </td>
+              <td><span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: s.color, borderRadius: 14, padding: "2px 9px" }}>{s.label}</span></td>
+              <td style={{ fontSize: 13 }}>{client.phone ?? "—"}</td>
+              <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(client.month)}</td>
+              <td className="num" style={{ fontWeight: 600, color: "var(--emerald-dark)" }}>{formatCurrency(client.total)}</td>
+              <td className="num">{client.openTasks > 0 ? <span style={{ color: "var(--brass)", fontWeight: 700 }}>{client.openTasks}</span> : "—"}</td>
+              <td style={{ display: "flex", gap: 6 }}>
+                <Link href={`/dashboard/clients/${client.id}`} className="btn btn-ghost btn-sm">Досие</Link>
+                <Link href={`/dashboard/documents/new?clientId=${client.id}`} className="btn btn-primary btn-sm">+ Фактура</Link>
+                <button onClick={() => deleteClient(client)} className="btn btn-ghost btn-sm" title="Изтрий клиент" style={{ color: "var(--brick)", borderColor: "var(--brick)" }}>🗑</button>
+              </td>
+            </tr>
+          );
+        };
+        const Head = () => (
+          <thead><tr>
+            <th>Клиент</th><th>Статус</th><th>Телефон</th>
+            <th className="num">Месечен абонамент</th><th className="num">Приход (общо)</th><th className="num">Задачи</th><th></th>
+          </tr></thead>
+        );
+
+        // Разделяме неактивните/загубените клиенти в отделна секция долу (само при изглед „Всички").
+        const splitInactive = status === "all";
+        const inactiveSet = new Set(["inactive", "lost"]);
+        const mainRows = splitInactive ? filtered.filter((c) => !inactiveSet.has(c.status)) : filtered;
+        const inactiveRows = splitInactive ? filtered.filter((c) => inactiveSet.has(c.status)) : [];
+        const mMonth = mainRows.reduce((s, c) => s + c.month, 0);
+        const mTotal = mainRows.reduce((s, c) => s + c.total, 0);
+
+        return (
+          <>
+            <div className="glass panel" style={{ padding: "8px 0" }}>
+              {filtered.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "40px 0", color: "var(--muted)" }}>
+                  <div style={{ fontSize: 30, marginBottom: 10 }}>👥</div>
+                  <div style={{ fontSize: 14, marginBottom: 14 }}>{clients.length === 0 ? "Няма клиенти" : "Няма съвпадения по търсенето"}</div>
+                  {clients.length === 0 && <Link href="/dashboard/clients/new" className="btn btn-primary btn-sm">Добави клиент</Link>}
+                </div>
+              ) : mainRows.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "24px 0", color: "var(--muted)", fontSize: 13 }}>Няма активни клиенти в този изглед.</div>
+              ) : (
+                <table>
+                  <Head />
+                  <tbody>{mainRows.map(renderRow)}</tbody>
+                  <tfoot>
+                    <tr style={{ borderTop: "2px solid var(--border)", fontWeight: 700 }}>
+                      <td colSpan={3} style={{ textAlign: "right" }}>{!splitInactive && filtered.length === clients.length ? "Общо:" : `Показани ${mainRows.length}:`}</td>
+                      <td className="num">{formatCurrency(splitInactive ? mMonth : fMonth)}</td>
+                      <td className="num" style={{ color: "var(--emerald-dark)" }}>{formatCurrency(splitInactive ? mTotal : fTotal)}</td>
+                      <td colSpan={2}></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              )}
+            </div>
+
+            {/* Неактивни / загубени клиенти — изнесени и сгъваеми, за по-структуриран изглед */}
+            {inactiveRows.length > 0 && (
+              <div style={{ marginTop: 14 }}>
+                <button
+                  onClick={() => setShowInactive((v) => !v)}
+                  className="glass panel"
+                  style={{ width: "100%", textAlign: "left", cursor: "pointer", border: "none", padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, fontSize: 13.5, fontWeight: 600 }}
+                >
+                  <span style={{ color: "var(--muted)" }}>{showInactive ? "▼" : "▶"}</span>
+                  Неактивни клиенти ({inactiveRows.length})
+                  <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--muted)", fontWeight: 400 }}>{showInactive ? "скрий" : "покажи"}</span>
+                </button>
+                {showInactive && (
+                  <div className="glass panel" style={{ padding: "8px 0", marginTop: 8 }}>
+                    <table>
+                      <Head />
+                      <tbody>{inactiveRows.map(renderRow)}</tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        );
+      })()}
 
       {/* Диаграма с приходите по клиенти */}
       {(() => {

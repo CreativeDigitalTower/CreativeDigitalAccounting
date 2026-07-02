@@ -1,15 +1,18 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/constants";
 
 type Row = { year: number; revenue: number; expenses: number | null; profit: number | null; employeeCount: number | null };
 
-export function FinancialHistorySection({ initial, goalYear, goalTarget, goalRevenue }: {
+export function FinancialHistorySection({ initial, goalYear, goalTarget, goalRevenue, currentExpenses, currentProfit }: {
   initial: Row[]; goalYear: number; goalTarget: number | null; goalRevenue: number;
+  currentExpenses: number; currentProfit: number;
 }) {
   const router = useRouter();
-  const [rows] = useState<Row[]>(initial);
+  const [rows, setRows] = useState<Row[]>(initial);
+  // Синхронизираме с новите данни след router.refresh() (иначе се показват едва след пълен презареждане).
+  useEffect(() => { setRows(initial); }, [initial]);
   const [editYear, setEditYear] = useState<number | null>(null);
   const [f, setF] = useState({ year: new Date().getFullYear() - 1, revenue: "", expenses: "", profit: "", employees: "" });
   const [adding, setAdding] = useState(false);
@@ -38,6 +41,14 @@ export function FinancialHistorySection({ initial, goalYear, goalTarget, goalRev
 
   const max = Math.max(1, ...rows.map((r) => Math.max(r.revenue, r.expenses ?? 0, Math.abs(r.profit ?? 0))));
   const goalPct = goalTarget ? Math.min(100, Math.round((goalRevenue / goalTarget) * 100)) : null;
+
+  // Обобщено за целия период на съществуване: исторически години (без текущата)
+  // + данните за текущата година на живо.
+  const pastRows = rows.filter((r) => r.year !== goalYear);
+  const allTimeRevenue = pastRows.reduce((s, r) => s + r.revenue, 0) + goalRevenue;
+  const allTimeExpenses = pastRows.reduce((s, r) => s + (r.expenses ?? 0), 0) + currentExpenses;
+  const allTimeProfit = pastRows.reduce((s, r) => s + (r.profit ?? (r.revenue - (r.expenses ?? 0))), 0) + currentProfit;
+  const yearsCount = new Set([...pastRows.map((r) => r.year), goalYear]).size;
 
   return (
     <>
@@ -142,6 +153,26 @@ export function FinancialHistorySection({ initial, goalYear, goalTarget, goalRev
             </table>
           </>
         )}
+      </div>
+
+      {/* Обобщено за целия период на съществуване на фирмата */}
+      <div className="glass panel" style={{ marginTop: 18 }}>
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 4px" }}>Обобщено за целия период</h3>
+        <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 14px" }}>
+          Сумарно за всички {yearsCount} {yearsCount === 1 ? "година" : "години"} (историческите данни + текущата {goalYear} г.) — движение и развитие на фирмата.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px,1fr))", gap: 14 }}>
+          {([
+            ["Общи приходи", allTimeRevenue, "var(--emerald-dark)"],
+            ["Общи разходи", allTimeExpenses, "var(--brick)"],
+            ["Обща печалба", allTimeProfit, allTimeProfit >= 0 ? "var(--navy)" : "var(--brick)"],
+          ] as [string, number, string][]).map(([l, v, c]) => (
+            <div key={l}>
+              <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 4 }}>{l}</div>
+              <div className="num" style={{ fontSize: 22, fontWeight: 700, color: c }}>{formatCurrency(v)}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );

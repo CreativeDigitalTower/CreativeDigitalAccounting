@@ -458,14 +458,17 @@ model MonthlyEntry {
 }
 
 model EmployeeLeave {
-  id         String   @id @default(cuid())
-  employeeId String
-  type       String   // leave | sick | unpaid | other
-  startDate  DateTime
-  endDate    DateTime
-  days       Float?
-  note       String?
-  createdAt  DateTime @default(now())
+  id          String   @id @default(cuid())
+  employeeId  String
+  type        String   // leave | sick | unpaid | other
+  startDate   DateTime
+  endDate     DateTime
+  days        Float?
+  note        String?
+  docName     String?  // прикачен документ (молба, болничен лист и т.н.)
+  docMimeType String?
+  docDataUrl  String?  @db.Text
+  createdAt   DateTime @default(now())
 
   employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 }

@@ -54,7 +54,11 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const allTimeVisitors = allTimeVisitorRows.length;
   const allTimeUsers = allTimeUserRows.length;
   const paidCount = (counts.start ?? 0) + (counts.business ?? 0) + (counts.pro ?? 0);
-  const mrr = companies.reduce((s, c) => s + (PLAN_PRICE[c.subscription?.plan ?? "free"] ?? 0), 0);
+  // Собственият акаунт не се заплаща — сумата му не се отчита като приход (MRR/ARR).
+  const OWN_ACCOUNT_EMAIL = "office@creativedigitaltower.com";
+  const isOwnAccount = (c: (typeof companies)[number]) =>
+    c.companyUsers.some((cu) => cu.user?.email?.toLowerCase() === OWN_ACCOUNT_EMAIL);
+  const mrr = companies.reduce((s, c) => s + (isOwnAccount(c) ? 0 : (PLAN_PRICE[c.subscription?.plan ?? "free"] ?? 0)), 0);
   const conversion = companies.length ? Math.round((paidCount / companies.length) * 100) : 0;
 
   // Сектори

@@ -8,7 +8,11 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     const { id } = await params;
     const emp = await prisma.employee.findUnique({ where: { id } });
     if (!emp || emp.companyId !== companyId) return NextResponse.json([], { status: 200 });
-    const leaves = await prisma.employeeLeave.findMany({ where: { employeeId: id }, orderBy: { startDate: "desc" } });
+    const leaves = await prisma.employeeLeave.findMany({
+      where: { employeeId: id },
+      select: { id: true, type: true, startDate: true, endDate: true, days: true, note: true, docName: true },
+      orderBy: { startDate: "desc" },
+    });
     return NextResponse.json(leaves);
   } catch {
     return NextResponse.json([], { status: 200 });
