@@ -227,7 +227,7 @@ function NewDocumentForm() {
 
       {!companyReady && (
         <div style={{ background: "var(--brass-soft)", border: "1px solid var(--brass)", color: "var(--brass)", borderRadius: 8, padding: "12px 16px", fontSize: 13, marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-          <span>⚠ За да издавате документи, първо попълнете данните на вашата фирма (име, ЕИК, адрес).</span>
+          <span style={{display:"inline-flex",alignItems:"center",gap:6}}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><path d="M12 3 1.5 21h21L12 3Z"/><path d="M12 10v5M12 18h.01"/></svg> За да издавате документи, първо попълнете данните на вашата фирма (име, ЕИК, адрес).</span>
           <Link href="/dashboard/settings" className="btn btn-primary btn-sm">Попълни сега →</Link>
         </div>
       )}

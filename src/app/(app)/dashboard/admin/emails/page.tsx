@@ -111,7 +111,7 @@ export default async function AdminEmailsPage({ searchParams }: { searchParams: 
                 <td style={{ fontSize: 12.5 }}>{l.toName ? `${l.toName} · ` : ""}{l.toEmail}</td>
                 <td style={{ fontSize: 12.5 }}>{l.subject}</td>
                 <td style={{ fontSize: 12 }}>{CAT_LABEL[l.category] ?? l.category}</td>
-                <td><span style={{ fontSize: 11.5, fontWeight: 700, color: STATUS_COLOR[l.status] }}>{STATUS_LABEL[l.status] ?? l.status}{l.bounced ? " ⚠" : ""}</span>
+                <td><span style={{ fontSize: 11.5, fontWeight: 700, color: STATUS_COLOR[l.status] }}>{STATUS_LABEL[l.status] ?? l.status}{l.bounced ? " " : ""}</span>
                   {l.status === "failed" && l.error && <div style={{ fontSize: 10.5, color: "var(--muted)" }} title={l.error}>{l.error.slice(0, 40)}</div>}</td>
                 <td className="num" style={{ fontSize: 12 }}>{l.opensCount > 0 ? `${l.opensCount}×` : "—"}</td>
                 <td style={{ fontSize: 12, color: "var(--muted)" }}>{new Date(l.createdAt).toLocaleString("bg-BG")}</td>
