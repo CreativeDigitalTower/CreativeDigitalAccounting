@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireFeature } from "@/lib/session";
+import { validateUpload } from "@/lib/fileSecurity";
 import { z } from "zod";
 
 const schema = z.object({
@@ -24,6 +25,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const emp = await prisma.employee.findUnique({ where: { id } });
     if (!emp || emp.companyId !== companyId) return NextResponse.json({ error: "Не е намерен." }, { status: 404 });
     const data = schema.parse(await req.json());
+    if (data.docDataUrl) {
+      const v = validateUpload({ mimeType: data.docMimeType, dataUrl: data.docDataUrl });
+      if (!v.ok) return NextResponse.json({ error: v.error }, { status: 400 });
+    }
     const start = new Date(data.startDate);
     const end = new Date(data.endDate);
     const leave = await prisma.employeeLeave.create({

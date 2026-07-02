@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireFeature } from "@/lib/session";
+import { fileResponse, validateUpload } from "@/lib/fileSecurity";
 import { z } from "zod";
 
 async function ownedLeave(companyId: string, employeeId: string, leaveId: string) {
@@ -18,12 +19,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     if (!leave || !leave.docDataUrl) return NextResponse.json({ error: "Не е намерен." }, { status: 404 });
     const base64 = leave.docDataUrl.includes(",") ? leave.docDataUrl.split(",")[1] : leave.docDataUrl;
     const buffer = Buffer.from(base64, "base64");
-    return new NextResponse(buffer as unknown as BodyInit, {
-      headers: {
-        "Content-Type": leave.docMimeType ?? "application/octet-stream",
-        "Content-Disposition": `attachment; filename="${encodeURIComponent(leave.docName ?? "document")}"`,
-      },
-    });
+    return fileResponse(buffer, leave.docMimeType ?? "application/octet-stream", leave.docName ?? "document", false);
   } catch {
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
   }
@@ -43,6 +39,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const leave = await ownedLeave(companyId, id, leaveId);
     if (!leave) return NextResponse.json({ error: "Не е намерен." }, { status: 404 });
     const data = putSchema.parse(await req.json());
+    const v = validateUpload({ mimeType: data.docMimeType, dataUrl: data.docDataUrl });
+    if (!v.ok) return NextResponse.json({ error: v.error }, { status: 400 });
     await prisma.employeeLeave.update({ where: { id: leaveId }, data });
     return NextResponse.json({ success: true, docName: data.docName });
   } catch (err) {

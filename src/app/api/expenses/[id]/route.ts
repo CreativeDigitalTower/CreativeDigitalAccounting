@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCompany } from "@/lib/session";
+import { validateUpload } from "@/lib/fileSecurity";
 import { z } from "zod";
 
 const schema = z.object({
@@ -22,6 +23,10 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const existing = await prisma.expense.findFirst({ where: { id, companyId }, select: { id: true } });
     if (!existing) return NextResponse.json({ error: "Не е намерен" }, { status: 404 });
     const d = schema.parse(await req.json());
+    if (d.attachmentUrl) {
+      const v = validateUpload({ dataUrl: d.attachmentUrl });
+      if (!v.ok) return NextResponse.json({ error: v.error }, { status: 400 });
+    }
     const expense = await prisma.expense.update({
       where: { id },
       data: {

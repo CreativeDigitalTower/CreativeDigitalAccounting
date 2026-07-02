@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireFeature } from "@/lib/session";
 import { audit } from "@/lib/documents";
+import { validateUpload } from "@/lib/fileSecurity";
 import { z } from "zod";
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
@@ -32,6 +33,8 @@ export async function POST(req: Request) {
   try {
     const { companyId, userId } = await requireFeature("archive");
     const data = schema.parse(await req.json());
+    const v = validateUpload(data);
+    if (!v.ok) return NextResponse.json({ error: v.error }, { status: 400 });
 
     const file = await prisma.archiveFile.create({
       data: { companyId, name: data.name, category: data.category ?? null, mimeType: data.mimeType, size: data.size, dataUrl: data.dataUrl },

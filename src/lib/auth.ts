@@ -17,7 +17,10 @@ const DUMMY_HASH = "$2b$12$W1Y/3A/Zz9FvyR/QqFXeGutE020ajjrmQ7QiNuHU1RpSwHRFhsluG
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
-  session: { strategy: "jwt" },
+  // Ограничен живот на сесията (7 дни) с ежедневно подновяване.
+  session: { strategy: "jwt", maxAge: 7 * 24 * 60 * 60, updateAge: 24 * 60 * 60 },
+  // Доверяваме се на прокси хедърите зад reverse proxy (за коректни secure бисквитки).
+  trustHost: true,
   pages: {
     signIn: "/login",
     error: "/login",
