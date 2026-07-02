@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCompany } from "@/lib/session";
+import { validateUpload } from "@/lib/fileSecurity";
 import { z } from "zod";
 
 const schema = z.object({
@@ -21,6 +22,10 @@ export async function POST(req: Request) {
     const { companyId } = await requireCompany();
     const body = await req.json();
     const data = schema.parse(body);
+    if (data.attachmentUrl) {
+      const v = validateUpload({ dataUrl: data.attachmentUrl });
+      if (!v.ok) return NextResponse.json({ error: v.error }, { status: 400 });
+    }
 
     const expense = await prisma.expense.create({
       data: {

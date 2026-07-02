@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireCompany } from "@/lib/session";
+import { decodeDataUrl, fileResponse } from "@/lib/fileSecurity";
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { companyId } = await requireCompany();
@@ -8,21 +9,13 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   const exp = await prisma.expense.findFirst({ where: { id, companyId }, select: { attachmentUrl: true, description: true } });
   if (!exp?.attachmentUrl) return new Response("Няма прикачен файл", { status: 404 });
 
-  const m = exp.attachmentUrl.match(/^data:([^;]+);base64,([\s\S]+)$/);
-  if (!m) {
-    // не е data URL — пренасочваме (ако е външен линк)
-    return Response.redirect(exp.attachmentUrl);
+  const decoded = decodeDataUrl(exp.attachmentUrl);
+  if (!decoded) {
+    // Не е data URL — пренасочваме само към сигурни https линкове (без open redirect).
+    if (/^https:\/\//i.test(exp.attachmentUrl)) return Response.redirect(exp.attachmentUrl);
+    return new Response("Невалиден файл", { status: 400 });
   }
-  const mime = m[1];
-  const buf = Buffer.from(m[2], "base64");
-  const ext = mime.includes("pdf") ? "pdf" : mime.includes("png") ? "png" : mime.includes("jpeg") ? "jpg" : "bin";
+  const ext = decoded.mime.includes("pdf") ? "pdf" : decoded.mime.includes("png") ? "png" : decoded.mime.includes("jpeg") ? "jpg" : "bin";
   const fname = `${(exp.description || "разход").replace(/[^\p{L}\p{N}_-]+/gu, "_")}.${ext}`;
-  const disposition = url.searchParams.get("view") ? "inline" : "attachment";
-  return new Response(new Uint8Array(buf), {
-    headers: {
-      "Content-Type": mime,
-      "Content-Disposition": `${disposition}; filename="${encodeURIComponent(fname)}"`,
-      "Cache-Control": "private, no-store",
-    },
-  });
+  return fileResponse(decoded.buf, decoded.mime, fname, !!url.searchParams.get("view"));
 }
