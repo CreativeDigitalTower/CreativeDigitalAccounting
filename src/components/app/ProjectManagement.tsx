@@ -22,6 +22,8 @@ export function ProjectManagement({ canManage }: { canManage: boolean }) {
   const [newBoard, setNewBoard] = useState("");
   const [taskModal, setTaskModal] = useState<{ boardId: string; task?: Task } | null>(null);
   const [infoBoard, setInfoBoard] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
     const r = await fetch("/api/pm/boards");
@@ -31,9 +33,17 @@ export function ProjectManagement({ canManage }: { canManage: boolean }) {
   useEffect(() => { load(); }, [load]);
 
   async function addBoard() {
-    if (!newBoard.trim()) return;
-    const r = await fetch("/api/pm/boards", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: newBoard.trim(), color: COLORS[boards.length % COLORS.length] }) });
-    if (r.ok) { setNewBoard(""); load(); }
+    if (!newBoard.trim() || saving) return;
+    setSaving(true); setError("");
+    try {
+      const r = await fetch("/api/pm/boards", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: newBoard.trim(), color: COLORS[boards.length % COLORS.length] }) });
+      if (r.ok) { setNewBoard(""); await load(); }
+      else setError((await r.json().catch(() => ({}))).error ?? `Грешка при създаване (${r.status}).`);
+    } catch {
+      setError("Няма връзка със сървъра.");
+    } finally {
+      setSaving(false);
+    }
   }
   async function delBoard(b: Board) {
     if (!(await confirmDelete(`таблото „${b.name}" и всичките му задачи`))) return;
@@ -63,10 +73,16 @@ export function ProjectManagement({ canManage }: { canManage: boolean }) {
         {canManage && (
           <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
             <input value={newBoard} onChange={(e) => setNewBoard(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addBoard()} placeholder="Име на фирма/колона…" style={{ padding: "7px 10px", fontSize: 13, minWidth: 180 }} />
-            <button className="btn btn-primary btn-sm" onClick={addBoard}>+ Ново табло</button>
+            <button className="btn btn-primary btn-sm" onClick={addBoard} disabled={saving}>{saving ? "…" : "+ Ново табло"}</button>
           </div>
         )}
       </div>
+
+      {error && (
+        <div style={{ background: "var(--brick-soft)", color: "var(--brick)", borderRadius: 8, padding: "10px 14px", fontSize: 12.5, marginBottom: 14 }}>
+          {error}
+        </div>
+      )}
 
       {boards.length === 0 ? (
         <div className="glass panel" style={{ textAlign: "center", padding: "44px 0", color: "var(--muted)" }}>
