@@ -12,6 +12,7 @@ const navGroups: { title: string; items: { href: string; label: string; icon: st
     title: "Общ преглед",
     items: [
       { href: "/dashboard", label: "Табло", icon: "dashboard", feature: "dashboard" },
+      { href: "/dashboard/pm", label: "Project Management", icon: "projects", feature: "project_management" },
       { href: "/dashboard/analytics", label: "Анализи", icon: "analytics", feature: "analytics" },
     ],
   },

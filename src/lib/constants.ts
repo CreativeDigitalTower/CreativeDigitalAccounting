@@ -181,7 +181,7 @@ const BUSINESS_FEATURES = [
   ...START_FEATURES,
   "projects", "contracts", "assets", "users", "audit",
   "production", "employees", "haccp", "revision", "stock_categories", "health_index", "declarations", "doc_templates",
-  "employee_portal",
+  "employee_portal", "project_management",
 ];
 const PRO_FEATURES = [...BUSINESS_FEATURES, "multicompany", "ai", "api"];
 
@@ -203,6 +203,7 @@ export const FEATURE_LABELS: Record<string, string> = {
   api: "API достъп", invoice_logo: "Лого във фактурите", protocols: "Приемо-предавателни протоколи",
   bank_statements: "Банкови извлечения", doc_templates: "Генериране на бизнес документи",
   employee_portal: "Портал за служители (самообслужване)",
+  project_management: "Project Management (задачи по фирми и екипи)",
 };
 
 const PLAN_RANK: Record<PlanId, number> = { free: 0, start: 1, business: 2, pro: 3 };

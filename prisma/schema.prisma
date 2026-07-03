@@ -161,6 +161,8 @@ model Company {
   subscriptionEvents SubscriptionEvent[]
   payrollMonths     PayrollMonth[]
   monthlyEntries    MonthlyEntry[]
+  projectBoards     ProjectBoard[]
+  projectTasks      ProjectTask[]
 }
 
 // История на абонаментите (заявки, плащания, промени на статус/план)
@@ -1172,4 +1174,50 @@ model BlogPost {
 
   @@index([status, publishedAt])
   @@index([category])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Project Management — задачи по фирми (табла), вкл. ежемесечни
+// ─────────────────────────────────────────────────────────────
+model ProjectBoard {
+  id             String   @id @default(cuid())
+  companyId      String
+  clientId       String?  // по избор — свързан клиент от CRM
+  name           String   // име на фирмата/колоната
+  importantNotes String?  @db.Text // важни изисквания за фирмата
+  links          String?  @db.Text // JSON: { site, facebook, instagram, linkedin, google, tiktok, viber, youtube, other }
+  color          String?  // акцентен цвят на колоната
+  order          Int      @default(0)
+  archived       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  company Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  tasks   ProjectTask[]
+
+  @@index([companyId])
+}
+
+model ProjectTask {
+  id         String   @id @default(cuid())
+  companyId  String
+  boardId    String
+  title      String
+  notes      String?  @db.Text
+  priority   String   @default("normal") // low | normal | high | urgent
+  status     String   @default("pending") // pending | assigned | in_progress | review | returned | done
+  progress   Int      @default(0) // 0-100
+  assigneeId String?  // userId на изпълнителя (CompanyUser)
+  dueDate    DateTime?
+  links      String?  @db.Text // JSON: [{ label, url }]
+  monthly    Boolean  @default(false) // ежемесечна задача
+  order      Int      @default(0)
+  createdById String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  company Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  board   ProjectBoard @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, boardId])
+  @@index([boardId, monthly])
 }

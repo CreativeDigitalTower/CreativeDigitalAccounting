@@ -190,6 +190,13 @@ tbody tr:hover{background:rgba(15,138,106,.05);}
 @keyframes histGrow{from{transform:scaleY(0);}to{transform:scaleY(1);}}
 .hist-bar{transform-origin:bottom;animation:histGrow .7s cubic-bezier(.22,1,.36,1) both;}
 
+/* Project Management — колони по фирми */
+.pm-scroll{scrollbar-width:thin;}
+.pm-scroll::-webkit-scrollbar{height:9px;}
+.pm-scroll::-webkit-scrollbar-thumb{background:rgba(20,30,25,.18);border-radius:6px;}
+.pm-col{transition:box-shadow .2s ease, transform .2s ease;animation:cardIn .4s ease both;}
+.pm-col:hover{box-shadow:0 12px 32px rgba(20,30,25,.12);}
+
 /* ─── CSS tooltip (пояснения с info иконка) ─── */
 .cda-tip{}
 .cda-tip .cda-tip-bubble{
