@@ -48,7 +48,9 @@ export default function InviteUserPage() {
                 <option value="sales">Продажби</option>
                 <option value="warehouse">Склад</option>
                 <option value="viewer">Преглед</option>
+                <option value="employee">Служител (портал за самообслужване)</option>
               </select>
+              <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 4 }}>Служителят получава достъп само до личния си портал (заплата, отпуски, документи) — не до бизнес данните.</p>
             </div>
           </div>
         </div>

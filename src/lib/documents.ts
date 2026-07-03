@@ -97,6 +97,13 @@ export async function audit(
   summary?: string
 ) {
   try {
+    // Ако Супер Админ е „влязъл в акаунта" (импърсонация), НЕ оставяме никаква
+    // следа в одит лога на фирмата — нито за влизането, нито за корекции.
+    const { cookies } = await import("next/headers");
+    const jar = await cookies();
+    if (jar.get("cda_impersonate")?.value) return;
+  } catch { /* извън request scope — продължаваме нормално */ }
+  try {
     await prisma.auditLog.create({
       data: { companyId, userId, action, entity, entityId, summary },
     });

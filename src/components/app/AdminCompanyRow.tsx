@@ -26,7 +26,7 @@ type Props = {
     mol: string | null; sector: string | null; phone: string | null; email: string | null;
   };
   members: {
-    name: string | null; email: string; representativeRole: string | null;
+    name: string | null; email: string; representativeRole: string | null; role: string;
     marketingConsent: boolean; termsAcceptedAt: string | null; createdAt: string;
   }[];
   sub: { status: string; paymentStatus: string; periodStart: string | null; periodEnd: string | null; trialUsed: boolean };
@@ -47,6 +47,11 @@ const PAY_OPTS = [
   { id: "pending", label: "Изчаква се плащане" },
   { id: "not_received", label: "Не е получено плащане" },
 ];
+const ROLE_BG: Record<string, string> = {
+  owner: "Собственик", manager: "Мениджър", accountant: "Счетоводител", sales: "Продажби",
+  warehouse: "Склад", viewer: "Преглед", employee: "Служител",
+};
+
 // Цветова индикация за активност: зелено ≤14 дни, жълто 15–30, червено >30, сиво — никога
 function activityBadge(iso: string | null): { color: string; bg: string; label: string } {
   if (!iso) return { color: "var(--muted)", bg: "rgba(120,120,110,.12)", label: "няма активност" };
@@ -67,6 +72,7 @@ export function AdminCompanyRow(props: Props) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [open, setOpen] = useState(false);
+  const [showUsers, setShowUsers] = useState(false);
   // Управление на абонаментния период
   const [mPlan, setMPlan] = useState(props.plan);
   const [mStart, setMStart] = useState(props.sub.periodStart?.slice(0, 10) ?? "");
@@ -242,20 +248,24 @@ export function AdminCompanyRow(props: Props) {
                 </dl>
               </div>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--brass)", letterSpacing: 1, marginBottom: 8 }}>РЕГИСТРИРАНИ ПОТРЕБИТЕЛИ</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {props.members.map((m, i) => (
-                    <div key={i} style={{ fontSize: 12.5, borderLeft: "2px solid var(--border)", paddingLeft: 10 }}>
-                      <div style={{ fontWeight: 600 }}>{m.name ?? "—"} <span style={{ color: "var(--muted)", fontWeight: 400 }}>({m.email})</span></div>
-                      <div style={{ color: "var(--ink-soft)" }}>Качество: {m.representativeRole ?? "—"}</div>
-                      <div style={{ color: "var(--ink-soft)" }}>
-                        Маркетинг съгласие: {m.marketingConsent ? "✓ Да" : "Не"} ·
-                        Условия приети: {m.termsAcceptedAt ? new Date(m.termsAcceptedAt).toLocaleDateString("bg-BG") : "—"}
+                <button onClick={() => setShowUsers((v) => !v)} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700, color: "var(--brass)", letterSpacing: 1 }}>
+                  <span>{showUsers ? "▼" : "▶"}</span> ПОТРЕБИТЕЛИ НА ФИРМАТА ({props.members.length})
+                </button>
+                {showUsers && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 8 }}>
+                    {props.members.map((m, i) => (
+                      <div key={i} style={{ fontSize: 12.5, borderLeft: "2px solid var(--border)", paddingLeft: 10 }}>
+                        <div style={{ fontWeight: 600 }}>{m.name ?? "—"} <span style={{ color: "var(--muted)", fontWeight: 400 }}>({m.email})</span> <span style={{ fontSize: 10.5, fontWeight: 700, color: "#fff", background: m.role === "owner" ? "var(--brass)" : m.role === "employee" ? "var(--emerald-dark)" : "var(--navy)", borderRadius: 10, padding: "1px 8px" }}>{ROLE_BG[m.role] ?? m.role}</span></div>
+                        <div style={{ color: "var(--ink-soft)" }}>Качество: {m.representativeRole ?? "—"}</div>
+                        <div style={{ color: "var(--ink-soft)" }}>
+                          Маркетинг съгласие: {m.marketingConsent ? "✓ Да" : "Не"} ·
+                          Условия приети: {m.termsAcceptedAt ? new Date(m.termsAcceptedAt).toLocaleDateString("bg-BG") : "—"}
+                        </div>
+                        <div style={{ color: "var(--muted)", fontSize: 11.5 }}>Регистриран: {new Date(m.createdAt).toLocaleString("bg-BG")}</div>
                       </div>
-                      <div style={{ color: "var(--muted)", fontSize: 11.5 }}>Регистриран: {new Date(m.createdAt).toLocaleString("bg-BG")}</div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </td>
