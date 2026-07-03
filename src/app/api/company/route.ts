@@ -70,6 +70,15 @@ export async function PUT(req: Request) {
       }
     }
 
+    // ── ДДС логика: при „Регистрирана по ЗДДС" номерът е задължителен ──
+    if (data.vatRegistered === true && !(data.vatNumber && String(data.vatNumber).trim())) {
+      return NextResponse.json({ error: "При регистрация по ЗДДС е задължителен ДДС номер." }, { status: 400 });
+    }
+    // Ако фирмата е регистрирана — по подразбиране НЕ е освободена от ДДС.
+    if (data.vatRegistered === true) {
+      data.defaultVatExempt = false;
+    }
+
     const company = await prisma.company.update({
       where: { id: companyId },
       data,

@@ -301,7 +301,8 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
         </p>
       )}
 
-      {data.vatExempt && data.vatExemptReasonText && (
+      {/* Основанието за неначисляване се показва САМО ако реално няма начислено ДДС */}
+      {vat <= 0.005 && data.vatExempt && data.vatExemptReasonText && (
         <div style={{ marginTop: 14, fontSize: 12, color: "var(--ink-soft)", fontStyle: "italic" }}>
           <strong style={{ color: accent, fontStyle: "normal" }}>Основание за неначисляване на ДДС:</strong> {data.vatExemptReasonText}
         </div>

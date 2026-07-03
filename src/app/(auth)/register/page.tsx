@@ -24,6 +24,8 @@ function RegisterForm() {
   const [eik, setEik] = useState("");
   const [eikErr, setEikErr] = useState("");
   const [companyPhone, setCompanyPhone] = useState("");
+  const [vatRegistered, setVatRegistered] = useState(false);
+  const [vatNumber, setVatNumber] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -51,12 +53,14 @@ function RegisterForm() {
     // Валидация на ЕИК/БУЛСТАT преди изпращане
     const eikCheck = checkEik();
     if (!eikCheck.isValid) { setLoading(false); setError(eikCheck.error ?? "Невалиден ЕИК/БУЛСТАТ."); return; }
+    if (vatRegistered && !vatNumber.trim()) { setLoading(false); setError("При регистрация по ЗДДС е задължителен ДДС номер."); return; }
 
     const res = await fetch("/api/auth/register", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: acc.name, email: acc.email, password: acc.password, representativeRole: acc.representativeRole,
-        companyName: fd.get("companyName"), eik: eikCheck.normalized, phone: companyPhone || undefined, vatNumber: fd.get("vatNumber") || undefined,
+        companyName: fd.get("companyName"), eik: eikCheck.normalized, phone: companyPhone || undefined,
+        vatRegistered, vatNumber: vatNumber.trim() || undefined,
         address: fd.get("address") || undefined, city: fd.get("city") || undefined, mol: fd.get("mol") || undefined,
         sector: fd.get("sector") || undefined, plan,
         referralSource: params.get("ref") || undefined,
@@ -136,7 +140,19 @@ function RegisterForm() {
                 {eikErr && <div style={{ color: "var(--brick)", fontSize: 11.5, marginTop: 3 }}>{eikErr}</div>}
               </div>
               <div><label>Телефон на фирмата *</label><input type="tel" required value={companyPhone} onChange={(e) => setCompanyPhone(e.target.value)} placeholder="+359..." /></div>
-              <div><label>ДДС номер (ако е приложимо)</label><input type="text" name="vatNumber" placeholder="BG..." /></div>
+              <div>
+                <label>Регистрация по ЗДДС *</label>
+                <select required value={vatRegistered ? "1" : "0"} onChange={(e) => setVatRegistered(e.target.value === "1")}>
+                  <option value="0">Не съм регистриран по ЗДДС</option>
+                  <option value="1">Регистриран по ЗДДС</option>
+                </select>
+              </div>
+              <div>
+                <label>ДДС номер {vatRegistered ? "*" : "(ако е приложимо)"}</label>
+                <input type="text" value={vatNumber} onChange={(e) => setVatNumber(e.target.value)} required={vatRegistered} placeholder="BG..." />
+                {vatRegistered && <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 3 }}>Фактурите ще се издават с начислено ДДС по подразбиране.</p>}
+                {!vatRegistered && <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 3 }}>Фактурите ще се издават без ДДС (чл. 113, ал. 9 от ЗДДС).</p>}
+              </div>
               <div><label>МОЛ *</label><input type="text" name="mol" required /></div>
               <div><label>Град *</label><input type="text" name="city" required /></div>
               <div><label>Сектор на дейност *</label>
