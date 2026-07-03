@@ -4,13 +4,16 @@ import { BlobBackground } from "@/components/Backgrounds";
 import { Logo } from "@/components/Logo";
 import { PortalSignOut } from "@/components/app/PortalSignOut";
 import { parseEmployeeAccess } from "@/lib/employeeAccess";
+import { planHasFeature, type PlanId } from "@/lib/constants";
 
 export default async function PortalLayout({ children }: { children: React.ReactNode }) {
   // Гарантира, че само роля employee (с активен план Бизнес/Про) вижда портала.
   const { employee } = await requireEmployee();
   const access = parseEmployeeAccess(employee.company.employeeAccess);
+  const hasPm = planHasFeature((employee.company.subscription?.plan ?? "free") as PlanId, "project_management");
   const tabs = [
     { href: "/portal", label: "Моят профил", on: true },
+    { href: "/portal/pm", label: "Project Management", on: hasPm },
     { href: "/portal/clients", label: "Клиенти", on: access.clients },
     { href: "/portal/projects", label: "Проекти", on: access.projects },
     { href: "/portal/suppliers", label: "Доставчици", on: access.suppliers },

@@ -66,6 +66,22 @@ export async function requireEmployee() {
   return { userId, employee, companyId: employee.companyId };
 }
 
+/**
+ * Достъп до Project Management — за ВСИЧКИ роли на фирмата (вкл. служители).
+ * Не пренасочва служителите; проверява плана (Бизнес/Про).
+ */
+export async function requireProjectAccess() {
+  const session = await getSession();
+  const userId = session.user!.id as string;
+  const companyId = await getCompanyId(userId);
+  const role = (await getMyRole(userId, companyId)) ?? "viewer";
+  const plan = await getPlan(companyId);
+  if (!planHasFeature(plan, "project_management")) {
+    redirect(role === "employee" ? "/portal" : "/dashboard/subscription?locked=project_management");
+  }
+  return { userId, companyId, role, isEmployee: role === "employee" };
+}
+
 export async function requireSuperAdmin() {
   const session = await getSession();
   const userId = session.user!.id as string;
