@@ -27,9 +27,11 @@ const SUB_STATUS_BG: Record<string, string> = {
 
 // Малка информационна иконка с пояснение (tooltip)
 function Info({ text }: { text: string }) {
+  // CSS hover tooltip (native title е ненадежден) — показва пояснението при посочване.
   return (
-    <span title={text} style={{ display: "inline-flex", verticalAlign: "-2px", marginLeft: 5, color: "var(--muted)", cursor: "help" }}>
+    <span className="cda-tip" title={text} style={{ display: "inline-flex", verticalAlign: "-2px", marginLeft: 5, color: "var(--muted)", cursor: "help", position: "relative" }}>
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 7.5h.01" /></svg>
+      <span className="cda-tip-bubble">{text}</span>
     </span>
   );
 }
@@ -95,7 +97,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   };
   const payingCount = companies.filter(isPaying).length;
   // Платен план, но плащането още не е потвърдено (изчаква се / не е получено) — не влиза в приход.
-  const awaitingPaymentCount = companies.filter((c) => (c.subscription?.plan ?? "free") !== "free" && c.subscription?.status === "active" && c.subscription?.paymentStatus !== "received" && !isOwnAccount(c)).length;
+  const awaitingList = companies.filter((c) => (c.subscription?.plan ?? "free") !== "free" && c.subscription?.status === "active" && c.subscription?.paymentStatus !== "received" && !isOwnAccount(c));
+  const awaitingPaymentCount = awaitingList.length;
   // Фирми в пробен (безплатен) период — показваме ги отделно, но НЕ като приход.
   const trialingCount = companies.filter((c) => c.subscription?.status === "trialing" && (c.subscription?.plan ?? "free") !== "free").length;
   const mrr = companies.reduce((s, c) => s + (isPaying(c) ? (PLAN_PRICE[c.subscription?.plan ?? "free"] ?? 0) : 0), 0);
@@ -220,7 +223,16 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const lastActivity = new Map<string, Date>();
   const appByCompany = await prisma.siteVisit.findMany({ where: { area: "app", companyId: { not: null } }, select: { companyId: true, createdAt: true }, orderBy: { createdAt: "desc" } });
   for (const v of appByCompany) { if (v.companyId && !lastActivity.has(v.companyId)) lastActivity.set(v.companyId, v.createdAt); }
-  const daysSince = (d?: Date) => d ? Math.floor((nowD.getTime() - new Date(d).getTime()) / 86400000) : Infinity;
+  // Последна активност = по-скорошното от (вход в приложението) и (издаден документ)
+  const lastDocByCompany = new Map<string, Date>();
+  const lastDocs = await prisma.document.groupBy({ by: ["companyId"], _max: { createdAt: true } });
+  for (const d of lastDocs) { if (d.companyId && d._max.createdAt) lastDocByCompany.set(d.companyId, d._max.createdAt); }
+  const lastActivityAt = (id: string): Date | null => {
+    const a = lastActivity.get(id); const b = lastDocByCompany.get(id);
+    if (a && b) return a > b ? a : b;
+    return a ?? b ?? null;
+  };
+  const daysSince = (d?: Date | null) => d ? Math.floor((nowD.getTime() - new Date(d).getTime()) / 86400000) : Infinity;
   const inactive = companies.map((c) => ({ id: c.id, name: c.name, plan: c.subscription?.plan ?? "free", days: daysSince(lastActivity.get(c.id)) }))
     .filter((c) => c.days >= 7).sort((a, b) => b.days - a.days).slice(0, 8);
 
@@ -230,9 +242,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const newThisMonth = companies.filter((c) => new Date(c.createdAt) >= growthMonthStart).length;
   const newPrevMonth = companies.filter((c) => new Date(c.createdAt) >= growthPrevStart && new Date(c.createdAt) < growthMonthStart).length;
   const avgDocsPerCompany = companies.length ? Math.round(totalDocuments / companies.length) : 0;
-  const active30 = companies.filter((c) => daysSince(lastActivity.get(c.id)) <= 30).length;
+  const active30 = companies.filter((c) => daysSince(lastActivityAt(c.id)) <= 30).length;
   const activationRate = companies.length ? Math.round((activatedCompanies / companies.length) * 100) : 0;
-  const churnRisk = companies.filter((c) => (c.subscription?.plan ?? "free") !== "free" && daysSince(lastActivity.get(c.id)) >= 21).length;
+  const churnRisk = companies.filter((c) => (c.subscription?.plan ?? "free") !== "free" && daysSince(lastActivityAt(c.id)) >= 21).length;
 
   // ─── Автоматични известия ───
   const adminAlerts: string[] = [];
@@ -302,6 +314,25 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           <Link href="/dashboard/admin/businesses" className="btn btn-ghost btn-sm">Бизнеси (филтри по сектор/план)</Link>
         </div>
       </div>
+
+      {/* Чакащи потвърждение на плащане */}
+      {awaitingList.length > 0 && (
+        <div className="glass panel" style={{ marginBottom: 16, borderLeft: "4px solid var(--brass)", background: "var(--brass-soft)" }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: "var(--brass)", marginBottom: 6 }}>
+            Очаква вашето потвърждение на плащане ({awaitingList.length})
+          </div>
+          <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginBottom: 8 }}>
+            Тези фирми имат избран платен план, но плащането още не е потвърдено. Проверете и маркирайте „Получено плащане" в реда на фирмата, за да влезе в приходите.
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {awaitingList.map((c) => (
+              <span key={c.id} style={{ fontSize: 12, fontWeight: 600, background: "#fff", borderRadius: 14, padding: "3px 11px" }}>
+                {c.name} <span style={{ color: "var(--muted)", fontWeight: 400 }}>· {planLabels[c.subscription?.plan ?? "free"]}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Plan distribution */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 14 }}>
@@ -593,6 +624,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           <thead>
             <tr>
               <th>Фирма</th>
+              <th>Активност</th>
               <th>ЕИК</th>
               <th className="num">Потр.</th>
               <th className="num">Док.</th>
@@ -613,6 +645,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                 users={c._count.companyUsers}
                 docs={c._count.documents}
                 createdAt={new Date(c.createdAt).toLocaleDateString("bg-BG")}
+                lastActivity={lastActivityAt(c.id)?.toISOString() ?? null}
                 owners={c.companyUsers.map((cu) => cu.user.email).slice(0, 2).join(", ")}
                 details={{
                   vatNumber: c.vatNumber, address: c.address, city: c.city,

@@ -19,6 +19,7 @@ type Props = {
   users: number;
   docs: number;
   createdAt: string;
+  lastActivity: string | null;
   owners: string;
   details: {
     vatNumber: string | null; address: string | null; city: string | null;
@@ -46,6 +47,16 @@ const PAY_OPTS = [
   { id: "pending", label: "Изчаква се плащане" },
   { id: "not_received", label: "Не е получено плащане" },
 ];
+// Цветова индикация за активност: зелено ≤14 дни, жълто 15–30, червено >30, сиво — никога
+function activityBadge(iso: string | null): { color: string; bg: string; label: string } {
+  if (!iso) return { color: "var(--muted)", bg: "rgba(120,120,110,.12)", label: "няма активност" };
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  const label = days === 0 ? "днес" : days === 1 ? "вчера" : `преди ${days} дни`;
+  if (days <= 14) return { color: "var(--emerald-dark)", bg: "rgba(15,138,106,.14)", label };
+  if (days <= 30) return { color: "var(--brass)", bg: "var(--brass-soft)", label };
+  return { color: "var(--brick)", bg: "var(--brick-soft)", label };
+}
+
 const PAY_META: Record<string, { color: string }> = {
   received: { color: "var(--emerald)" }, pending: { color: "var(--brass)" }, not_received: { color: "var(--brick)" },
 };
@@ -126,6 +137,8 @@ export function AdminCompanyRow(props: Props) {
     ["ДДС №", d.vatNumber], ["Сектор", d.sector], ["Град", d.city],
     ["Адрес", d.address], ["МОЛ", d.mol], ["Телефон", d.phone], ["Имейл (фирма)", d.email],
   ];
+  const act = activityBadge(props.lastActivity);
+  const awaitingPayment = plan !== "free" && pay !== "received";
 
   return (
     <>
@@ -134,10 +147,18 @@ export function AdminCompanyRow(props: Props) {
           <button onClick={() => setOpen(!open)} style={{ background: "none", border: "none", cursor: "pointer", textAlign: "left", padding: 0, display: "flex", alignItems: "center", gap: 6 }}>
             <span style={{ color: "var(--muted)", fontSize: 11 }}>{open ? "▼" : "▶"}</span>
             <span>
-              <span style={{ fontWeight: 600, fontSize: 13.5, display: "block" }}>{props.name}</span>
+              <span style={{ fontWeight: 600, fontSize: 13.5, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                {props.name}
+                {awaitingPayment && <span title="Фирмата има платен план, но плащането не е потвърдено — прегледайте и потвърдете." style={{ fontSize: 10, fontWeight: 700, color: "#fff", background: "var(--brass)", borderRadius: 10, padding: "1px 8px" }}>Очаква потвърждение</span>}
+              </span>
               <span style={{ fontSize: 11.5, color: "var(--muted)" }}>{props.owners}</span>
             </span>
           </button>
+        </td>
+        <td>
+          <span title={props.lastActivity ? `Последна активност: ${new Date(props.lastActivity).toLocaleString("bg-BG")}` : "Няма регистрирана активност"} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11.5, fontWeight: 600, color: act.color, background: act.bg, borderRadius: 12, padding: "2px 9px", whiteSpace: "nowrap" }}>
+            <span style={{ width: 7, height: 7, borderRadius: "50%", background: act.color, display: "inline-block" }} />{act.label}
+          </span>
         </td>
         <td className="num" style={{ fontSize: 12.5, color: "var(--muted)" }}>{props.eik ?? "—"}</td>
         <td className="num">{props.users}</td>
@@ -168,7 +189,7 @@ export function AdminCompanyRow(props: Props) {
       </tr>
       {open && (
         <tr>
-          <td colSpan={7} style={{ background: "rgba(0,0,0,.02)", padding: "16px 20px" }}>
+          <td colSpan={8} style={{ background: "rgba(0,0,0,.02)", padding: "16px 20px" }}>
             {/* Управление на абонамент */}
             <div style={{ marginBottom: 16, padding: "12px 14px", background: "rgba(255,255,255,.6)", borderRadius: 8, border: "1px solid var(--border)" }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: "var(--brass)", letterSpacing: 1, marginBottom: 8 }}>УПРАВЛЕНИЕ НА АБОНАМЕНТ</div>

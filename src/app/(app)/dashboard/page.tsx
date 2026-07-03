@@ -15,6 +15,7 @@ import { DashboardPeriodSelector } from "@/components/app/DashboardPeriodSelecto
 import { WidgetBoard, type WidgetData } from "@/components/app/WidgetBoard";
 import { resolveLayout, SECTOR_TITLE } from "@/lib/workspaces";
 import { NavIcon, UiIcon } from "@/components/app/NavIcons";
+import { reminderStatus, PRIORITY_META } from "@/lib/reminderColor";
 
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ period?: string; from?: string; to?: string }> }) {
   const { companyId, userId } = await requireCompany();
@@ -148,6 +149,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
   const hasTaxCalendar = planHasFeature((subscription?.plan ?? "free") as PlanId, "tax_calendar");
   const taxDeadlines = hasTaxCalendar ? upcomingStandard(6) : [];
+  // Собствени напомняния/задачи на фирмата (незавършени) — за таблото
+  const myReminders = hasTaxCalendar
+    ? (await prisma.taxReminder.findMany({ where: { companyId, done: false }, orderBy: { dueDate: "asc" }, take: 6 }))
+        .map((r) => ({ id: r.id, title: r.title, dueDate: r.dueDate.toISOString(), priority: r.priority, progress: r.progress }))
+    : [];
 
   // Бизнес здравен индекс + напомняния за плащане (Бизнес + Про)
   const hasHealth = planHasFeature((subscription?.plan ?? "free") as PlanId, "health_index");
@@ -505,6 +511,31 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           </div>
         </div>
       </div>
+
+      {/* Мои задачи и срокове (собствени напомняния) */}
+      {hasTaxCalendar && myReminders.length > 0 && (
+        <div className="glass panel" style={{ marginTop: 18 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0, display: "flex", alignItems: "center", gap: 8 }}><NavIcon.calendar width={16} height={16} /> Мои задачи и срокове</h3>
+            <Link href="/dashboard/tax-calendar" style={{ fontSize: 12.5, color: "var(--navy)", fontWeight: 600 }}>Управление →</Link>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 10 }}>
+            {myReminders.map((r) => {
+              const st = reminderStatus(r.dueDate);
+              const pr = PRIORITY_META[r.priority] ?? PRIORITY_META.normal;
+              return (
+                <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 8, background: st.bg }}>
+                  <span style={{ width: 4, height: 30, borderRadius: 2, background: pr.color, flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600 }}>{r.title}</div>
+                    <div style={{ fontSize: 11.5, color: st.color, fontWeight: 600 }}>{st.label} · {new Date(r.dueDate).toLocaleDateString("bg-BG")}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Данъчен и осигурителен календар — предстоящи срокове */}
       {hasTaxCalendar && taxDeadlines.length > 0 && (

@@ -10,6 +10,7 @@ const ROLE_LABELS: Record<string, string> = {
   sales: "Продажби",
   warehouse: "Склад",
   viewer: "Преглед",
+  employee: "Служител",
 };
 
 const ROLE_PERMISSIONS: Record<string, string[]> = {
@@ -19,6 +20,7 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
   sales: ["Документи", "Клиенти", "Оферти"],
   warehouse: ["Склад", "Доставчици"],
   viewer: ["Само преглед"],
+  employee: ["Портал за служители", "Собствени данни и отпуски", "Project Management (скоро)"],
 };
 
 export default async function UsersPage() {
