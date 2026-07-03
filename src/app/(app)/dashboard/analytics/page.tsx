@@ -6,7 +6,7 @@ import { MonthlyBarChart } from "@/components/app/MonthlyBarChart";
 import { MonthlyBackfill } from "@/components/app/MonthlyBackfill";
 import { PriceIncreaseSimulator } from "@/components/app/PriceIncreaseSimulator";
 import { aggregateClientRevenue } from "@/lib/clientRevenue";
-import { formatCurrency, toBGN, isDualCurrencyActive, EUR_TO_BGN } from "@/lib/constants";
+import { formatCurrency, toBGN, isDualCurrencyActive } from "@/lib/constants";
 import { sumPayroll } from "@/lib/payroll";
 import { VatRegistrationForecast } from "@/components/app/VatRegistrationForecast";
 
@@ -63,18 +63,8 @@ export default async function AnalyticsPage() {
   const monthInvoiced = monthInvoices.reduce((s, d) => s + d.lines.reduce((ss, l) => ss + l.lineTotal, 0), 0);
   const expectedMonthlyRevenue = expectedRetainer + monthInvoiced;
 
-  // ─── Прогноза за задължителна регистрация по ДДС (за нерегистрирани фирми) ───
-  const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1);
-  const [companyVat, trailingInvoices] = await Promise.all([
-    prisma.company.findUnique({ where: { id: companyId }, select: { vatRegistered: true } }),
-    prisma.document.findMany({ where: { companyId, type: "invoice", issueDate: { gte: twelveMonthsAgo } }, select: { lines: { select: { lineTotal: true } } } }),
-  ]);
-  const trailing12mTurnover = trailingInvoices.reduce((s, d) => s + d.lines.reduce((ss, l) => ss + l.lineTotal, 0), 0);
-  // Праг за задължителна регистрация по ЗДДС (към 2025 г.): 166 000 лв. облагаем оборот за 12 месеца.
-  const VAT_THRESHOLD_BGN = 166000;
-  const vatThreshold = VAT_THRESHOLD_BGN / EUR_TO_BGN; // в EUR (базова валута)
-  // Прогнозен месечен темп: по-голямото от абонаментите и средния оборот за 12 м.
-  const vatMonthlyRunRate = Math.max(expectedRetainer, trailing12mTurnover / 12);
+  // За прогнозата по ДДС ни трябва само дали фирмата е регистрирана
+  const companyVat = await prisma.company.findUnique({ where: { id: companyId }, select: { vatRegistered: true } });
 
   const currentMonthPayroll = payrollByMonth.get(now.getMonth()) ?? defaultMonthlyPayroll;
   const fixedMonthlyExpenses = recurringExpenses.reduce((s, e) => s + e.amount, 0) + currentMonthPayroll;
@@ -86,6 +76,14 @@ export default async function AnalyticsPage() {
   const yearProfit = yearRevenue - yearExpenses;
 
   const goalPercent = goal ? Math.min(100, Math.round((yearRevenue / goal.targetRevenue) * 100)) : null;
+
+  // ─── Прогноза за задължителна регистрация по ДДС (нов режим 2026) ───
+  // Праг: 51 130 EUR облагаем оборот за КАЛЕНДАРНАТА година (проследяван ежедневно).
+  const VAT_THRESHOLD_EUR = 51130;
+  const VAT_THRESHOLD_BGN = 100000; // равностойност по фиксирания курс (≈ 100 000 лв.)
+  const vatTurnover = yearRevenue; // приходи за календарната година (фактури + ръчно въведени)
+  const monthsElapsed = curMonth + 1; // изминали месеци от годината
+  const vatMonthlyRunRate = Math.max(expectedRetainer, vatTurnover / monthsElapsed);
 
   // Monthly breakdown (current year)
   const monthlyData: Record<number, number> = {};
@@ -211,7 +209,7 @@ export default async function AnalyticsPage() {
       {/* Прогноза за регистрация по ДДС (само за нерегистрирани фирми) */}
       {!companyVat?.vatRegistered && (
         <div style={{ marginTop: 18 }}>
-          <VatRegistrationForecast registered={!!companyVat?.vatRegistered} turnover={trailing12mTurnover} threshold={vatThreshold} thresholdBgn={VAT_THRESHOLD_BGN} monthlyRunRate={vatMonthlyRunRate} />
+          <VatRegistrationForecast registered={!!companyVat?.vatRegistered} turnover={vatTurnover} threshold={VAT_THRESHOLD_EUR} thresholdBgn={VAT_THRESHOLD_BGN} monthlyRunRate={vatMonthlyRunRate} year={year} />
         </div>
       )}
 
