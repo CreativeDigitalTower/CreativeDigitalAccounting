@@ -14,6 +14,8 @@ export function MonthlyBackfill({ year, currentMonth, defaultPayroll, months }: 
   const router = useRouter();
   const [rows, setRows] = useState<Row[]>(months);
   const [savingM, setSavingM] = useState<number | null>(null);
+  const [open, setOpen] = useState(false);
+  const hasData = months.some((m) => m.revenue > 0 || m.expenses > 0 || m.payroll != null);
 
   function setCell(m: number, key: keyof Row, val: number | null) {
     setRows((p) => p.map((r) => (r.month === m ? { ...r, [key]: val } : r)));
@@ -43,8 +45,13 @@ export function MonthlyBackfill({ year, currentMonth, defaultPayroll, months }: 
 
   return (
     <div className="glass panel">
-      <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 4px" }}>Месечни данни за {year} г.</h3>
-      <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 14px" }}>
+      <button onClick={() => setOpen((v) => !v)} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, width: "100%", textAlign: "left", display: "flex", alignItems: "center", gap: 10 }}>
+        <span style={{ color: "var(--muted)" }}>{open ? "▼" : "▶"}</span>
+        <span style={{ fontFamily: "'Fraunces', serif", fontSize: 15, fontWeight: 700 }}>Месечни данни за {year} г.</span>
+        <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--muted)" }}>{hasData ? "въведени данни" : "празно"} · {open ? "скрий" : "покажи"}</span>
+      </button>
+      {!open ? null : (<>
+      <p style={{ fontSize: 12, color: "var(--muted)", margin: "12px 0 14px" }}>
         Въведете приходи и разходи по месеци назад (за прехвърляне от предишна система). Разходът за заплати се изчислява автоматично от заплатите на служителите, но може да се коригира за всеки месец (отпуски, болнични, бонуси, промяна на заплата). Тези стойности се включват в годишните приходи, разходи и печалба.
       </p>
       <div style={{ overflowX: "auto" }}>
@@ -94,6 +101,7 @@ export function MonthlyBackfill({ year, currentMonth, defaultPayroll, months }: 
       <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 10 }}>
         Празно поле „Заплати" = автоматично изчисление ({formatCurrency(defaultPayroll)}/месец). Оцветеното поле означава ръчна корекция за месеца.
       </p>
+      </>)}
     </div>
   );
 }

@@ -8,6 +8,8 @@ export function PriceIncreaseSimulator({ monthlyRetainer, goalTarget }: {
 }) {
   const [pct, setPct] = useState(10);
 
+  const sign = pct >= 0 ? "+" : "";
+  const dir = pct >= 0 ? "var(--emerald-dark)" : "var(--brick)";
   const newMonthly = monthlyRetainer * (1 + pct / 100);
   const deltaMonthly = newMonthly - monthlyRetainer;
   const currentAnnual = monthlyRetainer * 12;
@@ -19,9 +21,9 @@ export function PriceIncreaseSimulator({ monthlyRetainer, goalTarget }: {
 
   return (
     <div className="glass panel">
-      <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 4px" }}>Симулация: увеличение на цените</h3>
+      <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 4px" }}>Симулация: промяна на цените (абонаменти)</h3>
       <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 14px" }}>
-        Ако увеличите месечните абонаменти с даден процент — какви биха били прогнозираните месечни и годишни приходи спрямо текущите и как това помага за финансовата цел.
+        Ако <strong>увеличите или намалите</strong> месечните абонаменти с даден процент — какви биха били прогнозираните месечни и годишни приходи спрямо текущите и как това помага за финансовата цел.
       </p>
 
       {monthlyRetainer <= 0 ? (
@@ -29,21 +31,21 @@ export function PriceIncreaseSimulator({ monthlyRetainer, goalTarget }: {
       ) : (
         <>
           <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", marginBottom: 16 }}>
-            <label style={{ fontSize: 13, fontWeight: 600 }}>Увеличение с:</label>
-            <input type="range" min={0} max={100} step={1} value={pct} onChange={(e) => setPct(Number(e.target.value))} style={{ flex: "1 1 200px", minWidth: 160 }} />
+            <label style={{ fontSize: 13, fontWeight: 600 }}>Промяна:</label>
+            <input type="range" min={-50} max={100} step={1} value={pct} onChange={(e) => setPct(Number(e.target.value))} style={{ flex: "1 1 200px", minWidth: 160 }} />
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <input type="number" min={0} max={500} value={pct} onChange={(e) => setPct(Math.max(0, Number(e.target.value) || 0))} style={{ width: 70, padding: "5px 8px", textAlign: "right" }} />
+              <input type="number" min={-100} max={500} value={pct} onChange={(e) => setPct(Number(e.target.value) || 0)} style={{ width: 74, padding: "5px 8px", textAlign: "right" }} />
               <span style={{ fontWeight: 700 }}>%</span>
             </div>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px,1fr))", gap: 14 }}>
             <Stat label="Текущи месечни приходи" value={formatCurrency(monthlyRetainer)} />
-            <Stat label={`Нови месечни приходи (+${pct}%)`} value={formatCurrency(newMonthly)} color="var(--emerald-dark)"
-              sub={`+${formatCurrency(deltaMonthly)} / месец`} />
+            <Stat label={`Нови месечни приходи (${sign}${pct}%)`} value={formatCurrency(newMonthly)} color={dir}
+              sub={`${sign}${formatCurrency(deltaMonthly)} / месец`} subColor={dir} />
             <Stat label="Текущи годишни приходи" value={formatCurrency(currentAnnual)} />
-            <Stat label={`Нови годишни приходи (+${pct}%)`} value={formatCurrency(newAnnual)} color="var(--emerald-dark)"
-              sub={`+${formatCurrency(deltaAnnual)} / година`} />
+            <Stat label={`Нови годишни приходи (${sign}${pct}%)`} value={formatCurrency(newAnnual)} color={dir}
+              sub={`${sign}${formatCurrency(deltaAnnual)} / година`} subColor={dir} />
           </div>
 
           {goalTarget && goalCoverNow != null && goalCoverNew != null && (
@@ -67,12 +69,12 @@ export function PriceIncreaseSimulator({ monthlyRetainer, goalTarget }: {
   );
 }
 
-function Stat({ label, value, sub, color }: { label: string; value: string; sub?: string; color?: string }) {
+function Stat({ label, value, sub, color, subColor }: { label: string; value: string; sub?: string; color?: string; subColor?: string }) {
   return (
     <div>
       <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 4 }}>{label}</div>
       <div className="num" style={{ fontSize: 20, fontWeight: 700, color: color ?? "var(--navy)" }}>{value}</div>
-      {sub && <div style={{ fontSize: 11.5, color: "var(--emerald-dark)", marginTop: 2 }}>{sub}</div>}
+      {sub && <div style={{ fontSize: 11.5, color: subColor ?? "var(--emerald-dark)", marginTop: 2 }}>{sub}</div>}
     </div>
   );
 }

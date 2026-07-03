@@ -4,6 +4,7 @@ import { planHasFeature, formatCurrency } from "@/lib/constants";
 import { CategoriesManager } from "@/components/app/CategoriesManager";
 import { FeatureLink } from "@/components/app/FeatureLink";
 import { NavIcon, UiIcon } from "@/components/app/NavIcons";
+import { WarehousePriceSimulator } from "@/components/app/WarehousePriceSimulator";
 import Link from "next/link";
 
 export default async function WarehousePage() {
@@ -174,6 +175,13 @@ export default async function WarehousePage() {
           </table>
         )}
       </div>
+
+      {/* Симулация на промяна на цените — само за платени планове */}
+      {plan !== "free" && (() => {
+        const priced = stockItems.filter((i) => (i.unitCost ?? 0) > 0);
+        const avgUnit = priced.length ? priced.reduce((s, i) => s + (i.unitCost ?? 0), 0) / priced.length : 0;
+        return <WarehousePriceSimulator totalValue={totalStockValue} itemCount={stockItems.length} avgUnit={avgUnit} />;
+      })()}
     </>
   );
 }
