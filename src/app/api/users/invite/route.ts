@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireFeature, getPlan } from "@/lib/session";
-import { SUBSCRIPTION_PLANS } from "@/lib/constants";
+import { SUBSCRIPTION_PLANS, planHasFeature } from "@/lib/constants";
 import { audit } from "@/lib/documents";
 import { z } from "zod";
 
@@ -9,7 +9,7 @@ const schema = z.object({
   email: z.string().email(),
   firstName: z.string().optional().nullable(),
   lastName: z.string().optional().nullable(),
-  role: z.enum(["owner", "manager", "accountant", "sales", "warehouse", "viewer"]),
+  role: z.enum(["owner", "manager", "accountant", "sales", "warehouse", "viewer", "employee"]),
 });
 
 export async function POST(req: Request) {
@@ -30,6 +30,10 @@ export async function POST(req: Request) {
 
     // Лимит на потребители по план
     const plan = await getPlan(companyId);
+    // Ролята „Служител" е достъпна само за Бизнес/Про (порталът за служители)
+    if (role === "employee" && !planHasFeature(plan, "employee_portal")) {
+      return NextResponse.json({ error: "Ролята Служител е достъпна само за планове Бизнес и Про." }, { status: 403 });
+    }
     const seatLimit = SUBSCRIPTION_PLANS[plan].users;
     if (seatLimit !== Infinity) {
       const seats = await prisma.companyUser.count({ where: { companyId } });
@@ -59,6 +63,19 @@ export async function POST(req: Request) {
       });
     } else {
       await prisma.companyUser.create({ data: { userId: user.id, companyId, role } });
+    }
+
+    // За роля „Служител" гарантираме, че има свързан Employee запис (за портала).
+    if (role === "employee") {
+      const linked = await prisma.employee.findFirst({ where: { userId: user.id, companyId }, select: { id: true } });
+      if (!linked) {
+        const byEmail = await prisma.employee.findFirst({ where: { companyId, email, userId: null }, select: { id: true } });
+        if (byEmail) {
+          await prisma.employee.update({ where: { id: byEmail.id }, data: { userId: user.id } });
+        } else {
+          await prisma.employee.create({ data: { companyId, name: fullName ?? email, email, userId: user.id } });
+        }
+      }
     }
 
     await audit(companyId, userId, "create", "CompanyUser", user.id, `${email} → ${role}`);

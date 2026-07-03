@@ -346,9 +346,13 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
       </div>
 
       {/* Бизнес показатели */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 20 }}>
         <div className="glass kpi-card">
-          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Регистрирани потребители</div>
+          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Регистрирани фирми<Info text="Общ брой активни (неархивирани) фирми в платформата." /></div>
+          <div className="num" style={{ fontSize: 22, fontWeight: 600 }}>{companies.length.toLocaleString("bg-BG")}</div>
+        </div>
+        <div className="glass kpi-card">
+          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>Регистрирани потребители<Info text="Общ брой потребителски акаунти в цялата платформа — собственици, поканени служители и всички други роли от фирмите." /></div>
           <div className="num" style={{ fontSize: 22, fontWeight: 600 }}>{totalUsers.toLocaleString("bg-BG")}</div>
         </div>
         <div className="glass kpi-card">
@@ -652,7 +656,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                   mol: c.mol, sector: c.sector, phone: c.phone, email: c.email,
                 }}
                 members={c.companyUsers.map((cu) => ({
-                  name: cu.user.name, email: cu.user.email, representativeRole: cu.user.representativeRole,
+                  name: cu.user.name, email: cu.user.email, representativeRole: cu.user.representativeRole, role: cu.role,
                   marketingConsent: cu.user.marketingConsent, termsAcceptedAt: cu.user.termsAcceptedAt?.toISOString() ?? null,
                   createdAt: cu.user.createdAt.toISOString(),
                 }))}

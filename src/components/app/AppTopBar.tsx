@@ -37,6 +37,8 @@ export function AppTopBar({ initialUnread }: { initialUnread: number }) {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [notifs, setNotifs] = useState<Notif[]>([]);
   const bellRef = useRef<HTMLDivElement>(null);
+  // Броят за камбанката: непрочетени известия + активни предупреждения
+  const badgeCount = unread + alerts.length;
 
   const loadNotifs = useCallback(async () => {
     const r = await fetch("/api/notifications");
@@ -90,9 +92,9 @@ export function AppTopBar({ initialUnread }: { initialUnread: number }) {
 
       {/* Камбана */}
       <div ref={bellRef} style={{ position: "relative" }}>
-        <button onClick={toggleBell} aria-label="Известия" style={{ position: "relative", width: 40, height: 40, borderRadius: 10, border: "1px solid var(--border)", background: "rgba(255,255,255,.6)", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--ink)" }}>
-          <UiIcon.bell width={18} height={18} />
-          {unread > 0 &&<span style={{ position: "absolute", top: -4, right: -4, minWidth: 18, height: 18, borderRadius: 9, background: "var(--brick)", color: "#fff", fontSize: 10.5, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 5px" }}>{unread}</span>}
+        <button onClick={toggleBell} aria-label="Известия" style={{ position: "relative", width: 40, height: 40, borderRadius: 10, border: "1px solid var(--border)", background: "rgba(255,255,255,.6)", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", color: badgeCount > 0 ? "var(--brick)" : "var(--ink)" }}>
+          <span className={badgeCount > 0 && !open ? "bell-ring" : ""} style={{ display: "inline-flex", transformOrigin: "50% 0" }}><UiIcon.bell width={18} height={18} /></span>
+          {badgeCount > 0 && <span className="bell-badge" style={{ position: "absolute", top: -5, right: -5, minWidth: 18, height: 18, borderRadius: 9, background: "var(--brick)", color: "#fff", fontSize: 10.5, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 5px", border: "2px solid #fff" }}>{badgeCount > 99 ? "99+" : badgeCount}</span>}
         </button>
         {open && (
           <div className="glass pop-in" style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, width: 340, borderRadius: 14, zIndex: 80, boxShadow: "0 12px 40px rgba(0,0,0,.16)", overflow: "hidden" }}>
