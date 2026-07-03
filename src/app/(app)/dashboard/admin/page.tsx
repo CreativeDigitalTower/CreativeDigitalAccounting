@@ -29,7 +29,7 @@ const SUB_STATUS_BG: Record<string, string> = {
 function Info({ text }: { text: string }) {
   // CSS hover tooltip (native title е ненадежден) — показва пояснението при посочване.
   return (
-    <span className="cda-tip" title={text} style={{ display: "inline-flex", verticalAlign: "-2px", marginLeft: 5, color: "var(--muted)", cursor: "help", position: "relative" }}>
+    <span className="cda-tip" style={{ display: "inline-flex", verticalAlign: "-2px", marginLeft: 5, color: "var(--muted)", cursor: "help", position: "relative" }}>
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 7.5h.01" /></svg>
       <span className="cda-tip-bubble">{text}</span>
     </span>
