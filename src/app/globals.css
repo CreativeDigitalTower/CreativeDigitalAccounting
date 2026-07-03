@@ -186,6 +186,10 @@ tbody tr:hover{background:rgba(15,138,106,.05);}
 @keyframes bellBadgePulse{0%,100%{box-shadow:0 0 0 0 rgba(162,59,43,.55);}50%{box-shadow:0 0 0 6px rgba(162,59,43,0);}}
 .bell-badge{animation:bellBadgePulse 1.8s ease-in-out infinite;}
 
+/* Анимация на стълбовете в историческата диаграма — израстват отдолу */
+@keyframes histGrow{from{transform:scaleY(0);}to{transform:scaleY(1);}}
+.hist-bar{transform-origin:bottom;animation:histGrow .7s cubic-bezier(.22,1,.36,1) both;}
+
 /* ─── CSS tooltip (пояснения с info иконка) ─── */
 .cda-tip{}
 .cda-tip .cda-tip-bubble{
