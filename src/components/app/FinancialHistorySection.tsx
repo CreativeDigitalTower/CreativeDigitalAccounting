@@ -40,6 +40,7 @@ export function FinancialHistorySection({ initial, goalYear, goalTarget, goalRev
   }
 
   const max = Math.max(1, ...rows.map((r) => Math.max(r.revenue, r.expenses ?? 0, Math.abs(r.profit ?? 0))));
+  const chartRows = [...rows].sort((a, b) => a.year - b.year); // хронологично за ръст/спад
   const goalPct = goalTarget ? Math.min(100, Math.round((goalRevenue / goalTarget) * 100)) : null;
 
   // Обобщено за целия период на съществуване: исторически години (без текущата)
@@ -102,24 +103,33 @@ export function FinancialHistorySection({ initial, goalYear, goalTarget, goalRev
         ) : (
           <>
             {/* Групирана диаграма */}
-            <div style={{ display: "flex", gap: 20, alignItems: "flex-end", height: 150, padding: "8px 4px 0", overflowX: "auto", marginBottom: 8 }}>
-              {rows.map((r) => {
+            <div style={{ display: "flex", gap: 20, alignItems: "flex-end", height: 168, padding: "8px 4px 0", overflowX: "auto", marginBottom: 8 }}>
+              {chartRows.map((r, i) => {
                 const bars = [
                   { label: "Приходи", v: r.revenue, c: "var(--emerald)" },
                   { label: "Разходи", v: r.expenses ?? 0, c: "var(--brick)" },
                   { label: "Печалба", v: r.profit ?? 0, c: "var(--navy)" },
                 ];
+                // Ръст/спад на приходите спрямо предходната година
+                const prev = chartRows[i - 1];
+                const yoy = prev && prev.revenue > 0 ? ((r.revenue - prev.revenue) / prev.revenue) * 100 : null;
+                const yoyUp = yoy != null && yoy >= 0;
                 return (
                   <div key={r.year} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, minWidth: 90 }}>
                     <div style={{ display: "flex", alignItems: "flex-end", gap: 5, height: 118 }}>
-                      {bars.map((b) => (
+                      {bars.map((b, bi) => (
                         <div key={b.label} title={`${b.label}: ${formatCurrency(b.v)}`} style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", height: "100%" }}>
                           <span className="num" style={{ fontSize: 9, fontWeight: 700, color: b.c }}>{b.v >= 1000 ? `${(b.v / 1000).toFixed(0)}k` : Math.round(b.v)}</span>
-                          <div className="chart-bar" style={{ width: 16, height: `${Math.max(2, (Math.abs(b.v) / max) * 96)}px`, background: b.c, borderRadius: "3px 3px 0 0" }} />
+                          <div className="chart-bar hist-bar" style={{ width: 16, height: `${Math.max(2, (Math.abs(b.v) / max) * 96)}px`, background: b.c, borderRadius: "3px 3px 0 0", animationDelay: `${i * 0.08 + bi * 0.04}s` }} />
                         </div>
                       ))}
                     </div>
                     <span style={{ fontSize: 12, fontWeight: 600 }}>{r.year}</span>
+                    {yoy != null && (
+                      <span style={{ fontSize: 10.5, fontWeight: 700, color: yoyUp ? "var(--emerald-dark)" : "var(--brick)", background: yoyUp ? "rgba(15,138,106,.12)" : "var(--brick-soft)", borderRadius: 10, padding: "1px 7px" }} title="Промяна на приходите спрямо предходната година">
+                        {yoyUp ? "▲ +" : "▼ "}{yoy.toFixed(1)}%
+                      </span>
+                    )}
                   </div>
                 );
               })}
