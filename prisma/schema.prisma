@@ -597,6 +597,9 @@ model TaxReminder {
   title     String
   dueDate   DateTime
   done      Boolean  @default(false)
+  priority  String   @default("normal") // low | normal | high
+  progress  Int      @default(0)        // 0-100 % изпълнение
+  note      String?  @db.Text
   createdAt DateTime @default(now())
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)

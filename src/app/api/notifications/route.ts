@@ -9,16 +9,24 @@ export async function GET() {
     const soon = new Date(now.getTime() + 7 * 24 * 3600 * 1000);
 
     const in14 = new Date(now.getTime() + 14 * 24 * 3600 * 1000);
-    const [stored, overdue, sub, expiringContracts, expiringStock, expiredStock] = await Promise.all([
+    const [stored, overdue, sub, expiringContracts, expiringStock, expiredStock, dueReminders] = await Promise.all([
       prisma.notification.findMany({ where: { companyId }, orderBy: { createdAt: "desc" }, take: 20 }),
       prisma.document.count({ where: { companyId, type: "invoice", status: "overdue" } }),
       prisma.subscription.findUnique({ where: { companyId }, select: { plan: true, currentPeriodEnd: true } }),
       prisma.contract.count({ where: { companyId, status: "active", endDate: { gte: now, lte: soon } } }),
       prisma.stockItem.count({ where: { companyId, expiryDate: { gte: now, lte: in14 } } }),
       prisma.stockItem.count({ where: { companyId, expiryDate: { lt: now } } }),
+      // Собствени задачи/напомняния: наближаващ (до 7 дни) или просрочен срок
+      prisma.taxReminder.findMany({ where: { companyId, done: false, dueDate: { lte: soon } }, orderBy: { dueDate: "asc" }, take: 10 }),
     ]);
 
     const alerts: { icon: string; title: string; body?: string; href: string; tone: string }[] = [];
+    for (const r of dueReminders) {
+      const days = Math.ceil((new Date(r.dueDate).getTime() - now.getTime()) / 86400000);
+      const tone = days <= 7 ? "warn" : "info";
+      const when = days < 0 ? `просрочено с ${-days} дни` : days === 0 ? "срок днес" : `остават ${days} дни`;
+      alerts.push({ icon: "warn", title: `Задача: ${r.title}`, body: when, href: "/dashboard/tax-calendar", tone });
+    }
     if (overdue > 0) alerts.push({ icon: "warn", title: `${overdue} просрочени фактури`, href: "/dashboard/invoices?status=overdue", tone: "warn" });
     if (expiredStock > 0) alerts.push({ icon: "warn", title: `${expiredStock} артикула с изтекъл срок на годност`, href: "/dashboard/warehouse", tone: "warn" });
     if (expiringStock > 0) alerts.push({ icon: "⏰", title: `${expiringStock} артикула с изтичащ срок (до 14 дни)`, href: "/dashboard/warehouse", tone: "info" });
