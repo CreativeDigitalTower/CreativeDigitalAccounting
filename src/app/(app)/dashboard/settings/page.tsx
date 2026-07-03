@@ -118,6 +118,16 @@ export default function SettingsPage() {
               <option value="0">Без регистрация по ДДС</option>
               <option value="1">Регистрирана по ЗДДС</option>
             </select>
+            {c.vatNumber && c.vatNumber.trim() && !c.vatRegistered && (
+              <div style={{ fontSize: 11.5, color: "var(--brick)", marginTop: 4 }}>
+                Въведен е ДДС номер, но статусът е „Без регистрация". Ако фирмата е регистрирана по ЗДДС, изберете „Регистрирана по ЗДДС".
+              </div>
+            )}
+            {c.vatRegistered && !(c.vatNumber && c.vatNumber.trim()) && (
+              <div style={{ fontSize: 11.5, color: "var(--brick)", marginTop: 4 }}>
+                При „Регистрирана по ЗДДС" е задължителен ДДС номер.
+              </div>
+            )}
           </div>
           <div>
             <label>МОЛ</label>
