@@ -7,14 +7,17 @@ import { z } from "zod";
 const linkSchema = z.object({ label: z.string(), url: z.string() });
 const schema = z.object({
   title: z.string().min(1).optional(),
+  description: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
   priority: z.enum(PM_PRIORITY_IDS as unknown as [string, ...string[]]).optional(),
   status: z.enum(PM_STATUS_IDS as unknown as [string, ...string[]]).optional(),
   progress: z.number().int().min(0).max(100).optional(),
   assigneeId: z.string().optional().nullable(),
+  assigneeName: z.string().optional().nullable(),
   dueDate: z.string().optional().nullable(),
   links: z.array(linkSchema).optional().nullable(),
   boardId: z.string().optional(),
+  archived: z.boolean().optional(),
 });
 
 // PATCH — редакция/смяна на статус (всеки член на фирмата, вкл. служители)
@@ -25,20 +28,32 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const existing = await prisma.projectTask.findFirst({ where: { id, companyId }, select: { id: true, status: true } });
     if (!existing) return NextResponse.json({ error: "Не е намерена." }, { status: 404 });
     const d = schema.parse(await req.json());
-    // При статус „Изпълнена" прогресът става 100%
+    // При статус „Изпълнена" прогресът става 100% и задачата се архивира автоматично.
+    // При връщане към друг статус — задачата се изважда от архива.
     const progress = d.status === "done" ? 100 : d.progress;
+    const archivePatch =
+      d.archived !== undefined
+        ? { archived: d.archived, archivedAt: d.archived ? new Date() : null }
+        : d.status === "done"
+        ? { archived: true, archivedAt: new Date() }
+        : d.status !== undefined
+        ? { archived: false, archivedAt: null }
+        : {};
     const task = await prisma.projectTask.update({
       where: { id },
       data: {
         ...(d.title !== undefined ? { title: d.title } : {}),
+        ...(d.description !== undefined ? { description: d.description } : {}),
         ...(d.notes !== undefined ? { notes: d.notes } : {}),
         ...(d.priority !== undefined ? { priority: d.priority } : {}),
         ...(d.status !== undefined ? { status: d.status } : {}),
         ...(progress !== undefined ? { progress } : {}),
         ...(d.assigneeId !== undefined ? { assigneeId: d.assigneeId } : {}),
+        ...(d.assigneeName !== undefined ? { assigneeName: d.assigneeName?.trim() || null } : {}),
         ...(d.dueDate !== undefined ? { dueDate: d.dueDate ? new Date(d.dueDate) : null } : {}),
         ...(d.links !== undefined ? { links: d.links && d.links.length ? JSON.stringify(d.links) : null } : {}),
         ...(d.boardId !== undefined ? { boardId: d.boardId } : {}),
+        ...archivePatch,
       },
     });
     return NextResponse.json(task);

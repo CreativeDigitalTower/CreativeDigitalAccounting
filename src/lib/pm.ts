@@ -35,6 +35,25 @@ export const PM_LINK_FIELDS: { key: string; label: string }[] = [
   { key: "other", label: "Други" },
 ];
 
+export const PM_MONTHS = ["Януари", "Февруари", "Март", "Април", "Май", "Юни", "Юли", "Август", "Септември", "Октомври", "Ноември", "Декември"];
+
+// "YYYY-MM" за даден Date
+export function periodKey(d: Date): string { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`; }
+// Човешки етикет за "YYYY-MM"
+export function periodLabel(key: string): string {
+  const [y, m] = key.split("-").map(Number);
+  return `${PM_MONTHS[(m || 1) - 1]} ${y}`;
+}
+// Предходен месец за "YYYY-MM"
+export function prevPeriod(key: string): string {
+  const [y, m] = key.split("-").map(Number);
+  return periodKey(new Date(y, m - 2, 1));
+}
+export function shiftPeriod(key: string, delta: number): string {
+  const [y, m] = key.split("-").map(Number);
+  return periodKey(new Date(y, m - 1 + delta, 1));
+}
+
 export type BoardLinks = Record<string, string>;
 export type TaskLink = { label: string; url: string };
 
