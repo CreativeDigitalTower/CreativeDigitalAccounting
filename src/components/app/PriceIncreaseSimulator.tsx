@@ -43,7 +43,7 @@ export function PriceIncreaseSimulator({ monthlyRetainer, goalTarget }: {
             <Stat label="Текущи месечни приходи" value={formatCurrency(monthlyRetainer)} />
             <Stat label={`Нови месечни приходи (${sign}${pct}%)`} value={formatCurrency(newMonthly)} color={dir}
               sub={`${sign}${formatCurrency(deltaMonthly)} / месец`} subColor={dir} />
-            <Stat label="Текущи годишни приходи" value={formatCurrency(currentAnnual)} />
+            <Stat label="Очаквани текущи годишни приходи" value={formatCurrency(currentAnnual)} />
             <Stat label={`Нови годишни приходи (${sign}${pct}%)`} value={formatCurrency(newAnnual)} color={dir}
               sub={`${sign}${formatCurrency(deltaAnnual)} / година`} subColor={dir} />
           </div>

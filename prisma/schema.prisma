@@ -1202,14 +1202,19 @@ model ProjectTask {
   companyId  String
   boardId    String
   title      String
-  notes      String?  @db.Text
+  description String?  @db.Text // описание на задачата
+  notes      String?  @db.Text // бележки
   priority   String   @default("normal") // low | normal | high | urgent
   status     String   @default("pending") // pending | assigned | in_progress | review | returned | done
   progress   Int      @default(0) // 0-100
   assigneeId String?  // userId на изпълнителя (CompanyUser)
+  assigneeName String? // ръчно въведено име на изпълнител (когато не е служител)
   dueDate    DateTime?
   links      String?  @db.Text // JSON: [{ label, url }]
-  monthly    Boolean  @default(false) // ежемесечна задача
+  monthly    Boolean  @default(false) // ежемесечна (повтаряема) задача
+  period     String?  // за ежемесечни: "YYYY-MM" — за кой месец се отнася
+  archived   Boolean  @default(false) // приключените се архивират автоматично
+  archivedAt DateTime? // кога е архивирана (за справки по месеци/години)
   order      Int      @default(0)
   createdById String?
   createdAt  DateTime @default(now())
@@ -1220,4 +1225,5 @@ model ProjectTask {
 
   @@index([companyId, boardId])
   @@index([boardId, monthly])
+  @@index([boardId, archived])
 }
