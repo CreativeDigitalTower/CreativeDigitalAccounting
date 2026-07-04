@@ -28,6 +28,12 @@ const highlights = [
   { Icon: IconBank, title: "Автоматични напомняния", desc: "Следете плащания, данъчни срокове, договори и важни събития без риск от пропуски." },
 ];
 
+const newFeatures = [
+  { Icon: IconProjects, title: "Управление на проекти (Project Management)", desc: "Модерни табла за задачи по фирми и проекти — всяка фирма е отделна колона. Възлагайте задачи с приоритет, изпълнител и срок, следете статуса и процента на изпълнение, работете като екип. Отделен раздел за ежемесечни задачи и автоматичен архив на приключените." },
+  { Icon: IconUsers, title: "HR портал за служители", desc: "Пълноценно самообслужване за екипа: собствен профил, онлайн молби за отпуск и одобрения, възлагане и проследяване на задачи, заплати и осигуровки — със сигурен, ограничен достъп за всеки служител." },
+  { Icon: IconChart, title: "Прогнози и симулатори за растеж", desc: "Прогноза за задължителна ДДС регистрация спрямо оборота, симулатори на приходи и складови цени и разширени анализи с KPI и историческо сравнение по години — за уверени бизнес решения." },
+];
+
 const stats = [
   { num: "17+", label: "бизнес модула" },
   { num: "100+", label: "функции" },
@@ -100,6 +106,27 @@ export default function HomePage() {
             <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, borderTop: "1px solid var(--border)", paddingTop: 6 }}><span>Общо</span><span className="num" style={{ color: "var(--emerald-dark)" }}>590,00 €</span></div>
             <div style={{ marginTop: 8, display: "inline-block", fontSize: 10.5, fontWeight: 700, color: "#fff", background: "var(--emerald)", borderRadius: 12, padding: "2px 10px" }}>● Платена</div>
           </div>
+        </div>
+      </section>
+
+      {/* Най-новите големи функционалности */}
+      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 70px" }}>
+        <div style={{ textAlign: "center", fontSize: 12, fontWeight: 700, letterSpacing: 1.6, color: "var(--brass)", textTransform: "uppercase", marginBottom: 10 }}>Ново в платформата</div>
+        <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 30, fontWeight: 700, textAlign: "center", marginBottom: 8 }}>
+          Най-новите мощни функционалности
+        </h2>
+        <p style={{ textAlign: "center", color: "var(--muted)", marginBottom: 32, fontSize: 14, maxWidth: 680, marginInline: "auto" }}>
+          Постоянно разширяваме платформата. Ето трите най-големи нови функции, които добавихме за вашия бизнес и екип.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 18 }}>
+          {newFeatures.map((f) => (
+            <div key={f.title} className="glass panel hover-lift" style={{ padding: "24px", borderTop: "3px solid var(--emerald)", position: "relative" }}>
+              <span style={{ position: "absolute", top: 16, right: 16, background: "var(--brass)", color: "#fff", fontSize: 10, fontWeight: 700, letterSpacing: .5, padding: "2px 9px", borderRadius: 20 }}>Ново</span>
+              <div className="icon-tile" style={{ marginBottom: 14 }}><f.Icon /></div>
+              <h3 style={{ margin: "0 0 10px", fontSize: 17, fontFamily: "'Fraunces', serif", fontWeight: 700, lineHeight: 1.25 }}>{f.title}</h3>
+              <p style={{ margin: 0, color: "var(--ink-soft)", fontSize: 13.5, lineHeight: 1.6 }}>{f.desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 
