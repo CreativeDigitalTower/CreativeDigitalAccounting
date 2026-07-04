@@ -1,6 +1,28 @@
 import Link from "next/link";
 import { IconInvoice, IconUsers, IconWarehouse, IconExpense, IconChart, IconProjects, IconDoc, IconBuilding, IconBank } from "@/components/Icons";
 
+// Най-новите и най-големи функционалности — представени с акцент
+const highlights = [
+  {
+    Icon: IconProjects,
+    tag: "Ново",
+    title: "Управление на проекти (Project Management)",
+    text: "Модерни табла за задачи по фирми и проекти — всяка фирма е отделна колона. Възлагайте задачи с приоритет, изпълнител, срок и процент на изпълнение, следете статуса и работете като екип. Отделен раздел за ежемесечни (повтарящи се) задачи по месеци и автоматичен архив на приключените за справки по периоди.",
+  },
+  {
+    Icon: IconUsers,
+    tag: "Ново",
+    title: "HR портал за служители",
+    text: "Пълноценен портал за самообслужване на служителите: собствен профил, онлайн молби за отпуск и одобрения, възлагане и проследяване на задачи, заплати и осигуровки. Всеки служител вижда точно това, до което има права — със сигурен, ограничен достъп.",
+  },
+  {
+    Icon: IconChart,
+    tag: "Ново",
+    title: "Прогнози и симулатори за растеж",
+    text: "Прогноза за задължителна ДДС регистрация спрямо оборота за календарната година, симулатори на приходи и складови цени (увеличение/намаление) и разширени анализи с KPI и историческо сравнение по години — за да вземате решения с ясна финансова картина.",
+  },
+];
+
 const modules = [
   {
     Icon: IconInvoice,
@@ -127,6 +149,24 @@ export default function SoftwarePage() {
         <Link href="/register" className="btn btn-primary" style={{ fontSize: 15, padding: "12px 28px" }}>
           Започни безплатно →
         </Link>
+      </div>
+
+      {/* Акцент — най-новите големи функционалности */}
+      <div style={{ marginBottom: 48 }}>
+        <div style={{ textAlign: "center", marginBottom: 22 }}>
+          <span style={{ display: "inline-block", background: "var(--emerald-soft)", color: "var(--emerald-dark)", fontSize: 12, fontWeight: 700, letterSpacing: 1, padding: "4px 14px", borderRadius: 20, marginBottom: 10 }}>НАЙ-НОВОТО В ПЛАТФОРМАТА</span>
+          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(24px, 3.5vw, 34px)", fontWeight: 700, margin: 0 }}>Мощни нови функционалности</h2>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 18 }}>
+          {highlights.map((h) => (
+            <div key={h.title} className="glass panel hover-lift" style={{ padding: 24, borderTop: "3px solid var(--emerald)", position: "relative" }}>
+              <span style={{ position: "absolute", top: 16, right: 16, background: "var(--brass)", color: "#fff", fontSize: 10, fontWeight: 700, letterSpacing: .5, padding: "2px 9px", borderRadius: 20 }}>{h.tag}</span>
+              <div className="icon-tile" style={{ marginBottom: 14 }}><h.Icon /></div>
+              <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, margin: "0 0 10px", lineHeight: 1.25 }}>{h.title}</h3>
+              <p style={{ fontSize: 13.5, color: "var(--ink-soft)", margin: 0, lineHeight: 1.6 }}>{h.text}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 18 }}>
