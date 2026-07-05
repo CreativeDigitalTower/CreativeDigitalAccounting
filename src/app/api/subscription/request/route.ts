@@ -4,6 +4,8 @@ import { logSubscriptionEvent } from "@/lib/subscriptionEvents";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, notifyAdmin } from "@/lib/email/send";
 import { subscriptionSelectedEmail, adminPaidSubEmail } from "@/lib/email/messages";
+import { generateSubscriptionProforma } from "@/lib/subscriptionProforma";
+import { type PlanId } from "@/lib/constants";
 import { z } from "zod";
 
 const schema = z.object({
@@ -17,6 +19,15 @@ export async function POST(req: Request) {
     const { companyId } = await requireCompany();
     const { plan, period, amount } = schema.parse(await req.json());
     await logSubscriptionEvent(companyId, "request", { plan, period: period ?? null, amount: amount ?? null, note: "Клиентът избра план за плащане по банков път" });
+
+    // ─── Автоматично генериране на проформа фактура от платформената фирма ───
+    let proforma: { token: string; number: string } | null = null;
+    try {
+      const p = await generateSubscriptionProforma({
+        clientCompanyId: companyId, plan: plan as PlanId, periodLabel: period ?? "Месечно", amount: amount ?? 0,
+      });
+      if (p) proforma = { token: p.token, number: p.number };
+    } catch (e) { console.error("subscription proforma", e); }
 
     // ─── Имейл: потвърждение към фирмата + известие към админ ───
     try {
@@ -33,7 +44,7 @@ export async function POST(req: Request) {
       await notifyAdmin(a.subject, a.html, "admin_new_paid_sub");
     } catch (e) { console.error("subscription email", e); }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, proforma });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: "Невалидни данни." }, { status: 400 });
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
