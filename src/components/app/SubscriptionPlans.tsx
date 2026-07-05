@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { PLAN_DETAILS, BILLING_PERIODS } from "@/components/marketing/Pricing";
 import { EUR_TO_BGN, isPromoActive } from "@/lib/constants";
@@ -12,6 +13,7 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
   const router = useRouter();
   const [period, setPeriod] = useState<(typeof BILLING_PERIODS)[number]>(BILLING_PERIODS[0]);
   const [payPlanId, setPayPlanId] = useState<string | null>(null);
+  const [payModal, setPayModal] = useState(false);
   const [trialMsg, setTrialMsg] = useState("");
   const promo = isPromoActive();
 
@@ -28,6 +30,7 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
 
   function choosePay(planId: string) {
     setPayPlanId(planId);
+    setPayModal(true);
     const plan = PLAN_DETAILS.find((p) => p.id === planId);
     const amount = plan ? +(plan.price * period.months * (1 - period.discount)).toFixed(2) : 0;
     // ─── Meta: избор на абонамент ───
@@ -37,7 +40,6 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
     } catch {}
     // регистрираме заявка за плащане (видима в Супер Админ историята)
     fetch("/api/subscription/request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: planId, period: period.label, amount }) }).catch(() => {});
-    setTimeout(() => document.getElementById("pay-box")?.scrollIntoView({ behavior: "smooth" }), 50);
   }
 
   const payPlan = PLAN_DETAILS.find((p) => p.id === payPlanId);
@@ -165,6 +167,50 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
         </div>
         <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 10 }}>Всички цени са без ДДС. 1 EUR = {EUR_TO_BGN} лв.</p>
       </div>
+
+      {/* Поп-ъп с ясни инструкции за плащане */}
+      {payModal && payPlan && createPortal(
+        <div onClick={() => setPayModal(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.5)", display: "flex", alignItems: "flex-start", justifyContent: "center", zIndex: 3000, padding: "6vh 16px 16px", overflowY: "auto" }}>
+          <div onClick={(e) => e.stopPropagation()} className="glass panel" style={{ width: "min(560px, 100%)", padding: 28, margin: "auto", borderTop: "4px solid var(--emerald)" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+              <div className="icon-tile" style={{ width: 52, height: 52 }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 9.5h19M6 15h4"/></svg>
+              </div>
+            </div>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, margin: "0 0 6px", textAlign: "center" }}>Плащане на абонамент</h3>
+            <p style={{ fontSize: 13, color: "var(--ink-soft)", textAlign: "center", margin: "0 0 18px", lineHeight: 1.5 }}>
+              Избрахте план <strong>{payPlan.name}</strong> · {period.label.toLowerCase()}.<br />
+              Преведете сумата по банковата ни сметка с данните по-долу.
+            </p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {[
+                { label: "Получател", value: bank.recipient },
+                { label: "IBAN", value: bank.iban },
+                { label: "Банка", value: bank.bank },
+                { label: "Основание за плащане", value: `Абонамент CDA — ${payPlan.name} (${period.label})` },
+                { label: "Сума за превод", value: `${payAmount.toFixed(2)} € (≈ ${(payAmount * EUR_TO_BGN).toFixed(2)} лв)`, highlight: true },
+              ].map((b) => (
+                <div key={b.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, background: b.highlight ? "var(--emerald-soft)" : "rgba(255,255,255,.55)", borderRadius: 10, padding: "12px 16px", border: `1px solid ${b.highlight ? "var(--emerald)" : "var(--border)"}` }}>
+                  <span style={{ fontSize: 11.5, color: "var(--muted)", textTransform: "uppercase", letterSpacing: .8, flexShrink: 0 }}>{b.label}</span>
+                  <span className="num" style={{ fontSize: b.highlight ? 17 : 14, fontWeight: 700, color: b.highlight ? "var(--emerald-dark)" : "var(--ink)", textAlign: "right", wordBreak: "break-word" }}>{b.value}</span>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ marginTop: 16, background: "var(--brass-soft)", border: "1px solid rgba(166,130,47,.3)", borderRadius: 10, padding: "12px 16px", fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.55 }}>
+              Веднага след като получим превода, ще Ви <strong>изпратим фактура</strong> за направеното плащане и <strong>незабавно ще активираме избрания абонамент</strong>.
+            </div>
+
+            <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 12, textAlign: "center" }}>Всички цени са без ДДС. 1 EUR = {EUR_TO_BGN} лв.</p>
+
+            <button onClick={() => setPayModal(false)} className="btn btn-primary" style={{ width: "100%", justifyContent: "center", marginTop: 12 }}>
+              Разбрах, ще извърша плащането
+            </button>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
