@@ -14,6 +14,8 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
   const [period, setPeriod] = useState<(typeof BILLING_PERIODS)[number]>(BILLING_PERIODS[0]);
   const [payPlanId, setPayPlanId] = useState<string | null>(null);
   const [payModal, setPayModal] = useState(false);
+  const [proforma, setProforma] = useState<{ token: string; number: string } | null>(null);
+  const [proformaLoading, setProformaLoading] = useState(false);
   const [trialMsg, setTrialMsg] = useState("");
   const promo = isPromoActive();
 
@@ -28,9 +30,11 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
     } else setTrialMsg((await res.json()).error ?? "Грешка при активиране на теста.");
   }
 
-  function choosePay(planId: string) {
+  async function choosePay(planId: string) {
     setPayPlanId(planId);
     setPayModal(true);
+    setProforma(null);
+    setProformaLoading(true);
     const plan = PLAN_DETAILS.find((p) => p.id === planId);
     const amount = plan ? +(plan.price * period.months * (1 - period.discount)).toFixed(2) : 0;
     // ─── Meta: избор на абонамент ───
@@ -38,8 +42,14 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
       metaTrack("SubscriptionSelected", { value: amount, currency: "EUR", plan_name: planId, billing_period: period.label });
       metaTrack("Subscribe", { value: amount, currency: "EUR", plan_name: planId, billing_period: period.label });
     } catch {}
-    // регистрираме заявка за плащане (видима в Супер Админ историята)
-    fetch("/api/subscription/request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: planId, period: period.label, amount }) }).catch(() => {});
+    // Регистрираме заявката (видима в Супер Админ историята) и автоматично
+    // генерираме проформа фактура към фирмата на клиента.
+    try {
+      const res = await fetch("/api/subscription/request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: planId, period: period.label, amount }) });
+      const data = await res.json().catch(() => ({}));
+      if (data?.proforma?.token) setProforma(data.proforma);
+    } catch { /* без проформа — банковите данни остават видими */ }
+    finally { setProformaLoading(false); }
   }
 
   const payPlan = PLAN_DETAILS.find((p) => p.id === payPlanId);
@@ -204,9 +214,20 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
 
             <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 12, textAlign: "center" }}>Всички цени са без ДДС. 1 EUR = {EUR_TO_BGN} лв.</p>
 
-            <button onClick={() => setPayModal(false)} className="btn btn-primary" style={{ width: "100%", justifyContent: "center", marginTop: 12 }}>
-              Разбрах, ще извърша плащането
-            </button>
+            <div style={{ display: "flex", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
+              {proformaLoading ? (
+                <button className="btn btn-ghost" style={{ flex: 1, justifyContent: "center", minWidth: 200 }} disabled>Генериране на проформа…</button>
+              ) : proforma ? (
+                <a href={`/d/${proforma.token}`} target="_blank" rel="noopener noreferrer" className="btn btn-ghost" style={{ flex: 1, justifyContent: "center", minWidth: 200 }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+                  Изтегли проформа фактура
+                </a>
+              ) : null}
+              <button onClick={() => setPayModal(false)} className="btn btn-primary" style={{ flex: 1, justifyContent: "center", minWidth: 200 }}>
+                Разбрах, ще извърша плащането
+              </button>
+            </div>
+            {proforma && <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 8, textAlign: "center" }}>Проформа № {proforma.number} е налична и във „Входящи документи“.</p>}
           </div>
         </div>,
         document.body
