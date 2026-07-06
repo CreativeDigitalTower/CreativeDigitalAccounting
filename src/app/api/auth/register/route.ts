@@ -24,6 +24,8 @@ const schema = z.object({
   mol: z.string().optional(),
   sector: z.string().optional(),
   plan: z.enum(["free", "start", "business", "pro"]).default("free"),
+  accountType: z.enum(["business", "accounting"]).optional(),
+  firmPlan: z.enum(["acc_solo", "acc_office", "acc_house"]).optional(),
   referralSource: z.string().max(60).optional(),
   acceptTerms: z.literal(true),
   marketingConsent: z.boolean().optional(),
@@ -82,6 +84,7 @@ export async function POST(req: Request) {
         : await tx.user.create({ data: { email: data.email, ...userData } });
 
       const vatReg = !!data.vatRegistered && !!(data.vatNumber && data.vatNumber.trim());
+      const isAccounting = data.accountType === "accounting";
       const company = await tx.company.create({
         data: {
           name: data.companyName, eik, phone: data.phone || null, vatNumber: data.vatNumber,
@@ -91,7 +94,10 @@ export async function POST(req: Request) {
           defaultVatExempt: !vatReg,
           defaultVatExemptReason: vatReg ? null : "art113_9",
           address: data.address, city: data.city, mol: data.mol, sector: data.sector,
-          referralSource: data.referralSource ?? null,
+          referralSource: data.referralSource ?? (isAccounting ? "accounting_firm_signup" : null),
+          // Счетоводна къща: мулти-фирмен режим
+          isAccountingFirm: isAccounting,
+          firmPlan: isAccounting ? (data.firmPlan ?? "acc_office") : null,
         },
       });
 

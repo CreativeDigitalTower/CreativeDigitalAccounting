@@ -2,9 +2,11 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { planHasFeature, type PlanId } from "@/lib/constants";
+import { planHasFeature, EFFECTIVE_FIRM_CLIENT_PLAN, type PlanId } from "@/lib/constants";
 
 export const IMPERSONATE_COOKIE = "cda_impersonate";
+// Активна фирма при счетоводна къща (превключване между клиентски фирми)
+export const ACTIVE_COMPANY_COOKIE = "cda_active_company";
 
 export async function getSession() {
   const session = await auth();
@@ -24,12 +26,42 @@ export async function getCompanyId(userId: string): Promise<string> {
     }
   }
 
+  // Активна клиентска фирма (счетоводна къща е „влязла" в клиент).
+  // Валидно само ако потребителят е член на тази фирма.
+  const active = jar.get(ACTIVE_COMPANY_COOKIE)?.value;
+  if (active) {
+    const member = await prisma.companyUser.findUnique({
+      where: { userId_companyId: { userId, companyId: active } },
+      select: { companyId: true },
+    });
+    if (member) return member.companyId;
+  }
+
   const cu = await prisma.companyUser.findFirst({
     where: { userId },
     orderBy: { company: { createdAt: "asc" } },
   });
   if (!cu) redirect("/onboarding");
   return cu.companyId;
+}
+
+/** Счетоводната къща (фирма с isAccountingFirm), която потребителят притежава — или null. */
+export async function getMyFirm(userId: string) {
+  const cu = await prisma.companyUser.findFirst({
+    where: { userId, role: "owner", company: { isAccountingFirm: true } },
+    select: { company: { select: { id: true, name: true, firmPlan: true } } },
+    orderBy: { company: { createdAt: "asc" } },
+  });
+  return cu?.company ?? null;
+}
+
+/** Изисква потребителят да притежава счетоводна къща; иначе към /dashboard. */
+export async function requireAccountingFirm() {
+  const session = await getSession();
+  const userId = session.user!.id as string;
+  const firm = await getMyFirm(userId);
+  if (!firm) redirect("/dashboard");
+  return { userId, firm };
 }
 
 /** Ролята на текущия потребител в дадена фирма. */
@@ -49,6 +81,9 @@ export async function requireCompany() {
   // Централна точка: всички бизнес страници и API маршрути минават оттук.
   const role = await getMyRole(userId, companyId);
   if (role === "employee") redirect("/portal");
+  // Ако активната фирма е самата счетоводна къща (не е влязла в клиент) → към /firm.
+  const comp = await prisma.company.findUnique({ where: { id: companyId }, select: { isAccountingFirm: true } });
+  if (comp?.isAccountingFirm) redirect("/firm");
   return { userId, companyId };
 }
 
@@ -91,11 +126,13 @@ export async function requireSuperAdmin() {
 }
 
 export async function getPlan(companyId: string): Promise<PlanId> {
-  const sub = await prisma.subscription.findUnique({
-    where: { companyId },
-    select: { plan: true },
+  // Клиентска фирма, управлявана от счетоводна къща → пълен (ефективен) план.
+  const comp = await prisma.company.findUnique({
+    where: { id: companyId },
+    select: { managedByFirmId: true, subscription: { select: { plan: true } } },
   });
-  return (sub?.plan ?? "free") as PlanId;
+  if (comp?.managedByFirmId) return EFFECTIVE_FIRM_CLIENT_PLAN;
+  return (comp?.subscription?.plan ?? "free") as PlanId;
 }
 
 /** Спира достъпа до страница, ако планът не включва дадена функция. */

@@ -7,6 +7,7 @@ import { BlobBackground } from "@/components/Backgrounds";
 import { SidebarShell } from "@/components/app/SidebarShell";
 import { AppTopBar } from "@/components/app/AppTopBar";
 import { ImpersonationBanner } from "@/components/app/ImpersonationBanner";
+import { FirmClientBanner } from "@/components/app/FirmClientBanner";
 import { VisitTracker } from "@/components/VisitTracker";
 import { TrialEndedPopup } from "@/components/app/TrialEndedPopup";
 import { enforceSubscription } from "@/lib/subscription";
@@ -23,7 +24,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (role === "employee") redirect("/portal");
 
   const [company, me, jar, sub, inboxUnread] = await Promise.all([
-    prisma.company.findUnique({ where: { id: companyId }, select: { name: true, logoUrl: true } }),
+    prisma.company.findUnique({ where: { id: companyId }, select: { name: true, logoUrl: true, managedByFirmId: true } }),
     prisma.user.findUnique({ where: { id: userId }, select: { isSuperAdmin: true } }),
     cookies(),
     enforceSubscription(companyId), // авто-връщане към БЕЗПЛАТЕН при изтекъл абонамент
@@ -32,7 +33,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (!company) redirect("/onboarding");
 
-  const plan = sub.plan;
+  // Клиентска фирма на счетоводна къща получава пълен (Про) достъп.
+  const plan = company.managedByFirmId ? "pro" : sub.plan;
   const isSuperAdmin = !!me?.isSuperAdmin;
   const impersonating = isSuperAdmin && !!jar.get(IMPERSONATE_COOKIE)?.value;
 
@@ -44,6 +46,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <SidebarShell companyName={company.name} plan={plan} isSuperAdmin={isSuperAdmin} logoUrl={plan !== "free" ? company.logoUrl : null} inboxUnread={inboxUnread} />
         <main style={{ flex: 1, minWidth: 0, maxWidth: 1180 }}>
           {impersonating && <ImpersonationBanner companyName={company.name} />}
+          {company.managedByFirmId && <FirmClientBanner companyName={company.name} />}
           {sub.justExpired && <TrialEndedPopup wasTrial={sub.wasTrial} periodEnd={sub.currentPeriodEnd ? new Date(sub.currentPeriodEnd).toISOString() : ""} />}
           <AppTopBar initialUnread={inboxUnread} />
           <div className="app-content" style={{ padding: "14px 36px 60px" }}>{children}</div>

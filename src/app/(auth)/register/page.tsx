@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { metaTrack } from "@/lib/metaClient";
 import { PLAN_DETAILS, BILLING_PERIODS } from "@/components/marketing/Pricing";
-import { EUR_TO_BGN, isPromoActive } from "@/lib/constants";
+import { EUR_TO_BGN, isPromoActive, ACCOUNTANT_PLANS, ACCOUNTANT_PLAN_FEATURES } from "@/lib/constants";
 import { validateEik } from "@/lib/validation/eik";
 
 const SECTORS = ["Търговия", "Услуги", "Производство", "IT / Софтуер", "Строителство", "Транспорт", "Туризъм / Ресторантьорство", "Земеделие", "Здравеопазване", "Образование", "Финанси", "Свободна професия", "Друг"];
@@ -14,7 +14,9 @@ const SECTORS = ["Търговия", "Услуги", "Производство",
 function RegisterForm() {
   const router = useRouter();
   const params = useSearchParams();
+  const [accountType, setAccountType] = useState<"business" | "accounting">(params.get("accountType") === "accounting" ? "accounting" : "business");
   const [plan, setPlan] = useState(params.get("plan") ?? "free");
+  const [firmPlan, setFirmPlan] = useState(params.get("firmPlan") ?? "acc_office");
   const [period, setPeriod] = useState(
     BILLING_PERIODS.find((p) => p.id === params.get("period")) ?? BILLING_PERIODS[0]
   );
@@ -63,6 +65,7 @@ function RegisterForm() {
         vatRegistered, vatNumber: vatNumber.trim() || undefined,
         address: fd.get("address") || undefined, city: fd.get("city") || undefined, mol: fd.get("mol") || undefined,
         sector: fd.get("sector") || undefined, plan,
+        accountType, firmPlan: accountType === "accounting" ? firmPlan : undefined,
         referralSource: params.get("ref") || undefined,
         acceptTerms: true, marketingConsent: !!fd.get("marketingConsent"),
       }),
@@ -82,7 +85,7 @@ function RegisterForm() {
       const login = await signIn("credentials", { email: acc.email, password: acc.password, redirect: false });
       setLoading(false);
       if (login?.error) router.push("/login?registered=1");
-      else router.push("/dashboard");
+      else router.push(accountType === "accounting" ? "/firm" : "/dashboard");
     } else {
       setLoading(false);
       setError((await res.json()).error ?? "Грешка при регистрацията.");
@@ -109,6 +112,25 @@ function RegisterForm() {
 
         {step === "account" ? (
           <form onSubmit={nextStep} style={{ display: "flex", flexDirection: "column", gap: 13 }}>
+            <div>
+              <label>Тип на профила *</label>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 4 }}>
+                {([
+                  { id: "business", title: "Фирма", desc: "За вашия собствен бизнес" },
+                  { id: "accounting", title: "Счетоводна къща", desc: "Управлявайте няколко клиентски фирми" },
+                ] as const).map((t) => {
+                  const active = accountType === t.id;
+                  return (
+                    <button type="button" key={t.id} onClick={() => setAccountType(t.id)}
+                      style={{ textAlign: "left", padding: "12px 14px", borderRadius: 10, cursor: "pointer",
+                        background: active ? "var(--emerald-soft)" : "rgba(255,255,255,.5)", border: active ? "2px solid var(--emerald)" : "1px solid var(--border)" }}>
+                      <div style={{ fontWeight: 700, fontSize: 13.5, fontFamily: "'Fraunces', serif" }}>{t.title}{active && <span style={{ color: "var(--emerald)", marginLeft: 6 }}>✓</span>}</div>
+                      <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 2 }}>{t.desc}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
             <div><label>Вашите имена *</label><input type="text" required value={acc.name} onChange={(e) => setAcc({ ...acc, name: e.target.value })} placeholder="Иван Иванов" /></div>
             <div><label>Качество (представител на фирмата) *</label>
               <select required value={acc.representativeRole} onChange={(e) => setAcc({ ...acc, representativeRole: e.target.value })}>
@@ -162,7 +184,32 @@ function RegisterForm() {
             </div>
 
             <div>
-              <label>Абонаментен план</label>
+              <label>{accountType === "accounting" ? "Абонамент за счетоводна къща" : "Абонаментен план"}</label>
+              {accountType === "accounting" ? (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginTop: 4 }}>
+                  {ACCOUNTANT_PLANS.map((p) => {
+                    const active = firmPlan === p.id;
+                    const hasPromo = promo && p.regularPrice > p.price;
+                    const price = promo ? p.price : p.regularPrice;
+                    return (
+                      <button type="button" key={p.id} onClick={() => setFirmPlan(p.id)}
+                        style={{ textAlign: "left", padding: "12px 12px", borderRadius: 10, cursor: "pointer", position: "relative",
+                          background: active ? "var(--emerald-soft)" : "rgba(255,255,255,.5)", border: active ? "2px solid var(--emerald)" : "1px solid var(--border)" }}>
+                        {p.recommended && <span style={{ position: "absolute", top: -8, right: 8, background: "var(--brass)", color: "#fff", fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 10 }}>Препоръчан</span>}
+                        <div style={{ fontWeight: 700, fontSize: 13, fontFamily: "'Fraunces', serif" }}>{p.name}{active && <span style={{ color: "var(--emerald)", marginLeft: 4 }}>✓</span>}</div>
+                        <div style={{ fontSize: 18, fontWeight: 700, marginTop: 4 }}>
+                          {hasPromo && <span className="num" style={{ fontSize: 11, color: "var(--muted)", textDecoration: "line-through", marginRight: 4 }}>{p.regularPrice}</span>}
+                          <span className="num" style={{ color: hasPromo ? "var(--emerald-dark)" : "var(--ink)" }}>{price}</span>
+                          <span style={{ fontSize: 10.5, color: "var(--muted)", fontWeight: 500 }}> €/мес</span>
+                        </div>
+                        <div style={{ fontSize: 10.5, color: "var(--navy)", fontWeight: 600, marginTop: 4 }}>{p.maxClients === Infinity ? "Неограничени фирми" : `До ${p.maxClients} фирми`}</div>
+                        <div style={{ fontSize: 10.5, color: "var(--ink-soft)", marginTop: 3, lineHeight: 1.35 }}>{p.tagline}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+              <>
               {/* Период на плащане */}
               <div style={{ display: "flex", gap: 4, margin: "4px 0 12px", background: "rgba(255,255,255,.5)", borderRadius: 20, padding: 4, width: "fit-content" }}>
                 {BILLING_PERIODS.map((p) => (
@@ -219,6 +266,13 @@ function RegisterForm() {
                   );
                 })}
               </div>
+              </>
+              )}
+              {accountType === "accounting" && (
+                <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 8 }}>
+                  Всеки клиент, който добавите, получава пълен достъп до всички модули. Плащането е по банков път; активираме плана след потвърждаване.
+                </p>
+              )}
             </div>
 
             <label style={{ display: "flex", gap: 8, alignItems: "flex-start", fontWeight: 400, fontSize: 12.5, marginTop: 4 }}>

@@ -7,6 +7,7 @@ import { Logo } from "@/components/Logo";
 const links = [
   { href: "/", label: "Начало" },
   { href: "/software", label: "За Софтуера" },
+  { href: "/accountants", label: "За счетоводители" },
   { href: "/services", label: "Услуги" },
 ];
 
