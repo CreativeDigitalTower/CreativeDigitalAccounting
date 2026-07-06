@@ -174,6 +174,41 @@ export function planPrice(plan: PlanId): number {
 // Видове официални изходящи документи, които се броят към месечния лимит
 export const OFFICIAL_DOC_TYPES = ["invoice", "proforma", "quote", "credit_note", "debit_note"] as const;
 
+// ─── Абонаментни планове за СЧЕТОВОДНИ КЪЩИ / СЧЕТОВОДИТЕЛИ ───────────────
+// Тарифите се различават по броя клиентски фирми, които къщата може да управлява.
+// Всяка управлявана клиентска фирма получава пълен достъп (виж EFFECTIVE_FIRM_CLIENT_PLAN).
+export const ACCOUNTANT_PLANS = [
+  { id: "acc_solo",   name: "Счетоводител",       tagline: "За самостоятелни счетоводители", regularPrice: 49,  price: 39,  maxClients: 15,       recommended: false },
+  { id: "acc_office", name: "Счетоводна кантора",  tagline: "За малки и средни кантори",       regularPrice: 99,  price: 79,  maxClients: 40,       recommended: true },
+  { id: "acc_house",  name: "Счетоводна къща",     tagline: "За големи къщи и екипи",          regularPrice: 199, price: 159, maxClients: Infinity, recommended: false },
+] as const;
+
+export type AccountantPlanId = (typeof ACCOUNTANT_PLANS)[number]["id"];
+export const ACCOUNTANT_PLAN_IDS = ACCOUNTANT_PLANS.map((p) => p.id) as AccountantPlanId[];
+
+// Общи предимства, включени във всеки счетоводен план (за маркетинг/регистрация)
+export const ACCOUNTANT_PLAN_FEATURES = [
+  "Управление на неограничени данни за всяка клиентска фирма",
+  "Пълен достъп до всички модули за всеки клиент (Про ниво)",
+  "Обобщена справка за всички клиенти на едно място",
+  "Бързо превключване между фирмите на клиентите",
+  "Отделни фактури, склад, разходи и анализи за всяка фирма",
+  "Проследяване на ДДС праг и данъчен календар по клиент",
+  "Регистрация на нови клиентски фирми без допълнителна такса",
+];
+
+export function accountantPlan(id: string | null | undefined) {
+  return ACCOUNTANT_PLANS.find((p) => p.id === id) ?? null;
+}
+export function accountantPlanLabel(id: string | null | undefined): string {
+  return accountantPlan(id)?.name ?? "Счетоводна къща";
+}
+export function accountantMaxClients(id: string | null | undefined): number {
+  return accountantPlan(id)?.maxClients ?? 0;
+}
+// Ефективният план, който получава всяка управлявана клиентска фирма (пълен достъп).
+export const EFFECTIVE_FIRM_CLIENT_PLAN: PlanId = "pro";
+
 // Кои функции са достъпни за кой план (за заключване в UI и сървъра)
 const FREE_FEATURES = ["documents", "clients", "suppliers", "warehouse", "dashboard", "cash", "tax_calendar"];
 const START_FEATURES = [...FREE_FEATURES, "expenses", "recurring", "analytics", "archive", "invoice_logo", "protocols", "bank_statements"];

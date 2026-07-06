@@ -127,6 +127,10 @@ model Company {
   referralSource  String?
   // Споделяне на документи към други регистрирани фирми през платформата (по подразбиране включено)
   shareDocsInternally Boolean @default(true)
+  // ─── Счетоводна къща (мулти-фирмен режим за счетоводители) ───
+  isAccountingFirm Boolean @default(false) // тази фирма е счетоводна къща/кантора
+  firmPlan         String?                 // абонаментен тир за счетоводна къща (acc_solo | acc_office | acc_house)
+  managedByFirmId  String?                 // ако е клиентска фирма — коя счетоводна къща я управлява
   createdAt       DateTime @default(now())
 
   auditLogs         AuditLog[]
@@ -163,6 +167,13 @@ model Company {
   monthlyEntries    MonthlyEntry[]
   projectBoards     ProjectBoard[]
   projectTasks      ProjectTask[]
+
+  // Самореференция: счетоводна къща ↔ управлявани клиентски фирми
+  managingFirm      Company?  @relation("FirmClients", fields: [managedByFirmId], references: [id], onDelete: SetNull)
+  managedClients    Company[] @relation("FirmClients")
+
+  @@index([managedByFirmId])
+  @@index([isAccountingFirm])
 }
 
 // История на абонаментите (заявки, плащания, промени на статус/план)
