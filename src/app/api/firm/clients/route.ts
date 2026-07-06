@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getSession, getMyFirm } from "@/lib/session";
 import { accountantMaxClients } from "@/lib/constants";
 import { validateEik } from "@/lib/validation/eik";
+import { notifyAdmin } from "@/lib/email/send";
 import { z } from "zod";
 
 const schema = z.object({
@@ -56,6 +57,8 @@ export async function POST(req: Request) {
           address: d.address || null, city: d.city || null, mol: d.mol || null,
           phone: d.phone || null, email: d.email || null, sector: d.sector || null,
           referralSource: "accounting_firm",
+          // Клиентът получава базово СТАРТ достъп; статус „активна".
+          clientStatus: "active", activatedAt: new Date(),
         },
       });
       // Счетоводителят получава пълен достъп до клиентската фирма
@@ -68,6 +71,15 @@ export async function POST(req: Request) {
       await tx.warehouse.create({ data: { companyId: c.id, name: "Главен склад" } });
       return c;
     });
+
+    // Известие към Супер Админ за нов клиент на счетоводна къща
+    try {
+      await notifyAdmin(
+        `Нов клиент на счетоводна къща — ${firm.name}`,
+        `<p>Счетоводна къща <strong>${firm.name}</strong> добави нова клиентска фирма: <strong>${company.name}</strong> (безплатен START достъп).</p>`,
+        "admin_firm_new_client"
+      );
+    } catch (e) { console.error("firm client notify", e); }
 
     return NextResponse.json({ success: true, companyId: company.id });
   } catch (err) {

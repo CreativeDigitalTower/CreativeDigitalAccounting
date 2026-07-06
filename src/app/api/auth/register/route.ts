@@ -8,6 +8,7 @@ import { sendEmail, notifyAdmin } from "@/lib/email/send";
 import { welcomeEmail, adminNewRegistrationEmail } from "@/lib/email/messages";
 import { APP_URL } from "@/lib/email/templates";
 import { validateEik } from "@/lib/validation/eik";
+import { generatePartnerCode } from "@/lib/partner";
 
 const schema = z.object({
   name: z.string().min(2),
@@ -25,7 +26,8 @@ const schema = z.object({
   sector: z.string().optional(),
   plan: z.enum(["free", "start", "business", "pro"]).default("free"),
   accountType: z.enum(["business", "accounting"]).optional(),
-  firmPlan: z.enum(["acc_solo", "acc_office", "acc_house"]).optional(),
+  firmPlan: z.enum(["acc_start", "acc_pro", "acc_office", "acc_enterprise"]).optional(),
+  partner: z.string().max(40).optional(), // партньорски код (реферал от счетоводна къща)
   referralSource: z.string().max(60).optional(),
   acceptTerms: z.literal(true),
   marketingConsent: z.boolean().optional(),
@@ -85,6 +87,11 @@ export async function POST(req: Request) {
 
       const vatReg = !!data.vatRegistered && !!(data.vatNumber && data.vatNumber.trim());
       const isAccounting = data.accountType === "accounting";
+      // Партньорски реферал: ако фирмата се регистрира чрез код на счетоводна къща.
+      const partnerFirm = !isAccounting && data.partner
+        ? await tx.company.findUnique({ where: { partnerCode: data.partner }, select: { id: true } })
+        : null;
+      const partnerCode = isAccounting ? await generatePartnerCode(data.companyName) : null;
       const company = await tx.company.create({
         data: {
           name: data.companyName, eik, phone: data.phone || null, vatNumber: data.vatNumber,
@@ -94,10 +101,15 @@ export async function POST(req: Request) {
           defaultVatExempt: !vatReg,
           defaultVatExemptReason: vatReg ? null : "art113_9",
           address: data.address, city: data.city, mol: data.mol, sector: data.sector,
-          referralSource: data.referralSource ?? (isAccounting ? "accounting_firm_signup" : null),
-          // Счетоводна къща: мулти-фирмен режим
+          referralSource: data.referralSource ?? (isAccounting ? "accounting_firm_signup" : partnerFirm ? "partner" : null),
+          // Счетоводна къща: мулти-фирмен режим + партньорски код
           isAccountingFirm: isAccounting,
-          firmPlan: isAccounting ? (data.firmPlan ?? "acc_office") : null,
+          firmPlan: isAccounting ? (data.firmPlan ?? "acc_start") : null,
+          partnerCode,
+          // Клиент, дошъл през партньорски линк → управляван от съответната къща
+          managedByFirmId: partnerFirm?.id ?? null,
+          clientStatus: partnerFirm ? "active" : null,
+          activatedAt: partnerFirm ? new Date() : null,
         },
       });
 
@@ -108,6 +120,14 @@ export async function POST(req: Request) {
       await tx.subscription.create({
         data: { companyId: company.id, plan: data.plan },
       });
+
+      // Партньорски реферал: маркираме съответната покана като приета
+      if (partnerFirm) {
+        await tx.clientInvite.updateMany({
+          where: { firmId: partnerFirm.id, email: data.email.toLowerCase(), status: "invited" },
+          data: { status: "accepted", acceptedAt: new Date(), companyId: company.id },
+        });
+      }
 
       // Seed default expense categories
       const defaultCategories = [

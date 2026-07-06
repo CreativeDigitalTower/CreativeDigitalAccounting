@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { metaTrack } from "@/lib/metaClient";
 import { PLAN_DETAILS, BILLING_PERIODS } from "@/components/marketing/Pricing";
-import { EUR_TO_BGN, isPromoActive, ACCOUNTANT_PLANS, ACCOUNTANT_PLAN_FEATURES } from "@/lib/constants";
+import { EUR_TO_BGN, isPromoActive, ACCOUNTANT_PLANS } from "@/lib/constants";
 import { validateEik } from "@/lib/validation/eik";
 
 const SECTORS = ["Търговия", "Услуги", "Производство", "IT / Софтуер", "Строителство", "Транспорт", "Туризъм / Ресторантьорство", "Земеделие", "Здравеопазване", "Образование", "Финанси", "Свободна професия", "Друг"];
@@ -16,7 +16,7 @@ function RegisterForm() {
   const params = useSearchParams();
   const [accountType, setAccountType] = useState<"business" | "accounting">(params.get("accountType") === "accounting" ? "accounting" : "business");
   const [plan, setPlan] = useState(params.get("plan") ?? "free");
-  const [firmPlan, setFirmPlan] = useState(params.get("firmPlan") ?? "acc_office");
+  const [firmPlan, setFirmPlan] = useState(params.get("firmPlan") ?? "acc_pro");
   const [period, setPeriod] = useState(
     BILLING_PERIODS.find((p) => p.id === params.get("period")) ?? BILLING_PERIODS[0]
   );
@@ -66,6 +66,7 @@ function RegisterForm() {
         address: fd.get("address") || undefined, city: fd.get("city") || undefined, mol: fd.get("mol") || undefined,
         sector: fd.get("sector") || undefined, plan,
         accountType, firmPlan: accountType === "accounting" ? firmPlan : undefined,
+        partner: params.get("partner") || undefined,
         referralSource: params.get("ref") || undefined,
         acceptTerms: true, marketingConsent: !!fd.get("marketingConsent"),
       }),
@@ -186,7 +187,7 @@ function RegisterForm() {
             <div>
               <label>{accountType === "accounting" ? "Абонамент за счетоводна къща" : "Абонаментен план"}</label>
               {accountType === "accounting" ? (
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginTop: 4 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 4 }}>
                   {ACCOUNTANT_PLANS.map((p) => {
                     const active = firmPlan === p.id;
                     const hasPromo = promo && p.regularPrice > p.price;

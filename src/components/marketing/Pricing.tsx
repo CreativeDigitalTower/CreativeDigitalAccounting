@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { EUR_TO_BGN, isPromoActive } from "@/lib/constants";
+import { EUR_TO_BGN, isPromoActive, BILLING_PERIODS } from "@/lib/constants";
 import { IconSeed, IconRocket, IconTrophy, IconCrown, IconBuilding } from "@/components/Icons";
 
 type Plan = {
@@ -29,11 +29,8 @@ export const PLAN_DETAILS: Plan[] = [
     suited: "счетоводни кантори, групи фирми, производители, по-големи бизнеси.", cta: "Изберете Про", href: "/register?plan=pro" },
 ];
 
-export const BILLING_PERIODS = [
-  { id: "monthly", label: "Месечно", months: 1, discount: 0 },
-  { id: "semiannual", label: "6 месеца", months: 6, discount: 0.05 },
-  { id: "annual", label: "1 година", months: 12, discount: 0.10 },
-] as const;
+// Периодите се дефинират централно в constants; ре-експорт за обратна съвместимост.
+export { BILLING_PERIODS };
 
 export function Pricing() {
   const [period, setPeriod] = useState<(typeof BILLING_PERIODS)[number]>(BILLING_PERIODS[0]);

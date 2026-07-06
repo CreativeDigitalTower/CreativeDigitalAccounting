@@ -11,6 +11,7 @@ import { FirmClientBanner } from "@/components/app/FirmClientBanner";
 import { VisitTracker } from "@/components/VisitTracker";
 import { TrialEndedPopup } from "@/components/app/TrialEndedPopup";
 import { enforceSubscription } from "@/lib/subscription";
+import { effectiveManagedPlan } from "@/lib/constants";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -33,8 +34,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (!company) redirect("/onboarding");
 
-  // Клиентска фирма на счетоводна къща получава пълен (Про) достъп.
-  const plan = company.managedByFirmId ? "pro" : sub.plan;
+  // Клиентска фирма на счетоводна къща: базово СТАРТ, а при надграждане — реалния план.
+  const plan = company.managedByFirmId ? effectiveManagedPlan(sub.plan) : sub.plan;
   const isSuperAdmin = !!me?.isSuperAdmin;
   const impersonating = isSuperAdmin && !!jar.get(IMPERSONATE_COOKIE)?.value;
 
