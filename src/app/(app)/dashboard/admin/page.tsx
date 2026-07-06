@@ -337,6 +337,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         </div>
       </div>
 
+      {/* ─── Счетоводни къщи · Партньорска програма ─── */}
+      <AdminFirmsPanel firms={firmRows} payouts={payoutRows} />
+
       {/* Чакащи потвърждение на плащане */}
       {awaitingList.length > 0 && (
         <div className="glass panel" style={{ marginBottom: 16, borderLeft: "4px solid var(--brass)", background: "var(--brass-soft)" }}>
@@ -644,9 +647,6 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           </div>
         </div>
       </div>
-
-      {/* ─── Счетоводни къщи · Партньорска програма ─── */}
-      <AdminFirmsPanel firms={firmRows} payouts={payoutRows} />
 
       <div className="glass panel" style={{ padding: "8px 0", overflowX: "auto" }}>
         <table>
