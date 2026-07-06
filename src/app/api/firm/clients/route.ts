@@ -76,7 +76,7 @@ export async function POST(req: Request) {
     try {
       await notifyAdmin(
         `Нов клиент на счетоводна къща — ${firm.name}`,
-        `<p>Счетоводна къща <strong>${firm.name}</strong> добави нова клиентска фирма: <strong>${company.name}</strong> (безплатен START достъп).</p>`,
+        `<p>Счетоводна къща <strong>${firm.name}</strong> добави нова клиентска фирма: <strong>${company.name}</strong> (безплатен СТАРТ достъп).</p>`,
         "admin_firm_new_client"
       );
     } catch (e) { console.error("firm client notify", e); }
