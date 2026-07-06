@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { planHasFeature, EFFECTIVE_FIRM_CLIENT_PLAN, type PlanId } from "@/lib/constants";
+import { planHasFeature, effectiveManagedPlan, type PlanId } from "@/lib/constants";
 
 export const IMPERSONATE_COOKIE = "cda_impersonate";
 // Активна фирма при счетоводна къща (превключване между клиентски фирми)
@@ -49,7 +49,7 @@ export async function getCompanyId(userId: string): Promise<string> {
 export async function getMyFirm(userId: string) {
   const cu = await prisma.companyUser.findFirst({
     where: { userId, role: "owner", company: { isAccountingFirm: true } },
-    select: { company: { select: { id: true, name: true, firmPlan: true } } },
+    select: { company: { select: { id: true, name: true, firmPlan: true, partnerCode: true, partnerPercentOverride: true, commissionPaidTotal: true } } },
     orderBy: { company: { createdAt: "asc" } },
   });
   return cu?.company ?? null;
@@ -131,7 +131,8 @@ export async function getPlan(companyId: string): Promise<PlanId> {
     where: { id: companyId },
     select: { managedByFirmId: true, subscription: { select: { plan: true } } },
   });
-  if (comp?.managedByFirmId) return EFFECTIVE_FIRM_CLIENT_PLAN;
+  // Клиентска фирма на счетоводна къща: базово СТАРТ, а при надграждане — реалния план.
+  if (comp?.managedByFirmId) return effectiveManagedPlan(comp.subscription?.plan);
   return (comp?.subscription?.plan ?? "free") as PlanId;
 }
 

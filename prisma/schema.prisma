@@ -129,8 +129,16 @@ model Company {
   shareDocsInternally Boolean @default(true)
   // ─── Счетоводна къща (мулти-фирмен режим за счетоводители) ───
   isAccountingFirm Boolean @default(false) // тази фирма е счетоводна къща/кантора
-  firmPlan         String?                 // абонаментен тир за счетоводна къща (acc_solo | acc_office | acc_house)
-  managedByFirmId  String?                 // ако е клиентска фирма — коя счетоводна къща я управлява
+  firmPlan         String?                 // абонаментен тир (acc_start | acc_pro | acc_office | acc_enterprise)
+  // Партньорска програма (за счетоводни къщи)
+  partnerCode            String?  @unique   // уникален код за покани/реферал линк
+  partnerPercentOverride Int?               // ръчна корекция на процента от Супер Админ (иначе по нива)
+  commissionPaidTotal    Float    @default(0) // общо изплатена комисионна
+  // ─── Клиентска фирма, управлявана от счетоводна къща ───
+  managedByFirmId  String?                 // коя счетоводна къща я управлява
+  clientStatus     String?                 // invited | active | inactive | paid
+  invitedAt        DateTime?               // кога е поканена
+  activatedAt      DateTime?               // кога е активирана (първо влизане/активност)
   createdAt       DateTime @default(now())
 
   auditLogs         AuditLog[]
@@ -171,9 +179,43 @@ model Company {
   // Самореференция: счетоводна къща ↔ управлявани клиентски фирми
   managingFirm      Company?  @relation("FirmClients", fields: [managedByFirmId], references: [id], onDelete: SetNull)
   managedClients    Company[] @relation("FirmClients")
+  clientInvites     ClientInvite[]
+  payoutRequests    CommissionPayout[]
 
   @@index([managedByFirmId])
   @@index([isAccountingFirm])
+}
+
+// Покана към клиентска фирма от счетоводна къща
+model ClientInvite {
+  id         String    @id @default(cuid())
+  firmId     String
+  email      String
+  name       String?
+  token      String    @unique
+  status     String    @default("invited") // invited | accepted | cancelled
+  companyId  String?   // попълва се при приемане (създадената клиентска фирма)
+  createdAt  DateTime  @default(now())
+  acceptedAt DateTime?
+
+  firm Company @relation(fields: [firmId], references: [id], onDelete: Cascade)
+
+  @@index([firmId, status])
+}
+
+// Заявка за изплащане на партньорска комисионна
+model CommissionPayout {
+  id          String    @id @default(cuid())
+  firmId      String
+  amount      Float
+  status      String    @default("requested") // requested | paid | rejected
+  note        String?
+  requestedAt DateTime  @default(now())
+  paidAt      DateTime?
+
+  firm Company @relation(fields: [firmId], references: [id], onDelete: Cascade)
+
+  @@index([firmId, status])
 }
 
 // История на абонаментите (заявки, плащания, промени на статус/план)

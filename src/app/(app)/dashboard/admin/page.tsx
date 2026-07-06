@@ -3,7 +3,9 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { AdminCompanyRow } from "@/components/app/AdminCompanyRow";
 import { AdminArchivedCompanies } from "@/components/app/AdminArchivedCompanies";
-import { SUBSCRIPTION_PLANS, planPrice, accountantPlanLabel } from "@/lib/constants";
+import { SUBSCRIPTION_PLANS, planPrice, accountantPlanLabel, accountantMaxClients } from "@/lib/constants";
+import { computeFirmPartnerStats } from "@/lib/partner";
+import { AdminFirmsPanel } from "@/components/app/AdminFirmsPanel";
 import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 
 const RANGES = [
@@ -298,6 +300,26 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const todayVisitors = todayVisitorSet.size;
   const todayActiveUsers = todayUserSet.size;
   const newCompanies = companies.filter((c) => !since || new Date(c.createdAt) >= since).length;
+
+  // ─── Счетоводни къщи · партньорска статистика ───
+  const firmsList = companies.filter((c) => c.isAccountingFirm);
+  const firmStats = await Promise.all(firmsList.map(async (f) => {
+    const stats = await computeFirmPartnerStats({ id: f.id, partnerCode: f.partnerCode, partnerPercentOverride: f.partnerPercentOverride, commissionPaidTotal: f.commissionPaidTotal });
+    const max = accountantMaxClients(f.firmPlan);
+    return {
+      id: f.id, name: f.name, planLabel: accountantPlanLabel(f.firmPlan),
+      maxClients: max === Infinity ? "∞" : String(max),
+      totalClients: stats.totalClients, startClients: stats.startClients, paidClients: stats.paidClients,
+      ratePercent: stats.ratePercent, overridePercent: f.partnerPercentOverride, monthlyCommission: stats.monthlyCommission,
+      paidTotal: stats.paidTotal, pendingRequests: stats.pendingRequests,
+    };
+  }));
+  const firmRows = firmStats;
+  const firmNameById = new Map(firmsList.map((f) => [f.id, f.name]));
+  const pendingPayouts = firmsList.length
+    ? await prisma.commissionPayout.findMany({ where: { status: "requested" }, orderBy: { requestedAt: "desc" } })
+    : [];
+  const payoutRows = pendingPayouts.map((p) => ({ id: p.id, firmId: p.firmId, firmName: firmNameById.get(p.firmId) ?? "—", amount: p.amount, requestedAt: p.requestedAt.toISOString() }));
 
   return (
     <>
@@ -623,37 +645,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         </div>
       </div>
 
-      {/* ─── Счетоводни къщи ─── */}
-      {(() => {
-        const firms = companies.filter((c) => c.isAccountingFirm);
-        if (!firms.length) return null;
-        const clientsByFirm = new Map<string, number>();
-        for (const c of companies) if (c.managedByFirmId) clientsByFirm.set(c.managedByFirmId, (clientsByFirm.get(c.managedByFirmId) ?? 0) + 1);
-        return (
-          <div style={{ marginBottom: 22 }}>
-            <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, fontWeight: 600, margin: "0 0 4px" }}>Счетоводни къщи</h2>
-            <div style={{ color: "var(--muted)", fontSize: 12.5, marginBottom: 10 }}>{firms.length} регистрирани · управляват общо {[...clientsByFirm.values()].reduce((s, n) => s + n, 0)} клиентски фирми</div>
-            <div className="glass panel" style={{ padding: "8px 0", overflowX: "auto" }}>
-              <table>
-                <thead><tr><th>Счетоводна къща</th><th>Собственик</th><th>Тарифа</th><th className="num">Клиенти</th><th>Плащане</th><th>Регистрация</th></tr></thead>
-                <tbody>
-                  {firms.map((c) => (
-                    <tr key={c.id}>
-                      <td style={{ fontWeight: 600 }}>{c.name}</td>
-                      <td style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>{c.companyUsers.map((cu) => cu.user.email).slice(0, 1).join(", ") || "—"}</td>
-                      <td><span style={{ fontSize: 11, fontWeight: 700, color: "var(--navy)", background: "var(--navy-soft)", borderRadius: 8, padding: "1px 8px" }}>{accountantPlanLabel(c.firmPlan)}</span></td>
-                      <td className="num" style={{ fontWeight: 700 }}>{clientsByFirm.get(c.id) ?? 0}</td>
-                      <td style={{ fontSize: 12.5 }}>{c.subscription?.paymentStatus === "received" ? <span style={{ color: "var(--emerald-dark)", fontWeight: 600 }}>Платено</span> : <span style={{ color: "var(--brass)" }}>Очаква</span>}</td>
-                      <td style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>{new Date(c.createdAt).toLocaleDateString("bg-BG")}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 8 }}>Абонаментът и плащането на всяка счетоводна къща се управляват от реда ѝ в таблицата с всички фирми по-долу.</p>
-          </div>
-        );
-      })()}
+      {/* ─── Счетоводни къщи · Партньорска програма ─── */}
+      <AdminFirmsPanel firms={firmRows} payouts={payoutRows} />
 
       <div className="glass panel" style={{ padding: "8px 0", overflowX: "auto" }}>
         <table>

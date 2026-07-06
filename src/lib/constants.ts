@@ -176,11 +176,12 @@ export const OFFICIAL_DOC_TYPES = ["invoice", "proforma", "quote", "credit_note"
 
 // ─── Абонаментни планове за СЧЕТОВОДНИ КЪЩИ / СЧЕТОВОДИТЕЛИ ───────────────
 // Тарифите се различават по броя клиентски фирми, които къщата може да управлява.
-// Всяка управлявана клиентска фирма получава пълен достъп (виж EFFECTIVE_FIRM_CLIENT_PLAN).
+// Всяка управлявана клиентска фирма получава базово СТАРТ достъп (виж FIRM_CLIENT_BASE_PLAN).
 export const ACCOUNTANT_PLANS = [
-  { id: "acc_solo",   name: "Счетоводител",       tagline: "За самостоятелни счетоводители", regularPrice: 49,  price: 39,  maxClients: 15,       recommended: false },
-  { id: "acc_office", name: "Счетоводна кантора",  tagline: "За малки и средни кантори",       regularPrice: 99,  price: 79,  maxClients: 40,       recommended: true },
-  { id: "acc_house",  name: "Счетоводна къща",     tagline: "За големи къщи и екипи",          regularPrice: 199, price: 159, maxClients: Infinity, recommended: false },
+  { id: "acc_start",      name: "Accountant Start",      tagline: "За самостоятелни счетоводители", regularPrice: 39,  price: 29,  maxClients: 10,       maxUsers: 1,        recommended: false, custom: false },
+  { id: "acc_pro",        name: "Accountant Pro",        tagline: "За малки счетоводни екипи",       regularPrice: 89,  price: 69,  maxClients: 50,       maxUsers: 3,        recommended: true,  custom: false },
+  { id: "acc_office",     name: "Accountant Office",     tagline: "За средни счетоводни кантори",    regularPrice: 189, price: 149, maxClients: 150,      maxUsers: 10,       recommended: false, custom: false },
+  { id: "acc_enterprise", name: "Accountant Enterprise", tagline: "За големи счетоводни къщи",        regularPrice: 299, price: 299, maxClients: Infinity, maxUsers: Infinity, recommended: false, custom: true },
 ] as const;
 
 export type AccountantPlanId = (typeof ACCOUNTANT_PLANS)[number]["id"];
@@ -188,26 +189,64 @@ export const ACCOUNTANT_PLAN_IDS = ACCOUNTANT_PLANS.map((p) => p.id) as Accounta
 
 // Общи предимства, включени във всеки счетоводен план (за маркетинг/регистрация)
 export const ACCOUNTANT_PLAN_FEATURES = [
-  "Управление на неограничени данни за всяка клиентска фирма",
-  "Пълен достъп до всички модули за всеки клиент (Про ниво)",
-  "Обобщена справка за всички клиенти на едно място",
+  "Всеки клиент получава безплатен СТАРТ достъп",
+  "Управление на всички клиентски фирми от едно място",
+  "Обобщена справка за всички клиенти",
   "Бързо превключване между фирмите на клиентите",
   "Отделни фактури, склад, разходи и анализи за всяка фирма",
-  "Проследяване на ДДС праг и данъчен календар по клиент",
-  "Регистрация на нови клиентски фирми без допълнителна такса",
+  "Партньорска комисионна при надграждане на клиент",
+  "Покани по имейл и партньорски реферал линк",
 ];
 
 export function accountantPlan(id: string | null | undefined) {
   return ACCOUNTANT_PLANS.find((p) => p.id === id) ?? null;
 }
 export function accountantPlanLabel(id: string | null | undefined): string {
-  return accountantPlan(id)?.name ?? "Счетоводна къща";
+  return accountantPlan(id)?.name ?? "Accountant Start";
 }
 export function accountantMaxClients(id: string | null | undefined): number {
-  return accountantPlan(id)?.maxClients ?? 0;
+  return accountantPlan(id)?.maxClients ?? ACCOUNTANT_PLANS[0].maxClients;
 }
-// Ефективният план, който получава всяка управлявана клиентска фирма (пълен достъп).
-export const EFFECTIVE_FIRM_CLIENT_PLAN: PlanId = "pro";
+export function accountantMaxUsers(id: string | null | undefined): number {
+  return accountantPlan(id)?.maxUsers ?? ACCOUNTANT_PLANS[0].maxUsers;
+}
+
+// ─── Партньорска комисионна за счетоводни къщи ───────────────────────────
+// Процентът зависи от броя платени клиенти (важи за целия портфейл).
+export const COMMISSION_TIERS = [
+  { minPaid: 0,  rate: 0.10, label: "10% (до 20 платени клиента)" },
+  { minPaid: 21, rate: 0.15, label: "15% (21–50 платени клиента)" },
+  { minPaid: 51, rate: 0.20, label: "20% (над 50 платени клиента)" },
+] as const;
+// Минимален праг за заявка за изплащане на комисионна (в EUR)
+export const COMMISSION_PAYOUT_THRESHOLD = 100;
+
+// Периоди на плащане и техните отстъпки — централно за всички абонаменти
+// (стандартни и счетоводни), за консистентност.
+export const BILLING_PERIODS = [
+  { id: "monthly", label: "Месечно", months: 1, discount: 0 },
+  { id: "semiannual", label: "6 месеца", months: 6, discount: 0.05 },
+  { id: "annual", label: "1 година", months: 12, discount: 0.10 },
+] as const;
+
+export function commissionRate(paidClients: number, overridePercent?: number | null): number {
+  if (overridePercent != null) return overridePercent / 100;
+  let rate: number = COMMISSION_TIERS[0].rate;
+  for (const t of COMMISSION_TIERS) if (paidClients >= t.minPaid) rate = t.rate;
+  return rate;
+}
+
+// Базовият (безплатен) план, който получава всяка управлявана клиентска фирма.
+export const FIRM_CLIENT_BASE_PLAN: PlanId = "start";
+// Ефективният план на клиентска фирма = по-високият между базовия СТАРТ и реалния ѝ абонамент.
+export function effectiveManagedPlan(subPlan: string | null | undefined): PlanId {
+  const sub = (subPlan ?? "free") as PlanId;
+  return planRank(sub) > planRank(FIRM_CLIENT_BASE_PLAN) ? sub : FIRM_CLIENT_BASE_PLAN;
+}
+// Клиент се счита за „платен" (носи комисионна), ако е на Бизнес/Про с потвърдено плащане.
+export function isPaidClientPlan(plan: string | null | undefined): boolean {
+  return planRank((plan ?? "free") as PlanId) >= planRank("business");
+}
 
 // Кои функции са достъпни за кой план (за заключване в UI и сървъра)
 const FREE_FEATURES = ["documents", "clients", "suppliers", "warehouse", "dashboard", "cash", "tax_calendar"];
