@@ -178,10 +178,10 @@ export const OFFICIAL_DOC_TYPES = ["invoice", "proforma", "quote", "credit_note"
 // Тарифите се различават по броя клиентски фирми, които къщата може да управлява.
 // Всяка управлявана клиентска фирма получава базово СТАРТ достъп (виж FIRM_CLIENT_BASE_PLAN).
 export const ACCOUNTANT_PLANS = [
-  { id: "acc_start",      name: "Accountant Start",      tagline: "За самостоятелни счетоводители", regularPrice: 39,  price: 29,  maxClients: 10,       maxUsers: 1,        recommended: false, custom: false },
-  { id: "acc_pro",        name: "Accountant Pro",        tagline: "За малки счетоводни екипи",       regularPrice: 89,  price: 69,  maxClients: 50,       maxUsers: 3,        recommended: true,  custom: false },
-  { id: "acc_office",     name: "Accountant Office",     tagline: "За средни счетоводни кантори",    regularPrice: 189, price: 149, maxClients: 150,      maxUsers: 10,       recommended: false, custom: false },
-  { id: "acc_enterprise", name: "Accountant Enterprise", tagline: "За големи счетоводни къщи",        regularPrice: 299, price: 299, maxClients: Infinity, maxUsers: Infinity, recommended: false, custom: true },
+  { id: "acc_start",      name: "Счетоводен Старт",   tagline: "За самостоятелни счетоводители", regularPrice: 39,  price: 29,  maxClients: 10,       maxUsers: 1,        recommended: false, custom: false },
+  { id: "acc_pro",        name: "Счетоводен Про",     tagline: "За малки счетоводни екипи",       regularPrice: 89,  price: 69,  maxClients: 50,       maxUsers: 3,        recommended: true,  custom: false },
+  { id: "acc_office",     name: "Счетоводна кантора", tagline: "За средни счетоводни кантори",    regularPrice: 189, price: 149, maxClients: 150,      maxUsers: 10,       recommended: false, custom: false },
+  { id: "acc_enterprise", name: "Счетоводна къща",    tagline: "За големи счетоводни къщи",        regularPrice: 299, price: 299, maxClients: Infinity, maxUsers: Infinity, recommended: false, custom: true },
 ] as const;
 
 export type AccountantPlanId = (typeof ACCOUNTANT_PLANS)[number]["id"];
@@ -194,15 +194,15 @@ export const ACCOUNTANT_PLAN_FEATURES = [
   "Обобщена справка за всички клиенти",
   "Бързо превключване между фирмите на клиентите",
   "Отделни фактури, склад, разходи и анализи за всяка фирма",
-  "Партньорска комисионна при надграждане на клиент",
-  "Покани по имейл и партньорски реферал линк",
+  "Проследяване на ДДС праг и данъчен календар по клиент",
+  "Покани на клиенти по имейл и реферал линк",
 ];
 
 export function accountantPlan(id: string | null | undefined) {
   return ACCOUNTANT_PLANS.find((p) => p.id === id) ?? null;
 }
 export function accountantPlanLabel(id: string | null | undefined): string {
-  return accountantPlan(id)?.name ?? "Accountant Start";
+  return accountantPlan(id)?.name ?? "Счетоводен Старт";
 }
 export function accountantMaxClients(id: string | null | undefined): number {
   return accountantPlan(id)?.maxClients ?? ACCOUNTANT_PLANS[0].maxClients;

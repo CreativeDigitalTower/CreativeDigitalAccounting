@@ -16,7 +16,7 @@ type Totals = { clients: number; revenue: number; expenses: number; docs: number
 
 const STATUS_BADGE: Record<string, { label: string; color: string; bg: string }> = {
   paid: { label: "Платен план", color: "var(--emerald-dark)", bg: "rgba(15,138,106,.12)" },
-  active: { label: "Активна (START)", color: "var(--navy)", bg: "var(--navy-soft)" },
+  active: { label: "Активна (СТАРТ)", color: "var(--navy)", bg: "var(--navy-soft)" },
   inactive: { label: "Неактивна", color: "var(--muted)", bg: "rgba(138,133,120,.14)" },
   invited: { label: "Поканена", color: "var(--brass)", bg: "var(--brass-soft)" },
 };
@@ -109,7 +109,7 @@ export function FirmDashboard({ firmName, clients, invites, totals, maxClients, 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 16 }}>
           {[
             { label: "Общо поканени клиенти", value: String(partner.totalClients) },
-            { label: "Клиенти на START", value: String(partner.startClients) },
+            { label: "Клиенти на СТАРТ", value: String(partner.startClients) },
             { label: "Клиенти на платен план", value: String(partner.paidClients) },
             { label: "Конверсия", value: `${partner.conversion}%` },
             { label: "Комисионна този месец", value: formatCurrency(partner.monthlyCommission) },
@@ -188,7 +188,7 @@ export function FirmDashboard({ firmName, clients, invites, totals, maxClients, 
       {clients.length === 0 ? (
         <div className="glass panel" style={{ textAlign: "center", padding: "48px 20px", color: "var(--muted)" }}>
           <div style={{ fontSize: 14, marginBottom: 8 }}>Още нямате добавени клиентски фирми.</div>
-          <div style={{ fontSize: 12.5 }}>Поканете клиент по имейл или го добавете директно — всеки получава безплатен START достъп.</div>
+          <div style={{ fontSize: 12.5 }}>Поканете клиент по имейл или го добавете директно — всеки получава безплатен СТАРТ достъп.</div>
         </div>
       ) : (
         <div className="glass panel" style={{ padding: 0, overflow: "hidden" }}>
@@ -239,7 +239,7 @@ function InviteModal({ onClose, onSent }: { onClose: () => void; onSent: () => v
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.45)", display: "flex", alignItems: "flex-start", justifyContent: "center", zIndex: 2000, padding: "10vh 16px 16px" }}>
       <div onClick={(e) => e.stopPropagation()} className="glass panel" style={{ width: "min(460px, 100%)", padding: 24 }}>
         <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, margin: "0 0 6px" }}>Покани клиент</h3>
-        <p style={{ fontSize: 12.5, color: "var(--muted)", margin: "0 0 14px" }}>Клиентът получава имейл с покана и безплатен START достъп.</p>
+        <p style={{ fontSize: 12.5, color: "var(--muted)", margin: "0 0 14px" }}>Клиентът получава имейл с покана и безплатен СТАРТ достъп.</p>
         {err && <div style={{ background: "var(--brick-soft)", color: "var(--brick)", borderRadius: 6, padding: "8px 12px", fontSize: 12.5, marginBottom: 12 }}>{err}</div>}
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <div><label>Имейл на клиента *</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="client@example.com" /></div>
@@ -274,7 +274,7 @@ function AddClientModal({ onClose, onCreated }: { onClose: () => void; onCreated
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.45)", display: "flex", alignItems: "flex-start", justifyContent: "center", zIndex: 2000, padding: "6vh 16px 16px", overflowY: "auto" }}>
       <div onClick={(e) => e.stopPropagation()} className="glass panel" style={{ width: "min(560px, 100%)", padding: 24, margin: "auto" }}>
         <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, margin: "0 0 4px" }}>Нова клиентска фирма</h3>
-        <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 14px" }}>Фирмата получава безплатен START достъп.</p>
+        <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 14px" }}>Фирмата получава безплатен СТАРТ достъп.</p>
         {err && <div style={{ background: "var(--brick-soft)", color: "var(--brick)", borderRadius: 6, padding: "8px 12px", fontSize: 12.5, marginBottom: 12 }}>{err}</div>}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div style={{ gridColumn: "1 / -1" }}><label>Име на фирмата *</label><input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></div>
