@@ -10,9 +10,10 @@ export type FirmClient = {
   id: string; name: string; eik: string | null; vatRegistered: boolean; city: string | null;
   planLabel: string; status: "active" | "inactive" | "paid";
   revenue: number; expenses: number; docs: number;
+  invoices: number; overdue: number; unpaid: number; vatState: "" | "near" | "over";
 };
 export type FirmInvite = { id: string; email: string; name: string | null; status: string; createdAt: string };
-type Totals = { clients: number; revenue: number; expenses: number; docs: number; vatRegistered: number };
+type Totals = { clients: number; revenue: number; expenses: number; docs: number; vatRegistered: number; overdue: number; unpaid: number; vatWatch: number };
 
 const STATUS_BADGE: Record<string, { label: string; color: string; bg: string }> = {
   paid: { label: "Платен план", color: "var(--emerald-dark)", bg: "rgba(15,138,106,.12)" },
@@ -21,8 +22,8 @@ const STATUS_BADGE: Record<string, { label: string; color: string; bg: string }>
   invited: { label: "Поканена", color: "var(--brass)", bg: "var(--brass-soft)" },
 };
 
-export function FirmDashboard({ firmName, clients, invites, totals, maxClients, partner }: {
-  firmName: string; clients: FirmClient[]; invites: FirmInvite[]; totals: Totals; maxClients: number | null; partner: PartnerStats;
+export function FirmDashboard({ firmName, firmId, paid, clients, invites, totals, maxClients, partner }: {
+  firmName: string; firmId: string; paid: boolean; clients: FirmClient[]; invites: FirmInvite[]; totals: Totals; maxClients: number | null; partner: PartnerStats;
 }) {
   const router = useRouter();
   const [q, setQ] = useState("");
@@ -72,6 +73,9 @@ export function FirmDashboard({ firmName, clients, invites, totals, maxClients, 
     { label: "Обща печалба", value: formatCurrency(profit), color: profit >= 0 ? "var(--emerald-dark)" : "var(--brick)" },
     { label: "Регистрирани по ДДС", value: `${totals.vatRegistered} / ${totals.clients}`, color: "var(--brass)" },
     { label: "Общо документи", value: String(totals.docs), color: "var(--ink)" },
+    { label: "Просрочени фактури", value: String(totals.overdue), color: totals.overdue ? "var(--brick)" : "var(--ink)" },
+    { label: "Неплатени фактури (сума)", value: formatCurrency(totals.unpaid), color: totals.unpaid ? "var(--brick)" : "var(--ink)" },
+    { label: "Клиенти близо/над ДДС праг", value: String(totals.vatWatch), color: totals.vatWatch ? "var(--brass)" : "var(--ink)" },
   ];
 
   return (
@@ -82,10 +86,17 @@ export function FirmDashboard({ firmName, clients, invites, totals, maxClients, 
           <div style={{ color: "var(--muted)", fontSize: 13 }}>Обобщен преглед на всички фирми, за които {firmName} води счетоводство.</div>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <button className="btn btn-ghost" onClick={() => setInviteOpen(true)} disabled={atLimit}>✉ Покани клиент</button>
-          <button className="btn btn-primary" onClick={() => setAddOpen(true)} disabled={atLimit} title={atLimit ? "Достигнат лимит за плана" : undefined}>+ Добави клиентска фирма</button>
+          <button className="btn btn-ghost" onClick={() => enter(firmId)}>Моята фирма (документи) →</button>
+          <button className="btn btn-ghost" onClick={() => setInviteOpen(true)} disabled={atLimit || !paid} title={!paid ? "Достъпно след потвърждение на плащане" : atLimit ? "Достигнат лимит за плана" : undefined}>✉ Покани клиент</button>
+          <button className="btn btn-primary" onClick={() => setAddOpen(true)} disabled={atLimit || !paid} title={!paid ? "Достъпно след потвърждение на плащане" : atLimit ? "Достигнат лимит за плана" : undefined}>+ Добави клиентска фирма</button>
         </div>
       </div>
+
+      {!paid && (
+        <div className="panel" style={{ padding: "14px 18px", marginBottom: 18, background: "var(--brass-soft)", border: "1px solid var(--brass)", borderRadius: 12, fontSize: 13 }}>
+          <strong style={{ color: "var(--brass)" }}>Очаква се потвърждение на плащане.</strong> Функциите за добавяне и покана на клиентски фирми ще се активират веднага след като потвърдим полученото плащане за Вашия счетоводен план. Може да разгледате таблото и да управлявате собствената си фирма.
+        </div>
+      )}
 
       {/* Обобщени KPI */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 22 }}>
@@ -193,18 +204,25 @@ export function FirmDashboard({ firmName, clients, invites, totals, maxClients, 
       ) : (
         <div className="glass panel" style={{ padding: 0, overflow: "hidden" }}>
           <table>
-            <thead><tr><th>Фирма</th><th>Статус</th><th>План</th><th className="num">Приходи (год.)</th><th className="num">Разходи (год.)</th><th className="num">Док.</th><th></th></tr></thead>
+            <thead><tr><th>Фирма</th><th>Статус</th><th>ДДС</th><th className="num">Фактури</th><th className="num">Просрочени</th><th className="num">Неплатено</th><th className="num">Приходи (год.)</th><th></th></tr></thead>
             <tbody>
               {filtered.map((c) => {
                 const b = STATUS_BADGE[c.status];
                 return (
                   <tr key={c.id}>
-                    <td style={{ fontWeight: 600 }}>{c.name}{c.city ? <span style={{ fontWeight: 400, color: "var(--muted)", fontSize: 12 }}> · {c.city}</span> : null}</td>
+                    <td style={{ fontWeight: 600 }}>{c.name}{c.city ? <span style={{ fontWeight: 400, color: "var(--muted)", fontSize: 12 }}> · {c.city}</span> : null}<div style={{ fontSize: 11, color: "var(--muted)", fontWeight: 400 }}>{c.planLabel}</div></td>
                     <td><span style={{ fontSize: 10.5, fontWeight: 700, color: b.color, background: b.bg, borderRadius: 8, padding: "1px 8px" }}>{b.label}</span></td>
-                    <td style={{ fontSize: 12.5 }}>{c.planLabel}</td>
+                    <td>
+                      {c.vatRegistered
+                        ? <span style={{ fontSize: 10.5, color: "var(--emerald-dark)", fontWeight: 600 }}>Регистрирана</span>
+                        : c.vatState === "over" ? <span style={{ fontSize: 10, fontWeight: 700, color: "#fff", background: "var(--brick)", borderRadius: 8, padding: "1px 7px" }}>Над прага!</span>
+                        : c.vatState === "near" ? <span style={{ fontSize: 10, fontWeight: 700, color: "var(--brass)", background: "var(--brass-soft)", borderRadius: 8, padding: "1px 7px" }}>Близо до прага</span>
+                        : <span style={{ fontSize: 10.5, color: "var(--muted)" }}>Без ДДС</span>}
+                    </td>
+                    <td className="num">{c.invoices}</td>
+                    <td className="num" style={{ fontWeight: c.overdue ? 700 : 400, color: c.overdue ? "var(--brick)" : "var(--muted)" }}>{c.overdue || "—"}</td>
+                    <td className="num" style={{ color: c.unpaid ? "var(--brick)" : "var(--muted)" }}>{c.unpaid ? formatCurrency(c.unpaid) : "—"}</td>
                     <td className="num" style={{ fontWeight: 600, color: "var(--emerald-dark)" }}>{formatCurrency(c.revenue)}</td>
-                    <td className="num" style={{ color: "var(--brick)" }}>{formatCurrency(c.expenses)}</td>
-                    <td className="num">{c.docs}</td>
                     <td style={{ textAlign: "right" }}>
                       <button className="btn btn-primary btn-sm" onClick={() => enter(c.id)} disabled={busyId === c.id}>{busyId === c.id ? "…" : "Влез →"}</button>
                     </td>
@@ -237,7 +255,7 @@ function InviteModal({ onClose, onSent }: { onClose: () => void; onSent: () => v
   }
   return createPortal(
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.45)", display: "flex", alignItems: "flex-start", justifyContent: "center", zIndex: 2000, padding: "10vh 16px 16px" }}>
-      <div onClick={(e) => e.stopPropagation()} className="glass panel" style={{ width: "min(460px, 100%)", padding: 24 }}>
+      <div onClick={(e) => e.stopPropagation()} className="panel" style={{ width: "min(460px, 100%)", padding: 24, background: "#FBFAF6", border: "1px solid var(--border)", borderRadius: 14, boxShadow: "0 24px 60px rgba(20,30,25,.28)" }}>
         <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, margin: "0 0 6px" }}>Покани клиент</h3>
         <p style={{ fontSize: 12.5, color: "var(--muted)", margin: "0 0 14px" }}>Клиентът получава имейл с покана и безплатен СТАРТ достъп.</p>
         {err && <div style={{ background: "var(--brick-soft)", color: "var(--brick)", borderRadius: 6, padding: "8px 12px", fontSize: 12.5, marginBottom: 12 }}>{err}</div>}
@@ -272,7 +290,7 @@ function AddClientModal({ onClose, onCreated }: { onClose: () => void; onCreated
 
   return createPortal(
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.45)", display: "flex", alignItems: "flex-start", justifyContent: "center", zIndex: 2000, padding: "6vh 16px 16px", overflowY: "auto" }}>
-      <div onClick={(e) => e.stopPropagation()} className="glass panel" style={{ width: "min(560px, 100%)", padding: 24, margin: "auto" }}>
+      <div onClick={(e) => e.stopPropagation()} className="panel" style={{ width: "min(560px, 100%)", padding: 24, margin: "auto", background: "#FBFAF6", border: "1px solid var(--border)", borderRadius: 14, boxShadow: "0 24px 60px rgba(20,30,25,.28)" }}>
         <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, margin: "0 0 4px" }}>Нова клиентска фирма</h3>
         <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 14px" }}>Фирмата получава безплатен СТАРТ достъп.</p>
         {err && <div style={{ background: "var(--brick-soft)", color: "var(--brick)", borderRadius: 6, padding: "8px 12px", fontSize: 12.5, marginBottom: 12 }}>{err}</div>}

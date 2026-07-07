@@ -308,6 +308,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     const max = accountantMaxClients(f.firmPlan);
     return {
       id: f.id, name: f.name, planLabel: accountantPlanLabel(f.firmPlan),
+      firmPlan: f.firmPlan ?? "acc_start",
+      paymentStatus: f.subscription?.paymentStatus ?? "pending",
       maxClients: max === Infinity ? "∞" : String(max),
       totalClients: stats.totalClients, startClients: stats.startClients, paidClients: stats.paidClients,
       ratePercent: stats.ratePercent, overridePercent: f.partnerPercentOverride, monthlyCommission: stats.monthlyCommission,
@@ -648,6 +650,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         </div>
       </div>
 
+      <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, fontWeight: 600, margin: "0 0 4px" }}>Всички фирми</h2>
+      <div style={{ color: "var(--muted)", fontSize: 12.5, marginBottom: 10 }}>Стандартни фирми и клиентски фирми (счетоводните къщи са в раздела по-горе).</div>
       <div className="glass panel" style={{ padding: "8px 0", overflowX: "auto" }}>
         <table>
           <thead>
@@ -663,7 +667,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             </tr>
           </thead>
           <tbody>
-            {companies.map((c) => (
+            {companies.filter((c) => !c.isAccountingFirm).map((c) => (
               <AdminCompanyRow
                 key={c.id}
                 id={c.id}

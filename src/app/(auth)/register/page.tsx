@@ -37,12 +37,18 @@ function RegisterForm() {
     return r;
   }
 
-  function nextStep(e: React.FormEvent<HTMLFormElement>) {
+  async function nextStep(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
     if (acc.email !== acc.email2) { setError("Имейлите не съвпадат."); return; }
     if (acc.password !== acc.password2) { setError("Паролите не съвпадат."); return; }
     if (acc.password.length < 8) { setError("Паролата трябва да е поне 8 символа."); return; }
+    // Проверка дали имейлът вече е зает — още на първата стъпка.
+    try {
+      const r = await fetch("/api/auth/check-email", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: acc.email }) });
+      const d = await r.json().catch(() => ({ available: true }));
+      if (!d.available) { setError("Имейл адресът вече е регистриран. Използвайте друг или влезте в профила си."); return; }
+    } catch { /* при мрежова грешка продължаваме — проверката се повтаря при финалния запис */ }
     setStep("company");
   }
 
