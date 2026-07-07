@@ -23,12 +23,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, redirect: "/firm" });
     }
 
-    // Проверяваме, че фирмата е клиент на тази къща
-    const client = await prisma.company.findFirst({
-      where: { id: companyId, managedByFirmId: firm.id },
-      select: { id: true },
-    });
-    if (!client) return NextResponse.json({ error: "Невалидна клиентска фирма." }, { status: 400 });
+    // Позволяваме: собствената фирма (за издаване на нейни документи) или клиентска фирма.
+    const target = companyId === firm.id
+      ? { id: firm.id }
+      : await prisma.company.findFirst({ where: { id: companyId, managedByFirmId: firm.id }, select: { id: true } });
+    if (!target) return NextResponse.json({ error: "Невалидна фирма." }, { status: 400 });
 
     jar.set(ACTIVE_COMPANY_COOKIE, companyId, { httpOnly: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 30 });
     return NextResponse.json({ success: true, redirect: "/dashboard" });

@@ -81,9 +81,15 @@ export async function requireCompany() {
   // Централна точка: всички бизнес страници и API маршрути минават оттук.
   const role = await getMyRole(userId, companyId);
   if (role === "employee") redirect("/portal");
-  // Ако активната фирма е самата счетоводна къща (не е влязла в клиент) → към /firm.
+  // Счетоводна къща: по подразбиране към /firm (работното място със списъка клиенти).
+  // Но ако изрично е „влязла" в собствената си фирма (за да издава документи/фактури
+  // за самата себе си), я допускаме до нормалното табло.
   const comp = await prisma.company.findUnique({ where: { id: companyId }, select: { isAccountingFirm: true } });
-  if (comp?.isAccountingFirm) redirect("/firm");
+  if (comp?.isAccountingFirm) {
+    const jar = await cookies();
+    const active = jar.get(ACTIVE_COMPANY_COOKIE)?.value;
+    if (active !== companyId) redirect("/firm");
+  }
   return { userId, companyId };
 }
 
@@ -129,8 +135,10 @@ export async function getPlan(companyId: string): Promise<PlanId> {
   // Клиентска фирма, управлявана от счетоводна къща → пълен (ефективен) план.
   const comp = await prisma.company.findUnique({
     where: { id: companyId },
-    select: { managedByFirmId: true, subscription: { select: { plan: true } } },
+    select: { managedByFirmId: true, isAccountingFirm: true, subscription: { select: { plan: true, paymentStatus: true } } },
   });
+  // Счетоводна къща (собствена фирма): пълен достъп (Про) само след потвърдено плащане.
+  if (comp?.isAccountingFirm) return comp.subscription?.paymentStatus === "received" ? "pro" : "free";
   // Клиентска фирма на счетоводна къща: базово СТАРТ, а при надграждане — реалния план.
   if (comp?.managedByFirmId) return effectiveManagedPlan(comp.subscription?.plan);
   return (comp?.subscription?.plan ?? "free") as PlanId;

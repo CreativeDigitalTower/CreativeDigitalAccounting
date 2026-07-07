@@ -26,24 +26,35 @@ export default async function FirmPage() {
     orderBy: { name: "asc" },
   });
   const clientIds = clients.map((c) => c.id);
-  const yearStart = new Date(new Date().getFullYear(), 0, 1);
+  const now = new Date();
+  const yearStart = new Date(now.getFullYear(), 0, 1);
+  const VAT_THRESHOLD_EUR = 51130; // облагаем оборот за календарната година
 
   const revenueByClient = new Map<string, number>();
   const expenseByClient = new Map<string, number>();
   const docsByClient = new Map<string, number>();
+  const invCountByClient = new Map<string, number>();
+  const overdueByClient = new Map<string, number>();
+  const unpaidByClient = new Map<string, number>();
 
   if (clientIds.length) {
     const [invoices, expenses, docCounts] = await Promise.all([
       prisma.document.findMany({
-        where: { companyId: { in: clientIds }, type: "invoice", issueDate: { gte: yearStart } },
-        select: { companyId: true, lines: { select: { lineTotal: true } } },
+        where: { companyId: { in: clientIds }, type: "invoice" },
+        select: { companyId: true, issueDate: true, dueDate: true, status: true, paidAmount: true, lines: { select: { lineTotal: true } } },
       }),
       prisma.expense.groupBy({ by: ["companyId"], where: { companyId: { in: clientIds }, date: { gte: yearStart } }, _sum: { amount: true } }),
       prisma.document.groupBy({ by: ["companyId"], where: { companyId: { in: clientIds } }, _count: { _all: true } }),
     ]);
     for (const inv of invoices) {
-      const t = inv.lines.reduce((s, l) => s + l.lineTotal, 0);
-      revenueByClient.set(inv.companyId, (revenueByClient.get(inv.companyId) ?? 0) + t);
+      const total = inv.lines.reduce((s, l) => s + l.lineTotal, 0);
+      invCountByClient.set(inv.companyId, (invCountByClient.get(inv.companyId) ?? 0) + 1);
+      if (new Date(inv.issueDate) >= yearStart) revenueByClient.set(inv.companyId, (revenueByClient.get(inv.companyId) ?? 0) + total);
+      const remaining = inv.status === "paid" ? 0 : Math.max(0, total - (inv.paidAmount ?? 0));
+      if (remaining > 0) {
+        unpaidByClient.set(inv.companyId, (unpaidByClient.get(inv.companyId) ?? 0) + remaining);
+        if (inv.dueDate && new Date(inv.dueDate) < now) overdueByClient.set(inv.companyId, (overdueByClient.get(inv.companyId) ?? 0) + 1);
+      }
     }
     for (const e of expenses) expenseByClient.set(e.companyId, e._sum.amount ?? 0);
     for (const d of docCounts) docsByClient.set(d.companyId, d._count._all);
@@ -53,12 +64,18 @@ export default async function FirmPage() {
     const plan = c.subscription?.plan ?? "free";
     const paid = isPaidClientPlan(plan) && c.subscription?.paymentStatus === "received";
     const status = paid ? "paid" : (c.clientStatus === "inactive" ? "inactive" : "active");
+    const revenue = revenueByClient.get(c.id) ?? 0;
+    const vatState: "" | "near" | "over" = c.vatRegistered ? "" : revenue >= VAT_THRESHOLD_EUR ? "over" : revenue >= VAT_THRESHOLD_EUR * 0.8 ? "near" : "";
     return {
       id: c.id, name: c.name, eik: c.eik, vatRegistered: c.vatRegistered, city: c.city,
       planLabel: planLabel(effectiveManagedPlan(plan)), status,
-      revenue: revenueByClient.get(c.id) ?? 0,
+      revenue,
       expenses: expenseByClient.get(c.id) ?? 0,
       docs: docsByClient.get(c.id) ?? 0,
+      invoices: invCountByClient.get(c.id) ?? 0,
+      overdue: overdueByClient.get(c.id) ?? 0,
+      unpaid: unpaidByClient.get(c.id) ?? 0,
+      vatState,
     };
   });
 
@@ -71,18 +88,25 @@ export default async function FirmPage() {
   }));
 
   const stats = await computeFirmPartnerStats(firmData);
+  const firmSub = await prisma.subscription.findUnique({ where: { companyId: firm.id }, select: { paymentStatus: true } });
+  const firmPaid = firmSub?.paymentStatus === "received";
   const totals = {
     clients: rows.length,
     revenue: rows.reduce((s, r) => s + r.revenue, 0),
     expenses: rows.reduce((s, r) => s + r.expenses, 0),
     docs: rows.reduce((s, r) => s + r.docs, 0),
     vatRegistered: rows.filter((r) => r.vatRegistered).length,
+    overdue: rows.reduce((s, r) => s + r.overdue, 0),
+    unpaid: rows.reduce((s, r) => s + r.unpaid, 0),
+    vatWatch: rows.filter((r) => r.vatState !== "").length,
   };
   const maxClients = accountantMaxClients(firm.firmPlan);
 
   return (
     <FirmDashboard
       firmName={firm.name}
+      firmId={firm.id}
+      paid={firmPaid}
       clients={rows}
       invites={invites}
       totals={totals}

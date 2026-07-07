@@ -16,6 +16,11 @@ export async function POST(req: Request) {
     const firm = await getMyFirm(userId);
     if (!firm) return NextResponse.json({ error: "Само за счетоводни къщи." }, { status: 403 });
 
+    const firmSub = await prisma.subscription.findUnique({ where: { companyId: firm.id }, select: { paymentStatus: true } });
+    if (firmSub?.paymentStatus !== "received") {
+      return NextResponse.json({ error: "Поканите се активират след потвърждение на плащане на плана." }, { status: 403 });
+    }
+
     const { email, name } = schema.parse(await req.json());
 
     // Лимит: покани + вече добавени клиенти не бива да надхвърлят тарифата

@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { formatCurrency } from "@/lib/constants";
+import { formatCurrency, ACCOUNTANT_PLANS } from "@/lib/constants";
 
 export type AdminFirmRow = {
-  id: string; name: string; planLabel: string; maxClients: string;
+  id: string; name: string; planLabel: string; firmPlan: string; paymentStatus: string; maxClients: string;
   totalClients: number; startClients: number; paidClients: number;
   ratePercent: number; overridePercent: number | null; monthlyCommission: number;
   paidTotal: number; pendingRequests: number;
@@ -27,6 +27,14 @@ export function AdminFirmsPanel({ firms, payouts }: { firms: AdminFirmRow[]; pay
   async function markPaid(id: string) {
     if (!confirm("Да отбележа ли тази комисионна като изплатена?")) return;
     await fetch(`/api/admin/payout/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "paid" }) });
+    router.refresh();
+  }
+  async function setPlan(id: string, firmPlan: string) {
+    await fetch(`/api/admin/firm/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ firmPlan }) });
+    router.refresh();
+  }
+  async function setPayment(id: string, paymentStatus: string) {
+    await fetch(`/api/admin/firm/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ paymentStatus }) });
     router.refresh();
   }
   async function viewClients(id: string) {
@@ -76,16 +84,24 @@ export function AdminFirmsPanel({ firms, payouts }: { firms: AdminFirmRow[]; pay
       <div className="glass panel" style={{ padding: "8px 0", overflowX: "auto", marginBottom: payouts.length ? 16 : 0 }}>
         <table>
           <thead><tr>
-            <th>Счетоводна къща</th><th>План</th><th className="num">Клиенти / лимит</th><th className="num">СТАРТ</th><th className="num">Платени</th>
+            <th>Счетоводна къща</th><th>Абонамент</th><th>Плащане</th><th className="num">Клиенти / лимит</th><th className="num">Платени</th>
             <th className="num">Комисионна/мес</th><th>Процент</th><th className="num">Изплатена</th><th></th>
           </tr></thead>
           <tbody>
             {firms.map((f) => (
               <tr key={f.id}>
                 <td style={{ fontWeight: 600 }}>{f.name}</td>
-                <td>{f.planLabel}</td>
+                <td>
+                  <select value={f.firmPlan} onChange={(e) => setPlan(f.id, e.target.value)} style={{ fontSize: 12, padding: "3px 6px" }}>
+                    {ACCOUNTANT_PLANS.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                </td>
+                <td>
+                  {f.paymentStatus === "received"
+                    ? <button onClick={() => setPayment(f.id, "pending")} title="Отмени потвърждението" style={{ background: "none", border: "none", cursor: "pointer", fontSize: 11, fontWeight: 700, color: "var(--emerald-dark)" }}>● Платено</button>
+                    : <button onClick={() => setPayment(f.id, "received")} className="btn btn-primary btn-sm" style={{ fontSize: 11 }}>Потвърди плащане</button>}
+                </td>
                 <td className="num">{f.totalClients} / {f.maxClients}</td>
-                <td className="num">{f.startClients}</td>
                 <td className="num" style={{ fontWeight: 700, color: "var(--emerald-dark)" }}>{f.paidClients}</td>
                 <td className="num">{formatCurrency(f.monthlyCommission)}</td>
                 <td>
