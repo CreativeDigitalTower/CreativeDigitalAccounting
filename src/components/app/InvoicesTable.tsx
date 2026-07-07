@@ -6,8 +6,7 @@ import { useRouter } from "next/navigation";
 import { StatusSelect, statusMeta } from "@/components/app/StatusSelect";
 import { ContextMenu, type MenuItem } from "@/components/app/ContextMenu";
 import { formatCurrency, groupByMonth } from "@/lib/constants";
-import { downloadInvoicesPdf } from "@/lib/invoicePdf";
-import { downloadDocsAsZip } from "@/lib/downloadDocs";
+import { downloadDocsAsZip, todayStamp } from "@/lib/downloadDocs";
 import { UiIcon } from "@/components/app/NavIcons";
 
 export type InvoiceRow = {
@@ -64,7 +63,7 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
 
   async function downloadOne(row: InvoiceRow) {
     setBusyId(row.id);
-    try { await downloadInvoicesPdf([row.id], row.number); }
+    try { await downloadDocsAsZip([row.id], row.number); } // 1 документ → директно PDF
     catch { alert("Неуспешно изтегляне на PDF."); }
     finally { setBusyId(null); }
   }
@@ -75,7 +74,7 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
     try {
       // Всеки документ — самостоятелен файл; при няколко избрани → ZIP архив.
       const ids = invoices.filter((i) => selected.has(i.id)).map((i) => i.id);
-      await downloadDocsAsZip(ids, `Документи-${ids.length}`);
+      await downloadDocsAsZip(ids, `Документи-${todayStamp()}`);
     } catch { alert("Неуспешно изтегляне."); }
     finally { setDownloading(false); }
   }

@@ -13,16 +13,44 @@ const TYPE_FILE: Record<string, string> = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type DocData = any;
 
-function sanitize(s: string): string {
+export function sanitizeFileName(s: string): string {
   return (s || "документ").replace(/[\\/:*?"<>|]+/g, "-").trim();
 }
+const sanitize = sanitizeFileName;
 
-function saveBlob(blob: Blob, filename: string) {
+/** Днешна дата като YYYY-MM-DD за имена на архиви. */
+export function todayStamp(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+export function saveBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url; a.download = filename;
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+/**
+ * Сваля списък от вече генерирани PDF файлове.
+ * 1 файл → директно PDF (application/pdf). 2+ файла → ZIP архив (application/zip),
+ * като всеки PDF е самостоятелен файл в архива.
+ */
+export async function downloadPdfBlobs(files: { name: string; blob: Blob }[], zipBaseName: string): Promise<void> {
+  if (files.length === 0) return;
+  if (files.length === 1) { saveBlob(files[0].blob, files[0].name); return; }
+  const { default: JSZip } = await import("jszip");
+  const zip = new JSZip();
+  const used: Record<string, number> = {};
+  for (const f of files) {
+    const count = used[f.name] ?? 0;
+    used[f.name] = count + 1;
+    const name = count === 0 ? f.name : f.name.replace(/\.pdf$/i, `-${count + 1}.pdf`);
+    zip.file(name, f.blob);
+  }
+  const content = await zip.generateAsync({ type: "blob" });
+  saveBlob(content, `${sanitize(zipBaseName)}.zip`);
 }
 
 async function fetchViewData(id: string): Promise<DocData | null> {
@@ -84,8 +112,8 @@ function addCanvas(pdf: any, canvas: HTMLCanvasElement) {
  */
 export async function downloadDocsAsZip(ids: string[], zipBaseName: string): Promise<void> {
   if (ids.length === 0) return;
-  const [{ default: html2canvas }, { jsPDF }, { default: JSZip }] = await Promise.all([
-    import("html2canvas-pro"), import("jspdf"), import("jszip"),
+  const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+    import("html2canvas-pro"), import("jspdf"),
   ]);
   const host = document.createElement("div");
   host.style.position = "fixed"; host.style.left = "-10000px"; host.style.top = "0";
@@ -100,19 +128,7 @@ export async function downloadDocsAsZip(ids: string[], zipBaseName: string): Pro
       addCanvas(pdf, canvas);
       files.push({ name: `${TYPE_FILE[data.type] ?? "Документ"}-${sanitize(data.number)}.pdf`, blob: pdf.output("blob") });
     }
-    if (files.length === 0) return;
-    if (files.length === 1) { saveBlob(files[0].blob, files[0].name); return; }
-
-    const zip = new JSZip();
-    const used: Record<string, number> = {};
-    for (const f of files) {
-      const count = used[f.name] ?? 0;
-      used[f.name] = count + 1;
-      const name = count === 0 ? f.name : f.name.replace(/\.pdf$/i, `-${count + 1}.pdf`);
-      zip.file(name, f.blob);
-    }
-    const content = await zip.generateAsync({ type: "blob" });
-    saveBlob(content, `${sanitize(zipBaseName)}.zip`);
+    await downloadPdfBlobs(files, zipBaseName);
   } finally {
     document.body.removeChild(host);
   }
