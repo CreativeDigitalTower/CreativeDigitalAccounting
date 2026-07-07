@@ -7,6 +7,7 @@ import { StatusSelect, statusMeta } from "@/components/app/StatusSelect";
 import { ContextMenu, type MenuItem } from "@/components/app/ContextMenu";
 import { formatCurrency, groupByMonth } from "@/lib/constants";
 import { downloadInvoicesPdf } from "@/lib/invoicePdf";
+import { downloadDocsAsZip } from "@/lib/downloadDocs";
 import { UiIcon } from "@/components/app/NavIcons";
 
 export type InvoiceRow = {
@@ -72,9 +73,10 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
     if (selected.size === 0) return;
     setDownloading(true);
     try {
+      // Всеки документ — самостоятелен файл; при няколко избрани → ZIP архив.
       const ids = invoices.filter((i) => selected.has(i.id)).map((i) => i.id);
-      await downloadInvoicesPdf(ids, ids.length === 1 ? invoices.find((i) => i.id === ids[0])!.number : `Фактури-${ids.length}`);
-    } catch { alert("Неуспешно изтегляне на PDF."); }
+      await downloadDocsAsZip(ids, `Документи-${ids.length}`);
+    } catch { alert("Неуспешно изтегляне."); }
     finally { setDownloading(false); }
   }
 
