@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/constants";
+import { downloadDocsAsZip } from "@/lib/downloadDocs";
 
 const DOC_LABEL: Record<string, string> = { invoice: "Фактура", proforma: "Проформа", quote: "Оферта", credit_note: "Кредитно известие", debit_note: "Дебитно известие" };
 const MONTHS = ["Януари", "Февруари", "Март", "Април", "Май", "Юни", "Юли", "Август", "Септември", "Октомври", "Ноември", "Декември"];
@@ -11,6 +12,7 @@ export type InboxDoc = { id: string; type: string; number: string; issueDate: st
 
 export function InboxDocuments({ docs }: { docs: InboxDoc[] }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [downloading, setDownloading] = useState(false);
 
   // Групиране по година → месец (най-новите най-отгоре)
   const groups = useMemo(() => {
@@ -36,9 +38,14 @@ export function InboxDocuments({ docs }: { docs: InboxDoc[] }) {
   function toggleAll() {
     setSelected(allSelected ? new Set() : new Set(allIds));
   }
-  function download(ids: string[]) {
-    if (!ids.length) return;
-    window.open(`/dashboard/inbox/print?ids=${ids.join(",")}`, "_blank");
+  async function download(ids: string[]) {
+    if (!ids.length || downloading) return;
+    setDownloading(true);
+    try {
+      // Всеки документ — самостоятелен файл; при няколко избрани → ZIP архив.
+      await downloadDocsAsZip(ids, `Входящи-документи-${ids.length}`);
+    } catch { alert("Неуспешно изтегляне."); }
+    finally { setDownloading(false); }
   }
 
   if (docs.length === 0) {
@@ -61,11 +68,12 @@ export function InboxDocuments({ docs }: { docs: InboxDoc[] }) {
           Избери всички ({docs.length})
         </label>
         {selected.size > 0 && <span style={{ fontSize: 12.5, color: "var(--muted)" }}>Избрани: {selected.size}</span>}
-        <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
-          <button className="btn btn-ghost btn-sm" onClick={() => download([...selected])} disabled={selected.size === 0}>
+        <div style={{ marginLeft: "auto", display: "flex", gap: 8, alignItems: "center" }}>
+          {downloading && <span style={{ fontSize: 12, color: "var(--muted)" }}>Генериране…</span>}
+          <button className="btn btn-ghost btn-sm" onClick={() => download([...selected])} disabled={selected.size === 0 || downloading}>
             ↓ Изтегли избраните{selected.size ? ` (${selected.size})` : ""}
           </button>
-          <button className="btn btn-primary btn-sm" onClick={() => download(allIds)}>↓ Изтегли всички</button>
+          <button className="btn btn-primary btn-sm" onClick={() => download(allIds)} disabled={downloading}>↓ Изтегли всички</button>
         </div>
       </div>
 
