@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { UiIcon } from "@/components/app/NavIcons";
 import { confirmDelete } from "@/lib/confirmDelete";
+import { downloadPdfBlobs, sanitizeFileName, todayStamp } from "@/lib/downloadDocs";
 
 type Doc = { id: string; title: string; category: string; categoryLabel: string; status: string; createdAt: string; updatedAt: string };
 const STATUS_LABEL: Record<string, string> = { draft: "Чернова", final: "Завършен", archived: "Архивиран" };
@@ -59,12 +60,11 @@ export function MyDocsList({ docs }: { docs: Doc[] }) {
         : "";
       const footerHtml = `<div style="margin-top:40px;padding-top:10px;border-top:1px solid #eee;display:flex;align-items:center;justify-content:center;gap:8px;font-size:10px;color:#9a9a90;"><img src="/cda-logo.png" alt="CDA" style="width:16px;height:16px;border-radius:50%;" crossorigin="anonymous" /><span>Генерирано чрез Creative Digital Accounting · www.CreativeDigitalAccounting.com</span></div>`;
       const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import("html2canvas-pro"), import("jspdf")]);
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight(), m = 8, availH = ph - m * 2, iw = pw - m * 2;
       const host = document.createElement("div");
       host.style.cssText = "position:fixed;left:-10000px;top:0;width:820px;background:#fff;";
       document.body.appendChild(host);
-      let first = true;
+      // Всеки документ → самостоятелен PDF; при няколко → ZIP архив.
+      const files: { name: string; blob: Blob }[] = [];
       for (const it of items) {
         const page = document.createElement("div");
         page.className = "bizdoc-page";
@@ -74,15 +74,16 @@ export function MyDocsList({ docs }: { docs: Doc[] }) {
         await new Promise((r) => setTimeout(r, 60));
         const canvas = await html2canvas(page, { scale: 2, backgroundColor: "#ffffff", useCORS: true, logging: false });
         const img = canvas.toDataURL("image/jpeg", 0.95);
+        const pdf = new jsPDF("p", "mm", "a4");
+        const pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight(), m = 8, availH = ph - m * 2, iw = pw - m * 2;
         const ih = (canvas.height * iw) / canvas.width;
-        if (!first) pdf.addPage();
-        first = false;
         let w = iw, h = ih; if (h > availH) { const s = availH / h; h = availH; w = iw * s; }
         pdf.addImage(img, "JPEG", (pw - w) / 2, m, w, h);
+        files.push({ name: `${sanitizeFileName(it.title || "Документ")}.pdf`, blob: pdf.output("blob") });
         host.removeChild(page);
       }
       document.body.removeChild(host);
-      pdf.save(ids.length === 1 ? `${items[0]?.title || "document"}.pdf` : `Документи-${ids.length}.pdf`);
+      await downloadPdfBlobs(files, `Документи-${todayStamp()}`);
     } catch { alert("Неуспешно сваляне."); } finally { setBusy(false); }
   }
 

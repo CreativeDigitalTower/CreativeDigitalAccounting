@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/constants";
-import { downloadDocsAsZip } from "@/lib/downloadDocs";
+import { downloadDocsAsZip, todayStamp } from "@/lib/downloadDocs";
 
 const DOC_LABEL: Record<string, string> = { invoice: "Фактура", proforma: "Проформа", quote: "Оферта", credit_note: "Кредитно известие", debit_note: "Дебитно известие" };
 const MONTHS = ["Януари", "Февруари", "Март", "Април", "Май", "Юни", "Юли", "Август", "Септември", "Октомври", "Ноември", "Декември"];
@@ -43,7 +43,7 @@ export function InboxDocuments({ docs }: { docs: InboxDoc[] }) {
     setDownloading(true);
     try {
       // Всеки документ — самостоятелен файл; при няколко избрани → ZIP архив.
-      await downloadDocsAsZip(ids, `Входящи-документи-${ids.length}`);
+      await downloadDocsAsZip(ids, `Входящи-документи-${todayStamp()}`);
     } catch { alert("Неуспешно изтегляне."); }
     finally { setDownloading(false); }
   }
