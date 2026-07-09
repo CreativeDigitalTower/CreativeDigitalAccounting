@@ -193,11 +193,12 @@ export default function SoftwarePage() {
         className="glass"
         style={{ marginTop: 40, padding: "20px 24px", borderRadius: 12, borderLeft: "4px solid var(--navy)" }}
       >
-        <strong style={{ color: "var(--navy)", fontSize: 13 }}>SAF-T Готовност</strong>
+        <strong style={{ color: "var(--navy)", fontSize: 13 }}>SAF-T Готовност — вграден модул</strong>
         <p style={{ margin: "6px 0 0", fontSize: 13, color: "var(--ink-soft)" }}>
           България въвежда задължително SAF-T отчитане поетапно — големи фирми от 2026 г., МСП от 2027 г.
-          Платформата съхранява <code>nomenclature_code</code> от самото начало,
-          за да е пълна съвместимост без реструктуриране на база данни.
+          Платформата има <strong>вграден SAF-T модул</strong>, който генерира готовите XML файлове
+          (месечни, годишни и при поискване) директно от Вашите данни — контрагенти, документи, данъци,
+          главна книга и активи. Без ръчна подготовка и без реструктуриране на данните.
         </p>
       </div>
     </div>

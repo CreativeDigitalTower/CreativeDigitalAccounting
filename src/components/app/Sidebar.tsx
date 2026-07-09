@@ -33,6 +33,7 @@ const navGroups: { title: string; items: { href: string; label: string; icon: st
       { href: "/dashboard/expenses", label: "Разходи", icon: "expenses", feature: "expenses" },
       { href: "/dashboard/contracts", label: "Договори", icon: "contracts", feature: "contracts" },
       { href: "/dashboard/tax-calendar", label: "Данъчен календар", icon: "calendar", feature: "tax_calendar" },
+      { href: "/dashboard/saft", label: "SAF-T", icon: "audit", feature: "saft" },
     ],
   },
   {
