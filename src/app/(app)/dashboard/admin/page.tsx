@@ -6,6 +6,8 @@ import { AdminArchivedCompanies } from "@/components/app/AdminArchivedCompanies"
 import { SUBSCRIPTION_PLANS, planPrice, accountantPlanLabel, accountantMaxClients } from "@/lib/constants";
 import { computeFirmPartnerStats } from "@/lib/partner";
 import { AdminFirmsPanel } from "@/components/app/AdminFirmsPanel";
+import { buildPlatformOverview } from "@/lib/bi/platform";
+import { PlatformOverview } from "@/components/bi/PlatformOverview";
 import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 
 const RANGES = [
@@ -323,6 +325,21 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     : [];
   const payoutRows = pendingPayouts.map((p) => ({ id: p.id, firmId: p.firmId, firmName: firmNameById.get(p.firmId) ?? "—", amount: p.amount, requestedAt: p.requestedAt.toISOString() }));
 
+  // ─── Executive Overview (Обзор на платформата) ───
+  const inactivePaidList = companies
+    .filter((c) => (c.subscription?.plan ?? "free") !== "free" && daysSince(lastActivityAt(c.id)) >= 21)
+    .map((c) => ({ id: c.id, name: c.name, days: daysSince(lastActivityAt(c.id)) }))
+    .sort((a, b) => b.days - a.days).slice(0, 6);
+  const platformOverview = await buildPlatformOverview({
+    companies, mrr, arr, payingCount, paidCount, trialingCount,
+    awaitingList: awaitingList.map((c) => ({ id: c.id, name: c.name })), conversion,
+    newThisMonth, newPrevMonth, active30, churnRisk,
+    firmStats, payoutRows,
+    upgradeOpportunities: upgradeOpportunities.map((o) => ({ id: o.id, name: o.name, plan: o.plan, used: o.used, limit: o.limit })),
+    hotLeads: hotLeads.map((l) => ({ id: l.id, name: l.name, plan: l.plan, score: l.score })),
+    inactivePaid: inactivePaidList,
+  });
+
   return (
     <>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20, gap: 12, flexWrap: "wrap" }}>
@@ -339,12 +356,17 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         </div>
       </div>
 
+      {/* ═══ Обзор на платформата (BI Executive Overview) ═══ */}
+      <PlatformOverview data={platformOverview} />
+
       {/* ─── Счетоводни къщи · Партньорска програма ─── */}
-      <AdminFirmsPanel firms={firmRows} payouts={payoutRows} />
+      <div id="firms">
+        <AdminFirmsPanel firms={firmRows} payouts={payoutRows} />
+      </div>
 
       {/* Чакащи потвърждение на плащане */}
       {awaitingList.length > 0 && (
-        <div className="glass panel" style={{ marginBottom: 16, borderLeft: "4px solid var(--brass)", background: "var(--brass-soft)" }}>
+        <div id="awaiting" className="glass panel" style={{ marginBottom: 16, borderLeft: "4px solid var(--brass)", background: "var(--brass-soft)", scrollMarginTop: 20 }}>
           <div style={{ fontWeight: 700, fontSize: 14, color: "var(--brass)", marginBottom: 6 }}>
             Очаква вашето потвърждение на плащане ({awaitingList.length})
           </div>
@@ -652,7 +674,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
       <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, fontWeight: 600, margin: "0 0 4px" }}>Всички фирми</h2>
       <div style={{ color: "var(--muted)", fontSize: 12.5, marginBottom: 10 }}>Стандартни фирми и клиентски фирми (счетоводните къщи са в раздела по-горе).</div>
-      <div className="glass panel" style={{ padding: "8px 0", overflowX: "auto" }}>
+      <div className="glass panel bi-table" style={{ padding: "8px 0", overflowX: "auto" }}>
         <table>
           <thead>
             <tr>
