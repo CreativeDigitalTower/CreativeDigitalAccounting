@@ -1,0 +1,18 @@
+{
+  "appName": "Creative Digital Accounting",
+  "language": "Limbă",
+  "actions": {
+    "save": "Salvează", "cancel": "Anulează", "delete": "Șterge", "edit": "Editează", "create": "Creează",
+    "close": "Închide", "confirm": "Confirmă", "search": "Caută", "back": "Înapoi", "next": "Înainte",
+    "download": "Descarcă", "send": "Trimite", "add": "Adaugă", "open": "Deschide", "view": "Vizualizează",
+    "apply": "Aplică", "reset": "Resetează", "export": "Export", "print": "Tipărește", "copy": "Copiază", "select": "Selectează"
+  },
+  "state": {
+    "loading": "Se încarcă…", "saving": "Se salvează…", "empty": "Nu există date", "noResults": "Niciun rezultat",
+    "error": "A apărut o eroare", "success": "Gata", "notEnoughData": "Încă nu există suficiente date pentru o analiză fiabilă."
+  },
+  "common": {
+    "yes": "Da", "no": "Nu", "all": "Toate", "from": "De la", "to": "Până la", "date": "Dată",
+    "status": "Stare", "total": "Total", "period": "Perioadă", "actions": "Acțiuni", "details": "Detalii"
+  }
+}

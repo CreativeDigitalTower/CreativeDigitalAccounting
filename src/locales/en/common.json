@@ -1,0 +1,18 @@
+{
+  "appName": "Creative Digital Accounting",
+  "language": "Language",
+  "actions": {
+    "save": "Save", "cancel": "Cancel", "delete": "Delete", "edit": "Edit", "create": "Create",
+    "close": "Close", "confirm": "Confirm", "search": "Search", "back": "Back", "next": "Next",
+    "download": "Download", "send": "Send", "add": "Add", "open": "Open", "view": "View",
+    "apply": "Apply", "reset": "Reset", "export": "Export", "print": "Print", "copy": "Copy", "select": "Select"
+  },
+  "state": {
+    "loading": "Loading…", "saving": "Saving…", "empty": "No data", "noResults": "No results",
+    "error": "Something went wrong", "success": "Done", "notEnoughData": "Not enough data yet for a reliable analysis."
+  },
+  "common": {
+    "yes": "Yes", "no": "No", "all": "All", "from": "From", "to": "To", "date": "Date",
+    "status": "Status", "total": "Total", "period": "Period", "actions": "Actions", "details": "Details"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "appName": "Creative Digital Accounting",
+  "language": "Язык",
+  "actions": {
+    "save": "Сохранить", "cancel": "Отмена", "delete": "Удалить", "edit": "Редактировать", "create": "Создать",
+    "close": "Закрыть", "confirm": "Подтвердить", "search": "Поиск", "back": "Назад", "next": "Далее",
+    "download": "Скачать", "send": "Отправить", "add": "Добавить", "open": "Открыть", "view": "Просмотр",
+    "apply": "Применить", "reset": "Сбросить", "export": "Экспорт", "print": "Печать", "copy": "Копировать", "select": "Выбрать"
+  },
+  "state": {
+    "loading": "Загрузка…", "saving": "Сохранение…", "empty": "Нет данных", "noResults": "Ничего не найдено",
+    "error": "Произошла ошибка", "success": "Готово", "notEnoughData": "Пока недостаточно данных для надёжного анализа."
+  },
+  "common": {
+    "yes": "Да", "no": "Нет", "all": "Все", "from": "С", "to": "По", "date": "Дата",
+    "status": "Статус", "total": "Итого", "period": "Период", "actions": "Действия", "details": "Подробнее"
+  }
+}

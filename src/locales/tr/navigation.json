@@ -1,0 +1,21 @@
+{
+  "groups": {
+    "overview": "Genel bakış", "sales": "Satış ve müşteriler", "finance": "Finans",
+    "operations": "Operasyonlar", "team": "Ekip", "more": "Daha fazla", "profile": "Profil"
+  },
+  "dashboard": "Panel", "projectManagement": "Proje Yönetimi", "analytics": "Analizler",
+  "invoices": "Faturalar", "documents": "Belgeler", "businessDocs": "İş belgeleri",
+  "clients": "Müşteriler (CRM)", "inbox": "Gelen belgeler", "cash": "Kasa", "expenses": "Giderler",
+  "contracts": "Sözleşmeler", "taxCalendar": "Vergi takvimi", "saft": "SAF-T", "suppliers": "Tedarikçiler",
+  "warehouse": "Stok", "production": "Üretim", "haccp": "HACCP", "projects": "Projeler",
+  "assets": "Varlıklar", "employees": "Çalışanlar", "users": "Kullanıcılar", "archive": "Arşiv",
+  "tools": "Ücretsiz araçlar", "training": "Eğitim", "audit": "Denetim kaydı",
+  "settings": "Şirket profili", "subscription": "Abonelik", "superAdmin": "Süper Yönetici",
+  "aiAssistant": "AI Asistanı", "soon": "YAKINDA", "activeCompany": "AKTİF ŞİRKET", "plan": "plan",
+  "signOut": "Çıkış",
+  "public": {
+    "home": "Ana sayfa", "software": "Yazılım", "services": "Hizmetler", "accountants": "Muhasebeciler için",
+    "blog": "Blog", "about": "Hakkımızda", "contact": "İletişim", "tools": "Araçlar",
+    "login": "Giriş", "register": "Kayıt ol", "pricing": "Fiyatlar", "getStarted": "Ücretsiz başla"
+  }
+}

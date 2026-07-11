@@ -17,6 +17,7 @@ model User {
   isSuperAdmin       Boolean   @default(false)
   onboardedAt        DateTime?
   representativeRole String?
+  preferredLanguage  String?   @default("bg") // език на интерфейса (bg|en|ru|ro|tr|el)
   marketingConsent   Boolean   @default(false)
   termsAcceptedAt    DateTime?
   failedLogins       Int       @default(0)

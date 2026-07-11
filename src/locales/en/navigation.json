@@ -1,0 +1,21 @@
+{
+  "groups": {
+    "overview": "Overview", "sales": "Sales & Clients", "finance": "Finance",
+    "operations": "Operations", "team": "Team", "more": "More", "profile": "Profile"
+  },
+  "dashboard": "Dashboard", "projectManagement": "Project Management", "analytics": "Analytics",
+  "invoices": "Invoices", "documents": "Documents", "businessDocs": "Business documents",
+  "clients": "Clients (CRM)", "inbox": "Incoming documents", "cash": "Cash register", "expenses": "Expenses",
+  "contracts": "Contracts", "taxCalendar": "Tax calendar", "saft": "SAF-T", "suppliers": "Suppliers",
+  "warehouse": "Inventory", "production": "Production", "haccp": "HACCP", "projects": "Projects",
+  "assets": "Assets", "employees": "Employees", "users": "Users", "archive": "Archive",
+  "tools": "Free tools", "training": "Training", "audit": "Audit log",
+  "settings": "Company profile", "subscription": "Subscription", "superAdmin": "Super Admin",
+  "aiAssistant": "AI Assistant", "soon": "SOON", "activeCompany": "ACTIVE COMPANY", "plan": "plan",
+  "signOut": "Sign out",
+  "public": {
+    "home": "Home", "software": "The Software", "services": "Services", "accountants": "For Accountants",
+    "blog": "Blog", "about": "About", "contact": "Contact", "tools": "Tools",
+    "login": "Log in", "register": "Sign up", "pricing": "Pricing", "getStarted": "Start for free"
+  }
+}
