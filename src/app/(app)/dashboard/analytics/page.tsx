@@ -1,41 +1,35 @@
 import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { FinancialHistorySection } from "@/components/app/FinancialHistorySection";
-import { TopClientsChart } from "@/components/app/TopClientsChart";
-import { MonthlyBarChart } from "@/components/app/MonthlyBarChart";
 import { MonthlyBackfill } from "@/components/app/MonthlyBackfill";
 import { PriceIncreaseSimulator } from "@/components/app/PriceIncreaseSimulator";
-import { aggregateClientRevenue } from "@/lib/clientRevenue";
-import { formatCurrency, toBGN, isDualCurrencyActive } from "@/lib/constants";
+import { formatCurrency, isDualCurrencyActive } from "@/lib/constants";
 import { sumPayroll } from "@/lib/payroll";
 import { VatRegistrationForecast } from "@/components/app/VatRegistrationForecast";
+import { resolvePeriod, computeAnalytics } from "@/lib/bi/analytics";
+import { AnalyticsPeriod } from "@/components/bi/AnalyticsPeriod";
+import { AnalyticsOverview } from "@/components/bi/AnalyticsOverview";
 
-export default async function AnalyticsPage() {
+export const dynamic = "force-dynamic";
+
+export default async function AnalyticsPage({ searchParams }: { searchParams: Promise<{ period?: string; from?: string; to?: string }> }) {
   const { companyId } = await requireFeature("analytics");
-  const dual = isDualCurrencyActive();
+  const sp = await searchParams;
   const now = new Date();
   const year = now.getFullYear();
   const yearStart = new Date(year, 0, 1);
 
-  const [invoices, expenses, goal, financialHistory, overdueCount, paidCount] = await Promise.all([
-    prisma.document.findMany({
-      where: { companyId, type: "invoice", issueDate: { gte: yearStart } },
-      include: { lines: true, client: { select: { name: true } } },
-    }),
-    prisma.expense.aggregate({
-      where: { companyId, date: { gte: yearStart } },
-      _sum: { amount: true },
-    }),
+  // ─── Actionable BI обзор за избрания период ───
+  const period = resolvePeriod(sp);
+  const analytics = await computeAnalytics(companyId, period);
+
+  // ─── Годишни инструменти (независими от избора на период) ───
+  const [invoices, goal, financialHistory] = await Promise.all([
+    prisma.document.findMany({ where: { companyId, type: "invoice", issueDate: { gte: yearStart } }, include: { lines: true } }),
     prisma.financialGoal.findUnique({ where: { companyId_year: { companyId, year } } }),
-    prisma.financialHistory.findMany({
-      where: { companyId },
-      orderBy: { year: "asc" },
-    }),
-    prisma.document.count({ where: { companyId, type: "invoice", status: "overdue" } }),
-    prisma.document.count({ where: { companyId, type: "invoice", status: "paid" } }),
+    prisma.financialHistory.findMany({ where: { companyId }, orderBy: { year: "asc" } }),
   ]);
 
-  // Заплати (разход) + ръчно въведени месечни данни за текущата година
   const [activeEmployees, payrollMonths, monthlyEntries] = await Promise.all([
     prisma.employee.findMany({ where: { companyId, active: true }, select: { salary: true } }),
     prisma.payrollMonth.findMany({ where: { companyId, year } }),
@@ -46,98 +40,63 @@ export default async function AnalyticsPage() {
   const manualRevByMonth = new Map(monthlyEntries.map((m) => [m.month, m.revenue]));
   const manualExpByMonth = new Map(monthlyEntries.map((m) => [m.month, m.expenses]));
   const curMonth = now.getMonth();
-  // Разход за заплати: за месеците от началото на годината до текущия (или ръчна корекция)
   let payrollExpense = 0;
   for (let m = 0; m <= curMonth; m++) payrollExpense += payrollByMonth.get(m) ?? defaultMonthlyPayroll;
   const manualRevenueTotal = monthlyEntries.reduce((s, m) => s + m.revenue, 0);
   const manualExpenseTotal = monthlyEntries.reduce((s, m) => s + m.expenses, 0);
 
-  // Очаквани месечни приходи (абонаментни договори) + фиксирани месечни разходи
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const [retainerAgg, recurringExpenses, monthInvoices] = await Promise.all([
+  const [retainerAgg, recurringExpenses, monthInvoices, expensesYearAgg] = await Promise.all([
     prisma.client.aggregate({ where: { companyId, monthlyRetainer: { not: null } }, _sum: { monthlyRetainer: true } }),
     prisma.expense.findMany({ where: { companyId, isRecurring: true }, include: { category: true } }),
     prisma.document.findMany({ where: { companyId, type: "invoice", issueDate: { gte: monthStart } }, include: { lines: true } }),
+    prisma.expense.aggregate({ where: { companyId, date: { gte: yearStart } }, _sum: { amount: true } }),
   ]);
   const expectedRetainer = retainerAgg._sum.monthlyRetainer ?? 0;
   const monthInvoiced = monthInvoices.reduce((s, d) => s + d.lines.reduce((ss, l) => ss + l.lineTotal, 0), 0);
   const expectedMonthlyRevenue = expectedRetainer + monthInvoiced;
-
-  // За прогнозата по ДДС ни трябва само дали фирмата е регистрирана
-  const companyVat = await prisma.company.findUnique({ where: { id: companyId }, select: { vatRegistered: true } });
-
   const currentMonthPayroll = payrollByMonth.get(now.getMonth()) ?? defaultMonthlyPayroll;
   const fixedMonthlyExpenses = recurringExpenses.reduce((s, e) => s + e.amount, 0) + currentMonthPayroll;
   const expectedMonthlyResult = expectedMonthlyRevenue - fixedMonthlyExpenses;
 
+  const companyVat = await prisma.company.findUnique({ where: { id: companyId }, select: { vatRegistered: true } });
+
   const invoiceRevenue = invoices.reduce((s, d) => s + d.lines.reduce((ss, l) => ss + l.lineTotal, 0), 0);
   const yearRevenue = invoiceRevenue + manualRevenueTotal;
-  const yearExpenses = (expenses._sum.amount ?? 0) + payrollExpense + manualExpenseTotal;
+  const yearExpenses = (expensesYearAgg._sum.amount ?? 0) + payrollExpense + manualExpenseTotal;
   const yearProfit = yearRevenue - yearExpenses;
 
-  const goalPercent = goal ? Math.min(100, Math.round((yearRevenue / goal.targetRevenue) * 100)) : null;
-
-  // ─── Прогноза за задължителна регистрация по ДДС (нов режим 2026) ───
-  // Праг: 51 130 EUR облагаем оборот за КАЛЕНДАРНАТА година (проследяван ежедневно).
   const VAT_THRESHOLD_EUR = 51130;
-  const VAT_THRESHOLD_BGN = 100000; // равностойност по фиксирания курс (≈ 100 000 лв.)
-  const vatTurnover = yearRevenue; // приходи за календарната година (фактури + ръчно въведени)
-  const monthsElapsed = curMonth + 1; // изминали месеци от годината
+  const VAT_THRESHOLD_BGN = 100000;
+  const vatTurnover = yearRevenue;
+  const monthsElapsed = curMonth + 1;
   const vatMonthlyRunRate = Math.max(expectedRetainer, vatTurnover / monthsElapsed);
 
-  // Monthly breakdown (current year)
-  const monthlyData: Record<number, number> = {};
-  for (const doc of invoices) {
-    const m = new Date(doc.issueDate).getMonth();
-    const total = doc.lines.reduce((s, l) => s + l.lineTotal, 0);
-    monthlyData[m] = (monthlyData[m] ?? 0) + total;
-  }
-  // добавяме ръчно въведените приходи по месеци
-  for (const [m, rev] of manualRevByMonth) monthlyData[m] = (monthlyData[m] ?? 0) + rev;
-
-  const MONTHS = ["Яну", "Фев", "Мар", "Апр", "Май", "Юни", "Юли", "Авг", "Сеп", "Окт", "Ное", "Дек"];
-  const maxMonth = Math.max(...Object.values(monthlyData), 1);
-
-  // Financial health score (rule-based)
-  let healthScore = 50;
-  if (yearProfit > 0) healthScore += 20;
-  if (overdueCount === 0) healthScore += 15;
-  if (goalPercent && goalPercent > 50) healthScore += 15;
-  healthScore = Math.min(100, healthScore);
-  const healthLabel = healthScore >= 80 ? "Отлично" : healthScore >= 60 ? "Добро" : "Нуждае се от внимание";
+  const dual = isDualCurrencyActive();
 
   return (
     <>
-      <div style={{ marginBottom: 20 }}>
-        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>Финансови Анализи</h1>
-        <div style={{ color: "var(--muted)", fontSize: 13 }}>{year} г.</div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 14, flexWrap: "wrap", marginBottom: 18 }}>
+        <div>
+          <div className="bi-eyebrow">Финансови анализи</div>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "2px 0 0" }}>Какво се случва в бизнеса Ви</h1>
+          <div style={{ color: "var(--muted)", fontSize: 13, marginTop: 2 }}>Период: <strong style={{ color: "var(--ink-soft)" }}>{analytics.period.label}</strong>{analytics.enoughToCompare ? "" : " · няма съпоставим предходен период"}</div>
+        </div>
+        <AnalyticsPeriod active={period.id} />
       </div>
 
-      {/* KPIs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, marginBottom: 24 }}>
-        {[
-          { label: `Приходи ${year}`, value: yearRevenue, color: "var(--emerald)" },
-          { label: `Разходи ${year}`, value: yearExpenses, color: "var(--brick)" },
-          { label: "Нетна печалба", value: yearProfit, color: "var(--navy)" },
-          { label: "Марж", value: yearRevenue > 0 ? Math.round((yearProfit / yearRevenue) * 100) : 0, isPercent: true, color: "var(--brass)" },
-        ].map((kpi) => (
-          <div key={kpi.label} className="glass kpi-card">
-            <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 8 }}>{kpi.label}</div>
-            <div className="num" style={{ fontSize: 21, fontWeight: 600 }}>
-              {kpi.isPercent ? `${kpi.value}%` : formatCurrency(kpi.value as number)}
-            </div>
-            {dual && !kpi.isPercent && (
-              <div className="num" style={{ fontSize: 10.5, color: "var(--muted)", marginTop: 2 }}>
-                ≈ {formatCurrency(toBGN(kpi.value as number), "BGN")}
-              </div>
-            )}
-          </div>
-        ))}
+      {/* ═══ BI обзор за избрания период ═══ */}
+      <AnalyticsOverview data={analytics} />
+
+      {/* ─── Годишни справки и инструменти ─── */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "26px 0 16px" }}>
+        <span className="bi-eyebrow" style={{ color: "var(--brass)" }}>Годишни справки и инструменти · {year}</span>
+        <div style={{ flex: 1, height: 1, background: "var(--bi-grid)" }} />
       </div>
 
-      {/* Месечна прогноза — очаквани приходи (абонаменти + фактури) vs фиксирани разходи */}
-      <div className="glass panel" style={{ marginBottom: 18 }}>
-        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 4px" }}>Месечна прогноза</h3>
+      {/* Месечна прогноза (абонаменти + фактури vs фиксирани разходи) */}
+      <div className="bi-card bi-flat bi-in" style={{ marginBottom: 16 }}>
+        <div className="bi-eyebrow" style={{ color: "var(--emerald-dark)", marginBottom: 4 }}>Месечна прогноза</div>
         <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 14px" }}>Очаквани месечни приходи (абонаментни договори + издадени фактури този месец) спрямо фиксираните месечни разходи.</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px,1fr))", gap: 14 }}>
           {[
@@ -152,74 +111,22 @@ export default async function AnalyticsPage() {
             </div>
           ))}
         </div>
-        {recurringExpenses.length > 0 && (
-          <div style={{ marginTop: 14, paddingTop: 12, borderTop: "1px solid var(--border)" }}>
-            <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 8 }}>Фиксирани месечни разходи:</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {recurringExpenses.map((e) => (
-                <span key={e.id} style={{ fontSize: 12, background: "var(--brick-soft)", color: "var(--brick)", borderRadius: 14, padding: "3px 11px", fontWeight: 600 }}>
-                  {e.category?.name ? `${e.category.name}: ` : ""}{e.description} — {formatCurrency(e.amount)}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
-      <div style={{ marginBottom: 18 }}>
-        <TopClientsChart data={aggregateClientRevenue(invoices)} title={`Топ 5 клиента по приход (${year})`} />
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 18 }}>
-        {/* Monthly chart — интерактивна */}
-        <MonthlyBarChart months={MONTHS} values={MONTHS.map((_, i) => monthlyData[i] ?? 0)} currentIndex={now.getMonth()} title={`Приходи по месеци (${year})`} />
-
-        {/* Right column */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          {/* Financial health */}
-          <div className="glass panel">
-            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>Финансово здраве</h3>
-            <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-              <div className="num" style={{ fontSize: 36, fontWeight: 700 }}>{healthScore}</div>
-              <div>
-                <div style={{ fontSize: 12.5, fontWeight: 600, color: healthScore >= 70 ? "var(--emerald)" : "var(--brass)" }}>
-                  {healthLabel}
-                </div>
-                <ul style={{ listStyle: "none", padding: 0, margin: "6px 0 0", fontSize: 12, color: "var(--ink-soft)", display: "flex", flexDirection: "column", gap: 4 }}>
-                  <li style={{ paddingLeft: 14, position: "relative" }}>
-                    <span style={{ position: "absolute", left: 0 }}>–</span>
-                    {yearProfit > 0 ? "Положителна печалба ✓" : "Отрицателна печалба"}
-                  </li>
-                  <li style={{ paddingLeft: 14, position: "relative" }}>
-                    <span style={{ position: "absolute", left: 0 }}>–</span>
-                    {overdueCount === 0 ? "Без просрочени фактури ✓" : `${overdueCount} просрочени фактури`}
-                  </li>
-                  <li style={{ paddingLeft: 14, position: "relative" }}>
-                    <span style={{ position: "absolute", left: 0 }}>–</span>
-                    {paidCount} платени фактури
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      {/* Прогноза за регистрация по ДДС (само за нерегистрирани фирми) */}
+      {/* Прогноза за регистрация по ДДС (нерегистрирани фирми) */}
       {!companyVat?.vatRegistered && (
-        <div style={{ marginTop: 18 }}>
+        <div style={{ marginBottom: 16 }}>
           <VatRegistrationForecast registered={!!companyVat?.vatRegistered} turnover={vatTurnover} threshold={VAT_THRESHOLD_EUR} thresholdBgn={VAT_THRESHOLD_BGN} monthlyRunRate={vatMonthlyRunRate} year={year} />
         </div>
       )}
 
-      {/* Симулация на увеличение на цените (абонаменти) */}
-      <div style={{ marginTop: 18 }}>
+      {/* Симулация на увеличение на цените */}
+      <div style={{ marginBottom: 16 }}>
         <PriceIncreaseSimulator monthlyRetainer={expectedRetainer} goalTarget={goal?.targetRevenue ?? null} />
       </div>
 
-      {/* Заплати по месеци + ръчно въведени приходи/разходи (текуща година) */}
-      <div style={{ marginTop: 18 }}>
+      {/* Заплати по месеци + ръчни приходи/разходи */}
+      <div style={{ marginBottom: 16 }}>
         <MonthlyBackfill
           year={year}
           currentMonth={curMonth}
@@ -233,8 +140,8 @@ export default async function AnalyticsPage() {
         />
       </div>
 
-      {/* Финансова цел + Историческа справка (редакция, разходи, диаграма) */}
-      <div style={{ marginTop: 18 }}>
+      {/* Финансова цел + Историческа справка */}
+      <div style={{ marginBottom: 8 }}>
         <FinancialHistorySection
           initial={financialHistory.map((h) => ({ year: h.year, revenue: h.revenue, expenses: h.expenses, profit: h.profit, employeeCount: h.employeeCount }))}
           goalYear={year}
@@ -244,6 +151,8 @@ export default async function AnalyticsPage() {
           currentProfit={yearProfit}
         />
       </div>
+
+      {dual && <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 8 }}>Сумите се визуализират в EUR; двойно EUR/BGN обозначаване е активно за официалните документи.</div>}
     </>
   );
 }
