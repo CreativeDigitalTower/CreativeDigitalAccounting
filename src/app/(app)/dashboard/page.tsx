@@ -16,6 +16,8 @@ import { WidgetBoard, type WidgetData } from "@/components/app/WidgetBoard";
 import { resolveLayout, SECTOR_TITLE } from "@/lib/workspaces";
 import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 import { reminderStatus, PRIORITY_META } from "@/lib/reminderColor";
+import { computeBusinessOverview } from "@/lib/bi/overview";
+import { BusinessOverviewSection } from "@/components/bi/BusinessOverviewSection";
 
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ period?: string; from?: string; to?: string }> }) {
   const { companyId, userId } = await requireCompany();
@@ -256,6 +258,9 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     clientsCount,
   };
 
+  // ─── Actionable BI обзор (реални данни → изводи) ───
+  const biOverview = await computeBusinessOverview(companyId);
+
   return (
     <>
       {needsProfile && <BusinessProfileWizard />}
@@ -268,6 +273,9 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         expectedRevenue={unpaidTotal}
         dateLabel={now.toLocaleDateString("bg-BG", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
       />
+
+      {/* ═══ Business Intelligence — обзор на бизнеса ═══ */}
+      <BusinessOverviewSection data={biOverview} />
 
       {/* Topbar + избор на период */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, marginBottom: 16, flexWrap: "wrap" }}>

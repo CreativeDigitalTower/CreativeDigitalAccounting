@@ -332,3 +332,83 @@ tbody tr:hover{background:rgba(15,138,106,.06);box-shadow:inset 3px 0 0 var(--em
 
 /* Бизнес документи — скрий жълтите placeholder подсветки при сваляне/печат */
 .exporting-doc .cda-fill, body.printing-doc .cda-fill{ background:transparent !important; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   BI DESIGN SYSTEM — собствена визуална система за анализи
+   (KPI карти, графики, insights, здраве на бизнеса)
+   ═══════════════════════════════════════════════════════════════════ */
+:root{
+  --bi-success: var(--emerald-dark);
+  --bi-ok: var(--navy);
+  --bi-attention: var(--brass);
+  --bi-danger: var(--brick);
+  --bi-info: var(--navy);
+  --bi-ink: var(--ink);
+  --bi-grid: rgba(20,30,25,.06);
+}
+
+/* Дискретно появяване с лек slide-up */
+@keyframes biIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.bi-in{animation:biIn .5s cubic-bezier(.22,1,.36,1) both;}
+.bi-in-1{animation-delay:.04s}.bi-in-2{animation-delay:.08s}.bi-in-3{animation-delay:.12s}
+.bi-in-4{animation-delay:.16s}.bi-in-5{animation-delay:.20s}.bi-in-6{animation-delay:.24s}
+
+/* Премиум карта — фина градиентна повърхност, мека сянка, деликатен hover */
+.bi-card{
+  position:relative; border-radius:16px; padding:16px 18px;
+  background:linear-gradient(160deg, rgba(255,255,255,.86), rgba(255,255,255,.66));
+  border:1px solid rgba(20,30,25,.07);
+  box-shadow:0 1px 2px rgba(20,30,25,.04), 0 10px 30px -18px rgba(20,30,25,.22);
+  transition:transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s ease;
+  overflow:hidden;
+}
+.bi-card:hover{transform:translateY(-3px);box-shadow:0 1px 2px rgba(20,30,25,.05), 0 22px 44px -22px rgba(20,30,25,.34);}
+.bi-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px;background:var(--accent,var(--emerald));opacity:.85;}
+.bi-card.bi-flat::before{display:none;}
+
+/* Тренд чип (▲/▼ %) */
+.bi-trend{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.2px;}
+.bi-trend.up{color:var(--emerald-dark);background:rgba(15,138,106,.10);}
+.bi-trend.down{color:var(--brick);background:rgba(162,59,43,.10);}
+.bi-trend.flat{color:var(--muted);background:rgba(138,133,120,.12);}
+.bi-trend.neutral-up{color:var(--brass);background:rgba(166,130,47,.12);}
+
+/* Стойност на KPI */
+.bi-value{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:26px;letter-spacing:-.5px;line-height:1.05;color:var(--ink);}
+.bi-label{font-size:11.5px;color:var(--muted);font-weight:600;letter-spacing:.3px;text-transform:uppercase;}
+.bi-caption{font-size:11.5px;color:var(--ink-soft);}
+
+/* Severity точки */
+.bi-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 3px rgba(0,0,0,.03);}
+.bi-dot.good{background:var(--emerald);}
+.bi-dot.ok{background:var(--navy);}
+.bi-dot.attention{background:var(--brass);}
+.bi-dot.critical{background:var(--brick);}
+
+/* Insight ред */
+.bi-insight{display:flex;gap:11px;align-items:flex-start;padding:10px 4px;border-bottom:1px solid rgba(20,30,25,.05);}
+.bi-insight:last-child{border-bottom:none;}
+.bi-insight .ico{color:var(--muted);flex-shrink:0;margin-top:1px;}
+
+/* Chart reveal (маска, която се разтваря) */
+@keyframes biSweep{from{clip-path:inset(0 100% 0 0);}to{clip-path:inset(0 0 0 0);}}
+.bi-sweep{animation:biSweep 1s cubic-bezier(.22,1,.36,1) both;}
+@keyframes biRise{from{transform:scaleY(0);}to{transform:scaleY(1);}}
+
+/* Секционен разделител/заглавие */
+.bi-eyebrow{font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--brass);}
+
+/* Премиум таблици — прилага се чрез .bi-table на обхващащ елемент */
+.bi-table table{border-collapse:separate;border-spacing:0;width:100%;}
+.bi-table thead th{position:sticky;top:0;z-index:2;background:rgba(246,247,244,.92);backdrop-filter:blur(6px);
+  font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);
+  padding:11px 14px;border-bottom:1px solid rgba(20,30,25,.08);text-align:left;}
+.bi-table tbody td{padding:12px 14px;font-size:13px;border-bottom:1px solid rgba(20,30,25,.045);}
+.bi-table tbody tr{transition:background .15s ease;}
+.bi-table tbody tr:hover{background:rgba(15,138,106,.045);}
+.bi-table tbody tr:last-child td{border-bottom:none;}
+
+/* BI обзор — адаптивно подреждане */
+@media (max-width: 860px){
+  .bi-overview-main{grid-template-columns:1fr !important;}
+}
