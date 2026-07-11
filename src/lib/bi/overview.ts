@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 // ─────────────────────────────────────────────────────────────────────────
 
 export type Severity = "good" | "ok" | "attention" | "critical";
-export type Insight = { icon: string; text: string; severity: Severity };
+export type Insight = { icon: string; text: string; severity: Severity; href?: string; cta?: string };
 export type MetricCard = {
   key: string;
   label: string;
