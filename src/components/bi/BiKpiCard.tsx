@@ -17,7 +17,7 @@ export function BiKpiCard({ card, index = 0 }: { card: MetricCard; index?: numbe
     <div className={`bi-card bi-in bi-in-${(index % 6) + 1}`} style={{ ["--accent" as string]: accent }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 10 }}>
         <span className="bi-label">{card.label}</span>
-        <span className={`bi-trend ${better}`}>{arrow} {deltaText}</span>
+        {card.deltaPct != null && <span className={`bi-trend ${better}`}>{arrow} {deltaText}</span>}
       </div>
       <div className="bi-value">
         <CountUp value={card.value} money={card.money} />

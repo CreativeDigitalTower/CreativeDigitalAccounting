@@ -81,7 +81,7 @@ export function AdminFirmsPanel({ firms, payouts }: { firms: AdminFirmRow[]; pay
       {firms.length === 0 ? (
         <div className="glass panel" style={{ textAlign: "center", padding: "32px 0", color: "var(--muted)", fontSize: 13 }}>Все още няма регистрирани счетоводни къщи.</div>
       ) : (
-      <div className="glass panel" style={{ padding: "8px 0", overflowX: "auto", marginBottom: payouts.length ? 16 : 0 }}>
+      <div className="glass panel bi-table" style={{ padding: "8px 0", overflowX: "auto", marginBottom: payouts.length ? 16 : 0 }}>
         <table>
           <thead><tr>
             <th>Счетоводна къща</th><th>Абонамент</th><th>Плащане</th><th className="num">Клиенти / лимит</th><th className="num">Платени</th>
@@ -130,7 +130,7 @@ export function AdminFirmsPanel({ firms, payouts }: { firms: AdminFirmRow[]; pay
       {payouts.length > 0 && (
         <>
           <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, fontWeight: 600, margin: "0 0 8px" }}>Чакащи заявки за изплащане</h3>
-          <div className="glass panel" style={{ padding: "8px 0", overflowX: "auto" }}>
+          <div className="glass panel bi-table" style={{ padding: "8px 0", overflowX: "auto" }}>
             <table>
               <thead><tr><th>Счетоводна къща</th><th className="num">Сума</th><th>Заявена</th><th></th></tr></thead>
               <tbody>
