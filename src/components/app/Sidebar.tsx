@@ -5,69 +5,70 @@ import { usePathname } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { planHasFeature, type PlanId } from "@/lib/constants";
 import { NavIcon } from "@/components/app/NavIcons";
+import { useT } from "@/components/i18n/I18nProvider";
 
 // Навигацията е групирана в логични сектори за по-ясен и структуриран изглед.
-const navGroups: { title: string; items: { href: string; label: string; icon: string; feature: string }[] }[] = [
+const navGroups: { title: string; titleKey: string; items: { href: string; label: string; icon: string; feature: string; tKey: string }[] }[] = [
   {
-    title: "Общ преглед",
+    title: "Общ преглед", titleKey: "navigation.groups.overview",
     items: [
-      { href: "/dashboard", label: "Табло", icon: "dashboard", feature: "dashboard" },
-      { href: "/dashboard/pm", label: "Project Management", icon: "projects", feature: "project_management" },
-      { href: "/dashboard/analytics", label: "Анализи", icon: "analytics", feature: "analytics" },
+      { href: "/dashboard", label: "Табло", icon: "dashboard", feature: "dashboard", tKey: "navigation.dashboard" },
+      { href: "/dashboard/pm", label: "Project Management", icon: "projects", feature: "project_management", tKey: "navigation.projectManagement" },
+      { href: "/dashboard/analytics", label: "Анализи", icon: "analytics", feature: "analytics", tKey: "navigation.analytics" },
     ],
   },
   {
-    title: "Продажби и клиенти",
+    title: "Продажби и клиенти", titleKey: "navigation.groups.sales",
     items: [
-      { href: "/dashboard/invoices", label: "Фактури", icon: "invoice", feature: "documents" },
-      { href: "/dashboard/documents", label: "Документи", icon: "document", feature: "documents" },
-      { href: "/dashboard/business-docs", label: "Бизнес документи", icon: "businessDocs", feature: "dashboard" },
-      { href: "/dashboard/clients", label: "Клиенти (CRM)", icon: "clients", feature: "clients" },
-      { href: "/dashboard/inbox", label: "Входящи документи", icon: "inbox", feature: "dashboard" },
+      { href: "/dashboard/invoices", label: "Фактури", icon: "invoice", feature: "documents", tKey: "navigation.invoices" },
+      { href: "/dashboard/documents", label: "Документи", icon: "document", feature: "documents", tKey: "navigation.documents" },
+      { href: "/dashboard/business-docs", label: "Бизнес документи", icon: "businessDocs", feature: "dashboard", tKey: "navigation.businessDocs" },
+      { href: "/dashboard/clients", label: "Клиенти (CRM)", icon: "clients", feature: "clients", tKey: "navigation.clients" },
+      { href: "/dashboard/inbox", label: "Входящи документи", icon: "inbox", feature: "dashboard", tKey: "navigation.inbox" },
     ],
   },
   {
-    title: "Финанси",
+    title: "Финанси", titleKey: "navigation.groups.finance",
     items: [
-      { href: "/dashboard/cash", label: "Каса", icon: "cash", feature: "cash" },
-      { href: "/dashboard/expenses", label: "Разходи", icon: "expenses", feature: "expenses" },
-      { href: "/dashboard/contracts", label: "Договори", icon: "contracts", feature: "contracts" },
-      { href: "/dashboard/tax-calendar", label: "Данъчен календар", icon: "calendar", feature: "tax_calendar" },
-      { href: "/dashboard/saft", label: "SAF-T", icon: "audit", feature: "saft" },
+      { href: "/dashboard/cash", label: "Каса", icon: "cash", feature: "cash", tKey: "navigation.cash" },
+      { href: "/dashboard/expenses", label: "Разходи", icon: "expenses", feature: "expenses", tKey: "navigation.expenses" },
+      { href: "/dashboard/contracts", label: "Договори", icon: "contracts", feature: "contracts", tKey: "navigation.contracts" },
+      { href: "/dashboard/tax-calendar", label: "Данъчен календар", icon: "calendar", feature: "tax_calendar", tKey: "navigation.taxCalendar" },
+      { href: "/dashboard/saft", label: "SAF-T", icon: "audit", feature: "saft", tKey: "navigation.saft" },
     ],
   },
   {
-    title: "Операции",
+    title: "Операции", titleKey: "navigation.groups.operations",
     items: [
-      { href: "/dashboard/suppliers", label: "Доставчици", icon: "suppliers", feature: "suppliers" },
-      { href: "/dashboard/warehouse", label: "Склад", icon: "warehouse", feature: "warehouse" },
-      { href: "/dashboard/production", label: "Производство", icon: "production", feature: "production" },
-      { href: "/dashboard/haccp", label: "HACCP", icon: "haccp", feature: "haccp" },
-      { href: "/dashboard/projects", label: "Проекти", icon: "projects", feature: "projects" },
-      { href: "/dashboard/assets", label: "Активи", icon: "assets", feature: "assets" },
+      { href: "/dashboard/suppliers", label: "Доставчици", icon: "suppliers", feature: "suppliers", tKey: "navigation.suppliers" },
+      { href: "/dashboard/warehouse", label: "Склад", icon: "warehouse", feature: "warehouse", tKey: "navigation.warehouse" },
+      { href: "/dashboard/production", label: "Производство", icon: "production", feature: "production", tKey: "navigation.production" },
+      { href: "/dashboard/haccp", label: "HACCP", icon: "haccp", feature: "haccp", tKey: "navigation.haccp" },
+      { href: "/dashboard/projects", label: "Проекти", icon: "projects", feature: "projects", tKey: "navigation.projects" },
+      { href: "/dashboard/assets", label: "Активи", icon: "assets", feature: "assets", tKey: "navigation.assets" },
     ],
   },
   {
-    title: "Екип",
+    title: "Екип", titleKey: "navigation.groups.team",
     items: [
-      { href: "/dashboard/employees", label: "Служители", icon: "employees", feature: "employees" },
-      { href: "/dashboard/users", label: "Потребители", icon: "users", feature: "users" },
+      { href: "/dashboard/employees", label: "Служители", icon: "employees", feature: "employees", tKey: "navigation.employees" },
+      { href: "/dashboard/users", label: "Потребители", icon: "users", feature: "users", tKey: "navigation.users" },
     ],
   },
   {
-    title: "Още",
+    title: "Още", titleKey: "navigation.groups.more",
     items: [
-      { href: "/dashboard/archive", label: "Архив", icon: "archive", feature: "archive" },
-      { href: "/dashboard/tools", label: "Безплатни инструменти", icon: "tools", feature: "dashboard" },
-      { href: "/dashboard/training", label: "Обучения", icon: "training", feature: "dashboard" },
-      { href: "/dashboard/audit", label: "Одит лог", icon: "audit", feature: "audit" },
+      { href: "/dashboard/archive", label: "Архив", icon: "archive", feature: "archive", tKey: "navigation.archive" },
+      { href: "/dashboard/tools", label: "Безплатни инструменти", icon: "tools", feature: "dashboard", tKey: "navigation.tools" },
+      { href: "/dashboard/training", label: "Обучения", icon: "training", feature: "dashboard", tKey: "navigation.training" },
+      { href: "/dashboard/audit", label: "Одит лог", icon: "audit", feature: "audit", tKey: "navigation.audit" },
     ],
   },
   {
-    title: "Профил",
+    title: "Профил", titleKey: "navigation.groups.profile",
     items: [
-      { href: "/dashboard/settings", label: "Профил на фирмата", icon: "settings", feature: "dashboard" },
-      { href: "/dashboard/subscription", label: "Абонамент", icon: "subscription", feature: "dashboard" },
+      { href: "/dashboard/settings", label: "Профил на фирмата", icon: "settings", feature: "dashboard", tKey: "navigation.settings" },
+      { href: "/dashboard/subscription", label: "Абонамент", icon: "subscription", feature: "dashboard", tKey: "navigation.subscription" },
     ],
   },
 ];
@@ -82,6 +83,7 @@ interface SidebarProps {
 
 export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread = 0 }: SidebarProps) {
   const pathname = usePathname();
+  const t = useT();
   const planId = plan as PlanId;
 
   return (
@@ -123,7 +125,7 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
         onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,.06)")}
       >
         <div style={{ fontSize: 10.5, color: "var(--brass)", fontWeight: 600, letterSpacing: 1, marginBottom: 6, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          АКТИВНА ФИРМА
+          {t("navigation.activeCompany")}
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: .7 }}><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
         </div>
         {logoUrl && (
@@ -139,7 +141,7 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
       <nav style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1 }}>
         {navGroups.map((group) => (
           <div key={group.title} className="sb-group">
-            <div className="sb-group-title">{group.title}</div>
+            <div className="sb-group-title">{t(group.titleKey)}</div>
             {group.items.map((item) => {
               const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
               const locked = !planHasFeature(planId, item.feature);
@@ -152,7 +154,7 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
                   className={`sb-link${isActive ? " sb-active" : ""}${locked ? " sb-locked" : ""}`}
                 >
                   <span className="sb-icon">{NavIcon[item.icon]?.({ width: 17, height: 17 })}</span>
-                  <span className="sb-label">{item.label}</span>
+                  <span className="sb-label">{t(item.tKey)}</span>
                   {item.href === "/dashboard/inbox" && inboxUnread > 0 && !locked && (
                     <span className="sb-badge">{inboxUnread}</span>
                   )}
@@ -175,7 +177,7 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
             <span className="sb-icon">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2.5 4.5 5.5V11c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V5.5L12 2.5Z" /><path d="m9 12 2 2 4-4" /></svg>
             </span>
-            <span className="sb-label">Супер Админ</span>
+            <span className="sb-label">{t("navigation.superAdmin")}</span>
           </Link>
         )}
 
@@ -198,7 +200,7 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
           <span style={{ display: "inline-flex", opacity: 0.4 }}>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="4.5" y="7.5" width="15" height="11" rx="2.5" /><path d="M12 4.5v3M9 12.5h.01M15 12.5h.01M9.5 16h5" /><path d="M2.5 11.5v3M21.5 11.5v3" /></svg>
           </span>
-          AI Асистент
+          {t("navigation.aiAssistant")}
           <span
             style={{
               marginLeft: "auto",
@@ -210,7 +212,7 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
               opacity: 0.7,
             }}
           >
-            СКОРО
+            {t("navigation.soon")}
           </span>
         </div>
       </nav>
@@ -233,7 +235,7 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
           <span style={{ color: "var(--brass)", fontWeight: 700 }}>
             {plan === "free" ? "Безплатен" : plan === "start" ? "Старт" : plan === "business" ? "Бизнес" : "Про"}
           </span>{" "}
-          план
+          {t("navigation.plan")}
         </div>
         <form action="/api/auth/signout" method="post">
           <button
@@ -249,7 +251,7 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
               padding: "4px 0",
             }}
           >
-            Изход ↗
+            {t("navigation.signOut")} ↗
           </button>
         </form>
       </div>

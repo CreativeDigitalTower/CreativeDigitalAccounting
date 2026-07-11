@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { UiIcon } from "@/components/app/NavIcons";
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 
 const searchIcon = (type: string) => {
   if (type === "Клиент") return <UiIcon.people width={17} height={17} />;
@@ -89,6 +90,9 @@ export function AppTopBar({ initialUnread }: { initialUnread: number }) {
           </div>
         )}
       </div>
+
+      {/* Език */}
+      <LanguageSwitcher />
 
       {/* Камбана */}
       <div ref={bellRef} style={{ position: "relative" }}>

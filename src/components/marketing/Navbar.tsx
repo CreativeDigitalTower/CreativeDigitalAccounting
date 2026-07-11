@@ -3,11 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
+import { useT } from "@/components/i18n/I18nProvider";
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 
 const links = [
-  { href: "/", label: "Начало" },
-  { href: "/software", label: "За Софтуера" },
-  { href: "/services", label: "Услуги" },
+  { href: "/", key: "navigation.public.home" },
+  { href: "/software", key: "navigation.public.software" },
+  { href: "/services", key: "navigation.public.services" },
 ];
 
 const toolsLinks = [
@@ -19,15 +21,16 @@ const toolsLinks = [
 ];
 
 const linksAfter = [
-  { href: "/accountants", label: "За счетоводители" },
-  { href: "/blog", label: "Блог" },
-  { href: "/about", label: "За Нас" },
-  { href: "/contact", label: "Контакти" },
+  { href: "/accountants", key: "navigation.public.accountants" },
+  { href: "/blog", key: "navigation.public.blog" },
+  { href: "/about", key: "navigation.public.about" },
+  { href: "/contact", key: "navigation.public.contact" },
 ];
 
 export function MarketingNavbar() {
   const [open, setOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
+  const t = useT();
 
   return (
     <nav
@@ -43,14 +46,14 @@ export function MarketingNavbar() {
         <div className="desktop-only" style={{ gap: 4, flex: 1, alignItems: "center" }}>
           {links.map((l) => (
             <Link key={l.href} href={l.href} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 13.5, fontWeight: 500, color: "var(--ink-soft)", textDecoration: "none" }}>
-              {l.label}
+              {t(l.key)}
             </Link>
           ))}
 
           {/* Tools dropdown */}
           <div style={{ position: "relative" }} onMouseEnter={() => setToolsOpen(true)} onMouseLeave={() => setToolsOpen(false)}>
             <Link href="/tools" style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 8, fontSize: 13.5, fontWeight: 500, color: "var(--ink-soft)", textDecoration: "none" }}>
-              Безплатни инструменти
+              {t('navigation.tools')}
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9" /></svg>
             </Link>
             {toolsOpen && (
@@ -66,15 +69,16 @@ export function MarketingNavbar() {
 
           {linksAfter.map((l) => (
             <Link key={l.href} href={l.href} style={{ padding: "6px 12px", borderRadius: 8, fontSize: 13.5, fontWeight: 500, color: "var(--ink-soft)", textDecoration: "none" }}>
-              {l.label}
+              {t(l.key)}
             </Link>
           ))}
         </div>
 
         {/* Desktop CTAs */}
         <div className="desktop-only" style={{ marginLeft: "auto", gap: 10, alignItems: "center" }}>
-          <Link href="/login" className="btn btn-ghost btn-sm">Вход</Link>
-          <Link href="/register" className="btn btn-primary btn-sm">Регистрация</Link>
+          <LanguageSwitcher />
+          <Link href="/login" className="btn btn-ghost btn-sm">{t('navigation.public.login')}</Link>
+          <Link href="/register" className="btn btn-primary btn-sm">{t('navigation.public.register')}</Link>
         </div>
 
         {/* Mobile burger */}
@@ -97,11 +101,11 @@ export function MarketingNavbar() {
         <div className="mobile-only" style={{ flexDirection: "column", padding: "8px 0 16px", borderTop: "1px solid var(--border)", gap: 2 }}>
           {links.map((l) => (
             <Link key={l.href} href={l.href} onClick={() => setOpen(false)} style={{ padding: "11px 8px", fontSize: 15, fontWeight: 500, color: "var(--ink-soft)", textDecoration: "none" }}>
-              {l.label}
+              {t(l.key)}
             </Link>
           ))}
           <Link href="/tools" onClick={() => setOpen(false)} style={{ padding: "11px 8px", fontSize: 15, fontWeight: 600, color: "var(--ink)", textDecoration: "none" }}>
-            Безплатни инструменти
+            {t('navigation.tools')}
           </Link>
           {toolsLinks.map((t) => (
             <Link key={t.href} href={t.href} onClick={() => setOpen(false)} style={{ padding: "9px 8px 9px 22px", fontSize: 14, color: "var(--ink-soft)", textDecoration: "none" }}>
@@ -110,12 +114,13 @@ export function MarketingNavbar() {
           ))}
           {linksAfter.map((l) => (
             <Link key={l.href} href={l.href} onClick={() => setOpen(false)} style={{ padding: "11px 8px", fontSize: 15, fontWeight: 500, color: "var(--ink-soft)", textDecoration: "none" }}>
-              {l.label}
+              {t(l.key)}
             </Link>
           ))}
-          <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-            <Link href="/login" onClick={() => setOpen(false)} className="btn btn-ghost btn-sm" style={{ flex: 1, justifyContent: "center" }}>Вход</Link>
-            <Link href="/register" onClick={() => setOpen(false)} className="btn btn-primary btn-sm" style={{ flex: 1, justifyContent: "center" }}>Регистрация</Link>
+          <div style={{ display: "flex", gap: 8, marginTop: 8, alignItems: "center" }}>
+            <LanguageSwitcher />
+            <Link href="/login" onClick={() => setOpen(false)} className="btn btn-ghost btn-sm" style={{ flex: 1, justifyContent: "center" }}>{t('navigation.public.login')}</Link>
+            <Link href="/register" onClick={() => setOpen(false)} className="btn btn-primary btn-sm" style={{ flex: 1, justifyContent: "center" }}>{t('navigation.public.register')}</Link>
           </div>
         </div>
       )}

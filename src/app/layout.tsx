@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { MetaPixel } from "@/components/MetaPixel";
+import { getLocale } from "@/lib/i18n/server";
+import { getMessages } from "@/lib/i18n/messages";
+import { I18nProvider } from "@/components/i18n/I18nProvider";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://creativedigitalaccounting.com";
 
@@ -37,13 +40,17 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const metaPixelId = process.env.META_PIXEL_ID;
+  const locale = await getLocale();
+  const messages = getMessages(locale);
   return (
-    <html lang="bg">
+    <html lang={locale}>
       <body>
         {metaPixelId && <MetaPixel pixelId={metaPixelId} />}
-        {children}
+        <I18nProvider locale={locale} messages={messages}>
+          {children}
+        </I18nProvider>
       </body>
     </html>
   );

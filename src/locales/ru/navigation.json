@@ -1,0 +1,21 @@
+{
+  "groups": {
+    "overview": "Обзор", "sales": "Продажи и клиенты", "finance": "Финансы",
+    "operations": "Операции", "team": "Команда", "more": "Ещё", "profile": "Профиль"
+  },
+  "dashboard": "Панель", "projectManagement": "Управление проектами", "analytics": "Аналитика",
+  "invoices": "Счета-фактуры", "documents": "Документы", "businessDocs": "Бизнес-документы",
+  "clients": "Клиенты (CRM)", "inbox": "Входящие документы", "cash": "Касса", "expenses": "Расходы",
+  "contracts": "Договоры", "taxCalendar": "Налоговый календарь", "saft": "SAF-T", "suppliers": "Поставщики",
+  "warehouse": "Склад", "production": "Производство", "haccp": "HACCP", "projects": "Проекты",
+  "assets": "Активы", "employees": "Сотрудники", "users": "Пользователи", "archive": "Архив",
+  "tools": "Бесплатные инструменты", "training": "Обучение", "audit": "Журнал аудита",
+  "settings": "Профиль компании", "subscription": "Подписка", "superAdmin": "Супер Админ",
+  "aiAssistant": "AI-ассистент", "soon": "СКОРО", "activeCompany": "АКТИВНАЯ КОМПАНИЯ", "plan": "план",
+  "signOut": "Выход",
+  "public": {
+    "home": "Главная", "software": "О программе", "services": "Услуги", "accountants": "Для бухгалтеров",
+    "blog": "Блог", "about": "О нас", "contact": "Контакты", "tools": "Инструменты",
+    "login": "Вход", "register": "Регистрация", "pricing": "Цены", "getStarted": "Начать бесплатно"
+  }
+}

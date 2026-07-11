@@ -1,0 +1,21 @@
+{
+  "groups": {
+    "overview": "Общ преглед", "sales": "Продажби и клиенти", "finance": "Финанси",
+    "operations": "Операции", "team": "Екип", "more": "Още", "profile": "Профил"
+  },
+  "dashboard": "Табло", "projectManagement": "Project Management", "analytics": "Анализи",
+  "invoices": "Фактури", "documents": "Документи", "businessDocs": "Бизнес документи",
+  "clients": "Клиенти (CRM)", "inbox": "Входящи документи", "cash": "Каса", "expenses": "Разходи",
+  "contracts": "Договори", "taxCalendar": "Данъчен календар", "saft": "SAF-T", "suppliers": "Доставчици",
+  "warehouse": "Склад", "production": "Производство", "haccp": "HACCP", "projects": "Проекти",
+  "assets": "Активи", "employees": "Служители", "users": "Потребители", "archive": "Архив",
+  "tools": "Безплатни инструменти", "training": "Обучения", "audit": "Одит лог",
+  "settings": "Профил на фирмата", "subscription": "Абонамент", "superAdmin": "Супер Админ",
+  "aiAssistant": "AI Асистент", "soon": "СКОРО", "activeCompany": "АКТИВНА ФИРМА", "plan": "план",
+  "signOut": "Изход",
+  "public": {
+    "home": "Начало", "software": "За Софтуера", "services": "Услуги", "accountants": "За счетоводители",
+    "blog": "Блог", "about": "За Нас", "contact": "Контакти", "tools": "Инструменти",
+    "login": "Вход", "register": "Регистрация", "pricing": "Цени", "getStarted": "Започни безплатно"
+  }
+}

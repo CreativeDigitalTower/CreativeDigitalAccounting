@@ -1,0 +1,21 @@
+{
+  "groups": {
+    "overview": "Prezentare generală", "sales": "Vânzări și clienți", "finance": "Finanțe",
+    "operations": "Operațiuni", "team": "Echipă", "more": "Mai mult", "profile": "Profil"
+  },
+  "dashboard": "Tablou de bord", "projectManagement": "Management de proiecte", "analytics": "Analize",
+  "invoices": "Facturi", "documents": "Documente", "businessDocs": "Documente de afaceri",
+  "clients": "Clienți (CRM)", "inbox": "Documente primite", "cash": "Casă", "expenses": "Cheltuieli",
+  "contracts": "Contracte", "taxCalendar": "Calendar fiscal", "saft": "SAF-T", "suppliers": "Furnizori",
+  "warehouse": "Stocuri", "production": "Producție", "haccp": "HACCP", "projects": "Proiecte",
+  "assets": "Active", "employees": "Angajați", "users": "Utilizatori", "archive": "Arhivă",
+  "tools": "Instrumente gratuite", "training": "Instruire", "audit": "Jurnal de audit",
+  "settings": "Profilul firmei", "subscription": "Abonament", "superAdmin": "Super Admin",
+  "aiAssistant": "Asistent AI", "soon": "ÎN CURÂND", "activeCompany": "FIRMĂ ACTIVĂ", "plan": "plan",
+  "signOut": "Deconectare",
+  "public": {
+    "home": "Acasă", "software": "Despre software", "services": "Servicii", "accountants": "Pentru contabili",
+    "blog": "Blog", "about": "Despre noi", "contact": "Contact", "tools": "Instrumente",
+    "login": "Autentificare", "register": "Înregistrare", "pricing": "Prețuri", "getStarted": "Începe gratuit"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "groups": {
+    "overview": "Επισκόπηση", "sales": "Πωλήσεις & πελάτες", "finance": "Οικονομικά",
+    "operations": "Λειτουργίες", "team": "Ομάδα", "more": "Περισσότερα", "profile": "Προφίλ"
+  },
+  "dashboard": "Πίνακας", "projectManagement": "Διαχείριση έργων", "analytics": "Αναλύσεις",
+  "invoices": "Τιμολόγια", "documents": "Έγγραφα", "businessDocs": "Επιχειρηματικά έγγραφα",
+  "clients": "Πελάτες (CRM)", "inbox": "Εισερχόμενα έγγραφα", "cash": "Ταμείο", "expenses": "Έξοδα",
+  "contracts": "Συμβάσεις", "taxCalendar": "Φορολογικό ημερολόγιο", "saft": "SAF-T", "suppliers": "Προμηθευτές",
+  "warehouse": "Αποθήκη", "production": "Παραγωγή", "haccp": "HACCP", "projects": "Έργα",
+  "assets": "Πάγια", "employees": "Υπάλληλοι", "users": "Χρήστες", "archive": "Αρχείο",
+  "tools": "Δωρεάν εργαλεία", "training": "Εκπαίδευση", "audit": "Αρχείο ελέγχου",
+  "settings": "Προφίλ εταιρείας", "subscription": "Συνδρομή", "superAdmin": "Super Admin",
+  "aiAssistant": "AI Βοηθός", "soon": "ΣΥΝΤΟΜΑ", "activeCompany": "ΕΝΕΡΓΗ ΕΤΑΙΡΕΙΑ", "plan": "πλάνο",
+  "signOut": "Αποσύνδεση",
+  "public": {
+    "home": "Αρχική", "software": "Το λογισμικό", "services": "Υπηρεσίες", "accountants": "Για λογιστές",
+    "blog": "Blog", "about": "Σχετικά", "contact": "Επικοινωνία", "tools": "Εργαλεία",
+    "login": "Σύνδεση", "register": "Εγγραφή", "pricing": "Τιμές", "getStarted": "Ξεκινήστε δωρεάν"
+  }
+}
