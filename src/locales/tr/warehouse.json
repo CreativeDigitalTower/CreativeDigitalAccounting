@@ -1,0 +1,227 @@
+{
+  "common": {
+    "back": "← Depo",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "saving": "Kaydediliyor…",
+    "errSave": "Kaydetme hatası.",
+    "selectItem": "— Ürün seçin —",
+    "select": "— Seçin —"
+  },
+  "page": {
+    "title": "Depo",
+    "subtitle": "{wh} depoda {items} ürün",
+    "btn": {
+      "receive": "+ Mal kabul",
+      "issue": "− Çıkış",
+      "scrap": "Fire",
+      "revision": "Sayım",
+      "newItem": "+ Yeni ürün"
+    },
+    "totalTitle": "Depoya göre toplam stok değeri",
+    "totalHint": "Miktar × birim fiyat olarak hesaplanır",
+    "whUnit": "ürün",
+    "lowStock": "Düşük stok ({n} ürün):",
+    "expiryTitle": "⏰ Son kullanma:",
+    "expired": "Süresi doldu ({d}g)",
+    "expiryIn": "{d}g içinde",
+    "noExpiry": "Süresiz",
+    "empty": "Depo boş",
+    "add": "Ürün ekle",
+    "th": {
+      "item": "Ürün",
+      "sku": "SKU",
+      "category": "Kategori",
+      "warehouse": "Depo",
+      "unit": "Birim",
+      "qty": "Stok",
+      "minQty": "Min. stok",
+      "price": "Birim fiyat",
+      "value": "Değer",
+      "expiry": "Son kullanma",
+      "status": "Durum"
+    },
+    "statusLow": "Düşük",
+    "statusOk": "✓ Normal",
+    "details": "Ayrıntılar",
+    "footTotal": "Toplam depo değeri:"
+  },
+  "optStock": "{name} (stok: {q} {u})",
+  "optAvail": "{name} (mevcut: {q} {u})",
+  "receive": {
+    "heading": "Mal kabul",
+    "noItems1": "Ürününüz yok. Önce",
+    "noItemsLink": "bir ürün ekleyin",
+    "f": {
+      "item": "Ürün *",
+      "qty": "Miktar *",
+      "qtyIn": "Miktar ({unit}) *",
+      "qtyPh": "miktar",
+      "qtyPhUnit": "örn. 10 {unit}",
+      "price": "Birim fiyat (EUR)",
+      "supplier": "Tedarikçi",
+      "batch": "Parti numarası",
+      "batchPh": "örn. L2026-0617",
+      "date": "Tarih *",
+      "note": "Not"
+    },
+    "save": "Kabul et",
+    "saving": "Kaydediliyor…"
+  },
+  "issue": {
+    "heading": "Stok çıkışı",
+    "availPrefix": "Mevcut stok:",
+    "f": {
+      "item": "Ürün *",
+      "qty": "Çıkış miktarı *",
+      "qtyIn": "Çıkış miktarı ({unit}) *",
+      "qtyPh": "miktar",
+      "qtyPhUnit": "örn. 5 {unit}",
+      "date": "Tarih *",
+      "reason": "Neden / Gerekçe",
+      "reasonPh": "Örn. satış, fire, üretimde kullanıldı…"
+    },
+    "save": "Çıkış yap",
+    "saving": "Kaydediliyor…"
+  },
+  "scrap": {
+    "heading": "Fire çıkışı",
+    "availPrefix": "Mevcut:",
+    "f": {
+      "item": "Ürün *",
+      "qty": "Fire miktarı *",
+      "qtyIn": "Fire miktarı ({unit}) *",
+      "qtyPh": "miktar",
+      "qtyPhUnit": "örn. 2 {unit}",
+      "date": "Tarih *",
+      "reason": "Fire nedeni",
+      "reasonPh": "örn. süresi doldu, hasar, standart dışı…"
+    },
+    "save": "Fire yap",
+    "saving": "Kaydediliyor…",
+    "archiveTitle": "Fire arşivi ({n})",
+    "empty": "Henüz fire yok.",
+    "th": {
+      "date": "Tarih",
+      "item": "Ürün",
+      "qty": "Miktar",
+      "reason": "Neden"
+    }
+  },
+  "revision": {
+    "heading": "Sayım (envanter)",
+    "intro": "Fiilen sayılan miktarları girin. Kayıtta stok seviyeleri otomatik güncellenir ve farklar „sayım” hareketi olarak kaydedilir.",
+    "needCount": "En az bir sayılan miktar veya yeni ürün girin.",
+    "errCreate": "Yeni ürün oluşturma hatası.",
+    "noItems": "Depoda ürün yok.",
+    "th": {
+      "item": "Ürün",
+      "system": "Sistemde",
+      "counted": "Sayılan",
+      "diff": "Fark"
+    },
+    "newTitle": "Yeni bulunan ürünler",
+    "newHint": "Sistemde olmayan bir ürün bulursanız — buraya girin, depoya eklenecektir.",
+    "newBtn": "+ Yeni ürün",
+    "namePh": "Ad",
+    "unitPh": "Birim",
+    "qtyPh": "Miktar",
+    "pricePh": "Birim fiyat €",
+    "noteLabel": "Sayım notu",
+    "notePh": "örn. aylık envanter",
+    "apply": "Sayımı uygula",
+    "applying": "Uygulanıyor…",
+    "archiveTitle": "Sayım arşivi ({n})",
+    "archiveEmpty": "Henüz yapılmış sayım yok.",
+    "at": "saat",
+    "metaBy": "{user} tarafından",
+    "metaCount": "{n} ürün · {c} değişti",
+    "protoTh": {
+      "item": "Ürün",
+      "before": "Önce",
+      "counted": "Sayılan",
+      "diff": "Fark"
+    }
+  },
+  "itemsNew": {
+    "heading": "Yeni ürün",
+    "noWarehouse": "Deponuz yok. „Ana depo” (kayıtta otomatik oluşturulur) kullanılacak.",
+    "f": {
+      "warehouse": "Depo *",
+      "category": "Kategori",
+      "name": "Ad *",
+      "sku": "SKU / Kod",
+      "unit": "Ölçü birimi",
+      "qty": "Başlangıç stoğu",
+      "minQty": "Min. stok",
+      "price": "Birim fiyat (EUR)",
+      "expiryTitle": "Son kullanma tarihi",
+      "noExpiry": "Süresiz (raf ömrü yok)",
+      "expiryHint": "Tarih yaklaştığında bildirim alırsınız (7 gün — sarı, süresi dolmuş — kırmızı)."
+    },
+    "save": "Kaydet",
+    "saving": "Kaydediliyor…"
+  },
+  "itemDetail": {
+    "mtype": {
+      "receive": "Mal kabul",
+      "issue": "Çıkış",
+      "production": "Üretim",
+      "transfer": "Transfer"
+    },
+    "receiveBtn": "+ Mal kabul",
+    "kpi": {
+      "qty": "Stok",
+      "minQty": "Min. stok",
+      "warehouse": "Depo",
+      "sku": "SKU",
+      "price": "Birim fiyat"
+    },
+    "movements": "Hareketler ({n})",
+    "noMovements": "Hareket yok.",
+    "th": {
+      "type": "Tür",
+      "date": "Tarih",
+      "qty": "Mik.",
+      "supplier": "Tedarikçi"
+    }
+  },
+  "actions": {
+    "edit": "Düzenle",
+    "close": "Kapat",
+    "delTitle": "Ürünü sil",
+    "confirmDelete": "„{name}“ ürünü",
+    "errDelete": "Silme hatası.",
+    "modalTitle": "Ürünü düzenle",
+    "f": {
+      "name": "Ad",
+      "sku": "SKU",
+      "unit": "Ölçü birimi",
+      "qty": "Stok",
+      "minQty": "Min. stok",
+      "price": "Birim fiyat (€)",
+      "expiry": "Son kullanma tarihi"
+    },
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "saving": "Kaydediliyor…"
+  },
+  "simulator": {
+    "title": "Simülasyon: depo fiyatlarını değiştir",
+    "desc": "Ürün fiyatlarını belirli bir yüzde <strong>artırır veya azaltırsanız</strong> — tahmini toplam stok değeri ve ortalama birim fiyat ne olurdu.",
+    "needPrices": "Simülasyonu kullanmak için ürünlerin birim fiyatlarını girin.",
+    "changeLabel": "Değişim:",
+    "curTotal": "Mevcut toplam değer",
+    "newTotal": "Yeni toplam değer ({sign}{pct}%)",
+    "avgUnit": "Ortalama birim fiyat",
+    "newAvg": "Yeni ortalama fiyat ({sign}{pct}%)",
+    "items": "{n} ürün"
+  },
+  "categories": {
+    "toggle": "Depo kategorileri ({n})",
+    "empty": "Kategori yok. Ürünleri düzenlemek için oluşturun.",
+    "newPh": "Yeni kategori (örn. Hammadde)",
+    "add": "Ekle",
+    "confirmDelete": "bu kategori"
+  }
+}

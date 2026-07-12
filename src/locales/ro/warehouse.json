@@ -1,0 +1,227 @@
+{
+  "common": {
+    "back": "← Depozit",
+    "cancel": "Anulează",
+    "save": "Salvează",
+    "saving": "Se salvează…",
+    "errSave": "Eroare la salvare.",
+    "selectItem": "— Selectați articol —",
+    "select": "— Selectați —"
+  },
+  "page": {
+    "title": "Depozit",
+    "subtitle": "{items} articole în {wh} depozite",
+    "btn": {
+      "receive": "+ Recepție",
+      "issue": "− Eliberare",
+      "scrap": "Rebut",
+      "revision": "Inventar",
+      "newItem": "+ Articol nou"
+    },
+    "totalTitle": "Valoarea totală a stocului pe depozit",
+    "totalHint": "Calculat ca cantitate × preț unitar",
+    "whUnit": "articole",
+    "lowStock": "Stoc scăzut ({n} articole):",
+    "expiryTitle": "⏰ Expirare:",
+    "expired": "Expirat ({d}z)",
+    "expiryIn": "În {d}z",
+    "noExpiry": "Fără expirare",
+    "empty": "Depozitul este gol",
+    "add": "Adaugă articol",
+    "th": {
+      "item": "Articol",
+      "sku": "SKU",
+      "category": "Categorie",
+      "warehouse": "Depozit",
+      "unit": "U.M.",
+      "qty": "Stoc",
+      "minQty": "Stoc min.",
+      "price": "Preț unitar",
+      "value": "Valoare",
+      "expiry": "Expirare",
+      "status": "Status"
+    },
+    "statusLow": "Scăzut",
+    "statusOk": "✓ Normal",
+    "details": "Detalii",
+    "footTotal": "Valoarea totală a depozitului:"
+  },
+  "optStock": "{name} (stoc: {q} {u})",
+  "optAvail": "{name} (disponibil: {q} {u})",
+  "receive": {
+    "heading": "Recepție marfă",
+    "noItems1": "Nu aveți articole. Mai întâi",
+    "noItemsLink": "adăugați un articol",
+    "f": {
+      "item": "Articol *",
+      "qty": "Cantitate *",
+      "qtyIn": "Cantitate (în {unit}) *",
+      "qtyPh": "cantitate",
+      "qtyPhUnit": "ex. 10 {unit}",
+      "price": "Preț unitar (EUR)",
+      "supplier": "Furnizor",
+      "batch": "Număr lot",
+      "batchPh": "ex. L2026-0617",
+      "date": "Dată *",
+      "note": "Notă"
+    },
+    "save": "Recepționează",
+    "saving": "Se salvează…"
+  },
+  "issue": {
+    "heading": "Eliberare marfă",
+    "availPrefix": "Stoc disponibil:",
+    "f": {
+      "item": "Articol *",
+      "qty": "Cantitate de eliberat *",
+      "qtyIn": "Cantitate de eliberat (în {unit}) *",
+      "qtyPh": "cantitate",
+      "qtyPhUnit": "ex. 5 {unit}",
+      "date": "Dată *",
+      "reason": "Motiv",
+      "reasonPh": "Ex. vânzare, rebut, folosit în producție…"
+    },
+    "save": "Eliberează",
+    "saving": "Se salvează…"
+  },
+  "scrap": {
+    "heading": "Rebut marfă",
+    "availPrefix": "Disponibil:",
+    "f": {
+      "item": "Articol *",
+      "qty": "Cantitate de casat *",
+      "qtyIn": "Cantitate de casat (în {unit}) *",
+      "qtyPh": "cantitate",
+      "qtyPhUnit": "ex. 2 {unit}",
+      "date": "Dată *",
+      "reason": "Motiv casare",
+      "reasonPh": "ex. expirat, deteriorat, neconform…"
+    },
+    "save": "Casează",
+    "saving": "Se salvează…",
+    "archiveTitle": "Arhivă rebuturi ({n})",
+    "empty": "Încă niciun rebut.",
+    "th": {
+      "date": "Dată",
+      "item": "Articol",
+      "qty": "Cantitate",
+      "reason": "Motiv"
+    }
+  },
+  "revision": {
+    "heading": "Inventar",
+    "intro": "Introduceți cantitățile efectiv numărate. La salvare, stocurile se actualizează automat, iar diferențele se înregistrează ca mișcare „inventar”.",
+    "needCount": "Introduceți cel puțin o cantitate numărată sau un articol nou.",
+    "errCreate": "Eroare la crearea unui articol nou.",
+    "noItems": "Niciun articol în depozit.",
+    "th": {
+      "item": "Articol",
+      "system": "În sistem",
+      "counted": "Numărat",
+      "diff": "Diferență"
+    },
+    "newTitle": "Articole nou găsite",
+    "newHint": "Dacă găsiți un produs care nu este în sistem — introduceți-l aici și va fi adăugat în depozit.",
+    "newBtn": "+ Articol nou",
+    "namePh": "Denumire",
+    "unitPh": "U.M.",
+    "qtyPh": "Cantitate",
+    "pricePh": "Preț unitar €",
+    "noteLabel": "Notă la inventar",
+    "notePh": "ex. inventar lunar",
+    "apply": "Aplică inventarul",
+    "applying": "Se aplică…",
+    "archiveTitle": "Arhivă inventare ({n})",
+    "archiveEmpty": "Încă niciun inventar efectuat.",
+    "at": "la",
+    "metaBy": "de {user}",
+    "metaCount": "{n} articole · {c} modificate",
+    "protoTh": {
+      "item": "Articol",
+      "before": "Înainte",
+      "counted": "Numărat",
+      "diff": "Diferență"
+    }
+  },
+  "itemsNew": {
+    "heading": "Articol nou",
+    "noWarehouse": "Nu aveți depozit. Se va folosi „Depozitul principal” (creat automat la înregistrare).",
+    "f": {
+      "warehouse": "Depozit *",
+      "category": "Categorie",
+      "name": "Denumire *",
+      "sku": "SKU / Cod",
+      "unit": "Unitate de măsură",
+      "qty": "Stoc inițial",
+      "minQty": "Stoc min.",
+      "price": "Preț unitar (EUR)",
+      "expiryTitle": "Data expirării",
+      "noExpiry": "Fără expirare (fără termen)",
+      "expiryHint": "La apropierea termenului veți primi o notificare (7 zile — galben, expirat — roșu)."
+    },
+    "save": "Salvează",
+    "saving": "Se salvează…"
+  },
+  "itemDetail": {
+    "mtype": {
+      "receive": "Recepție",
+      "issue": "Eliberare",
+      "production": "Producție",
+      "transfer": "Transfer"
+    },
+    "receiveBtn": "+ Recepție",
+    "kpi": {
+      "qty": "Stoc",
+      "minQty": "Stoc min.",
+      "warehouse": "Depozit",
+      "sku": "SKU",
+      "price": "Preț unitar"
+    },
+    "movements": "Mișcări ({n})",
+    "noMovements": "Nicio mișcare.",
+    "th": {
+      "type": "Tip",
+      "date": "Dată",
+      "qty": "Cant.",
+      "supplier": "Furnizor"
+    }
+  },
+  "actions": {
+    "edit": "Editează",
+    "close": "Închide",
+    "delTitle": "Șterge articolul",
+    "confirmDelete": "articolul „{name}“",
+    "errDelete": "Eroare la ștergere.",
+    "modalTitle": "Editare articol",
+    "f": {
+      "name": "Denumire",
+      "sku": "SKU",
+      "unit": "Unitate de măsură",
+      "qty": "Stoc",
+      "minQty": "Stoc min.",
+      "price": "Preț unitar (€)",
+      "expiry": "Data expirării"
+    },
+    "cancel": "Anulează",
+    "save": "Salvează",
+    "saving": "Se salvează…"
+  },
+  "simulator": {
+    "title": "Simulare: modificarea prețurilor în depozit",
+    "desc": "Dacă <strong>creșteți sau reduceți</strong> prețurile produselor cu un anumit procent — care ar fi valoarea totală estimată a stocurilor și prețul unitar mediu.",
+    "needPrices": "Introduceți prețuri unitare pentru articole pentru a folosi simularea.",
+    "changeLabel": "Modificare:",
+    "curTotal": "Valoare totală curentă",
+    "newTotal": "Valoare totală nouă ({sign}{pct}%)",
+    "avgUnit": "Preț unitar mediu",
+    "newAvg": "Preț mediu nou ({sign}{pct}%)",
+    "items": "{n} articole"
+  },
+  "categories": {
+    "toggle": "Categorii depozit ({n})",
+    "empty": "Nicio categorie. Creați pentru a organiza articolele.",
+    "newPh": "Categorie nouă (ex. Materii prime)",
+    "add": "Adaugă",
+    "confirmDelete": "această categorie"
+  }
+}

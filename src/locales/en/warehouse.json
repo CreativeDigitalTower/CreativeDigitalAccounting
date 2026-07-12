@@ -1,0 +1,227 @@
+{
+  "common": {
+    "back": "← Warehouse",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "errSave": "Error while saving.",
+    "selectItem": "— Select item —",
+    "select": "— Select —"
+  },
+  "page": {
+    "title": "Warehouse",
+    "subtitle": "{items} items in {wh} warehouses",
+    "btn": {
+      "receive": "+ Receive",
+      "issue": "− Issue",
+      "scrap": "Scrap",
+      "revision": "Stocktake",
+      "newItem": "+ New item"
+    },
+    "totalTitle": "Total stock value by warehouse",
+    "totalHint": "Calculated as quantity × unit price",
+    "whUnit": "items",
+    "lowStock": "Low stock ({n} items):",
+    "expiryTitle": "⏰ Expiry:",
+    "expired": "Expired ({d}d)",
+    "expiryIn": "In {d}d",
+    "noExpiry": "No expiry",
+    "empty": "The warehouse is empty",
+    "add": "Add item",
+    "th": {
+      "item": "Item",
+      "sku": "SKU",
+      "category": "Category",
+      "warehouse": "Warehouse",
+      "unit": "Unit",
+      "qty": "Stock",
+      "minQty": "Min. stock",
+      "price": "Unit price",
+      "value": "Value",
+      "expiry": "Expiry",
+      "status": "Status"
+    },
+    "statusLow": "Low",
+    "statusOk": "✓ OK",
+    "details": "Details",
+    "footTotal": "Total warehouse value:"
+  },
+  "optStock": "{name} (stock: {q} {u})",
+  "optAvail": "{name} (available: {q} {u})",
+  "receive": {
+    "heading": "Receive stock",
+    "noItems1": "You have no items. First",
+    "noItemsLink": "add an item",
+    "f": {
+      "item": "Item *",
+      "qty": "Quantity *",
+      "qtyIn": "Quantity (in {unit}) *",
+      "qtyPh": "quantity",
+      "qtyPhUnit": "e.g. 10 {unit}",
+      "price": "Unit price (EUR)",
+      "supplier": "Supplier",
+      "batch": "Batch number",
+      "batchPh": "e.g. L2026-0617",
+      "date": "Date *",
+      "note": "Note"
+    },
+    "save": "Receive",
+    "saving": "Saving…"
+  },
+  "issue": {
+    "heading": "Issue stock",
+    "availPrefix": "Available stock:",
+    "f": {
+      "item": "Item *",
+      "qty": "Quantity to issue *",
+      "qtyIn": "Quantity to issue (in {unit}) *",
+      "qtyPh": "quantity",
+      "qtyPhUnit": "e.g. 5 {unit}",
+      "date": "Date *",
+      "reason": "Reason",
+      "reasonPh": "E.g. sale, scrap, used in production…"
+    },
+    "save": "Issue",
+    "saving": "Saving…"
+  },
+  "scrap": {
+    "heading": "Scrap stock",
+    "availPrefix": "Available:",
+    "f": {
+      "item": "Item *",
+      "qty": "Quantity to scrap *",
+      "qtyIn": "Quantity to scrap (in {unit}) *",
+      "qtyPh": "quantity",
+      "qtyPhUnit": "e.g. 2 {unit}",
+      "date": "Date *",
+      "reason": "Scrap reason",
+      "reasonPh": "e.g. expired, damaged, substandard…"
+    },
+    "save": "Scrap",
+    "saving": "Saving…",
+    "archiveTitle": "Scrap archive ({n})",
+    "empty": "No scrapping yet.",
+    "th": {
+      "date": "Date",
+      "item": "Item",
+      "qty": "Quantity",
+      "reason": "Reason"
+    }
+  },
+  "revision": {
+    "heading": "Stocktake (inventory)",
+    "intro": "Enter the actually counted quantities. On save, stock levels are updated automatically and differences are recorded as a “stocktake” movement.",
+    "needCount": "Enter at least one counted quantity or a new item.",
+    "errCreate": "Error creating a new item.",
+    "noItems": "No items in the warehouse.",
+    "th": {
+      "item": "Item",
+      "system": "In system",
+      "counted": "Counted",
+      "diff": "Difference"
+    },
+    "newTitle": "Newly found items",
+    "newHint": "If you find a product that is not in the system — enter it here and it will be added to the warehouse.",
+    "newBtn": "+ New item",
+    "namePh": "Name",
+    "unitPh": "Unit",
+    "qtyPh": "Quantity",
+    "pricePh": "Unit price €",
+    "noteLabel": "Stocktake note",
+    "notePh": "e.g. monthly inventory",
+    "apply": "Apply stocktake",
+    "applying": "Applying…",
+    "archiveTitle": "Stocktake archive ({n})",
+    "archiveEmpty": "No stocktakes yet.",
+    "at": "at",
+    "metaBy": "by {user}",
+    "metaCount": "{n} items · {c} changed",
+    "protoTh": {
+      "item": "Item",
+      "before": "Before",
+      "counted": "Counted",
+      "diff": "Difference"
+    }
+  },
+  "itemsNew": {
+    "heading": "New item",
+    "noWarehouse": "You have no warehouse. The “Main warehouse” (created automatically on registration) will be used.",
+    "f": {
+      "warehouse": "Warehouse *",
+      "category": "Category",
+      "name": "Name *",
+      "sku": "SKU / Code",
+      "unit": "Unit of measure",
+      "qty": "Initial stock",
+      "minQty": "Min. stock",
+      "price": "Unit price (EUR)",
+      "expiryTitle": "Expiry date",
+      "noExpiry": "No expiry (no shelf life)",
+      "expiryHint": "You will get a notification as the date approaches (7 days — yellow, expired — red)."
+    },
+    "save": "Save",
+    "saving": "Saving…"
+  },
+  "itemDetail": {
+    "mtype": {
+      "receive": "Receive",
+      "issue": "Issue",
+      "production": "Production",
+      "transfer": "Transfer"
+    },
+    "receiveBtn": "+ Receive",
+    "kpi": {
+      "qty": "Stock",
+      "minQty": "Min. stock",
+      "warehouse": "Warehouse",
+      "sku": "SKU",
+      "price": "Unit price"
+    },
+    "movements": "Movements ({n})",
+    "noMovements": "No movements.",
+    "th": {
+      "type": "Type",
+      "date": "Date",
+      "qty": "Qty",
+      "supplier": "Supplier"
+    }
+  },
+  "actions": {
+    "edit": "Edit",
+    "close": "Close",
+    "delTitle": "Delete item",
+    "confirmDelete": "item „{name}“",
+    "errDelete": "Error while deleting.",
+    "modalTitle": "Edit item",
+    "f": {
+      "name": "Name",
+      "sku": "SKU",
+      "unit": "Unit of measure",
+      "qty": "Stock",
+      "minQty": "Min. stock",
+      "price": "Unit price (€)",
+      "expiry": "Expiry date"
+    },
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…"
+  },
+  "simulator": {
+    "title": "Simulation: change warehouse prices",
+    "desc": "If you <strong>increase or decrease</strong> product prices by a given percentage — what would the projected total stock value and average unit price be.",
+    "needPrices": "Enter unit prices for the items to use the simulation.",
+    "changeLabel": "Change:",
+    "curTotal": "Current total value",
+    "newTotal": "New total value ({sign}{pct}%)",
+    "avgUnit": "Average unit price",
+    "newAvg": "New average price ({sign}{pct}%)",
+    "items": "{n} items"
+  },
+  "categories": {
+    "toggle": "Warehouse categories ({n})",
+    "empty": "No categories. Create some to organize your items.",
+    "newPh": "New category (e.g. Raw materials)",
+    "add": "Add",
+    "confirmDelete": "this category"
+  }
+}

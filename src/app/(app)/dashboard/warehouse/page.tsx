@@ -6,9 +6,11 @@ import { FeatureLink } from "@/components/app/FeatureLink";
 import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 import { WarehousePriceSimulator } from "@/components/app/WarehousePriceSimulator";
 import Link from "next/link";
+import { getT } from "@/lib/i18n/server";
 
 export default async function WarehousePage() {
   const { companyId } = await requireCompany();
+  const { t, locale } = await getT();
   const plan = await getPlan(companyId);
   const extended = planHasFeature(plan, "production"); // Бизнес + Про
 
@@ -33,9 +35,9 @@ export default async function WarehousePage() {
     if (!exp) return null;
     const d = new Date(exp); d.setHours(0, 0, 0, 0);
     const days = Math.round((d.getTime() - now.getTime()) / 86400000);
-    if (days < 0) return { label: `Изтекъл (${-days}д)`, color: "var(--brick)", days };
-    if (days <= 7) return { label: `След ${days}д`, color: "var(--brass)", days };
-    return { label: d.toLocaleDateString("bg-BG"), color: "var(--ink-soft)", days };
+    if (days < 0) return { label: t("warehouse.page.expired", { d: -days }), color: "var(--brick)", days };
+    if (days <= 7) return { label: t("warehouse.page.expiryIn", { d: days }), color: "var(--brass)", days };
+    return { label: d.toLocaleDateString(locale), color: "var(--ink-soft)", days };
   }
   const expiringItems = stockItems.map((i) => ({ i, s: expiryStatus(i.expiryDate) })).filter((x) => x.s && x.s.days <= 7);
 
@@ -49,15 +51,15 @@ export default async function WarehousePage() {
     <>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
         <div>
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>Склад</h1>
-          <div style={{ color: "var(--muted)", fontSize: 13 }}>{stockItems.length} артикула в {warehouses.length} склада</div>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>{t("warehouse.page.title")}</h1>
+          <div style={{ color: "var(--muted)", fontSize: 13 }}>{t("warehouse.page.subtitle", { items: stockItems.length, wh: warehouses.length })}</div>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <Link href="/dashboard/warehouse/receive" className="btn btn-ghost">+ Заприходяване</Link>
-          <Link href="/dashboard/warehouse/issue" className="btn btn-ghost">− Изписване</Link>
-          <FeatureLink plan={plan} feature="revision" href="/dashboard/warehouse/scrap">Брак</FeatureLink>
-          <FeatureLink plan={plan} feature="revision" href="/dashboard/warehouse/revision">Ревизия</FeatureLink>
-          <Link href="/dashboard/warehouse/items/new" className="btn btn-primary">+ Нов артикул</Link>
+          <Link href="/dashboard/warehouse/receive" className="btn btn-ghost">{t("warehouse.page.btn.receive")}</Link>
+          <Link href="/dashboard/warehouse/issue" className="btn btn-ghost">{t("warehouse.page.btn.issue")}</Link>
+          <FeatureLink plan={plan} feature="revision" href="/dashboard/warehouse/scrap">{t("warehouse.page.btn.scrap")}</FeatureLink>
+          <FeatureLink plan={plan} feature="revision" href="/dashboard/warehouse/revision">{t("warehouse.page.btn.revision")}</FeatureLink>
+          <Link href="/dashboard/warehouse/items/new" className="btn btn-primary">{t("warehouse.page.btn.newItem")}</Link>
         </div>
       </div>
 
@@ -66,8 +68,8 @@ export default async function WarehousePage() {
       {/* Обща стойност на склада */}
       <div className="glass panel" style={{ padding: "16px 20px", marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, background: "linear-gradient(135deg, rgba(15,138,106,.08), rgba(11,94,74,.04))" }}>
         <div>
-          <div style={{ fontSize: 12.5, color: "var(--muted)" }}>Обща стойност на наличността по склад</div>
-          <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>Изчислено като количество × единична цена</div>
+          <div style={{ fontSize: 12.5, color: "var(--muted)" }}>{t("warehouse.page.totalTitle")}</div>
+          <div style={{ fontSize: 11.5, color: "var(--ink-soft)" }}>{t("warehouse.page.totalHint")}</div>
         </div>
         <div className="num" style={{ fontSize: 28, fontWeight: 700, color: "var(--emerald-dark)" }}>{formatCurrency(totalStockValue)}</div>
       </div>
@@ -78,7 +80,7 @@ export default async function WarehousePage() {
           <div key={w.id} className="glass kpi-card">
             <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}><NavIcon.warehouse width={14} height={14} /> {w.name}</div>
             <div className="num" style={{ fontSize: 22, fontWeight: 600 }}>{w._count.stockItems}</div>
-            <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 2 }}>артикула · <strong style={{ color: "var(--emerald-dark)" }}>{formatCurrency(valueByWarehouse.get(w.id) ?? 0)}</strong></div>
+            <div style={{ fontSize: 12, color: "var(--ink-soft)", marginTop: 2 }}>{t("warehouse.page.whUnit")} · <strong style={{ color: "var(--emerald-dark)" }}>{formatCurrency(valueByWarehouse.get(w.id) ?? 0)}</strong></div>
           </div>
         ))}
       </div>
@@ -86,7 +88,7 @@ export default async function WarehousePage() {
       {/* Low stock alert */}
       {lowStock.length > 0 && (
         <div style={{ background: "var(--brick-soft)", border: "1px solid rgba(162,59,43,.3)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, fontSize: 13 }}>
-          <strong style={{ color: "var(--brick)", display: "inline-flex", alignItems: "center", gap: 6 }}><UiIcon.warning width={14} height={14} /> Ниска наличност ({lowStock.length} артикула):</strong>{" "}
+          <strong style={{ color: "var(--brick)", display: "inline-flex", alignItems: "center", gap: 6 }}><UiIcon.warning width={14} height={14} /> {t("warehouse.page.lowStock", { n: lowStock.length })}</strong>{" "}
           {lowStock.map((i) => i.name).join(", ")}
         </div>
       )}
@@ -94,7 +96,7 @@ export default async function WarehousePage() {
       {/* Изтичащ срок на годност */}
       {expiringItems.length > 0 && (
         <div style={{ background: "var(--brass-soft)", border: "1px solid rgba(165,129,46,.35)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, fontSize: 13 }}>
-          <strong style={{ color: "var(--brass)" }}>⏰ Срок на годност:</strong>{" "}
+          <strong style={{ color: "var(--brass)" }}>{t("warehouse.page.expiryTitle")}</strong>{" "}
           {expiringItems.map(({ i, s }) => <span key={i.id} style={{ color: s!.color, fontWeight: 600, marginRight: 10 }}>{i.name} — {s!.label}</span>)}
         </div>
       )}
@@ -103,24 +105,24 @@ export default async function WarehousePage() {
         {stockItems.length === 0 ? (
           <div style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, color: "var(--muted)" }}><NavIcon.warehouse width={34} height={34} /></div>
-            <div style={{ fontSize: 14, marginBottom: 16 }}>Складът е празен</div>
-            <Link href="/dashboard/warehouse/items/new" className="btn btn-primary btn-sm">Добави артикул</Link>
+            <div style={{ fontSize: 14, marginBottom: 16 }}>{t("warehouse.page.empty")}</div>
+            <Link href="/dashboard/warehouse/items/new" className="btn btn-primary btn-sm">{t("warehouse.page.add")}</Link>
           </div>
         ) : (
           <table>
             <thead>
               <tr>
-                <th>Артикул</th>
-                <th>SKU</th>
-                {extended && <th>Категория</th>}
-                <th>Склад</th>
-                <th>Ед. мярка</th>
-                <th className="num">Наличност</th>
-                <th className="num">Мин. наличност</th>
-                <th className="num">Ед. цена</th>
-                <th className="num">Стойност</th>
-                <th>Срок</th>
-                <th>Статус</th>
+                <th>{t("warehouse.page.th.item")}</th>
+                <th>{t("warehouse.page.th.sku")}</th>
+                {extended && <th>{t("warehouse.page.th.category")}</th>}
+                <th>{t("warehouse.page.th.warehouse")}</th>
+                <th>{t("warehouse.page.th.unit")}</th>
+                <th className="num">{t("warehouse.page.th.qty")}</th>
+                <th className="num">{t("warehouse.page.th.minQty")}</th>
+                <th className="num">{t("warehouse.page.th.price")}</th>
+                <th className="num">{t("warehouse.page.th.value")}</th>
+                <th>{t("warehouse.page.th.expiry")}</th>
+                <th>{t("warehouse.page.th.status")}</th>
                 <th></th>
               </tr>
             </thead>
@@ -148,17 +150,17 @@ export default async function WarehousePage() {
                     </td>
                     <td>{(() => { const s = expiryStatus(item.expiryDate); return s
                       ? <span style={{ fontSize: 11.5, fontWeight: 700, color: "#fff", background: s.color, borderRadius: 12, padding: "2px 9px" }}>{s.label}</span>
-                      : <span style={{ fontSize: 12, color: "var(--muted)" }}>Безсрочно</span>; })()}</td>
+                      : <span style={{ fontSize: 12, color: "var(--muted)" }}>{t("warehouse.page.noExpiry")}</span>; })()}</td>
                     <td>
                       {isLow ? (
-                        <span style={{ color: "var(--brick)", fontSize: 12, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4 }}><UiIcon.warning width={12} height={12} /> Ниска</span>
+                        <span style={{ color: "var(--brick)", fontSize: 12, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4 }}><UiIcon.warning width={12} height={12} /> {t("warehouse.page.statusLow")}</span>
                       ) : (
-                        <span style={{ color: "var(--emerald)", fontSize: 12, fontWeight: 600 }}>✓ Норма</span>
+                        <span style={{ color: "var(--emerald)", fontSize: 12, fontWeight: 600 }}>{t("warehouse.page.statusOk")}</span>
                       )}
                     </td>
                     <td>
                       <Link href={`/dashboard/warehouse/items/${item.id}`} className="btn btn-ghost btn-sm">
-                        Детайли
+                        {t("warehouse.page.details")}
                       </Link>
                     </td>
                   </tr>
@@ -167,7 +169,7 @@ export default async function WarehousePage() {
             </tbody>
             <tfoot>
               <tr style={{ borderTop: "2px solid var(--border)", fontWeight: 700 }}>
-                <td colSpan={extended ? 8 : 7} style={{ textAlign: "right" }}>Обща стойност на склада:</td>
+                <td colSpan={extended ? 8 : 7} style={{ textAlign: "right" }}>{t("warehouse.page.footTotal")}</td>
                 <td className="num" style={{ color: "var(--emerald-dark)" }}>{formatCurrency(totalStockValue)}</td>
                 <td colSpan={3}></td>
               </tr>
