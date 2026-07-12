@@ -1,0 +1,37 @@
+{
+  "docTypes": {
+    "invoice": "factură",
+    "proforma": "proformă",
+    "quote": "ofertă",
+    "credit_note": "notă de credit",
+    "debit_note": "notă de debit",
+    "contract": "contract",
+    "protocol": "protocol",
+    "document": "document"
+  },
+  "incomingDocument": {
+    "title": "Document nou primit de la {sender}",
+    "body": "{sender} v-a emis {docType} nr. {number}."
+  },
+  "subscriptionProforma": {
+    "title": "Factură proformă pentru abonamentul {plan}",
+    "body": "{platform} v-a emis proforma nr. {number} pentru abonamentul selectat. O puteți vizualiza și plăti prin transfer bancar."
+  },
+  "alert": {
+    "task": "Sarcină: {title}",
+    "taskOverdue": "Întârziat (zile): {n}",
+    "taskToday": "Scadență astăzi",
+    "taskRemaining": "Zile rămase: {n}",
+    "overdueInvoices": "Facturi restante: {n}",
+    "expiredStock": "Articole cu data expirată: {n}",
+    "expiringStock": "Articole care expiră (în 14 zile): {n}",
+    "expiringContracts": "Contracte care expiră: {n}",
+    "subExpiring": "Abonamentul expiră (în {days} zile)"
+  },
+  "topbar": {
+    "searchPlaceholder": "Caută clienți, facturi, furnizori…",
+    "bell": "Notificări",
+    "title": "Notificări",
+    "empty": "Nu există notificări noi"
+  }
+}

@@ -95,8 +95,9 @@ export async function generateSubscriptionProforma(opts: {
   await prisma.notification.create({
     data: {
       companyId: client.id, type: "incoming_document",
-      title: `Проформа фактура за абонамент ${planLabel(plan)}`,
-      body: `${platform.name} Ви издаде проформа № ${number} за избрания абонамент. Можете да я прегледате и платите по банков път.`,
+      titleKey: "notifications.subscriptionProforma.title",
+      bodyKey: "notifications.subscriptionProforma.body",
+      data: { plan, platform: platform.name, number },
       link: `/dashboard/inbox/${doc.id}`,
     },
   });

@@ -1,0 +1,37 @@
+{
+  "docTypes": {
+    "invoice": "счёт",
+    "proforma": "проформа",
+    "quote": "предложение",
+    "credit_note": "кредит-нота",
+    "debit_note": "дебет-нота",
+    "contract": "договор",
+    "protocol": "протокол",
+    "document": "документ"
+  },
+  "incomingDocument": {
+    "title": "Новый входящий документ от {sender}",
+    "body": "{sender} выставил(а) вам {docType} № {number}."
+  },
+  "subscriptionProforma": {
+    "title": "Проформа-счёт за подписку {plan}",
+    "body": "{platform} выставил(а) вам проформу № {number} за выбранную подписку. Вы можете просмотреть и оплатить её банковским переводом."
+  },
+  "alert": {
+    "task": "Задача: {title}",
+    "taskOverdue": "Просрочено (дней): {n}",
+    "taskToday": "Срок сегодня",
+    "taskRemaining": "Осталось дней: {n}",
+    "overdueInvoices": "Просроченные счета: {n}",
+    "expiredStock": "Товары с истёкшим сроком годности: {n}",
+    "expiringStock": "Товары с истекающим сроком (до 14 дней): {n}",
+    "expiringContracts": "Истекающие договоры: {n}",
+    "subExpiring": "Подписка истекает (до {days} дней)"
+  },
+  "topbar": {
+    "searchPlaceholder": "Поиск клиентов, счетов, поставщиков…",
+    "bell": "Уведомления",
+    "title": "Уведомления",
+    "empty": "Нет новых уведомлений"
+  }
+}

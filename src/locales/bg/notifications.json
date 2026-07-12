@@ -1,0 +1,37 @@
+{
+  "docTypes": {
+    "invoice": "фактура",
+    "proforma": "проформа",
+    "quote": "оферта",
+    "credit_note": "кредитно известие",
+    "debit_note": "дебитно известие",
+    "contract": "договор",
+    "protocol": "протокол",
+    "document": "документ"
+  },
+  "incomingDocument": {
+    "title": "Нов входящ документ от {sender}",
+    "body": "{sender} Ви издаде {docType} № {number}."
+  },
+  "subscriptionProforma": {
+    "title": "Проформа фактура за абонамент {plan}",
+    "body": "{platform} Ви издаде проформа № {number} за избрания абонамент. Можете да я прегледате и платите по банков път."
+  },
+  "alert": {
+    "task": "Задача: {title}",
+    "taskOverdue": "Просрочено (дни): {n}",
+    "taskToday": "Срок днес",
+    "taskRemaining": "Оставащи дни: {n}",
+    "overdueInvoices": "Просрочени фактури: {n}",
+    "expiredStock": "Артикули с изтекъл срок на годност: {n}",
+    "expiringStock": "Артикули с изтичащ срок (до 14 дни): {n}",
+    "expiringContracts": "Изтичащи договори: {n}",
+    "subExpiring": "Абонаментът изтича (до {days} дни)"
+  },
+  "topbar": {
+    "searchPlaceholder": "Търси клиенти, фактури, доставчици…",
+    "bell": "Известия",
+    "title": "Известия",
+    "empty": "Няма нови известия"
+  }
+}

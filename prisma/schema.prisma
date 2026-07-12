@@ -753,7 +753,12 @@ model Notification {
   id        String   @id @default(cuid())
   companyId String
   type      String   // incoming_document | system | info
-  title     String
+  // i18n: съхраняваме преводен ключ + payload, а не финален текст.
+  // title/body остават като fallback за легаси записи и краен резерв.
+  titleKey  String?
+  bodyKey   String?
+  data      Json?
+  title     String?
   body      String?  @db.Text
   link      String?
   read      Boolean  @default(false)

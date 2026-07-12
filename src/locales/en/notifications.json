@@ -1,0 +1,37 @@
+{
+  "docTypes": {
+    "invoice": "invoice",
+    "proforma": "proforma",
+    "quote": "quote",
+    "credit_note": "credit note",
+    "debit_note": "debit note",
+    "contract": "contract",
+    "protocol": "protocol",
+    "document": "document"
+  },
+  "incomingDocument": {
+    "title": "New incoming document from {sender}",
+    "body": "{sender} issued you {docType} No. {number}."
+  },
+  "subscriptionProforma": {
+    "title": "Proforma invoice for the {plan} subscription",
+    "body": "{platform} issued you proforma No. {number} for the selected subscription. You can review and pay it by bank transfer."
+  },
+  "alert": {
+    "task": "Task: {title}",
+    "taskOverdue": "Overdue (days): {n}",
+    "taskToday": "Due today",
+    "taskRemaining": "Days remaining: {n}",
+    "overdueInvoices": "Overdue invoices: {n}",
+    "expiredStock": "Items past expiry date: {n}",
+    "expiringStock": "Items nearing expiry (within 14 days): {n}",
+    "expiringContracts": "Expiring contracts: {n}",
+    "subExpiring": "Subscription expiring (within {days} days)"
+  },
+  "topbar": {
+    "searchPlaceholder": "Search clients, invoices, suppliers…",
+    "bell": "Notifications",
+    "title": "Notifications",
+    "empty": "No new notifications"
+  }
+}

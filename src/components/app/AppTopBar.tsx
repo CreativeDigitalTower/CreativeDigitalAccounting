@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { UiIcon } from "@/components/app/NavIcons";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { useI18n } from "@/components/i18n/I18nProvider";
+import { renderNotif } from "@/lib/i18n/notif";
 
 const searchIcon = (type: string) => {
   if (type === "Клиент") return <UiIcon.people width={17} height={17} />;
@@ -12,11 +14,13 @@ const searchIcon = (type: string) => {
 };
 
 type SearchResult = { type: string; label: string; sub: string; href: string; icon: string };
-type Notif = { id: string; type: string; title: string; body?: string | null; link?: string | null; read: boolean; createdAt: string };
-type Alert = { icon: string; title: string; body?: string; href: string; tone: string };
+type Vars = Record<string, string | number>;
+type Notif = { id: string; type: string; titleKey?: string | null; bodyKey?: string | null; data?: unknown; title?: string | null; body?: string | null; link?: string | null; read: boolean; createdAt: string };
+type Alert = { icon: string; titleKey: string; titleVars?: Vars; bodyKey?: string; bodyVars?: Vars; href: string; tone: string };
 
 export function AppTopBar({ initialUnread }: { initialUnread: number }) {
   const router = useRouter();
+  const { t, locale } = useI18n();
   // ─── Search ───
   const [q, setQ] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -71,7 +75,7 @@ export function AppTopBar({ initialUnread }: { initialUnread: number }) {
         <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--muted)", display: "inline-flex", pointerEvents: "none" }}><UiIcon.search width={16} height={16} /></span>
         <input
           value={q} onChange={(e) => setQ(e.target.value)} onFocus={() => results.length && setShowSearch(true)}
-          placeholder="Търси клиенти, фактури, доставчици…"
+          placeholder={t("notifications.topbar.searchPlaceholder")}
           style={{ width: "100%", padding: "9px 14px 9px 34px", borderRadius: 10, fontSize: 13.5 }}
         />
         {showSearch && results.length > 0 && (
@@ -96,33 +100,35 @@ export function AppTopBar({ initialUnread }: { initialUnread: number }) {
 
       {/* Камбана */}
       <div ref={bellRef} style={{ position: "relative" }}>
-        <button onClick={toggleBell} aria-label="Известия" style={{ position: "relative", width: 40, height: 40, borderRadius: 10, border: "1px solid var(--border)", background: "rgba(255,255,255,.6)", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", color: badgeCount > 0 ? "var(--brick)" : "var(--ink)" }}>
+        <button onClick={toggleBell} aria-label={t("notifications.topbar.bell")} style={{ position: "relative", width: 40, height: 40, borderRadius: 10, border: "1px solid var(--border)", background: "rgba(255,255,255,.6)", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", color: badgeCount > 0 ? "var(--brick)" : "var(--ink)" }}>
           <span className={badgeCount > 0 && !open ? "bell-ring" : ""} style={{ display: "inline-flex", transformOrigin: "50% 0" }}><UiIcon.bell width={18} height={18} /></span>
           {badgeCount > 0 && <span className="bell-badge" style={{ position: "absolute", top: -5, right: -5, minWidth: 18, height: 18, borderRadius: 9, background: "var(--brick)", color: "#fff", fontSize: 10.5, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 5px", border: "2px solid #fff" }}>{badgeCount > 99 ? "99+" : badgeCount}</span>}
         </button>
         {open && (
           <div className="glass pop-in" style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, width: 340, borderRadius: 14, zIndex: 80, boxShadow: "0 12px 40px rgba(0,0,0,.16)", overflow: "hidden" }}>
-            <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border)", fontWeight: 700, fontSize: 14, fontFamily: "'Fraunces', serif" }}>Известия</div>
+            <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border)", fontWeight: 700, fontSize: 14, fontFamily: "'Fraunces', serif" }}>{t("notifications.topbar.title")}</div>
             <div style={{ maxHeight: 420, overflowY: "auto" }}>
               {alerts.length === 0 && notifs.length === 0 && (
-                <div style={{ padding: "26px 16px", textAlign: "center", color: "var(--muted)", fontSize: 13, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}><UiIcon.party width={22} height={22} />Няма нови известия</div>
+                <div style={{ padding: "26px 16px", textAlign: "center", color: "var(--muted)", fontSize: 13, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}><UiIcon.party width={22} height={22} />{t("notifications.topbar.empty")}</div>
               )}
               {alerts.map((a, i) => (
                 <Link key={`a${i}`} href={a.href} onClick={() => setOpen(false)} style={row(a.tone === "warn")}>
                   <span style={{ display: "inline-flex", color: a.tone === "warn" ? "var(--brick)" : "var(--brass)" }}>{a.tone === "warn" ? <UiIcon.warning width={17} height={17} /> : <UiIcon.bell width={17} height={17} />}</span>
-                  <span style={{ flex: 1 }}><span style={{ fontWeight: 600, fontSize: 13 }}>{a.title}</span>{a.body && <div style={{ fontSize: 12, color: "var(--muted)" }}>{a.body}</div>}</span>
+                  <span style={{ flex: 1 }}><span style={{ fontWeight: 600, fontSize: 13 }}>{t(a.titleKey, a.titleVars)}</span>{a.bodyKey && <div style={{ fontSize: 12, color: "var(--muted)" }}>{t(a.bodyKey, a.bodyVars)}</div>}</span>
                 </Link>
               ))}
-              {notifs.map((n) => (
+              {notifs.map((n) => {
+                const { title, body } = renderNotif(t, n);
+                return (
                 <Link key={n.id} href={n.link ?? "/dashboard/inbox"} onClick={() => setOpen(false)} style={row(false)}>
                   <span style={{ display: "inline-flex", color: "var(--emerald-dark)" }}>{n.type === "incoming_document" ? <UiIcon.doc width={17} height={17} /> : <UiIcon.bell width={17} height={17} />}</span>
                   <span style={{ flex: 1 }}>
-                    <span style={{ fontWeight: 600, fontSize: 13 }}>{n.title}</span>
-                    {n.body && <div style={{ fontSize: 12, color: "var(--muted)" }}>{n.body}</div>}
-                    <div style={{ fontSize: 10.5, color: "var(--muted)", marginTop: 2 }}>{new Date(n.createdAt).toLocaleString("bg-BG")}</div>
+                    <span style={{ fontWeight: 600, fontSize: 13 }}>{title}</span>
+                    {body && <div style={{ fontSize: 12, color: "var(--muted)" }}>{body}</div>}
+                    <div style={{ fontSize: 10.5, color: "var(--muted)", marginTop: 2 }}>{new Date(n.createdAt).toLocaleString(locale)}</div>
                   </span>
                 </Link>
-              ))}
+              );})}
             </div>
           </div>
         )}

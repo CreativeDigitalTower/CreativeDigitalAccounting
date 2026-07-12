@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCompany } from "@/lib/session";
 
+// Известията се връщат като преводен ключ + payload (не финален текст) — клиентът
+// (AppTopBar) ги превежда на текущия език. Виж `renderNotif` / `useT`.
+type Vars = Record<string, string | number>;
+type Alert = { icon: string; titleKey: string; titleVars?: Vars; bodyKey?: string; bodyVars?: Vars; href: string; tone: string };
+
 export async function GET() {
   try {
     const { companyId } = await requireCompany();
@@ -20,27 +25,36 @@ export async function GET() {
       prisma.taxReminder.findMany({ where: { companyId, done: false, dueDate: { lte: soon } }, orderBy: { dueDate: "asc" }, take: 10 }),
     ]);
 
-    const alerts: { icon: string; title: string; body?: string; href: string; tone: string }[] = [];
+    const alerts: Alert[] = [];
     for (const r of dueReminders) {
       const days = Math.ceil((new Date(r.dueDate).getTime() - now.getTime()) / 86400000);
       const tone = days <= 7 ? "warn" : "info";
-      const when = days < 0 ? `просрочено с ${-days} дни` : days === 0 ? "срок днес" : `остават ${days} дни`;
-      alerts.push({ icon: "warn", title: `Задача: ${r.title}`, body: when, href: "/dashboard/tax-calendar", tone });
+      const body = days < 0
+        ? { bodyKey: "notifications.alert.taskOverdue", bodyVars: { n: -days } }
+        : days === 0
+          ? { bodyKey: "notifications.alert.taskToday" }
+          : { bodyKey: "notifications.alert.taskRemaining", bodyVars: { n: days } };
+      alerts.push({ icon: "warn", titleKey: "notifications.alert.task", titleVars: { title: r.title }, href: "/dashboard/tax-calendar", tone, ...body });
     }
-    if (overdue > 0) alerts.push({ icon: "warn", title: `${overdue} просрочени фактури`, href: "/dashboard/invoices?status=overdue", tone: "warn" });
-    if (expiredStock > 0) alerts.push({ icon: "warn", title: `${expiredStock} артикула с изтекъл срок на годност`, href: "/dashboard/warehouse", tone: "warn" });
-    if (expiringStock > 0) alerts.push({ icon: "⏰", title: `${expiringStock} артикула с изтичащ срок (до 14 дни)`, href: "/dashboard/warehouse", tone: "info" });
-    if (expiringContracts > 0) alerts.push({ icon: "info", title: `${expiringContracts} изтичащи договора`, href: "/dashboard/contracts", tone: "info" });
+    if (overdue > 0) alerts.push({ icon: "warn", titleKey: "notifications.alert.overdueInvoices", titleVars: { n: overdue }, href: "/dashboard/invoices?status=overdue", tone: "warn" });
+    if (expiredStock > 0) alerts.push({ icon: "warn", titleKey: "notifications.alert.expiredStock", titleVars: { n: expiredStock }, href: "/dashboard/warehouse", tone: "warn" });
+    if (expiringStock > 0) alerts.push({ icon: "⏰", titleKey: "notifications.alert.expiringStock", titleVars: { n: expiringStock }, href: "/dashboard/warehouse", tone: "info" });
+    if (expiringContracts > 0) alerts.push({ icon: "info", titleKey: "notifications.alert.expiringContracts", titleVars: { n: expiringContracts }, href: "/dashboard/contracts", tone: "info" });
     if (sub?.plan && sub.plan !== "free" && sub.currentPeriodEnd) {
       const days = Math.ceil((new Date(sub.currentPeriodEnd).getTime() - now.getTime()) / 86400000);
-      if (days >= 0 && days <= 7) alerts.push({ icon: "warn", title: `Абонаментът изтича след ${days} дни`, href: "/dashboard/subscription", tone: "warn" });
+      if (days >= 0 && days <= 7) alerts.push({ icon: "warn", titleKey: "notifications.alert.subExpiring", titleVars: { days }, href: "/dashboard/subscription", tone: "warn" });
     }
 
     const unread = stored.filter((n) => !n.read).length;
     return NextResponse.json({
       unread,
       alerts,
-      notifications: stored.map((n) => ({ id: n.id, type: n.type, title: n.title, body: n.body, link: n.link, read: n.read, createdAt: n.createdAt })),
+      notifications: stored.map((n) => ({
+        id: n.id, type: n.type,
+        titleKey: n.titleKey, bodyKey: n.bodyKey, data: n.data,
+        title: n.title, body: n.body,
+        link: n.link, read: n.read, createdAt: n.createdAt,
+      })),
     });
   } catch {
     return NextResponse.json({ unread: 0, alerts: [], notifications: [] });
