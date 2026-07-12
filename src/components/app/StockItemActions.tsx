@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UiIcon } from "@/components/app/NavIcons";
 import { confirmDelete } from "@/lib/confirmDelete";
+import { useT } from "@/components/i18n/I18nProvider";
 
 type Item = {
   id: string; name: string; sku: string | null; unit: string;
@@ -11,6 +12,7 @@ type Item = {
 };
 
 export function StockItemActions({ item }: { item: Item }) {
+  const t = useT();
   const router = useRouter();
   const [edit, setEdit] = useState(false);
   const [f, setF] = useState(item);
@@ -30,44 +32,44 @@ export function StockItemActions({ item }: { item: Item }) {
     });
     setBusy(false);
     if (res.ok) { setEdit(false); router.refresh(); }
-    else setErr((await res.json().catch(() => ({}))).error ?? "Грешка при запис.");
+    else setErr((await res.json().catch(() => ({}))).error ?? t("warehouse.common.errSave"));
   }
 
   async function remove() {
-    if (!(await confirmDelete(`артикула „${item.name}"`))) return;
+    if (!(await confirmDelete(t("warehouse.actions.confirmDelete", { name: item.name })))) return;
     setBusy(true);
     const res = await fetch(`/api/warehouse/items/${item.id}`, { method: "DELETE" });
     setBusy(false);
     if (res.ok) router.push("/dashboard/warehouse");
-    else alert((await res.json().catch(() => ({}))).error ?? "Грешка при изтриване.");
+    else alert((await res.json().catch(() => ({}))).error ?? t("warehouse.actions.errDelete"));
   }
 
   return (
     <div style={{ marginLeft: "auto", display: "flex", gap: 8, alignItems: "center" }}>
       <button className="btn btn-ghost btn-sm" onClick={() => setEdit((v) => !v)} style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
-        {edit ? "Затвори" : <><UiIcon.edit /> Редактирай</>}
+        {edit ? t("warehouse.actions.close") : <><UiIcon.edit /> {t("warehouse.actions.edit")}</>}
       </button>
-      <button className="btn btn-ghost btn-sm" onClick={remove} disabled={busy} title="Изтрий артикул" style={{ color: "var(--brick)", borderColor: "var(--brick)", display: "inline-flex", alignItems: "center" }}>
+      <button className="btn btn-ghost btn-sm" onClick={remove} disabled={busy} title={t("warehouse.actions.delTitle")} style={{ color: "var(--brick)", borderColor: "var(--brick)", display: "inline-flex", alignItems: "center" }}>
         <UiIcon.trash />
       </button>
 
       {edit && (
         <div onClick={() => setEdit(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 }}>
           <div onClick={(e) => e.stopPropagation()} className="glass panel" style={{ width: "min(520px, 100%)", padding: 22 }}>
-            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 17, margin: "0 0 14px" }}>Редакция на артикул</h3>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 17, margin: "0 0 14px" }}>{t("warehouse.actions.modalTitle")}</h3>
             {err && <div style={{ background: "var(--brick-soft)", color: "var(--brick)", borderRadius: 6, padding: "8px 12px", fontSize: 12.5, marginBottom: 12 }}>{err}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-              <div style={{ gridColumn: "1 / -1" }}><label>Наименование</label><input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></div>
-              <div><label>SKU</label><input value={f.sku ?? ""} onChange={(e) => setF({ ...f, sku: e.target.value })} /></div>
-              <div><label>Мерна единица</label><input value={f.unit} onChange={(e) => setF({ ...f, unit: e.target.value })} /></div>
-              <div><label>Наличност</label><input type="number" value={f.quantity} onChange={(e) => setF({ ...f, quantity: Number(e.target.value) })} /></div>
-              <div><label>Мин. наличност</label><input type="number" value={f.minQuantity ?? ""} onChange={(e) => setF({ ...f, minQuantity: e.target.value ? Number(e.target.value) : null })} /></div>
-              <div><label>Ед. цена (€)</label><input type="number" value={f.unitCost ?? ""} onChange={(e) => setF({ ...f, unitCost: e.target.value ? Number(e.target.value) : null })} /></div>
-              <div><label>Срок на годност</label><input type="date" value={f.expiryDate?.slice(0, 10) ?? ""} onChange={(e) => setF({ ...f, expiryDate: e.target.value })} /></div>
+              <div style={{ gridColumn: "1 / -1" }}><label>{t("warehouse.actions.f.name")}</label><input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></div>
+              <div><label>{t("warehouse.actions.f.sku")}</label><input value={f.sku ?? ""} onChange={(e) => setF({ ...f, sku: e.target.value })} /></div>
+              <div><label>{t("warehouse.actions.f.unit")}</label><input value={f.unit} onChange={(e) => setF({ ...f, unit: e.target.value })} /></div>
+              <div><label>{t("warehouse.actions.f.qty")}</label><input type="number" value={f.quantity} onChange={(e) => setF({ ...f, quantity: Number(e.target.value) })} /></div>
+              <div><label>{t("warehouse.actions.f.minQty")}</label><input type="number" value={f.minQuantity ?? ""} onChange={(e) => setF({ ...f, minQuantity: e.target.value ? Number(e.target.value) : null })} /></div>
+              <div><label>{t("warehouse.actions.f.price")}</label><input type="number" value={f.unitCost ?? ""} onChange={(e) => setF({ ...f, unitCost: e.target.value ? Number(e.target.value) : null })} /></div>
+              <div><label>{t("warehouse.actions.f.expiry")}</label><input type="date" value={f.expiryDate?.slice(0, 10) ?? ""} onChange={(e) => setF({ ...f, expiryDate: e.target.value })} /></div>
             </div>
             <div style={{ display: "flex", gap: 8, marginTop: 16, justifyContent: "flex-end" }}>
-              <button className="btn btn-ghost btn-sm" onClick={() => setEdit(false)} disabled={busy}>Отказ</button>
-              <button className="btn btn-primary btn-sm" onClick={save} disabled={busy}>{busy ? "Записване…" : "Запази"}</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => setEdit(false)} disabled={busy}>{t("warehouse.actions.cancel")}</button>
+              <button className="btn btn-primary btn-sm" onClick={save} disabled={busy}>{busy ? t("warehouse.actions.saving") : t("warehouse.actions.save")}</button>
             </div>
           </div>
         </div>

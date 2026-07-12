@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useT } from "@/components/i18n/I18nProvider";
 
 type Item = { id: string; name: string; unit: string; quantity: number };
 type Warehouse = { id: string; name: string };
 type NewItem = { name: string; unit: string; warehouseId: string; qty: string; unitCost: string };
 
 export function RevisionForm({ items, warehouses }: { items: Item[]; warehouses: Warehouse[] }) {
+  const t = useT();
   const router = useRouter();
   const [counts, setCounts] = useState<Record<string, string>>({});
   const [newItems, setNewItems] = useState<NewItem[]>([]);
@@ -27,7 +29,7 @@ export function RevisionForm({ items, warehouses }: { items: Item[]; warehouses:
       .map((i) => ({ stockItemId: i.id, countedQty: Number(counts[i.id]) }));
 
     const validNew = newItems.filter((n) => n.name.trim() && n.warehouseId && n.qty !== "");
-    if (lines.length === 0 && validNew.length === 0) { setError("Въведете поне една преброена бройка или нов артикул."); return; }
+    if (lines.length === 0 && validNew.length === 0) { setError(t("warehouse.revision.needCount")); return; }
     setSaving(true);
 
     // Създаваме новооткритите артикули (с наличност 0), после ги включваме в ревизията
@@ -37,7 +39,7 @@ export function RevisionForm({ items, warehouses }: { items: Item[]; warehouses:
         body: JSON.stringify({ warehouseId: n.warehouseId, name: n.name.trim(), unit: n.unit || "бр", quantity: 0, unitCost: n.unitCost ? Number(n.unitCost) : null }),
       });
       if (cRes.ok) { const created = await cRes.json(); lines.push({ stockItemId: created.id, countedQty: Number(n.qty) }); }
-      else { setSaving(false); setError("Грешка при създаване на нов артикул."); return; }
+      else { setSaving(false); setError(t("warehouse.revision.errCreate")); return; }
     }
 
     const res = await fetch("/api/warehouse/stocktake", {
@@ -46,26 +48,26 @@ export function RevisionForm({ items, warehouses }: { items: Item[]; warehouses:
     });
     setSaving(false);
     if (res.ok) router.push("/dashboard/warehouse");
-    else setError((await res.json()).error ?? "Грешка при запис.");
+    else setError((await res.json()).error ?? t("warehouse.common.errSave"));
   }
 
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
-        <Link href="/dashboard/warehouse" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← Склад</Link>
-        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>Ревизия (инвентаризация)</h1>
+        <Link href="/dashboard/warehouse" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>{t("warehouse.common.back")}</Link>
+        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{t("warehouse.revision.heading")}</h1>
       </div>
       <p style={{ fontSize: 13, color: "var(--ink-soft)", marginBottom: 16 }}>
-        Въведете реално преброените количества. При запис складовите наличности се обновяват автоматично, а разликите се записват като движение „ревизия".
+        {t("warehouse.revision.intro")}
       </p>
       {error && <div style={{ background: "var(--brick-soft)", border: "1px solid var(--brick)", color: "var(--brick)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 16 }}>{error}</div>}
 
       <div className="glass panel" style={{ padding: "8px 0", marginBottom: 16 }}>
         {items.length === 0 ? (
-          <div style={{ padding: "32px", color: "var(--muted)", fontSize: 13 }}>Няма артикули в склада.</div>
+          <div style={{ padding: "32px", color: "var(--muted)", fontSize: 13 }}>{t("warehouse.revision.noItems")}</div>
         ) : (
           <table>
-            <thead><tr><th>Артикул</th><th className="num">По система</th><th className="num">Преброено</th><th className="num">Разлика</th></tr></thead>
+            <thead><tr><th>{t("warehouse.revision.th.item")}</th><th className="num">{t("warehouse.revision.th.system")}</th><th className="num">{t("warehouse.revision.th.counted")}</th><th className="num">{t("warehouse.revision.th.diff")}</th></tr></thead>
             <tbody>
               {items.map((i) => {
                 const counted = counts[i.id];
@@ -93,31 +95,31 @@ export function RevisionForm({ items, warehouses }: { items: Item[]; warehouses:
       <div className="glass panel" style={{ padding: 16, marginBottom: 16 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: newItems.length ? 12 : 0, flexWrap: "wrap", gap: 8 }}>
           <div>
-            <div style={{ fontFamily: "'Fraunces', serif", fontSize: 14, fontWeight: 600 }}>Новооткрити артикули</div>
-            <div style={{ fontSize: 12, color: "var(--muted)" }}>Ако намерите продукт, който не е в системата — впишете го тук и той ще се добави в склада.</div>
+            <div style={{ fontFamily: "'Fraunces', serif", fontSize: 14, fontWeight: 600 }}>{t("warehouse.revision.newTitle")}</div>
+            <div style={{ fontSize: 12, color: "var(--muted)" }}>{t("warehouse.revision.newHint")}</div>
           </div>
-          <button className="btn btn-ghost btn-sm" onClick={addNew} disabled={warehouses.length === 0}>+ Нов артикул</button>
+          <button className="btn btn-ghost btn-sm" onClick={addNew} disabled={warehouses.length === 0}>{t("warehouse.revision.newBtn")}</button>
         </div>
         {newItems.map((n, i) => (
           <div key={i} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr auto", gap: 8, marginBottom: 8, alignItems: "center" }}>
-            <input placeholder="Наименование" value={n.name} onChange={(e) => updNew(i, "name", e.target.value)} style={{ padding: "6px 8px", fontSize: 12.5 }} />
+            <input placeholder={t("warehouse.revision.namePh")} value={n.name} onChange={(e) => updNew(i, "name", e.target.value)} style={{ padding: "6px 8px", fontSize: 12.5 }} />
             <select value={n.warehouseId} onChange={(e) => updNew(i, "warehouseId", e.target.value)} style={{ padding: "6px 8px", fontSize: 12.5 }}>{warehouses.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}</select>
-            <input placeholder="Мярка" value={n.unit} onChange={(e) => updNew(i, "unit", e.target.value)} style={{ padding: "6px 8px", fontSize: 12.5 }} />
-            <input type="number" placeholder="Количество" value={n.qty} onChange={(e) => updNew(i, "qty", e.target.value)} style={{ padding: "6px 8px", fontSize: 12.5, textAlign: "right" }} />
-            <input type="number" placeholder="Ед. цена €" value={n.unitCost} onChange={(e) => updNew(i, "unitCost", e.target.value)} style={{ padding: "6px 8px", fontSize: 12.5, textAlign: "right" }} />
+            <input placeholder={t("warehouse.revision.unitPh")} value={n.unit} onChange={(e) => updNew(i, "unit", e.target.value)} style={{ padding: "6px 8px", fontSize: 12.5 }} />
+            <input type="number" placeholder={t("warehouse.revision.qtyPh")} value={n.qty} onChange={(e) => updNew(i, "qty", e.target.value)} style={{ padding: "6px 8px", fontSize: 12.5, textAlign: "right" }} />
+            <input type="number" placeholder={t("warehouse.revision.pricePh")} value={n.unitCost} onChange={(e) => updNew(i, "unitCost", e.target.value)} style={{ padding: "6px 8px", fontSize: 12.5, textAlign: "right" }} />
             <button onClick={() => delNew(i)} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer", fontSize: 16 }}>×</button>
           </div>
         ))}
       </div>
 
       <div className="glass panel" style={{ padding: 16, marginBottom: 16 }}>
-        <label>Бележка към ревизията</label>
-        <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="напр. месечна инвентаризация" />
+        <label>{t("warehouse.revision.noteLabel")}</label>
+        <input value={note} onChange={(e) => setNote(e.target.value)} placeholder={t("warehouse.revision.notePh")} />
       </div>
 
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-        <Link href="/dashboard/warehouse" className="btn btn-ghost">Отказ</Link>
-        <button className="btn btn-primary" onClick={apply} disabled={saving}>{saving ? "Прилагане…" : "Приложи ревизията"}</button>
+        <Link href="/dashboard/warehouse" className="btn btn-ghost">{t("warehouse.common.cancel")}</Link>
+        <button className="btn btn-primary" onClick={apply} disabled={saving}>{saving ? t("warehouse.revision.applying") : t("warehouse.revision.apply")}</button>
       </div>
     </>
   );
