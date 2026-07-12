@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useT } from "@/components/i18n/I18nProvider";
 
 type Category = { id: string; name: string };
 type Supplier = { id: string; name: string };
 
 export default function NewExpensePage() {
+  const t = useT();
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -25,7 +27,7 @@ export default function NewExpensePage() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 3 * 1024 * 1024) {
-      setError("Файлът трябва да е под 3MB.");
+      setError(t("expenses.new.fileTooLarge"));
       return;
     }
     setAttachmentName(file.name);
@@ -63,7 +65,7 @@ export default function NewExpensePage() {
     setSaving(false);
     if (!res.ok) {
       const data = await res.json();
-      setError(data.error ?? "Грешка при запис.");
+      setError(data.error ?? t("expenses.errSave"));
     } else {
       router.push("/dashboard/expenses");
     }
@@ -72,8 +74,8 @@ export default function NewExpensePage() {
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
-        <Link href="/dashboard/expenses" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← Разходи</Link>
-        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>Нов разход</h1>
+        <Link href="/dashboard/expenses" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>{t("expenses.new.back")}</Link>
+        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{t("expenses.new.heading")}</h1>
       </div>
 
       {error && (
@@ -86,37 +88,37 @@ export default function NewExpensePage() {
         <div className="glass panel" style={{ padding: "28px", marginBottom: 16 }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14 }}>
             <div style={{ gridColumn: "1 / -1" }}>
-              <label>Описание *</label>
-              <input type="text" name="description" required placeholder="Наем офис м. Юни" />
+              <label>{t("expenses.new.f.description")}</label>
+              <input type="text" name="description" required placeholder={t("expenses.new.f.descriptionPh")} />
             </div>
             <div>
-              <label>Номер на разходна фактура</label>
-              <input type="text" name="invoiceNumber" placeholder="напр. 0000001234" />
+              <label>{t("expenses.new.f.invoiceNumber")}</label>
+              <input type="text" name="invoiceNumber" placeholder={t("expenses.new.f.invoiceNumberPh")} />
             </div>
             <div>
-              <label>Категория *</label>
+              <label>{t("expenses.new.f.category")}</label>
               <select name="categoryId" required>
-                <option value="">— Изберете —</option>
+                <option value="">{t("expenses.new.f.selectCat")}</option>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label>Доставчик</label>
+              <label>{t("expenses.new.f.supplier")}</label>
               <select name="supplierId">
-                <option value="">— Без доставчик —</option>
+                <option value="">{t("expenses.new.f.noSupplier")}</option>
                 {suppliers.map((s) => (
                   <option key={s.id} value={s.id}>{s.name}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label>Бруто сума (EUR) *</label>
+              <label>{t("expenses.new.f.gross")}</label>
               <input type="number" name="amount" required min="0" step="0.01" placeholder="100.00" />
             </div>
             <div>
-              <label>ДДС ставка</label>
+              <label>{t("expenses.new.f.vatRate")}</label>
               <select name="vatRate">
                 <option value="20">20%</option>
                 <option value="9">9%</option>
@@ -124,26 +126,26 @@ export default function NewExpensePage() {
               </select>
             </div>
             <div>
-              <label>Дата *</label>
+              <label>{t("expenses.new.f.date")}</label>
               <input type="date" name="date" required defaultValue={new Date().toISOString().slice(0, 10)} />
             </div>
             <div style={{ gridColumn: "1 / -1" }}>
-              <label>Прикачи разходна фактура (PDF/снимка)</label>
+              <label>{t("expenses.new.f.attach")}</label>
               <input type="file" accept="application/pdf,image/*" onChange={handleFile} style={{ fontSize: 13 }} />
-              {attachmentName && <div style={{ fontSize: 12, color: "var(--emerald)", marginTop: 6 }}>✓ Прикачен: {attachmentName}</div>}
+              {attachmentName && <div style={{ fontSize: 12, color: "var(--emerald)", marginTop: 6 }}>{t("expenses.new.f.attached")} {attachmentName}</div>}
             </div>
             <div style={{ gridColumn: "1 / -1" }}>
               <label style={{ display: "flex", gap: 8, alignItems: "center", fontWeight: 400 }}>
-                <input type="checkbox" name="isRecurring" style={{ width: "auto" }} /> Повтарящ се месечен разход (наем, заплати, поддръжка…)
+                <input type="checkbox" name="isRecurring" style={{ width: "auto" }} /> {t("expenses.new.f.recurring")}
               </label>
-              <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 4 }}>Използва се за изчисляване на фиксираните месечни разходи в Анализи.</div>
+              <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 4 }}>{t("expenses.new.f.recurringHint")}</div>
             </div>
           </div>
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-          <Link href="/dashboard/expenses" className="btn btn-ghost">Отказ</Link>
+          <Link href="/dashboard/expenses" className="btn btn-ghost">{t("expenses.new.cancel")}</Link>
           <button type="submit" className="btn btn-primary" disabled={saving}>
-            {saving ? "Записване…" : "Запази разход"}
+            {saving ? t("expenses.new.saving") : t("expenses.new.save")}
           </button>
         </div>
       </form>

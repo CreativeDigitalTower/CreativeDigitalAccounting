@@ -3,9 +3,11 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { formatCurrency, toBGN, isDualCurrencyActive, EUR_TO_BGN } from "@/lib/constants";
 import { ExpensesList } from "@/components/app/ExpensesList";
+import { getT } from "@/lib/i18n/server";
 
 export default async function ExpensesPage() {
   const { companyId } = await requireFeature("expenses");
+  const { t } = await getT();
   const dual = isDualCurrencyActive();
 
   const [expenses, totalResult, categories, suppliers] = await Promise.all([
@@ -29,25 +31,25 @@ export default async function ExpensesPage() {
     <>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
         <div>
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>Разходи</h1>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>{t("expenses.title")}</h1>
           <div style={{ color: "var(--muted)", fontSize: 13 }}>
-            Общо: <strong className="num">{formatCurrency(total)}</strong>
+            {t("expenses.totalLabel")} <strong className="num">{formatCurrency(total)}</strong>
             {dual && <span className="num" style={{ color: "var(--muted)", marginLeft: 8, fontSize: 12 }}>≈ {formatCurrency(toBGN(total), "BGN")}</span>}
           </div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <Link href="/dashboard/expenses/new" className="btn btn-primary">+ Нов разход</Link>
+          <Link href="/dashboard/expenses/new" className="btn btn-primary">{t("expenses.newExpense")}</Link>
         </div>
       </div>
 
       {/* Category breakdown */}
       <div className="glass panel" style={{ marginBottom: 20, padding: "20px 24px" }}>
-        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 14, margin: "0 0 14px" }}>ДДС обобщение</h3>
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 14, margin: "0 0 14px" }}>{t("expenses.vatSummary")}</h3>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
           {[
-            { label: "Нето разходи", value: total - totalVat },
-            { label: "ДДС по разходи", value: totalVat },
-            { label: "Бруто разходи", value: total },
+            { label: t("expenses.net"), value: total - totalVat },
+            { label: t("expenses.vat"), value: totalVat },
+            { label: t("expenses.gross"), value: total },
           ].map((s) => (
             <div key={s.label}>
               <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 4 }}>{s.label}</div>
@@ -59,8 +61,8 @@ export default async function ExpensesPage() {
 
       {expenses.length === 0 ? (
         <div className="glass panel" style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
-          <div style={{ fontSize: 14, marginBottom: 16 }}>Няма въведени разходи</div>
-          <Link href="/dashboard/expenses/new" className="btn btn-primary btn-sm">Добави разход</Link>
+          <div style={{ fontSize: 14, marginBottom: 16 }}>{t("expenses.empty.none")}</div>
+          <Link href="/dashboard/expenses/new" className="btn btn-primary btn-sm">{t("expenses.empty.add")}</Link>
         </div>
       ) : (
         <ExpensesList

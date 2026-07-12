@@ -1,0 +1,82 @@
+{
+  "title": "Cheltuieli",
+  "totalLabel": "Total:",
+  "newExpense": "+ Cheltuială nouă",
+  "vatSummary": "Sumar TVA",
+  "net": "Cheltuieli nete",
+  "vat": "TVA pe cheltuieli",
+  "gross": "Cheltuieli brute",
+  "empty": {
+    "none": "Nicio cheltuială înregistrată",
+    "add": "Adaugă cheltuială",
+    "filtered": "Nicio cheltuială pentru acest filtru."
+  },
+  "search": "Caută cheltuială, categorie, furnizor…",
+  "filter": {
+    "all": "Toate",
+    "recurring": "Recurente",
+    "single": "Unice"
+  },
+  "th": {
+    "description": "Descriere",
+    "category": "Categorie",
+    "type": "Tip",
+    "supplier": "Furnizor",
+    "date": "Dată",
+    "gross": "Brut",
+    "file": "Fișier"
+  },
+  "type": {
+    "monthly": "Lunar",
+    "single": "Unic"
+  },
+  "row": {
+    "edit": "Editează",
+    "delete": "Șterge"
+  },
+  "confirmDelete": "cheltuiala „{name}“",
+  "errDelete": "Eroare la ștergere.",
+  "errSave": "Eroare la salvare.",
+  "monthTotal": "Total:",
+  "editModal": {
+    "title": "Editare cheltuială",
+    "description": "Descriere",
+    "gross": "Sumă brută (€)",
+    "vat": "Sumă TVA (€)",
+    "date": "Dată",
+    "category": "Categorie",
+    "supplier": "Furnizor",
+    "noSupplier": "— Fără —",
+    "recurring": "Cheltuială lunară recurentă",
+    "confirmDelete": "Ștergeți cheltuiala?",
+    "delete": "Șterge",
+    "cancel": "Anulează",
+    "save": "Salvează",
+    "saving": "Se salvează…"
+  },
+  "new": {
+    "back": "← Cheltuieli",
+    "heading": "Cheltuială nouă",
+    "fileTooLarge": "Fișierul trebuie să fie sub 3MB.",
+    "cancel": "Anulează",
+    "save": "Salvează cheltuiala",
+    "saving": "Se salvează…",
+    "f": {
+      "description": "Descriere *",
+      "descriptionPh": "Chirie birou, iunie",
+      "invoiceNumber": "Număr factură de cheltuială",
+      "invoiceNumberPh": "ex. 0000001234",
+      "category": "Categorie *",
+      "selectCat": "— Selectați —",
+      "supplier": "Furnizor",
+      "noSupplier": "— Fără furnizor —",
+      "gross": "Sumă brută (EUR) *",
+      "vatRate": "Cotă TVA",
+      "date": "Dată *",
+      "attach": "Atașează factura de cheltuială (PDF/foto)",
+      "attached": "✓ Atașat:",
+      "recurring": "Cheltuială lunară recurentă (chirie, salarii, întreținere…)",
+      "recurringHint": "Folosită pentru calcularea cheltuielilor lunare fixe în Analize."
+    }
+  }
+}

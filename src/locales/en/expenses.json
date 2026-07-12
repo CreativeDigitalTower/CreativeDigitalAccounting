@@ -1,0 +1,82 @@
+{
+  "title": "Expenses",
+  "totalLabel": "Total:",
+  "newExpense": "+ New expense",
+  "vatSummary": "VAT summary",
+  "net": "Net expenses",
+  "vat": "VAT on expenses",
+  "gross": "Gross expenses",
+  "empty": {
+    "none": "No expenses recorded",
+    "add": "Add expense",
+    "filtered": "No expenses for this filter."
+  },
+  "search": "Search expense, category, supplier…",
+  "filter": {
+    "all": "All",
+    "recurring": "Recurring",
+    "single": "One-off"
+  },
+  "th": {
+    "description": "Description",
+    "category": "Category",
+    "type": "Type",
+    "supplier": "Supplier",
+    "date": "Date",
+    "gross": "Gross",
+    "file": "File"
+  },
+  "type": {
+    "monthly": "Monthly",
+    "single": "One-off"
+  },
+  "row": {
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "confirmDelete": "expense „{name}“",
+  "errDelete": "Error while deleting.",
+  "errSave": "Error while saving.",
+  "monthTotal": "Total:",
+  "editModal": {
+    "title": "Edit expense",
+    "description": "Description",
+    "gross": "Gross amount (€)",
+    "vat": "VAT amount (€)",
+    "date": "Date",
+    "category": "Category",
+    "supplier": "Supplier",
+    "noSupplier": "— None —",
+    "recurring": "Recurring monthly expense",
+    "confirmDelete": "Delete the expense?",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…"
+  },
+  "new": {
+    "back": "← Expenses",
+    "heading": "New expense",
+    "fileTooLarge": "File must be under 3MB.",
+    "cancel": "Cancel",
+    "save": "Save expense",
+    "saving": "Saving…",
+    "f": {
+      "description": "Description *",
+      "descriptionPh": "Office rent, June",
+      "invoiceNumber": "Expense invoice number",
+      "invoiceNumberPh": "e.g. 0000001234",
+      "category": "Category *",
+      "selectCat": "— Select —",
+      "supplier": "Supplier",
+      "noSupplier": "— No supplier —",
+      "gross": "Gross amount (EUR) *",
+      "vatRate": "VAT rate",
+      "date": "Date *",
+      "attach": "Attach expense invoice (PDF/photo)",
+      "attached": "✓ Attached:",
+      "recurring": "Recurring monthly expense (rent, salaries, maintenance…)",
+      "recurringHint": "Used to calculate fixed monthly expenses in Analytics."
+    }
+  }
+}
