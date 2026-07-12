@@ -1,0 +1,70 @@
+{
+  "title": "Contracte",
+  "count": "{n} contracte",
+  "newContract": "+ Contract nou",
+  "empty": {
+    "none": "Niciun contract",
+    "add": "Adaugă contract"
+  },
+  "th": {
+    "contract": "Contract",
+    "party": "Parte",
+    "type": "Tip",
+    "start": "Început",
+    "end": "Sfârșit",
+    "autoRenew": "Reînnoire auto",
+    "status": "Status"
+  },
+  "partyType": {
+    "client": "Client",
+    "supplier": "Furnizor"
+  },
+  "status": {
+    "active": "Activ",
+    "expired": "Expirat",
+    "cancelled": "Anulat"
+  },
+  "view": "Vizualizează",
+  "errSave": "Eroare la salvare.",
+  "new": {
+    "back": "← Contracte",
+    "heading": "Contract nou",
+    "cancel": "Anulează",
+    "save": "Salvează",
+    "saving": "Se salvează…",
+    "f": {
+      "title": "Titlu *",
+      "titlePh": "Contract de servicii",
+      "party": "Parte",
+      "start": "Început *",
+      "end": "Sfârșit",
+      "autoRenew": "Reînnoire automată"
+    }
+  },
+  "detail": {
+    "back": "← Contracte",
+    "edit": "✎ Editează",
+    "save": "Salvează",
+    "saving": "Se salvează…",
+    "fileLabel": "Fișierul contractului (PDF/DOCX/foto)",
+    "yes": "Da",
+    "no": "Nu",
+    "f": {
+      "title": "Titlu",
+      "start": "Început",
+      "end": "Sfârșit",
+      "value": "Valoare (€)",
+      "status": "Status",
+      "autoRenew": "Reînnoire automată",
+      "notes": "Note"
+    },
+    "v": {
+      "party": "Parte",
+      "start": "Început",
+      "end": "Sfârșit",
+      "value": "Valoare",
+      "autoRenew": "Reînnoire auto",
+      "status": "Status"
+    }
+  }
+}

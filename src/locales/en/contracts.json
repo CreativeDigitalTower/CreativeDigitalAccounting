@@ -1,0 +1,70 @@
+{
+  "title": "Contracts",
+  "count": "{n} contracts",
+  "newContract": "+ New contract",
+  "empty": {
+    "none": "No contracts",
+    "add": "Add contract"
+  },
+  "th": {
+    "contract": "Contract",
+    "party": "Party",
+    "type": "Type",
+    "start": "Start",
+    "end": "End",
+    "autoRenew": "Auto-renew",
+    "status": "Status"
+  },
+  "partyType": {
+    "client": "Client",
+    "supplier": "Supplier"
+  },
+  "status": {
+    "active": "Active",
+    "expired": "Expired",
+    "cancelled": "Cancelled"
+  },
+  "view": "View",
+  "errSave": "Error while saving.",
+  "new": {
+    "back": "← Contracts",
+    "heading": "New contract",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "f": {
+      "title": "Title *",
+      "titlePh": "Service agreement",
+      "party": "Party",
+      "start": "Start *",
+      "end": "End",
+      "autoRenew": "Automatic renewal"
+    }
+  },
+  "detail": {
+    "back": "← Contracts",
+    "edit": "✎ Edit",
+    "save": "Save",
+    "saving": "Saving…",
+    "fileLabel": "Contract file (PDF/DOCX/photo)",
+    "yes": "Yes",
+    "no": "No",
+    "f": {
+      "title": "Title",
+      "start": "Start",
+      "end": "End",
+      "value": "Value (€)",
+      "status": "Status",
+      "autoRenew": "Automatic renewal",
+      "notes": "Notes"
+    },
+    "v": {
+      "party": "Party",
+      "start": "Start",
+      "end": "End",
+      "value": "Value",
+      "autoRenew": "Auto-renew",
+      "status": "Status"
+    }
+  }
+}

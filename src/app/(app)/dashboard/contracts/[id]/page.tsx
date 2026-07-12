@@ -2,14 +2,16 @@ import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { ContractDetail } from "@/components/app/ContractDetail";
+import { getT } from "@/lib/i18n/server";
 
 export default async function ContractDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { companyId } = await requireFeature("contracts");
+  const { t } = await getT();
   const { id } = await params;
   const c = await prisma.contract.findFirst({ where: { id, companyId }, include: { client: true, supplier: true } });
   if (!c) notFound();
 
-  const party = `${c.counterpartyType === "client" ? "Клиент" : "Доставчик"}: ${(c.counterpartyType === "client" ? c.client?.name : c.supplier?.name) ?? "—"}`;
+  const party = `${t(`contracts.partyType.${c.counterpartyType === "client" ? "client" : "supplier"}`)}: ${(c.counterpartyType === "client" ? c.client?.name : c.supplier?.name) ?? "—"}`;
 
   return (
     <ContractDetail

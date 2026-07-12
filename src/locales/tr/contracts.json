@@ -1,0 +1,70 @@
+{
+  "title": "Sözleşmeler",
+  "count": "{n} sözleşme",
+  "newContract": "+ Yeni sözleşme",
+  "empty": {
+    "none": "Sözleşme yok",
+    "add": "Sözleşme ekle"
+  },
+  "th": {
+    "contract": "Sözleşme",
+    "party": "Taraf",
+    "type": "Tür",
+    "start": "Başlangıç",
+    "end": "Bitiş",
+    "autoRenew": "Oto. yenileme",
+    "status": "Durum"
+  },
+  "partyType": {
+    "client": "Müşteri",
+    "supplier": "Tedarikçi"
+  },
+  "status": {
+    "active": "Aktif",
+    "expired": "Süresi dolmuş",
+    "cancelled": "İptal edildi"
+  },
+  "view": "Görüntüle",
+  "errSave": "Kaydetme hatası.",
+  "new": {
+    "back": "← Sözleşmeler",
+    "heading": "Yeni sözleşme",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "saving": "Kaydediliyor…",
+    "f": {
+      "title": "Başlık *",
+      "titlePh": "Hizmet sözleşmesi",
+      "party": "Taraf",
+      "start": "Başlangıç *",
+      "end": "Bitiş",
+      "autoRenew": "Otomatik yenileme"
+    }
+  },
+  "detail": {
+    "back": "← Sözleşmeler",
+    "edit": "✎ Düzenle",
+    "save": "Kaydet",
+    "saving": "Kaydediliyor…",
+    "fileLabel": "Sözleşme dosyası (PDF/DOCX/foto)",
+    "yes": "Evet",
+    "no": "Hayır",
+    "f": {
+      "title": "Başlık",
+      "start": "Başlangıç",
+      "end": "Bitiş",
+      "value": "Değer (€)",
+      "status": "Durum",
+      "autoRenew": "Otomatik yenileme",
+      "notes": "Notlar"
+    },
+    "v": {
+      "party": "Taraf",
+      "start": "Başlangıç",
+      "end": "Bitiş",
+      "value": "Değer",
+      "autoRenew": "Oto. yenileme",
+      "status": "Durum"
+    }
+  }
+}
