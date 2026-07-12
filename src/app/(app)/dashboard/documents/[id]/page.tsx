@@ -59,7 +59,7 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
             eik: doc.clientIsIndividual ? null : doc.client.eik, vatNumber: doc.clientIsIndividual ? null : doc.client.vatNumber,
           } : null,
           lines: doc.lines.map((l) => ({ id: l.id, description: l.description, quantity: l.quantity, unitPrice: l.unitPrice, vatRate: l.vatRate, lineTotal: l.lineTotal })),
-          vatExempt: doc.vatExempt, vatExemptReasonText: vatExemptReasonText(doc.vatExemptReason),
+          vatExempt: doc.vatExempt, vatExemptReasonText: vatExemptReasonText(doc.vatExemptReason), language: doc.language,
         };
         return doc.type === "quote" ? <OfferDocument data={docData} /> : <InvoiceDocument data={docData} />;
       })()}

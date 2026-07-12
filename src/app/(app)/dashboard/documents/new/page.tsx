@@ -8,6 +8,8 @@ import {
   CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, PAYMENT_METHODS, allowedTemplateCount, VAT_EXEMPT_REASONS, type PlanId,
 } from "@/lib/constants";
 import { TemplateGallery } from "@/components/app/TemplateGallery";
+import { useI18n } from "@/components/i18n/I18nProvider";
+import { isLocale } from "@/lib/i18n/config";
 
 type ClientFull = { id: string; name: string; eik: string | null; vatNumber: string | null; city: string | null; address: string | null; contactEmail: string | null };
 type Line = { description: string; quantity: number; unitPrice: number; vatRate: number };
@@ -24,6 +26,9 @@ function NewDocumentForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dual = isDualCurrencyActive();
+  const { locale } = useI18n();
+  // Език на документа по подразбиране: езикът на текущия потребител (иначе български).
+  const defaultDocLang = isLocale(locale) ? locale : "bg";
 
   const [type, setType] = useState(searchParams.get("type") ?? "invoice");
   const [number, setNumber] = useState("");
@@ -36,7 +41,7 @@ function NewDocumentForm() {
     name: "", eik: "", vatNumber: "", vatRegistered: false, mol: "", city: "", address: "", contactEmail: "",
   });
   const [currency, setCurrency] = useState("EUR");
-  const [language, setLanguage] = useState("bg");
+  const [language, setLanguage] = useState<string>(defaultDocLang);
   const [template, setTemplate] = useState("classic");
   const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
   const [lines, setLines] = useState<Line[]>([{ description: "", quantity: 1, unitPrice: 0, vatRate: 20 }]);
