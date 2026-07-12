@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useT } from "@/components/i18n/I18nProvider";
 
 type Party = { id: string; name: string };
 
 export default function NewContractPage() {
+  const t = useT();
   const router = useRouter();
   const [type, setType] = useState<"client" | "supplier">("client");
   const [clients, setClients] = useState<Party[]>([]);
@@ -37,7 +39,7 @@ export default function NewContractPage() {
     });
     setSaving(false);
     if (res.ok) router.push("/dashboard/contracts");
-    else setError((await res.json()).error ?? "Грешка при запис.");
+    else setError((await res.json()).error ?? t("contracts.errSave"));
   }
 
   const parties = type === "client" ? clients : suppliers;
@@ -45,33 +47,33 @@ export default function NewContractPage() {
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
-        <Link href="/dashboard/contracts" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← Договори</Link>
-        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>Нов договор</h1>
+        <Link href="/dashboard/contracts" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>{t("contracts.new.back")}</Link>
+        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{t("contracts.new.heading")}</h1>
       </div>
       {error && <div style={{ background: "var(--brick-soft)", border: "1px solid var(--brick)", color: "var(--brick)", borderRadius: 8, padding: "10px 14px", fontSize: 13, marginBottom: 16 }}>{error}</div>}
       <form onSubmit={handleSubmit}>
         <div className="glass panel" style={{ padding: 28, marginBottom: 16 }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px,1fr))", gap: 14 }}>
-            <div style={{ gridColumn: "1 / -1" }}><label>Заглавие *</label><input type="text" name="title" required placeholder="Договор за услуга" /></div>
-            <div><label>Страна</label>
+            <div style={{ gridColumn: "1 / -1" }}><label>{t("contracts.new.f.title")}</label><input type="text" name="title" required placeholder={t("contracts.new.f.titlePh")} /></div>
+            <div><label>{t("contracts.new.f.party")}</label>
               <select value={type} onChange={(e) => setType(e.target.value as "client" | "supplier")}>
-                <option value="client">Клиент</option><option value="supplier">Доставчик</option>
+                <option value="client">{t("contracts.partyType.client")}</option><option value="supplier">{t("contracts.partyType.supplier")}</option>
               </select>
             </div>
-            <div><label>{type === "client" ? "Клиент" : "Доставчик"}</label>
+            <div><label>{t(`contracts.partyType.${type}`)}</label>
               <select name="partyId"><option value="">—</option>{parties.map((p)=><option key={p.id} value={p.id}>{p.name}</option>)}</select>
             </div>
-            <div><label>Начало *</label><input type="date" name="startDate" required defaultValue={new Date().toISOString().slice(0,10)} /></div>
-            <div><label>Край</label><input type="date" name="endDate" /></div>
+            <div><label>{t("contracts.new.f.start")}</label><input type="date" name="startDate" required defaultValue={new Date().toISOString().slice(0,10)} /></div>
+            <div><label>{t("contracts.new.f.end")}</label><input type="date" name="endDate" /></div>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 22 }}>
               <input type="checkbox" name="autoRenew" id="ar" style={{ width: "auto" }} />
-              <label htmlFor="ar" style={{ margin: 0 }}>Автоматично подновяване</label>
+              <label htmlFor="ar" style={{ margin: 0 }}>{t("contracts.new.f.autoRenew")}</label>
             </div>
           </div>
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-          <Link href="/dashboard/contracts" className="btn btn-ghost">Отказ</Link>
-          <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? "Записване…" : "Запази"}</button>
+          <Link href="/dashboard/contracts" className="btn btn-ghost">{t("contracts.new.cancel")}</Link>
+          <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? t("contracts.new.saving") : t("contracts.new.save")}</button>
         </div>
       </form>
     </>

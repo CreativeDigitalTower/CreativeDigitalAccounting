@@ -2,9 +2,11 @@ import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { NavIcon, UiIcon } from "@/components/app/NavIcons";
+import { getT } from "@/lib/i18n/server";
 
 export default async function ContractsPage() {
   const { companyId } = await requireFeature("contracts");
+  const { t, locale } = await getT();
   const now = new Date();
   const soon = new Date(now.getTime() + 30 * 24 * 3600 * 1000);
 
@@ -14,36 +16,34 @@ export default async function ContractsPage() {
     orderBy: { startDate: "desc" },
   });
 
-  const statusLabel: Record<string, string> = { active: "Активен", expired: "Изтекъл", cancelled: "Анулиран" };
-
   return (
     <>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
         <div>
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>Договори</h1>
-          <div style={{ color: "var(--muted)", fontSize: 13 }}>{contracts.length} договора</div>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>{t("contracts.title")}</h1>
+          <div style={{ color: "var(--muted)", fontSize: 13 }}>{t("contracts.count", { n: contracts.length })}</div>
         </div>
-        <Link href="/dashboard/contracts/new" className="btn btn-primary">+ Нов договор</Link>
+        <Link href="/dashboard/contracts/new" className="btn btn-primary">{t("contracts.newContract")}</Link>
       </div>
 
       <div className="glass panel" style={{ padding: "8px 0" }}>
         {contracts.length === 0 ? (
           <div style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, color: "var(--muted)" }}><NavIcon.contracts width={34} height={34} /></div>
-            <div style={{ fontSize: 14, marginBottom: 16 }}>Няма договори</div>
-            <Link href="/dashboard/contracts/new" className="btn btn-primary btn-sm">Добави договор</Link>
+            <div style={{ fontSize: 14, marginBottom: 16 }}>{t("contracts.empty.none")}</div>
+            <Link href="/dashboard/contracts/new" className="btn btn-primary btn-sm">{t("contracts.empty.add")}</Link>
           </div>
         ) : (
           <table>
             <thead>
               <tr>
-                <th>Договор</th>
-                <th>Страна</th>
-                <th>Тип</th>
-                <th>Начало</th>
-                <th>Край</th>
-                <th>Авт. подновяване</th>
-                <th>Статус</th>
+                <th>{t("contracts.th.contract")}</th>
+                <th>{t("contracts.th.party")}</th>
+                <th>{t("contracts.th.type")}</th>
+                <th>{t("contracts.th.start")}</th>
+                <th>{t("contracts.th.end")}</th>
+                <th>{t("contracts.th.autoRenew")}</th>
+                <th>{t("contracts.th.status")}</th>
                 <th></th>
               </tr>
             </thead>
@@ -57,27 +57,27 @@ export default async function ContractsPage() {
                     <td style={{ fontSize: 13 }}>{counterparty ?? "—"}</td>
                     <td>
                       <span style={{ fontSize: 12, fontWeight: 600, color: c.counterpartyType === "client" ? "var(--navy)" : "var(--brass)" }}>
-                        {c.counterpartyType === "client" ? "Клиент" : "Доставчик"}
+                        {t(`contracts.partyType.${c.counterpartyType === "client" ? "client" : "supplier"}`)}
                       </span>
                     </td>
                     <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>
-                      {new Date(c.startDate).toLocaleDateString("bg-BG")}
+                      {new Date(c.startDate).toLocaleDateString(locale)}
                     </td>
                     <td style={{ fontSize: 13 }}>
                       {c.endDate ? (
                         <span style={{ color: expiring ? "var(--brick)" : "var(--ink-soft)" }}>
-                          {expiring && <UiIcon.warning width={12} height={12} />} {new Date(c.endDate).toLocaleDateString("bg-BG")}
+                          {expiring && <UiIcon.warning width={12} height={12} />} {new Date(c.endDate).toLocaleDateString(locale)}
                         </span>
                       ) : "—"}
                     </td>
                     <td style={{ textAlign: "center" }}>{c.autoRenew ? "✓" : "—"}</td>
                     <td>
                       <span style={{ fontSize: 12, fontWeight: 600, color: c.status === "active" ? "var(--emerald)" : "var(--muted)" }}>
-                        {statusLabel[c.status]}
+                        {t(`contracts.status.${c.status}`)}
                       </span>
                     </td>
                     <td>
-                      <Link href={`/dashboard/contracts/${c.id}`} className="btn btn-ghost btn-sm">Преглед</Link>
+                      <Link href={`/dashboard/contracts/${c.id}`} className="btn btn-ghost btn-sm">{t("contracts.view")}</Link>
                     </td>
                   </tr>
                 );
