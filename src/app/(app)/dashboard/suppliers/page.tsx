@@ -3,9 +3,11 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { UiIcon } from "@/components/app/NavIcons";
 import { SupplierRowActions } from "@/components/app/SupplierRowActions";
+import { getT } from "@/lib/i18n/server";
 
 export default async function SuppliersPage() {
   const { companyId } = await requireCompany();
+  const { t } = await getT();
 
   const suppliers = await prisma.supplier.findMany({
     where: { companyId },
@@ -28,30 +30,30 @@ export default async function SuppliersPage() {
     <>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
         <div>
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>Доставчици</h1>
-          <div style={{ color: "var(--muted)", fontSize: 13 }}>{suppliers.length} доставчика</div>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>{t("suppliers.title")}</h1>
+          <div style={{ color: "var(--muted)", fontSize: 13 }}>{t("suppliers.count", { n: suppliers.length })}</div>
         </div>
-        <Link href="/dashboard/suppliers/new" className="btn btn-primary">+ Нов доставчик</Link>
+        <Link href="/dashboard/suppliers/new" className="btn btn-primary">{t("suppliers.newSupplier")}</Link>
       </div>
 
       <div className="glass panel" style={{ padding: "8px 0" }}>
         {suppliers.length === 0 ? (
           <div style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, color: "var(--muted)" }}><UiIcon.truck width={34} height={34} /></div>
-            <div style={{ fontSize: 14, marginBottom: 16 }}>Няма доставчици</div>
-            <Link href="/dashboard/suppliers/new" className="btn btn-primary btn-sm">Добави доставчик</Link>
+            <div style={{ fontSize: 14, marginBottom: 16 }}>{t("suppliers.empty.none")}</div>
+            <Link href="/dashboard/suppliers/new" className="btn btn-primary btn-sm">{t("suppliers.empty.add")}</Link>
           </div>
         ) : (
           <table>
             <thead>
               <tr>
-                <th>Доставчик</th>
-                <th>ЕИК</th>
-                <th>Имейл</th>
-                <th>Телефон</th>
-                <th className="num">Разходи</th>
-                <th className="num">Договори</th>
-                <th>Рейтинг</th>
+                <th>{t("suppliers.th.supplier")}</th>
+                <th>{t("suppliers.th.eik")}</th>
+                <th>{t("suppliers.th.email")}</th>
+                <th>{t("suppliers.th.phone")}</th>
+                <th className="num">{t("suppliers.th.expenses")}</th>
+                <th className="num">{t("suppliers.th.contracts")}</th>
+                <th>{t("suppliers.th.rating")}</th>
                 <th></th>
               </tr>
             </thead>

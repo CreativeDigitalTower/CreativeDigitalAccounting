@@ -1,0 +1,74 @@
+{
+  "title": "Suppliers",
+  "count": "{n} suppliers",
+  "newSupplier": "+ New supplier",
+  "empty": {
+    "none": "No suppliers",
+    "add": "Add supplier"
+  },
+  "th": {
+    "supplier": "Supplier",
+    "eik": "Company ID",
+    "email": "Email",
+    "phone": "Phone",
+    "expenses": "Expenses",
+    "contracts": "Contracts",
+    "rating": "Rating"
+  },
+  "row": {
+    "dossier": "Profile",
+    "edit": "Edit",
+    "delete": "Delete supplier"
+  },
+  "confirmDelete": "supplier „{name}“",
+  "errDelete": "Error while deleting.",
+  "errSave": "Error while saving.",
+  "new": {
+    "back": "← Suppliers",
+    "heading": "New supplier",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "f": {
+      "name": "Name *",
+      "namePh": "Supplier Ltd",
+      "eik": "Company ID / UIC",
+      "vat": "VAT number",
+      "address": "Address",
+      "email": "Email",
+      "phone": "Phone",
+      "rating": "Rating (1–5)",
+      "notes": "Notes"
+    }
+  },
+  "dossier": {
+    "back": "← Suppliers",
+    "totalExpenses": "Total expenses",
+    "expenses": "Expenses ({n})",
+    "empty": "No expenses.",
+    "th": {
+      "description": "Description",
+      "date": "Date",
+      "amount": "Amount"
+    }
+  },
+  "info": {
+    "title": "Supplier details",
+    "edit": "Edit",
+    "save": "Save",
+    "saving": "Saving…",
+    "name": "Name",
+    "rating": "Rating (1–5)",
+    "notes": "Notes",
+    "f": {
+      "eik": "Company ID",
+      "vat": "VAT №",
+      "contactPerson": "Contact person",
+      "email": "Email",
+      "phone": "Phone",
+      "website": "Website",
+      "city": "City",
+      "address": "Address"
+    }
+  }
+}
