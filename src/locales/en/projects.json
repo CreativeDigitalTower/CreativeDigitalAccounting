@@ -1,0 +1,80 @@
+{
+  "title": "Projects",
+  "count": "{n} projects",
+  "newProject": "+ New project",
+  "empty": {
+    "none": "No projects",
+    "add": "Add project"
+  },
+  "status": {
+    "active": "Active",
+    "completed": "Completed",
+    "on_hold": "On hold",
+    "cancelled": "Cancelled"
+  },
+  "budget": "Budget",
+  "deadline": "Deadline",
+  "details": "Details",
+  "errSave": "Error while saving.",
+  "new": {
+    "back": "← Projects",
+    "heading": "New project",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "f": {
+      "name": "Project name *",
+      "client": "Client",
+      "noClient": "— No client —",
+      "status": "Status",
+      "budget": "Budget (EUR)",
+      "plannedBudget": "Planned budget (EUR)",
+      "deadline": "Deadline",
+      "progress": "Progress (%)"
+    }
+  },
+  "detail": {
+    "back": "← Projects",
+    "edit": "✎ Edit",
+    "close": "Close",
+    "f": {
+      "name": "Name",
+      "description": "Description",
+      "status": "Status",
+      "budget": "Budget (€)",
+      "deadline": "Deadline"
+    },
+    "kpi": {
+      "client": "Client",
+      "budget": "Budget",
+      "revenue": "Revenue",
+      "expense": "Expenses",
+      "profit": "Profit",
+      "deadline": "Deadline"
+    },
+    "progress": "Progress: {n}%",
+    "entries": {
+      "title": "Revenue & expenses",
+      "expense": "− Expense",
+      "revenue": "+ Revenue",
+      "descPh": "Description",
+      "amountPh": "Amount €",
+      "empty": "No records.",
+      "revenueLabel": "Revenue",
+      "expenseLabel": "Expense",
+      "confirmDelete": "this record"
+    },
+    "subs": {
+      "title": "Subprojects ({n})",
+      "meta": "{status} · {pct}% · profit {profit}",
+      "namePh": "Subproject name…",
+      "add": "+ Add"
+    },
+    "notes": {
+      "title": "Notes & comments",
+      "placeholder": "Add a note…",
+      "empty": "No notes.",
+      "confirmDelete": "this note"
+    }
+  }
+}

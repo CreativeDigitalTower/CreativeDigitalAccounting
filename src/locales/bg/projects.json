@@ -1,0 +1,80 @@
+{
+  "title": "Проекти",
+  "count": "{n} проекта",
+  "newProject": "+ Нов проект",
+  "empty": {
+    "none": "Няма проекти",
+    "add": "Добави проект"
+  },
+  "status": {
+    "active": "Активен",
+    "completed": "Завършен",
+    "on_hold": "Пауза",
+    "cancelled": "Анулиран"
+  },
+  "budget": "Бюджет",
+  "deadline": "Срок",
+  "details": "Детайли",
+  "errSave": "Грешка при запис.",
+  "new": {
+    "back": "← Проекти",
+    "heading": "Нов проект",
+    "cancel": "Отказ",
+    "save": "Запази",
+    "saving": "Записване…",
+    "f": {
+      "name": "Име на проекта *",
+      "client": "Клиент",
+      "noClient": "— Без клиент —",
+      "status": "Статус",
+      "budget": "Бюджет (EUR)",
+      "plannedBudget": "Планиран бюджет (EUR)",
+      "deadline": "Краен срок",
+      "progress": "Прогрес (%)"
+    }
+  },
+  "detail": {
+    "back": "← Проекти",
+    "edit": "✎ Редактирай",
+    "close": "Затвори",
+    "f": {
+      "name": "Име",
+      "description": "Описание",
+      "status": "Статус",
+      "budget": "Бюджет (€)",
+      "deadline": "Краен срок"
+    },
+    "kpi": {
+      "client": "Клиент",
+      "budget": "Бюджет",
+      "revenue": "Приходи",
+      "expense": "Разходи",
+      "profit": "Печалба",
+      "deadline": "Срок"
+    },
+    "progress": "Прогрес: {n}%",
+    "entries": {
+      "title": "Приходи и разходи",
+      "expense": "− Разход",
+      "revenue": "+ Приход",
+      "descPh": "Описание",
+      "amountPh": "Сума €",
+      "empty": "Няма записи.",
+      "revenueLabel": "Приход",
+      "expenseLabel": "Разход",
+      "confirmDelete": "това движение"
+    },
+    "subs": {
+      "title": "Подпроекти ({n})",
+      "meta": "{status} · {pct}% · печалба {profit}",
+      "namePh": "Име на подпроект…",
+      "add": "+ Добави"
+    },
+    "notes": {
+      "title": "Бележки и коментари",
+      "placeholder": "Добави бележка…",
+      "empty": "Няма бележки.",
+      "confirmDelete": "тази бележка"
+    }
+  }
+}

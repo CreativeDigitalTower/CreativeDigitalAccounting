@@ -1,0 +1,80 @@
+{
+  "title": "Projeler",
+  "count": "{n} proje",
+  "newProject": "+ Yeni proje",
+  "empty": {
+    "none": "Proje yok",
+    "add": "Proje ekle"
+  },
+  "status": {
+    "active": "Aktif",
+    "completed": "Tamamlandı",
+    "on_hold": "Beklemede",
+    "cancelled": "İptal edildi"
+  },
+  "budget": "Bütçe",
+  "deadline": "Son tarih",
+  "details": "Ayrıntılar",
+  "errSave": "Kaydetme hatası.",
+  "new": {
+    "back": "← Projeler",
+    "heading": "Yeni proje",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "saving": "Kaydediliyor…",
+    "f": {
+      "name": "Proje adı *",
+      "client": "Müşteri",
+      "noClient": "— Müşteri yok —",
+      "status": "Durum",
+      "budget": "Bütçe (EUR)",
+      "plannedBudget": "Planlanan bütçe (EUR)",
+      "deadline": "Son tarih",
+      "progress": "İlerleme (%)"
+    }
+  },
+  "detail": {
+    "back": "← Projeler",
+    "edit": "✎ Düzenle",
+    "close": "Kapat",
+    "f": {
+      "name": "Ad",
+      "description": "Açıklama",
+      "status": "Durum",
+      "budget": "Bütçe (€)",
+      "deadline": "Son tarih"
+    },
+    "kpi": {
+      "client": "Müşteri",
+      "budget": "Bütçe",
+      "revenue": "Gelirler",
+      "expense": "Giderler",
+      "profit": "Kâr",
+      "deadline": "Son tarih"
+    },
+    "progress": "İlerleme: {n}%",
+    "entries": {
+      "title": "Gelir ve giderler",
+      "expense": "− Gider",
+      "revenue": "+ Gelir",
+      "descPh": "Açıklama",
+      "amountPh": "Tutar €",
+      "empty": "Kayıt yok.",
+      "revenueLabel": "Gelir",
+      "expenseLabel": "Gider",
+      "confirmDelete": "bu kayıt"
+    },
+    "subs": {
+      "title": "Alt projeler ({n})",
+      "meta": "{status} · {pct}% · kâr {profit}",
+      "namePh": "Alt proje adı…",
+      "add": "+ Ekle"
+    },
+    "notes": {
+      "title": "Notlar ve yorumlar",
+      "placeholder": "Not ekle…",
+      "empty": "Not yok.",
+      "confirmDelete": "bu not"
+    }
+  }
+}
