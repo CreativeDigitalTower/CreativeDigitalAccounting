@@ -4,9 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useT } from "@/components/i18n/I18nProvider";
 
 export default function LoginPage() {
   const router = useRouter();
+  const t = useT();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -24,7 +26,7 @@ export default function LoginPage() {
 
     setLoading(false);
     if (res?.error) {
-      setError("Грешен имейл или парола.");
+      setError(t("auth.login.invalid"));
     } else {
       router.push("/dashboard");
     }
@@ -34,10 +36,10 @@ export default function LoginPage() {
     <div style={{ width: "100%", maxWidth: 420 }}>
       <div className="glass panel" style={{ padding: "40px 36px" }}>
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 28, fontWeight: 700, margin: "0 0 6px" }}>
-          Вход
+          {t("auth.login.title")}
         </h1>
         <p style={{ color: "var(--muted)", fontSize: 13.5, margin: "0 0 28px" }}>
-          Влезте в акаунта на вашата фирма
+          {t("auth.login.subtitle")}
         </p>
 
         {error && (
@@ -58,13 +60,13 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div>
-            <label>Имейл адрес</label>
+            <label>{t("auth.login.email")}</label>
             <input type="email" name="email" required placeholder="ivan@firma.bg" autoComplete="email" />
           </div>
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-              <label>Парола</label>
-              <Link href="/forgot-password" style={{ fontSize: 12, color: "var(--navy)", fontWeight: 600 }}>Забравена парола?</Link>
+              <label>{t("auth.login.password")}</label>
+              <Link href="/forgot-password" style={{ fontSize: 12, color: "var(--navy)", fontWeight: 600 }}>{t("auth.login.forgot")}</Link>
             </div>
             <input type="password" name="password" required placeholder="••••••••" autoComplete="current-password" />
           </div>
@@ -74,14 +76,14 @@ export default function LoginPage() {
             disabled={loading}
             style={{ justifyContent: "center", marginTop: 4, opacity: loading ? 0.7 : 1 }}
           >
-            {loading ? "Влизане…" : "Вход →"}
+            {loading ? t("auth.login.submitting") : t("auth.login.submit")}
           </button>
         </form>
 
         <p style={{ marginTop: 24, textAlign: "center", fontSize: 13.5, color: "var(--ink-soft)" }}>
-          Нямате акаунт?{" "}
+          {t("auth.login.noAccount")}{" "}
           <Link href="/register" style={{ color: "var(--navy)", fontWeight: 600 }}>
-            Регистрирайте се безплатно
+            {t("auth.login.registerFree")}
           </Link>
         </p>
       </div>

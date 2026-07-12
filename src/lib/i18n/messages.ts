@@ -5,27 +5,33 @@ import { DEFAULT_LOCALE } from "./config";
 // нов JSON файл за всеки език + нов ред тук. Добавяне на нов език = нов блок.
 import bgCommon from "@/locales/bg/common.json";
 import bgNav from "@/locales/bg/navigation.json";
+import bgAuth from "@/locales/bg/auth.json";
 import enCommon from "@/locales/en/common.json";
 import enNav from "@/locales/en/navigation.json";
+import enAuth from "@/locales/en/auth.json";
 import ruCommon from "@/locales/ru/common.json";
 import ruNav from "@/locales/ru/navigation.json";
+import ruAuth from "@/locales/ru/auth.json";
 import roCommon from "@/locales/ro/common.json";
 import roNav from "@/locales/ro/navigation.json";
+import roAuth from "@/locales/ro/auth.json";
 import trCommon from "@/locales/tr/common.json";
 import trNav from "@/locales/tr/navigation.json";
+import trAuth from "@/locales/tr/auth.json";
 import elCommon from "@/locales/el/common.json";
 import elNav from "@/locales/el/navigation.json";
+import elAuth from "@/locales/el/auth.json";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Messages = Record<string, any>;
 
 const DICTS: Record<Locale, Messages> = {
-  bg: { common: bgCommon, navigation: bgNav },
-  en: { common: enCommon, navigation: enNav },
-  ru: { common: ruCommon, navigation: ruNav },
-  ro: { common: roCommon, navigation: roNav },
-  tr: { common: trCommon, navigation: trNav },
-  el: { common: elCommon, navigation: elNav },
+  bg: { common: bgCommon, navigation: bgNav, auth: bgAuth },
+  en: { common: enCommon, navigation: enNav, auth: enAuth },
+  ru: { common: ruCommon, navigation: ruNav, auth: ruAuth },
+  ro: { common: roCommon, navigation: roNav, auth: roAuth },
+  tr: { common: trCommon, navigation: trNav, auth: trAuth },
+  el: { common: elCommon, navigation: elNav, auth: elAuth },
 };
 
 // Дълбоко сливане: липсващ ключ пада обратно към българския (никога raw key на екрана).
