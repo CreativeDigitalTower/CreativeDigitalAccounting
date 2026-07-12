@@ -1,17 +1,19 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 const PRESETS = [
-  { id: "this_month", label: "Текущ месец" },
-  { id: "last_month", label: "Предишен месец" },
-  { id: "quarter", label: "Тримесечие" },
-  { id: "year", label: "Тази година" },
-  { id: "last_year", label: "Миналата година" },
+  { id: "this_month", key: "bi.period.thisMonth" },
+  { id: "last_month", key: "bi.period.lastMonth" },
+  { id: "quarter", key: "bi.period.quarter" },
+  { id: "year", key: "bi.period.year" },
+  { id: "last_year", key: "bi.period.lastYear" },
 ];
 
 export function AnalyticsPeriod({ active }: { active: string }) {
   const router = useRouter();
+  const { t } = useI18n();
   const [showRange, setShowRange] = useState(active === "custom");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -25,7 +27,7 @@ export function AnalyticsPeriod({ active }: { active: string }) {
   return (
     <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
       {PRESETS.map((p) => (
-        <button key={p.id} onClick={() => pick(p.id)} className={`filter-tab${active === p.id ? " active" : ""}`} style={{ fontSize: 12.5 }}>{p.label}</button>
+        <button key={p.id} onClick={() => pick(p.id)} className={`filter-tab${active === p.id ? " active" : ""}`} style={{ fontSize: 12.5 }}>{t(p.key)}</button>
       ))}
       <button onClick={() => setShowRange((v) => !v)} className={`filter-tab${active === "custom" ? " active" : ""}`} style={{ fontSize: 12.5 }}>
         <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: "-2px" }}><rect x="3.5" y="4.5" width="17" height="16" rx="2" /><path d="M3.5 9h17M8 2.5v4M16 2.5v4" /></svg> Период</span>
@@ -35,7 +37,7 @@ export function AnalyticsPeriod({ active }: { active: string }) {
           <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} style={{ width: "auto", fontSize: 12.5, padding: "5px 8px" }} />
           <span style={{ color: "var(--muted)" }}>–</span>
           <input type="date" value={to} onChange={(e) => setTo(e.target.value)} style={{ width: "auto", fontSize: 12.5, padding: "5px 8px" }} />
-          <button onClick={applyRange} className="btn btn-primary btn-sm" disabled={!from || !to}>Покажи</button>
+          <button onClick={applyRange} className="btn btn-primary btn-sm" disabled={!from || !to}>{t("bi.period.show")}</button>
         </div>
       )}
     </div>

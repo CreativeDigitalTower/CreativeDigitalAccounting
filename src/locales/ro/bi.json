@@ -1,0 +1,128 @@
+{
+  "section": {
+    "overview": "Prezentare de ansamblu",
+    "whatsHappening": "Ce se întâmplă în afacerea dvs.",
+    "period6m": "Ultimele 6 luni · comparativ cu luna precedentă",
+    "revExpProfit": "Venituri · Cheltuieli · Profit",
+    "businessHealth": "Sănătatea afacerii",
+    "forecastMonth": "Prognoză pentru lună",
+    "forecastPeriod": "Prognoză pentru perioadă",
+    "insights": "Concluzii inteligente",
+    "risks": "Atenție · riscuri",
+    "opportunities": "Oportunități de creștere",
+    "notEnoughData": "Încă nu sunt suficiente date pentru analiză. Emiteți primele facturi și adăugați cheltuieli pentru a vedea concluziile.",
+    "notEnoughPeriod": "Încă nu sunt suficiente informații pentru această perioadă. Emiteți facturi și introduceți cheltuieli pentru a vedea analiza.",
+    "payments": "Plăți și creanțe",
+    "topClients": "Top clienți după venit"
+  },
+  "kpi": {
+    "revenue": "Venituri",
+    "expenses": "Cheltuieli",
+    "profit": "Profit",
+    "invoices": "Facturi emise",
+    "avgInvoice": "Factură medie",
+    "newClients": "Clienți noi",
+    "margin": "Marjă de profit",
+    "cashFlow": "Flux de numerar"
+  },
+  "ref": {
+    "lastMonth": "luna trecută",
+    "prevPeriod": "perioada precedentă"
+  },
+  "caption": {
+    "better": "mai bine decât {ref}",
+    "worse": "mai slab decât {ref}",
+    "flat": "fără schimbare față de {ref}",
+    "noBase": "nicio perioadă comparabilă",
+    "current": "valoare curentă"
+  },
+  "health": {
+    "excellent": "Excelent",
+    "good": "Bun",
+    "needsAttention": "Atenție",
+    "critical": "Critic",
+    "verdictExcellent": "Compania are o sănătate financiară excelentă.",
+    "verdictGood": "Stare stabilă, cu potențial de îmbunătățire.",
+    "verdictAttention": "Există semnale care necesită atenție.",
+    "verdictCritical": "Indicatori critici — sunt necesare măsuri urgente."
+  },
+  "forecast": {
+    "revenue": "Cifră de afaceri estimată",
+    "expenses": "Cheltuieli estimate",
+    "profit": "Profit estimat",
+    "vat": "TVA estimat",
+    "documents": "Documente estimate",
+    "pace": "în ritmul actual · {pct}% din lună scurs",
+    "pacePeriod": "în ritmul actual · {pct}% scurs"
+  },
+  "payments": {
+    "paid": "Plătite (perioadă)",
+    "unpaid": "Neplătite (total)",
+    "overdue": "Restante",
+    "invoicesCount": "{count} facturi",
+    "collectOverdue": "Încasează restanțele →",
+    "noOverdue": "Nicio creanță restantă ✓"
+  },
+  "insight": {
+    "revenueUp": "Veniturile au crescut cu {pct}% față de {ref}.",
+    "revenueDown": "Veniturile au scăzut cu {pct}% față de {ref}.",
+    "expensesUp": "Cheltuielile au crescut cu {pct}% față de {ref}.",
+    "profitDecline3": "Profitul scade a treia lună consecutiv.",
+    "topClient": "Cel mai mare client „{name}” reprezintă {pct}% din venituri.",
+    "topClientPeriod": "Clientul „{name}” reprezintă {pct}% din cifra de afaceri a perioadei.",
+    "overdue": "{count} facturi restante necesită încasare.",
+    "overdueBlocking": "{count} facturi restante blochează {amount}.",
+    "avgInvoiceUp": "Valoarea medie a facturii crește (+{pct}%).",
+    "newClientsDown": "Numărul de clienți noi scade.",
+    "forecastRevenue": "În ritmul actual perioada se încheie cu aproximativ {amount} venituri.",
+    "stable": "Indicatorii sunt stabili. Nicio abatere care să necesite atenție.",
+    "notEnoughCompare": "Încă nu sunt suficiente informații pentru o comparație fiabilă.",
+    "expOverRev": "Cheltuielile depășesc veniturile luna aceasta.",
+    "expFasterRev": "Cheltuielile cresc mai repede decât veniturile.",
+    "noInvoicesMonth": "Nu s-au emis facturi luna aceasta.",
+    "topClientRisk": "Prea multă dependență de un singur client.",
+    "concentrationRisk": "Risc mare de concentrare — un client reprezintă {pct}% din cifra de afaceri.",
+    "noRisks": "Niciun risc identificat momentan."
+  },
+  "opp": {
+    "avgInvoice10Year": "Dacă măriți factura medie cu 10%, venitul anual ar crește cu ~{amount}.",
+    "avgInvoice10Period": "Dacă măriți factura medie cu 10%, venitul perioadei ar fi cu ~{amount} mai mare.",
+    "bestMonth": "Cea mai puternică lună a perioadei este {label} — analizați ce o diferențiază.",
+    "bestInterval": "Cel mai puternic interval al perioadei: {label}.",
+    "diversify": "Extinderea bazei de clienți va reduce dependența și riscul.",
+    "collectUnpaid": "{amount} așteaptă încasarea — încasarea mai rapidă îmbunătățește fluxul de numerar.",
+    "keepAdding": "Continuați să introduceți date pentru recomandări mai precise."
+  },
+  "cta": {
+    "viewInvoices": "Vezi facturile",
+    "viewExpenses": "Vezi cheltuielile",
+    "analyzeExpenses": "Analizează cheltuielile",
+    "collect": "Încasează plăți",
+    "viewClients": "Vezi clienții",
+    "diversify": "Diversifică",
+    "attractClients": "Atrage clienți",
+    "collectShort": "Încasează"
+  },
+  "period": {
+    "thisMonth": "Luna curentă",
+    "lastMonth": "Luna precedentă",
+    "quarter": "Trimestru",
+    "year": "Anul curent",
+    "lastYear": "Anul trecut",
+    "custom": "Perioadă",
+    "show": "Afișează"
+  },
+  "analytics": {
+    "eyebrow": "Analize financiare",
+    "title": "Ce se întâmplă în afacerea dvs.",
+    "periodLabel": "Perioadă",
+    "noComparable": "nicio perioadă precedentă comparabilă",
+    "annualTools": "Rapoarte și instrumente anuale"
+  },
+  "topcl": {
+    "client": "Client",
+    "revenue": "Venit",
+    "share": "Cotă",
+    "empty": "Niciun venit de la clienți pentru perioadă."
+  }
+}

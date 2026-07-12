@@ -9,11 +9,13 @@ import { VatRegistrationForecast } from "@/components/app/VatRegistrationForecas
 import { resolvePeriod, computeAnalytics } from "@/lib/bi/analytics";
 import { AnalyticsPeriod } from "@/components/bi/AnalyticsPeriod";
 import { AnalyticsOverview } from "@/components/bi/AnalyticsOverview";
+import { getT } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function AnalyticsPage({ searchParams }: { searchParams: Promise<{ period?: string; from?: string; to?: string }> }) {
   const { companyId } = await requireFeature("analytics");
+  const { t } = await getT();
   const sp = await searchParams;
   const now = new Date();
   const year = now.getFullYear();
@@ -78,9 +80,9 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
     <>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 14, flexWrap: "wrap", marginBottom: 18 }}>
         <div>
-          <div className="bi-eyebrow">Финансови анализи</div>
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "2px 0 0" }}>Какво се случва в бизнеса Ви</h1>
-          <div style={{ color: "var(--muted)", fontSize: 13, marginTop: 2 }}>Период: <strong style={{ color: "var(--ink-soft)" }}>{analytics.period.label}</strong>{analytics.enoughToCompare ? "" : " · няма съпоставим предходен период"}</div>
+          <div className="bi-eyebrow">{t("bi.analytics.eyebrow")}</div>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "2px 0 0" }}>{t("bi.analytics.title")}</h1>
+          <div style={{ color: "var(--muted)", fontSize: 13, marginTop: 2 }}>{t("bi.analytics.periodLabel")}: <strong style={{ color: "var(--ink-soft)" }}>{period.id === "custom" ? period.label : t(`bi.period.${period.id === "this_month" ? "thisMonth" : period.id === "last_month" ? "lastMonth" : period.id === "last_year" ? "lastYear" : period.id}`)}</strong>{analytics.enoughToCompare ? "" : ` · ${t("bi.analytics.noComparable")}`}</div>
         </div>
         <AnalyticsPeriod active={period.id} />
       </div>
@@ -90,7 +92,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
 
       {/* ─── Годишни справки и инструменти ─── */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "26px 0 16px" }}>
-        <span className="bi-eyebrow" style={{ color: "var(--brass)" }}>Годишни справки и инструменти · {year}</span>
+        <span className="bi-eyebrow" style={{ color: "var(--brass)" }}>{t("bi.analytics.annualTools")} · {year}</span>
         <div style={{ flex: 1, height: 1, background: "var(--bi-grid)" }} />
       </div>
 

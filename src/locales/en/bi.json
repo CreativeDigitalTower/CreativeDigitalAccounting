@@ -1,0 +1,128 @@
+{
+  "section": {
+    "overview": "Business overview",
+    "whatsHappening": "What’s happening in your business",
+    "period6m": "Last 6 months · compared to the previous month",
+    "revExpProfit": "Revenue · Expenses · Profit",
+    "businessHealth": "Business health",
+    "forecastMonth": "Forecast for the month",
+    "forecastPeriod": "Forecast for the period",
+    "insights": "Smart insights",
+    "risks": "Attention · risks",
+    "opportunities": "Growth opportunities",
+    "notEnoughData": "Not enough data yet for analysis. Issue your first invoices and add expenses to see the smart insights.",
+    "notEnoughPeriod": "Not enough information for this period yet. Issue invoices and enter expenses to see the analysis.",
+    "payments": "Payments & receivables",
+    "topClients": "Top clients by revenue"
+  },
+  "kpi": {
+    "revenue": "Revenue",
+    "expenses": "Expenses",
+    "profit": "Profit",
+    "invoices": "Invoices issued",
+    "avgInvoice": "Average invoice",
+    "newClients": "New clients",
+    "margin": "Profit margin",
+    "cashFlow": "Cash flow"
+  },
+  "ref": {
+    "lastMonth": "last month",
+    "prevPeriod": "the previous period"
+  },
+  "caption": {
+    "better": "better than {ref}",
+    "worse": "weaker than {ref}",
+    "flat": "no change vs {ref}",
+    "noBase": "no comparable period",
+    "current": "current value"
+  },
+  "health": {
+    "excellent": "Excellent",
+    "good": "Good",
+    "needsAttention": "Attention",
+    "critical": "Critical",
+    "verdictExcellent": "The company is in excellent financial health.",
+    "verdictGood": "Stable condition with room for improvement.",
+    "verdictAttention": "There are signals that require attention.",
+    "verdictCritical": "Critical indicators — urgent action is needed."
+  },
+  "forecast": {
+    "revenue": "Expected turnover",
+    "expenses": "Expected expenses",
+    "profit": "Expected profit",
+    "vat": "Expected VAT",
+    "documents": "Expected documents",
+    "pace": "at the current pace · {pct}% of the month elapsed",
+    "pacePeriod": "at the current pace · {pct}% elapsed"
+  },
+  "payments": {
+    "paid": "Paid (period)",
+    "unpaid": "Unpaid (total)",
+    "overdue": "Overdue",
+    "invoicesCount": "{count} invoices",
+    "collectOverdue": "Collect overdue →",
+    "noOverdue": "No overdue receivables ✓"
+  },
+  "insight": {
+    "revenueUp": "Revenue grew by {pct}% vs {ref}.",
+    "revenueDown": "Revenue fell by {pct}% vs {ref}.",
+    "expensesUp": "Expenses increased by {pct}% vs {ref}.",
+    "profitDecline3": "Profit has been declining for the third month in a row.",
+    "topClient": "Your largest client “{name}” accounts for {pct}% of revenue.",
+    "topClientPeriod": "Client “{name}” accounts for {pct}% of turnover for the period.",
+    "overdue": "{count} overdue invoices need collecting.",
+    "overdueBlocking": "{count} overdue invoices are blocking {amount}.",
+    "avgInvoiceUp": "The average invoice value is rising (+{pct}%).",
+    "newClientsDown": "The number of new clients is decreasing.",
+    "forecastRevenue": "At the current pace the period ends with about {amount} in revenue.",
+    "stable": "Indicators are stable. No deviations that require attention.",
+    "notEnoughCompare": "Not enough information yet for a reliable comparison.",
+    "expOverRev": "Expenses exceed revenue this month.",
+    "expFasterRev": "Expenses are growing faster than revenue.",
+    "noInvoicesMonth": "No invoices issued this month.",
+    "topClientRisk": "Too much dependence on a single client.",
+    "concentrationRisk": "High concentration risk — one client is {pct}% of turnover.",
+    "noRisks": "No risks identified at the moment."
+  },
+  "opp": {
+    "avgInvoice10Year": "If you raise the average invoice by 10%, annual revenue would grow by ~{amount}.",
+    "avgInvoice10Period": "If you raise the average invoice by 10%, revenue for the period would be ~{amount} more.",
+    "bestMonth": "The strongest month in the period is {label} — analyse what sets it apart.",
+    "bestInterval": "Strongest interval in the period: {label}.",
+    "diversify": "Growing your client base will reduce dependence and risk.",
+    "collectUnpaid": "{amount} awaits collection — faster collection improves cash flow.",
+    "keepAdding": "Keep entering data for more accurate recommendations."
+  },
+  "cta": {
+    "viewInvoices": "Review invoices",
+    "viewExpenses": "View expenses",
+    "analyzeExpenses": "Analyse expenses",
+    "collect": "Collect payments",
+    "viewClients": "View clients",
+    "diversify": "Diversify",
+    "attractClients": "Attract clients",
+    "collectShort": "Collect"
+  },
+  "period": {
+    "thisMonth": "This month",
+    "lastMonth": "Previous month",
+    "quarter": "Quarter",
+    "year": "This year",
+    "lastYear": "Last year",
+    "custom": "Period",
+    "show": "Show"
+  },
+  "analytics": {
+    "eyebrow": "Financial analytics",
+    "title": "What’s happening in your business",
+    "periodLabel": "Period",
+    "noComparable": "no comparable previous period",
+    "annualTools": "Annual reports & tools"
+  },
+  "topcl": {
+    "client": "Client",
+    "revenue": "Revenue",
+    "share": "Share",
+    "empty": "No client revenue for this period."
+  }
+}

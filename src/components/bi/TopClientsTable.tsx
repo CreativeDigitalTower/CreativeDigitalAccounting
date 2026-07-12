@@ -1,11 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 type Row = { name: string; total: number; sharePct: number };
 const money = (v: number) => Math.round(v).toLocaleString("bg-BG") + " €";
 
 export function TopClientsTable({ rows }: { rows: Row[] }) {
+  const { t } = useI18n();
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<{ k: "name" | "total" | "sharePct"; dir: 1 | -1 }>({ k: "total", dir: -1 });
 
@@ -27,15 +29,15 @@ export function TopClientsTable({ rows }: { rows: Row[] }) {
   return (
     <div className="bi-card bi-flat bi-in" style={{ padding: "16px 18px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, flexWrap: "wrap" }}>
-        <div className="bi-eyebrow" style={{ color: "var(--navy)" }}>Топ клиенти по приход</div>
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Търси клиент…" style={{ marginLeft: "auto", width: "auto", minWidth: 180, fontSize: 12.5, padding: "6px 10px" }} />
+        <div className="bi-eyebrow" style={{ color: "var(--navy)" }}>{t("bi.section.topClients")}</div>
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("common.actions.search") + "…"} style={{ marginLeft: "auto", width: "auto", minWidth: 180, fontSize: 12.5, padding: "6px 10px" }} />
       </div>
       {rows.length === 0 ? (
-        <div style={{ padding: "22px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>Няма приходи от клиенти за периода.</div>
+        <div style={{ padding: "22px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>{t("bi.topcl.empty")}</div>
       ) : (
         <div className="bi-table" style={{ overflowX: "auto" }}>
           <table>
-            <thead><tr>{th("name", "Клиент")}{th("total", "Приход", true)}{th("sharePct", "Дял", true)}<th style={{ width: "28%" }}></th></tr></thead>
+            <thead><tr>{th("name", t("bi.topcl.client"))}{th("total", t("bi.topcl.revenue"), true)}{th("sharePct", t("bi.topcl.share"), true)}<th style={{ width: "28%" }}></th></tr></thead>
             <tbody>
               {view.map((r) => (
                 <tr key={r.name}>

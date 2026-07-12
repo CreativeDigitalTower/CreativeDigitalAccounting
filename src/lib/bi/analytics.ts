@@ -16,7 +16,6 @@ export type ResolvedPeriod = {
 };
 
 const MONTHS_BG = ["Ян", "Фев", "Мар", "Апр", "Май", "Юни", "Юли", "Авг", "Сеп", "Окт", "Ное", "Дек"];
-const bg = (n: number) => Math.round(n).toLocaleString("bg-BG");
 
 export function resolvePeriod(sp: { period?: string; from?: string; to?: string }): ResolvedPeriod {
   const now = new Date();
@@ -136,23 +135,24 @@ export async function computeAnalytics(companyId: string, period: ResolvedPeriod
   const profitArr = revenue.map((r, i) => r - expensesArr[i]);
 
   // ─── KPI карти ───
-  const mk = (key: string, label: string, cur: number, prev: number, money: boolean, goodWhenUp: boolean, spark: number[]): MetricCard => {
+  const mk = (key: string, labelKey: string, cur: number, prev: number, money: boolean, goodWhenUp: boolean, spark: number[]): MetricCard => {
     const dp = pctChange(cur, prev); const d = dir(cur, prev);
-    let caption = "спрямо предходния период";
-    if (!enoughToCompare || dp == null) caption = "няма съпоставим период";
-    else if (d === "flat") caption = "без промяна спрямо предходния период";
-    else caption = (goodWhenUp ? d === "up" : d === "down") ? "по-добре от предходния период" : "по-слабо от предходния период";
-    return { key, label, value: cur, money, deltaPct: enoughToCompare ? dp : null, direction: d, goodWhenUp, caption, spark };
+    let captionKey = "bi.caption.noBase";
+    if (enoughToCompare && dp != null) {
+      if (d === "flat") captionKey = "bi.caption.flat";
+      else captionKey = (goodWhenUp ? d === "up" : d === "down") ? "bi.caption.better" : "bi.caption.worse";
+    }
+    return { key, labelKey, value: cur, money, deltaPct: enoughToCompare ? dp : null, direction: d, goodWhenUp, captionKey, captionRefKey: "bi.ref.prevPeriod", spark };
   };
   const cards: MetricCard[] = [
-    mk("revenue", "Приходи", revCur, revPrev, true, true, revenue),
-    mk("expenses", "Разходи", expCurV, expPrevV, true, false, expensesArr),
-    mk("profit", "Печалба", profitCur, profitPrev, true, true, profitArr),
-    mk("margin", "Марж на печалба", Math.round(marginCur), Math.round(marginPrev), false, true, buckets.map((_, i) => (revenue[i] > 0 ? Math.round((profitArr[i] / revenue[i]) * 100) : 0))),
-    mk("cash", "Паричен поток", cashCur, cashPrev, true, true, buckets.map((_, i) => revenue[i] - expensesArr[i])),
-    mk("invoices", "Издадени фактури", invCur.length, invPrev.length, false, true, revenue.map((v) => (v > 0 ? 1 : 0))),
-    mk("avg", "Средна фактура", avgCur, avgPrev, true, true, buckets.map((_, i) => revenue[i])),
-    mk("clients", "Нови клиенти", newClientsCur, newClientsPrev, false, true, buckets.map(() => 0)),
+    mk("revenue", "bi.kpi.revenue", revCur, revPrev, true, true, revenue),
+    mk("expenses", "bi.kpi.expenses", expCurV, expPrevV, true, false, expensesArr),
+    mk("profit", "bi.kpi.profit", profitCur, profitPrev, true, true, profitArr),
+    mk("margin", "bi.kpi.margin", Math.round(marginCur), Math.round(marginPrev), false, true, buckets.map((_, i) => (revenue[i] > 0 ? Math.round((profitArr[i] / revenue[i]) * 100) : 0))),
+    mk("cash", "bi.kpi.cashFlow", cashCur, cashPrev, true, true, buckets.map((_, i) => revenue[i] - expensesArr[i])),
+    mk("invoices", "bi.kpi.invoices", invCur.length, invPrev.length, false, true, revenue.map((v) => (v > 0 ? 1 : 0))),
+    mk("avg", "bi.kpi.avgInvoice", avgCur, avgPrev, true, true, buckets.map((_, i) => revenue[i])),
+    mk("clients", "bi.kpi.newClients", newClientsCur, newClientsPrev, false, true, buckets.map(() => 0)),
   ];
 
   // ─── Просрочени / неплатени ───
@@ -194,51 +194,51 @@ export async function computeAnalytics(companyId: string, period: ResolvedPeriod
   if (notes.length === 0) notes.push("Няма отклонения, изискващи внимание.");
   score = Math.max(0, Math.min(100, Math.round(score)));
   const tone: Severity = score >= 85 ? "good" : score >= 65 ? "ok" : score >= 45 ? "attention" : "critical";
-  const healthLabel = score >= 85 ? "Отлично финансово състояние." : score >= 65 ? "Стабилно с потенциал за подобрение." : score >= 45 ? "Има сигнали за внимание." : "Критични показатели.";
+  const healthLabelKey = score >= 85 ? "bi.health.verdictExcellent" : score >= 65 ? "bi.health.verdictGood" : score >= 45 ? "bi.health.verdictAttention" : "bi.health.verdictCritical";
 
-  // ─── Actionable insights / risks / opportunities ───
+  // ─── Actionable insights / risks / opportunities (ключове + payload) ───
   const insights: Insight[] = [], risks: Insight[] = [], opportunities: Insight[] = [];
+  const REF = "bi.ref.prevPeriod";
   const revDelta = pctChange(revCur, revPrev);
   if (enoughToCompare && revDelta != null && Math.abs(revDelta) >= 3) {
     insights.push({ icon: revDelta >= 0 ? "trending-up" : "trending-down", severity: revDelta >= 0 ? "good" : "attention",
-      text: `Приходите са с ${Math.abs(Math.round(revDelta))}% ${revDelta >= 0 ? "по-високи" : "по-ниски"} спрямо предходния период.`, href: "/dashboard/invoices", cta: "Прегледай фактурите" });
+      key: revDelta >= 0 ? "bi.insight.revenueUp" : "bi.insight.revenueDown", vars: { pct: Math.abs(Math.round(revDelta)) }, refKey: REF, href: "/dashboard/invoices", ctaKey: "bi.cta.viewInvoices" });
   }
   const expDelta = pctChange(expCurV, expPrevV);
   if (enoughToCompare && expDelta != null && expDelta >= 15) {
-    insights.push({ icon: "trending-up", severity: "attention", text: `Разходите нарастват с ${Math.round(expDelta)}% спрямо предходния период.`, href: "/dashboard/expenses", cta: "Виж разходите" });
+    insights.push({ icon: "trending-up", severity: "attention", key: "bi.insight.expensesUp", vars: { pct: Math.round(expDelta) }, refKey: REF, href: "/dashboard/expenses", ctaKey: "bi.cta.viewExpenses" });
   }
   if (enoughToCompare && revDelta != null && expDelta != null && expDelta > revDelta + 5) {
-    risks.push({ icon: "alert", severity: "attention", text: "Разходите растат по-бързо от приходите.", href: "/dashboard/expenses", cta: "Анализирай разходите" });
+    risks.push({ icon: "alert", severity: "attention", key: "bi.insight.expFasterRev", href: "/dashboard/expenses", ctaKey: "bi.cta.analyzeExpenses" });
   }
   if (overdueCount > 0) {
-    const msg = `${overdueCount} просрочени фактури блокират ${bg(overdueAmount)} €.`;
-    insights.push({ icon: "clock", severity: overdueCount >= 5 ? "critical" : "attention", text: msg, href: "/dashboard/invoices?status=overdue", cta: "Събери плащания" });
-    risks.push({ icon: "alert", severity: overdueCount >= 5 ? "critical" : "attention", text: msg, href: "/dashboard/invoices?status=overdue", cta: "Виж просрочените" });
+    insights.push({ icon: "clock", severity: overdueCount >= 5 ? "critical" : "attention", key: "bi.insight.overdueBlocking", vars: { count: overdueCount }, amount: overdueAmount, href: "/dashboard/invoices?status=overdue", ctaKey: "bi.cta.collect" });
+    risks.push({ icon: "alert", severity: overdueCount >= 5 ? "critical" : "attention", key: "bi.insight.overdueBlocking", vars: { count: overdueCount }, amount: overdueAmount, href: "/dashboard/invoices?status=overdue", ctaKey: "bi.cta.collect" });
   }
   if (topShare >= 30 && topClients[0]) {
-    insights.push({ icon: "user", severity: topShare >= 45 ? "attention" : "ok", text: `Клиент „${topClients[0].name}" формира ${topShare}% от оборота за периода.`, href: "/dashboard/clients", cta: "Виж клиентите" });
-    if (topShare >= 45) risks.push({ icon: "alert", severity: "attention", text: `Висок риск от концентрация — един клиент е ${topShare}% от оборота.`, href: "/dashboard/clients", cta: "Диверсифицирай" });
+    insights.push({ icon: "user", severity: topShare >= 45 ? "attention" : "ok", key: "bi.insight.topClientPeriod", vars: { name: topClients[0].name, pct: topShare }, href: "/dashboard/clients", ctaKey: "bi.cta.viewClients" });
+    if (topShare >= 45) risks.push({ icon: "alert", severity: "attention", key: "bi.insight.concentrationRisk", vars: { pct: topShare }, href: "/dashboard/clients", ctaKey: "bi.cta.diversify" });
   }
-  if (profitCur < 0) risks.push({ icon: "alert", severity: "critical", text: "Разходите надвишават приходите за периода.", href: "/dashboard/expenses", cta: "Прегледай разходите" });
+  if (profitCur < 0) risks.push({ icon: "alert", severity: "critical", key: "bi.insight.expOverRev", href: "/dashboard/expenses", ctaKey: "bi.cta.viewExpenses" });
   const avgDelta = pctChange(avgCur, avgPrev);
-  if (enoughToCompare && avgDelta != null && avgDelta >= 5) insights.push({ icon: "trending-up", severity: "good", text: `Средната стойност на фактура се увеличава (+${Math.round(avgDelta)}%).` });
-  if (enoughToCompare && newClientsCur < newClientsPrev) insights.push({ icon: "trending-down", severity: "attention", text: "Намалява броят на новите клиенти.", href: "/dashboard/clients", cta: "Привлечи клиенти" });
-  if (forecast && enoughToCompare && revCur < revPrev) insights.push({ icon: "forecast", severity: "attention", text: `При текущия темп периодът приключва с около ${bg(forecast.revenue)} € приходи.` });
+  if (enoughToCompare && avgDelta != null && avgDelta >= 5) insights.push({ icon: "trending-up", severity: "good", key: "bi.insight.avgInvoiceUp", vars: { pct: Math.round(avgDelta) } });
+  if (enoughToCompare && newClientsCur < newClientsPrev) insights.push({ icon: "trending-down", severity: "attention", key: "bi.insight.newClientsDown", href: "/dashboard/clients", ctaKey: "bi.cta.attractClients" });
+  if (forecast && enoughToCompare && revCur < revPrev) insights.push({ icon: "forecast", severity: "attention", key: "bi.insight.forecastRevenue", amount: forecast.revenue });
 
-  if (revCur > 0) opportunities.push({ icon: "bulb", severity: "good", text: `Ако вдигнете средната фактура с 10%, приходите за периода биха били ~${bg(revCur * 0.1)} € повече.` });
+  if (revCur > 0) opportunities.push({ icon: "bulb", severity: "good", key: "bi.opp.avgInvoice10Period", amount: revCur * 0.1 });
   const bestIdx = revenue.indexOf(Math.max(...revenue));
-  if (revenue[bestIdx] > 0 && buckets[bestIdx]) opportunities.push({ icon: "bulb", severity: "ok", text: `Най-силен интервал в периода: ${buckets[bestIdx].label}.` });
-  if (unpaidAmount > 0) opportunities.push({ icon: "bulb", severity: "ok", text: `${bg(unpaidAmount)} € чакат събиране — по-бързото инкасиране подобрява паричния поток.`, href: "/dashboard/invoices?status=overdue", cta: "Събери" });
+  if (revenue[bestIdx] > 0 && buckets[bestIdx]) opportunities.push({ icon: "bulb", severity: "ok", key: "bi.opp.bestInterval", vars: { label: buckets[bestIdx].label } });
+  if (unpaidAmount > 0) opportunities.push({ icon: "bulb", severity: "ok", key: "bi.opp.collectUnpaid", amount: unpaidAmount, href: "/dashboard/invoices?status=overdue", ctaKey: "bi.cta.collectShort" });
 
-  if (insights.length === 0) insights.push({ icon: "check", severity: "good", text: enoughToCompare ? "Показателите са стабилни. Няма отклонения." : "Все още няма достатъчно информация за надеждно сравнение." });
-  if (risks.length === 0) risks.push({ icon: "check", severity: "good", text: "Няма установени рискове за момента." });
-  if (opportunities.length === 0) opportunities.push({ icon: "bulb", severity: "ok", text: "Продължавайте да въвеждате данни за по-точни препоръки." });
+  if (insights.length === 0) insights.push({ icon: "check", severity: "good", key: enoughToCompare ? "bi.insight.stable" : "bi.insight.notEnoughCompare" });
+  if (risks.length === 0) risks.push({ icon: "check", severity: "good", key: "bi.insight.noRisks" });
+  if (opportunities.length === 0) opportunities.push({ icon: "bulb", severity: "ok", key: "bi.opp.keepAdding" });
 
   return {
     period: { label: period.label },
     hasData, enoughToCompare, cards,
     trend: { labels: buckets.map((b) => b.label), revenue, expenses: expensesArr, profit: profitArr },
-    health: { score, label: healthLabel, tone, notes },
+    health: { score, label: healthLabelKey, tone, notes },
     insights, risks, opportunities, forecast, topClients,
     payments: { paidCount, paidAmount, unpaidCount, unpaidAmount, overdueCount, overdueAmount },
   };

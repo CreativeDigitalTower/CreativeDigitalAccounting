@@ -1,0 +1,128 @@
+{
+  "section": {
+    "overview": "İşletme özeti",
+    "whatsHappening": "İşletmenizde neler oluyor",
+    "period6m": "Son 6 ay · önceki aya göre",
+    "revExpProfit": "Gelir · Gider · Kâr",
+    "businessHealth": "İşletme sağlığı",
+    "forecastMonth": "Ay tahmini",
+    "forecastPeriod": "Dönem tahmini",
+    "insights": "Akıllı çıkarımlar",
+    "risks": "Dikkat · riskler",
+    "opportunities": "Büyüme fırsatları",
+    "notEnoughData": "Analiz için henüz yeterli veri yok. İlk faturalarınızı kesin ve gider ekleyin ki çıkarımları görün.",
+    "notEnoughPeriod": "Bu dönem için henüz yeterli bilgi yok. Fatura kesin ve gider girin ki analizi görün.",
+    "payments": "Ödemeler ve alacaklar",
+    "topClients": "Gelire göre en iyi müşteriler"
+  },
+  "kpi": {
+    "revenue": "Gelir",
+    "expenses": "Giderler",
+    "profit": "Kâr",
+    "invoices": "Kesilen faturalar",
+    "avgInvoice": "Ortalama fatura",
+    "newClients": "Yeni müşteriler",
+    "margin": "Kâr marjı",
+    "cashFlow": "Nakit akışı"
+  },
+  "ref": {
+    "lastMonth": "geçen aya",
+    "prevPeriod": "önceki döneme"
+  },
+  "caption": {
+    "better": "{ref} göre daha iyi",
+    "worse": "{ref} göre daha zayıf",
+    "flat": "{ref} göre değişim yok",
+    "noBase": "karşılaştırılabilir dönem yok",
+    "current": "mevcut değer"
+  },
+  "health": {
+    "excellent": "Mükemmel",
+    "good": "İyi",
+    "needsAttention": "Dikkat",
+    "critical": "Kritik",
+    "verdictExcellent": "Şirket mükemmel bir mali durumda.",
+    "verdictGood": "İyileştirme potansiyeli olan istikrarlı durum.",
+    "verdictAttention": "Dikkat gerektiren sinyaller var.",
+    "verdictCritical": "Kritik göstergeler — acil önlem gerekiyor."
+  },
+  "forecast": {
+    "revenue": "Beklenen ciro",
+    "expenses": "Beklenen giderler",
+    "profit": "Beklenen kâr",
+    "vat": "Beklenen KDV",
+    "documents": "Beklenen belgeler",
+    "pace": "mevcut hızda · ayın %{pct}’i geçti",
+    "pacePeriod": "mevcut hızda · %{pct} geçti"
+  },
+  "payments": {
+    "paid": "Ödendi (dönem)",
+    "unpaid": "Ödenmedi (toplam)",
+    "overdue": "Gecikmiş",
+    "invoicesCount": "{count} fatura",
+    "collectOverdue": "Gecikmişleri tahsil et →",
+    "noOverdue": "Gecikmiş alacak yok ✓"
+  },
+  "insight": {
+    "revenueUp": "Gelir {ref} göre %{pct} arttı.",
+    "revenueDown": "Gelir {ref} göre %{pct} azaldı.",
+    "expensesUp": "Giderler {ref} göre %{pct} arttı.",
+    "profitDecline3": "Kâr üst üste üçüncü aydır düşüyor.",
+    "topClient": "En büyük müşteriniz “{name}” gelirin %{pct}’ini oluşturuyor.",
+    "topClientPeriod": "“{name}” müşterisi dönem cirosunun %{pct}’ini oluşturuyor.",
+    "overdue": "{count} gecikmiş fatura tahsilat bekliyor.",
+    "overdueBlocking": "{count} gecikmiş fatura {amount} tutarını bloke ediyor.",
+    "avgInvoiceUp": "Ortalama fatura tutarı artıyor (+%{pct}).",
+    "newClientsDown": "Yeni müşteri sayısı azalıyor.",
+    "forecastRevenue": "Mevcut hızda dönem yaklaşık {amount} gelirle kapanıyor.",
+    "stable": "Göstergeler istikrarlı. Dikkat gerektiren sapma yok.",
+    "notEnoughCompare": "Güvenilir bir karşılaştırma için henüz yeterli bilgi yok.",
+    "expOverRev": "Bu ay giderler geliri aşıyor.",
+    "expFasterRev": "Giderler gelirden daha hızlı artıyor.",
+    "noInvoicesMonth": "Bu ay fatura kesilmedi.",
+    "topClientRisk": "Tek bir müşteriye aşırı bağımlılık.",
+    "concentrationRisk": "Yüksek yoğunlaşma riski — bir müşteri cironun %{pct}’i.",
+    "noRisks": "Şu an tespit edilen risk yok."
+  },
+  "opp": {
+    "avgInvoice10Year": "Ortalama faturayı %10 artırırsanız yıllık gelir yaklaşık {amount} artar.",
+    "avgInvoice10Period": "Ortalama faturayı %10 artırırsanız dönem geliri yaklaşık {amount} daha fazla olur.",
+    "bestMonth": "Dönemin en güçlü ayı {label} — onu farklı kılanı analiz edin.",
+    "bestInterval": "Dönemin en güçlü aralığı: {label}.",
+    "diversify": "Müşteri tabanını genişletmek bağımlılığı ve riski azaltır.",
+    "collectUnpaid": "{amount} tahsilat bekliyor — daha hızlı tahsilat nakit akışını iyileştirir.",
+    "keepAdding": "Daha isabetli öneriler için veri girmeye devam edin."
+  },
+  "cta": {
+    "viewInvoices": "Faturaları incele",
+    "viewExpenses": "Giderleri gör",
+    "analyzeExpenses": "Giderleri analiz et",
+    "collect": "Ödemeleri tahsil et",
+    "viewClients": "Müşterileri gör",
+    "diversify": "Çeşitlendir",
+    "attractClients": "Müşteri çek",
+    "collectShort": "Tahsil et"
+  },
+  "period": {
+    "thisMonth": "Bu ay",
+    "lastMonth": "Önceki ay",
+    "quarter": "Çeyrek",
+    "year": "Bu yıl",
+    "lastYear": "Geçen yıl",
+    "custom": "Dönem",
+    "show": "Göster"
+  },
+  "analytics": {
+    "eyebrow": "Finansal analizler",
+    "title": "İşletmenizde neler oluyor",
+    "periodLabel": "Dönem",
+    "noComparable": "karşılaştırılabilir önceki dönem yok",
+    "annualTools": "Yıllık raporlar ve araçlar"
+  },
+  "topcl": {
+    "client": "Müşteri",
+    "revenue": "Gelir",
+    "share": "Pay",
+    "empty": "Bu dönem için müşteri geliri yok."
+  }
+}
