@@ -1,0 +1,44 @@
+{
+  "footer": {
+    "tagline": "{name} — tüm işletmenizi tek bir yerden yönetin.",
+    "whyReceiving": "Bu e-postayı {name} platformunda hesabınız olduğu için alıyorsunuz."
+  },
+  "welcome": {
+    "subject": "Creative Digital Accounting’e hoş geldiniz",
+    "eyebrow": "Kayıt başarılı",
+    "title": "Hoş geldiniz, {name}!",
+    "preheader": "Hesabınız başarıyla oluşturuldu.",
+    "intro": "Aramıza katıldığınız için mutluyuz. Hesabınız hazır; artık faturaları, belgeleri, müşterileri, stoğu ve finansları tek bir yerden yönetebilirsiniz.",
+    "introVerify": "Tam erişim için lütfen aşağıdaki düğmeyle e-posta adresinizi doğrulayın:",
+    "introStart": "Başlamak için panelinize giriş yapın.",
+    "btnVerify": "E-posta adresini doğrula",
+    "btnDashboard": "Panele git",
+    "footnote": "Bu hesabı siz oluşturmadıysanız bu e-postayı yok sayabilirsiniz."
+  },
+  "verify": {
+    "subject": "E-posta adresinizi doğrulayın",
+    "eyebrow": "Doğrulama",
+    "title": "E-posta adresinizi doğrulayın",
+    "intro1": "Merhaba, {name}.",
+    "intro2": "Bu adresin size ait olduğunu onaylamak için aşağıdaki düğmeye tıklayın. Bağlantı 24 saat geçerlidir.",
+    "button": "E-postayı doğrula",
+    "footnote": "Kayıt olmadıysanız bu e-postayı yok sayın."
+  },
+  "reset": {
+    "subject": "Şifre sıfırlama",
+    "eyebrow": "Güvenlik",
+    "title": "Şifremi unuttum",
+    "intro1": "Merhaba, {name}.",
+    "intro2": "Şifrenizi sıfırlama talebi aldık. Yeni bir şifre belirlemek için aşağıdaki düğmeye tıklayın. Bağlantı <strong>60 dakika</strong> geçerlidir.",
+    "button": "Yeni şifre belirle",
+    "footnote": "Şifre sıfırlama talebinde bulunmadıysanız bu e-postayı yok sayın — şifreniz değişmeden kalır."
+  },
+  "changed": {
+    "subject": "Şifreniz değiştirildi",
+    "eyebrow": "Güvenlik",
+    "title": "Şifreniz başarıyla değiştirildi",
+    "intro1": "Merhaba, {name}.",
+    "intro2": "Bu, hesap şifrenizin değiştirildiğine dair bir onaydır.",
+    "footnote": "Bu değişikliği siz yapmadıysanız, hemen office@creativedigitalaccounting.com adresinden bize ulaşın."
+  }
+}

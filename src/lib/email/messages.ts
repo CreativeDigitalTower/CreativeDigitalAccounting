@@ -1,5 +1,7 @@
 import { baseTemplate, APP_URL, type EmailButton } from "./templates";
 import { formatCurrency, BANK_DETAILS } from "@/lib/constants";
+import { getMessages, makeT } from "@/lib/i18n/messages";
+import { normalizeLocale, type Locale } from "@/lib/i18n/config";
 
 type Msg = { subject: string; html: string; category: string };
 
@@ -8,64 +10,74 @@ const planName = (p?: string | null) => (p ? PLAN_LABEL[p] ?? p : "—");
 
 // ─────────────────────────── АКАУНТ ───────────────────────────
 
-export function welcomeEmail(name: string, verifyUrl?: string): Msg {
+export function welcomeEmail(name: string, verifyUrl?: string, locale: Locale = "bg"): Msg {
+  const loc = normalizeLocale(locale);
+  const et = makeT(getMessages(loc));
+  const E = (k: string, v?: Record<string, string | number>) => et(`emails.welcome.${k}`, v);
   return {
     category: "account",
-    subject: "Добре дошли в Creative Digital Accounting",
+    subject: E("subject"),
     html: baseTemplate({
-      eyebrow: "Регистрацията е успешна",
-      title: `Добре дошли, ${name}!`,
-      preheader: "Вашият акаунт е създаден успешно.",
-      intro: [
-        "Радваме се, че се присъединихте. Вашият акаунт е създаден и вече можете да управлявате фактури, документи, клиенти, складове и финанси от едно място.",
-        verifyUrl ? "За пълен достъп, моля потвърдете имейл адреса си с бутона по-долу:" : "Влезте в таблото си, за да започнете.",
-      ],
-      button: verifyUrl ? { label: "Потвърди имейл адреса", url: verifyUrl } : { label: "Към таблото", url: `${APP_URL}/dashboard` },
-      footnote: "Ако не сте създавали този акаунт, можете да игнорирате този имейл.",
+      locale: loc,
+      eyebrow: E("eyebrow"),
+      title: E("title", { name }),
+      preheader: E("preheader"),
+      intro: [E("intro"), verifyUrl ? E("introVerify") : E("introStart")],
+      button: verifyUrl ? { label: E("btnVerify"), url: verifyUrl } : { label: E("btnDashboard"), url: `${APP_URL}/dashboard` },
+      footnote: E("footnote"),
     }),
   };
 }
 
-export function verifyEmail(name: string, verifyUrl: string): Msg {
+export function verifyEmail(name: string, verifyUrl: string, locale: Locale = "bg"): Msg {
+  const loc = normalizeLocale(locale);
+  const et = makeT(getMessages(loc));
+  const E = (k: string, v?: Record<string, string | number>) => et(`emails.verify.${k}`, v);
   return {
     category: "account",
-    subject: "Потвърдете имейл адреса си",
+    subject: E("subject"),
     html: baseTemplate({
-      eyebrow: "Потвърждение",
-      title: "Потвърдете имейл адреса си",
-      intro: [`Здравейте, ${name}.`, "Натиснете бутона по-долу, за да потвърдите, че този имейл адрес принадлежи на Вас. Линкът е валиден 24 часа."],
-      button: { label: "Потвърди имейла", url: verifyUrl },
-      footnote: "Ако не сте се регистрирали, игнорирайте този имейл.",
+      locale: loc,
+      eyebrow: E("eyebrow"),
+      title: E("title"),
+      intro: [E("intro1", { name }), E("intro2")],
+      button: { label: E("button"), url: verifyUrl },
+      footnote: E("footnote"),
     }),
   };
 }
 
-export function passwordResetEmail(name: string, resetUrl: string): Msg {
+export function passwordResetEmail(name: string, resetUrl: string, locale: Locale = "bg"): Msg {
+  const loc = normalizeLocale(locale);
+  const et = makeT(getMessages(loc));
+  const E = (k: string, v?: Record<string, string | number>) => et(`emails.reset.${k}`, v);
   return {
     category: "account",
-    subject: "Възстановяване на парола",
+    subject: E("subject"),
     html: baseTemplate({
-      eyebrow: "Сигурност",
-      title: "Забравена парола",
-      intro: [
-        `Здравейте, ${name || ""}.`,
-        "Получихме заявка за смяна на паролата Ви. Натиснете бутона по-долу, за да зададете нова парола. Линкът е валиден <strong>60 минути</strong>.",
-      ],
-      button: { label: "Задай нова парола", url: resetUrl },
-      footnote: "Ако не сте заявявали смяна на парола, игнорирайте този имейл — паролата Ви остава непроменена.",
+      locale: loc,
+      eyebrow: E("eyebrow"),
+      title: E("title"),
+      intro: [E("intro1", { name: name || "" }), E("intro2")],
+      button: { label: E("button"), url: resetUrl },
+      footnote: E("footnote"),
     }),
   };
 }
 
-export function passwordChangedEmail(name: string): Msg {
+export function passwordChangedEmail(name: string, locale: Locale = "bg"): Msg {
+  const loc = normalizeLocale(locale);
+  const et = makeT(getMessages(loc));
+  const E = (k: string, v?: Record<string, string | number>) => et(`emails.changed.${k}`, v);
   return {
     category: "account",
-    subject: "Паролата Ви беше променена",
+    subject: E("subject"),
     html: baseTemplate({
-      eyebrow: "Сигурност",
-      title: "Паролата Ви беше сменена успешно",
-      intro: [`Здравейте, ${name || ""}.`, "Това е потвърждение, че паролата за акаунта Ви беше променена."],
-      footnote: "Ако не сте извършвали тази промяна, незабавно се свържете с нас на office@creativedigitalaccounting.com.",
+      locale: loc,
+      eyebrow: E("eyebrow"),
+      title: E("title"),
+      intro: [E("intro1", { name: name || "" }), E("intro2")],
+      footnote: E("footnote"),
     }),
   };
 }
