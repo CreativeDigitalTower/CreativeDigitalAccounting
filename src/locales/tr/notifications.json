@@ -1,0 +1,37 @@
+{
+  "docTypes": {
+    "invoice": "fatura",
+    "proforma": "proforma",
+    "quote": "teklif",
+    "credit_note": "alacak dekontu",
+    "debit_note": "borç dekontu",
+    "contract": "sözleşme",
+    "protocol": "protokol",
+    "document": "belge"
+  },
+  "incomingDocument": {
+    "title": "{sender} tarafından yeni gelen belge",
+    "body": "{sender} size {docType} No. {number} düzenledi."
+  },
+  "subscriptionProforma": {
+    "title": "{plan} aboneliği için proforma fatura",
+    "body": "{platform} seçtiğiniz abonelik için size proforma No. {number} düzenledi. Görüntüleyip banka havalesiyle ödeyebilirsiniz."
+  },
+  "alert": {
+    "task": "Görev: {title}",
+    "taskOverdue": "Gecikmiş (gün): {n}",
+    "taskToday": "Bugün son gün",
+    "taskRemaining": "Kalan gün: {n}",
+    "overdueInvoices": "Vadesi geçmiş faturalar: {n}",
+    "expiredStock": "Son kullanma tarihi geçmiş ürünler: {n}",
+    "expiringStock": "Süresi dolmak üzere olan ürünler (14 gün içinde): {n}",
+    "expiringContracts": "Süresi dolan sözleşmeler: {n}",
+    "subExpiring": "Abonelik sona eriyor ({days} gün içinde)"
+  },
+  "topbar": {
+    "searchPlaceholder": "Müşteri, fatura, tedarikçi ara…",
+    "bell": "Bildirimler",
+    "title": "Bildirimler",
+    "empty": "Yeni bildirim yok"
+  }
+}

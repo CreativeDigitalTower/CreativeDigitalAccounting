@@ -161,12 +161,12 @@ export async function POST(req: Request) {
           const recipient = await prisma.company.findFirst({ where: { eik, id: { not: companyId } }, select: { id: true, name: true } });
           if (recipient) {
             await prisma.document.update({ where: { id: document.id }, data: { recipientCompanyId: recipient.id } });
-            const DOC_LABEL: Record<string, string> = { invoice: "фактура", proforma: "проформа", quote: "оферта", credit_note: "кредитно известие", debit_note: "дебитно известие" };
             await prisma.notification.create({
               data: {
                 companyId: recipient.id, type: "incoming_document",
-                title: `Нов входящ документ от ${sender.name}`,
-                body: `${sender.name} Ви издаде ${DOC_LABEL[data.type] ?? "документ"} № ${number}.`,
+                titleKey: "notifications.incomingDocument.title",
+                bodyKey: "notifications.incomingDocument.body",
+                data: { sender: sender.name, number, type: data.type },
                 link: `/dashboard/inbox/${document.id}`,
               },
             });
