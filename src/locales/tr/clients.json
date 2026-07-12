@@ -1,0 +1,113 @@
+{
+  "title": "Müşteriler (CRM)",
+  "count": "{n} müşteri",
+  "newClient": "+ Yeni müşteri",
+  "tabList": "Liste",
+  "tabPipeline": "Pipeline (huni)",
+  "kpi": {
+    "monthly": "Aylık abonelikler",
+    "total": "Gelir (toplam)",
+    "active": "Aktif müşteriler",
+    "openTasks": "Açık görevler"
+  },
+  "searchPlaceholder": "İsim, iletişim kişisi veya telefona göre ara…",
+  "filterAll": "Tümü",
+  "th": {
+    "client": "Müşteri",
+    "status": "Durum",
+    "phone": "Telefon",
+    "monthly": "Aylık abonelik",
+    "total": "Gelir (toplam)",
+    "tasks": "Görevler"
+  },
+  "row": {
+    "dossier": "Profil",
+    "invoice": "+ Fatura",
+    "delete": "Müşteriyi sil"
+  },
+  "empty": {
+    "none": "Müşteri yok",
+    "noMatch": "Aramayla eşleşme yok",
+    "add": "Müşteri ekle",
+    "noActive": "Bu görünümde aktif müşteri yok."
+  },
+  "foot": {
+    "total": "Toplam:",
+    "shown": "Gösterilen {n}:"
+  },
+  "inactive": {
+    "toggle": "Pasif müşteriler ({n})",
+    "show": "göster",
+    "hide": "gizle"
+  },
+  "chartTitle": "Müşteriye göre gelir (ilk {n})",
+  "menu": {
+    "dossier": "Profili aç",
+    "invoice": "Yeni fatura",
+    "offer": "Yeni teklif",
+    "copyName": "İsmi kopyala",
+    "merge": "Başka müşteriyle birleştir",
+    "delete": "Müşteriyi sil"
+  },
+  "merge": {
+    "title": "Müşterileri birleştir",
+    "desc": "„{name}“ seçilen müşteriyle birleştirilecek. Tüm faturalar, tutarlar ve veriler aktarılır, yinelenen profil silinir.",
+    "into": "Şununla birleştir:",
+    "select": "— Bir müşteri seçin —",
+    "cancel": "İptal",
+    "submit": "Birleştir",
+    "submitting": "Birleştiriliyor…"
+  },
+  "err": {
+    "merge": "Birleştirme hatası.",
+    "delete": "Silme hatası.",
+    "save": "Kaydetme hatası.",
+    "eik": "Geçersiz vergi/şirket numarası."
+  },
+  "confirmDelete": "müşteri „{name}“",
+  "pipeline": {
+    "deal": "Anlaşma: {v}",
+    "invoiced": "Faturalanan: {v}"
+  },
+  "status": {
+    "lead": "Potansiyel",
+    "active": "Aktif",
+    "vip": "VIP",
+    "inactive": "Pasif",
+    "lost": "Kaybedilen"
+  },
+  "stage": {
+    "new": "Yeni",
+    "contacted": "İletişim kuruldu",
+    "proposal": "Teklif gönderildi",
+    "negotiation": "Görüşme",
+    "won": "Kazanıldı",
+    "lost": "Kaybedildi"
+  },
+  "new": {
+    "back": "← Müşteriler",
+    "heading": "Yeni müşteri",
+    "matchInfo": "Bu şirket platforma kayıtlı: {name}. Ona gönderilen belgeler otomatik olarak profiline iletilecek.",
+    "matchFill": "Verileri otomatik doldur",
+    "section": "Temel bilgiler",
+    "cancel": "İptal",
+    "save": "Müşteriyi kaydet",
+    "saving": "Kaydediliyor…",
+    "f": {
+      "name": "Unvan / Tam ad *",
+      "namePh": "Örnek Ltd.",
+      "eik": "Şirket no / vergi no",
+      "vat": "KDV numarası",
+      "contactPerson": "İletişim kişisi",
+      "person": "Ali Yılmaz",
+      "mol": "Sorumlu kişi",
+      "address": "Adres",
+      "addressPh": "Vitosha Cd. 1",
+      "city": "Şehir",
+      "cityPh": "Sofya",
+      "email": "İletişim e-postası",
+      "emailPh": "office@firma.com",
+      "phone": "Telefon"
+    }
+  }
+}

@@ -3,9 +3,11 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { ClientPipeline } from "@/components/app/ClientPipeline";
 import { ClientsList } from "@/components/app/ClientsList";
+import { getT } from "@/lib/i18n/server";
 
 export default async function ClientsPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
   const { companyId } = await requireCompany();
+  const { t } = await getT();
   const view = (await searchParams).view === "pipeline" ? "pipeline" : "list";
 
   const now = new Date();
@@ -48,16 +50,16 @@ export default async function ClientsPage({ searchParams }: { searchParams: Prom
     <>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
         <div>
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>Клиенти (CRM)</h1>
-          <div style={{ color: "var(--muted)", fontSize: 13 }}>{clients.length} клиента</div>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>{t("clients.title")}</h1>
+          <div style={{ color: "var(--muted)", fontSize: 13 }}>{t("clients.count", { n: clients.length })}</div>
         </div>
-        <Link href="/dashboard/clients/new" className="btn btn-primary">+ Нов клиент</Link>
+        <Link href="/dashboard/clients/new" className="btn btn-primary">{t("clients.newClient")}</Link>
       </div>
 
       {/* Изглед: списък / pipeline */}
       <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
-        <Link href="/dashboard/clients" className={`filter-tab${view === "list" ? " active" : ""}`}>Списък</Link>
-        <Link href="/dashboard/clients?view=pipeline" className={`filter-tab${view === "pipeline" ? " active" : ""}`}>Pipeline (фуния)</Link>
+        <Link href="/dashboard/clients" className={`filter-tab${view === "list" ? " active" : ""}`}>{t("clients.tabList")}</Link>
+        <Link href="/dashboard/clients?view=pipeline" className={`filter-tab${view === "pipeline" ? " active" : ""}`}>{t("clients.tabPipeline")}</Link>
       </div>
 
       {view === "pipeline" ? (

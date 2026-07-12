@@ -1,0 +1,113 @@
+{
+  "title": "Clienți (CRM)",
+  "count": "{n} clienți",
+  "newClient": "+ Client nou",
+  "tabList": "Listă",
+  "tabPipeline": "Pipeline (pâlnie)",
+  "kpi": {
+    "monthly": "Abonamente lunare",
+    "total": "Venit (total)",
+    "active": "Clienți activi",
+    "openTasks": "Sarcini deschise"
+  },
+  "searchPlaceholder": "Caută după nume, persoană de contact sau telefon…",
+  "filterAll": "Toți",
+  "th": {
+    "client": "Client",
+    "status": "Status",
+    "phone": "Telefon",
+    "monthly": "Abonament lunar",
+    "total": "Venit (total)",
+    "tasks": "Sarcini"
+  },
+  "row": {
+    "dossier": "Profil",
+    "invoice": "+ Factură",
+    "delete": "Șterge clientul"
+  },
+  "empty": {
+    "none": "Niciun client",
+    "noMatch": "Nicio potrivire pentru căutare",
+    "add": "Adaugă client",
+    "noActive": "Niciun client activ în această vizualizare."
+  },
+  "foot": {
+    "total": "Total:",
+    "shown": "Afișați {n}:"
+  },
+  "inactive": {
+    "toggle": "Clienți inactivi ({n})",
+    "show": "afișează",
+    "hide": "ascunde"
+  },
+  "chartTitle": "Venit pe client (top {n})",
+  "menu": {
+    "dossier": "Deschide profilul",
+    "invoice": "Factură nouă",
+    "offer": "Ofertă nouă",
+    "copyName": "Copiază numele",
+    "merge": "Îmbină cu alt client",
+    "delete": "Șterge clientul"
+  },
+  "merge": {
+    "title": "Îmbinarea clienților",
+    "desc": "„{name}“ va fi îmbinat în clientul selectat. Toate facturile, sumele și datele sunt transferate, iar profilul duplicat este șters.",
+    "into": "Îmbină în:",
+    "select": "— Selectați un client —",
+    "cancel": "Anulează",
+    "submit": "Îmbină",
+    "submitting": "Se îmbină…"
+  },
+  "err": {
+    "merge": "Eroare la îmbinare.",
+    "delete": "Eroare la ștergere.",
+    "save": "Eroare la salvare.",
+    "eik": "CUI/cod fiscal invalid."
+  },
+  "confirmDelete": "clientul „{name}“",
+  "pipeline": {
+    "deal": "Tranzacție: {v}",
+    "invoiced": "Facturat: {v}"
+  },
+  "status": {
+    "lead": "Potențial",
+    "active": "Activ",
+    "vip": "VIP",
+    "inactive": "Inactiv",
+    "lost": "Pierdut"
+  },
+  "stage": {
+    "new": "Nou",
+    "contacted": "Contact stabilit",
+    "proposal": "Ofertă trimisă",
+    "negotiation": "Negociere",
+    "won": "Câștigat",
+    "lost": "Pierdut"
+  },
+  "new": {
+    "back": "← Clienți",
+    "heading": "Client nou",
+    "matchInfo": "Această firmă este înregistrată pe platformă: {name}. Documentele către ea vor fi livrate automat în profilul său.",
+    "matchFill": "Completează datele automat",
+    "section": "Date de bază",
+    "cancel": "Anulează",
+    "save": "Salvează clientul",
+    "saving": "Se salvează…",
+    "f": {
+      "name": "Denumire / Nume complet *",
+      "namePh": "Exemplu SRL",
+      "eik": "CUI / cod fiscal",
+      "vat": "Număr TVA",
+      "contactPerson": "Persoană de contact",
+      "person": "Ion Popescu",
+      "mol": "Persoană responsabilă",
+      "address": "Adresă",
+      "addressPh": "Str. Vitosha 1",
+      "city": "Oraș",
+      "cityPh": "Sofia",
+      "email": "E-mail de contact",
+      "emailPh": "office@firma.ro",
+      "phone": "Telefon"
+    }
+  }
+}
