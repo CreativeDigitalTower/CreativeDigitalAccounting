@@ -7,37 +7,43 @@ import bgCommon from "@/locales/bg/common.json";
 import bgNav from "@/locales/bg/navigation.json";
 import bgAuth from "@/locales/bg/auth.json";
 import bgBi from "@/locales/bg/bi.json";
+import bgPdf from "@/locales/bg/pdf.json";
 import enCommon from "@/locales/en/common.json";
 import enNav from "@/locales/en/navigation.json";
 import enAuth from "@/locales/en/auth.json";
 import enBi from "@/locales/en/bi.json";
+import enPdf from "@/locales/en/pdf.json";
 import ruCommon from "@/locales/ru/common.json";
 import ruNav from "@/locales/ru/navigation.json";
 import ruAuth from "@/locales/ru/auth.json";
 import ruBi from "@/locales/ru/bi.json";
+import ruPdf from "@/locales/ru/pdf.json";
 import roCommon from "@/locales/ro/common.json";
 import roNav from "@/locales/ro/navigation.json";
 import roAuth from "@/locales/ro/auth.json";
 import roBi from "@/locales/ro/bi.json";
+import roPdf from "@/locales/ro/pdf.json";
 import trCommon from "@/locales/tr/common.json";
 import trNav from "@/locales/tr/navigation.json";
 import trAuth from "@/locales/tr/auth.json";
 import trBi from "@/locales/tr/bi.json";
+import trPdf from "@/locales/tr/pdf.json";
 import elCommon from "@/locales/el/common.json";
 import elNav from "@/locales/el/navigation.json";
 import elAuth from "@/locales/el/auth.json";
 import elBi from "@/locales/el/bi.json";
+import elPdf from "@/locales/el/pdf.json";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Messages = Record<string, any>;
 
 const DICTS: Record<Locale, Messages> = {
-  bg: { common: bgCommon, navigation: bgNav, auth: bgAuth, bi: bgBi },
-  en: { common: enCommon, navigation: enNav, auth: enAuth, bi: enBi },
-  ru: { common: ruCommon, navigation: ruNav, auth: ruAuth, bi: ruBi },
-  ro: { common: roCommon, navigation: roNav, auth: roAuth, bi: roBi },
-  tr: { common: trCommon, navigation: trNav, auth: trAuth, bi: trBi },
-  el: { common: elCommon, navigation: elNav, auth: elAuth, bi: elBi },
+  bg: { common: bgCommon, navigation: bgNav, auth: bgAuth, bi: bgBi, pdf: bgPdf },
+  en: { common: enCommon, navigation: enNav, auth: enAuth, bi: enBi, pdf: enPdf },
+  ru: { common: ruCommon, navigation: ruNav, auth: ruAuth, bi: ruBi, pdf: ruPdf },
+  ro: { common: roCommon, navigation: roNav, auth: roAuth, bi: roBi, pdf: roPdf },
+  tr: { common: trCommon, navigation: trNav, auth: trAuth, bi: trBi, pdf: trPdf },
+  el: { common: elCommon, navigation: elNav, auth: elAuth, bi: elBi, pdf: elPdf },
 };
 
 // Дълбоко сливане: липсващ ключ пада обратно към българския (никога raw key на екрана).

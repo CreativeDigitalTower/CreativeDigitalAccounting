@@ -75,14 +75,14 @@ export const CURRENCIES = [
 ] as const;
 
 // Езици за документите
+// Езици за генериране на документи/PDF — съвпадат с поддържаните преводи (src/locales).
+// Добавяне на нов документен език = нов ред + преводи в locales/<code>/pdf.json.
 export const DOC_LANGUAGES = [
   { code: "bg", label: "Български" },
   { code: "en", label: "English" },
-  { code: "de", label: "Deutsch" },
-  { code: "fr", label: "Français" },
-  { code: "es", label: "Español" },
-  { code: "it", label: "Italiano" },
+  { code: "ru", label: "Русский" },
   { code: "ro", label: "Română" },
+  { code: "tr", label: "Türkçe" },
   { code: "el", label: "Ελληνικά" },
 ] as const;
 

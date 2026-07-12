@@ -33,7 +33,7 @@ export default async function PublicDocumentPage({ params }: { params: Promise<{
       name: doc.client.name, mol: doc.client.mol, address: doc.client.address, city: doc.client.city,
       eik: doc.clientIsIndividual ? null : doc.client.eik, vatNumber: doc.clientIsIndividual ? null : doc.client.vatNumber,
     } : null,
-    vatExempt: doc.vatExempt, vatExemptReasonText: vatExemptReasonText(doc.vatExemptReason),
+    vatExempt: doc.vatExempt, vatExemptReasonText: vatExemptReasonText(doc.vatExemptReason), language: doc.language,
     lines: doc.lines.map((l) => ({ id: l.id, description: l.description, quantity: l.quantity, unitPrice: l.unitPrice, vatRate: l.vatRate, lineTotal: l.lineTotal })),
   };
 
