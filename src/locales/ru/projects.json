@@ -1,0 +1,80 @@
+{
+  "title": "Проекты",
+  "count": "{n} проектов",
+  "newProject": "+ Новый проект",
+  "empty": {
+    "none": "Нет проектов",
+    "add": "Добавить проект"
+  },
+  "status": {
+    "active": "Активный",
+    "completed": "Завершён",
+    "on_hold": "Пауза",
+    "cancelled": "Аннулирован"
+  },
+  "budget": "Бюджет",
+  "deadline": "Срок",
+  "details": "Детали",
+  "errSave": "Ошибка при сохранении.",
+  "new": {
+    "back": "← Проекты",
+    "heading": "Новый проект",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "saving": "Сохранение…",
+    "f": {
+      "name": "Название проекта *",
+      "client": "Клиент",
+      "noClient": "— Без клиента —",
+      "status": "Статус",
+      "budget": "Бюджет (EUR)",
+      "plannedBudget": "Планируемый бюджет (EUR)",
+      "deadline": "Крайний срок",
+      "progress": "Прогресс (%)"
+    }
+  },
+  "detail": {
+    "back": "← Проекты",
+    "edit": "✎ Редактировать",
+    "close": "Закрыть",
+    "f": {
+      "name": "Название",
+      "description": "Описание",
+      "status": "Статус",
+      "budget": "Бюджет (€)",
+      "deadline": "Крайний срок"
+    },
+    "kpi": {
+      "client": "Клиент",
+      "budget": "Бюджет",
+      "revenue": "Доходы",
+      "expense": "Расходы",
+      "profit": "Прибыль",
+      "deadline": "Срок"
+    },
+    "progress": "Прогресс: {n}%",
+    "entries": {
+      "title": "Доходы и расходы",
+      "expense": "− Расход",
+      "revenue": "+ Доход",
+      "descPh": "Описание",
+      "amountPh": "Сумма €",
+      "empty": "Нет записей.",
+      "revenueLabel": "Доход",
+      "expenseLabel": "Расход",
+      "confirmDelete": "эту операцию"
+    },
+    "subs": {
+      "title": "Подпроекты ({n})",
+      "meta": "{status} · {pct}% · прибыль {profit}",
+      "namePh": "Название подпроекта…",
+      "add": "+ Добавить"
+    },
+    "notes": {
+      "title": "Заметки и комментарии",
+      "placeholder": "Добавить заметку…",
+      "empty": "Нет заметок.",
+      "confirmDelete": "эту заметку"
+    }
+  }
+}

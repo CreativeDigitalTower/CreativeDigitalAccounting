@@ -1,0 +1,80 @@
+{
+  "title": "Proiecte",
+  "count": "{n} proiecte",
+  "newProject": "+ Proiect nou",
+  "empty": {
+    "none": "Niciun proiect",
+    "add": "Adaugă proiect"
+  },
+  "status": {
+    "active": "Activ",
+    "completed": "Finalizat",
+    "on_hold": "În așteptare",
+    "cancelled": "Anulat"
+  },
+  "budget": "Buget",
+  "deadline": "Termen",
+  "details": "Detalii",
+  "errSave": "Eroare la salvare.",
+  "new": {
+    "back": "← Proiecte",
+    "heading": "Proiect nou",
+    "cancel": "Anulează",
+    "save": "Salvează",
+    "saving": "Se salvează…",
+    "f": {
+      "name": "Nume proiect *",
+      "client": "Client",
+      "noClient": "— Fără client —",
+      "status": "Status",
+      "budget": "Buget (EUR)",
+      "plannedBudget": "Buget planificat (EUR)",
+      "deadline": "Termen limită",
+      "progress": "Progres (%)"
+    }
+  },
+  "detail": {
+    "back": "← Proiecte",
+    "edit": "✎ Editează",
+    "close": "Închide",
+    "f": {
+      "name": "Nume",
+      "description": "Descriere",
+      "status": "Status",
+      "budget": "Buget (€)",
+      "deadline": "Termen limită"
+    },
+    "kpi": {
+      "client": "Client",
+      "budget": "Buget",
+      "revenue": "Venituri",
+      "expense": "Cheltuieli",
+      "profit": "Profit",
+      "deadline": "Termen"
+    },
+    "progress": "Progres: {n}%",
+    "entries": {
+      "title": "Venituri și cheltuieli",
+      "expense": "− Cheltuială",
+      "revenue": "+ Venit",
+      "descPh": "Descriere",
+      "amountPh": "Sumă €",
+      "empty": "Nicio înregistrare.",
+      "revenueLabel": "Venit",
+      "expenseLabel": "Cheltuială",
+      "confirmDelete": "această înregistrare"
+    },
+    "subs": {
+      "title": "Subproiecte ({n})",
+      "meta": "{status} · {pct}% · profit {profit}",
+      "namePh": "Nume subproiect…",
+      "add": "+ Adaugă"
+    },
+    "notes": {
+      "title": "Note și comentarii",
+      "placeholder": "Adaugă o notă…",
+      "empty": "Nicio notă.",
+      "confirmDelete": "această notă"
+    }
+  }
+}
