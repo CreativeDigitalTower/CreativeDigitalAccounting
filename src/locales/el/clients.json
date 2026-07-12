@@ -109,5 +109,130 @@
       "emailPh": "office@firma.gr",
       "phone": "Τηλέφωνο"
     }
+  },
+  "taskType": {
+    "call": "Κλήση",
+    "email": "Αποστολή email",
+    "offer": "Αποστολή προσφοράς",
+    "contract": "Αποστολή σύμβασης",
+    "followup": "Επικοινωνία με πελάτη",
+    "meeting": "Συνάντηση",
+    "other": "Άλλο"
+  },
+  "docShort": {
+    "invoice": "Τιμολόγιο",
+    "proforma": "Προτιμ.",
+    "quote": "Προσφορά",
+    "credit_note": "Πιστ. σημ.",
+    "debit_note": "Χρεωστ. σημ."
+  },
+  "docLower": {
+    "invoice": "τιμολόγιο",
+    "proforma": "προτιμολόγιο",
+    "quote": "προσφορά",
+    "credit_note": "πιστωτικό σημείωμα",
+    "debit_note": "χρεωστικό σημείωμα"
+  },
+  "crm": {
+    "back": "← Πελάτες (CRM)",
+    "newOffer": "+ Προσφορά",
+    "newInvoice": "+ Τιμολόγιο",
+    "statusLabel": "Κατάσταση:",
+    "stageLabel": "Στάδιο (pipeline):",
+    "dealValueLabel": "Αξία συμφωνίας (€):",
+    "kpi": {
+      "turnover": "Τζίρος πελάτη",
+      "invoiced": "Τιμολογημένα (στο σύστημα)",
+      "paid": "Πληρωμένα",
+      "documents": "Έγγραφα"
+    },
+    "tabs": {
+      "overview": "Επισκόπηση",
+      "timeline": "Χρονολόγιο",
+      "docs": "Έγγραφα και έργα",
+      "files": "Αρχεία"
+    },
+    "info": {
+      "title": "Στοιχεία πελάτη",
+      "edit": "✎ Επεξεργασία",
+      "save": "Αποθήκευση",
+      "name": "Επωνυμία",
+      "birthday": "Γενέθλια",
+      "clientSince": "Πελάτης από (ημ/νία)",
+      "openingRevenue": "Μεταφερόμενος τζίρος (€)",
+      "openingRevenuePh": "τζίρος πριν το σύστημα",
+      "monthlyRetainer": "Μηνιαία συνδρομή (€)",
+      "monthlyRetainerPh": "προαιρετικό",
+      "clientSinceView": "Πελάτης από",
+      "openingRevenueView": "Μεταφερόμενος τζίρος",
+      "monthlyRetainerView": "Μηνιαία συνδρομή"
+    },
+    "f": {
+      "eik": "Κωδικός εταιρείας",
+      "vat": "ΑΦΜ",
+      "mol": "Υπεύθυνος",
+      "contactPerson": "Πρόσωπο επικοινωνίας",
+      "email": "E-mail",
+      "phone": "Τηλέφωνο",
+      "website": "Ιστότοπος",
+      "city": "Πόλη",
+      "address": "Διεύθυνση",
+      "tags": "Ετικέτες"
+    },
+    "contacts": {
+      "title": "Πρόσωπα επικοινωνίας",
+      "add": "+ Προσθήκη επαφής",
+      "name": "Όνομα",
+      "position": "Θέση",
+      "phone": "Τηλέφωνο",
+      "email": "E-mail",
+      "confirmDelete": "αυτή την επαφή"
+    },
+    "tasks": {
+      "title": "Εργασίες CRM",
+      "placeholder": "Εργασία…",
+      "empty": "Καμία εργασία.",
+      "confirmDelete": "αυτή την εργασία"
+    },
+    "notes": {
+      "title": "Σημειώσεις CRM",
+      "placeholder": "Προσθήκη σημείωσης…",
+      "empty": "Καμία σημείωση."
+    },
+    "timeline": {
+      "title": "Χρονολόγιο πελάτη",
+      "empty": "Δεν υπάρχουν ακόμη συμβάντα.",
+      "added": "Ο πελάτης προστέθηκε στο CRM",
+      "issued": "Εκδόθηκε {doc} αρ. {number}",
+      "payment": "Πληρωμή για {number} ({amount})",
+      "contract": "Σύμβαση: {title}",
+      "project": "Έργο: {name}",
+      "taskDone": "Ολοκληρωμένη εργασία: {title}"
+    },
+    "docs": {
+      "title": "Έγγραφα ({n})",
+      "empty": "Κανένα έγγραφο.",
+      "number": "Αριθμός",
+      "type": "Τύπος",
+      "date": "Ημ/νία",
+      "amount": "Ποσό",
+      "status": "Κατάσταση",
+      "paid": "Πληρωμένο",
+      "overdue": "Ληξιπρόθεσμο"
+    },
+    "lists": {
+      "contracts": "Συμβάσεις ({n})",
+      "contractsEmpty": "Καμία σύμβαση.",
+      "projects": "Έργα ({n})",
+      "projectsEmpty": "Κανένα έργο."
+    },
+    "files": {
+      "title": "Αρχεία πελάτη",
+      "empty": "Δεν υπάρχουν αρχεία.",
+      "uploading": "Μεταφόρτωση…",
+      "tooLarge": "Το αρχείο είναι πολύ μεγάλο (μέγ. 5 MB).",
+      "uploadErr": "Σφάλμα μεταφόρτωσης.",
+      "confirmDelete": "αυτό το αρχείο"
+    }
   }
 }

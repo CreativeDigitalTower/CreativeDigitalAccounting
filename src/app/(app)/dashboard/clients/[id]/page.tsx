@@ -2,12 +2,16 @@ import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { ClientCrm } from "@/components/app/ClientCrm";
-
-const DOC_LABEL: Record<string, string> = { invoice: "фактура", proforma: "проформа", quote: "оферта", credit_note: "кредитно известие", debit_note: "дебитно известие" };
+import { getT } from "@/lib/i18n/server";
 
 export default async function ClientDossierPage({ params }: { params: Promise<{ id: string }> }) {
   const { companyId } = await requireCompany();
+  const { t } = await getT();
   const { id } = await params;
+  const docLower = (type: string) => {
+    const label = t(`clients.docLower.${type}`);
+    return label === `clients.docLower.${type}` ? type : label;
+  };
 
   const client = await prisma.client.findFirst({
     where: { id, companyId },
@@ -30,15 +34,15 @@ export default async function ClientDossierPage({ params }: { params: Promise<{ 
 
   // ─── Хронология ───
   const timeline: { date: string; kind: string; label: string; icon: string; color: string }[] = [];
-  timeline.push({ date: client.createdAt.toISOString(), kind: "added", label: "Клиентът е добавен в CRM", icon: "+", color: "var(--navy)" });
+  timeline.push({ date: client.createdAt.toISOString(), kind: "added", label: t("clients.crm.timeline.added"), icon: "+", color: "var(--navy)" });
   for (const d of client.documents) {
-    const label = `Издадена ${DOC_LABEL[d.type] ?? d.type} № ${d.number}`;
+    const label = t("clients.crm.timeline.issued", { doc: docLower(d.type), number: d.number });
     timeline.push({ date: d.issueDate.toISOString(), kind: d.type, label, icon: d.type === "quote" ? "✓" : "•", color: d.type === "quote" ? "var(--brass)" : "var(--navy)" });
-    if (d.status === "paid") timeline.push({ date: d.issueDate.toISOString(), kind: "payment", label: `Плащане по ${d.number} (${docTotal(d).toFixed(2)} €)`, icon: "€", color: "var(--emerald)" });
+    if (d.status === "paid") timeline.push({ date: d.issueDate.toISOString(), kind: "payment", label: t("clients.crm.timeline.payment", { number: d.number, amount: `${docTotal(d).toFixed(2)} €` }), icon: "€", color: "var(--emerald)" });
   }
-  for (const c of client.contracts) timeline.push({ date: c.startDate.toISOString(), kind: "contract", label: `Договор: ${c.title}`, icon: "§", color: "var(--navy)" });
-  for (const p of client.projects) timeline.push({ date: (p.deadline ?? client.createdAt).toISOString(), kind: "project", label: `Проект: ${p.name}`, icon: "▣", color: "var(--brass)" });
-  for (const t of client.tasks.filter((t) => t.done)) timeline.push({ date: t.createdAt.toISOString(), kind: "task", label: `Изпълнена задача: ${t.title}`, icon: "✓", color: "var(--emerald)" });
+  for (const c of client.contracts) timeline.push({ date: c.startDate.toISOString(), kind: "contract", label: t("clients.crm.timeline.contract", { title: c.title }), icon: "§", color: "var(--navy)" });
+  for (const p of client.projects) timeline.push({ date: (p.deadline ?? client.createdAt).toISOString(), kind: "project", label: t("clients.crm.timeline.project", { name: p.name }), icon: "▣", color: "var(--brass)" });
+  for (const task of client.tasks.filter((x) => x.done)) timeline.push({ date: task.createdAt.toISOString(), kind: "task", label: t("clients.crm.timeline.taskDone", { title: task.title }), icon: "✓", color: "var(--emerald)" });
   timeline.sort((a, b) => (a.date < b.date ? 1 : -1));
 
   return (

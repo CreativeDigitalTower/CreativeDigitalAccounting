@@ -109,5 +109,130 @@
       "emailPh": "office@firma.bg",
       "phone": "Телефон"
     }
+  },
+  "taskType": {
+    "call": "Обади се",
+    "email": "Изпрати имейл",
+    "offer": "Изпрати оферта",
+    "contract": "Изпрати договор",
+    "followup": "Потърси клиента",
+    "meeting": "Среща",
+    "other": "Друго"
+  },
+  "docShort": {
+    "invoice": "Фактура",
+    "proforma": "Проформа",
+    "quote": "Оферта",
+    "credit_note": "Кр. известие",
+    "debit_note": "Деб. известие"
+  },
+  "docLower": {
+    "invoice": "фактура",
+    "proforma": "проформа",
+    "quote": "оферта",
+    "credit_note": "кредитно известие",
+    "debit_note": "дебитно известие"
+  },
+  "crm": {
+    "back": "← Клиенти (CRM)",
+    "newOffer": "+ Оферта",
+    "newInvoice": "+ Фактура",
+    "statusLabel": "Статус:",
+    "stageLabel": "Етап (pipeline):",
+    "dealValueLabel": "Стойност на сделка (€):",
+    "kpi": {
+      "turnover": "Оборот от клиента",
+      "invoiced": "Фактурирано (в системата)",
+      "paid": "Платено",
+      "documents": "Документи"
+    },
+    "tabs": {
+      "overview": "Преглед",
+      "timeline": "Хронология",
+      "docs": "Документи и проекти",
+      "files": "Файлове"
+    },
+    "info": {
+      "title": "Данни за клиента",
+      "edit": "✎ Редактирай",
+      "save": "Запази",
+      "name": "Наименование",
+      "birthday": "Рожден ден",
+      "clientSince": "Клиент от (дата)",
+      "openingRevenue": "Пренесен оборот (€)",
+      "openingRevenuePh": "оборот преди системата",
+      "monthlyRetainer": "Месечен абонамент (€)",
+      "monthlyRetainerPh": "по избор",
+      "clientSinceView": "Клиент от",
+      "openingRevenueView": "Пренесен оборот",
+      "monthlyRetainerView": "Месечен абонамент"
+    },
+    "f": {
+      "eik": "ЕИК",
+      "vat": "ДДС №",
+      "mol": "МОЛ",
+      "contactPerson": "Контактно лице",
+      "email": "Имейл",
+      "phone": "Телефон",
+      "website": "Уебсайт",
+      "city": "Град",
+      "address": "Адрес",
+      "tags": "Тагове"
+    },
+    "contacts": {
+      "title": "Контактни лица",
+      "add": "+ Добави контакт",
+      "name": "Име",
+      "position": "Длъжност",
+      "phone": "Телефон",
+      "email": "Имейл",
+      "confirmDelete": "този контакт"
+    },
+    "tasks": {
+      "title": "CRM задачи",
+      "placeholder": "Задача…",
+      "empty": "Няма задачи.",
+      "confirmDelete": "тази задача"
+    },
+    "notes": {
+      "title": "CRM бележки",
+      "placeholder": "Добави бележка…",
+      "empty": "Няма бележки."
+    },
+    "timeline": {
+      "title": "Хронология на клиента",
+      "empty": "Все още няма събития.",
+      "added": "Клиентът е добавен в CRM",
+      "issued": "Издадена {doc} № {number}",
+      "payment": "Плащане по {number} ({amount})",
+      "contract": "Договор: {title}",
+      "project": "Проект: {name}",
+      "taskDone": "Изпълнена задача: {title}"
+    },
+    "docs": {
+      "title": "Документи ({n})",
+      "empty": "Няма документи.",
+      "number": "Номер",
+      "type": "Тип",
+      "date": "Дата",
+      "amount": "Сума",
+      "status": "Статус",
+      "paid": "Платена",
+      "overdue": "Просрочена"
+    },
+    "lists": {
+      "contracts": "Договори ({n})",
+      "contractsEmpty": "Няма договори.",
+      "projects": "Проекти ({n})",
+      "projectsEmpty": "Няма проекти."
+    },
+    "files": {
+      "title": "Файлове на клиента",
+      "empty": "Няма качени файлове.",
+      "uploading": "Качване…",
+      "tooLarge": "Файлът е твърде голям (макс. 5 MB).",
+      "uploadErr": "Грешка при качване.",
+      "confirmDelete": "този файл"
+    }
   }
 }

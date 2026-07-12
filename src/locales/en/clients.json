@@ -109,5 +109,130 @@
       "emailPh": "office@company.com",
       "phone": "Phone"
     }
+  },
+  "taskType": {
+    "call": "Call",
+    "email": "Send email",
+    "offer": "Send quote",
+    "contract": "Send contract",
+    "followup": "Follow up",
+    "meeting": "Meeting",
+    "other": "Other"
+  },
+  "docShort": {
+    "invoice": "Invoice",
+    "proforma": "Proforma",
+    "quote": "Quote",
+    "credit_note": "Credit note",
+    "debit_note": "Debit note"
+  },
+  "docLower": {
+    "invoice": "invoice",
+    "proforma": "proforma",
+    "quote": "quote",
+    "credit_note": "credit note",
+    "debit_note": "debit note"
+  },
+  "crm": {
+    "back": "← Clients (CRM)",
+    "newOffer": "+ Quote",
+    "newInvoice": "+ Invoice",
+    "statusLabel": "Status:",
+    "stageLabel": "Stage (pipeline):",
+    "dealValueLabel": "Deal value (€):",
+    "kpi": {
+      "turnover": "Client turnover",
+      "invoiced": "Invoiced (in system)",
+      "paid": "Paid",
+      "documents": "Documents"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "timeline": "Timeline",
+      "docs": "Documents & projects",
+      "files": "Files"
+    },
+    "info": {
+      "title": "Client details",
+      "edit": "✎ Edit",
+      "save": "Save",
+      "name": "Name",
+      "birthday": "Birthday",
+      "clientSince": "Client since (date)",
+      "openingRevenue": "Opening revenue (€)",
+      "openingRevenuePh": "revenue before the system",
+      "monthlyRetainer": "Monthly retainer (€)",
+      "monthlyRetainerPh": "optional",
+      "clientSinceView": "Client since",
+      "openingRevenueView": "Opening revenue",
+      "monthlyRetainerView": "Monthly retainer"
+    },
+    "f": {
+      "eik": "Company ID",
+      "vat": "VAT №",
+      "mol": "Responsible officer",
+      "contactPerson": "Contact person",
+      "email": "Email",
+      "phone": "Phone",
+      "website": "Website",
+      "city": "City",
+      "address": "Address",
+      "tags": "Tags"
+    },
+    "contacts": {
+      "title": "Contact persons",
+      "add": "+ Add contact",
+      "name": "Name",
+      "position": "Position",
+      "phone": "Phone",
+      "email": "Email",
+      "confirmDelete": "this contact"
+    },
+    "tasks": {
+      "title": "CRM tasks",
+      "placeholder": "Task…",
+      "empty": "No tasks.",
+      "confirmDelete": "this task"
+    },
+    "notes": {
+      "title": "CRM notes",
+      "placeholder": "Add a note…",
+      "empty": "No notes."
+    },
+    "timeline": {
+      "title": "Client timeline",
+      "empty": "No events yet.",
+      "added": "Client added to CRM",
+      "issued": "Issued {doc} No. {number}",
+      "payment": "Payment on {number} ({amount})",
+      "contract": "Contract: {title}",
+      "project": "Project: {name}",
+      "taskDone": "Task completed: {title}"
+    },
+    "docs": {
+      "title": "Documents ({n})",
+      "empty": "No documents.",
+      "number": "Number",
+      "type": "Type",
+      "date": "Date",
+      "amount": "Amount",
+      "status": "Status",
+      "paid": "Paid",
+      "overdue": "Overdue"
+    },
+    "lists": {
+      "contracts": "Contracts ({n})",
+      "contractsEmpty": "No contracts.",
+      "projects": "Projects ({n})",
+      "projectsEmpty": "No projects."
+    },
+    "files": {
+      "title": "Client files",
+      "empty": "No uploaded files.",
+      "uploading": "Uploading…",
+      "tooLarge": "File is too large (max. 5 MB).",
+      "uploadErr": "Upload error.",
+      "confirmDelete": "this file"
+    }
   }
 }

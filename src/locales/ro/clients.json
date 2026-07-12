@@ -109,5 +109,130 @@
       "emailPh": "office@firma.ro",
       "phone": "Telefon"
     }
+  },
+  "taskType": {
+    "call": "Sună",
+    "email": "Trimite e-mail",
+    "offer": "Trimite ofertă",
+    "contract": "Trimite contract",
+    "followup": "Contactează clientul",
+    "meeting": "Întâlnire",
+    "other": "Altele"
+  },
+  "docShort": {
+    "invoice": "Factură",
+    "proforma": "Proformă",
+    "quote": "Ofertă",
+    "credit_note": "Notă cr.",
+    "debit_note": "Notă db."
+  },
+  "docLower": {
+    "invoice": "factură",
+    "proforma": "proformă",
+    "quote": "ofertă",
+    "credit_note": "notă de credit",
+    "debit_note": "notă de debit"
+  },
+  "crm": {
+    "back": "← Clienți (CRM)",
+    "newOffer": "+ Ofertă",
+    "newInvoice": "+ Factură",
+    "statusLabel": "Status:",
+    "stageLabel": "Etapă (pipeline):",
+    "dealValueLabel": "Valoare tranzacție (€):",
+    "kpi": {
+      "turnover": "Cifra de afaceri a clientului",
+      "invoiced": "Facturat (în sistem)",
+      "paid": "Plătit",
+      "documents": "Documente"
+    },
+    "tabs": {
+      "overview": "Prezentare",
+      "timeline": "Cronologie",
+      "docs": "Documente și proiecte",
+      "files": "Fișiere"
+    },
+    "info": {
+      "title": "Datele clientului",
+      "edit": "✎ Editează",
+      "save": "Salvează",
+      "name": "Denumire",
+      "birthday": "Zi de naștere",
+      "clientSince": "Client din (data)",
+      "openingRevenue": "Venit preluat (€)",
+      "openingRevenuePh": "venit înainte de sistem",
+      "monthlyRetainer": "Abonament lunar (€)",
+      "monthlyRetainerPh": "opțional",
+      "clientSinceView": "Client din",
+      "openingRevenueView": "Venit preluat",
+      "monthlyRetainerView": "Abonament lunar"
+    },
+    "f": {
+      "eik": "CUI",
+      "vat": "TVA №",
+      "mol": "Persoană responsabilă",
+      "contactPerson": "Persoană de contact",
+      "email": "E-mail",
+      "phone": "Telefon",
+      "website": "Website",
+      "city": "Oraș",
+      "address": "Adresă",
+      "tags": "Etichete"
+    },
+    "contacts": {
+      "title": "Persoane de contact",
+      "add": "+ Adaugă contact",
+      "name": "Nume",
+      "position": "Funcție",
+      "phone": "Telefon",
+      "email": "E-mail",
+      "confirmDelete": "acest contact"
+    },
+    "tasks": {
+      "title": "Sarcini CRM",
+      "placeholder": "Sarcină…",
+      "empty": "Nicio sarcină.",
+      "confirmDelete": "această sarcină"
+    },
+    "notes": {
+      "title": "Note CRM",
+      "placeholder": "Adaugă o notă…",
+      "empty": "Nicio notă."
+    },
+    "timeline": {
+      "title": "Cronologia clientului",
+      "empty": "Încă niciun eveniment.",
+      "added": "Client adăugat în CRM",
+      "issued": "Emis {doc} nr. {number}",
+      "payment": "Plată pe {number} ({amount})",
+      "contract": "Contract: {title}",
+      "project": "Proiect: {name}",
+      "taskDone": "Sarcină finalizată: {title}"
+    },
+    "docs": {
+      "title": "Documente ({n})",
+      "empty": "Niciun document.",
+      "number": "Număr",
+      "type": "Tip",
+      "date": "Dată",
+      "amount": "Sumă",
+      "status": "Status",
+      "paid": "Plătită",
+      "overdue": "Restantă"
+    },
+    "lists": {
+      "contracts": "Contracte ({n})",
+      "contractsEmpty": "Niciun contract.",
+      "projects": "Proiecte ({n})",
+      "projectsEmpty": "Niciun proiect."
+    },
+    "files": {
+      "title": "Fișierele clientului",
+      "empty": "Niciun fișier încărcat.",
+      "uploading": "Se încarcă…",
+      "tooLarge": "Fișierul este prea mare (max. 5 MB).",
+      "uploadErr": "Eroare la încărcare.",
+      "confirmDelete": "acest fișier"
+    }
   }
 }
