@@ -1,0 +1,113 @@
+{
+  "title": "Clients (CRM)",
+  "count": "{n} clients",
+  "newClient": "+ New client",
+  "tabList": "List",
+  "tabPipeline": "Pipeline (funnel)",
+  "kpi": {
+    "monthly": "Monthly retainers",
+    "total": "Revenue (total)",
+    "active": "Active clients",
+    "openTasks": "Open tasks"
+  },
+  "searchPlaceholder": "Search by name, contact person or phone…",
+  "filterAll": "All",
+  "th": {
+    "client": "Client",
+    "status": "Status",
+    "phone": "Phone",
+    "monthly": "Monthly retainer",
+    "total": "Revenue (total)",
+    "tasks": "Tasks"
+  },
+  "row": {
+    "dossier": "Profile",
+    "invoice": "+ Invoice",
+    "delete": "Delete client"
+  },
+  "empty": {
+    "none": "No clients",
+    "noMatch": "No matches for the search",
+    "add": "Add client",
+    "noActive": "No active clients in this view."
+  },
+  "foot": {
+    "total": "Total:",
+    "shown": "Shown {n}:"
+  },
+  "inactive": {
+    "toggle": "Inactive clients ({n})",
+    "show": "show",
+    "hide": "hide"
+  },
+  "chartTitle": "Revenue by client (top {n})",
+  "menu": {
+    "dossier": "Open profile",
+    "invoice": "New invoice",
+    "offer": "New quote",
+    "copyName": "Copy name",
+    "merge": "Merge with another client",
+    "delete": "Delete client"
+  },
+  "merge": {
+    "title": "Merge clients",
+    "desc": "„{name}“ will be merged into the selected client. All invoices, amounts and data are transferred, and the duplicate profile is deleted.",
+    "into": "Merge into:",
+    "select": "— Select a client —",
+    "cancel": "Cancel",
+    "submit": "Merge",
+    "submitting": "Merging…"
+  },
+  "err": {
+    "merge": "Error while merging.",
+    "delete": "Error while deleting.",
+    "save": "Error while saving.",
+    "eik": "Invalid company ID/UIC."
+  },
+  "confirmDelete": "client „{name}“",
+  "pipeline": {
+    "deal": "Deal: {v}",
+    "invoiced": "Invoiced: {v}"
+  },
+  "status": {
+    "lead": "Lead",
+    "active": "Active",
+    "vip": "VIP",
+    "inactive": "Inactive",
+    "lost": "Lost"
+  },
+  "stage": {
+    "new": "New",
+    "contacted": "Contacted",
+    "proposal": "Quote sent",
+    "negotiation": "Negotiation",
+    "won": "Won",
+    "lost": "Lost"
+  },
+  "new": {
+    "back": "← Clients",
+    "heading": "New client",
+    "matchInfo": "This company is registered on the platform: {name}. Documents to it will be delivered automatically to its profile.",
+    "matchFill": "Fill in data automatically",
+    "section": "Basic details",
+    "cancel": "Cancel",
+    "save": "Save client",
+    "saving": "Saving…",
+    "f": {
+      "name": "Name / Full name *",
+      "namePh": "Example Ltd",
+      "eik": "Company ID / UIC",
+      "vat": "VAT number",
+      "contactPerson": "Contact person",
+      "person": "John Smith",
+      "mol": "Responsible officer",
+      "address": "Address",
+      "addressPh": "1 Vitosha St",
+      "city": "City",
+      "cityPh": "Sofia",
+      "email": "Contact email",
+      "emailPh": "office@company.com",
+      "phone": "Phone"
+    }
+  }
+}

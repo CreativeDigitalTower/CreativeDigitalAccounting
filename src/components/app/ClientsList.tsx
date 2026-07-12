@@ -8,6 +8,7 @@ import { STATUSES } from "@/lib/crm";
 import { ContextMenu, type MenuItem } from "@/components/app/ContextMenu";
 import { UiIcon } from "@/components/app/NavIcons";
 import { confirmDelete } from "@/lib/confirmDelete";
+import { useT } from "@/components/i18n/I18nProvider";
 
 export type ClientRow = {
   id: string; name: string; contactPerson: string | null; phone: string | null;
@@ -15,6 +16,7 @@ export type ClientRow = {
 };
 
 export function ClientsList({ clients, grandMonth, grandTotal }: { clients: ClientRow[]; grandMonth: number; grandTotal: number }) {
+  const t = useT();
   const router = useRouter();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<string>("all");
@@ -32,25 +34,25 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
     });
     setMerging(false);
     if (res.ok) { setMergeSource(null); setMergeTarget(""); router.refresh(); }
-    else alert((await res.json()).error ?? "Грешка при обединяване.");
+    else alert((await res.json()).error ?? t("clients.err.merge"));
   }
 
   async function deleteClient(c: ClientRow) {
-    if (!(await confirmDelete(`клиент „${c.name}"`))) return;
+    if (!(await confirmDelete(t("clients.confirmDelete", { name: c.name })))) return;
     const res = await fetch(`/api/clients/${c.id}`, { method: "DELETE" });
     if (res.ok) router.refresh();
-    else alert((await res.json()).error ?? "Грешка при изтриване.");
+    else alert((await res.json()).error ?? t("clients.err.delete"));
   }
 
   function menuItems(c: ClientRow): MenuItem[] {
     return [
-      { label: "Отвори досие", icon: <UiIcon.people width={15} height={15} />, onClick: () => router.push(`/dashboard/clients/${c.id}`) },
-      { label: "Нова фактура", icon: <UiIcon.doc width={15} height={15} />, onClick: () => router.push(`/dashboard/documents/new?clientId=${c.id}`) },
-      { label: "Нова оферта", icon: <UiIcon.doc width={15} height={15} />, onClick: () => router.push(`/dashboard/documents/new?clientId=${c.id}&type=quote`) },
+      { label: t("clients.menu.dossier"), icon: <UiIcon.people width={15} height={15} />, onClick: () => router.push(`/dashboard/clients/${c.id}`) },
+      { label: t("clients.menu.invoice"), icon: <UiIcon.doc width={15} height={15} />, onClick: () => router.push(`/dashboard/documents/new?clientId=${c.id}`) },
+      { label: t("clients.menu.offer"), icon: <UiIcon.doc width={15} height={15} />, onClick: () => router.push(`/dashboard/documents/new?clientId=${c.id}&type=quote`) },
       { divider: true, label: "", onClick: () => {} },
-      { label: "Копирай име", icon: "⧉", onClick: () => navigator.clipboard?.writeText(c.name) },
-      { label: "Обедини с друг клиент", icon: "⇄", onClick: () => { setMergeSource(c); setMergeTarget(""); } },
-      { label: "Изтрий клиент", icon: <UiIcon.trash width={15} height={15} />, danger: true, onClick: () => deleteClient(c) },
+      { label: t("clients.menu.copyName"), icon: "⧉", onClick: () => navigator.clipboard?.writeText(c.name) },
+      { label: t("clients.menu.merge"), icon: "⇄", onClick: () => { setMergeSource(c); setMergeTarget(""); } },
+      { label: t("clients.menu.delete"), icon: <UiIcon.trash width={15} height={15} />, danger: true, onClick: () => deleteClient(c) },
     ];
   }
 
@@ -76,25 +78,25 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
     <>
       {/* Приходи */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 14 }}>
-        <Kpi label="Месечни абонаменти" value={formatCurrency(grandMonth)} color="var(--emerald-dark)" />
-        <Kpi label="Приход (общо)" value={formatCurrency(grandTotal)} color="var(--navy)" />
-        <Kpi label="Активни клиенти" value={String(counts["active"] ?? 0)} color="var(--ink)" />
-        <Kpi label="Отворени задачи" value={String(clients.reduce((s, c) => s + c.openTasks, 0))} color="var(--brass)" />
+        <Kpi label={t("clients.kpi.monthly")} value={formatCurrency(grandMonth)} color="var(--emerald-dark)" />
+        <Kpi label={t("clients.kpi.total")} value={formatCurrency(grandTotal)} color="var(--navy)" />
+        <Kpi label={t("clients.kpi.active")} value={String(counts["active"] ?? 0)} color="var(--ink)" />
+        <Kpi label={t("clients.kpi.openTasks")} value={String(clients.reduce((s, c) => s + c.openTasks, 0))} color="var(--brass)" />
       </div>
 
       {/* Търсене + филтри по статус */}
       <div className="glass panel" style={{ padding: "12px 16px", marginBottom: 14, display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
         <input
-          placeholder="Търси по име, лице за контакт или телефон…"
+          placeholder={t("clients.searchPlaceholder")}
           value={q}
           onChange={(e) => setQ(e.target.value)}
           style={{ flex: "1 1 280px", minWidth: 220, padding: "8px 12px" }}
         />
         <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-          <button className={`filter-tab${status === "all" ? " active" : ""}`} onClick={() => setStatus("all")}>Всички ({clients.length})</button>
+          <button className={`filter-tab${status === "all" ? " active" : ""}`} onClick={() => setStatus("all")}>{t("clients.filterAll")} ({clients.length})</button>
           {STATUSES.map((s) => (
             <button key={s.id} className={`filter-tab${status === s.id ? " active" : ""}`} onClick={() => setStatus(s.id)}>
-              {s.label} ({counts[s.id] ?? 0})
+              {t(`clients.status.${s.id}`)} ({counts[s.id] ?? 0})
             </button>
           ))}
         </div>
@@ -116,23 +118,23 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
                   </div>
                 </div>
               </td>
-              <td><span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: s.color, borderRadius: 14, padding: "2px 9px" }}>{s.label}</span></td>
+              <td><span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: s.color, borderRadius: 14, padding: "2px 9px" }}>{t(`clients.status.${s.id}`)}</span></td>
               <td style={{ fontSize: 13 }}>{client.phone ?? "—"}</td>
               <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(client.month)}</td>
               <td className="num" style={{ fontWeight: 600, color: "var(--emerald-dark)" }}>{formatCurrency(client.total)}</td>
               <td className="num">{client.openTasks > 0 ? <span style={{ color: "var(--brass)", fontWeight: 700 }}>{client.openTasks}</span> : "—"}</td>
               <td style={{ display: "flex", gap: 6 }}>
-                <Link href={`/dashboard/clients/${client.id}`} className="btn btn-ghost btn-sm">Досие</Link>
-                <Link href={`/dashboard/documents/new?clientId=${client.id}`} className="btn btn-primary btn-sm">+ Фактура</Link>
-                <button onClick={() => deleteClient(client)} className="btn btn-ghost btn-sm" title="Изтрий клиент" style={{ color: "var(--brick)", borderColor: "var(--brick)", display: "inline-flex", alignItems: "center" }}><UiIcon.trash /></button>
+                <Link href={`/dashboard/clients/${client.id}`} className="btn btn-ghost btn-sm">{t("clients.row.dossier")}</Link>
+                <Link href={`/dashboard/documents/new?clientId=${client.id}`} className="btn btn-primary btn-sm">{t("clients.row.invoice")}</Link>
+                <button onClick={() => deleteClient(client)} className="btn btn-ghost btn-sm" title={t("clients.row.delete")} style={{ color: "var(--brick)", borderColor: "var(--brick)", display: "inline-flex", alignItems: "center" }}><UiIcon.trash /></button>
               </td>
             </tr>
           );
         };
         const Head = () => (
           <thead><tr>
-            <th>Клиент</th><th>Статус</th><th>Телефон</th>
-            <th className="num">Месечен абонамент</th><th className="num">Приход (общо)</th><th className="num">Задачи</th><th></th>
+            <th>{t("clients.th.client")}</th><th>{t("clients.th.status")}</th><th>{t("clients.th.phone")}</th>
+            <th className="num">{t("clients.th.monthly")}</th><th className="num">{t("clients.th.total")}</th><th className="num">{t("clients.th.tasks")}</th><th></th>
           </tr></thead>
         );
 
@@ -150,18 +152,18 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
               {filtered.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "40px 0", color: "var(--muted)" }}>
                   <div style={{ display: "flex", justifyContent: "center", marginBottom: 10, color: "var(--muted)" }}><UiIcon.people width={32} height={32} /></div>
-                  <div style={{ fontSize: 14, marginBottom: 14 }}>{clients.length === 0 ? "Няма клиенти" : "Няма съвпадения по търсенето"}</div>
-                  {clients.length === 0 && <Link href="/dashboard/clients/new" className="btn btn-primary btn-sm">Добави клиент</Link>}
+                  <div style={{ fontSize: 14, marginBottom: 14 }}>{clients.length === 0 ? t("clients.empty.none") : t("clients.empty.noMatch")}</div>
+                  {clients.length === 0 && <Link href="/dashboard/clients/new" className="btn btn-primary btn-sm">{t("clients.empty.add")}</Link>}
                 </div>
               ) : mainRows.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "24px 0", color: "var(--muted)", fontSize: 13 }}>Няма активни клиенти в този изглед.</div>
+                <div style={{ textAlign: "center", padding: "24px 0", color: "var(--muted)", fontSize: 13 }}>{t("clients.empty.noActive")}</div>
               ) : (
                 <table>
                   <Head />
                   <tbody>{mainRows.map(renderRow)}</tbody>
                   <tfoot>
                     <tr style={{ borderTop: "2px solid var(--border)", fontWeight: 700 }}>
-                      <td colSpan={3} style={{ textAlign: "right" }}>{!splitInactive && filtered.length === clients.length ? "Общо:" : `Показани ${mainRows.length}:`}</td>
+                      <td colSpan={3} style={{ textAlign: "right" }}>{!splitInactive && filtered.length === clients.length ? t("clients.foot.total") : t("clients.foot.shown", { n: mainRows.length })}</td>
                       <td className="num">{formatCurrency(splitInactive ? mMonth : fMonth)}</td>
                       <td className="num" style={{ color: "var(--emerald-dark)" }}>{formatCurrency(splitInactive ? mTotal : fTotal)}</td>
                       <td colSpan={2}></td>
@@ -180,8 +182,8 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
                   style={{ width: "100%", textAlign: "left", cursor: "pointer", border: "none", padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, fontSize: 13.5, fontWeight: 600 }}
                 >
                   <span style={{ color: "var(--muted)" }}>{showInactive ? "▼" : "▶"}</span>
-                  Неактивни клиенти ({inactiveRows.length})
-                  <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--muted)", fontWeight: 400 }}>{showInactive ? "скрий" : "покажи"}</span>
+                  {t("clients.inactive.toggle", { n: inactiveRows.length })}
+                  <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--muted)", fontWeight: 400 }}>{showInactive ? t("clients.inactive.hide") : t("clients.inactive.show")}</span>
                 </button>
                 {showInactive && (
                   <div className="glass panel" style={{ padding: "8px 0", marginTop: 8 }}>
@@ -205,7 +207,7 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
         const COLORS = ["#0F8A6A", "#2C4A66", "#A5812E", "#3F9C82", "#A23B2B", "#0B5E4A", "#6B7C76", "#C9A227", "#245C4A", "#8A4B3B"];
         return (
           <div className="glass panel" style={{ marginTop: 16, padding: "18px 20px" }}>
-            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>Приходи по клиенти (топ {top.length})</h3>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>{t("clients.chartTitle", { n: top.length })}</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {top.map((c, i) => (
                 <div key={c.id}>
@@ -228,18 +230,18 @@ export function ClientsList({ clients, grandMonth, grandTotal }: { clients: Clie
       {mergeSource && (
         <div onClick={() => setMergeSource(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 }}>
           <div onClick={(e) => e.stopPropagation()} className="glass panel" style={{ width: 440, maxWidth: "100%", padding: 24, borderRadius: 14 }}>
-            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 17, margin: "0 0 6px" }}>Обединяване на клиенти</h3>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 17, margin: "0 0 6px" }}>{t("clients.merge.title")}</h3>
             <p style={{ fontSize: 12.5, color: "var(--muted)", margin: "0 0 14px" }}>
-              „{mergeSource.name}" ще бъде обединен в избрания клиент. Всички фактури, суми и данни се прехвърлят, а дублиращият профил се изтрива.
+              {t("clients.merge.desc", { name: mergeSource.name })}
             </p>
-            <label style={{ fontSize: 12, fontWeight: 600 }}>Обедини в:</label>
+            <label style={{ fontSize: 12, fontWeight: 600 }}>{t("clients.merge.into")}</label>
             <select value={mergeTarget} onChange={(e) => setMergeTarget(e.target.value)} style={{ marginBottom: 14 }}>
-              <option value="">— Изберете клиент —</option>
+              <option value="">{t("clients.merge.select")}</option>
               {clients.filter((c) => c.id !== mergeSource.id).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-              <button className="btn btn-ghost btn-sm" onClick={() => setMergeSource(null)}>Отказ</button>
-              <button className="btn btn-primary btn-sm" disabled={!mergeTarget || merging} onClick={doMerge}>{merging ? "Обединяване…" : "Обедини"}</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => setMergeSource(null)}>{t("clients.merge.cancel")}</button>
+              <button className="btn btn-primary btn-sm" disabled={!mergeTarget || merging} onClick={doMerge}>{merging ? t("clients.merge.submitting") : t("clients.merge.submit")}</button>
             </div>
           </div>
         </div>

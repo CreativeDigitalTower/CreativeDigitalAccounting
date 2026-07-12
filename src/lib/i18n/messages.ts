@@ -10,6 +10,7 @@ import bgBi from "@/locales/bg/bi.json";
 import bgPdf from "@/locales/bg/pdf.json";
 import bgEmails from "@/locales/bg/emails.json";
 import bgNotif from "@/locales/bg/notifications.json";
+import bgClients from "@/locales/bg/clients.json";
 import enCommon from "@/locales/en/common.json";
 import enNav from "@/locales/en/navigation.json";
 import enAuth from "@/locales/en/auth.json";
@@ -17,6 +18,7 @@ import enBi from "@/locales/en/bi.json";
 import enPdf from "@/locales/en/pdf.json";
 import enEmails from "@/locales/en/emails.json";
 import enNotif from "@/locales/en/notifications.json";
+import enClients from "@/locales/en/clients.json";
 import ruCommon from "@/locales/ru/common.json";
 import ruNav from "@/locales/ru/navigation.json";
 import ruAuth from "@/locales/ru/auth.json";
@@ -24,6 +26,7 @@ import ruBi from "@/locales/ru/bi.json";
 import ruPdf from "@/locales/ru/pdf.json";
 import ruEmails from "@/locales/ru/emails.json";
 import ruNotif from "@/locales/ru/notifications.json";
+import ruClients from "@/locales/ru/clients.json";
 import roCommon from "@/locales/ro/common.json";
 import roNav from "@/locales/ro/navigation.json";
 import roAuth from "@/locales/ro/auth.json";
@@ -31,6 +34,7 @@ import roBi from "@/locales/ro/bi.json";
 import roPdf from "@/locales/ro/pdf.json";
 import roEmails from "@/locales/ro/emails.json";
 import roNotif from "@/locales/ro/notifications.json";
+import roClients from "@/locales/ro/clients.json";
 import trCommon from "@/locales/tr/common.json";
 import trNav from "@/locales/tr/navigation.json";
 import trAuth from "@/locales/tr/auth.json";
@@ -38,6 +42,7 @@ import trBi from "@/locales/tr/bi.json";
 import trPdf from "@/locales/tr/pdf.json";
 import trEmails from "@/locales/tr/emails.json";
 import trNotif from "@/locales/tr/notifications.json";
+import trClients from "@/locales/tr/clients.json";
 import elCommon from "@/locales/el/common.json";
 import elNav from "@/locales/el/navigation.json";
 import elAuth from "@/locales/el/auth.json";
@@ -45,17 +50,18 @@ import elBi from "@/locales/el/bi.json";
 import elPdf from "@/locales/el/pdf.json";
 import elEmails from "@/locales/el/emails.json";
 import elNotif from "@/locales/el/notifications.json";
+import elClients from "@/locales/el/clients.json";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Messages = Record<string, any>;
 
 const DICTS: Record<Locale, Messages> = {
-  bg: { common: bgCommon, navigation: bgNav, auth: bgAuth, bi: bgBi, pdf: bgPdf, emails: bgEmails, notifications: bgNotif },
-  en: { common: enCommon, navigation: enNav, auth: enAuth, bi: enBi, pdf: enPdf, emails: enEmails, notifications: enNotif },
-  ru: { common: ruCommon, navigation: ruNav, auth: ruAuth, bi: ruBi, pdf: ruPdf, emails: ruEmails, notifications: ruNotif },
-  ro: { common: roCommon, navigation: roNav, auth: roAuth, bi: roBi, pdf: roPdf, emails: roEmails, notifications: roNotif },
-  tr: { common: trCommon, navigation: trNav, auth: trAuth, bi: trBi, pdf: trPdf, emails: trEmails, notifications: trNotif },
-  el: { common: elCommon, navigation: elNav, auth: elAuth, bi: elBi, pdf: elPdf, emails: elEmails, notifications: elNotif },
+  bg: { common: bgCommon, navigation: bgNav, auth: bgAuth, bi: bgBi, pdf: bgPdf, emails: bgEmails, notifications: bgNotif, clients: bgClients },
+  en: { common: enCommon, navigation: enNav, auth: enAuth, bi: enBi, pdf: enPdf, emails: enEmails, notifications: enNotif, clients: enClients },
+  ru: { common: ruCommon, navigation: ruNav, auth: ruAuth, bi: ruBi, pdf: ruPdf, emails: ruEmails, notifications: ruNotif, clients: ruClients },
+  ro: { common: roCommon, navigation: roNav, auth: roAuth, bi: roBi, pdf: roPdf, emails: roEmails, notifications: roNotif, clients: roClients },
+  tr: { common: trCommon, navigation: trNav, auth: trAuth, bi: trBi, pdf: trPdf, emails: trEmails, notifications: trNotif, clients: trClients },
+  el: { common: elCommon, navigation: elNav, auth: elAuth, bi: elBi, pdf: elPdf, emails: elEmails, notifications: elNotif, clients: elClients },
 };
 
 // Дълбоко сливане: липсващ ключ пада обратно към българския (никога raw key на екрана).
