@@ -1,12 +1,34 @@
 import { baseTemplate, APP_URL, type EmailButton } from "./templates";
 import { formatCurrency, BANK_DETAILS } from "@/lib/constants";
 import { getMessages, makeT } from "@/lib/i18n/messages";
-import { normalizeLocale, type Locale } from "@/lib/i18n/config";
+import { normalizeLocale, intlLocale, type Locale } from "@/lib/i18n/config";
 
 type Msg = { subject: string; html: string; category: string };
 
-const PLAN_LABEL: Record<string, string> = { free: "Безплатен", start: "Старт", business: "Бизнес", pro: "Про" };
-const planName = (p?: string | null) => (p ? PLAN_LABEL[p] ?? p : "—");
+/** Преводач, ограничен до `emails.` namespace-а, за даден език. */
+function emT(locale: Locale) {
+  const loc = normalizeLocale(locale);
+  const et = makeT(getMessages(loc));
+  return { loc, E: (k: string, v?: Record<string, string | number>) => et(`emails.${k}`, v) };
+}
+
+/** Локализирано име на план (free/start/business/pro). */
+const planLabel = (E: (k: string, v?: Record<string, string | number>) => string, p?: string | null) =>
+  p ? E(`plans.${p}`) : "—";
+
+/** Локализирано име на вид документ. */
+const docLabel = (E: (k: string, v?: Record<string, string | number>) => string, t?: string | null) =>
+  E(`docTypes.${t ?? "document"}`);
+
+/** Име на план само на български — за админ имейлите (office@), които са винаги на bg. */
+const PLAN_LABEL_BG: Record<string, string> = { free: "Безплатен", start: "Старт", business: "Бизнес", pro: "Про" };
+const planName = (p?: string | null) => (p ? PLAN_LABEL_BG[p] ?? p : "—");
+
+/** Правилната дума за „ден/дни" според езика и бройката. */
+function dayWord(loc: Locale, E: (k: string, v?: Record<string, string | number>) => string, n: number): string {
+  const cat = new Intl.PluralRules(intlLocale(loc)).select(n);
+  return E(`daysUnit.${cat}`);
+}
 
 // ─────────────────────────── АКАУНТ ───────────────────────────
 
@@ -82,256 +104,284 @@ export function passwordChangedEmail(name: string, locale: Locale = "bg"): Msg {
   };
 }
 
-export function accountLockedEmail(name: string): Msg {
+export function accountLockedEmail(name: string, locale: Locale = "bg"): Msg {
+  const { loc, E } = emT(locale);
   return {
     category: "account",
-    subject: "Акаунтът Ви беше временно заключен",
+    subject: E("locked.subject"),
     html: baseTemplate({
-      eyebrow: "Сигурност",
-      title: "Засечени неуспешни опити за вход",
-      intro: [`Здравейте, ${name || ""}.`, "Регистрирахме няколко последователни неуспешни опита за вход. За Ваша защита акаунтът е временно заключен за 15 минути. Ако сте Вие — изчакайте или възстановете паролата си."],
-      button: { label: "Възстанови парола", url: `${APP_URL}/forgot-password` },
-      footnote: "Ако това не сте били Вие, препоръчваме веднага да смените паролата си.",
+      locale: loc,
+      eyebrow: E("locked.eyebrow"),
+      title: E("locked.title"),
+      intro: [E("locked.intro1", { name: name || "" }), E("locked.intro2")],
+      button: { label: E("locked.button"), url: `${APP_URL}/forgot-password` },
+      footnote: E("locked.footnote"),
     }),
   };
 }
 
-export function newLoginEmail(name: string, info: { ip?: string; device?: string; when: string }): Msg {
+export function newLoginEmail(name: string, info: { ip?: string; device?: string; when: string }, locale: Locale = "bg"): Msg {
+  const { loc, E } = emT(locale);
   return {
     category: "account",
-    subject: "Нов вход в акаунта Ви",
+    subject: E("newLogin.subject"),
     html: baseTemplate({
-      eyebrow: "Сигурност",
-      title: "Нов вход в акаунта",
-      intro: [`Здравейте, ${name || ""}.`, "Регистрирахме вход в акаунта Ви от ново устройство или местоположение:"],
+      locale: loc,
+      eyebrow: E("newLogin.eyebrow"),
+      title: E("newLogin.title"),
+      intro: [E("newLogin.intro1", { name: name || "" }), E("newLogin.intro2")],
       details: [
-        { label: "Време", value: info.when },
-        ...(info.device ? [{ label: "Устройство", value: info.device }] : []),
-        ...(info.ip ? [{ label: "IP адрес", value: info.ip }] : []),
+        { label: E("newLogin.lblTime"), value: info.when },
+        ...(info.device ? [{ label: E("newLogin.lblDevice"), value: info.device }] : []),
+        ...(info.ip ? [{ label: E("newLogin.lblIp"), value: info.ip }] : []),
       ],
-      footnote: "Ако това сте Вие — няма нужда от действие. В противен случай сменете паролата си незабавно.",
+      footnote: E("newLogin.footnote"),
     }),
   };
 }
 
 // ─────────────────────────── АБОНАМЕНТИ ───────────────────────────
 
-export function subscriptionSelectedEmail(company: string, plan: string, period: string, amount?: number): Msg {
+export function subscriptionSelectedEmail(company: string, plan: string, period: string, amount?: number, locale: Locale = "bg"): Msg {
+  const { loc, E } = emT(locale);
+  const pl = planLabel(E, plan);
   return {
     category: "subscription",
-    subject: `Заявка за абонамент „${planName(plan)}“ е приета`,
+    subject: E("subSelected.subject", { plan: pl }),
     html: baseTemplate({
-      eyebrow: "Абонамент",
-      title: "Получихме Вашата заявка",
-      intro: [
-        `Здравейте,`,
-        `Регистрирахме заявка за план <strong>${planName(plan)}</strong> за фирма ${company}. За да активираме абонамента, моля извършете плащане по банков път със следните данни:`,
-      ],
+      locale: loc,
+      eyebrow: E("subSelected.eyebrow"),
+      title: E("subSelected.title"),
+      intro: [E("subSelected.intro1"), E("subSelected.intro2", { plan: pl, company })],
       details: [
-        { label: "План", value: planName(plan) },
-        { label: "Период", value: period === "yearly" ? "Годишен" : "Месечен" },
-        ...(amount ? [{ label: "Сума за плащане", value: formatCurrency(amount) }] : []),
-        { label: "Получател", value: BANK_DETAILS.recipient },
-        { label: "IBAN", value: BANK_DETAILS.iban },
-        { label: "Банка", value: BANK_DETAILS.bank },
-        { label: "Основание", value: `Абонамент ${planName(plan)} — ${company}` },
+        { label: E("subSelected.lblPlan"), value: pl },
+        { label: E("subSelected.lblPeriod"), value: E(`period.${period === "yearly" ? "yearly" : "monthly"}`) },
+        ...(amount ? [{ label: E("subSelected.lblAmount"), value: formatCurrency(amount) }] : []),
+        { label: E("subSelected.lblRecipient"), value: BANK_DETAILS.recipient },
+        { label: E("subSelected.lblIban"), value: BANK_DETAILS.iban },
+        { label: E("subSelected.lblBank"), value: BANK_DETAILS.bank },
+        { label: E("subSelected.lblReason"), value: E("subSelected.reason", { plan: pl, company }) },
       ],
-      button: { label: "Виж абонамента", url: `${APP_URL}/dashboard/subscription` },
-      footnote: "След като получим плащането, ще активираме абонамента Ви и ще получите потвърждение по имейл.",
+      button: { label: E("subSelected.button"), url: `${APP_URL}/dashboard/subscription` },
+      footnote: E("subSelected.footnote"),
     }),
   };
 }
 
-export function paymentSuccessEmail(company: string, plan: string, amount: number, method: string): Msg {
+export function paymentSuccessEmail(company: string, plan: string, amount: number, method: string, locale: Locale = "bg"): Msg {
+  const { loc, E } = emT(locale);
   return {
     category: "subscription",
-    subject: "Плащането е успешно — благодарим Ви!",
+    subject: E("paymentSuccess.subject"),
     html: baseTemplate({
-      eyebrow: "Абонамент",
-      title: "Плащането е получено",
-      intro: [`Благодарим Ви! Плащането за абонамента на ${company} беше потвърдено и планът Ви е активен.`],
+      locale: loc,
+      eyebrow: E("paymentSuccess.eyebrow"),
+      title: E("paymentSuccess.title"),
+      intro: [E("paymentSuccess.intro", { company })],
       details: [
-        { label: "План", value: planName(plan) },
-        { label: "Сума", value: formatCurrency(amount) },
-        { label: "Метод", value: method },
+        { label: E("paymentSuccess.lblPlan"), value: planLabel(E, plan) },
+        { label: E("paymentSuccess.lblAmount"), value: formatCurrency(amount) },
+        { label: E("paymentSuccess.lblMethod"), value: method },
       ],
-      button: { label: "Към таблото", url: `${APP_URL}/dashboard` },
+      button: { label: E("paymentSuccess.button"), url: `${APP_URL}/dashboard` },
     }),
   };
 }
 
-export function paymentFailedEmail(company: string, plan: string): Msg {
+export function paymentFailedEmail(company: string, plan: string, locale: Locale = "bg"): Msg {
+  const { loc, E } = emT(locale);
   return {
     category: "subscription",
-    subject: "Плащането не беше успешно",
+    subject: E("paymentFailed.subject"),
     html: baseTemplate({
-      eyebrow: "Абонамент",
-      title: "Възникна проблем с плащането",
-      intro: [`Опитът за плащане на абонамента (${planName(plan)}) за ${company} не беше успешен. Моля, опитайте отново или изберете друг метод за плащане.`],
-      button: { label: "Опитай отново", url: `${APP_URL}/dashboard/subscription` },
+      locale: loc,
+      eyebrow: E("paymentFailed.eyebrow"),
+      title: E("paymentFailed.title"),
+      intro: [E("paymentFailed.intro", { plan: planLabel(E, plan), company })],
+      button: { label: E("paymentFailed.button"), url: `${APP_URL}/dashboard/subscription` },
     }),
   };
 }
 
-export function subscriptionActivatedEmail(company: string, plan: string, until?: string): Msg {
+export function subscriptionActivatedEmail(company: string, plan: string, until?: string, locale: Locale = "bg"): Msg {
+  const { loc, E } = emT(locale);
+  const pl = planLabel(E, plan);
   return {
     category: "subscription",
-    subject: `Абонаментът „${planName(plan)}“ е активиран`,
+    subject: E("subActivated.subject", { plan: pl }),
     html: baseTemplate({
-      eyebrow: "Абонамент",
-      title: "Абонаментът Ви е активен",
-      intro: [`Планът <strong>${planName(plan)}</strong> за ${company} вече е активен. Благодарим Ви, че сте с нас!`],
-      details: until ? [{ label: "Валиден до", value: until }] : undefined,
-      button: { label: "Към таблото", url: `${APP_URL}/dashboard` },
+      locale: loc,
+      eyebrow: E("subActivated.eyebrow"),
+      title: E("subActivated.title"),
+      intro: [E("subActivated.intro", { plan: pl, company })],
+      details: until ? [{ label: E("subActivated.lblUntil"), value: until }] : undefined,
+      button: { label: E("subActivated.button"), url: `${APP_URL}/dashboard` },
     }),
   };
 }
 
-export function subscriptionExpiringEmail(company: string, plan: string, daysLeft: number, until: string): Msg {
+export function subscriptionExpiringEmail(company: string, plan: string, daysLeft: number, until: string, locale: Locale = "bg"): Msg {
+  const { loc, E } = emT(locale);
+  const dw = dayWord(loc, E, daysLeft);
   return {
     category: "reminder",
-    subject: `Абонаментът Ви изтича след ${daysLeft} ${daysLeft === 1 ? "ден" : "дни"}`,
+    subject: E("subExpiring.subject", { days: daysLeft, daysWord: dw }),
     html: baseTemplate({
-      eyebrow: "Напомняне",
-      title: `Абонаментът Ви изтича скоро`,
+      locale: loc,
+      eyebrow: E("subExpiring.eyebrow"),
+      title: E("subExpiring.title"),
       intro: [
-        `Напомняме Ви, че планът <strong>${planName(plan)}</strong> за ${company} изтича на <strong>${until}</strong> (след ${daysLeft} ${daysLeft === 1 ? "ден" : "дни"}).`,
-        "Подновете навреме, за да запазите достъпа до всички функции без прекъсване.",
+        E("subExpiring.intro1", { plan: planLabel(E, plan), company, until, days: daysLeft, daysWord: dw }),
+        E("subExpiring.intro2"),
       ],
-      button: { label: "Поднови абонамента", url: `${APP_URL}/dashboard/subscription` },
-      footnote: "Ако вече сте подновили абонамента си — извиняваме се за безпокойството и Ви молим да пренебрегнете това напомняне.",
+      button: { label: E("subExpiring.button"), url: `${APP_URL}/dashboard/subscription` },
+      footnote: E("subExpiring.footnote"),
     }),
   };
 }
 
-export function subscriptionExpiredEmail(company: string, plan: string): Msg {
+export function subscriptionExpiredEmail(company: string, plan: string, locale: Locale = "bg"): Msg {
+  const { loc, E } = emT(locale);
   return {
     category: "reminder",
-    subject: "Абонаментът Ви изтече",
+    subject: E("subExpired.subject"),
     html: baseTemplate({
-      eyebrow: "Напомняне",
-      title: "Абонаментът Ви изтече",
-      intro: [
-        `Планът <strong>${planName(plan)}</strong> за ${company} изтече и акаунтът беше върнат към Безплатния план. Данните Ви са запазени.`,
-        "Подновете по всяко време, за да възстановите пълния достъп.",
-      ],
-      button: { label: "Поднови сега", url: `${APP_URL}/dashboard/subscription` },
-      footnote: "Ако вече сте подновили абонамента си — извиняваме се и Ви молим да пренебрегнете това съобщение.",
+      locale: loc,
+      eyebrow: E("subExpired.eyebrow"),
+      title: E("subExpired.title"),
+      intro: [E("subExpired.intro1", { plan: planLabel(E, plan), company }), E("subExpired.intro2")],
+      button: { label: E("subExpired.button"), url: `${APP_URL}/dashboard/subscription` },
+      footnote: E("subExpired.footnote"),
     }),
   };
 }
 
-export function subscriptionRenewedEmail(company: string, plan: string, until: string): Msg {
+export function subscriptionRenewedEmail(company: string, plan: string, until: string, locale: Locale = "bg"): Msg {
+  const { loc, E } = emT(locale);
   return {
     category: "subscription",
-    subject: "Абонаментът Ви е подновен",
+    subject: E("subRenewed.subject"),
     html: baseTemplate({
-      eyebrow: "Абонамент",
-      title: "Благодарим за подновяването",
-      intro: [`Планът <strong>${planName(plan)}</strong> за ${company} е подновен успешно.`],
-      details: [{ label: "Валиден до", value: until }],
-      button: { label: "Към таблото", url: `${APP_URL}/dashboard` },
+      locale: loc,
+      eyebrow: E("subRenewed.eyebrow"),
+      title: E("subRenewed.title"),
+      intro: [E("subRenewed.intro", { plan: planLabel(E, plan), company })],
+      details: [{ label: E("subRenewed.lblUntil"), value: until }],
+      button: { label: E("subRenewed.button"), url: `${APP_URL}/dashboard` },
     }),
   };
 }
 
-export function planChangedEmail(company: string, from: string, to: string): Msg {
+export function planChangedEmail(company: string, from: string, to: string, locale: Locale = "bg"): Msg {
+  const { loc, E } = emT(locale);
   const up = ["free", "start", "business", "pro"].indexOf(to) > ["free", "start", "business", "pro"].indexOf(from);
   return {
     category: "subscription",
-    subject: up ? "Преминахте към по-висок план" : "Планът Ви беше променен",
+    subject: up ? E("planChanged.subjectUp") : E("planChanged.subjectDown"),
     html: baseTemplate({
-      eyebrow: "Абонамент",
-      title: up ? "Надградихте абонамента си" : "Промяна на абонамента",
-      intro: [`Планът на ${company} беше променен от <strong>${planName(from)}</strong> на <strong>${planName(to)}</strong>.`],
-      button: { label: "Виж промените", url: `${APP_URL}/dashboard/subscription` },
+      locale: loc,
+      eyebrow: E("planChanged.eyebrow"),
+      title: up ? E("planChanged.titleUp") : E("planChanged.titleDown"),
+      intro: [E("planChanged.intro", { company, from: planLabel(E, from), to: planLabel(E, to) })],
+      button: { label: E("planChanged.button"), url: `${APP_URL}/dashboard/subscription` },
     }),
   };
 }
 
 // ─────────────────────────── ДОКУМЕНТИ ───────────────────────────
 
-const DOC_LABEL: Record<string, string> = {
-  invoice: "Фактура", proforma: "Проформа фактура", quote: "Оферта",
-  credit_note: "Кредитно известие", debit_note: "Дебитно известие", contract: "Договор", protocol: "Протокол",
-};
-
-export function documentCopyEmail(docType: string, number: string, company: string, button: EmailButton): Msg {
-  const label = DOC_LABEL[docType] ?? "Документ";
+export function documentCopyEmail(docType: string, number: string, company: string, button: EmailButton, locale: Locale = "bg"): Msg {
+  const { loc, E } = emT(locale);
+  const label = docLabel(E, docType);
   return {
     category: "document",
-    subject: `Копие: ${label} № ${number}`,
+    subject: E("docCopy.subject", { label, number }),
     html: baseTemplate({
-      eyebrow: "Документ",
-      title: `${label} № ${number}`,
-      intro: [`Прилагаме копие на издадения от ${company} документ. Можете да го прегледате и изтеглите от линка по-долу.`],
+      locale: loc,
+      eyebrow: E("docCopy.eyebrow"),
+      title: E("docCopy.title", { label, number }),
+      intro: [E("docCopy.intro", { company })],
       button,
     }),
   };
 }
 
-/** Външен имейл до клиента с фактура/оферта за преглед, приемане/отхвърляне. */
+/** Външен имейл до клиента с фактура/оферта за преглед, приемане/отхвърляне.
+ *  `locale` е езикът на документа (Document.language). */
 export function invoiceToClientEmail(opts: {
-  fromCompany: string; docLabel: string; number: string; total: string; viewUrl: string; clientName?: string;
+  fromCompany: string; docType: string; number: string; total: string; viewUrl: string; clientName?: string; locale?: Locale;
 }): Msg {
+  const { loc, E } = emT(opts.locale ?? "bg");
+  const label = docLabel(E, opts.docType);
+  const lower = label.toLowerCase();
   return {
     category: "document",
-    subject: `${opts.fromCompany} Ви изпрати ${opts.docLabel.toLowerCase()} № ${opts.number}`,
+    subject: E("toClient.subject", { company: opts.fromCompany, docLabelLower: lower, number: opts.number }),
     html: baseTemplate({
+      locale: loc,
       eyebrow: opts.fromCompany,
-      title: `${opts.docLabel} № ${opts.number}`,
+      title: `${label} № ${opts.number}`,
       intro: [
-        `Здравейте${opts.clientName ? ", " + opts.clientName : ""},`,
-        `Фирма <strong>${opts.fromCompany}</strong> Ви изпрати ${opts.docLabel.toLowerCase()} на стойност <strong>${opts.total}</strong>.`,
-        "Можете да я прегледате, изтеглите като PDF и да я приемете или отхвърлите онлайн:",
+        opts.clientName ? E("toClient.greetingName", { name: opts.clientName }) : E("toClient.greeting"),
+        E("toClient.intro", { company: opts.fromCompany, docLabelLower: lower, total: opts.total }),
+        E("toClient.intro2"),
       ],
-      button: { label: "Преглед на документа", url: opts.viewUrl },
-      footnote: "Бутонът отваря защитена страница само за Вас — не е нужна регистрация.",
+      button: { label: E("toClient.button"), url: opts.viewUrl },
+      footnote: E("toClient.footnote"),
     }),
   };
 }
 
 /** Известие до фирмата за решението на клиента. */
-export function clientDecisionEmail(opts: { docLabel: string; number: string; clientName: string; decision: "accepted" | "rejected"; viewUrl: string }): Msg {
+export function clientDecisionEmail(opts: { docType: string; number: string; clientName: string; decision: "accepted" | "rejected"; viewUrl: string; locale?: Locale }): Msg {
+  const { loc, E } = emT(opts.locale ?? "bg");
   const accepted = opts.decision === "accepted";
+  const lower = docLabel(E, opts.docType).toLowerCase();
+  const vars = { clientName: opts.clientName, docLabelLower: lower, number: opts.number };
   return {
     category: "client_decision",
-    subject: `${opts.clientName} ${accepted ? "прие" : "отхвърли"} ${opts.docLabel.toLowerCase()} № ${opts.number}`,
+    subject: accepted ? E("clientDecision.subjectAccepted", vars) : E("clientDecision.subjectRejected", vars),
     html: baseTemplate({
-      eyebrow: "Решение на клиент",
-      title: accepted ? "Документът беше приет ✓" : "Документът беше отхвърлен",
-      intro: [`Клиентът <strong>${opts.clientName}</strong> ${accepted ? "прие" : "отхвърли"} ${opts.docLabel.toLowerCase()} № ${opts.number}.`],
-      button: { label: "Отвори документа", url: opts.viewUrl },
+      locale: loc,
+      eyebrow: E("clientDecision.eyebrow"),
+      title: accepted ? E("clientDecision.titleAccepted") : E("clientDecision.titleRejected"),
+      intro: [accepted ? E("clientDecision.introAccepted", vars) : E("clientDecision.introRejected", vars)],
+      button: { label: E("clientDecision.button"), url: opts.viewUrl },
     }),
   };
 }
 
 // ─────────────────────────── НАПОМНЯНИЯ ───────────────────────────
 
-export function unpaidInvoiceEmail(company: string, number: string, daysOverdue: number, amount: string, url: string): Msg {
+export function unpaidInvoiceEmail(company: string, number: string, daysOverdue: number, amount: string, url: string, locale: Locale = "bg"): Msg {
+  const { loc, E } = emT(locale);
+  const dw = dayWord(loc, E, daysOverdue);
   return {
     category: "reminder",
-    subject: `Неплатена фактура № ${number}`,
+    subject: E("unpaidInvoice.subject", { number }),
     html: baseTemplate({
-      eyebrow: "Напомняне",
-      title: `Фактура № ${number} все още не е платена`,
-      intro: [`Напомняме, че фактура № ${number} (${amount}) за ${company} е с изтекъл падеж от ${daysOverdue} ${daysOverdue === 1 ? "ден" : "дни"}.`],
-      button: { label: "Виж фактурата", url },
-      footnote: "Ако плащането вече е извършено, моля пренебрегнете това напомняне.",
+      locale: loc,
+      eyebrow: E("unpaidInvoice.eyebrow"),
+      title: E("unpaidInvoice.title", { number }),
+      intro: [E("unpaidInvoice.intro", { number, amount, company, days: daysOverdue, daysWord: dw })],
+      button: { label: E("unpaidInvoice.button"), url },
+      footnote: E("unpaidInvoice.footnote"),
     }),
   };
 }
 
-export function expiringEntityEmail(kind: "contract" | "project" | "warranty" | "license", name: string, date: string, url: string): Msg {
-  const LABEL = { contract: "Договор", project: "Проект", warranty: "Гаранция", license: "Лиценз" }[kind];
+export function expiringEntityEmail(kind: "contract" | "project" | "warranty" | "license", name: string, date: string, url: string, locale: Locale = "bg"): Msg {
+  const { loc, E } = emT(locale);
+  const label = E(`entities.${kind}`);
   return {
     category: "reminder",
-    subject: `${LABEL} изтича скоро: ${name}`,
+    subject: E("expiringEntity.subject", { label, name }),
     html: baseTemplate({
-      eyebrow: "Напомняне",
-      title: `${LABEL} изтича на ${date}`,
-      intro: [`${LABEL} „${name}“ наближава крайния си срок (${date}). Прегледайте го навреме.`],
-      button: { label: `Отвори`, url },
+      locale: loc,
+      eyebrow: E("expiringEntity.eyebrow"),
+      title: E("expiringEntity.title", { label, date }),
+      intro: [E("expiringEntity.intro", { label, name, date })],
+      button: { label: E("expiringEntity.button"), url },
     }),
   };
 }

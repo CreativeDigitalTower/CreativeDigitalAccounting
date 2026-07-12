@@ -5,12 +5,8 @@ import { requireCompany } from "@/lib/session";
 import { sendEmail } from "@/lib/email/send";
 import { invoiceToClientEmail } from "@/lib/email/messages";
 import { APP_URL } from "@/lib/email/templates";
+import { normalizeLocale, intlLocale } from "@/lib/i18n/config";
 import { z } from "zod";
-
-const DOC_LABEL: Record<string, string> = {
-  invoice: "Фактура", proforma: "Проформа фактура", quote: "Оферта",
-  credit_note: "Кредитно известие", debit_note: "Дебитно известие",
-};
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -29,13 +25,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     });
 
     const total = doc.lines.reduce((s, l) => s + l.lineTotal, 0);
+    const docLoc = normalizeLocale(doc.language);
     const m = invoiceToClientEmail({
       fromCompany: doc.company.name,
-      docLabel: DOC_LABEL[doc.type] ?? "Документ",
+      docType: doc.type,
       number: doc.number,
-      total: new Intl.NumberFormat("bg-BG", { style: "currency", currency: doc.currency || "EUR" }).format(total),
+      total: new Intl.NumberFormat(intlLocale(docLoc), { style: "currency", currency: doc.currency || "EUR" }).format(total),
       viewUrl: `${APP_URL}/d/${token}`,
       clientName: doc.client?.name,
+      locale: docLoc,
     });
     await sendEmail({ to: email, toName: doc.client?.name, subject: m.subject, html: m.html, category: m.category, type: "invoice_to_client", companyId });
 

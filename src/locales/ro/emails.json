@@ -40,5 +40,174 @@
     "intro1": "Bună ziua, {name}.",
     "intro2": "Aceasta este o confirmare că parola contului dvs. a fost schimbată.",
     "footnote": "Dacă nu ați făcut această modificare, contactați-ne imediat la office@creativedigitalaccounting.com."
+  },
+  "plans": {
+    "free": "Gratuit",
+    "start": "Start",
+    "business": "Business",
+    "pro": "Pro"
+  },
+  "period": {
+    "monthly": "Lunar",
+    "yearly": "Anual"
+  },
+  "daysUnit": {
+    "one": "zi",
+    "few": "zile",
+    "many": "de zile",
+    "other": "zile"
+  },
+  "docTypes": {
+    "invoice": "Factură",
+    "proforma": "Factură proformă",
+    "quote": "Ofertă",
+    "credit_note": "Notă de credit",
+    "debit_note": "Notă de debit",
+    "contract": "Contract",
+    "protocol": "Protocol",
+    "document": "Document"
+  },
+  "entities": {
+    "contract": "Contract",
+    "project": "Proiect",
+    "warranty": "Garanție",
+    "license": "Licență"
+  },
+  "locked": {
+    "subject": "Contul dvs. a fost blocat temporar",
+    "eyebrow": "Securitate",
+    "title": "Au fost detectate încercări eșuate de autentificare",
+    "intro1": "Bună ziua, {name}.",
+    "intro2": "Am detectat mai multe încercări consecutive eșuate de autentificare. Pentru protecția dvs., contul a fost blocat temporar timp de 15 minute. Dacă ați fost dvs. — așteptați sau resetați parola.",
+    "button": "Resetează parola",
+    "footnote": "Dacă nu ați fost dvs., vă recomandăm să schimbați parola imediat."
+  },
+  "newLogin": {
+    "subject": "Autentificare nouă în contul dvs.",
+    "eyebrow": "Securitate",
+    "title": "Autentificare nouă în cont",
+    "intro1": "Bună ziua, {name}.",
+    "intro2": "Am înregistrat o autentificare în contul dvs. de pe un dispozitiv sau o locație nouă:",
+    "lblTime": "Oră",
+    "lblDevice": "Dispozitiv",
+    "lblIp": "Adresă IP",
+    "footnote": "Dacă ați fost dvs., nu este necesară nicio acțiune. În caz contrar, schimbați parola imediat."
+  },
+  "subSelected": {
+    "subject": "Cererea de abonament „{plan}“ a fost primită",
+    "eyebrow": "Abonament",
+    "title": "Am primit cererea dvs.",
+    "intro1": "Bună ziua,",
+    "intro2": "Am înregistrat o cerere pentru planul <strong>{plan}</strong> pentru {company}. Pentru a activa abonamentul, vă rugăm să efectuați plata prin transfer bancar cu următoarele date:",
+    "lblPlan": "Plan",
+    "lblPeriod": "Perioadă",
+    "lblAmount": "Sumă de plată",
+    "lblRecipient": "Beneficiar",
+    "lblIban": "IBAN",
+    "lblBank": "Bancă",
+    "lblReason": "Detalii plată",
+    "reason": "Abonament {plan} — {company}",
+    "button": "Vezi abonamentul",
+    "footnote": "După primirea plății, vom activa abonamentul dvs. și veți primi o confirmare prin e-mail."
+  },
+  "paymentSuccess": {
+    "subject": "Plată reușită — vă mulțumim!",
+    "eyebrow": "Abonament",
+    "title": "Plata a fost primită",
+    "intro": "Vă mulțumim! Plata pentru abonamentul {company} a fost confirmată, iar planul dvs. este activ.",
+    "lblPlan": "Plan",
+    "lblAmount": "Sumă",
+    "lblMethod": "Metodă",
+    "button": "Spre panou"
+  },
+  "paymentFailed": {
+    "subject": "Plata nu a reușit",
+    "eyebrow": "Abonament",
+    "title": "A apărut o problemă cu plata",
+    "intro": "Încercarea de plată pentru abonamentul ({plan}) pentru {company} nu a reușit. Vă rugăm să încercați din nou sau să alegeți o altă metodă de plată.",
+    "button": "Încearcă din nou"
+  },
+  "subActivated": {
+    "subject": "Abonamentul „{plan}“ a fost activat",
+    "eyebrow": "Abonament",
+    "title": "Abonamentul dvs. este activ",
+    "intro": "Planul <strong>{plan}</strong> pentru {company} este acum activ. Vă mulțumim că sunteți alături de noi!",
+    "lblUntil": "Valabil până la",
+    "button": "Spre panou"
+  },
+  "subRenewed": {
+    "subject": "Abonamentul dvs. a fost reînnoit",
+    "eyebrow": "Abonament",
+    "title": "Vă mulțumim pentru reînnoire",
+    "intro": "Planul <strong>{plan}</strong> pentru {company} a fost reînnoit cu succes.",
+    "lblUntil": "Valabil până la",
+    "button": "Spre panou"
+  },
+  "planChanged": {
+    "subjectUp": "Ați trecut la un plan superior",
+    "subjectDown": "Planul dvs. a fost modificat",
+    "titleUp": "Ați făcut upgrade la abonament",
+    "titleDown": "Modificare abonament",
+    "eyebrow": "Abonament",
+    "intro": "Planul pentru {company} a fost modificat de la <strong>{from}</strong> la <strong>{to}</strong>.",
+    "button": "Vezi modificările"
+  },
+  "subExpiring": {
+    "subject": "Abonamentul dvs. expiră în {days} {daysWord}",
+    "eyebrow": "Reamintire",
+    "title": "Abonamentul dvs. expiră în curând",
+    "intro1": "Vă reamintim că planul <strong>{plan}</strong> pentru {company} expiră pe <strong>{until}</strong> (în {days} {daysWord}).",
+    "intro2": "Reînnoiți la timp pentru a păstra accesul la toate funcțiile fără întrerupere.",
+    "button": "Reînnoiește abonamentul",
+    "footnote": "Dacă ați reînnoit deja abonamentul, ne cerem scuze pentru deranj și vă rugăm să ignorați această reamintire."
+  },
+  "subExpired": {
+    "subject": "Abonamentul dvs. a expirat",
+    "eyebrow": "Reamintire",
+    "title": "Abonamentul dvs. a expirat",
+    "intro1": "Planul <strong>{plan}</strong> pentru {company} a expirat, iar contul a revenit la planul Gratuit. Datele dvs. sunt păstrate.",
+    "intro2": "Reînnoiți oricând pentru a restabili accesul complet.",
+    "button": "Reînnoiește acum",
+    "footnote": "Dacă ați reînnoit deja abonamentul, ne cerem scuze și vă rugăm să ignorați acest mesaj."
+  },
+  "unpaidInvoice": {
+    "subject": "Factură neplătită nr. {number}",
+    "eyebrow": "Reamintire",
+    "title": "Factura nr. {number} este încă neplătită",
+    "intro": "Vă reamintim că factura nr. {number} ({amount}) pentru {company} are scadența depășită cu {days} {daysWord}.",
+    "button": "Vezi factura",
+    "footnote": "Dacă plata a fost deja efectuată, vă rugăm să ignorați această reamintire."
+  },
+  "expiringEntity": {
+    "subject": "{label} expiră în curând: {name}",
+    "eyebrow": "Reamintire",
+    "title": "{label} expiră pe {date}",
+    "intro": "{label} „{name}“ se apropie de termenul limită ({date}). Vă rugăm să îl verificați la timp.",
+    "button": "Deschide"
+  },
+  "docCopy": {
+    "subject": "Copie: {label} nr. {number}",
+    "eyebrow": "Document",
+    "title": "{label} nr. {number}",
+    "intro": "Atașăm o copie a documentului emis de {company}. Îl puteți vizualiza și descărca din linkul de mai jos."
+  },
+  "toClient": {
+    "subject": "{company} v-a trimis {docLabelLower} nr. {number}",
+    "greetingName": "Bună ziua, {name},",
+    "greeting": "Bună ziua,",
+    "intro": "<strong>{company}</strong> v-a trimis o {docLabelLower} în valoare de <strong>{total}</strong>.",
+    "intro2": "O puteți vizualiza, descărca în format PDF și accepta sau respinge online:",
+    "button": "Vezi documentul",
+    "footnote": "Butonul deschide o pagină securizată doar pentru dvs. — nu este necesară înregistrarea."
+  },
+  "clientDecision": {
+    "subjectAccepted": "{clientName} a acceptat {docLabelLower} nr. {number}",
+    "subjectRejected": "{clientName} a respins {docLabelLower} nr. {number}",
+    "eyebrow": "Decizia clientului",
+    "titleAccepted": "Documentul a fost acceptat ✓",
+    "titleRejected": "Documentul a fost respins",
+    "introAccepted": "Clientul <strong>{clientName}</strong> a acceptat {docLabelLower} nr. {number}.",
+    "introRejected": "Clientul <strong>{clientName}</strong> a respins {docLabelLower} nr. {number}.",
+    "button": "Deschide documentul"
   }
 }

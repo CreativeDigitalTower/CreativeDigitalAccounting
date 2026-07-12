@@ -4,6 +4,7 @@ import { logSubscriptionEvent } from "@/lib/subscriptionEvents";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, notifyAdmin } from "@/lib/email/send";
 import { subscriptionSelectedEmail, adminPaidSubEmail } from "@/lib/email/messages";
+import { normalizeLocale } from "@/lib/i18n/config";
 import { generateSubscriptionProforma } from "@/lib/subscriptionProforma";
 import { type PlanId } from "@/lib/constants";
 import { z } from "zod";
@@ -33,11 +34,11 @@ export async function POST(req: Request) {
     try {
       const company = await prisma.company.findUnique({
         where: { id: companyId },
-        select: { name: true, companyUsers: { where: { role: "owner" }, select: { user: { select: { email: true, name: true } } } } },
+        select: { name: true, companyUsers: { where: { role: "owner" }, select: { user: { select: { email: true, name: true, preferredLanguage: true } } } } },
       });
       const owner = company?.companyUsers[0]?.user;
       if (owner?.email) {
-        const m = subscriptionSelectedEmail(company!.name, plan, period ?? "monthly", amount);
+        const m = subscriptionSelectedEmail(company!.name, plan, period ?? "monthly", amount, normalizeLocale(owner.preferredLanguage));
         await sendEmail({ to: owner.email, toName: owner.name, subject: m.subject, html: m.html, category: m.category, type: "subscription_selected", companyId });
       }
       const a = adminPaidSubEmail({ company: company?.name ?? "—", plan, amount: amount ?? 0, method: "Банков превод" });

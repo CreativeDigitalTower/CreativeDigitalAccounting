@@ -6,9 +6,10 @@ import {
 } from "@/lib/email/messages";
 import { formatCurrency } from "@/lib/constants";
 import { APP_URL } from "@/lib/email/templates";
+import { normalizeLocale, intlLocale } from "@/lib/i18n/config";
 
 const DAY = 24 * 60 * 60 * 1000;
-const fmt = (d: Date) => d.toLocaleDateString("bg-BG");
+const fmt = (d: Date, loc: string) => d.toLocaleDateString(intlLocale(normalizeLocale(loc)));
 const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
 /**
@@ -41,9 +42,9 @@ export async function GET(req: Request) {
   async function ownerOf(companyId: string) {
     const c = await prisma.company.findUnique({
       where: { id: companyId },
-      select: { name: true, emailPrefs: true, companyUsers: { where: { role: "owner" }, select: { user: { select: { email: true, name: true } } } } },
+      select: { name: true, emailPrefs: true, companyUsers: { where: { role: "owner" }, select: { user: { select: { email: true, name: true, preferredLanguage: true } } } } },
     });
-    return c ? { name: c.name, email: c.companyUsers[0]?.user.email, userName: c.companyUsers[0]?.user.name } : null;
+    return c ? { name: c.name, email: c.companyUsers[0]?.user.email, userName: c.companyUsers[0]?.user.name, loc: normalizeLocale(c.companyUsers[0]?.user.preferredLanguage) } : null;
   }
 
   // ─── 1) Изтичащ абонамент: 7 / 3 / 1 дни ───
@@ -58,7 +59,7 @@ export async function GET(req: Request) {
       const o = await ownerOf(s.companyId);
       if (!o?.email) continue;
       if (await alreadySent("subscription_expiring", o.email, `${days}`)) continue;
-      const m = subscriptionExpiringEmail(o.name, s.plan, days, fmt(s.currentPeriodEnd!));
+      const m = subscriptionExpiringEmail(o.name, s.plan, days, fmt(s.currentPeriodEnd!, o.loc), o.loc);
       await sendEmail({ to: o.email, toName: o.userName, subject: m.subject, html: m.html, category: m.category, type: "subscription_expiring", companyId: s.companyId });
       sent++;
     }
@@ -77,7 +78,7 @@ export async function GET(req: Request) {
       if (!o?.email) continue;
       if (await alreadySent("invoice_unpaid", o.email, inv.number)) continue;
       const total = inv.lines.reduce((s, l) => s + l.lineTotal, 0);
-      const m = unpaidInvoiceEmail(o.name, inv.number, days, formatCurrency(total), `${APP_URL}/dashboard/invoices/${inv.id}`);
+      const m = unpaidInvoiceEmail(o.name, inv.number, days, formatCurrency(total), `${APP_URL}/dashboard/invoices/${inv.id}`, o.loc);
       await sendEmail({ to: o.email, toName: o.userName, subject: m.subject, html: m.html, category: m.category, type: "invoice_unpaid", companyId: inv.companyId });
       sent++;
     }
@@ -94,7 +95,7 @@ export async function GET(req: Request) {
       const o = await ownerOf(c.companyId);
       if (!o?.email) continue;
       if (await alreadySent("contract_expiring", o.email, c.title)) continue;
-      const m = expiringEntityEmail("contract", c.title, fmt(c.endDate!), `${APP_URL}/dashboard/contracts`);
+      const m = expiringEntityEmail("contract", c.title, fmt(c.endDate!, o.loc), `${APP_URL}/dashboard/contracts`, o.loc);
       await sendEmail({ to: o.email, toName: o.userName, subject: m.subject, html: m.html, category: m.category, type: "contract_expiring", companyId: c.companyId });
       sent++;
     }
@@ -111,7 +112,7 @@ export async function GET(req: Request) {
       const o = await ownerOf(p.companyId);
       if (!o?.email) continue;
       if (await alreadySent("project_expiring", o.email, p.name)) continue;
-      const m = expiringEntityEmail("project", p.name, fmt(p.deadline!), `${APP_URL}/dashboard/projects`);
+      const m = expiringEntityEmail("project", p.name, fmt(p.deadline!, o.loc), `${APP_URL}/dashboard/projects`, o.loc);
       await sendEmail({ to: o.email, toName: o.userName, subject: m.subject, html: m.html, category: m.category, type: "project_expiring", companyId: p.companyId });
       sent++;
     }
