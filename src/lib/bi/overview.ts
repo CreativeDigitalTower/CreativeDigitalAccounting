@@ -6,16 +6,24 @@ import { prisma } from "@/lib/prisma";
 // ─────────────────────────────────────────────────────────────────────────
 
 export type Severity = "good" | "ok" | "attention" | "critical";
-export type Insight = { icon: string; text: string; severity: Severity; href?: string; cta?: string };
+// i18n: генераторите подават преводни ключове + payload (не финален текст).
+// text/cta/label/caption остават за компоненти, които все още не са ключови.
+export type Insight = {
+  icon: string; severity: Severity; text?: string; href?: string; cta?: string;
+  key?: string; vars?: Record<string, string | number>; amount?: number; refKey?: string; ctaKey?: string;
+};
 export type MetricCard = {
   key: string;
-  label: string;
+  label?: string;            // fallback текст (bg), ако няма labelKey
+  labelKey?: string;         // преводен ключ за етикета
   value: number;
   money: boolean;
   deltaPct: number | null;   // спрямо предходния месец
   direction: "up" | "down" | "flat";
   goodWhenUp: boolean;       // за оцветяване (приходи ↑ добре, разходи ↑ зле)
-  caption: string;           // кратко обяснение/сравнение
+  caption?: string;          // fallback текст (bg)
+  captionKey?: string;       // преводен ключ (напр. bi.caption.better)
+  captionRefKey?: string;    // ключ за {ref} (напр. bi.ref.lastMonth)
   spark: number[];           // микрографика (последни месеци)
 };
 
@@ -26,7 +34,7 @@ export type BusinessOverview = {
   expenseSeries: number[];
   profitSeries: number[];
   cards: MetricCard[];
-  health: { score: number; label: string; tone: Severity };
+  health: { score: number; label: string; labelKey: string; tone: Severity };
   insights: Insight[];
   risks: Insight[];
   opportunities: Insight[];
@@ -103,12 +111,12 @@ export async function computeBusinessOverview(companyId: string): Promise<Busine
 
   // ─── KPI карти с тренд ───
   const cards: MetricCard[] = [
-    mk("revenue", "Приходи", revenueSeries, true, true, cur, prev),
-    mk("expenses", "Разходи", expenseSeries, true, false, cur, prev),
-    mk("profit", "Печалба", profitSeries, true, true, cur, prev),
-    mk("invoices", "Издадени фактури", invCountSeries, false, true, cur, prev),
-    mk("avg", "Средна фактура", avgInvSeries, true, true, cur, prev),
-    mk("clients", "Нови клиенти", newClientsSeries, false, true, cur, prev),
+    mk("revenue", "bi.kpi.revenue", revenueSeries, true, true, cur, prev),
+    mk("expenses", "bi.kpi.expenses", expenseSeries, true, false, cur, prev),
+    mk("profit", "bi.kpi.profit", profitSeries, true, true, cur, prev),
+    mk("invoices", "bi.kpi.invoices", invCountSeries, false, true, cur, prev),
+    mk("avg", "bi.kpi.avgInvoice", avgInvSeries, true, true, cur, prev),
+    mk("clients", "bi.kpi.newClients", newClientsSeries, false, true, cur, prev),
   ];
 
   // ─── Просрочени плащания ───
@@ -154,6 +162,7 @@ export async function computeBusinessOverview(companyId: string): Promise<Busine
   if (N >= 3 && profitSeries[cur] < profitSeries[cur - 1] && profitSeries[cur - 1] < profitSeries[cur - 2]) score -= 10;
   score = Math.max(0, Math.min(100, Math.round(score)));
   const healthTone: Severity = score >= 85 ? "good" : score >= 65 ? "ok" : score >= 45 ? "attention" : "critical";
+  const healthLabelKey = score >= 85 ? "bi.health.verdictExcellent" : score >= 65 ? "bi.health.verdictGood" : score >= 45 ? "bi.health.verdictAttention" : "bi.health.verdictCritical";
   const healthLabel = score >= 85 ? "Фирмата е в отлично финансово състояние."
     : score >= 65 ? "Стабилно състояние с потенциал за подобрение."
     : score >= 45 ? "Има сигнали, които изискват внимание."
@@ -164,74 +173,68 @@ export async function computeBusinessOverview(companyId: string): Promise<Busine
   const risks: Insight[] = [];
   const opportunities: Insight[] = [];
 
+  const REF = "bi.ref.lastMonth";
   const revDelta = pctChange(rev, revenueSeries[prev]);
   if (revDelta != null && Math.abs(revDelta) >= 3) {
     insights.push({ icon: revDelta >= 0 ? "trending-up" : "trending-down", severity: revDelta >= 0 ? "good" : "attention",
-      text: `Приходите ${revDelta >= 0 ? "нараснаха" : "намаляха"} с ${Math.abs(Math.round(revDelta))}% спрямо предходния месец.` });
+      key: revDelta >= 0 ? "bi.insight.revenueUp" : "bi.insight.revenueDown", vars: { pct: Math.abs(Math.round(revDelta)) }, refKey: REF });
   }
   const expDelta = pctChange(exp, expenseSeries[prev]);
   if (expDelta != null && expDelta >= 15) {
-    insights.push({ icon: "trending-up", severity: "attention", text: `Разходите се увеличиха с ${Math.round(expDelta)}% спрямо предходния месец.` });
-    risks.push({ icon: "alert", severity: "attention", text: `Необичайно висок ръст на разходите (+${Math.round(expDelta)}%).` });
+    insights.push({ icon: "trending-up", severity: "attention", key: "bi.insight.expensesUp", vars: { pct: Math.round(expDelta) }, refKey: REF });
+    risks.push({ icon: "alert", severity: "attention", key: "bi.insight.expensesUp", vars: { pct: Math.round(expDelta) }, refKey: REF });
   }
-  // 3 месеца спад в печалбата
   if (N >= 3 && profitSeries[cur] < profitSeries[cur - 1] && profitSeries[cur - 1] < profitSeries[cur - 2]) {
-    insights.push({ icon: "trending-down", severity: "critical", text: "Печалбата намалява вече трети пореден месец." });
-    risks.push({ icon: "alert", severity: "critical", text: "Устойчив низходящ тренд на печалбата." });
+    insights.push({ icon: "trending-down", severity: "critical", key: "bi.insight.profitDecline3" });
+    risks.push({ icon: "alert", severity: "critical", key: "bi.insight.profitDecline3" });
   }
   if (topClient && topClient.sharePct >= 30) {
-    insights.push({ icon: "user", severity: topClient.sharePct >= 45 ? "attention" : "ok",
-      text: `Най-големият клиент „${topClient.name}" формира ${topClient.sharePct}% от приходите.` });
-    if (topClient.sharePct >= 45) risks.push({ icon: "alert", severity: "attention", text: "Прекалено голяма зависимост от един клиент." });
+    insights.push({ icon: "user", severity: topClient.sharePct >= 45 ? "attention" : "ok", key: "bi.insight.topClient", vars: { name: topClient.name, pct: topClient.sharePct } });
+    if (topClient.sharePct >= 45) risks.push({ icon: "alert", severity: "attention", key: "bi.insight.topClientRisk" });
   }
   if (overdueCount > 0) {
-    insights.push({ icon: "clock", severity: overdueCount >= 5 ? "critical" : "attention",
-      text: `${overdueCount} фактури са просрочени на обща стойност, изискват събиране.` });
-    risks.push({ icon: "alert", severity: overdueCount >= 5 ? "critical" : "attention", text: `${overdueCount} неплатени/просрочени фактури.` });
+    insights.push({ icon: "clock", severity: overdueCount >= 5 ? "critical" : "attention", key: "bi.insight.overdue", vars: { count: overdueCount } });
+    risks.push({ icon: "alert", severity: overdueCount >= 5 ? "critical" : "attention", key: "bi.insight.overdue", vars: { count: overdueCount } });
   }
   const avgDelta = pctChange(avgInvSeries[cur], avgInvSeries[prev]);
-  if (avgDelta != null && avgDelta >= 5) insights.push({ icon: "trending-up", severity: "good", text: `Средната стойност на фактура се увеличава (+${Math.round(avgDelta)}%).` });
+  if (avgDelta != null && avgDelta >= 5) insights.push({ icon: "trending-up", severity: "good", key: "bi.insight.avgInvoiceUp", vars: { pct: Math.round(avgDelta) } });
   const clientsDelta = newClientsSeries[cur] - newClientsSeries[prev];
-  if (clientsDelta < 0) insights.push({ icon: "trending-down", severity: "attention", text: "Намалява броят на новите клиенти спрямо предходния месец." });
+  if (clientsDelta < 0) insights.push({ icon: "trending-down", severity: "attention", key: "bi.insight.newClientsDown" });
   if (forecast.revenue > 0 && rev < revenueSeries[prev]) {
-    insights.push({ icon: "forecast", severity: "attention", text: `При текущия темп месецът приключва с около ${Math.round(forecast.revenue)} € приходи.` });
+    insights.push({ icon: "forecast", severity: "attention", key: "bi.insight.forecastRevenue", amount: forecast.revenue });
   }
-  if (prof < 0) risks.push({ icon: "alert", severity: "critical", text: "Разходите надвишават приходите този месец." });
-  if (invCountSeries[cur] === 0 && dayOfMonth > 7) risks.push({ icon: "alert", severity: "attention", text: "Няма издадени фактури този месец." });
+  if (prof < 0) risks.push({ icon: "alert", severity: "critical", key: "bi.insight.expOverRev" });
+  if (invCountSeries[cur] === 0 && dayOfMonth > 7) risks.push({ icon: "alert", severity: "attention", key: "bi.insight.noInvoicesMonth" });
 
   // Възможности
-  if (rev > 0) opportunities.push({ icon: "bulb", severity: "good",
-    text: `Ако увеличите средната фактура с 10%, годишният приход би нараснал с ~${Math.round(avgInvSeries[cur] * invCountSeries[cur] * 12 * 0.1)} €.` });
-  // най-силен месец в периода
+  if (rev > 0) opportunities.push({ icon: "bulb", severity: "good", key: "bi.opp.avgInvoice10Year", amount: avgInvSeries[cur] * invCountSeries[cur] * 12 * 0.1 });
   const bestIdx = revenueSeries.indexOf(Math.max(...revenueSeries));
-  if (revenueSeries[bestIdx] > 0) opportunities.push({ icon: "bulb", severity: "ok", text: `Най-силен месец в периода е ${buckets[bestIdx].label} — анализирайте какво го отличава.` });
-  if (topClient) opportunities.push({ icon: "bulb", severity: "ok", text: "Разширяването на клиентската база ще намали зависимостта и риска." });
+  if (revenueSeries[bestIdx] > 0) opportunities.push({ icon: "bulb", severity: "ok", key: "bi.opp.bestMonth", vars: { label: buckets[bestIdx].label } });
+  if (topClient) opportunities.push({ icon: "bulb", severity: "ok", key: "bi.opp.diversify" });
 
-  if (insights.length === 0) insights.push({ icon: "check", severity: "good", text: "Показателите са стабилни. Няма отклонения, изискващи внимание." });
-  if (risks.length === 0) risks.push({ icon: "check", severity: "good", text: "Няма установени рискове за момента." });
+  if (insights.length === 0) insights.push({ icon: "check", severity: "good", key: "bi.insight.stable" });
+  if (risks.length === 0) risks.push({ icon: "check", severity: "good", key: "bi.insight.noRisks" });
 
   return {
     hasData,
     monthsLabels: buckets.map((b) => b.label),
     revenueSeries, expenseSeries, profitSeries,
     cards,
-    health: { score, label: healthLabel, tone: healthTone },
+    health: { score, label: healthLabel, labelKey: healthLabelKey, tone: healthTone },
     insights, risks, opportunities,
     forecast,
     topClient,
   };
 
-  function mk(key: string, label: string, series: number[], money: boolean, goodWhenUp: boolean, ci: number, pi: number): MetricCard {
+  function mk(key: string, labelKey: string, series: number[], money: boolean, goodWhenUp: boolean, ci: number, pi: number): MetricCard {
     const c = series[ci], p = series[pi];
     const dp = pctChange(c, p);
     const d = dir(c, p);
-    let caption = "спрямо миналия месец";
-    if (dp == null) caption = "няма база за сравнение";
-    else if (d === "flat") caption = "без промяна спрямо миналия месец";
-    else {
-      const better = goodWhenUp ? d === "up" : d === "down";
-      caption = better ? "по-добре от миналия месец" : "по-слабо от миналия месец";
+    let captionKey = "bi.caption.noBase";
+    if (dp != null) {
+      if (d === "flat") captionKey = "bi.caption.flat";
+      else captionKey = (goodWhenUp ? d === "up" : d === "down") ? "bi.caption.better" : "bi.caption.worse";
     }
-    return { key, label, value: c, money, deltaPct: dp, direction: d, goodWhenUp, caption, spark: series.slice() };
+    return { key, labelKey, value: c, money, deltaPct: dp, direction: d, goodWhenUp, captionKey, captionRefKey: "bi.ref.lastMonth", spark: series.slice() };
   }
 }
