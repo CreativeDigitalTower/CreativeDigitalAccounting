@@ -6,6 +6,7 @@ import { TRIAL_DAYS } from "@/lib/subscription";
 import { logSubscriptionEvent } from "@/lib/subscriptionEvents";
 import { sendEmail, notifyAdmin } from "@/lib/email/send";
 import { subscriptionActivatedEmail, adminSimpleEmail } from "@/lib/email/messages";
+import { normalizeLocale, intlLocale } from "@/lib/i18n/config";
 import { z } from "zod";
 
 const schema = z.object({ plan: z.enum(["start", "business"]) });
@@ -35,11 +36,12 @@ export async function POST(req: Request) {
     try {
       const company = await prisma.company.findUnique({
         where: { id: companyId },
-        select: { name: true, companyUsers: { where: { role: "owner" }, select: { user: { select: { email: true, name: true } } } } },
+        select: { name: true, companyUsers: { where: { role: "owner" }, select: { user: { select: { email: true, name: true, preferredLanguage: true } } } } },
       });
       const owner = company?.companyUsers[0]?.user;
       if (owner?.email && company) {
-        const m = subscriptionActivatedEmail(company.name, plan, end.toLocaleDateString("bg-BG"));
+        const loc = normalizeLocale(owner.preferredLanguage);
+        const m = subscriptionActivatedEmail(company.name, plan, end.toLocaleDateString(intlLocale(loc)), loc);
         await sendEmail({ to: owner.email, toName: owner.name, subject: `Активиран ${TRIAL_DAYS}-дневен тест`, html: m.html, category: "subscription", type: "trial_started", companyId });
         const a = adminSimpleEmail("Активиран безплатен пробен период", [
           { label: "Фирма", value: company.name }, { label: "План", value: plan }, { label: "Дни", value: String(TRIAL_DAYS) },

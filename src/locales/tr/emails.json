@@ -40,5 +40,174 @@
     "intro1": "Merhaba, {name}.",
     "intro2": "Bu, hesap şifrenizin değiştirildiğine dair bir onaydır.",
     "footnote": "Bu değişikliği siz yapmadıysanız, hemen office@creativedigitalaccounting.com adresinden bize ulaşın."
+  },
+  "plans": {
+    "free": "Ücretsiz",
+    "start": "Başlangıç",
+    "business": "İşletme",
+    "pro": "Pro"
+  },
+  "period": {
+    "monthly": "Aylık",
+    "yearly": "Yıllık"
+  },
+  "daysUnit": {
+    "one": "gün",
+    "few": "gün",
+    "many": "gün",
+    "other": "gün"
+  },
+  "docTypes": {
+    "invoice": "Fatura",
+    "proforma": "Proforma fatura",
+    "quote": "Teklif",
+    "credit_note": "Alacak dekontu",
+    "debit_note": "Borç dekontu",
+    "contract": "Sözleşme",
+    "protocol": "Protokol",
+    "document": "Belge"
+  },
+  "entities": {
+    "contract": "Sözleşme",
+    "project": "Proje",
+    "warranty": "Garanti",
+    "license": "Lisans"
+  },
+  "locked": {
+    "subject": "Hesabınız geçici olarak kilitlendi",
+    "eyebrow": "Güvenlik",
+    "title": "Başarısız giriş denemeleri tespit edildi",
+    "intro1": "Merhaba, {name}.",
+    "intro2": "Art arda birkaç başarısız giriş denemesi tespit ettik. Sizi korumak için hesap 15 dakika süreyle geçici olarak kilitlendi. Bu sizseniz — bekleyin veya şifrenizi sıfırlayın.",
+    "button": "Şifreyi sıfırla",
+    "footnote": "Bu siz değilseniz, şifrenizi hemen değiştirmenizi öneririz."
+  },
+  "newLogin": {
+    "subject": "Hesabınıza yeni giriş",
+    "eyebrow": "Güvenlik",
+    "title": "Hesaba yeni giriş",
+    "intro1": "Merhaba, {name}.",
+    "intro2": "Hesabınıza yeni bir cihaz veya konumdan giriş yapıldığını kaydettik:",
+    "lblTime": "Zaman",
+    "lblDevice": "Cihaz",
+    "lblIp": "IP adresi",
+    "footnote": "Bu sizseniz herhangi bir işlem gerekmez. Aksi halde şifrenizi hemen değiştirin."
+  },
+  "subSelected": {
+    "subject": "„{plan}“ abonelik talebiniz alındı",
+    "eyebrow": "Abonelik",
+    "title": "Talebinizi aldık",
+    "intro1": "Merhaba,",
+    "intro2": "{company} için <strong>{plan}</strong> planı talebini kaydettik. Aboneliği etkinleştirmek için lütfen aşağıdaki bilgilerle banka havalesi yapın:",
+    "lblPlan": "Plan",
+    "lblPeriod": "Dönem",
+    "lblAmount": "Ödenecek tutar",
+    "lblRecipient": "Alıcı",
+    "lblIban": "IBAN",
+    "lblBank": "Banka",
+    "lblReason": "Açıklama",
+    "reason": "Abonelik {plan} — {company}",
+    "button": "Aboneliği görüntüle",
+    "footnote": "Ödemeyi aldığımızda aboneliğinizi etkinleştirecek ve size e-posta ile onay göndereceğiz."
+  },
+  "paymentSuccess": {
+    "subject": "Ödeme başarılı — teşekkür ederiz!",
+    "eyebrow": "Abonelik",
+    "title": "Ödeme alındı",
+    "intro": "Teşekkür ederiz! {company} aboneliği için ödeme onaylandı ve planınız etkin.",
+    "lblPlan": "Plan",
+    "lblAmount": "Tutar",
+    "lblMethod": "Yöntem",
+    "button": "Panoya git"
+  },
+  "paymentFailed": {
+    "subject": "Ödeme başarısız oldu",
+    "eyebrow": "Abonelik",
+    "title": "Ödemede bir sorun oluştu",
+    "intro": "{company} için abonelik ({plan}) ödeme denemesi başarısız oldu. Lütfen tekrar deneyin veya başka bir ödeme yöntemi seçin.",
+    "button": "Tekrar dene"
+  },
+  "subActivated": {
+    "subject": "„{plan}“ aboneliği etkinleştirildi",
+    "eyebrow": "Abonelik",
+    "title": "Aboneliğiniz etkin",
+    "intro": "{company} için <strong>{plan}</strong> planı artık etkin. Bizimle olduğunuz için teşekkür ederiz!",
+    "lblUntil": "Geçerlilik tarihi",
+    "button": "Panoya git"
+  },
+  "subRenewed": {
+    "subject": "Aboneliğiniz yenilendi",
+    "eyebrow": "Abonelik",
+    "title": "Yenilediğiniz için teşekkürler",
+    "intro": "{company} için <strong>{plan}</strong> planı başarıyla yenilendi.",
+    "lblUntil": "Geçerlilik tarihi",
+    "button": "Panoya git"
+  },
+  "planChanged": {
+    "subjectUp": "Daha yüksek bir plana geçtiniz",
+    "subjectDown": "Planınız değiştirildi",
+    "titleUp": "Aboneliğinizi yükselttiniz",
+    "titleDown": "Abonelik değişikliği",
+    "eyebrow": "Abonelik",
+    "intro": "{company} planı <strong>{from}</strong> planından <strong>{to}</strong> planına değiştirildi.",
+    "button": "Değişiklikleri gör"
+  },
+  "subExpiring": {
+    "subject": "Aboneliğiniz {days} {daysWord} içinde sona eriyor",
+    "eyebrow": "Hatırlatma",
+    "title": "Aboneliğiniz yakında sona eriyor",
+    "intro1": "{company} için <strong>{plan}</strong> planının <strong>{until}</strong> tarihinde ({days} {daysWord} içinde) sona ereceğini hatırlatırız.",
+    "intro2": "Tüm özelliklere kesintisiz erişimi korumak için zamanında yenileyin.",
+    "button": "Aboneliği yenile",
+    "footnote": "Aboneliğinizi zaten yenilediyseniz, rahatsızlık için özür diler ve bu hatırlatmayı dikkate almamanızı rica ederiz."
+  },
+  "subExpired": {
+    "subject": "Aboneliğiniz sona erdi",
+    "eyebrow": "Hatırlatma",
+    "title": "Aboneliğiniz sona erdi",
+    "intro1": "{company} için <strong>{plan}</strong> planı sona erdi ve hesap Ücretsiz plana döndürüldü. Verileriniz korundu.",
+    "intro2": "Tam erişimi geri kazanmak için istediğiniz zaman yenileyin.",
+    "button": "Şimdi yenile",
+    "footnote": "Aboneliğinizi zaten yenilediyseniz, özür diler ve bu mesajı dikkate almamanızı rica ederiz."
+  },
+  "unpaidInvoice": {
+    "subject": "Ödenmemiş fatura No. {number}",
+    "eyebrow": "Hatırlatma",
+    "title": "{number} numaralı fatura hâlâ ödenmedi",
+    "intro": "{company} için {number} numaralı fatura ({amount}) vadesinin {days} {daysWord} geçtiğini hatırlatırız.",
+    "button": "Faturayı görüntüle",
+    "footnote": "Ödeme zaten yapıldıysa, lütfen bu hatırlatmayı dikkate almayın."
+  },
+  "expiringEntity": {
+    "subject": "{label} yakında sona eriyor: {name}",
+    "eyebrow": "Hatırlatma",
+    "title": "{label} {date} tarihinde sona eriyor",
+    "intro": "{label} „{name}“ son tarihine yaklaşıyor ({date}). Lütfen zamanında inceleyin.",
+    "button": "Aç"
+  },
+  "docCopy": {
+    "subject": "Kopya: {label} No. {number}",
+    "eyebrow": "Belge",
+    "title": "{label} No. {number}",
+    "intro": "{company} tarafından düzenlenen belgenin bir kopyasını ekliyoruz. Aşağıdaki bağlantıdan görüntüleyip indirebilirsiniz."
+  },
+  "toClient": {
+    "subject": "{company} size {docLabelLower} No. {number} gönderdi",
+    "greetingName": "Merhaba, {name},",
+    "greeting": "Merhaba,",
+    "intro": "<strong>{company}</strong> size <strong>{total}</strong> tutarında bir {docLabelLower} gönderdi.",
+    "intro2": "Bunu inceleyebilir, PDF olarak indirebilir ve çevrimiçi olarak kabul edebilir veya reddedebilirsiniz:",
+    "button": "Belgeyi görüntüle",
+    "footnote": "Düğme yalnızca size özel güvenli bir sayfa açar — kayıt gerekmez."
+  },
+  "clientDecision": {
+    "subjectAccepted": "{clientName}, {docLabelLower} No. {number} belgesini kabul etti",
+    "subjectRejected": "{clientName}, {docLabelLower} No. {number} belgesini reddetti",
+    "eyebrow": "Müşteri kararı",
+    "titleAccepted": "Belge kabul edildi ✓",
+    "titleRejected": "Belge reddedildi",
+    "introAccepted": "Müşteri <strong>{clientName}</strong>, {docLabelLower} No. {number} belgesini kabul etti.",
+    "introRejected": "Müşteri <strong>{clientName}</strong>, {docLabelLower} No. {number} belgesini reddetti.",
+    "button": "Belgeyi aç"
   }
 }

@@ -40,5 +40,174 @@
     "intro1": "Hello, {name}.",
     "intro2": "This is a confirmation that your account password has been changed.",
     "footnote": "If you didn’t make this change, contact us immediately at office@creativedigitalaccounting.com."
+  },
+  "plans": {
+    "free": "Free",
+    "start": "Start",
+    "business": "Business",
+    "pro": "Pro"
+  },
+  "period": {
+    "monthly": "Monthly",
+    "yearly": "Yearly"
+  },
+  "daysUnit": {
+    "one": "day",
+    "few": "days",
+    "many": "days",
+    "other": "days"
+  },
+  "docTypes": {
+    "invoice": "Invoice",
+    "proforma": "Proforma invoice",
+    "quote": "Quote",
+    "credit_note": "Credit note",
+    "debit_note": "Debit note",
+    "contract": "Contract",
+    "protocol": "Protocol",
+    "document": "Document"
+  },
+  "entities": {
+    "contract": "Contract",
+    "project": "Project",
+    "warranty": "Warranty",
+    "license": "License"
+  },
+  "locked": {
+    "subject": "Your account was temporarily locked",
+    "eyebrow": "Security",
+    "title": "Failed sign-in attempts detected",
+    "intro1": "Hello, {name}.",
+    "intro2": "We detected several consecutive failed sign-in attempts. To protect you, the account has been temporarily locked for 15 minutes. If this was you — please wait or reset your password.",
+    "button": "Reset password",
+    "footnote": "If this wasn't you, we recommend changing your password immediately."
+  },
+  "newLogin": {
+    "subject": "New sign-in to your account",
+    "eyebrow": "Security",
+    "title": "New sign-in to your account",
+    "intro1": "Hello, {name}.",
+    "intro2": "We registered a sign-in to your account from a new device or location:",
+    "lblTime": "Time",
+    "lblDevice": "Device",
+    "lblIp": "IP address",
+    "footnote": "If this was you, no action is needed. Otherwise, change your password immediately."
+  },
+  "subSelected": {
+    "subject": "Your „{plan}“ subscription request was received",
+    "eyebrow": "Subscription",
+    "title": "We received your request",
+    "intro1": "Hello,",
+    "intro2": "We registered a request for the <strong>{plan}</strong> plan for {company}. To activate the subscription, please make a bank transfer using the following details:",
+    "lblPlan": "Plan",
+    "lblPeriod": "Period",
+    "lblAmount": "Amount due",
+    "lblRecipient": "Recipient",
+    "lblIban": "IBAN",
+    "lblBank": "Bank",
+    "lblReason": "Reference",
+    "reason": "Subscription {plan} — {company}",
+    "button": "View subscription",
+    "footnote": "Once we receive the payment, we'll activate your subscription and send you a confirmation by email."
+  },
+  "paymentSuccess": {
+    "subject": "Payment successful — thank you!",
+    "eyebrow": "Subscription",
+    "title": "Payment received",
+    "intro": "Thank you! The payment for {company}'s subscription has been confirmed and your plan is active.",
+    "lblPlan": "Plan",
+    "lblAmount": "Amount",
+    "lblMethod": "Method",
+    "button": "Go to dashboard"
+  },
+  "paymentFailed": {
+    "subject": "Payment was not successful",
+    "eyebrow": "Subscription",
+    "title": "There was a problem with the payment",
+    "intro": "The payment attempt for the subscription ({plan}) for {company} was not successful. Please try again or choose another payment method.",
+    "button": "Try again"
+  },
+  "subActivated": {
+    "subject": "The „{plan}“ subscription is activated",
+    "eyebrow": "Subscription",
+    "title": "Your subscription is active",
+    "intro": "The <strong>{plan}</strong> plan for {company} is now active. Thank you for being with us!",
+    "lblUntil": "Valid until",
+    "button": "Go to dashboard"
+  },
+  "subRenewed": {
+    "subject": "Your subscription has been renewed",
+    "eyebrow": "Subscription",
+    "title": "Thank you for renewing",
+    "intro": "The <strong>{plan}</strong> plan for {company} has been renewed successfully.",
+    "lblUntil": "Valid until",
+    "button": "Go to dashboard"
+  },
+  "planChanged": {
+    "subjectUp": "You upgraded to a higher plan",
+    "subjectDown": "Your plan was changed",
+    "titleUp": "You upgraded your subscription",
+    "titleDown": "Subscription change",
+    "eyebrow": "Subscription",
+    "intro": "The plan for {company} was changed from <strong>{from}</strong> to <strong>{to}</strong>.",
+    "button": "View changes"
+  },
+  "subExpiring": {
+    "subject": "Your subscription expires in {days} {daysWord}",
+    "eyebrow": "Reminder",
+    "title": "Your subscription expires soon",
+    "intro1": "This is a reminder that the <strong>{plan}</strong> plan for {company} expires on <strong>{until}</strong> (in {days} {daysWord}).",
+    "intro2": "Renew in time to keep access to all features without interruption.",
+    "button": "Renew subscription",
+    "footnote": "If you have already renewed your subscription, we apologize for the inconvenience and ask you to disregard this reminder."
+  },
+  "subExpired": {
+    "subject": "Your subscription has expired",
+    "eyebrow": "Reminder",
+    "title": "Your subscription has expired",
+    "intro1": "The <strong>{plan}</strong> plan for {company} has expired and the account was reverted to the Free plan. Your data is preserved.",
+    "intro2": "Renew at any time to restore full access.",
+    "button": "Renew now",
+    "footnote": "If you have already renewed your subscription, we apologize and ask you to disregard this message."
+  },
+  "unpaidInvoice": {
+    "subject": "Unpaid invoice No. {number}",
+    "eyebrow": "Reminder",
+    "title": "Invoice No. {number} is still unpaid",
+    "intro": "A reminder that invoice No. {number} ({amount}) for {company} is {days} {daysWord} past due.",
+    "button": "View invoice",
+    "footnote": "If the payment has already been made, please disregard this reminder."
+  },
+  "expiringEntity": {
+    "subject": "{label} expires soon: {name}",
+    "eyebrow": "Reminder",
+    "title": "{label} expires on {date}",
+    "intro": "{label} „{name}“ is approaching its deadline ({date}). Please review it in time.",
+    "button": "Open"
+  },
+  "docCopy": {
+    "subject": "Copy: {label} No. {number}",
+    "eyebrow": "Document",
+    "title": "{label} No. {number}",
+    "intro": "Please find a copy of the document issued by {company}. You can view and download it from the link below."
+  },
+  "toClient": {
+    "subject": "{company} sent you {docLabelLower} No. {number}",
+    "greetingName": "Hello, {name},",
+    "greeting": "Hello,",
+    "intro": "<strong>{company}</strong> sent you a {docLabelLower} for <strong>{total}</strong>.",
+    "intro2": "You can review it, download it as a PDF, and accept or reject it online:",
+    "button": "View document",
+    "footnote": "The button opens a secure page just for you — no registration required."
+  },
+  "clientDecision": {
+    "subjectAccepted": "{clientName} accepted {docLabelLower} No. {number}",
+    "subjectRejected": "{clientName} rejected {docLabelLower} No. {number}",
+    "eyebrow": "Client decision",
+    "titleAccepted": "The document was accepted ✓",
+    "titleRejected": "The document was rejected",
+    "introAccepted": "Client <strong>{clientName}</strong> accepted {docLabelLower} No. {number}.",
+    "introRejected": "Client <strong>{clientName}</strong> rejected {docLabelLower} No. {number}.",
+    "button": "Open document"
   }
 }

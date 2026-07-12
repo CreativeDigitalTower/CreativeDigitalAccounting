@@ -5,6 +5,7 @@ import { audit } from "@/lib/documents";
 import { logSubscriptionEvent } from "@/lib/subscriptionEvents";
 import { sendEmail } from "@/lib/email/send";
 import { subscriptionActivatedEmail, planChangedEmail } from "@/lib/email/messages";
+import { normalizeLocale, intlLocale } from "@/lib/i18n/config";
 import { z } from "zod";
 
 const schema = z.object({
@@ -47,15 +48,16 @@ export async function POST(req: Request) {
     try {
       const company = await prisma.company.findUnique({
         where: { id: companyId },
-        select: { name: true, companyUsers: { where: { role: "owner" }, select: { user: { select: { email: true, name: true } } } } },
+        select: { name: true, companyUsers: { where: { role: "owner" }, select: { user: { select: { email: true, name: true, preferredLanguage: true } } } } },
       });
       const owner = company?.companyUsers[0]?.user;
       if (owner?.email && company) {
+        const loc = normalizeLocale(owner.preferredLanguage);
         const prevPlan = prev?.plan ?? "free";
-        const until = periodEnd ? new Date(periodEnd).toLocaleDateString("bg-BG") : undefined;
+        const until = periodEnd ? new Date(periodEnd).toLocaleDateString(intlLocale(loc)) : undefined;
         const m = prevPlan !== plan && prevPlan !== "free"
-          ? planChangedEmail(company.name, prevPlan, plan)
-          : subscriptionActivatedEmail(company.name, plan, until);
+          ? planChangedEmail(company.name, prevPlan, plan, loc)
+          : subscriptionActivatedEmail(company.name, plan, until, loc);
         await sendEmail({ to: owner.email, toName: owner.name, subject: m.subject, html: m.html, category: m.category, type: "subscription_activated", companyId });
       }
     } catch (e) { console.error("admin plan email", e); }
