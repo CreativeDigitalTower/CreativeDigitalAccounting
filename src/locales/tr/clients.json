@@ -109,5 +109,130 @@
       "emailPh": "office@firma.com",
       "phone": "Telefon"
     }
+  },
+  "taskType": {
+    "call": "Ara",
+    "email": "E-posta gönder",
+    "offer": "Teklif gönder",
+    "contract": "Sözleşme gönder",
+    "followup": "Müşteriyi ara",
+    "meeting": "Toplantı",
+    "other": "Diğer"
+  },
+  "docShort": {
+    "invoice": "Fatura",
+    "proforma": "Proforma",
+    "quote": "Teklif",
+    "credit_note": "Alacak d.",
+    "debit_note": "Borç d."
+  },
+  "docLower": {
+    "invoice": "fatura",
+    "proforma": "proforma",
+    "quote": "teklif",
+    "credit_note": "alacak dekontu",
+    "debit_note": "borç dekontu"
+  },
+  "crm": {
+    "back": "← Müşteriler (CRM)",
+    "newOffer": "+ Teklif",
+    "newInvoice": "+ Fatura",
+    "statusLabel": "Durum:",
+    "stageLabel": "Aşama (pipeline):",
+    "dealValueLabel": "Anlaşma değeri (€):",
+    "kpi": {
+      "turnover": "Müşteri cirosu",
+      "invoiced": "Faturalanan (sistemde)",
+      "paid": "Ödendi",
+      "documents": "Belgeler"
+    },
+    "tabs": {
+      "overview": "Genel bakış",
+      "timeline": "Zaman çizelgesi",
+      "docs": "Belgeler ve projeler",
+      "files": "Dosyalar"
+    },
+    "info": {
+      "title": "Müşteri bilgileri",
+      "edit": "✎ Düzenle",
+      "save": "Kaydet",
+      "name": "Unvan",
+      "birthday": "Doğum günü",
+      "clientSince": "Müşteri olma tarihi",
+      "openingRevenue": "Devreden ciro (€)",
+      "openingRevenuePh": "sistemden önceki ciro",
+      "monthlyRetainer": "Aylık abonelik (€)",
+      "monthlyRetainerPh": "isteğe bağlı",
+      "clientSinceView": "Müşteri olma",
+      "openingRevenueView": "Devreden ciro",
+      "monthlyRetainerView": "Aylık abonelik"
+    },
+    "f": {
+      "eik": "Şirket no",
+      "vat": "KDV №",
+      "mol": "Sorumlu kişi",
+      "contactPerson": "İletişim kişisi",
+      "email": "E-posta",
+      "phone": "Telefon",
+      "website": "Web sitesi",
+      "city": "Şehir",
+      "address": "Adres",
+      "tags": "Etiketler"
+    },
+    "contacts": {
+      "title": "İletişim kişileri",
+      "add": "+ Kişi ekle",
+      "name": "Ad",
+      "position": "Görev",
+      "phone": "Telefon",
+      "email": "E-posta",
+      "confirmDelete": "bu kişi"
+    },
+    "tasks": {
+      "title": "CRM görevleri",
+      "placeholder": "Görev…",
+      "empty": "Görev yok.",
+      "confirmDelete": "bu görev"
+    },
+    "notes": {
+      "title": "CRM notları",
+      "placeholder": "Not ekle…",
+      "empty": "Not yok."
+    },
+    "timeline": {
+      "title": "Müşteri zaman çizelgesi",
+      "empty": "Henüz etkinlik yok.",
+      "added": "Müşteri CRM'e eklendi",
+      "issued": "{doc} No. {number} düzenlendi",
+      "payment": "{number} için ödeme ({amount})",
+      "contract": "Sözleşme: {title}",
+      "project": "Proje: {name}",
+      "taskDone": "Görev tamamlandı: {title}"
+    },
+    "docs": {
+      "title": "Belgeler ({n})",
+      "empty": "Belge yok.",
+      "number": "Numara",
+      "type": "Tür",
+      "date": "Tarih",
+      "amount": "Tutar",
+      "status": "Durum",
+      "paid": "Ödendi",
+      "overdue": "Gecikmiş"
+    },
+    "lists": {
+      "contracts": "Sözleşmeler ({n})",
+      "contractsEmpty": "Sözleşme yok.",
+      "projects": "Projeler ({n})",
+      "projectsEmpty": "Proje yok."
+    },
+    "files": {
+      "title": "Müşteri dosyaları",
+      "empty": "Yüklenen dosya yok.",
+      "uploading": "Yükleniyor…",
+      "tooLarge": "Dosya çok büyük (maks. 5 MB).",
+      "uploadErr": "Yükleme hatası.",
+      "confirmDelete": "bu dosya"
+    }
   }
 }
