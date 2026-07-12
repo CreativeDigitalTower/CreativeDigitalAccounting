@@ -6,6 +6,7 @@ import { z } from "zod";
 import crypto from "crypto";
 import { sendEmail, notifyAdmin } from "@/lib/email/send";
 import { welcomeEmail, adminNewRegistrationEmail } from "@/lib/email/messages";
+import { localeFromRequest } from "@/lib/i18n/recipient";
 import { APP_URL } from "@/lib/email/templates";
 import { validateEik } from "@/lib/validation/eik";
 import { generatePartnerCode } from "@/lib/partner";
@@ -70,16 +71,17 @@ export async function POST(req: Request) {
         where: { id: existing.id },
         data: {
           name: data.name, passwordHash, representativeRole: data.representativeRole || null,
-          marketingConsent: !!data.marketingConsent, termsAcceptedAt: new Date(),
+          marketingConsent: !!data.marketingConsent, termsAcceptedAt: new Date(), preferredLanguage: (await localeFromRequest()),
         },
       });
       return NextResponse.json({ success: true, joinedExisting: true });
     }
 
+    const regLocale = await localeFromRequest();
     const result = await prisma.$transaction(async (tx) => {
       const userData = {
         name: data.name, passwordHash, representativeRole: data.representativeRole || null,
-        marketingConsent: !!data.marketingConsent, termsAcceptedAt: new Date(),
+        marketingConsent: !!data.marketingConsent, termsAcceptedAt: new Date(), preferredLanguage: regLocale,
       };
       const user = existing
         ? await tx.user.update({ where: { id: existing.id }, data: userData })
@@ -161,7 +163,7 @@ export async function POST(req: Request) {
         data: { identifier: data.email, token, expires: new Date(Date.now() + 24 * 60 * 60 * 1000) },
       });
       const verifyUrl = `${APP_URL}/verify-email?token=${token}`;
-      const w = welcomeEmail(data.name, verifyUrl);
+      const w = welcomeEmail(data.name, verifyUrl, regLocale);
       await sendEmail({ to: data.email, toName: data.name, subject: w.subject, html: w.html, category: w.category, type: "welcome", companyId: result.companyId, force: true });
 
       const a = adminNewRegistrationEmail({ name: data.name, company: data.companyName, eik: data.eik, email: data.email, plan: data.plan });

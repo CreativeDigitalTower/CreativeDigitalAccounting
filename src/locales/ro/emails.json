@@ -1,0 +1,44 @@
+{
+  "footer": {
+    "tagline": "{name} — gestionați întreaga afacere dintr-un singur loc.",
+    "whyReceiving": "Primiți acest e-mail deoarece aveți un cont la {name}."
+  },
+  "welcome": {
+    "subject": "Bine ați venit la Creative Digital Accounting",
+    "eyebrow": "Înregistrare reușită",
+    "title": "Bine ați venit, {name}!",
+    "preheader": "Contul dvs. a fost creat cu succes.",
+    "intro": "Ne bucurăm că vi s-ați alăturat. Contul dvs. este creat și puteți gestiona facturi, documente, clienți, stocuri și finanțe dintr-un singur loc.",
+    "introVerify": "Pentru acces complet, confirmați adresa de e-mail cu butonul de mai jos:",
+    "introStart": "Autentificați-vă în tabloul de bord pentru a începe.",
+    "btnVerify": "Confirmă adresa de e-mail",
+    "btnDashboard": "Spre tabloul de bord",
+    "footnote": "Dacă nu ați creat acest cont, puteți ignora acest e-mail."
+  },
+  "verify": {
+    "subject": "Confirmați adresa de e-mail",
+    "eyebrow": "Confirmare",
+    "title": "Confirmați adresa de e-mail",
+    "intro1": "Bună ziua, {name}.",
+    "intro2": "Apăsați butonul de mai jos pentru a confirma că această adresă vă aparține. Linkul este valabil 24 de ore.",
+    "button": "Confirmă e-mailul",
+    "footnote": "Dacă nu v-ați înregistrat, ignorați acest e-mail."
+  },
+  "reset": {
+    "subject": "Resetare parolă",
+    "eyebrow": "Securitate",
+    "title": "Parolă uitată",
+    "intro1": "Bună ziua, {name}.",
+    "intro2": "Am primit o solicitare de resetare a parolei. Apăsați butonul de mai jos pentru a seta o parolă nouă. Linkul este valabil <strong>60 de minute</strong>.",
+    "button": "Setează o parolă nouă",
+    "footnote": "Dacă nu ați solicitat resetarea parolei, ignorați acest e-mail — parola rămâne neschimbată."
+  },
+  "changed": {
+    "subject": "Parola dvs. a fost schimbată",
+    "eyebrow": "Securitate",
+    "title": "Parola dvs. a fost schimbată cu succes",
+    "intro1": "Bună ziua, {name}.",
+    "intro2": "Aceasta este o confirmare că parola contului dvs. a fost schimbată.",
+    "footnote": "Dacă nu ați făcut această modificare, contactați-ne imediat la office@creativedigitalaccounting.com."
+  }
+}

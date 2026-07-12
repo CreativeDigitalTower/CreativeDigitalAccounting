@@ -1,4 +1,6 @@
 import { PLATFORM_NAME, PLATFORM_URL } from "@/lib/constants";
+import { getMessages, makeT } from "@/lib/i18n/messages";
+import { normalizeLocale } from "@/lib/i18n/config";
 
 const EMERALD = "#0F8A6A";
 const EMERALD_DARK = "#0B5E4A";
@@ -27,10 +29,14 @@ interface BaseOpts {
   footnote?: string;
   /** small accent label shown above the title */
   eyebrow?: string;
+  /** език на получателя (bg по подразбиране) */
+  locale?: string;
 }
 
 /** Elegant, minimalist, brand-consistent HTML email shell. */
 export function baseTemplate(o: BaseOpts): string {
+  const loc = normalizeLocale(o.locale);
+  const et = makeT(getMessages(loc));
   const detailRows = (o.details ?? [])
     .map(
       (d) => `
@@ -52,7 +58,7 @@ export function baseTemplate(o: BaseOpts): string {
     : "";
 
   return `<!DOCTYPE html>
-<html lang="bg"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="${loc}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="x-apple-disable-message-reformatting"><title>${escapeHtml(o.title)}</title></head>
 <body style="margin:0;padding:0;background:${BG};-webkit-font-smoothing:antialiased;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(o.preheader ?? o.title)}</div>
@@ -83,7 +89,7 @@ export function baseTemplate(o: BaseOpts): string {
     <!-- footer -->
     <tr><td style="padding:22px 40px 30px;background:#FAFBFA;border-top:1px solid #EEF2F0;">
       <p style="margin:0 0 6px;font-size:12px;color:${MUTED};line-height:1.6;">
-        ${escapeHtml(PLATFORM_NAME)} — управление на целия Ви бизнес от едно място.
+        ${escapeHtml(et("emails.footer.tagline", { name: PLATFORM_NAME }))}
       </p>
       <p style="margin:0;font-size:11.5px;color:#9AA8A2;">
         <a href="${APP_URL}" style="color:${EMERALD};text-decoration:none;">${escapeHtml(PLATFORM_URL)}</a>
@@ -92,7 +98,7 @@ export function baseTemplate(o: BaseOpts): string {
     </td></tr>
   </table>
   <p style="max-width:560px;margin:16px auto 0;font-size:11px;color:#9AA8A2;line-height:1.5;text-align:center;">
-    Получавате този имейл, защото имате акаунт в ${escapeHtml(PLATFORM_NAME)}.
+    ${escapeHtml(et("emails.footer.whyReceiving", { name: PLATFORM_NAME }))}
     {{UNSUB}}
   </p>
 </td></tr></table>

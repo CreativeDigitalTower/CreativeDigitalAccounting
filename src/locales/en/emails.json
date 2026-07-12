@@ -1,0 +1,44 @@
+{
+  "footer": {
+    "tagline": "{name} — run your whole business from one place.",
+    "whyReceiving": "You are receiving this email because you have an account at {name}."
+  },
+  "welcome": {
+    "subject": "Welcome to Creative Digital Accounting",
+    "eyebrow": "Registration successful",
+    "title": "Welcome, {name}!",
+    "preheader": "Your account has been created successfully.",
+    "intro": "We’re glad you joined. Your account is ready and you can now manage invoices, documents, clients, inventory and finances from one place.",
+    "introVerify": "For full access, please confirm your email address using the button below:",
+    "introStart": "Log in to your dashboard to get started.",
+    "btnVerify": "Confirm email address",
+    "btnDashboard": "Go to dashboard",
+    "footnote": "If you didn’t create this account, you can ignore this email."
+  },
+  "verify": {
+    "subject": "Confirm your email address",
+    "eyebrow": "Verification",
+    "title": "Confirm your email address",
+    "intro1": "Hello, {name}.",
+    "intro2": "Click the button below to confirm that this email address belongs to you. The link is valid for 24 hours.",
+    "button": "Confirm email",
+    "footnote": "If you didn’t sign up, please ignore this email."
+  },
+  "reset": {
+    "subject": "Password reset",
+    "eyebrow": "Security",
+    "title": "Forgot password",
+    "intro1": "Hello, {name}.",
+    "intro2": "We received a request to reset your password. Click the button below to set a new password. The link is valid for <strong>60 minutes</strong>.",
+    "button": "Set a new password",
+    "footnote": "If you didn’t request a password reset, ignore this email — your password stays unchanged."
+  },
+  "changed": {
+    "subject": "Your password was changed",
+    "eyebrow": "Security",
+    "title": "Your password was changed successfully",
+    "intro1": "Hello, {name}.",
+    "intro2": "This is a confirmation that your account password has been changed.",
+    "footnote": "If you didn’t make this change, contact us immediately at office@creativedigitalaccounting.com."
+  }
+}

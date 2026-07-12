@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { sendEmail } from "@/lib/email/send";
 import { passwordResetEmail } from "@/lib/email/messages";
+import { normalizeLocale } from "@/lib/i18n/config";
 import { APP_URL } from "@/lib/email/templates";
 
 export async function POST(req: Request) {
@@ -22,7 +23,7 @@ export async function POST(req: Request) {
         data: { userId: user.id, token, expires: new Date(Date.now() + 60 * 60 * 1000) },
       });
       const url = `${APP_URL}/reset-password?token=${token}`;
-      const m = passwordResetEmail(user.name || "", url);
+      const m = passwordResetEmail(user.name || "", url, normalizeLocale(user.preferredLanguage));
       await sendEmail({ to: user.email, toName: user.name, subject: m.subject, html: m.html, category: m.category, type: "password_reset", force: true });
     }
     return NextResponse.json({ ok: true });
