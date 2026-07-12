@@ -12,6 +12,7 @@ import bgEmails from "@/locales/bg/emails.json";
 import bgNotif from "@/locales/bg/notifications.json";
 import bgClients from "@/locales/bg/clients.json";
 import bgSuppliers from "@/locales/bg/suppliers.json";
+import bgExpenses from "@/locales/bg/expenses.json";
 import enCommon from "@/locales/en/common.json";
 import enNav from "@/locales/en/navigation.json";
 import enAuth from "@/locales/en/auth.json";
@@ -21,6 +22,7 @@ import enEmails from "@/locales/en/emails.json";
 import enNotif from "@/locales/en/notifications.json";
 import enClients from "@/locales/en/clients.json";
 import enSuppliers from "@/locales/en/suppliers.json";
+import enExpenses from "@/locales/en/expenses.json";
 import ruCommon from "@/locales/ru/common.json";
 import ruNav from "@/locales/ru/navigation.json";
 import ruAuth from "@/locales/ru/auth.json";
@@ -30,6 +32,7 @@ import ruEmails from "@/locales/ru/emails.json";
 import ruNotif from "@/locales/ru/notifications.json";
 import ruClients from "@/locales/ru/clients.json";
 import ruSuppliers from "@/locales/ru/suppliers.json";
+import ruExpenses from "@/locales/ru/expenses.json";
 import roCommon from "@/locales/ro/common.json";
 import roNav from "@/locales/ro/navigation.json";
 import roAuth from "@/locales/ro/auth.json";
@@ -39,6 +42,7 @@ import roEmails from "@/locales/ro/emails.json";
 import roNotif from "@/locales/ro/notifications.json";
 import roClients from "@/locales/ro/clients.json";
 import roSuppliers from "@/locales/ro/suppliers.json";
+import roExpenses from "@/locales/ro/expenses.json";
 import trCommon from "@/locales/tr/common.json";
 import trNav from "@/locales/tr/navigation.json";
 import trAuth from "@/locales/tr/auth.json";
@@ -48,6 +52,7 @@ import trEmails from "@/locales/tr/emails.json";
 import trNotif from "@/locales/tr/notifications.json";
 import trClients from "@/locales/tr/clients.json";
 import trSuppliers from "@/locales/tr/suppliers.json";
+import trExpenses from "@/locales/tr/expenses.json";
 import elCommon from "@/locales/el/common.json";
 import elNav from "@/locales/el/navigation.json";
 import elAuth from "@/locales/el/auth.json";
@@ -57,17 +62,18 @@ import elEmails from "@/locales/el/emails.json";
 import elNotif from "@/locales/el/notifications.json";
 import elClients from "@/locales/el/clients.json";
 import elSuppliers from "@/locales/el/suppliers.json";
+import elExpenses from "@/locales/el/expenses.json";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Messages = Record<string, any>;
 
 const DICTS: Record<Locale, Messages> = {
-  bg: { common: bgCommon, navigation: bgNav, auth: bgAuth, bi: bgBi, pdf: bgPdf, emails: bgEmails, notifications: bgNotif, clients: bgClients, suppliers: bgSuppliers },
-  en: { common: enCommon, navigation: enNav, auth: enAuth, bi: enBi, pdf: enPdf, emails: enEmails, notifications: enNotif, clients: enClients, suppliers: enSuppliers },
-  ru: { common: ruCommon, navigation: ruNav, auth: ruAuth, bi: ruBi, pdf: ruPdf, emails: ruEmails, notifications: ruNotif, clients: ruClients, suppliers: ruSuppliers },
-  ro: { common: roCommon, navigation: roNav, auth: roAuth, bi: roBi, pdf: roPdf, emails: roEmails, notifications: roNotif, clients: roClients, suppliers: roSuppliers },
-  tr: { common: trCommon, navigation: trNav, auth: trAuth, bi: trBi, pdf: trPdf, emails: trEmails, notifications: trNotif, clients: trClients, suppliers: trSuppliers },
-  el: { common: elCommon, navigation: elNav, auth: elAuth, bi: elBi, pdf: elPdf, emails: elEmails, notifications: elNotif, clients: elClients, suppliers: elSuppliers },
+  bg: { common: bgCommon, navigation: bgNav, auth: bgAuth, bi: bgBi, pdf: bgPdf, emails: bgEmails, notifications: bgNotif, clients: bgClients, suppliers: bgSuppliers, expenses: bgExpenses },
+  en: { common: enCommon, navigation: enNav, auth: enAuth, bi: enBi, pdf: enPdf, emails: enEmails, notifications: enNotif, clients: enClients, suppliers: enSuppliers, expenses: enExpenses },
+  ru: { common: ruCommon, navigation: ruNav, auth: ruAuth, bi: ruBi, pdf: ruPdf, emails: ruEmails, notifications: ruNotif, clients: ruClients, suppliers: ruSuppliers, expenses: ruExpenses },
+  ro: { common: roCommon, navigation: roNav, auth: roAuth, bi: roBi, pdf: roPdf, emails: roEmails, notifications: roNotif, clients: roClients, suppliers: roSuppliers, expenses: roExpenses },
+  tr: { common: trCommon, navigation: trNav, auth: trAuth, bi: trBi, pdf: trPdf, emails: trEmails, notifications: trNotif, clients: trClients, suppliers: trSuppliers, expenses: trExpenses },
+  el: { common: elCommon, navigation: elNav, auth: elAuth, bi: elBi, pdf: elPdf, emails: elEmails, notifications: elNotif, clients: elClients, suppliers: elSuppliers, expenses: elExpenses },
 };
 
 // Дълбоко сливане: липсващ ключ пада обратно към българския (никога raw key на екрана).

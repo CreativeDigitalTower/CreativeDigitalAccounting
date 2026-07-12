@@ -1,0 +1,82 @@
+{
+  "title": "Giderler",
+  "totalLabel": "Toplam:",
+  "newExpense": "+ Yeni gider",
+  "vatSummary": "KDV özeti",
+  "net": "Net giderler",
+  "vat": "Giderlerde KDV",
+  "gross": "Brüt giderler",
+  "empty": {
+    "none": "Kayıtlı gider yok",
+    "add": "Gider ekle",
+    "filtered": "Bu filtreye uygun gider yok."
+  },
+  "search": "Gider, kategori, tedarikçi ara…",
+  "filter": {
+    "all": "Tümü",
+    "recurring": "Yinelenen",
+    "single": "Tek seferlik"
+  },
+  "th": {
+    "description": "Açıklama",
+    "category": "Kategori",
+    "type": "Tür",
+    "supplier": "Tedarikçi",
+    "date": "Tarih",
+    "gross": "Brüt",
+    "file": "Dosya"
+  },
+  "type": {
+    "monthly": "Aylık",
+    "single": "Tek seferlik"
+  },
+  "row": {
+    "edit": "Düzenle",
+    "delete": "Sil"
+  },
+  "confirmDelete": "„{name}“ gideri",
+  "errDelete": "Silme hatası.",
+  "errSave": "Kaydetme hatası.",
+  "monthTotal": "Toplam:",
+  "editModal": {
+    "title": "Gideri düzenle",
+    "description": "Açıklama",
+    "gross": "Brüt tutar (€)",
+    "vat": "KDV tutarı (€)",
+    "date": "Tarih",
+    "category": "Kategori",
+    "supplier": "Tedarikçi",
+    "noSupplier": "— Yok —",
+    "recurring": "Yinelenen aylık gider",
+    "confirmDelete": "Gider silinsin mi?",
+    "delete": "Sil",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "saving": "Kaydediliyor…"
+  },
+  "new": {
+    "back": "← Giderler",
+    "heading": "Yeni gider",
+    "fileTooLarge": "Dosya 3MB'den küçük olmalı.",
+    "cancel": "İptal",
+    "save": "Gideri kaydet",
+    "saving": "Kaydediliyor…",
+    "f": {
+      "description": "Açıklama *",
+      "descriptionPh": "Ofis kirası, Haziran",
+      "invoiceNumber": "Gider faturası numarası",
+      "invoiceNumberPh": "örn. 0000001234",
+      "category": "Kategori *",
+      "selectCat": "— Seçin —",
+      "supplier": "Tedarikçi",
+      "noSupplier": "— Tedarikçi yok —",
+      "gross": "Brüt tutar (EUR) *",
+      "vatRate": "KDV oranı",
+      "date": "Tarih *",
+      "attach": "Gider faturası ekle (PDF/foto)",
+      "attached": "✓ Eklendi:",
+      "recurring": "Yinelenen aylık gider (kira, maaşlar, bakım…)",
+      "recurringHint": "Analizlerde sabit aylık giderleri hesaplamak için kullanılır."
+    }
+  }
+}
