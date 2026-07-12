@@ -1,0 +1,74 @@
+{
+  "title": "Tedarikçiler",
+  "count": "{n} tedarikçi",
+  "newSupplier": "+ Yeni tedarikçi",
+  "empty": {
+    "none": "Tedarikçi yok",
+    "add": "Tedarikçi ekle"
+  },
+  "th": {
+    "supplier": "Tedarikçi",
+    "eik": "Şirket no",
+    "email": "E-posta",
+    "phone": "Telefon",
+    "expenses": "Giderler",
+    "contracts": "Sözleşmeler",
+    "rating": "Puan"
+  },
+  "row": {
+    "dossier": "Profil",
+    "edit": "Düzenle",
+    "delete": "Tedarikçiyi sil"
+  },
+  "confirmDelete": "„{name}“ tedarikçisi",
+  "errDelete": "Silme hatası.",
+  "errSave": "Kaydetme hatası.",
+  "new": {
+    "back": "← Tedarikçiler",
+    "heading": "Yeni tedarikçi",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "saving": "Kaydediliyor…",
+    "f": {
+      "name": "Unvan *",
+      "namePh": "Tedarikçi Ltd.",
+      "eik": "Şirket no / vergi no",
+      "vat": "KDV numarası",
+      "address": "Adres",
+      "email": "E-posta",
+      "phone": "Telefon",
+      "rating": "Puan (1–5)",
+      "notes": "Notlar"
+    }
+  },
+  "dossier": {
+    "back": "← Tedarikçiler",
+    "totalExpenses": "Toplam gider",
+    "expenses": "Giderler ({n})",
+    "empty": "Gider yok.",
+    "th": {
+      "description": "Açıklama",
+      "date": "Tarih",
+      "amount": "Tutar"
+    }
+  },
+  "info": {
+    "title": "Tedarikçi bilgileri",
+    "edit": "Düzenle",
+    "save": "Kaydet",
+    "saving": "Kaydediliyor…",
+    "name": "Unvan",
+    "rating": "Puan (1–5)",
+    "notes": "Notlar",
+    "f": {
+      "eik": "Şirket no",
+      "vat": "KDV №",
+      "contactPerson": "İletişim kişisi",
+      "email": "E-posta",
+      "phone": "Telefon",
+      "website": "Web sitesi",
+      "city": "Şehir",
+      "address": "Adres"
+    }
+  }
+}

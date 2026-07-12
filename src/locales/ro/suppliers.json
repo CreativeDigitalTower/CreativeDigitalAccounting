@@ -1,0 +1,74 @@
+{
+  "title": "Furnizori",
+  "count": "{n} furnizori",
+  "newSupplier": "+ Furnizor nou",
+  "empty": {
+    "none": "Niciun furnizor",
+    "add": "Adaugă furnizor"
+  },
+  "th": {
+    "supplier": "Furnizor",
+    "eik": "CUI",
+    "email": "E-mail",
+    "phone": "Telefon",
+    "expenses": "Cheltuieli",
+    "contracts": "Contracte",
+    "rating": "Rating"
+  },
+  "row": {
+    "dossier": "Profil",
+    "edit": "Editează",
+    "delete": "Șterge furnizorul"
+  },
+  "confirmDelete": "furnizorul „{name}“",
+  "errDelete": "Eroare la ștergere.",
+  "errSave": "Eroare la salvare.",
+  "new": {
+    "back": "← Furnizori",
+    "heading": "Furnizor nou",
+    "cancel": "Anulează",
+    "save": "Salvează",
+    "saving": "Se salvează…",
+    "f": {
+      "name": "Denumire *",
+      "namePh": "Furnizor SRL",
+      "eik": "CUI / cod fiscal",
+      "vat": "Număr TVA",
+      "address": "Adresă",
+      "email": "E-mail",
+      "phone": "Telefon",
+      "rating": "Rating (1–5)",
+      "notes": "Note"
+    }
+  },
+  "dossier": {
+    "back": "← Furnizori",
+    "totalExpenses": "Total cheltuieli",
+    "expenses": "Cheltuieli ({n})",
+    "empty": "Nicio cheltuială.",
+    "th": {
+      "description": "Descriere",
+      "date": "Dată",
+      "amount": "Sumă"
+    }
+  },
+  "info": {
+    "title": "Datele furnizorului",
+    "edit": "Editează",
+    "save": "Salvează",
+    "saving": "Se salvează…",
+    "name": "Denumire",
+    "rating": "Rating (1–5)",
+    "notes": "Note",
+    "f": {
+      "eik": "CUI",
+      "vat": "TVA №",
+      "contactPerson": "Persoană de contact",
+      "email": "E-mail",
+      "phone": "Telefon",
+      "website": "Website",
+      "city": "Oraș",
+      "address": "Adresă"
+    }
+  }
+}
