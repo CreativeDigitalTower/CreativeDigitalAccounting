@@ -2,29 +2,23 @@ import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { UserRowActions } from "@/components/app/UserRowActions";
+import { getT } from "@/lib/i18n/server";
 
-const ROLE_LABELS: Record<string, string> = {
-  owner: "Собственик",
-  manager: "Мениджър",
-  accountant: "Счетоводител",
-  sales: "Продажби",
-  warehouse: "Склад",
-  viewer: "Преглед",
-  employee: "Служител",
-};
-
-const ROLE_PERMISSIONS: Record<string, string[]> = {
-  owner: ["Всички права", "Абонамент", "Потребители"],
-  manager: ["Документи", "Клиенти", "Разходи", "Проекти", "Анализи"],
-  accountant: ["Документи", "Разходи", "Анализи", "Активи"],
-  sales: ["Документи", "Клиенти", "Оферти"],
-  warehouse: ["Склад", "Доставчици"],
-  viewer: ["Само преглед"],
-  employee: ["Портал за служители", "Собствени данни и отпуски", "Project Management (скоро)"],
+const ROLE_KEYS = ["owner", "manager", "accountant", "sales", "warehouse", "viewer", "employee"];
+const MODULE_KEYS = ["documents", "clients", "warehouse", "expenses", "analytics", "projects", "contracts", "assets", "users", "subscription"];
+const ROLE_PERMS: Record<string, string[]> = {
+  owner: ["all"],
+  manager: ["documents", "clients", "expenses", "projects", "analytics"],
+  accountant: ["documents", "expenses", "analytics", "assets"],
+  sales: ["documents", "clients"],
+  warehouse: ["warehouse"],
+  viewer: [],
+  employee: [],
 };
 
 export default async function UsersPage() {
   const { companyId, userId } = await requireFeature("users");
+  const { t } = await getT();
 
   const companyUsers = await prisma.companyUser.findMany({
     where: { companyId },
@@ -39,36 +33,36 @@ export default async function UsersPage() {
     <>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
         <div>
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>Потребители и Роли</h1>
-          <div style={{ color: "var(--muted)", fontSize: 13 }}>{companyUsers.length} потребители</div>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>{t("account.users.title")}</h1>
+          <div style={{ color: "var(--muted)", fontSize: 13 }}>{t("account.users.count", { n: companyUsers.length })}</div>
         </div>
         {canManage && (
-          <Link href="/dashboard/users/invite" className="btn btn-primary">+ Покани потребител</Link>
+          <Link href="/dashboard/users/invite" className="btn btn-primary">{t("account.users.invite")}</Link>
         )}
       </div>
 
       {/* Permissions matrix */}
       <div className="glass panel" style={{ marginBottom: 18, padding: "20px 24px", overflowX: "auto" }}>
-        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>Матрица на правата</h3>
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>{t("account.users.matrixTitle")}</h3>
         <table style={{ fontSize: 12.5 }}>
           <thead>
             <tr>
-              <th style={{ minWidth: 130 }}>Роля</th>
-              {["Документи", "Клиенти", "Склад", "Разходи", "Анализи", "Проекти", "Договори", "Активи", "Потребители", "Абонамент"].map((m) => (
-                <th key={m} style={{ textAlign: "center", minWidth: 70 }}>{m}</th>
+              <th style={{ minWidth: 130 }}>{t("account.users.roleCol")}</th>
+              {MODULE_KEYS.map((m) => (
+                <th key={m} style={{ textAlign: "center", minWidth: 70 }}>{t(`account.users.modules.${m}`)}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {Object.entries(ROLE_LABELS).map(([role, label]) => {
-              const perms = ROLE_PERMISSIONS[role] ?? [];
-              const hasAll = perms.includes("Всички права");
+            {ROLE_KEYS.map((role) => {
+              const perms = ROLE_PERMS[role] ?? [];
+              const hasAll = perms.includes("all");
               return (
                 <tr key={role}>
                   <td>
-                    <span style={{ fontWeight: 600, fontSize: 13 }}>{label}</span>
+                    <span style={{ fontWeight: 600, fontSize: 13 }}>{t(`account.users.roles.${role}`)}</span>
                   </td>
-                  {["Документи", "Клиенти", "Склад", "Разходи", "Анализи", "Проекти", "Договори", "Активи", "Потребители", "Абонамент"].map((m) => (
+                  {MODULE_KEYS.map((m) => (
                     <td key={m} style={{ textAlign: "center" }}>
                       {hasAll || perms.includes(m) ? (
                         <span style={{ color: "var(--emerald)", fontWeight: 700 }}>✓</span>
@@ -89,9 +83,9 @@ export default async function UsersPage() {
         <table>
           <thead>
             <tr>
-              <th>Потребител</th>
-              <th>Имейл</th>
-              <th>Роля</th>
+              <th>{t("account.users.th.user")}</th>
+              <th>{t("account.users.th.email")}</th>
+              <th>{t("account.users.th.role")}</th>
               {canManage && <th></th>}
             </tr>
           </thead>
@@ -105,14 +99,14 @@ export default async function UsersPage() {
                     </div>
                     <div>
                       <div style={{ fontWeight: 600, fontSize: 13.5 }}>{cu.user.name ?? "—"}</div>
-                      {cu.userId === userId && <div style={{ fontSize: 11, color: "var(--emerald)", fontWeight: 600 }}>▸ Вие</div>}
+                      {cu.userId === userId && <div style={{ fontSize: 11, color: "var(--emerald)", fontWeight: 600 }}>{t("account.users.you")}</div>}
                     </div>
                   </div>
                 </td>
                 <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>{cu.user.email}</td>
                 <td>
                   <span style={{ fontSize: 12.5, fontWeight: 600, color: cu.role === "owner" ? "var(--brass)" : "var(--navy)", background: cu.role === "owner" ? "var(--brass-soft)" : "var(--navy-soft)", borderRadius: 20, padding: "3px 10px" }}>
-                    {ROLE_LABELS[cu.role]}
+                    {t(`account.users.roles.${cu.role}`)}
                   </span>
                 </td>
                 {canManage && (
@@ -120,7 +114,7 @@ export default async function UsersPage() {
                     {cu.userId !== userId ? (
                       <UserRowActions targetUserId={cu.userId} role={cu.role} canManageOwner={myRole === "owner"} />
                     ) : (
-                      <span style={{ fontSize: 11.5, color: "var(--muted)" }}>—</span>
+                      <span style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("account.users.none")}</span>
                     )}
                   </td>
                 )}
