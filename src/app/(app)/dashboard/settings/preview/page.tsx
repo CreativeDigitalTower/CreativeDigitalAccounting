@@ -1,14 +1,16 @@
 import Link from "next/link";
 import { InvoiceDocument } from "@/components/app/InvoiceDocument";
 import { INVOICE_TEMPLATES, getTemplate } from "@/lib/constants";
+import { getT } from "@/lib/i18n/server";
 
 export default async function TemplatePreviewPage({ searchParams }: { searchParams: Promise<{ template?: string }> }) {
   const { template } = await searchParams;
+  const { t, locale } = await getT();
   const tpl = getTemplate(template);
 
   const sample = {
     type: "invoice", number: "0000000123", issueDate: new Date(), taxEventDate: new Date(),
-    dueDate: new Date(Date.now() + 30 * 864e5), currency: "EUR", paymentMethod: "bank_transfer",
+    dueDate: new Date(Date.now() + 30 * 864e5), currency: "EUR", paymentMethod: "bank_transfer", language: locale,
     notes: "Благодарим Ви за доверието! Плащане в 30-дневен срок.", template: tpl.id, logoUrl: null,
     company: {
       name: "Вашата Фирма ЕООД", mol: "Иван Иванов", address: "ул. Примерна 12", city: "София 1000",
@@ -29,8 +31,8 @@ export default async function TemplatePreviewPage({ searchParams }: { searchPara
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20, flexWrap: "wrap" }}>
-        <Link href="/dashboard/settings" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← Профил на фирмата</Link>
-        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, fontWeight: 600, margin: 0 }}>Преглед на шаблон: {tpl.name}</h1>
+        <Link href="/dashboard/settings" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>{t("account.previewPage.back")}</Link>
+        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, fontWeight: 600, margin: 0 }}>{t("account.previewPage.heading", { name: tpl.name })}</h1>
       </div>
 
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
@@ -42,7 +44,7 @@ export default async function TemplatePreviewPage({ searchParams }: { searchPara
       </div>
 
       <p style={{ fontSize: 12.5, color: "var(--muted)", marginBottom: 14 }}>
-        Това е примерна фактура с примерни данни. За да приложите този шаблон, изберете го в <Link href="/dashboard/settings" style={{ color: "var(--navy)" }}>Профил на фирмата</Link>.
+        {t("account.previewPage.note")}
       </p>
 
       <InvoiceDocument data={sample} />

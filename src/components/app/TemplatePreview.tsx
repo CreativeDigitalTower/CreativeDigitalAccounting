@@ -1,15 +1,20 @@
 import { getTemplate } from "@/lib/constants";
 
+import { useT } from "@/components/i18n/I18nProvider";
+
 /** Мини визуализация на това как изглежда фактурата с даден шаблон. */
 export function TemplatePreview({ templateId, showLogo = false }: { templateId: string; showLogo?: boolean }) {
   const t = getTemplate(templateId);
+  const tr = useT();
+  const cM = tr("account.templateMock.company");
+  const iM = tr("account.templateMock.invoice");
   const accent = t.accent;
   const layout = t.layout as string;
 
   const line = (w: string, c = "#D9D7C8") => <div style={{ height: 4, width: w, background: c, borderRadius: 2 }} />;
   const brand = showLogo
     ? <div style={{ width: 30, height: 14, borderRadius: 3, background: accent, opacity: .85 }} />
-    : <div style={{ fontSize: 8, fontWeight: 700, color: accent, fontFamily: "'Fraunces',serif" }}>ФИРМА</div>;
+    : <div style={{ fontSize: 8, fontWeight: 700, color: accent, fontFamily: "'Fraunces',serif" }}>{cM}</div>;
   const filledHead = ["band", "split", "boxed", "gradient", "letterhead", "cards"].includes(layout);
   const banner = layout === "split" || layout === "gradient" || layout === "letterhead";
 
@@ -29,7 +34,7 @@ export function TemplatePreview({ templateId, showLogo = false }: { templateId: 
     head = (
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
         {layout === "letterhead" ? null : brand}
-        <div style={{ fontSize: 9, fontWeight: 700, color: accent, letterSpacing: 1 }}>ФАКТУРА</div>
+        <div style={{ fontSize: 9, fontWeight: 700, color: accent, letterSpacing: 1 }}>{iM}</div>
         {line("28px")}
         <div style={{ borderTop: `2px solid ${accent}`, width: 40, marginTop: 2 }} />
       </div>
@@ -39,7 +44,7 @@ export function TemplatePreview({ templateId, showLogo = false }: { templateId: 
       <>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           {brand}
-          <div style={{ fontSize: 8, fontWeight: 700, color: accent }}>ФАКТУРА</div>
+          <div style={{ fontSize: 8, fontWeight: 700, color: accent }}>{iM}</div>
         </div>
         <div style={{ border: `1px solid ${accent}`, borderRadius: 3, padding: 4, display: "flex", flexDirection: "column", gap: 3 }}>{line("44px")}{line("32px")}</div>
       </>
@@ -48,8 +53,8 @@ export function TemplatePreview({ templateId, showLogo = false }: { templateId: 
     head = (
       <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", borderBottom: "1px solid #E5E3D5", paddingBottom: 4 }}>
-          <div style={{ fontSize: 8, fontWeight: 700 }}>ФИРМА</div>
-          <div style={{ fontSize: 7, letterSpacing: 1, color: "#555" }}>ФАКТУРА</div>
+          <div style={{ fontSize: 8, fontWeight: 700 }}>{cM}</div>
+          <div style={{ fontSize: 7, letterSpacing: 1, color: "#555" }}>{iM}</div>
         </div>
         {line("40px")}
       </div>
@@ -58,8 +63,8 @@ export function TemplatePreview({ templateId, showLogo = false }: { templateId: 
     head = (
       <div style={{ display: "flex", flexDirection: "column", gap: 5, fontFamily: "monospace" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "2px solid #16201C", borderBottom: "1px solid #16201C", padding: "3px 0" }}>
-          <div style={{ fontSize: 7.5, fontWeight: 700 }}>ФИРМА</div>
-          <div style={{ fontSize: 6.5, letterSpacing: 1 }}>ФАКТУРА</div>
+          <div style={{ fontSize: 7.5, fontWeight: 700 }}>{cM}</div>
+          <div style={{ fontSize: 6.5, letterSpacing: 1 }}>{iM}</div>
         </div>
         {line("40px")}
       </div>
@@ -70,7 +75,7 @@ export function TemplatePreview({ templateId, showLogo = false }: { templateId: 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>{brand}{line("44px")}{line("32px")}</div>
         <div style={{ textAlign: "right" }}>
-          <div style={{ fontSize: 8, fontWeight: 700, color: accent }}>ФАКТУРА</div>
+          <div style={{ fontSize: 8, fontWeight: 700, color: accent }}>{iM}</div>
           {line("28px")}
         </div>
       </div>
@@ -79,8 +84,8 @@ export function TemplatePreview({ templateId, showLogo = false }: { templateId: 
 
   const bannerBlock = (
     <div style={{ margin: "-10px -12px 0", padding: "10px 12px", background: layout === "gradient" ? `linear-gradient(120deg, ${accent}, ${accent}99)` : accent, display: "flex", justifyContent: layout === "letterhead" ? "center" : "space-between", alignItems: "center" }}>
-      <div style={{ fontSize: 8, fontWeight: 700, color: "#fff", fontFamily: "'Fraunces',serif" }}>ФИРМА</div>
-      {layout !== "letterhead" && <div style={{ fontSize: 8, fontWeight: 700, color: "#fff" }}>ФАКТУРА</div>}
+      <div style={{ fontSize: 8, fontWeight: 700, color: "#fff", fontFamily: "'Fraunces',serif" }}>{cM}</div>
+      {layout !== "letterhead" && <div style={{ fontSize: 8, fontWeight: 700, color: "#fff" }}>{iM}</div>}
     </div>
   );
 
@@ -98,7 +103,7 @@ export function TemplatePreview({ templateId, showLogo = false }: { templateId: 
       <div style={{ background: "#fff", borderRadius: 6, overflow: "hidden", border: "1px solid var(--border)", aspectRatio: "1 / 1.3", display: "flex" }}>
         <div style={{ width: "34%", background: `${accent}1A`, borderRight: `2px solid ${accent}`, padding: 8, display: "flex", flexDirection: "column", gap: 5 }}>
           {brand}
-          <div style={{ fontSize: 8, fontWeight: 700, color: accent }}>ФАКТУРА</div>
+          <div style={{ fontSize: 8, fontWeight: 700, color: accent }}>{iM}</div>
           {line("80%")}{line("60%")}
         </div>
         <div style={{ flex: 1, padding: "10px 10px", display: "flex", flexDirection: "column", gap: 6 }}>
