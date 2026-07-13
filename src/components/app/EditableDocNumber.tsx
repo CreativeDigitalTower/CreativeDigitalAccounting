@@ -1,9 +1,11 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useT } from "@/components/i18n/I18nProvider";
 
 /** Номер на документ — заключен по подразбиране; молив го отключва за редакция. */
 export function EditableDocNumber({ id, initial }: { id: string; initial: string }) {
+  const t = useT();
   const router = useRouter();
   const [number, setNumber] = useState(initial);
   const [edit, setEdit] = useState(false);
@@ -19,7 +21,7 @@ export function EditableDocNumber({ id, initial }: { id: string; initial: string
     });
     setBusy(false);
     if (res.ok) { setNumber(val.trim()); setEdit(false); router.refresh(); }
-    else setError((await res.json()).error ?? "Грешка");
+    else setError((await res.json()).error ?? t("documents.docNumber.errGeneric"));
   }
 
   if (edit) {
@@ -28,7 +30,7 @@ export function EditableDocNumber({ id, initial }: { id: string; initial: string
         <input value={val} onChange={(e) => setVal(e.target.value)} autoFocus disabled={busy}
           onKeyDown={(e) => { if (e.key === "Enter") save(); if (e.key === "Escape") { setEdit(false); setVal(number); } }}
           style={{ width: 160, padding: "4px 8px", fontSize: 18, fontFamily: "'IBM Plex Mono', monospace" }} />
-        <button onClick={save} disabled={busy} className="btn btn-primary btn-sm">{busy ? "…" : "Запази"}</button>
+        <button onClick={save} disabled={busy} className="btn btn-primary btn-sm">{busy ? "…" : t("documents.docNumber.save")}</button>
         <button onClick={() => { setEdit(false); setVal(number); setError(""); }} className="btn btn-ghost btn-sm">✕</button>
         {error && <span style={{ fontSize: 11.5, color: "var(--brick)" }}>{error}</span>}
       </span>
@@ -38,7 +40,7 @@ export function EditableDocNumber({ id, initial }: { id: string; initial: string
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
       <span className="num">{number}</span>
-      <button onClick={() => { setVal(number); setEdit(true); }} title="Редактирай номера (заключен по подразбиране)"
+      <button onClick={() => { setVal(number); setEdit(true); }} title={t("documents.docNumber.editTitle")}
         style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", fontSize: 14, padding: 2 }}>
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
       </button>

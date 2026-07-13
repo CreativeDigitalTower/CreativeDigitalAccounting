@@ -9,9 +9,11 @@ import { SendToClient } from "@/components/app/SendToClient";
 import { EditableDocNumber } from "@/components/app/EditableDocNumber";
 import { InvoiceDocument } from "@/components/app/InvoiceDocument";
 import { OfferDocument } from "@/components/app/OfferDocument";
+import { getT } from "@/lib/i18n/server";
 
 export default async function DocumentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { companyId } = await requireCompany();
+  const { t } = await getT();
   const { id } = await params;
 
   const doc = await prisma.document.findUnique({
@@ -29,16 +31,16 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
       {/* Topbar */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <Link href="/dashboard/documents" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← Документи</Link>
+          <Link href="/dashboard/documents" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>{t("documents.detail.back")}</Link>
           <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, fontWeight: 600, margin: 0 }}>
             <EditableDocNumber id={doc.id} initial={doc.number} />
           </h1>
-          <Stamp status={doc.status} />
+          <Stamp status={doc.status} label={t(`documents.stamp.${doc.status}`)} />
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", position: "relative" }} className="no-print">
           <SendToClient id={doc.id} defaultEmail={doc.clientEmail ?? doc.client?.contactEmail} decision={doc.clientDecision} sentAt={doc.sentToClientAt?.toISOString() ?? null} />
-          {doc.type === "quote" && <Link href={`/dashboard/documents/new?type=proforma&parent=${doc.id}`} className="btn btn-ghost btn-sm">→ Проформа</Link>}
-          {doc.type === "proforma" && <Link href={`/dashboard/documents/new?type=invoice&parent=${doc.id}`} className="btn btn-ghost btn-sm">→ Фактура</Link>}
+          {doc.type === "quote" && <Link href={`/dashboard/documents/new?type=proforma&parent=${doc.id}`} className="btn btn-ghost btn-sm">{t("documents.detail.toProforma")}</Link>}
+          {doc.type === "proforma" && <Link href={`/dashboard/documents/new?type=invoice&parent=${doc.id}`} className="btn btn-ghost btn-sm">{t("documents.detail.toInvoice")}</Link>}
           <DocumentActions id={doc.id} status={doc.status} number={doc.number} />
         </div>
       </div>
@@ -67,7 +69,7 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
       {/* Вътрешен коментар — само за вашия екип, НЕ е част от документа */}
       {doc.internalComment && (
         <div className="glass no-print" style={{ maxWidth: 800, marginTop: 14, padding: "14px 18px", borderRadius: 12, borderLeft: "4px solid var(--brass)" }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--brass)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Вътрешен коментар (не се вижда от клиента)</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--brass)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>{t("documents.detail.internalTitle")}</div>
           <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>{doc.internalComment}</div>
         </div>
       )}
