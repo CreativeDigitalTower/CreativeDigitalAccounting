@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { DownloadButtons } from "@/components/app/DownloadButtons";
 import { PLATFORM_CREDIT } from "@/lib/constants";
+import { getT } from "@/lib/i18n/server";
 
 type Product = { name: string; kg: string; batch: string; bestBefore: string };
 type Lab = { indicator: string; method: string; result: string };
@@ -14,6 +15,7 @@ function parse<T>(s: string | null): T[] {
 
 export default async function DeclarationDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { companyId } = await requireFeature("declarations");
+  const { t, locale } = await getT();
   const { id } = await params;
   const [d, company] = await Promise.all([
     prisma.conformityDeclaration.findFirst({ where: { id, companyId } }),
@@ -29,40 +31,40 @@ export default async function DeclarationDetailPage({ params }: { params: Promis
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }} className="no-print">
-        <Link href="/dashboard/documents/declarations" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← Декларации</Link>
+        <Link href="/dashboard/documents/declarations" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>{t("subdocs.decl.doc.back")}</Link>
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, fontWeight: 600, margin: 0 }}>{d.number}</h1>
         <div style={{ marginLeft: "auto" }}><DownloadButtons filename={d.number} /></div>
       </div>
 
       <div className="glass printable" style={{ borderRadius: 14, maxWidth: 820, padding: "40px 48px", fontSize: 13 }}>
-        <h2 style={{ fontFamily: "'Fraunces', serif", textAlign: "center", fontSize: 21, fontWeight: 700, margin: "0 0 18px" }}>ДЕКЛАРАЦИЯ ЗА СЪОТВЕТСТВИЕ</h2>
+        <h2 style={{ fontFamily: "'Fraunces', serif", textAlign: "center", fontSize: 21, fontWeight: 700, margin: "0 0 18px" }}>{t("subdocs.decl.doc.title")}</h2>
 
         <div style={{ display: "flex", justifyContent: "space-between", gap: 30, marginBottom: 18 }}>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 11.5, color: "var(--muted)", fontWeight: 700, marginBottom: 4 }}>ДОСТАВЧИК:</div>
+            <div style={{ fontSize: 11.5, color: "var(--muted)", fontWeight: 700, marginBottom: 4 }}>{t("subdocs.decl.doc.supplier")}</div>
             <div style={{ fontWeight: 600 }}>{company?.name}</div>
             <div style={{ fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.6 }}>
               {company?.address && <div>{company.address}{company?.city ? `, ${company.city}` : ""}</div>}
               {company?.eik && <div>{company.vatNumber ?? company.eik}</div>}
-              {company?.mol && <div>МОЛ: {company.mol}</div>}
+              {company?.mol && <div>{t("subdocs.decl.doc.mol")} {company.mol}</div>}
             </div>
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 11.5, color: "var(--muted)", fontWeight: 700, marginBottom: 4 }}>КЛИЕНТ:</div>
+            <div style={{ fontSize: 11.5, color: "var(--muted)", fontWeight: 700, marginBottom: 4 }}>{t("subdocs.decl.doc.client")}</div>
             <div style={{ fontWeight: 600 }}>{d.clientName ?? "—"}</div>
             <div style={{ fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.6 }}>
               {d.clientAddress && <div>{d.clientAddress}</div>}
               {d.clientEik && <div>{d.clientEik}</div>}
-              {d.clientMol && <div>МОЛ: {d.clientMol}</div>}
+              {d.clientMol && <div>{t("subdocs.decl.doc.mol")} {d.clientMol}</div>}
             </div>
           </div>
         </div>
 
         {products.length > 0 && (
           <>
-            <div style={{ fontWeight: 600, margin: "8px 0" }}>Декларираме, че следните продукти са годни за консумация:</div>
+            <div style={{ fontWeight: 600, margin: "8px 0" }}>{t("subdocs.decl.doc.productsIntro")}</div>
             <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 16 }}>
-              <thead><tr><th style={th}>№</th><th style={th}>НАИМЕНОВАНИЕ</th><th style={th}>КГ.</th><th style={th}>ПАРТИДА НОМЕР</th><th style={th}>НАЙ-ДОБЪР ДО</th></tr></thead>
+              <thead><tr><th style={th}>{t("subdocs.decl.doc.pNo")}</th><th style={th}>{t("subdocs.decl.doc.pName")}</th><th style={th}>{t("subdocs.decl.doc.pKg")}</th><th style={th}>{t("subdocs.decl.doc.pBatch")}</th><th style={th}>{t("subdocs.decl.doc.pBest")}</th></tr></thead>
               <tbody>
                 {products.map((p, i) => (
                   <tr key={i}>
@@ -82,7 +84,7 @@ export default async function DeclarationDetailPage({ params }: { params: Promis
 
         {labs.length > 0 && (
           <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 16 }}>
-            <thead><tr><th style={th}>№</th><th style={th}>НАИМЕНОВАНИЕ НА ПОКАЗАТЕЛЯ</th><th style={th}>МЕТОД НА ИЗПИТВАНЕ</th><th style={th}>РЕЗУЛТАТИ</th></tr></thead>
+            <thead><tr><th style={th}>{t("subdocs.decl.doc.lNo")}</th><th style={th}>{t("subdocs.decl.doc.lIndicator")}</th><th style={th}>{t("subdocs.decl.doc.lMethod")}</th><th style={th}>{t("subdocs.decl.doc.lResult")}</th></tr></thead>
             <tbody>
               {labs.map((l, i) => (
                 <tr key={i}>
@@ -100,8 +102,8 @@ export default async function DeclarationDetailPage({ params }: { params: Promis
         {d.standards && <p style={{ fontSize: 11.5, color: "var(--ink-soft)", lineHeight: 1.6, marginBottom: 8 }}>{d.standards}</p>}
 
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 36, fontSize: 12.5 }}>
-          <div>Дата: {new Date(d.date).toLocaleDateString("bg-BG")}</div>
-          <div>Изготвил (подпис, дата и печат): {d.signedBy ?? company?.mol ?? "................"}</div>
+          <div>{t("subdocs.decl.doc.dateLabel")} {new Date(d.date).toLocaleDateString(locale)}</div>
+          <div>{t("subdocs.decl.doc.signedLabel")} {d.signedBy ?? company?.mol ?? "................"}</div>
         </div>
 
         <div style={{ marginTop: 28, paddingTop: 12, borderTop: "1px solid var(--border)", fontSize: 10.5, color: "var(--muted)", textAlign: "center" }}>
