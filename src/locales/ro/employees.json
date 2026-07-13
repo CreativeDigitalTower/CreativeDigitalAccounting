@@ -1,0 +1,188 @@
+{
+  "title": "Angajați",
+  "count": "{n} angajați",
+  "addBtn": "+ Angajat nou",
+  "errSave": "Eroare la salvare.",
+  "loading": "Se încarcă…",
+  "confirmDeleteEmployee": "Ștergeți angajatul?",
+  "contract": {
+    "permanent": "Muncă pe durată nedeterminată",
+    "fixed_term": "Muncă pe durată determinată",
+    "civil": "Contract civil"
+  },
+  "leave": {
+    "leave": "Concediu plătit",
+    "sick": "Concediu medical",
+    "unpaid": "Concediu neplătit",
+    "other": "Altele"
+  },
+  "bonusKind": {
+    "cash": "Bani",
+    "voucher": "Voucher",
+    "performance": "Performanță",
+    "holiday": "Sărbătoare",
+    "other": "Altele"
+  },
+  "payroll": {
+    "title": "Costuri salariale (total)",
+    "rateNote": "Rate categoria 3 de muncă: contribuții angajat {emp}% + angajator {empr}%, impozit 10%.",
+    "employerCost": "Cost total angajator",
+    "gross": "Total salarii brute",
+    "insurances": "Total contribuții",
+    "netTotal": "Total net pentru angajați"
+  },
+  "form": {
+    "editTitle": "Editare",
+    "newTitle": "Angajat nou",
+    "name": "Nume *",
+    "position": "Funcție",
+    "phone": "Telefon",
+    "email": "E-mail",
+    "salary": "Salariu (brut)",
+    "hiredAt": "Data angajării",
+    "leaveDays": "Concediu plătit anual (zile)",
+    "department": "Departament / unitate",
+    "contractType": "Tip contract",
+    "paymentMethod": "Metodă de plată",
+    "payBank": "Prin cont bancar",
+    "payCash": "Numerar",
+    "iban": "IBAN",
+    "bank": "Bancă",
+    "address": "Adresă",
+    "notes": "Note",
+    "cancel": "Anulează",
+    "save": "Salvează"
+  },
+  "th": {
+    "name": "Nume",
+    "position": "Funcție",
+    "phone": "Telefon",
+    "email": "E-mail",
+    "salary": "Salariu"
+  },
+  "empty": "Niciun angajat adăugat",
+  "delete": "Șterge",
+  "editTitle": "Editează",
+  "access": {
+    "header": "Acces angajați la module",
+    "nothingShared": "nimic partajat",
+    "modulesCount": "{n} module",
+    "saved": "Salvat ✓",
+    "errShort": "Eroare",
+    "intro": "Alegeți ce module văd angajații în portalul lor. Accesul este <strong>doar pentru citire</strong> și cu <strong>date sensibile ascunse</strong> (finanțe, contacte clienți), pentru a preveni scurgerile.",
+    "modules": {
+      "clients": {
+        "label": "Clienți",
+        "note": "doar nume — fără finanțe și contacte"
+      },
+      "projects": {
+        "label": "Proiecte",
+        "note": "nume, status, termen — fără valori"
+      },
+      "suppliers": {
+        "label": "Furnizori",
+        "note": "doar nume și oraș"
+      },
+      "warehouse": {
+        "label": "Depozit",
+        "note": "articole și stocuri — fără prețuri"
+      }
+    }
+  },
+  "detail": {
+    "dept": "Departament:",
+    "contract": "Contract:",
+    "salary": "Salariu:",
+    "payCashShort": "numerar",
+    "payBankShort": "prin cont bancar",
+    "iban": "IBAN:",
+    "address": "Adresă:",
+    "notes": "Note:"
+  },
+  "breakdown": {
+    "title": "Detaliere salariu (lunar)",
+    "gross": "Salariu brut",
+    "empSSC": "Contribuții (angajat)",
+    "tax": "Impozit (10%)",
+    "net": "Sumă netă",
+    "emprSSC": "Contribuții (angajator)",
+    "companyCost": "Cost total firmă"
+  },
+  "days": "{n} zile",
+  "leaveStats": {
+    "entitlement": "Concediu plătit cuvenit",
+    "usedPaid": "Plătit folosit",
+    "remaining": "Plătit rămas",
+    "unpaidSick": "Neplătit / Medical"
+  },
+  "leaveForm": {
+    "type": "Tip",
+    "from": "De la",
+    "to": "Până la",
+    "note": "Notă",
+    "docOptional": "Document (opțional)",
+    "attach": "Atașează…",
+    "add": "+ Adaugă",
+    "fileTooLarge": "Fișierul este prea mare (max. 5 MB)."
+  },
+  "leaves": {
+    "sectionTitle": "Concedii / medicale",
+    "pendingTitle": "Cereri de aprobat ({n})",
+    "approve": "Aprobă",
+    "reject": "Respinge",
+    "none": "Niciun concediu/medical înregistrat.",
+    "pendingTag": "· în așteptare",
+    "rejectedTag": "· respins",
+    "replace": "Înlocuiește",
+    "addDoc": "+ Document",
+    "replaceTitle": "Înlocuiește documentul",
+    "attachTitle": "Atașează document",
+    "delDoc": "șterge doc.",
+    "confirmDelDoc": "documentul atașat",
+    "confirmDelLeave": "această înregistrare concediu/medical"
+  },
+  "portal": {
+    "title": "Portal angajat",
+    "activeAccess": "✓ Acces activ ({email})",
+    "revoke": "Revocă accesul",
+    "emailPh": "e-mail angajat",
+    "invite": "Invită în portal",
+    "needEmail": "Indicați un e-mail.",
+    "invited": "Invitația a fost trimisă. Angajatul se înregistrează cu același e-mail.",
+    "err": "Eroare.",
+    "revoked": "Acces revocat.",
+    "confirmRevoke": "accesul la portal pentru acest angajat",
+    "hint": "Angajatul vede doar datele sale — salariu, contribuții, concedii și documente depuse."
+  },
+  "bonuses": {
+    "title": "Bonusuri",
+    "totalPrefix": "· total {v}",
+    "month": "Lună",
+    "year": "An",
+    "amount": "Sumă (€)",
+    "kind": "Tip",
+    "note": "Notă",
+    "add": "+ Adaugă",
+    "none": "Niciun bonus introdus.",
+    "confirmDelete": "acest bonus"
+  },
+  "files": {
+    "title": "Arhivă documente",
+    "docType": "Tip document",
+    "uploading": "Se încarcă…",
+    "attachFile": "+ Atașează fișier",
+    "maxSize": "max. 5 MB",
+    "none": "Niciun document atașat.",
+    "uploadErr": "Eroare la încărcare.",
+    "confirmDelete": "Ștergeți documentul?",
+    "types": {
+      "contract": "Contract de muncă",
+      "annex": "Act adițional",
+      "leaveRequest": "Cerere de concediu",
+      "resignation": "Cerere de demisie",
+      "sickNote": "Certificat medical",
+      "jobDescription": "Fișă de post",
+      "other": "Altele"
+    }
+  }
+}
