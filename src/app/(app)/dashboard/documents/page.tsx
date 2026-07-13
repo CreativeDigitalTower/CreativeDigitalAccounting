@@ -5,14 +5,7 @@ import { StatusSelect } from "@/components/app/StatusSelect";
 import { FeatureLink, FeatureTab } from "@/components/app/FeatureLink";
 import { formatCurrency, toBGN, isDualCurrencyActive, groupByMonth } from "@/lib/constants";
 import { UiIcon } from "@/components/app/NavIcons";
-
-const TYPE_LABELS: Record<string, string> = {
-  invoice: "Фактура",
-  proforma: "Проформа",
-  quote: "Оферта",
-  credit_note: "Кредитно известие",
-  debit_note: "Дебитно известие",
-};
+import { getT } from "@/lib/i18n/server";
 
 export default async function DocumentsPage({
   searchParams,
@@ -23,6 +16,7 @@ export default async function DocumentsPage({
   const plan = await getPlan(companyId);
   const params = await searchParams;
   const dual = isDualCurrencyActive();
+  const { t, locale } = await getT();
 
   const docs = await prisma.document.findMany({
     where: {
@@ -38,34 +32,34 @@ export default async function DocumentsPage({
     <>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 18, marginBottom: 18, flexWrap: "wrap" }}>
         <div>
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>Документи</h1>
-          <div style={{ color: "var(--muted)", fontSize: 13 }}>{docs.length} документа</div>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>{t("documents.page.title")}</h1>
+          <div style={{ color: "var(--muted)", fontSize: 13 }}>{t("documents.page.count", { n: docs.length })}</div>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <FeatureLink plan={plan} feature="protocols" href="/dashboard/documents/protocols">ППП</FeatureLink>
-          <FeatureLink plan={plan} feature="declarations" href="/dashboard/documents/declarations">Декларации</FeatureLink>
-          <Link href="/dashboard/documents/new" className="btn btn-primary">+ Нов документ</Link>
+          <FeatureLink plan={plan} feature="protocols" href="/dashboard/documents/protocols">{t("documents.page.ppp")}</FeatureLink>
+          <FeatureLink plan={plan} feature="declarations" href="/dashboard/documents/declarations">{t("documents.page.declarations")}</FeatureLink>
+          <Link href="/dashboard/documents/new" className="btn btn-primary">{t("documents.page.newDoc")}</Link>
         </div>
       </div>
 
       {/* Категории документи */}
       <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
-        <span className="filter-tab active">Изходящи документи</span>
-        <FeatureTab plan={plan} feature="protocols" href="/dashboard/documents/protocols">Протоколи (ППП)</FeatureTab>
-        <FeatureTab plan={plan} feature="declarations" href="/dashboard/documents/declarations">Декларации за съответствие</FeatureTab>
-        <FeatureTab plan={plan} feature="expenses" href="/dashboard/expenses">Разходни фактури</FeatureTab>
-        <FeatureTab plan={plan} feature="bank_statements" href="/dashboard/bank-statements">Банкови извлечения</FeatureTab>
+        <span className="filter-tab active">{t("documents.page.cat.outgoing")}</span>
+        <FeatureTab plan={plan} feature="protocols" href="/dashboard/documents/protocols">{t("documents.page.cat.protocols")}</FeatureTab>
+        <FeatureTab plan={plan} feature="declarations" href="/dashboard/documents/declarations">{t("documents.page.cat.declarations")}</FeatureTab>
+        <FeatureTab plan={plan} feature="expenses" href="/dashboard/expenses">{t("documents.page.cat.expenses")}</FeatureTab>
+        <FeatureTab plan={plan} feature="bank_statements" href="/dashboard/bank-statements">{t("documents.page.cat.bank")}</FeatureTab>
       </div>
 
       {/* Filter tabs */}
       <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
         {[
-          { label: "Всички", type: "" },
-          { label: "Приходни фактури", type: "invoice" },
-          { label: "Проформи", type: "proforma" },
-          { label: "Оферти", type: "quote" },
-          { label: "Кр. известия", type: "credit_note" },
-          { label: "Деб. известия", type: "debit_note" },
+          { label: t("documents.page.filter.all"), type: "" },
+          { label: t("documents.page.filter.invoice"), type: "invoice" },
+          { label: t("documents.page.filter.proforma"), type: "proforma" },
+          { label: t("documents.page.filter.quote"), type: "quote" },
+          { label: t("documents.page.filter.credit"), type: "credit_note" },
+          { label: t("documents.page.filter.debit"), type: "debit_note" },
         ].map((f) => (
           <Link
             key={f.type}
@@ -80,11 +74,11 @@ export default async function DocumentsPage({
       {/* Status filter */}
       <div style={{ display: "flex", gap: 6, marginBottom: 20, flexWrap: "wrap" }}>
         {[
-          { label: "Всички статуси", status: "" },
-          { label: "Чернова", status: "draft" },
-          { label: "Изпратена", status: "sent" },
-          { label: "Платена", status: "paid" },
-          { label: "Просрочена", status: "overdue" },
+          { label: t("documents.page.statusAll"), status: "" },
+          { label: t("documents.status.draft"), status: "draft" },
+          { label: t("documents.status.sent"), status: "sent" },
+          { label: t("documents.status.paid"), status: "paid" },
+          { label: t("documents.status.overdue"), status: "overdue" },
         ].map((f) => (
           <Link
             key={f.status}
@@ -100,8 +94,8 @@ export default async function DocumentsPage({
       {docs.length === 0 ? (
         <div className="glass panel" style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, color: "var(--muted)" }}><UiIcon.doc width={34} height={34} /></div>
-          <div style={{ fontSize: 14, marginBottom: 16 }}>Няма документи</div>
-          <Link href="/dashboard/documents/new" className="btn btn-primary btn-sm">Създай първия документ</Link>
+          <div style={{ fontSize: 14, marginBottom: 16 }}>{t("documents.page.empty")}</div>
+          <Link href="/dashboard/documents/new" className="btn btn-primary btn-sm">{t("documents.page.createFirst")}</Link>
         </div>
       ) : (
         groupByMonth(docs).map((group) => (
@@ -111,8 +105,8 @@ export default async function DocumentsPage({
               <table>
                 <thead>
                   <tr>
-                    <th>Номер</th><th>Тип</th><th>Клиент</th><th>Дата</th><th>Падеж</th>
-                    <th className="num">Сума</th>{dual && <th className="num">BGN</th>}<th>Статус</th><th></th>
+                    <th>{t("documents.page.th.number")}</th><th>{t("documents.page.th.type")}</th><th>{t("documents.page.th.client")}</th><th>{t("documents.page.th.date")}</th><th>{t("documents.page.th.due")}</th>
+                    <th className="num">{t("documents.page.th.amount")}</th>{dual && <th className="num">BGN</th>}<th>{t("documents.page.th.status")}</th><th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -121,16 +115,16 @@ export default async function DocumentsPage({
                     return (
                       <tr key={doc.id}>
                         <td className="num" style={{ color: "var(--muted)", fontSize: 12 }}>{doc.number}</td>
-                        <td style={{ fontSize: 13 }}>{TYPE_LABELS[doc.type]}</td>
+                        <td style={{ fontSize: 13 }}>{t(`documents.types.${doc.type}`)}</td>
                         <td style={{ fontWeight: 600 }}>{doc.client?.name ?? "—"}</td>
-                        <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>{new Date(doc.issueDate).toLocaleDateString("bg-BG")}</td>
-                        <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>{doc.dueDate ? new Date(doc.dueDate).toLocaleDateString("bg-BG") : "—"}</td>
+                        <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>{new Date(doc.issueDate).toLocaleDateString(locale)}</td>
+                        <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>{doc.dueDate ? new Date(doc.dueDate).toLocaleDateString(locale) : "—"}</td>
                         <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(total, doc.currency)}</td>
                         {dual && <td className="num" style={{ fontSize: 11.5, color: "var(--muted)" }}>{formatCurrency(toBGN(total), "BGN")}</td>}
                         <td><StatusSelect id={doc.id} status={doc.status} /></td>
                         <td style={{ display: "flex", gap: 6 }}>
-                          <Link href={`/dashboard/documents/${doc.id}`} className="btn btn-ghost btn-sm">Преглед</Link>
-                          <Link href={`/dashboard/documents/${doc.id}/edit`} className="btn btn-ghost btn-sm" title="Редактирай" style={{ display: "inline-flex", alignItems: "center" }}><UiIcon.edit /></Link>
+                          <Link href={`/dashboard/documents/${doc.id}`} className="btn btn-ghost btn-sm">{t("documents.page.view")}</Link>
+                          <Link href={`/dashboard/documents/${doc.id}/edit`} className="btn btn-ghost btn-sm" title={t("documents.page.edit")} style={{ display: "inline-flex", alignItems: "center" }}><UiIcon.edit /></Link>
                         </td>
                       </tr>
                     );

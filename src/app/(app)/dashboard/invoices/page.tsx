@@ -4,6 +4,7 @@ import Link from "next/link";
 import { InvoicesTable } from "@/components/app/InvoicesTable";
 import { TemplateGallery } from "@/components/app/TemplateGallery";
 import { formatCurrency, toBGN, isDualCurrencyActive, DOC_STATUSES, type PlanId } from "@/lib/constants";
+import { getT } from "@/lib/i18n/server";
 
 export default async function InvoicesPage({
   searchParams,
@@ -14,6 +15,7 @@ export default async function InvoicesPage({
   const plan = await getPlan(companyId);
   const params = await searchParams;
   const dual = isDualCurrencyActive();
+  const { t } = await getT();
 
   const invoices = await prisma.document.findMany({
     where: { companyId, type: "invoice", ...(params.status ? { status: params.status as never } : {}) },
@@ -36,17 +38,17 @@ export default async function InvoicesPage({
     <>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
         <div>
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>Фактури</h1>
-          <div style={{ color: "var(--muted)", fontSize: 13 }}>{invoices.length} фактури</div>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>{t("documents.invoices.title")}</h1>
+          <div style={{ color: "var(--muted)", fontSize: 13 }}>{t("documents.invoices.count", { n: invoices.length })}</div>
         </div>
-        <Link href="/dashboard/documents/new?type=invoice" className="btn btn-primary">+ Нова фактура</Link>
+        <Link href="/dashboard/documents/new?type=invoice" className="btn btn-primary">{t("documents.invoices.newInvoice")}</Link>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 20 }}>
         {[
-          { label: "Общо фактурирано", value: totals.all, color: "var(--navy)" },
-          { label: "Платено", value: totals.paid, color: "var(--emerald)" },
-          { label: "За събиране", value: totals.outstanding, color: "var(--brass)" },
+          { label: t("documents.invoices.kpi.invoiced"), value: totals.all, color: "var(--navy)" },
+          { label: t("documents.invoices.kpi.paid"), value: totals.paid, color: "var(--emerald)" },
+          { label: t("documents.invoices.kpi.outstanding"), value: totals.outstanding, color: "var(--brass)" },
         ].map((k) => (
           <div key={k.label} className="glass kpi-card">
             <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 8 }}>{k.label}</div>
@@ -57,10 +59,10 @@ export default async function InvoicesPage({
       </div>
 
       <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
-        <Link href="/dashboard/invoices" className={`filter-tab${!params.status ? " active" : ""}`}>Всички</Link>
+        <Link href="/dashboard/invoices" className={`filter-tab${!params.status ? " active" : ""}`}>{t("documents.invoices.filterAll")}</Link>
         {DOC_STATUSES.map((s) => (
           <Link key={s.value} href={`/dashboard/invoices?status=${s.value}`} className={`filter-tab${params.status === s.value ? " active" : ""}`}>
-            {s.label}
+            {t(`documents.status.${s.value}`)}
           </Link>
         ))}
       </div>
@@ -68,8 +70,8 @@ export default async function InvoicesPage({
       {invoices.length === 0 ? (
         <div className="glass panel" style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, color: "var(--muted)" }}><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2.5h9l3 3V21l-2-1.2-2 1.2-2-1.2-2 1.2-2-1.2L6 21V2.5Z"/><path d="M8.5 7.5h7M8.5 11h7M8.5 14.5h4"/></svg></div>
-          <div style={{ fontSize: 14, marginBottom: 16 }}>Няма фактури</div>
-          <Link href="/dashboard/documents/new?type=invoice" className="btn btn-primary btn-sm">Издай първата фактура</Link>
+          <div style={{ fontSize: 14, marginBottom: 16 }}>{t("documents.invoices.empty")}</div>
+          <Link href="/dashboard/documents/new?type=invoice" className="btn btn-primary btn-sm">{t("documents.invoices.issueFirst")}</Link>
         </div>
       ) : (
         <InvoicesTable
@@ -82,7 +84,7 @@ export default async function InvoicesPage({
       )}
 
       {/* Шаблони за фактури — преглед на дизайните */}
-      <TemplateGallery plan={plan as PlanId} title="Шаблони за фактури — преглед на дизайните" />
+      <TemplateGallery plan={plan as PlanId} title={t("documents.invoices.galleryTitle")} />
     </>
   );
 }

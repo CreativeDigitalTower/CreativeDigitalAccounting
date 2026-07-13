@@ -1,0 +1,104 @@
+{
+  "status": {
+    "draft": "Ciornă",
+    "issued": "Emisă",
+    "sent": "Trimisă",
+    "partially_paid": "Parțial plătită",
+    "paid": "Plătită",
+    "overdue": "Restantă",
+    "cancelled": "Anulată"
+  },
+  "types": {
+    "invoice": "Factură",
+    "proforma": "Proformă",
+    "quote": "Ofertă",
+    "credit_note": "Notă de credit",
+    "debit_note": "Notă de debit"
+  },
+  "changeStatus": "Schimbă statusul",
+  "page": {
+    "title": "Documente",
+    "count": "{n} documente",
+    "newDoc": "+ Document nou",
+    "ppp": "NIR",
+    "declarations": "Declarații",
+    "cat": {
+      "outgoing": "Documente emise",
+      "protocols": "Protocoale (NIR)",
+      "declarations": "Declarații de conformitate",
+      "expenses": "Facturi de cheltuieli",
+      "bank": "Extrase bancare"
+    },
+    "filter": {
+      "all": "Toate",
+      "invoice": "Facturi de venit",
+      "proforma": "Proforme",
+      "quote": "Oferte",
+      "credit": "Note de credit",
+      "debit": "Note de debit"
+    },
+    "statusAll": "Toate statusurile",
+    "empty": "Niciun document",
+    "createFirst": "Creează primul document",
+    "th": {
+      "number": "Număr",
+      "type": "Tip",
+      "client": "Client",
+      "date": "Dată",
+      "due": "Scadență",
+      "amount": "Sumă",
+      "status": "Status"
+    },
+    "view": "Vizualizează",
+    "edit": "Editează"
+  },
+  "invoices": {
+    "title": "Facturi",
+    "count": "{n} facturi",
+    "newInvoice": "+ Factură nouă",
+    "kpi": {
+      "invoiced": "Total facturat",
+      "paid": "Plătit",
+      "outstanding": "De încasat"
+    },
+    "filterAll": "Toate",
+    "empty": "Nicio factură",
+    "issueFirst": "Emite prima factură",
+    "galleryTitle": "Șabloane de factură — previzualizează designurile"
+  },
+  "table": {
+    "overdueAlert": "{n} facturi restante — solicitați plata de la clienți.",
+    "soonAlert": "{n} facturi cu scadență apropiată (în 5 zile).",
+    "selected": "Selectate: {n}",
+    "generating": "Se generează…",
+    "downloadSelected": "↓ Descarcă selectate ({n})",
+    "clearSelection": "Șterge selecția",
+    "selectAll": "Selectează tot",
+    "overdueBy": "restantă cu {n} zile",
+    "dueIn": "până la scadență: {n} zile",
+    "open": "Deschide",
+    "edit": "Editează",
+    "downloadPdf": "Descarcă PDF",
+    "menu": {
+      "open": "Deschide",
+      "edit": "Editează",
+      "downloadPdf": "Descarcă PDF",
+      "copyNumber": "Copiază numărul",
+      "markPaid": "Marchează plătită",
+      "markOverdue": "Marchează restantă"
+    },
+    "errPdf": "Descărcarea PDF a eșuat.",
+    "errDownload": "Descărcarea a eșuat.",
+    "zipName": "Documente"
+  },
+  "actions": {
+    "statusLabel": "Status:",
+    "edit": "✎ Editează"
+  },
+  "gallery": {
+    "defaultTitle": "Șabloane de factură",
+    "selectHint": "Alegeți un design și vedeți cum va arăta documentul.",
+    "viewHint": "Previzualizați designurile disponibile pentru documentele dvs.",
+    "preview": "Previzualizare"
+  }
+}
