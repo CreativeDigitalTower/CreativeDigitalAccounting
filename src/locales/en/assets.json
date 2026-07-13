@@ -1,0 +1,87 @@
+{
+  "title": "Fixed Assets",
+  "count": "{n} assets",
+  "bookValueLabel": "Book value:",
+  "newAsset": "+ New asset",
+  "empty": "No registered assets",
+  "add": "Add asset",
+  "details": "Details",
+  "warrantyExpired": "Expired ",
+  "errSave": "Error while saving.",
+  "errDelete": "Error while deleting.",
+  "th": {
+    "name": "Name",
+    "category": "Category",
+    "acquired": "Acquired on",
+    "value": "Acquisition value",
+    "depreciation": "Annual depreciation",
+    "bookValue": "Book value",
+    "warranty": "Warranty"
+  },
+  "categories": {
+    "machines": "Machinery & equipment",
+    "computers": "Computers & tech",
+    "vehicles": "Vehicles",
+    "furniture": "Furniture",
+    "buildings": "Buildings",
+    "intangible": "Intangible assets",
+    "other": "Other"
+  },
+  "status": {
+    "in_use": "In use",
+    "maintenance": "In service",
+    "sold": "Sold",
+    "scrapped": "Scrapped",
+    "written_off": "Written off"
+  },
+  "new": {
+    "back": "← Assets",
+    "heading": "New asset",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "f": {
+      "name": "Name *",
+      "namePh": "Dell laptop / Vehicle…",
+      "category": "Category *",
+      "categorySelect": "Select",
+      "acquired": "Acquired on *",
+      "value": "Value (EUR) *",
+      "depreciation": "Annual depreciation (EUR)",
+      "warranty": "Warranty until",
+      "insurance": "Insurance until"
+    }
+  },
+  "detail": {
+    "back": "← Assets",
+    "statusLabel": "Status:",
+    "edit": "Edit",
+    "close": "Close",
+    "delTitle": "Delete asset",
+    "confirmDelete": "asset „{name}“",
+    "f": {
+      "name": "Name",
+      "category": "Category",
+      "acquired": "Acquired",
+      "value": "Value (€)",
+      "depreciation": "Annual depreciation (€)",
+      "bookValue": "Book value (€)",
+      "warranty": "Warranty until",
+      "insurance": "Insurance until",
+      "notes": "Notes"
+    },
+    "kpi": {
+      "category": "Category",
+      "acquired": "Acquired",
+      "value": "Value",
+      "depreciation": "Annual depreciation",
+      "bookValue": "Book value",
+      "warranty": "Warranty until",
+      "insurance": "Insurance until"
+    },
+    "serviceLog": {
+      "title": "Service log ({n})",
+      "empty": "No records."
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "title": "Дълготрайни Активи",
+  "count": "{n} актива",
+  "bookValueLabel": "Балансова стойност:",
+  "newAsset": "+ Нов актив",
+  "empty": "Няма регистрирани активи",
+  "add": "Добави актив",
+  "details": "Детайли",
+  "warrantyExpired": "Изтекла ",
+  "errSave": "Грешка при запис.",
+  "errDelete": "Грешка при изтриване.",
+  "th": {
+    "name": "Наименование",
+    "category": "Категория",
+    "acquired": "Придобит на",
+    "value": "Придоб. стойност",
+    "depreciation": "Год. амортизация",
+    "bookValue": "Балансова стойност",
+    "warranty": "Гаранция"
+  },
+  "categories": {
+    "machines": "Машини и оборудване",
+    "computers": "Компютри и техника",
+    "vehicles": "Транспортни средства",
+    "furniture": "Обзавеждане",
+    "buildings": "Сгради",
+    "intangible": "Нематериални активи",
+    "other": "Други"
+  },
+  "status": {
+    "in_use": "В употреба",
+    "maintenance": "В сервиз",
+    "sold": "Продаден",
+    "scrapped": "Бракуван",
+    "written_off": "Отписан"
+  },
+  "new": {
+    "back": "← Активи",
+    "heading": "Нов актив",
+    "cancel": "Отказ",
+    "save": "Запази",
+    "saving": "Записване…",
+    "f": {
+      "name": "Наименование *",
+      "namePh": "Лаптоп Dell / Автомобил…",
+      "category": "Категория *",
+      "categorySelect": "Изберете",
+      "acquired": "Придобит на *",
+      "value": "Стойност (EUR) *",
+      "depreciation": "Год. амортизация (EUR)",
+      "warranty": "Гаранция до",
+      "insurance": "Застраховка до"
+    }
+  },
+  "detail": {
+    "back": "← Активи",
+    "statusLabel": "Статус:",
+    "edit": "Редактирай",
+    "close": "Затвори",
+    "delTitle": "Изтрий актив",
+    "confirmDelete": "актива „{name}“",
+    "f": {
+      "name": "Наименование",
+      "category": "Категория",
+      "acquired": "Придобит",
+      "value": "Стойност (€)",
+      "depreciation": "Год. амортизация (€)",
+      "bookValue": "Балансова стойност (€)",
+      "warranty": "Гаранция до",
+      "insurance": "Застраховка до",
+      "notes": "Бележки"
+    },
+    "kpi": {
+      "category": "Категория",
+      "acquired": "Придобит",
+      "value": "Стойност",
+      "depreciation": "Год. амортизация",
+      "bookValue": "Балансова стойност",
+      "warranty": "Гаранция до",
+      "insurance": "Застраховка до"
+    },
+    "serviceLog": {
+      "title": "Сервизен дневник ({n})",
+      "empty": "Няма записи."
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "title": "Πάγια",
+  "count": "{n} πάγια",
+  "bookValueLabel": "Λογιστική αξία:",
+  "newAsset": "+ Νέο πάγιο",
+  "empty": "Δεν υπάρχουν καταχωρημένα πάγια",
+  "add": "Προσθήκη παγίου",
+  "details": "Λεπτομέρειες",
+  "warrantyExpired": "Έληξε ",
+  "errSave": "Σφάλμα κατά την αποθήκευση.",
+  "errDelete": "Σφάλμα κατά τη διαγραφή.",
+  "th": {
+    "name": "Ονομασία",
+    "category": "Κατηγορία",
+    "acquired": "Απόκτηση",
+    "value": "Αξία απόκτησης",
+    "depreciation": "Ετήσια απόσβεση",
+    "bookValue": "Λογιστική αξία",
+    "warranty": "Εγγύηση"
+  },
+  "categories": {
+    "machines": "Μηχανήματα & εξοπλισμός",
+    "computers": "Υπολογιστές & τεχνολογία",
+    "vehicles": "Οχήματα",
+    "furniture": "Έπιπλα",
+    "buildings": "Κτίρια",
+    "intangible": "Άυλα πάγια",
+    "other": "Άλλα"
+  },
+  "status": {
+    "in_use": "Σε χρήση",
+    "maintenance": "Σε σέρβις",
+    "sold": "Πωλήθηκε",
+    "scrapped": "Απορρίφθηκε",
+    "written_off": "Διαγράφηκε"
+  },
+  "new": {
+    "back": "← Πάγια",
+    "heading": "Νέο πάγιο",
+    "cancel": "Άκυρο",
+    "save": "Αποθήκευση",
+    "saving": "Αποθήκευση…",
+    "f": {
+      "name": "Ονομασία *",
+      "namePh": "Laptop Dell / Όχημα…",
+      "category": "Κατηγορία *",
+      "categorySelect": "Επιλέξτε",
+      "acquired": "Απόκτηση *",
+      "value": "Αξία (EUR) *",
+      "depreciation": "Ετήσια απόσβεση (EUR)",
+      "warranty": "Εγγύηση έως",
+      "insurance": "Ασφάλιση έως"
+    }
+  },
+  "detail": {
+    "back": "← Πάγια",
+    "statusLabel": "Κατάσταση:",
+    "edit": "Επεξεργασία",
+    "close": "Κλείσιμο",
+    "delTitle": "Διαγραφή παγίου",
+    "confirmDelete": "το πάγιο „{name}“",
+    "f": {
+      "name": "Ονομασία",
+      "category": "Κατηγορία",
+      "acquired": "Απόκτηση",
+      "value": "Αξία (€)",
+      "depreciation": "Ετήσια απόσβεση (€)",
+      "bookValue": "Λογιστική αξία (€)",
+      "warranty": "Εγγύηση έως",
+      "insurance": "Ασφάλιση έως",
+      "notes": "Σημειώσεις"
+    },
+    "kpi": {
+      "category": "Κατηγορία",
+      "acquired": "Απόκτηση",
+      "value": "Αξία",
+      "depreciation": "Ετήσια απόσβεση",
+      "bookValue": "Λογιστική αξία",
+      "warranty": "Εγγύηση έως",
+      "insurance": "Ασφάλιση έως"
+    },
+    "serviceLog": {
+      "title": "Ημερολόγιο σέρβις ({n})",
+      "empty": "Καμία εγγραφή."
+    }
+  }
+}
