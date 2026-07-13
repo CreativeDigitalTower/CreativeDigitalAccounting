@@ -4,10 +4,14 @@ import { useEffect, useState } from "react";
 import { confirmDelete } from "@/lib/confirmDelete";
 import { reminderStatus, PRIORITY_META } from "@/lib/reminderColor";
 import { UiIcon } from "@/components/app/NavIcons";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 type Reminder = { id: string; title: string; dueDate: string; done: boolean; priority: string; progress: number; note: string | null };
 
 export function TaxReminders() {
+  const { t, locale } = useI18n();
+  const prioLabel = (id: string) => { const l = t(`modules.reminder.priority.${id}`); return l.startsWith("modules.") ? id : l; };
+  const statusLabel = (days: number, done: boolean) => done ? t("modules.reminder.status.done") : days < 0 ? t("modules.reminder.status.overdue", { n: -days }) : days === 0 ? t("modules.reminder.status.today") : t("modules.reminder.status.inDays", { n: days });
   const [items, setItems] = useState<Reminder[]>([]);
   const [f, setF] = useState({ title: "", dueDate: "", priority: "normal", note: "" });
   const [editId, setEditId] = useState<string | null>(null);
@@ -26,7 +30,7 @@ export function TaxReminders() {
     load();
   }
   async function remove(id: string) {
-    if (!(await confirmDelete("това напомняне"))) return;
+    if (!(await confirmDelete(t("modules.reminder.confirmDelete")))) return;
     await fetch(`/api/tax-reminders?id=${id}`, { method: "DELETE" });
     setItems((p) => p.filter((x) => x.id !== id));
   }
@@ -42,16 +46,16 @@ export function TaxReminders() {
 
   return (
     <div className="glass panel" style={{ padding: "18px 22px" }}>
-      <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 4px" }}>Мои напомняния и задачи</h3>
-      <p style={{ fontSize: 11.5, color: "var(--muted)", margin: "0 0 12px" }}>Важни срокове и задачи (ГФО, корпоративен данък и др.). Цветът се променя, когато срокът наближава.</p>
+      <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 4px" }}>{t("modules.reminder.title")}</h3>
+      <p style={{ fontSize: 11.5, color: "var(--muted)", margin: "0 0 12px" }}>{t("modules.reminder.subtitle")}</p>
       <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap", alignItems: "flex-end" }}>
-        <div style={{ flex: 2, minWidth: 180 }}><label style={{ fontSize: 11 }}>Задача</label><input value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} placeholder="Напр. Подаване на ГФО" style={{ padding: "7px 10px", fontSize: 13 }} /></div>
-        <div><label style={{ fontSize: 11 }}>Срок</label><input type="date" value={f.dueDate} onChange={(e) => setF({ ...f, dueDate: e.target.value })} style={{ padding: "7px 10px", fontSize: 13 }} /></div>
-        <div><label style={{ fontSize: 11 }}>Приоритет</label><select value={f.priority} onChange={(e) => setF({ ...f, priority: e.target.value })} style={{ padding: "7px 8px", fontSize: 13 }}>{Object.entries(PRIORITY_META).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}</select></div>
-        <button className="btn btn-primary btn-sm" onClick={add}>+ Добави</button>
+        <div style={{ flex: 2, minWidth: 180 }}><label style={{ fontSize: 11 }}>{t("modules.reminder.taskLabel")}</label><input value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} placeholder={t("modules.reminder.taskPh")} style={{ padding: "7px 10px", fontSize: 13 }} /></div>
+        <div><label style={{ fontSize: 11 }}>{t("modules.reminder.due")}</label><input type="date" value={f.dueDate} onChange={(e) => setF({ ...f, dueDate: e.target.value })} style={{ padding: "7px 10px", fontSize: 13 }} /></div>
+        <div><label style={{ fontSize: 11 }}>{t("modules.reminder.priorityLabel")}</label><select value={f.priority} onChange={(e) => setF({ ...f, priority: e.target.value })} style={{ padding: "7px 8px", fontSize: 13 }}>{Object.keys(PRIORITY_META).map((k) => <option key={k} value={k}>{prioLabel(k)}</option>)}</select></div>
+        <button className="btn btn-primary btn-sm" onClick={add}>{t("modules.reminder.add")}</button>
       </div>
       {items.length === 0 ? (
-        <div style={{ fontSize: 12.5, color: "var(--muted)" }}>Няма собствени напомняния.</div>
+        <div style={{ fontSize: 12.5, color: "var(--muted)" }}>{t("modules.reminder.empty")}</div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           {items.map((r) => {
@@ -63,16 +67,16 @@ export function TaxReminders() {
                   <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 8, marginBottom: 8 }}>
                     <input value={ef.title} onChange={(e) => setEf({ ...ef, title: e.target.value })} style={{ padding: "6px 9px", fontSize: 12.5 }} />
                     <input type="date" value={ef.dueDate} onChange={(e) => setEf({ ...ef, dueDate: e.target.value })} style={{ padding: "6px 9px", fontSize: 12.5 }} />
-                    <select value={ef.priority} onChange={(e) => setEf({ ...ef, priority: e.target.value })} style={{ padding: "6px 8px", fontSize: 12.5 }}>{Object.entries(PRIORITY_META).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}</select>
+                    <select value={ef.priority} onChange={(e) => setEf({ ...ef, priority: e.target.value })} style={{ padding: "6px 8px", fontSize: 12.5 }}>{Object.keys(PRIORITY_META).map((k) => <option key={k} value={k}>{prioLabel(k)}</option>)}</select>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                    <label style={{ fontSize: 11, color: "var(--muted)" }}>Изпълнение: {ef.progress}%</label>
+                    <label style={{ fontSize: 11, color: "var(--muted)" }}>{t("modules.reminder.progress", { n: ef.progress })}</label>
                     <input type="range" min={0} max={100} step={5} value={ef.progress} onChange={(e) => setEf({ ...ef, progress: Number(e.target.value) })} style={{ flex: 1 }} />
                   </div>
-                  <input value={ef.note} onChange={(e) => setEf({ ...ef, note: e.target.value })} placeholder="Бележка (по избор)" style={{ padding: "6px 9px", fontSize: 12.5, marginBottom: 8 }} />
+                  <input value={ef.note} onChange={(e) => setEf({ ...ef, note: e.target.value })} placeholder={t("modules.reminder.notePh")} style={{ padding: "6px 9px", fontSize: 12.5, marginBottom: 8 }} />
                   <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-                    <button className="btn btn-ghost btn-sm" onClick={() => setEditId(null)}>Отказ</button>
-                    <button className="btn btn-primary btn-sm" onClick={saveEdit}>Запази</button>
+                    <button className="btn btn-ghost btn-sm" onClick={() => setEditId(null)}>{t("modules.reminder.cancel")}</button>
+                    <button className="btn btn-primary btn-sm" onClick={saveEdit}>{t("modules.reminder.save")}</button>
                   </div>
                 </div>
               );
@@ -80,7 +84,7 @@ export function TaxReminders() {
             return (
               <div key={r.id} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, padding: "7px 0", borderBottom: "1px solid rgba(217,215,200,.4)" }}>
                 <input type="checkbox" checked={r.done} onChange={() => patch(r.id, { done: !r.done, progress: !r.done ? 100 : 0 })} style={{ width: "auto" }} />
-                <span style={{ width: 4, height: 22, borderRadius: 2, background: pr.color, flexShrink: 0 }} title={`Приоритет: ${pr.label}`} />
+                <span style={{ width: 4, height: 22, borderRadius: 2, background: pr.color, flexShrink: 0 }} title={t("modules.reminder.priorityTitle", { p: prioLabel(r.priority) })} />
                 <span style={{ flex: 1, minWidth: 0 }}>
                   <span style={{ textDecoration: r.done ? "line-through" : "none", color: r.done ? "var(--muted)" : "inherit", fontWeight: 500 }}>{r.title}</span>
                   {!r.done && r.progress > 0 && r.progress < 100 && (
@@ -88,10 +92,10 @@ export function TaxReminders() {
                   )}
                   {r.note && <span style={{ display: "block", fontSize: 11, color: "var(--muted)" }}>{r.note}</span>}
                 </span>
-                <span style={{ fontSize: 11, fontWeight: 700, color: st.color, background: st.bg, borderRadius: 12, padding: "2px 9px", whiteSpace: "nowrap" }}>{st.label}</span>
-                <span className="num" style={{ fontSize: 11.5, color: "var(--muted)" }}>{new Date(r.dueDate).toLocaleDateString("bg-BG")}</span>
-                <button onClick={() => startEdit(r)} title="Редактирай" style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", display: "inline-flex" }}><UiIcon.edit width={14} height={14} /></button>
-                <button onClick={() => remove(r.id)} title="Изтрий" style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer" }}>×</button>
+                <span style={{ fontSize: 11, fontWeight: 700, color: st.color, background: st.bg, borderRadius: 12, padding: "2px 9px", whiteSpace: "nowrap" }}>{statusLabel(st.days, r.done)}</span>
+                <span className="num" style={{ fontSize: 11.5, color: "var(--muted)" }}>{new Date(r.dueDate).toLocaleDateString(locale)}</span>
+                <button onClick={() => startEdit(r)} title={t("modules.reminder.edit")} style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", display: "inline-flex" }}><UiIcon.edit width={14} height={14} /></button>
+                <button onClick={() => remove(r.id)} title={t("modules.reminder.delete")} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer" }}>×</button>
               </div>
             );
           })}

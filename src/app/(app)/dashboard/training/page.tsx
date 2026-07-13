@@ -1,32 +1,28 @@
 import { requireCompany } from "@/lib/session";
 import { NavIcon, UiIcon } from "@/components/app/NavIcons";
+import { getLocale } from "@/lib/i18n/server";
+import { getMessages } from "@/lib/i18n/messages";
 
 export default async function TrainingPage() {
   await requireCompany();
+  const m = (getMessages(await getLocale()).modules as { training: { title: string; subtitle: string; soon: string; heroTitle: string; heroText: string; topics: { title: string; desc: string }[] } }).training;
   const ti = { width: 26, height: 26 };
-  const topics = [
-    { icon: <NavIcon.invoice {...ti} />, title: "Как се генерира фактура", desc: "Стъпка по стъпка — от клиент до изпращане и плащане." },
-    { icon: <NavIcon.document {...ti} />, title: "Създаване на бизнес документи", desc: "Оферти, договори, протоколи и над 100 шаблона." },
-    { icon: <UiIcon.people {...ti} />, title: "Работа с CRM", desc: "Клиентско досие, pipeline, задачи и хронология." },
-    { icon: <NavIcon.warehouse {...ti} />, title: "Склад и производство", desc: "Партиди, рецепти, автоматично изписване." },
-    { icon: <NavIcon.subscription {...ti} />, title: "Абонаменти и плащания", desc: "Как да изберете и управлявате своя план." },
-    { icon: <NavIcon.training {...ti} />, title: "Въпроси и отговори", desc: "Често задавани въпроси и съвети от екипа." },
-  ];
+  const icons = [<NavIcon.invoice key="0" {...ti} />, <NavIcon.document key="1" {...ti} />, <UiIcon.people key="2" {...ti} />, <NavIcon.warehouse key="3" {...ti} />, <NavIcon.subscription key="4" {...ti} />, <NavIcon.training key="5" {...ti} />];
+  const topics = m.topics.map((tp, i) => ({ icon: icons[i], title: tp.title, desc: tp.desc }));
 
   return (
     <>
       <div style={{ marginBottom: 18 }}>
-        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 4px", display: "flex", alignItems: "center", gap: 10 }}><NavIcon.training width={24} height={24} /> Обучения</h1>
-        <div style={{ color: "var(--muted)", fontSize: 13 }}>Видео уроци за работа с платформата</div>
+        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 4px", display: "flex", alignItems: "center", gap: 10 }}><NavIcon.training width={24} height={24} /> {m.title}</h1>
+        <div style={{ color: "var(--muted)", fontSize: 13 }}>{m.subtitle}</div>
       </div>
 
       <div className="glass panel" style={{ padding: "44px 32px", textAlign: "center", marginBottom: 22, background: "linear-gradient(135deg, rgba(15,138,106,.08), rgba(11,94,74,.05))" }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, color: "var(--emerald-dark)" }}><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5" /><path d="m10 9.5 5 2.5-5 2.5V9.5Z" /></svg></div>
-        <div style={{ display: "inline-block", fontSize: 11, fontWeight: 700, letterSpacing: 1.5, color: "var(--brass)", border: "1px solid var(--brass)", borderRadius: 14, padding: "3px 14px", marginBottom: 14 }}>СКОРО</div>
-        <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: "0 0 10px" }}>Центърът за обучения е в разработка</h2>
+        <div style={{ display: "inline-block", fontSize: 11, fontWeight: 700, letterSpacing: 1.5, color: "var(--brass)", border: "1px solid var(--brass)", borderRadius: 14, padding: "3px 14px", marginBottom: 14 }}>{m.soon}</div>
+        <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: "0 0 10px" }}>{m.heroTitle}</h2>
         <p style={{ fontSize: 14, color: "var(--ink-soft)", maxWidth: 520, margin: "0 auto", lineHeight: 1.6 }}>
-          Подготвяме серия видео уроци, в които стъпка по стъпка показваме как се работи с всяка част от платформата.
-          Скоро ще можете да гледате обученията директно тук.
+          {m.heroText}
         </p>
       </div>
 

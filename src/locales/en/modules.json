@@ -1,0 +1,255 @@
+{
+  "cash": {
+    "title": "Cash",
+    "subtitle": "{n} registers · track available balances",
+    "totalTitle": "Total balance (all registers)",
+    "newTitle": "New register",
+    "nameLabel": "Register name",
+    "namePh": "e.g. Register 1 / Cash box",
+    "currency": "Currency",
+    "create": "+ Create register",
+    "loading": "Loading…",
+    "rename": "Rename",
+    "delete": "Delete",
+    "save": "Save",
+    "edit": "Edit",
+    "confirmDelete": "Delete register „{name}“?"
+  },
+  "audit": {
+    "title": "Audit log",
+    "subtitle": "Who changed what and when — last {n} events",
+    "empty": "No recorded actions yet",
+    "system": "System",
+    "th": {
+      "datetime": "Date & time",
+      "user": "User",
+      "action": "Action",
+      "entity": "Object",
+      "details": "Details"
+    },
+    "action": {
+      "create": "Create",
+      "update": "Edit",
+      "delete": "Delete",
+      "status_change": "Status change",
+      "login": "Login",
+      "impersonate": "Technical access"
+    },
+    "entity": {
+      "Document": "Document",
+      "Client": "Client",
+      "Expense": "Expense",
+      "Company": "Company",
+      "CashRegister": "Register",
+      "Subscription": "Subscription"
+    }
+  },
+  "bank": {
+    "title": "Documents",
+    "subtitle": "Bank statements",
+    "tabs": {
+      "all": "All",
+      "invoice": "Sales invoices",
+      "expense": "Expense invoices",
+      "bank": "Bank statements"
+    },
+    "errType": "Only PDF, Excel (.xls/.xlsx) and CSV files are supported.",
+    "errSize": "File must be under 8MB.",
+    "errUpload": "Upload error.",
+    "uploadTitle": "Upload statement (PDF / Excel / CSV)",
+    "name": "Name",
+    "namePh": "Bank statement June 2026",
+    "from": "Period from",
+    "to": "Period to",
+    "file": "File",
+    "uploading": "Uploading…",
+    "upload": "Upload",
+    "ready": "✓ Ready to upload:",
+    "loading": "Loading…",
+    "empty": "No uploaded bank statements",
+    "th": {
+      "name": "Name",
+      "type": "Type",
+      "period": "Period",
+      "uploadedAt": "Uploaded on"
+    },
+    "download": "↓ Download",
+    "delete": "Delete",
+    "confirmDelete": "Delete the statement?"
+  },
+  "archive": {
+    "title": "Document Archive",
+    "subtitle": "Store scanned documents, contracts and files in one place",
+    "tabs": {
+      "archive": "Archived files",
+      "issued": "Issued documents ({n})",
+      "protocols": "Protocols (GRN)"
+    },
+    "categories": {
+      "contracts": "Contracts",
+      "invoices": "Invoices",
+      "accounting": "Accounting",
+      "hr": "HR",
+      "bank": "Bank",
+      "legal": "Legal",
+      "other": "Other"
+    },
+    "uploadTitle": "Upload a document",
+    "category": "Category",
+    "uploading": "Uploading…",
+    "hint": "Any files up to 5 MB are supported (PDF, images, documents).",
+    "loading": "Loading…",
+    "empty": "No uploaded files",
+    "th": {
+      "file": "File",
+      "category": "Category",
+      "size": "Size",
+      "uploadedAt": "Uploaded on"
+    },
+    "download": "↓ Download",
+    "delete": "Delete",
+    "fileTooLarge": "File is too large (max. 5 MB).",
+    "errUpload": "Upload error.",
+    "confirmDelete": "Delete the file?"
+  },
+  "taxCalendar": {
+    "title": "Tax and social security calendar",
+    "subtitle": "Deadlines under VAT, corporate tax, income tax, social security and your own reminders",
+    "upcomingTitle": "Upcoming statutory deadlines",
+    "th": {
+      "date": "Deadline",
+      "obligation": "Obligation",
+      "law": "Law"
+    },
+    "today": "today",
+    "inDays": "in {n} days",
+    "note": "Deadlines are indicative; if they fall on a non-working day they move to the next working day. Check the official publications of the revenue agency."
+  },
+  "reminder": {
+    "title": "My reminders and tasks",
+    "subtitle": "Important deadlines and tasks (annual financial statements, corporate tax, etc.). The colour changes as the deadline approaches.",
+    "taskLabel": "Task",
+    "taskPh": "E.g. Submit annual financial statement",
+    "due": "Due",
+    "priorityLabel": "Priority",
+    "add": "+ Add",
+    "empty": "No personal reminders.",
+    "progress": "Progress: {n}%",
+    "notePh": "Note (optional)",
+    "cancel": "Cancel",
+    "save": "Save",
+    "priorityTitle": "Priority: {p}",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDelete": "this reminder",
+    "priority": {
+      "high": "High",
+      "normal": "Normal",
+      "low": "Low"
+    },
+    "status": {
+      "done": "done",
+      "overdue": "overdue by {n} days",
+      "today": "today",
+      "inDays": "in {n} days"
+    }
+  },
+  "saft": {
+    "title": "SAF-T",
+    "subtitle": "Standard Audit File for Tax — generate for submission to the revenue agency.",
+    "readyYes": "✓ Company data is ready for SAF-T",
+    "readyNo": "Required company data is missing",
+    "missing": "Missing: {fields}",
+    "companyProfile": "Company profile",
+    "missingCompany": "company data",
+    "contentTitle": "What the generated file contains",
+    "content": [
+      "Header — company data, period and software",
+      "Chart of accounts (GeneralLedgerAccounts)",
+      "Customers and Suppliers (counterparties)",
+      "Tax table (VAT 20/9/0%)",
+      "Products and stock items",
+      "Fixed assets (annual/on demand)",
+      "General ledger (GeneralLedgerEntries)",
+      "Sales (SalesInvoices) from invoices",
+      "Purchases (PurchaseInvoices) from expenses"
+    ],
+    "obligations": [
+      {
+        "title": "What is SAF-T",
+        "text": "SAF-T (Standard Audit File for Tax) is a standardized XML file with a structure defined by the revenue agency, containing accounting data, documents, counterparties, taxes and assets. It gives the revenue administration a complete, uniform picture for audit."
+      },
+      {
+        "title": "Who is obliged",
+        "text": "The obligation is introduced in stages — first for large enterprises, then for medium and small, and finally for micro-enterprises. Check which group your company belongs to and the date from which the obligation applies."
+      },
+      {
+        "title": "Frequency",
+        "text": "Monthly — accounting data and purchase/sales data; annually — fixed asset data; on demand — stock levels. The module generates all three types."
+      },
+      {
+        "title": "Deadlines",
+        "text": "Monthly files are submitted by the statutory deadline after the end of the respective month. The annual file — together with the annual closing. Follow the official deadlines of the revenue agency."
+      }
+    ],
+    "disclaimer": "The file is generated per the SAF-T structure for Bulgaria (OECD SAF-T 2.0 / revenue agency). Before submission, check compliance against the current official XSD schema for your reporting period.",
+    "panel": {
+      "title": "Generate SAF-T file",
+      "subtitle": "Choose type and period. The file is downloaded in XML format, ready for submission to the revenue agency.",
+      "year": "Year",
+      "month": "Month",
+      "generate": "↓ Generate and download SAF-T",
+      "generating": "Generating…",
+      "errGen": "Generation error.",
+      "errNet": "No connection to the server.",
+      "notReady": "Fill in the missing company data above to generate a valid SAF-T file.",
+      "types": {
+        "monthly": {
+          "label": "Monthly",
+          "desc": "Accounting data and documents for a selected month"
+        },
+        "annual": {
+          "label": "Annual",
+          "desc": "Annual data, including fixed assets"
+        },
+        "on_demand": {
+          "label": "On demand",
+          "desc": "Stock and assets — snapshot at the moment"
+        }
+      }
+    }
+  },
+  "training": {
+    "title": "Training",
+    "subtitle": "Video tutorials for using the platform",
+    "soon": "SOON",
+    "heroTitle": "The training center is under development",
+    "heroText": "We are preparing a series of video tutorials showing step by step how to work with every part of the platform. Soon you will be able to watch the tutorials right here.",
+    "topics": [
+      {
+        "title": "How to generate an invoice",
+        "desc": "Step by step — from client to sending and payment."
+      },
+      {
+        "title": "Creating business documents",
+        "desc": "Quotes, contracts, protocols and over 100 templates."
+      },
+      {
+        "title": "Working with the CRM",
+        "desc": "Client profile, pipeline, tasks and timeline."
+      },
+      {
+        "title": "Warehouse and production",
+        "desc": "Batches, recipes, automatic issuing."
+      },
+      {
+        "title": "Subscriptions and payments",
+        "desc": "How to choose and manage your plan."
+      },
+      {
+        "title": "Q&A",
+        "desc": "Frequently asked questions and tips from the team."
+      }
+    ]
+  }
+}

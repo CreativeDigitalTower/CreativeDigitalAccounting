@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import { CURRENCIES, formatCurrency } from "@/lib/constants";
 import { NavIcon, UiIcon } from "@/components/app/NavIcons";
+import { useT } from "@/components/i18n/I18nProvider";
 
 type Register = { id: string; name: string; currency: string; balance: number };
 
 export default function CashPage() {
+  const t = useT();
   const [registers, setRegisters] = useState<Register[]>([]);
   const [loading, setLoading] = useState(true);
   const [newName, setNewName] = useState("");
@@ -39,20 +41,20 @@ export default function CashPage() {
     return acc;
   }, {} as Record<string, number>);
 
-  if (loading) return <div style={{ color: "var(--muted)", padding: 40 }}>Зареждане…</div>;
+  if (loading) return <div style={{ color: "var(--muted)", padding: 40 }}>{t("modules.cash.loading")}</div>;
 
   return (
     <>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
         <div>
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>Каса</h1>
-          <div style={{ color: "var(--muted)", fontSize: 13 }}>{registers.length} каси · следете наличните суми</div>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>{t("modules.cash.title")}</h1>
+          <div style={{ color: "var(--muted)", fontSize: 13 }}>{t("modules.cash.subtitle", { n: registers.length })}</div>
         </div>
       </div>
 
       {/* Обща КАСА */}
       <div className="glass panel" style={{ padding: "20px 24px", marginBottom: 18, borderLeft: "4px solid var(--emerald)" }}>
-        <div style={{ fontSize: 11.5, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Обща наличност (всички каси)</div>
+        <div style={{ fontSize: 11.5, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>{t("modules.cash.totalTitle")}</div>
         {Object.keys(totalsByCurrency).length === 0 ? (
           <div className="num" style={{ fontSize: 26, fontWeight: 700 }}>{formatCurrency(0)}</div>
         ) : (
@@ -67,26 +69,26 @@ export default function CashPage() {
       {/* Списък каси */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14, marginBottom: 18 }}>
         {registers.map((r) => (
-          <CashCard key={r.id} register={r} onChange={load} />
+          <CashCard key={r.id} register={r} onChange={load} t={t} />
         ))}
       </div>
 
       {/* Нова каса */}
       <div className="glass panel" style={{ padding: "18px 22px" }}>
-        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 12px" }}>Нова каса</h3>
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 12px" }}>{t("modules.cash.newTitle")}</h3>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
           <div style={{ flex: 1, minWidth: 180 }}>
-            <label>Име на касата</label>
-            <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="напр. Каса 1 / Каса в брой" />
+            <label>{t("modules.cash.nameLabel")}</label>
+            <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={t("modules.cash.namePh")} />
           </div>
           <div style={{ width: 160 }}>
-            <label>Валута</label>
+            <label>{t("modules.cash.currency")}</label>
             <select value={newCurrency} onChange={(e) => setNewCurrency(e.target.value)}>
               {CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.code}</option>)}
             </select>
           </div>
           <button onClick={createRegister} className="btn btn-primary" disabled={creating || !newName.trim()}>
-            + Създай каса
+            {t("modules.cash.create")}
           </button>
         </div>
       </div>
@@ -94,7 +96,7 @@ export default function CashPage() {
   );
 }
 
-function CashCard({ register, onChange }: { register: Register; onChange: () => void }) {
+function CashCard({ register, onChange, t }: { register: Register; onChange: () => void; t: (k: string, v?: Record<string, string | number>) => string }) {
   const [editingName, setEditingName] = useState(false);
   const [name, setName] = useState(register.name);
   const [editingBalance, setEditingBalance] = useState(false);
@@ -117,7 +119,7 @@ function CashCard({ register, onChange }: { register: Register; onChange: () => 
     onChange();
   }
   async function remove() {
-    if (!confirm(`Изтриване на каса „${register.name}"?`)) return;
+    if (!confirm(t("modules.cash.confirmDelete", { name: register.name }))) return;
     await fetch(`/api/cash/${register.id}`, { method: "DELETE" });
     onChange();
   }
@@ -134,9 +136,9 @@ function CashCard({ register, onChange }: { register: Register; onChange: () => 
           <>
             <div style={{ fontWeight: 600, fontSize: 15, display: "flex", alignItems: "center", gap: 8 }}>
               <NavIcon.cash width={16} height={16} /> {register.name}
-              <button onClick={() => setEditingName(true)} title="Преименувай" style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", display: "inline-flex", alignItems: "center" }}><UiIcon.edit width={13} height={13} /></button>
+              <button onClick={() => setEditingName(true)} title={t("modules.cash.rename")} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--muted)", display: "inline-flex", alignItems: "center" }}><UiIcon.edit width={13} height={13} /></button>
             </div>
-            <button onClick={remove} title="Изтрий" style={{ background: "none", border: "none", cursor: "pointer", color: "var(--brick)", display: "inline-flex", alignItems: "center" }}><UiIcon.trash width={15} height={15} /></button>
+            <button onClick={remove} title={t("modules.cash.delete")} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--brick)", display: "inline-flex", alignItems: "center" }}><UiIcon.trash width={15} height={15} /></button>
           </>
         )}
       </div>
@@ -144,13 +146,13 @@ function CashCard({ register, onChange }: { register: Register; onChange: () => 
       {editingBalance ? (
         <div style={{ display: "flex", gap: 6 }}>
           <input type="number" step="0.01" value={balance} onChange={(e) => setBalance(e.target.value)} style={{ fontSize: 15, fontFamily: "'IBM Plex Mono', monospace" }} />
-          <button onClick={saveBalance} className="btn btn-primary btn-sm">Запази</button>
+          <button onClick={saveBalance} className="btn btn-primary btn-sm">{t("modules.cash.save")}</button>
         </div>
       ) : (
         <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
           <div className="num" style={{ fontSize: 24, fontWeight: 700 }}>{formatCurrency(register.balance, register.currency)}</div>
           <button onClick={() => { setBalance(String(register.balance)); setEditingBalance(true); }} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, color: "var(--navy)", fontWeight: 600 }}>
-            Редактирай
+            {t("modules.cash.edit")}
           </button>
         </div>
       )}

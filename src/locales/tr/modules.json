@@ -1,0 +1,255 @@
+{
+  "cash": {
+    "title": "Kasa",
+    "subtitle": "{n} kasa · mevcut tutarları takip edin",
+    "totalTitle": "Toplam bakiye (tüm kasalar)",
+    "newTitle": "Yeni kasa",
+    "nameLabel": "Kasa adı",
+    "namePh": "örn. Kasa 1 / Nakit kasa",
+    "currency": "Para birimi",
+    "create": "+ Kasa oluştur",
+    "loading": "Yükleniyor…",
+    "rename": "Yeniden adlandır",
+    "delete": "Sil",
+    "save": "Kaydet",
+    "edit": "Düzenle",
+    "confirmDelete": "„{name}“ kasası silinsin mi?"
+  },
+  "audit": {
+    "title": "Denetim kaydı",
+    "subtitle": "Kim, ne zaman ve neyi değiştirdi — son {n} olay",
+    "empty": "Henüz kayıtlı işlem yok",
+    "system": "Sistem",
+    "th": {
+      "datetime": "Tarih ve saat",
+      "user": "Kullanıcı",
+      "action": "İşlem",
+      "entity": "Nesne",
+      "details": "Ayrıntılar"
+    },
+    "action": {
+      "create": "Oluşturma",
+      "update": "Düzenleme",
+      "delete": "Silme",
+      "status_change": "Durum değişikliği",
+      "login": "Giriş",
+      "impersonate": "Teknik erişim"
+    },
+    "entity": {
+      "Document": "Belge",
+      "Client": "Müşteri",
+      "Expense": "Gider",
+      "Company": "Firma",
+      "CashRegister": "Kasa",
+      "Subscription": "Abonelik"
+    }
+  },
+  "bank": {
+    "title": "Belgeler",
+    "subtitle": "Banka ekstreleri",
+    "tabs": {
+      "all": "Tümü",
+      "invoice": "Satış faturaları",
+      "expense": "Gider faturaları",
+      "bank": "Banka ekstreleri"
+    },
+    "errType": "Yalnızca PDF, Excel (.xls/.xlsx) ve CSV dosyaları desteklenir.",
+    "errSize": "Dosya 8MB'den küçük olmalı.",
+    "errUpload": "Yükleme hatası.",
+    "uploadTitle": "Ekstre yükle (PDF / Excel / CSV)",
+    "name": "Ad",
+    "namePh": "Banka ekstresi Haziran 2026",
+    "from": "Dönem başlangıcı",
+    "to": "Dönem bitişi",
+    "file": "Dosya",
+    "uploading": "Yükleniyor…",
+    "upload": "Yükle",
+    "ready": "✓ Yüklemeye hazır:",
+    "loading": "Yükleniyor…",
+    "empty": "Yüklenmiş banka ekstresi yok",
+    "th": {
+      "name": "Ad",
+      "type": "Tür",
+      "period": "Dönem",
+      "uploadedAt": "Yüklenme"
+    },
+    "download": "↓ İndir",
+    "delete": "Sil",
+    "confirmDelete": "Ekstre silinsin mi?"
+  },
+  "archive": {
+    "title": "Belge Arşivi",
+    "subtitle": "Taranmış belgeleri, sözleşmeleri ve dosyaları tek yerde saklayın",
+    "tabs": {
+      "archive": "Arşivlenen dosyalar",
+      "issued": "Düzenlenen belgeler ({n})",
+      "protocols": "Protokoller (MKF)"
+    },
+    "categories": {
+      "contracts": "Sözleşmeler",
+      "invoices": "Faturalar",
+      "accounting": "Muhasebe",
+      "hr": "İnsan kaynakları",
+      "bank": "Banka",
+      "legal": "Hukuki",
+      "other": "Diğer"
+    },
+    "uploadTitle": "Belge yükleme",
+    "category": "Kategori",
+    "uploading": "Yükleniyor…",
+    "hint": "5 MB'a kadar her tür dosya desteklenir (PDF, görsel, belge).",
+    "loading": "Yükleniyor…",
+    "empty": "Yüklenmiş dosya yok",
+    "th": {
+      "file": "Dosya",
+      "category": "Kategori",
+      "size": "Boyut",
+      "uploadedAt": "Yüklenme"
+    },
+    "download": "↓ İndir",
+    "delete": "Sil",
+    "fileTooLarge": "Dosya çok büyük (maks. 5 MB).",
+    "errUpload": "Yükleme hatası.",
+    "confirmDelete": "Dosya silinsin mi?"
+  },
+  "taxCalendar": {
+    "title": "Vergi ve sigorta takvimi",
+    "subtitle": "KDV, kurumlar vergisi, gelir vergisi, sosyal güvenlik son tarihleri ve kendi hatırlatmalarınız",
+    "upcomingTitle": "Yaklaşan yasal son tarihler",
+    "th": {
+      "date": "Son tarih",
+      "obligation": "Yükümlülük",
+      "law": "Kanun"
+    },
+    "today": "bugün",
+    "inDays": "{n} gün sonra",
+    "note": "Son tarihler bilgi amaçlıdır; tatil gününe denk gelirse bir sonraki iş gününe kaydırılır. Vergi idaresinin resmi yayınlarını kontrol edin."
+  },
+  "reminder": {
+    "title": "Hatırlatmalarım ve görevlerim",
+    "subtitle": "Önemli son tarihler ve görevler (yıllık mali tablolar, kurumlar vergisi vb.). Son tarih yaklaştıkça renk değişir.",
+    "taskLabel": "Görev",
+    "taskPh": "Örn. Yıllık mali tablo sunumu",
+    "due": "Son tarih",
+    "priorityLabel": "Öncelik",
+    "add": "+ Ekle",
+    "empty": "Kişisel hatırlatma yok.",
+    "progress": "İlerleme: %{n}",
+    "notePh": "Not (isteğe bağlı)",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "priorityTitle": "Öncelik: {p}",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "confirmDelete": "bu hatırlatma",
+    "priority": {
+      "high": "Yüksek",
+      "normal": "Normal",
+      "low": "Düşük"
+    },
+    "status": {
+      "done": "tamamlandı",
+      "overdue": "{n} gün gecikmiş",
+      "today": "bugün",
+      "inDays": "{n} gün sonra"
+    }
+  },
+  "saft": {
+    "title": "SAF-T",
+    "subtitle": "Standart Vergi Denetim Dosyası (Standard Audit File for Tax) — vergi idaresine sunmak için oluşturma.",
+    "readyYes": "✓ Firma verileri SAF-T için hazır",
+    "readyNo": "Zorunlu firma verileri eksik",
+    "missing": "Eksik: {fields}",
+    "companyProfile": "Firma profili",
+    "missingCompany": "firma verileri",
+    "contentTitle": "Oluşturulan dosya neler içerir",
+    "content": [
+      "Header — firma verileri, dönem ve yazılım",
+      "Hesap planı (GeneralLedgerAccounts)",
+      "Müşteriler ve Tedarikçiler (taraflar)",
+      "Vergi tablosu (KDV 20/9/0%)",
+      "Ürünler ve stok kalemleri",
+      "Duran varlıklar (yıllık/talep üzerine)",
+      "Büyük defter (GeneralLedgerEntries)",
+      "Satışlar (SalesInvoices) faturalardan",
+      "Alışlar (PurchaseInvoices) giderlerden"
+    ],
+    "obligations": [
+      {
+        "title": "SAF-T nedir",
+        "text": "SAF-T (Standard Audit File for Tax), vergi idaresi tarafından tanımlanmış bir yapıya sahip, muhasebe verileri, belgeler, taraflar, vergiler ve varlıkları içeren standart bir XML dosyasıdır. Vergi idaresine denetim için eksiksiz ve tek biçimli bir tablo sunar."
+      },
+      {
+        "title": "Kim yükümlü",
+        "text": "Yükümlülük aşamalı olarak uygulanır — önce büyük işletmeler, sonra orta ve küçük, en son mikro işletmeler. Firmanızın hangi gruba girdiğini ve yükümlülüğün hangi tarihten itibaren doğduğunu kontrol edin."
+      },
+      {
+        "title": "Sıklık",
+        "text": "Aylık — muhasebe verileri ve alış/satış verileri; yıllık — duran varlık verileri; talep üzerine — stok seviyeleri. Modül her üç türü de oluşturur."
+      },
+      {
+        "title": "Son tarihler",
+        "text": "Aylık dosyalar, ilgili ayın sonundan sonra yasal süre içinde sunulur. Yıllık dosya — yıllık kapanışla birlikte. Vergi idaresinin resmi son tarihlerini takip edin."
+      }
+    ],
+    "disclaimer": "Dosya, Bulgaristan için SAF-T yapısına göre oluşturulur (OECD SAF-T 2.0 / vergi idaresi). Sunmadan önce, raporlama döneminiz için güncel resmi XSD şemasına uygunluğu kontrol edin.",
+    "panel": {
+      "title": "SAF-T dosyası oluştur",
+      "subtitle": "Tür ve dönem seçin. Dosya, vergi idaresine sunmaya hazır XML biçiminde indirilir.",
+      "year": "Yıl",
+      "month": "Ay",
+      "generate": "↓ SAF-T oluştur ve indir",
+      "generating": "Oluşturuluyor…",
+      "errGen": "Oluşturma hatası.",
+      "errNet": "Sunucuya bağlantı yok.",
+      "notReady": "Geçerli bir SAF-T dosyası oluşturmak için yukarıdaki eksik firma verilerini doldurun.",
+      "types": {
+        "monthly": {
+          "label": "Aylık",
+          "desc": "Seçilen ay için muhasebe verileri ve belgeler"
+        },
+        "annual": {
+          "label": "Yıllık",
+          "desc": "Duran varlıklar dahil yıllık veriler"
+        },
+        "on_demand": {
+          "label": "Talep üzerine",
+          "desc": "Stok ve varlıklar — anlık görüntü"
+        }
+      }
+    }
+  },
+  "training": {
+    "title": "Eğitimler",
+    "subtitle": "Platformu kullanmak için video dersler",
+    "soon": "YAKINDA",
+    "heroTitle": "Eğitim merkezi geliştiriliyor",
+    "heroText": "Platformun her bölümüyle nasıl çalışılacağını adım adım gösteren bir video ders serisi hazırlıyoruz. Yakında eğitimleri doğrudan buradan izleyebileceksiniz.",
+    "topics": [
+      {
+        "title": "Fatura nasıl oluşturulur",
+        "desc": "Adım adım — müşteriden gönderime ve ödemeye."
+      },
+      {
+        "title": "İş belgeleri oluşturma",
+        "desc": "Teklifler, sözleşmeler, protokoller ve 100'den fazla şablon."
+      },
+      {
+        "title": "CRM ile çalışma",
+        "desc": "Müşteri profili, pipeline, görevler ve zaman çizelgesi."
+      },
+      {
+        "title": "Depo ve üretim",
+        "desc": "Partiler, reçeteler, otomatik çıkış."
+      },
+      {
+        "title": "Abonelikler ve ödemeler",
+        "desc": "Planınızı nasıl seçer ve yönetirsiniz."
+      },
+      {
+        "title": "Soru ve cevaplar",
+        "desc": "Sıkça sorulan sorular ve ekipten ipuçları."
+      }
+    ]
+  }
+}
