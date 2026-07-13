@@ -21,6 +21,7 @@ import bgDocuments from "@/locales/bg/documents.json";
 import bgAssets from "@/locales/bg/assets.json";
 import bgModules from "@/locales/bg/modules.json";
 import bgAccount from "@/locales/bg/account.json";
+import bgSubdocs from "@/locales/bg/subdocs.json";
 import enCommon from "@/locales/en/common.json";
 import enNav from "@/locales/en/navigation.json";
 import enAuth from "@/locales/en/auth.json";
@@ -39,6 +40,7 @@ import enDocuments from "@/locales/en/documents.json";
 import enAssets from "@/locales/en/assets.json";
 import enModules from "@/locales/en/modules.json";
 import enAccount from "@/locales/en/account.json";
+import enSubdocs from "@/locales/en/subdocs.json";
 import ruCommon from "@/locales/ru/common.json";
 import ruNav from "@/locales/ru/navigation.json";
 import ruAuth from "@/locales/ru/auth.json";
@@ -57,6 +59,7 @@ import ruDocuments from "@/locales/ru/documents.json";
 import ruAssets from "@/locales/ru/assets.json";
 import ruModules from "@/locales/ru/modules.json";
 import ruAccount from "@/locales/ru/account.json";
+import ruSubdocs from "@/locales/ru/subdocs.json";
 import roCommon from "@/locales/ro/common.json";
 import roNav from "@/locales/ro/navigation.json";
 import roAuth from "@/locales/ro/auth.json";
@@ -75,6 +78,7 @@ import roDocuments from "@/locales/ro/documents.json";
 import roAssets from "@/locales/ro/assets.json";
 import roModules from "@/locales/ro/modules.json";
 import roAccount from "@/locales/ro/account.json";
+import roSubdocs from "@/locales/ro/subdocs.json";
 import trCommon from "@/locales/tr/common.json";
 import trNav from "@/locales/tr/navigation.json";
 import trAuth from "@/locales/tr/auth.json";
@@ -93,6 +97,7 @@ import trDocuments from "@/locales/tr/documents.json";
 import trAssets from "@/locales/tr/assets.json";
 import trModules from "@/locales/tr/modules.json";
 import trAccount from "@/locales/tr/account.json";
+import trSubdocs from "@/locales/tr/subdocs.json";
 import elCommon from "@/locales/el/common.json";
 import elNav from "@/locales/el/navigation.json";
 import elAuth from "@/locales/el/auth.json";
@@ -111,17 +116,18 @@ import elDocuments from "@/locales/el/documents.json";
 import elAssets from "@/locales/el/assets.json";
 import elModules from "@/locales/el/modules.json";
 import elAccount from "@/locales/el/account.json";
+import elSubdocs from "@/locales/el/subdocs.json";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Messages = Record<string, any>;
 
 const DICTS: Record<Locale, Messages> = {
-  bg: { common: bgCommon, navigation: bgNav, auth: bgAuth, bi: bgBi, pdf: bgPdf, emails: bgEmails, notifications: bgNotif, clients: bgClients, suppliers: bgSuppliers, expenses: bgExpenses, contracts: bgContracts, projects: bgProjects, warehouse: bgWarehouse, employees: bgEmployees, documents: bgDocuments, assets: bgAssets, modules: bgModules, account: bgAccount },
-  en: { common: enCommon, navigation: enNav, auth: enAuth, bi: enBi, pdf: enPdf, emails: enEmails, notifications: enNotif, clients: enClients, suppliers: enSuppliers, expenses: enExpenses, contracts: enContracts, projects: enProjects, warehouse: enWarehouse, employees: enEmployees, documents: enDocuments, assets: enAssets, modules: enModules, account: enAccount },
-  ru: { common: ruCommon, navigation: ruNav, auth: ruAuth, bi: ruBi, pdf: ruPdf, emails: ruEmails, notifications: ruNotif, clients: ruClients, suppliers: ruSuppliers, expenses: ruExpenses, contracts: ruContracts, projects: ruProjects, warehouse: ruWarehouse, employees: ruEmployees, documents: ruDocuments, assets: ruAssets, modules: ruModules, account: ruAccount },
-  ro: { common: roCommon, navigation: roNav, auth: roAuth, bi: roBi, pdf: roPdf, emails: roEmails, notifications: roNotif, clients: roClients, suppliers: roSuppliers, expenses: roExpenses, contracts: roContracts, projects: roProjects, warehouse: roWarehouse, employees: roEmployees, documents: roDocuments, assets: roAssets, modules: roModules, account: roAccount },
-  tr: { common: trCommon, navigation: trNav, auth: trAuth, bi: trBi, pdf: trPdf, emails: trEmails, notifications: trNotif, clients: trClients, suppliers: trSuppliers, expenses: trExpenses, contracts: trContracts, projects: trProjects, warehouse: trWarehouse, employees: trEmployees, documents: trDocuments, assets: trAssets, modules: trModules, account: trAccount },
-  el: { common: elCommon, navigation: elNav, auth: elAuth, bi: elBi, pdf: elPdf, emails: elEmails, notifications: elNotif, clients: elClients, suppliers: elSuppliers, expenses: elExpenses, contracts: elContracts, projects: elProjects, warehouse: elWarehouse, employees: elEmployees, documents: elDocuments, assets: elAssets, modules: elModules, account: elAccount },
+  bg: { common: bgCommon, navigation: bgNav, auth: bgAuth, bi: bgBi, pdf: bgPdf, emails: bgEmails, notifications: bgNotif, clients: bgClients, suppliers: bgSuppliers, expenses: bgExpenses, contracts: bgContracts, projects: bgProjects, warehouse: bgWarehouse, employees: bgEmployees, documents: bgDocuments, assets: bgAssets, modules: bgModules, account: bgAccount, subdocs: bgSubdocs },
+  en: { common: enCommon, navigation: enNav, auth: enAuth, bi: enBi, pdf: enPdf, emails: enEmails, notifications: enNotif, clients: enClients, suppliers: enSuppliers, expenses: enExpenses, contracts: enContracts, projects: enProjects, warehouse: enWarehouse, employees: enEmployees, documents: enDocuments, assets: enAssets, modules: enModules, account: enAccount, subdocs: enSubdocs },
+  ru: { common: ruCommon, navigation: ruNav, auth: ruAuth, bi: ruBi, pdf: ruPdf, emails: ruEmails, notifications: ruNotif, clients: ruClients, suppliers: ruSuppliers, expenses: ruExpenses, contracts: ruContracts, projects: ruProjects, warehouse: ruWarehouse, employees: ruEmployees, documents: ruDocuments, assets: ruAssets, modules: ruModules, account: ruAccount, subdocs: ruSubdocs },
+  ro: { common: roCommon, navigation: roNav, auth: roAuth, bi: roBi, pdf: roPdf, emails: roEmails, notifications: roNotif, clients: roClients, suppliers: roSuppliers, expenses: roExpenses, contracts: roContracts, projects: roProjects, warehouse: roWarehouse, employees: roEmployees, documents: roDocuments, assets: roAssets, modules: roModules, account: roAccount, subdocs: roSubdocs },
+  tr: { common: trCommon, navigation: trNav, auth: trAuth, bi: trBi, pdf: trPdf, emails: trEmails, notifications: trNotif, clients: trClients, suppliers: trSuppliers, expenses: trExpenses, contracts: trContracts, projects: trProjects, warehouse: trWarehouse, employees: trEmployees, documents: trDocuments, assets: trAssets, modules: trModules, account: trAccount, subdocs: trSubdocs },
+  el: { common: elCommon, navigation: elNav, auth: elAuth, bi: elBi, pdf: elPdf, emails: elEmails, notifications: elNotif, clients: elClients, suppliers: elSuppliers, expenses: elExpenses, contracts: elContracts, projects: elProjects, warehouse: elWarehouse, employees: elEmployees, documents: elDocuments, assets: elAssets, modules: elModules, account: elAccount, subdocs: elSubdocs },
 };
 
 // Дълбоко сливане: липсващ ключ пада обратно към българския (никога raw key на екрана).
