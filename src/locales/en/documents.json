@@ -1,0 +1,104 @@
+{
+  "status": {
+    "draft": "Draft",
+    "issued": "Issued",
+    "sent": "Sent",
+    "partially_paid": "Partially paid",
+    "paid": "Paid",
+    "overdue": "Overdue",
+    "cancelled": "Cancelled"
+  },
+  "types": {
+    "invoice": "Invoice",
+    "proforma": "Proforma",
+    "quote": "Quote",
+    "credit_note": "Credit note",
+    "debit_note": "Debit note"
+  },
+  "changeStatus": "Change status",
+  "page": {
+    "title": "Documents",
+    "count": "{n} documents",
+    "newDoc": "+ New document",
+    "ppp": "GRN",
+    "declarations": "Declarations",
+    "cat": {
+      "outgoing": "Outgoing documents",
+      "protocols": "Protocols (GRN)",
+      "declarations": "Declarations of conformity",
+      "expenses": "Expense invoices",
+      "bank": "Bank statements"
+    },
+    "filter": {
+      "all": "All",
+      "invoice": "Sales invoices",
+      "proforma": "Proformas",
+      "quote": "Quotes",
+      "credit": "Credit notes",
+      "debit": "Debit notes"
+    },
+    "statusAll": "All statuses",
+    "empty": "No documents",
+    "createFirst": "Create the first document",
+    "th": {
+      "number": "Number",
+      "type": "Type",
+      "client": "Client",
+      "date": "Date",
+      "due": "Due",
+      "amount": "Amount",
+      "status": "Status"
+    },
+    "view": "View",
+    "edit": "Edit"
+  },
+  "invoices": {
+    "title": "Invoices",
+    "count": "{n} invoices",
+    "newInvoice": "+ New invoice",
+    "kpi": {
+      "invoiced": "Total invoiced",
+      "paid": "Paid",
+      "outstanding": "Outstanding"
+    },
+    "filterAll": "All",
+    "empty": "No invoices",
+    "issueFirst": "Issue the first invoice",
+    "galleryTitle": "Invoice templates — preview the designs"
+  },
+  "table": {
+    "overdueAlert": "{n} overdue invoices — follow up with clients for payment.",
+    "soonAlert": "{n} invoices with an approaching due date (within 5 days).",
+    "selected": "Selected: {n}",
+    "generating": "Generating…",
+    "downloadSelected": "↓ Download selected ({n})",
+    "clearSelection": "Clear selection",
+    "selectAll": "Select all",
+    "overdueBy": "overdue by {n} days",
+    "dueIn": "due in: {n} days",
+    "open": "Open",
+    "edit": "Edit",
+    "downloadPdf": "Download PDF",
+    "menu": {
+      "open": "Open",
+      "edit": "Edit",
+      "downloadPdf": "Download PDF",
+      "copyNumber": "Copy number",
+      "markPaid": "Mark as paid",
+      "markOverdue": "Mark as overdue"
+    },
+    "errPdf": "Failed to download PDF.",
+    "errDownload": "Download failed.",
+    "zipName": "Documents"
+  },
+  "actions": {
+    "statusLabel": "Status:",
+    "edit": "✎ Edit"
+  },
+  "gallery": {
+    "defaultTitle": "Invoice templates",
+    "selectHint": "Choose a design and see how the document will look.",
+    "viewHint": "Preview the available designs for your documents.",
+    "preview": "Preview"
+  }
+}

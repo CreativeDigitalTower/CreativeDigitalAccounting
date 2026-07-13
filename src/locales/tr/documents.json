@@ -1,0 +1,104 @@
+{
+  "status": {
+    "draft": "Taslak",
+    "issued": "Düzenlendi",
+    "sent": "Gönderildi",
+    "partially_paid": "Kısmen ödendi",
+    "paid": "Ödendi",
+    "overdue": "Gecikmiş",
+    "cancelled": "İptal edildi"
+  },
+  "types": {
+    "invoice": "Fatura",
+    "proforma": "Proforma",
+    "quote": "Teklif",
+    "credit_note": "Alacak dekontu",
+    "debit_note": "Borç dekontu"
+  },
+  "changeStatus": "Durumu değiştir",
+  "page": {
+    "title": "Belgeler",
+    "count": "{n} belge",
+    "newDoc": "+ Yeni belge",
+    "ppp": "MKF",
+    "declarations": "Beyanlar",
+    "cat": {
+      "outgoing": "Giden belgeler",
+      "protocols": "Protokoller (MKF)",
+      "declarations": "Uygunluk beyanları",
+      "expenses": "Gider faturaları",
+      "bank": "Banka ekstreleri"
+    },
+    "filter": {
+      "all": "Tümü",
+      "invoice": "Satış faturaları",
+      "proforma": "Proformalar",
+      "quote": "Teklifler",
+      "credit": "Alacak dekontları",
+      "debit": "Borç dekontları"
+    },
+    "statusAll": "Tüm durumlar",
+    "empty": "Belge yok",
+    "createFirst": "İlk belgeyi oluştur",
+    "th": {
+      "number": "Numara",
+      "type": "Tür",
+      "client": "Müşteri",
+      "date": "Tarih",
+      "due": "Vade",
+      "amount": "Tutar",
+      "status": "Durum"
+    },
+    "view": "Görüntüle",
+    "edit": "Düzenle"
+  },
+  "invoices": {
+    "title": "Faturalar",
+    "count": "{n} fatura",
+    "newInvoice": "+ Yeni fatura",
+    "kpi": {
+      "invoiced": "Toplam faturalanan",
+      "paid": "Ödendi",
+      "outstanding": "Tahsil edilecek"
+    },
+    "filterAll": "Tümü",
+    "empty": "Fatura yok",
+    "issueFirst": "İlk faturayı düzenle",
+    "galleryTitle": "Fatura şablonları — tasarımları önizle"
+  },
+  "table": {
+    "overdueAlert": "{n} gecikmiş fatura — müşterilerden ödeme talep edin.",
+    "soonAlert": "{n} fatura vadesi yaklaşıyor (5 gün içinde).",
+    "selected": "Seçili: {n}",
+    "generating": "Oluşturuluyor…",
+    "downloadSelected": "↓ Seçilenleri indir ({n})",
+    "clearSelection": "Seçimi temizle",
+    "selectAll": "Tümünü seç",
+    "overdueBy": "{n} gün gecikmiş",
+    "dueIn": "vadeye: {n} gün",
+    "open": "Aç",
+    "edit": "Düzenle",
+    "downloadPdf": "PDF indir",
+    "menu": {
+      "open": "Aç",
+      "edit": "Düzenle",
+      "downloadPdf": "PDF indir",
+      "copyNumber": "Numarayı kopyala",
+      "markPaid": "Ödendi olarak işaretle",
+      "markOverdue": "Gecikmiş olarak işaretle"
+    },
+    "errPdf": "PDF indirilemedi.",
+    "errDownload": "İndirme başarısız.",
+    "zipName": "Belgeler"
+  },
+  "actions": {
+    "statusLabel": "Durum:",
+    "edit": "✎ Düzenle"
+  },
+  "gallery": {
+    "defaultTitle": "Fatura şablonları",
+    "selectHint": "Bir tasarım seçin ve belgenin nasıl görüneceğini görün.",
+    "viewHint": "Belgeleriniz için mevcut tasarımları önizleyin.",
+    "preview": "Önizleme"
+  }
+}

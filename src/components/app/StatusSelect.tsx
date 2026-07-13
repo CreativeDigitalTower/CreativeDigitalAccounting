@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { DOC_STATUSES } from "@/lib/constants";
+import { useT } from "@/components/i18n/I18nProvider";
 
 export const STATUS_STYLE: Record<string, { bg: string; fg: string; dot: string }> = {
   muted: { bg: "rgba(120,120,120,.12)", fg: "var(--muted)", dot: "var(--muted)" },
@@ -15,10 +16,11 @@ export const STATUS_STYLE: Record<string, { bg: string; fg: string; dot: string 
 
 export function statusMeta(status: string) {
   const s = DOC_STATUSES.find((x) => x.value === status) ?? DOC_STATUSES[0];
-  return { label: s.label, ...(STATUS_STYLE[s.color] ?? STATUS_STYLE.muted) };
+  return { value: s.value, ...(STATUS_STYLE[s.color] ?? STATUS_STYLE.muted) };
 }
 
 export function StatusSelect({ id, status }: { id: string; status: string }) {
+  const t = useT();
   const router = useRouter();
   const [current, setCurrent] = useState(status);
   const [saving, setSaving] = useState(false);
@@ -70,7 +72,7 @@ export function StatusSelect({ id, status }: { id: string; status: string }) {
     <div ref={ref} style={{ position: "relative", display: "inline-block" }} onClick={(e) => e.stopPropagation()}>
       <button
         ref={btnRef}
-        type="button" disabled={saving} onClick={openMenu} title="Смени статус"
+        type="button" disabled={saving} onClick={openMenu} title={t("documents.changeStatus")}
         style={{
           display: "inline-flex", alignItems: "center", gap: 7, padding: "4px 11px", borderRadius: 20,
           background: m.bg, color: m.fg, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700,
@@ -78,7 +80,7 @@ export function StatusSelect({ id, status }: { id: string; status: string }) {
         }}
       >
         <span style={{ width: 7, height: 7, borderRadius: "50%", background: m.dot, flexShrink: 0 }} />
-        {saving ? "…" : m.label}
+        {saving ? "…" : t(`documents.status.${m.value}`)}
         <span style={{ fontSize: 9, opacity: 0.6 }}>▾</span>
       </button>
       {open && pos && typeof document !== "undefined" && createPortal(
@@ -92,7 +94,7 @@ export function StatusSelect({ id, status }: { id: string; status: string }) {
                 onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(15,138,106,.08)")}
                 onMouseLeave={(e) => (e.currentTarget.style.background = s.value === current ? "rgba(15,138,106,.06)" : "transparent")}>
                 <span style={{ width: 8, height: 8, borderRadius: "50%", background: st.dot }} />
-                {s.label}
+                {t(`documents.status.${s.value}`)}
               </button>
             );
           })}

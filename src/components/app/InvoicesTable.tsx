@@ -8,6 +8,7 @@ import { ContextMenu, type MenuItem } from "@/components/app/ContextMenu";
 import { formatCurrency, groupByMonth } from "@/lib/constants";
 import { downloadDocsAsZip, todayStamp } from "@/lib/downloadDocs";
 import { UiIcon } from "@/components/app/NavIcons";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 export type InvoiceRow = {
   id: string; number: string; clientName: string; issueDate: string; dueDate: string | null;
@@ -15,6 +16,7 @@ export type InvoiceRow = {
 };
 
 export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
+  const { t, locale } = useI18n();
   const router = useRouter();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [downloading, setDownloading] = useState(false);
@@ -27,13 +29,13 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
   }
   function menuItems(doc: InvoiceRow): MenuItem[] {
     return [
-      { label: "Отвори", icon: <UiIcon.doc width={15} height={15} />, onClick: () => router.push(`/dashboard/documents/${doc.id}`) },
-      { label: "Редактирай", icon: <UiIcon.edit width={15} height={15} />, onClick: () => router.push(`/dashboard/documents/${doc.id}/edit`) },
-      { label: "Изтегли PDF", icon: "↓", onClick: () => downloadOne(doc) },
-      { label: "Копирай номер", icon: "⧉", onClick: () => navigator.clipboard?.writeText(doc.number) },
+      { label: t("documents.table.menu.open"), icon: <UiIcon.doc width={15} height={15} />, onClick: () => router.push(`/dashboard/documents/${doc.id}`) },
+      { label: t("documents.table.menu.edit"), icon: <UiIcon.edit width={15} height={15} />, onClick: () => router.push(`/dashboard/documents/${doc.id}/edit`) },
+      { label: t("documents.table.menu.downloadPdf"), icon: "↓", onClick: () => downloadOne(doc) },
+      { label: t("documents.table.menu.copyNumber"), icon: "⧉", onClick: () => navigator.clipboard?.writeText(doc.number) },
       { divider: true, label: "", onClick: () => {} },
-      { label: "Маркирай като платена", icon: <UiIcon.check width={15} height={15} />, onClick: () => setStatus(doc.id, "paid") },
-      { label: "Маркирай като просрочена", icon: <UiIcon.warning width={15} height={15} />, onClick: () => setStatus(doc.id, "overdue") },
+      { label: t("documents.table.menu.markPaid"), icon: <UiIcon.check width={15} height={15} />, onClick: () => setStatus(doc.id, "paid") },
+      { label: t("documents.table.menu.markOverdue"), icon: <UiIcon.warning width={15} height={15} />, onClick: () => setStatus(doc.id, "overdue") },
     ];
   }
 
@@ -64,7 +66,7 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
   async function downloadOne(row: InvoiceRow) {
     setBusyId(row.id);
     try { await downloadDocsAsZip([row.id], row.number); } // 1 документ → директно PDF
-    catch { alert("Неуспешно изтегляне на PDF."); }
+    catch { alert(t("documents.table.errPdf")); }
     finally { setBusyId(null); }
   }
 
@@ -74,8 +76,8 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
     try {
       // Всеки документ — самостоятелен файл; при няколко избрани → ZIP архив.
       const ids = invoices.filter((i) => selected.has(i.id)).map((i) => i.id);
-      await downloadDocsAsZip(ids, `Документи-${todayStamp()}`);
-    } catch { alert("Неуспешно изтегляне."); }
+      await downloadDocsAsZip(ids, `${t("documents.table.zipName")}-${todayStamp()}`);
+    } catch { alert(t("documents.table.errDownload")); }
     finally { setDownloading(false); }
   }
 
@@ -85,12 +87,12 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
         <div style={{ display: "flex", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
           {overdueCount > 0 && (
             <div style={{ flex: 1, minWidth: 240, background: "var(--brick-soft)", border: "1px solid var(--brick)", color: "var(--brick)", borderRadius: 10, padding: "10px 14px", fontSize: 13, fontWeight: 600 }}>
-              <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "currentColor", marginRight: 7 }} />{overdueCount} просрочени фактури — потърсете плащане от клиентите.
+              <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "currentColor", marginRight: 7 }} />{t("documents.table.overdueAlert", { n: overdueCount })}
             </div>
           )}
           {soonCount > 0 && (
             <div style={{ flex: 1, minWidth: 240, background: "var(--brass-soft)", border: "1px solid var(--brass)", color: "var(--brass)", borderRadius: 10, padding: "10px 14px", fontSize: 13, fontWeight: 600 }}>
-              <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "currentColor", marginRight: 7 }} />{soonCount} фактури с наближаващ падеж (до 5 дни).
+              <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "currentColor", marginRight: 7 }} />{t("documents.table.soonAlert", { n: soonCount })}
             </div>
           )}
         </div>
@@ -98,11 +100,11 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
 
       {selected.size > 0 && (
         <div className="glass" style={{ position: "sticky", top: 8, zIndex: 30, padding: "10px 16px", borderRadius: 10, marginBottom: 12, display: "flex", alignItems: "center", gap: 14 }}>
-          <span style={{ fontSize: 13, fontWeight: 600 }}>Избрани: {selected.size}</span>
+          <span style={{ fontSize: 13, fontWeight: 600 }}>{t("documents.table.selected", { n: selected.size })}</span>
           <button className="btn btn-primary btn-sm" onClick={downloadSelected} disabled={downloading}>
-            {downloading ? "Генериране…" : `↓ Изтегли избраните (${selected.size})`}
+            {downloading ? t("documents.table.generating") : t("documents.table.downloadSelected", { n: selected.size })}
           </button>
-          <button className="btn btn-ghost btn-sm" onClick={() => setSelected(new Set())}>Изчисти избора</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => setSelected(new Set())}>{t("documents.table.clearSelection")}</button>
         </div>
       )}
 
@@ -113,8 +115,8 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
             <table>
               <thead>
                 <tr>
-                  <th style={{ width: 28 }}><input type="checkbox" checked={allSelected} onChange={toggleAll} style={{ width: "auto" }} title="Избери всички" /></th>
-                  <th>№</th><th>Клиент</th><th>Дата</th><th>Падеж</th><th className="num">Сума</th><th>Статус</th><th></th>
+                  <th style={{ width: 28 }}><input type="checkbox" checked={allSelected} onChange={toggleAll} style={{ width: "auto" }} title={t("documents.table.selectAll")} /></th>
+                  <th>№</th><th>{t("documents.page.th.client")}</th><th>{t("documents.page.th.date")}</th><th>{t("documents.page.th.due")}</th><th className="num">{t("documents.page.th.amount")}</th><th>{t("documents.page.th.status")}</th><th></th>
                 </tr>
               </thead>
               <tbody>
@@ -130,22 +132,22 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
                     <td><input type="checkbox" checked={selected.has(doc.id)} onChange={() => toggle(doc.id)} style={{ width: "auto" }} /></td>
                     <td className="num" style={{ fontSize: 12.5, fontWeight: 600 }}>{doc.number}</td>
                     <td style={{ fontWeight: 600 }}>{doc.clientName}</td>
-                    <td style={{ fontSize: 13, color: "var(--ink-soft)" }}>{new Date(doc.issueDate).toLocaleDateString("bg-BG")}</td>
+                    <td style={{ fontSize: 13, color: "var(--ink-soft)" }}>{new Date(doc.issueDate).toLocaleDateString(locale)}</td>
                     <td style={{ fontSize: 13, color: "var(--ink-soft)" }}>
-                      {doc.dueDate ? new Date(doc.dueDate).toLocaleDateString("bg-BG") : "—"}
+                      {doc.dueDate ? new Date(doc.dueDate).toLocaleDateString(locale) : "—"}
                       {rem && (
                         <div style={{ fontSize: 11, fontWeight: 700, marginTop: 2, color: rem.kind === "overdue" ? "var(--brick)" : "var(--brass)", display: "flex", alignItems: "center", gap: 5 }}>
                           <span style={{ display: "inline-block", width: 7, height: 7, borderRadius: "50%", background: "currentColor" }} />
-                          {rem.kind === "overdue" ? `просрочена с ${rem.days} дни` : `до падеж: ${rem.days} дни`}
+                          {rem.kind === "overdue" ? t("documents.table.overdueBy", { n: rem.days }) : t("documents.table.dueIn", { n: rem.days })}
                         </div>
                       )}
                     </td>
                     <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(doc.total, doc.currency)}</td>
                     <td><StatusSelect id={doc.id} status={doc.status} /></td>
                     <td style={{ display: "flex", gap: 6 }}>
-                      <Link href={`/dashboard/documents/${doc.id}`} className="btn btn-ghost btn-sm">Отвори</Link>
-                      <Link href={`/dashboard/documents/${doc.id}/edit`} className="btn btn-ghost btn-sm" title="Редактирай" style={{ display: "inline-flex", alignItems: "center" }}><UiIcon.edit /></Link>
-                      <button className="btn btn-ghost btn-sm" onClick={() => downloadOne(doc)} disabled={busyId === doc.id} title="Изтегли PDF">
+                      <Link href={`/dashboard/documents/${doc.id}`} className="btn btn-ghost btn-sm">{t("documents.table.open")}</Link>
+                      <Link href={`/dashboard/documents/${doc.id}/edit`} className="btn btn-ghost btn-sm" title={t("documents.table.edit")} style={{ display: "inline-flex", alignItems: "center" }}><UiIcon.edit /></Link>
+                      <button className="btn btn-ghost btn-sm" onClick={() => downloadOne(doc)} disabled={busyId === doc.id} title={t("documents.table.downloadPdf")}>
                         {busyId === doc.id ? "…" : "↓ PDF"}
                       </button>
                     </td>
