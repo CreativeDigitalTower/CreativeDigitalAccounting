@@ -1,0 +1,87 @@
+{
+  "title": "Duran Varlıklar",
+  "count": "{n} varlık",
+  "bookValueLabel": "Defter değeri:",
+  "newAsset": "+ Yeni varlık",
+  "empty": "Kayıtlı varlık yok",
+  "add": "Varlık ekle",
+  "details": "Ayrıntılar",
+  "warrantyExpired": "Süresi dolmuş ",
+  "errSave": "Kaydetme hatası.",
+  "errDelete": "Silme hatası.",
+  "th": {
+    "name": "Ad",
+    "category": "Kategori",
+    "acquired": "Edinim tarihi",
+    "value": "Edinim değeri",
+    "depreciation": "Yıllık amortisman",
+    "bookValue": "Defter değeri",
+    "warranty": "Garanti"
+  },
+  "categories": {
+    "machines": "Makine ve ekipman",
+    "computers": "Bilgisayar ve teknoloji",
+    "vehicles": "Araçlar",
+    "furniture": "Mobilya",
+    "buildings": "Binalar",
+    "intangible": "Maddi olmayan varlıklar",
+    "other": "Diğer"
+  },
+  "status": {
+    "in_use": "Kullanımda",
+    "maintenance": "Serviste",
+    "sold": "Satıldı",
+    "scrapped": "Hurdaya ayrıldı",
+    "written_off": "Kayıttan düşüldü"
+  },
+  "new": {
+    "back": "← Varlıklar",
+    "heading": "Yeni varlık",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "saving": "Kaydediliyor…",
+    "f": {
+      "name": "Ad *",
+      "namePh": "Dell dizüstü / Araç…",
+      "category": "Kategori *",
+      "categorySelect": "Seçin",
+      "acquired": "Edinim tarihi *",
+      "value": "Değer (EUR) *",
+      "depreciation": "Yıllık amortisman (EUR)",
+      "warranty": "Garanti bitişi",
+      "insurance": "Sigorta bitişi"
+    }
+  },
+  "detail": {
+    "back": "← Varlıklar",
+    "statusLabel": "Durum:",
+    "edit": "Düzenle",
+    "close": "Kapat",
+    "delTitle": "Varlığı sil",
+    "confirmDelete": "„{name}“ varlığı",
+    "f": {
+      "name": "Ad",
+      "category": "Kategori",
+      "acquired": "Edinildi",
+      "value": "Değer (€)",
+      "depreciation": "Yıllık amortisman (€)",
+      "bookValue": "Defter değeri (€)",
+      "warranty": "Garanti bitişi",
+      "insurance": "Sigorta bitişi",
+      "notes": "Notlar"
+    },
+    "kpi": {
+      "category": "Kategori",
+      "acquired": "Edinildi",
+      "value": "Değer",
+      "depreciation": "Yıllık amortisman",
+      "bookValue": "Defter değeri",
+      "warranty": "Garanti bitişi",
+      "insurance": "Sigorta bitişi"
+    },
+    "serviceLog": {
+      "title": "Servis kaydı ({n})",
+      "empty": "Kayıt yok."
+    }
+  }
+}

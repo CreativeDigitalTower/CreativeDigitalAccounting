@@ -1,0 +1,87 @@
+{
+  "title": "Imobilizări",
+  "count": "{n} active",
+  "bookValueLabel": "Valoare contabilă:",
+  "newAsset": "+ Activ nou",
+  "empty": "Niciun activ înregistrat",
+  "add": "Adaugă activ",
+  "details": "Detalii",
+  "warrantyExpired": "Expirată ",
+  "errSave": "Eroare la salvare.",
+  "errDelete": "Eroare la ștergere.",
+  "th": {
+    "name": "Denumire",
+    "category": "Categorie",
+    "acquired": "Achiziționat la",
+    "value": "Valoare achiziție",
+    "depreciation": "Amortizare anuală",
+    "bookValue": "Valoare contabilă",
+    "warranty": "Garanție"
+  },
+  "categories": {
+    "machines": "Mașini și echipamente",
+    "computers": "Calculatoare și tehnică",
+    "vehicles": "Vehicule",
+    "furniture": "Mobilier",
+    "buildings": "Clădiri",
+    "intangible": "Active necorporale",
+    "other": "Altele"
+  },
+  "status": {
+    "in_use": "În uz",
+    "maintenance": "În service",
+    "sold": "Vândut",
+    "scrapped": "Casat",
+    "written_off": "Scos din uz"
+  },
+  "new": {
+    "back": "← Active",
+    "heading": "Activ nou",
+    "cancel": "Anulează",
+    "save": "Salvează",
+    "saving": "Se salvează…",
+    "f": {
+      "name": "Denumire *",
+      "namePh": "Laptop Dell / Autovehicul…",
+      "category": "Categorie *",
+      "categorySelect": "Selectați",
+      "acquired": "Achiziționat la *",
+      "value": "Valoare (EUR) *",
+      "depreciation": "Amortizare anuală (EUR)",
+      "warranty": "Garanție până la",
+      "insurance": "Asigurare până la"
+    }
+  },
+  "detail": {
+    "back": "← Active",
+    "statusLabel": "Status:",
+    "edit": "Editează",
+    "close": "Închide",
+    "delTitle": "Șterge activul",
+    "confirmDelete": "activul „{name}“",
+    "f": {
+      "name": "Denumire",
+      "category": "Categorie",
+      "acquired": "Achiziționat",
+      "value": "Valoare (€)",
+      "depreciation": "Amortizare anuală (€)",
+      "bookValue": "Valoare contabilă (€)",
+      "warranty": "Garanție până la",
+      "insurance": "Asigurare până la",
+      "notes": "Note"
+    },
+    "kpi": {
+      "category": "Categorie",
+      "acquired": "Achiziționat",
+      "value": "Valoare",
+      "depreciation": "Amortizare anuală",
+      "bookValue": "Valoare contabilă",
+      "warranty": "Garanție până la",
+      "insurance": "Asigurare până la"
+    },
+    "serviceLog": {
+      "title": "Jurnal service ({n})",
+      "empty": "Nicio înregistrare."
+    }
+  }
+}

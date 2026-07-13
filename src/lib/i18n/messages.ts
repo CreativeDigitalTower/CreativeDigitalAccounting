@@ -18,6 +18,7 @@ import bgProjects from "@/locales/bg/projects.json";
 import bgWarehouse from "@/locales/bg/warehouse.json";
 import bgEmployees from "@/locales/bg/employees.json";
 import bgDocuments from "@/locales/bg/documents.json";
+import bgAssets from "@/locales/bg/assets.json";
 import enCommon from "@/locales/en/common.json";
 import enNav from "@/locales/en/navigation.json";
 import enAuth from "@/locales/en/auth.json";
@@ -33,6 +34,7 @@ import enProjects from "@/locales/en/projects.json";
 import enWarehouse from "@/locales/en/warehouse.json";
 import enEmployees from "@/locales/en/employees.json";
 import enDocuments from "@/locales/en/documents.json";
+import enAssets from "@/locales/en/assets.json";
 import ruCommon from "@/locales/ru/common.json";
 import ruNav from "@/locales/ru/navigation.json";
 import ruAuth from "@/locales/ru/auth.json";
@@ -48,6 +50,7 @@ import ruProjects from "@/locales/ru/projects.json";
 import ruWarehouse from "@/locales/ru/warehouse.json";
 import ruEmployees from "@/locales/ru/employees.json";
 import ruDocuments from "@/locales/ru/documents.json";
+import ruAssets from "@/locales/ru/assets.json";
 import roCommon from "@/locales/ro/common.json";
 import roNav from "@/locales/ro/navigation.json";
 import roAuth from "@/locales/ro/auth.json";
@@ -63,6 +66,7 @@ import roProjects from "@/locales/ro/projects.json";
 import roWarehouse from "@/locales/ro/warehouse.json";
 import roEmployees from "@/locales/ro/employees.json";
 import roDocuments from "@/locales/ro/documents.json";
+import roAssets from "@/locales/ro/assets.json";
 import trCommon from "@/locales/tr/common.json";
 import trNav from "@/locales/tr/navigation.json";
 import trAuth from "@/locales/tr/auth.json";
@@ -78,6 +82,7 @@ import trProjects from "@/locales/tr/projects.json";
 import trWarehouse from "@/locales/tr/warehouse.json";
 import trEmployees from "@/locales/tr/employees.json";
 import trDocuments from "@/locales/tr/documents.json";
+import trAssets from "@/locales/tr/assets.json";
 import elCommon from "@/locales/el/common.json";
 import elNav from "@/locales/el/navigation.json";
 import elAuth from "@/locales/el/auth.json";
@@ -93,17 +98,18 @@ import elProjects from "@/locales/el/projects.json";
 import elWarehouse from "@/locales/el/warehouse.json";
 import elEmployees from "@/locales/el/employees.json";
 import elDocuments from "@/locales/el/documents.json";
+import elAssets from "@/locales/el/assets.json";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Messages = Record<string, any>;
 
 const DICTS: Record<Locale, Messages> = {
-  bg: { common: bgCommon, navigation: bgNav, auth: bgAuth, bi: bgBi, pdf: bgPdf, emails: bgEmails, notifications: bgNotif, clients: bgClients, suppliers: bgSuppliers, expenses: bgExpenses, contracts: bgContracts, projects: bgProjects, warehouse: bgWarehouse, employees: bgEmployees, documents: bgDocuments },
-  en: { common: enCommon, navigation: enNav, auth: enAuth, bi: enBi, pdf: enPdf, emails: enEmails, notifications: enNotif, clients: enClients, suppliers: enSuppliers, expenses: enExpenses, contracts: enContracts, projects: enProjects, warehouse: enWarehouse, employees: enEmployees, documents: enDocuments },
-  ru: { common: ruCommon, navigation: ruNav, auth: ruAuth, bi: ruBi, pdf: ruPdf, emails: ruEmails, notifications: ruNotif, clients: ruClients, suppliers: ruSuppliers, expenses: ruExpenses, contracts: ruContracts, projects: ruProjects, warehouse: ruWarehouse, employees: ruEmployees, documents: ruDocuments },
-  ro: { common: roCommon, navigation: roNav, auth: roAuth, bi: roBi, pdf: roPdf, emails: roEmails, notifications: roNotif, clients: roClients, suppliers: roSuppliers, expenses: roExpenses, contracts: roContracts, projects: roProjects, warehouse: roWarehouse, employees: roEmployees, documents: roDocuments },
-  tr: { common: trCommon, navigation: trNav, auth: trAuth, bi: trBi, pdf: trPdf, emails: trEmails, notifications: trNotif, clients: trClients, suppliers: trSuppliers, expenses: trExpenses, contracts: trContracts, projects: trProjects, warehouse: trWarehouse, employees: trEmployees, documents: trDocuments },
-  el: { common: elCommon, navigation: elNav, auth: elAuth, bi: elBi, pdf: elPdf, emails: elEmails, notifications: elNotif, clients: elClients, suppliers: elSuppliers, expenses: elExpenses, contracts: elContracts, projects: elProjects, warehouse: elWarehouse, employees: elEmployees, documents: elDocuments },
+  bg: { common: bgCommon, navigation: bgNav, auth: bgAuth, bi: bgBi, pdf: bgPdf, emails: bgEmails, notifications: bgNotif, clients: bgClients, suppliers: bgSuppliers, expenses: bgExpenses, contracts: bgContracts, projects: bgProjects, warehouse: bgWarehouse, employees: bgEmployees, documents: bgDocuments, assets: bgAssets },
+  en: { common: enCommon, navigation: enNav, auth: enAuth, bi: enBi, pdf: enPdf, emails: enEmails, notifications: enNotif, clients: enClients, suppliers: enSuppliers, expenses: enExpenses, contracts: enContracts, projects: enProjects, warehouse: enWarehouse, employees: enEmployees, documents: enDocuments, assets: enAssets },
+  ru: { common: ruCommon, navigation: ruNav, auth: ruAuth, bi: ruBi, pdf: ruPdf, emails: ruEmails, notifications: ruNotif, clients: ruClients, suppliers: ruSuppliers, expenses: ruExpenses, contracts: ruContracts, projects: ruProjects, warehouse: ruWarehouse, employees: ruEmployees, documents: ruDocuments, assets: ruAssets },
+  ro: { common: roCommon, navigation: roNav, auth: roAuth, bi: roBi, pdf: roPdf, emails: roEmails, notifications: roNotif, clients: roClients, suppliers: roSuppliers, expenses: roExpenses, contracts: roContracts, projects: roProjects, warehouse: roWarehouse, employees: roEmployees, documents: roDocuments, assets: roAssets },
+  tr: { common: trCommon, navigation: trNav, auth: trAuth, bi: trBi, pdf: trPdf, emails: trEmails, notifications: trNotif, clients: trClients, suppliers: trSuppliers, expenses: trExpenses, contracts: trContracts, projects: trProjects, warehouse: trWarehouse, employees: trEmployees, documents: trDocuments, assets: trAssets },
+  el: { common: elCommon, navigation: elNav, auth: elAuth, bi: elBi, pdf: elPdf, emails: elEmails, notifications: elNotif, clients: elClients, suppliers: elSuppliers, expenses: elExpenses, contracts: elContracts, projects: elProjects, warehouse: elWarehouse, employees: elEmployees, documents: elDocuments, assets: elAssets },
 };
 
 // Дълбоко сливане: липсващ ключ пада обратно към българския (никога raw key на екрана).
