@@ -1,0 +1,255 @@
+{
+  "cash": {
+    "title": "Casă",
+    "subtitle": "{n} case · urmăriți sumele disponibile",
+    "totalTitle": "Sold total (toate casele)",
+    "newTitle": "Casă nouă",
+    "nameLabel": "Numele casei",
+    "namePh": "ex. Casa 1 / Casa de numerar",
+    "currency": "Monedă",
+    "create": "+ Creează casă",
+    "loading": "Se încarcă…",
+    "rename": "Redenumește",
+    "delete": "Șterge",
+    "save": "Salvează",
+    "edit": "Editează",
+    "confirmDelete": "Ștergeți casa „{name}“?"
+  },
+  "audit": {
+    "title": "Jurnal de audit",
+    "subtitle": "Cine, când și ce a modificat — ultimele {n} evenimente",
+    "empty": "Încă nicio acțiune înregistrată",
+    "system": "Sistem",
+    "th": {
+      "datetime": "Dată și oră",
+      "user": "Utilizator",
+      "action": "Acțiune",
+      "entity": "Obiect",
+      "details": "Detalii"
+    },
+    "action": {
+      "create": "Creare",
+      "update": "Editare",
+      "delete": "Ștergere",
+      "status_change": "Schimbare status",
+      "login": "Autentificare",
+      "impersonate": "Acces tehnic"
+    },
+    "entity": {
+      "Document": "Document",
+      "Client": "Client",
+      "Expense": "Cheltuială",
+      "Company": "Firmă",
+      "CashRegister": "Casă",
+      "Subscription": "Abonament"
+    }
+  },
+  "bank": {
+    "title": "Documente",
+    "subtitle": "Extrase bancare",
+    "tabs": {
+      "all": "Toate",
+      "invoice": "Facturi de venit",
+      "expense": "Facturi de cheltuieli",
+      "bank": "Extrase bancare"
+    },
+    "errType": "Sunt acceptate doar fișiere PDF, Excel (.xls/.xlsx) și CSV.",
+    "errSize": "Fișierul trebuie să fie sub 8MB.",
+    "errUpload": "Eroare la încărcare.",
+    "uploadTitle": "Încarcă extras (PDF / Excel / CSV)",
+    "name": "Denumire",
+    "namePh": "Extras bancar iunie 2026",
+    "from": "Perioadă de la",
+    "to": "Perioadă până la",
+    "file": "Fișier",
+    "uploading": "Se încarcă…",
+    "upload": "Încarcă",
+    "ready": "✓ Gata de încărcare:",
+    "loading": "Se încarcă…",
+    "empty": "Niciun extras bancar încărcat",
+    "th": {
+      "name": "Denumire",
+      "type": "Tip",
+      "period": "Perioadă",
+      "uploadedAt": "Încărcat la"
+    },
+    "download": "↓ Descarcă",
+    "delete": "Șterge",
+    "confirmDelete": "Ștergeți extrasul?"
+  },
+  "archive": {
+    "title": "Arhivă de documente",
+    "subtitle": "Păstrați documente scanate, contracte și fișiere într-un singur loc",
+    "tabs": {
+      "archive": "Fișiere arhivate",
+      "issued": "Documente emise ({n})",
+      "protocols": "Protocoale (NIR)"
+    },
+    "categories": {
+      "contracts": "Contracte",
+      "invoices": "Facturi",
+      "accounting": "Contabile",
+      "hr": "Resurse umane",
+      "bank": "Bancare",
+      "legal": "Juridice",
+      "other": "Altele"
+    },
+    "uploadTitle": "Încărcare document",
+    "category": "Categorie",
+    "uploading": "Se încarcă…",
+    "hint": "Sunt acceptate orice fișiere până la 5 MB (PDF, imagini, documente).",
+    "loading": "Se încarcă…",
+    "empty": "Niciun fișier încărcat",
+    "th": {
+      "file": "Fișier",
+      "category": "Categorie",
+      "size": "Dimensiune",
+      "uploadedAt": "Încărcat la"
+    },
+    "download": "↓ Descarcă",
+    "delete": "Șterge",
+    "fileTooLarge": "Fișierul este prea mare (max. 5 MB).",
+    "errUpload": "Eroare la încărcare.",
+    "confirmDelete": "Ștergeți fișierul?"
+  },
+  "taxCalendar": {
+    "title": "Calendar fiscal și de asigurări",
+    "subtitle": "Termene TVA, impozit pe profit, impozit pe venit, asigurări sociale și memento-uri proprii",
+    "upcomingTitle": "Termene legale viitoare",
+    "th": {
+      "date": "Termen",
+      "obligation": "Obligație",
+      "law": "Lege"
+    },
+    "today": "astăzi",
+    "inDays": "în {n} zile",
+    "note": "Termenele sunt orientative; dacă cad într-o zi nelucrătoare se mută în ziua lucrătoare următoare. Verificați publicațiile oficiale ale administrației fiscale."
+  },
+  "reminder": {
+    "title": "Memento-urile și sarcinile mele",
+    "subtitle": "Termene și sarcini importante (situații financiare anuale, impozit pe profit etc.). Culoarea se schimbă pe măsură ce se apropie termenul.",
+    "taskLabel": "Sarcină",
+    "taskPh": "Ex. Depunerea situațiilor financiare anuale",
+    "due": "Termen",
+    "priorityLabel": "Prioritate",
+    "add": "+ Adaugă",
+    "empty": "Niciun memento propriu.",
+    "progress": "Progres: {n}%",
+    "notePh": "Notă (opțional)",
+    "cancel": "Anulează",
+    "save": "Salvează",
+    "priorityTitle": "Prioritate: {p}",
+    "edit": "Editează",
+    "delete": "Șterge",
+    "confirmDelete": "acest memento",
+    "priority": {
+      "high": "Ridicată",
+      "normal": "Normală",
+      "low": "Scăzută"
+    },
+    "status": {
+      "done": "finalizat",
+      "overdue": "restant cu {n} zile",
+      "today": "astăzi",
+      "inDays": "în {n} zile"
+    }
+  },
+  "saft": {
+    "title": "SAF-T",
+    "subtitle": "Fișier standard de audit fiscal (Standard Audit File for Tax) — generare pentru depunere la administrația fiscală.",
+    "readyYes": "✓ Datele firmei sunt gata pentru SAF-T",
+    "readyNo": "Lipsesc date obligatorii ale firmei",
+    "missing": "Lipsește: {fields}",
+    "companyProfile": "Profilul firmei",
+    "missingCompany": "datele firmei",
+    "contentTitle": "Ce conține fișierul generat",
+    "content": [
+      "Header — datele firmei, perioada și software-ul",
+      "Plan de conturi (GeneralLedgerAccounts)",
+      "Clienți și Furnizori (parteneri)",
+      "Tabel de taxe (TVA 20/9/0%)",
+      "Produse și articole de stoc",
+      "Imobilizări (anual/la cerere)",
+      "Registru general (GeneralLedgerEntries)",
+      "Vânzări (SalesInvoices) din facturi",
+      "Achiziții (PurchaseInvoices) din cheltuieli"
+    ],
+    "obligations": [
+      {
+        "title": "Ce este SAF-T",
+        "text": "SAF-T (Standard Audit File for Tax) este un fișier XML standardizat cu o structură definită de administrația fiscală, care conține date contabile, documente, parteneri, taxe și active. Oferă administrației fiscale o imagine completă și uniformă pentru audit."
+      },
+      {
+        "title": "Cine este obligat",
+        "text": "Obligația se introduce în etape — mai întâi pentru marile întreprinderi, apoi pentru cele mijlocii și mici, iar în final pentru microîntreprinderi. Verificați cărei grupe îi aparține firma dvs. și de la ce dată apare obligația."
+      },
+      {
+        "title": "Periodicitate",
+        "text": "Lunar — date contabile și date privind achizițiile/vânzările; anual — date privind imobilizările; la cerere — stocuri. Modulul generează toate cele trei tipuri."
+      },
+      {
+        "title": "Termene",
+        "text": "Fișierele lunare se depun până la termenul legal după încheierea lunii respective. Fișierul anual — împreună cu închiderea anuală. Urmăriți termenele oficiale ale administrației fiscale."
+      }
+    ],
+    "disclaimer": "Fișierul este generat conform structurii SAF-T pentru Bulgaria (OECD SAF-T 2.0 / administrația fiscală). Înainte de depunere, verificați conformitatea cu schema XSD oficială actuală pentru perioada dvs. de raportare.",
+    "panel": {
+      "title": "Generare fișier SAF-T",
+      "subtitle": "Alegeți tipul și perioada. Fișierul se descarcă în format XML, gata de depunere la administrația fiscală.",
+      "year": "An",
+      "month": "Lună",
+      "generate": "↓ Generează și descarcă SAF-T",
+      "generating": "Se generează…",
+      "errGen": "Eroare la generare.",
+      "errNet": "Fără conexiune la server.",
+      "notReady": "Completați datele lipsă ale firmei de mai sus pentru a genera un fișier SAF-T valid.",
+      "types": {
+        "monthly": {
+          "label": "Lunar",
+          "desc": "Date contabile și documente pentru o lună selectată"
+        },
+        "annual": {
+          "label": "Anual",
+          "desc": "Date anuale, inclusiv imobilizări"
+        },
+        "on_demand": {
+          "label": "La cerere",
+          "desc": "Stocuri și active — instantaneu la moment"
+        }
+      }
+    }
+  },
+  "training": {
+    "title": "Instruire",
+    "subtitle": "Tutoriale video pentru utilizarea platformei",
+    "soon": "ÎN CURÂND",
+    "heroTitle": "Centrul de instruire este în dezvoltare",
+    "heroText": "Pregătim o serie de tutoriale video în care arătăm pas cu pas cum se lucrează cu fiecare parte a platformei. În curând veți putea urmări instruirile direct aici.",
+    "topics": [
+      {
+        "title": "Cum se generează o factură",
+        "desc": "Pas cu pas — de la client la trimitere și plată."
+      },
+      {
+        "title": "Crearea documentelor de afaceri",
+        "desc": "Oferte, contracte, protocoale și peste 100 de șabloane."
+      },
+      {
+        "title": "Lucrul cu CRM",
+        "desc": "Profil client, pipeline, sarcini și cronologie."
+      },
+      {
+        "title": "Depozit și producție",
+        "desc": "Loturi, rețete, eliberare automată."
+      },
+      {
+        "title": "Abonamente și plăți",
+        "desc": "Cum să alegeți și să gestionați planul dvs."
+      },
+      {
+        "title": "Întrebări și răspunsuri",
+        "desc": "Întrebări frecvente și sfaturi de la echipă."
+      }
+    ]
+  }
+}
