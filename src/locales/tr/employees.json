@@ -1,0 +1,188 @@
+{
+  "title": "Çalışanlar",
+  "count": "{n} çalışan",
+  "addBtn": "+ Yeni çalışan",
+  "errSave": "Kaydetme hatası.",
+  "loading": "Yükleniyor…",
+  "confirmDeleteEmployee": "Çalışan silinsin mi?",
+  "contract": {
+    "permanent": "Belirsiz süreli iş",
+    "fixed_term": "Belirli süreli iş",
+    "civil": "Hizmet sözleşmesi"
+  },
+  "leave": {
+    "leave": "Ücretli izin",
+    "sick": "Hastalık izni",
+    "unpaid": "Ücretsiz izin",
+    "other": "Diğer"
+  },
+  "bonusKind": {
+    "cash": "Nakit",
+    "voucher": "Kupon",
+    "performance": "Performans",
+    "holiday": "Tatil",
+    "other": "Diğer"
+  },
+  "payroll": {
+    "title": "Maaş maliyetleri (toplam)",
+    "rateNote": "3. kategori işçilik oranları: çalışan primi {emp}% + işveren {empr}%, vergi 10%.",
+    "employerCost": "Toplam işveren maliyeti",
+    "gross": "Toplam brüt maaşlar",
+    "insurances": "Toplam primler",
+    "netTotal": "Çalışanlara toplam net"
+  },
+  "form": {
+    "editTitle": "Düzenleme",
+    "newTitle": "Yeni çalışan",
+    "name": "Ad *",
+    "position": "Pozisyon",
+    "phone": "Telefon",
+    "email": "E-posta",
+    "salary": "Maaş (brüt)",
+    "hiredAt": "İşe alım tarihi",
+    "leaveDays": "Yıllık ücretli izin (gün)",
+    "department": "Departman / birim",
+    "contractType": "Sözleşme türü",
+    "paymentMethod": "Ödeme yöntemi",
+    "payBank": "Banka hesabına",
+    "payCash": "Nakit",
+    "iban": "IBAN",
+    "bank": "Banka",
+    "address": "Adres",
+    "notes": "Notlar",
+    "cancel": "İptal",
+    "save": "Kaydet"
+  },
+  "th": {
+    "name": "Ad",
+    "position": "Pozisyon",
+    "phone": "Telefon",
+    "email": "E-posta",
+    "salary": "Maaş"
+  },
+  "empty": "Eklenmiş çalışan yok",
+  "delete": "Sil",
+  "editTitle": "Düzenle",
+  "access": {
+    "header": "Çalışanların modül erişimi",
+    "nothingShared": "hiçbir şey paylaşılmadı",
+    "modulesCount": "{n} modül",
+    "saved": "Kaydedildi ✓",
+    "errShort": "Hata",
+    "intro": "Çalışanların portalında hangi modülleri göreceğini seçin. Erişim <strong>salt okunur</strong> ve <strong>hassas veriler gizli</strong> (finans, müşteri iletişimi) olup veri sızıntısını önler.",
+    "modules": {
+      "clients": {
+        "label": "Müşteriler",
+        "note": "yalnızca isimler — finans ve iletişim yok"
+      },
+      "projects": {
+        "label": "Projeler",
+        "note": "ad, durum, son tarih — tutar yok"
+      },
+      "suppliers": {
+        "label": "Tedarikçiler",
+        "note": "yalnızca isim ve şehir"
+      },
+      "warehouse": {
+        "label": "Depo",
+        "note": "ürünler ve stok — fiyat yok"
+      }
+    }
+  },
+  "detail": {
+    "dept": "Departman:",
+    "contract": "Sözleşme:",
+    "salary": "Maaş:",
+    "payCashShort": "nakit",
+    "payBankShort": "banka hesabına",
+    "iban": "IBAN:",
+    "address": "Adres:",
+    "notes": "Notlar:"
+  },
+  "breakdown": {
+    "title": "Maaş dökümü (aylık)",
+    "gross": "Brüt maaş",
+    "empSSC": "Primler (çalışan)",
+    "tax": "Vergi (%10)",
+    "net": "Net tutar",
+    "emprSSC": "Primler (işveren)",
+    "companyCost": "Toplam şirket maliyeti"
+  },
+  "days": "{n} gün",
+  "leaveStats": {
+    "entitlement": "Hak edilen ücretli izin",
+    "usedPaid": "Kullanılan ücretli",
+    "remaining": "Kalan ücretli",
+    "unpaidSick": "Ücretsiz / Hastalık"
+  },
+  "leaveForm": {
+    "type": "Tür",
+    "from": "Başlangıç",
+    "to": "Bitiş",
+    "note": "Not",
+    "docOptional": "Belge (isteğe bağlı)",
+    "attach": "Ekle…",
+    "add": "+ Ekle",
+    "fileTooLarge": "Dosya çok büyük (maks. 5 MB)."
+  },
+  "leaves": {
+    "sectionTitle": "İzin / hastalık",
+    "pendingTitle": "Onay bekleyen istekler ({n})",
+    "approve": "Onayla",
+    "reject": "Reddet",
+    "none": "Kayıtlı izin/hastalık yok.",
+    "pendingTag": "· onay bekliyor",
+    "rejectedTag": "· reddedildi",
+    "replace": "Değiştir",
+    "addDoc": "+ Belge",
+    "replaceTitle": "Belgeyi değiştir",
+    "attachTitle": "Belge ekle",
+    "delDoc": "belgeyi sil",
+    "confirmDelDoc": "ekli belge",
+    "confirmDelLeave": "bu izin/hastalık kaydı"
+  },
+  "portal": {
+    "title": "Çalışan portalı",
+    "activeAccess": "✓ Aktif erişim ({email})",
+    "revoke": "Erişimi kaldır",
+    "emailPh": "çalışan e-postası",
+    "invite": "Portala davet et",
+    "needEmail": "Bir e-posta belirtin.",
+    "invited": "Davet gönderildi. Çalışan aynı e-posta ile kaydolur.",
+    "err": "Hata.",
+    "revoked": "Erişim kaldırıldı.",
+    "confirmRevoke": "bu çalışan için portal erişimi",
+    "hint": "Çalışan yalnızca kendi verilerini görür — maaş, primler, izinler ve gönderilen belgeler."
+  },
+  "bonuses": {
+    "title": "Primler",
+    "totalPrefix": "· toplam {v}",
+    "month": "Ay",
+    "year": "Yıl",
+    "amount": "Tutar (€)",
+    "kind": "Tür",
+    "note": "Not",
+    "add": "+ Ekle",
+    "none": "Girilmiş prim yok.",
+    "confirmDelete": "bu prim"
+  },
+  "files": {
+    "title": "Belge arşivi",
+    "docType": "Belge türü",
+    "uploading": "Yükleniyor…",
+    "attachFile": "+ Dosya ekle",
+    "maxSize": "maks. 5 MB",
+    "none": "Ekli belge yok.",
+    "uploadErr": "Yükleme hatası.",
+    "confirmDelete": "Belge silinsin mi?",
+    "types": {
+      "contract": "İş sözleşmesi",
+      "annex": "Ek protokol",
+      "leaveRequest": "İzin dilekçesi",
+      "resignation": "İstifa dilekçesi",
+      "sickNote": "Sağlık raporu",
+      "jobDescription": "Görev tanımı",
+      "other": "Diğer"
+    }
+  }
+}

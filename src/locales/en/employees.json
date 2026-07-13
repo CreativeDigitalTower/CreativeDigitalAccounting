@@ -1,0 +1,188 @@
+{
+  "title": "Employees",
+  "count": "{n} employees",
+  "addBtn": "+ New employee",
+  "errSave": "Error while saving.",
+  "loading": "Loading…",
+  "confirmDeleteEmployee": "Delete the employee?",
+  "contract": {
+    "permanent": "Permanent employment",
+    "fixed_term": "Fixed-term employment",
+    "civil": "Civil contract"
+  },
+  "leave": {
+    "leave": "Paid leave",
+    "sick": "Sick leave",
+    "unpaid": "Unpaid leave",
+    "other": "Other"
+  },
+  "bonusKind": {
+    "cash": "Cash",
+    "voucher": "Voucher",
+    "performance": "Performance",
+    "holiday": "Holiday",
+    "other": "Other"
+  },
+  "payroll": {
+    "title": "Payroll costs (total)",
+    "rateNote": "Category-3 labour rates: employee contributions {emp}% + employer {empr}%, tax 10%.",
+    "employerCost": "Total employer cost",
+    "gross": "Total gross salaries",
+    "insurances": "Total contributions",
+    "netTotal": "Total net for employees"
+  },
+  "form": {
+    "editTitle": "Edit",
+    "newTitle": "New employee",
+    "name": "Name *",
+    "position": "Position",
+    "phone": "Phone",
+    "email": "Email",
+    "salary": "Salary (gross)",
+    "hiredAt": "Hire date",
+    "leaveDays": "Annual paid leave (days)",
+    "department": "Department / unit",
+    "contractType": "Contract type",
+    "paymentMethod": "Payment method",
+    "payBank": "Bank transfer",
+    "payCash": "Cash",
+    "iban": "IBAN",
+    "bank": "Bank",
+    "address": "Address",
+    "notes": "Notes",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "th": {
+    "name": "Name",
+    "position": "Position",
+    "phone": "Phone",
+    "email": "Email",
+    "salary": "Salary"
+  },
+  "empty": "No employees added",
+  "delete": "Delete",
+  "editTitle": "Edit",
+  "access": {
+    "header": "Employee access to modules",
+    "nothingShared": "nothing shared",
+    "modulesCount": "{n} modules",
+    "saved": "Saved ✓",
+    "errShort": "Error",
+    "intro": "Choose which modules employees can see in their portal. Access is <strong>read-only</strong> and with <strong>sensitive data hidden</strong> (finances, client contacts) to prevent data leaks.",
+    "modules": {
+      "clients": {
+        "label": "Clients",
+        "note": "names only — no finances or contacts"
+      },
+      "projects": {
+        "label": "Projects",
+        "note": "name, status, deadline — no amounts"
+      },
+      "suppliers": {
+        "label": "Suppliers",
+        "note": "names and city only"
+      },
+      "warehouse": {
+        "label": "Warehouse",
+        "note": "items and stock — no prices"
+      }
+    }
+  },
+  "detail": {
+    "dept": "Department:",
+    "contract": "Contract:",
+    "salary": "Salary:",
+    "payCashShort": "cash",
+    "payBankShort": "bank transfer",
+    "iban": "IBAN:",
+    "address": "Address:",
+    "notes": "Notes:"
+  },
+  "breakdown": {
+    "title": "Salary breakdown (monthly)",
+    "gross": "Gross salary",
+    "empSSC": "Contributions (employee)",
+    "tax": "Tax (10%)",
+    "net": "Net amount",
+    "emprSSC": "Contributions (employer)",
+    "companyCost": "Total company cost"
+  },
+  "days": "{n} days",
+  "leaveStats": {
+    "entitlement": "Paid leave entitlement",
+    "usedPaid": "Used paid",
+    "remaining": "Remaining paid",
+    "unpaidSick": "Unpaid / Sick"
+  },
+  "leaveForm": {
+    "type": "Type",
+    "from": "From",
+    "to": "To",
+    "note": "Note",
+    "docOptional": "Document (optional)",
+    "attach": "Attach…",
+    "add": "+ Add",
+    "fileTooLarge": "File is too large (max. 5 MB)."
+  },
+  "leaves": {
+    "sectionTitle": "Leave / sick",
+    "pendingTitle": "Requests to approve ({n})",
+    "approve": "Approve",
+    "reject": "Reject",
+    "none": "No recorded leave/sick.",
+    "pendingTag": "· pending approval",
+    "rejectedTag": "· rejected",
+    "replace": "Replace",
+    "addDoc": "+ Document",
+    "replaceTitle": "Replace document",
+    "attachTitle": "Attach document",
+    "delDoc": "delete doc.",
+    "confirmDelDoc": "the attached document",
+    "confirmDelLeave": "this leave/sick record"
+  },
+  "portal": {
+    "title": "Employee portal",
+    "activeAccess": "✓ Active access ({email})",
+    "revoke": "Revoke access",
+    "emailPh": "employee email",
+    "invite": "Invite to portal",
+    "needEmail": "Please provide an email.",
+    "invited": "The invitation was sent. The employee registers with the same email.",
+    "err": "Error.",
+    "revoked": "Access revoked.",
+    "confirmRevoke": "portal access for this employee",
+    "hint": "The employee sees only their own data — salary, contributions, leave and submitted documents."
+  },
+  "bonuses": {
+    "title": "Bonuses",
+    "totalPrefix": "· total {v}",
+    "month": "Month",
+    "year": "Year",
+    "amount": "Amount (€)",
+    "kind": "Type",
+    "note": "Note",
+    "add": "+ Add",
+    "none": "No bonuses entered.",
+    "confirmDelete": "this bonus"
+  },
+  "files": {
+    "title": "Document archive",
+    "docType": "Document type",
+    "uploading": "Uploading…",
+    "attachFile": "+ Attach file",
+    "maxSize": "max. 5 MB",
+    "none": "No attached documents.",
+    "uploadErr": "Upload error.",
+    "confirmDelete": "Delete the document?",
+    "types": {
+      "contract": "Employment contract",
+      "annex": "Annex",
+      "leaveRequest": "Leave request",
+      "resignation": "Resignation letter",
+      "sickNote": "Sick note",
+      "jobDescription": "Job description",
+      "other": "Other"
+    }
+  }
+}
