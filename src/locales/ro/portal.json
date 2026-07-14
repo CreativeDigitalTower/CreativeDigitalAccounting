@@ -1,0 +1,110 @@
+{
+  "layout": {
+    "employeeOf": "Angajat · {company}",
+    "tabs": {
+      "profile": "Profilul meu",
+      "pm": "Project Management",
+      "clients": "Clienți",
+      "projects": "Proiecte",
+      "suppliers": "Furnizori",
+      "warehouse": "Depozit"
+    }
+  },
+  "me": {
+    "title": "Profilul meu",
+    "roleFallback": "Angajat",
+    "hired": "din {date} ({n} luni)",
+    "salaryTitle": "Salariu și contribuții (lunar)",
+    "gross": "Salariu brut",
+    "empSSC": "Contribuții (ale mele)",
+    "tax": "Impozit (10%)",
+    "net": "Sumă netă",
+    "annualGross": "Brut anual",
+    "annualNet": "Net anual",
+    "totalReceived": "Total primit (aprox.)",
+    "totalInsurances": "Contribuții plătite (aprox.)",
+    "payCash": "în numerar",
+    "payBank": "prin cont bancar",
+    "payNote": "Salariul se plătește {method}{iban}. Sumele „total/aproximativ“ sunt calculate pe baza salariului curent × luni de vechime + bonusuri.",
+    "leaveTitle": "Concedii",
+    "entitlement": "Plătit cuvenit",
+    "used": "Folosit (aprobat)",
+    "remaining": "Rămas",
+    "days": "{n} zile",
+    "errPeriod": "Indicați o perioadă.",
+    "errGeneric": "Eroare.",
+    "errUpload": "Eroare la încărcare.",
+    "errTooLarge": "Fișierul este prea mare (max. 5 MB).",
+    "newLeave": "Cerere nouă de concediu",
+    "type": "Tip",
+    "from": "De la",
+    "to": "Până la",
+    "note": "Notă",
+    "submit": "Trimite cererea",
+    "noLeaves": "Nicio cerere/concediu.",
+    "confirmCancel": "această cerere",
+    "leaveType": {
+      "leave": "Concediu plătit",
+      "sick": "Concediu medical",
+      "unpaid": "Concediu neplătit",
+      "other": "Altele"
+    },
+    "status": {
+      "pending": "În așteptarea aprobării",
+      "approved": "Aprobat",
+      "rejected": "Respins"
+    },
+    "docsTitle": "Documentele mele",
+    "uploading": "Se încarcă…",
+    "uploadBtn": "+ Trimite document",
+    "docsHint": "Documentele trimise sunt vizibile angajatorului pentru verificare.",
+    "noDocs": "Niciun document."
+  },
+  "clients": {
+    "title": "Clienți",
+    "subtitle": "Listă doar pentru vizualizare. Datele financiare și contactele clienților nu sunt vizibile.",
+    "empty": "Niciun client.",
+    "th": {
+      "client": "Client",
+      "city": "Oraș",
+      "status": "Status"
+    }
+  },
+  "suppliers": {
+    "title": "Furnizori",
+    "subtitle": "Listă doar pentru vizualizare.",
+    "empty": "Niciun furnizor.",
+    "th": {
+      "supplier": "Furnizor",
+      "city": "Oraș"
+    }
+  },
+  "projects": {
+    "title": "Proiecte",
+    "subtitle": "Listă doar pentru vizualizare. Valorile și datele financiare nu sunt vizibile.",
+    "empty": "Niciun proiect.",
+    "th": {
+      "project": "Proiect",
+      "client": "Client",
+      "status": "Status",
+      "deadline": "Termen limită"
+    },
+    "status": {
+      "active": "Activ",
+      "on_hold": "În așteptare",
+      "done": "Finalizat",
+      "cancelled": "Anulat"
+    }
+  },
+  "warehouse": {
+    "title": "Depozit",
+    "subtitle": "Stocuri doar pentru vizualizare. Prețurile și valorile nu sunt vizibile.",
+    "empty": "Niciun articol.",
+    "th": {
+      "item": "Articol",
+      "sku": "SKU",
+      "warehouse": "Depozit",
+      "qty": "Stoc"
+    }
+  }
+}

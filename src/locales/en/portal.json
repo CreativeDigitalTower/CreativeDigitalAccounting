@@ -1,0 +1,110 @@
+{
+  "layout": {
+    "employeeOf": "Employee · {company}",
+    "tabs": {
+      "profile": "My profile",
+      "pm": "Project Management",
+      "clients": "Clients",
+      "projects": "Projects",
+      "suppliers": "Suppliers",
+      "warehouse": "Warehouse"
+    }
+  },
+  "me": {
+    "title": "My profile",
+    "roleFallback": "Employee",
+    "hired": "since {date} ({n} mo.)",
+    "salaryTitle": "Salary and contributions (monthly)",
+    "gross": "Gross salary",
+    "empSSC": "Contributions (mine)",
+    "tax": "Tax (10%)",
+    "net": "Net amount",
+    "annualGross": "Annual gross",
+    "annualNet": "Annual net",
+    "totalReceived": "Total received (approx.)",
+    "totalInsurances": "Contributions paid (approx.)",
+    "payCash": "in cash",
+    "payBank": "by bank transfer",
+    "payNote": "Salary is paid {method}{iban}. The „total/approximate“ amounts are calculated based on current salary × months of service + bonuses.",
+    "leaveTitle": "Leave",
+    "entitlement": "Paid entitlement",
+    "used": "Used (approved)",
+    "remaining": "Remaining",
+    "days": "{n} days",
+    "errPeriod": "Specify a period.",
+    "errGeneric": "Error.",
+    "errUpload": "Upload error.",
+    "errTooLarge": "File is too large (max. 5 MB).",
+    "newLeave": "New leave request",
+    "type": "Type",
+    "from": "From",
+    "to": "To",
+    "note": "Note",
+    "submit": "Submit request",
+    "noLeaves": "No requests/leave.",
+    "confirmCancel": "this request",
+    "leaveType": {
+      "leave": "Paid leave",
+      "sick": "Sick leave",
+      "unpaid": "Unpaid leave",
+      "other": "Other"
+    },
+    "status": {
+      "pending": "Awaiting approval",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "docsTitle": "My documents",
+    "uploading": "Uploading…",
+    "uploadBtn": "+ Send document",
+    "docsHint": "Submitted documents are visible to the employer for review.",
+    "noDocs": "No documents."
+  },
+  "clients": {
+    "title": "Clients",
+    "subtitle": "View-only list. Financial data and client contacts are not visible.",
+    "empty": "No clients.",
+    "th": {
+      "client": "Client",
+      "city": "City",
+      "status": "Status"
+    }
+  },
+  "suppliers": {
+    "title": "Suppliers",
+    "subtitle": "View-only list.",
+    "empty": "No suppliers.",
+    "th": {
+      "supplier": "Supplier",
+      "city": "City"
+    }
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "View-only list. Values and financial data are not visible.",
+    "empty": "No projects.",
+    "th": {
+      "project": "Project",
+      "client": "Client",
+      "status": "Status",
+      "deadline": "Deadline"
+    },
+    "status": {
+      "active": "Active",
+      "on_hold": "On hold",
+      "done": "Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "warehouse": {
+    "title": "Warehouse",
+    "subtitle": "View-only stock. Prices and values are not visible.",
+    "empty": "No items.",
+    "th": {
+      "item": "Item",
+      "sku": "SKU",
+      "warehouse": "Warehouse",
+      "qty": "Stock"
+    }
+  }
+}

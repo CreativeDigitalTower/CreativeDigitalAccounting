@@ -2,10 +2,12 @@ import { requireEmployee } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { parseEmployeeAccess } from "@/lib/employeeAccess";
+import { getT } from "@/lib/i18n/server";
 
 export default async function PortalWarehousePage() {
   const { employee, companyId } = await requireEmployee();
   if (!parseEmployeeAccess(employee.company.employeeAccess).warehouse) redirect("/portal");
+  const { t } = await getT();
 
   // МАСКИРАНИ данни: артикул, наличност, мерна единица, склад — БЕЗ цени и стойности.
   const items = await prisma.stockItem.findMany({
@@ -16,11 +18,11 @@ export default async function PortalWarehousePage() {
 
   return (
     <div className="glass panel">
-      <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, fontWeight: 700, margin: "0 0 4px" }}>Склад</h1>
-      <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 14px" }}>Наличности само за преглед. Цените и стойностите не са видими.</p>
-      {items.length === 0 ? <div style={{ fontSize: 13, color: "var(--muted)" }}>Няма артикули.</div> : (
+      <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, fontWeight: 700, margin: "0 0 4px" }}>{t("portal.warehouse.title")}</h1>
+      <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 14px" }}>{t("portal.warehouse.subtitle")}</p>
+      {items.length === 0 ? <div style={{ fontSize: 13, color: "var(--muted)" }}>{t("portal.warehouse.empty")}</div> : (
         <table>
-          <thead><tr><th>Артикул</th><th>SKU</th><th>Склад</th><th className="num">Наличност</th></tr></thead>
+          <thead><tr><th>{t("portal.warehouse.th.item")}</th><th>{t("portal.warehouse.th.sku")}</th><th>{t("portal.warehouse.th.warehouse")}</th><th className="num">{t("portal.warehouse.th.qty")}</th></tr></thead>
           <tbody>
             {items.map((i) => {
               const low = i.minQuantity != null && i.quantity <= i.minQuantity;

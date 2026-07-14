@@ -1,0 +1,110 @@
+{
+  "layout": {
+    "employeeOf": "Çalışan · {company}",
+    "tabs": {
+      "profile": "Profilim",
+      "pm": "Project Management",
+      "clients": "Müşteriler",
+      "projects": "Projeler",
+      "suppliers": "Tedarikçiler",
+      "warehouse": "Depo"
+    }
+  },
+  "me": {
+    "title": "Profilim",
+    "roleFallback": "Çalışan",
+    "hired": "{date} tarihinden ({n} ay)",
+    "salaryTitle": "Maaş ve primler (aylık)",
+    "gross": "Brüt maaş",
+    "empSSC": "Primler (benim)",
+    "tax": "Vergi (%10)",
+    "net": "Net tutar",
+    "annualGross": "Yıllık brüt",
+    "annualNet": "Yıllık net",
+    "totalReceived": "Toplam alınan (yaklaşık)",
+    "totalInsurances": "Ödenen primler (yaklaşık)",
+    "payCash": "nakit",
+    "payBank": "banka hesabına",
+    "payNote": "Maaş {method} ödenir{iban}. „Toplam/yaklaşık“ tutarlar mevcut maaş × hizmet ayı + primler esas alınarak hesaplanır.",
+    "leaveTitle": "İzinler",
+    "entitlement": "Hak edilen ücretli",
+    "used": "Kullanılan (onaylı)",
+    "remaining": "Kalan",
+    "days": "{n} gün",
+    "errPeriod": "Bir dönem belirtin.",
+    "errGeneric": "Hata.",
+    "errUpload": "Yükleme hatası.",
+    "errTooLarge": "Dosya çok büyük (maks. 5 MB).",
+    "newLeave": "Yeni izin talebi",
+    "type": "Tür",
+    "from": "Başlangıç",
+    "to": "Bitiş",
+    "note": "Not",
+    "submit": "Talep gönder",
+    "noLeaves": "İzin/talep yok.",
+    "confirmCancel": "bu talep",
+    "leaveType": {
+      "leave": "Ücretli izin",
+      "sick": "Hastalık izni",
+      "unpaid": "Ücretsiz izin",
+      "other": "Diğer"
+    },
+    "status": {
+      "pending": "Onay bekliyor",
+      "approved": "Onaylandı",
+      "rejected": "Reddedildi"
+    },
+    "docsTitle": "Belgelerim",
+    "uploading": "Yükleniyor…",
+    "uploadBtn": "+ Belge gönder",
+    "docsHint": "Gönderilen belgeler inceleme için işveren tarafından görülür.",
+    "noDocs": "Belge yok."
+  },
+  "clients": {
+    "title": "Müşteriler",
+    "subtitle": "Yalnızca görüntüleme listesi. Finansal veriler ve müşteri iletişimleri görünmez.",
+    "empty": "Müşteri yok.",
+    "th": {
+      "client": "Müşteri",
+      "city": "Şehir",
+      "status": "Durum"
+    }
+  },
+  "suppliers": {
+    "title": "Tedarikçiler",
+    "subtitle": "Yalnızca görüntüleme listesi.",
+    "empty": "Tedarikçi yok.",
+    "th": {
+      "supplier": "Tedarikçi",
+      "city": "Şehir"
+    }
+  },
+  "projects": {
+    "title": "Projeler",
+    "subtitle": "Yalnızca görüntüleme listesi. Değerler ve finansal veriler görünmez.",
+    "empty": "Proje yok.",
+    "th": {
+      "project": "Proje",
+      "client": "Müşteri",
+      "status": "Durum",
+      "deadline": "Son tarih"
+    },
+    "status": {
+      "active": "Aktif",
+      "on_hold": "Beklemede",
+      "done": "Tamamlandı",
+      "cancelled": "İptal edildi"
+    }
+  },
+  "warehouse": {
+    "title": "Depo",
+    "subtitle": "Yalnızca görüntüleme stoğu. Fiyatlar ve değerler görünmez.",
+    "empty": "Ürün yok.",
+    "th": {
+      "item": "Ürün",
+      "sku": "SKU",
+      "warehouse": "Depo",
+      "qty": "Stok"
+    }
+  }
+}
