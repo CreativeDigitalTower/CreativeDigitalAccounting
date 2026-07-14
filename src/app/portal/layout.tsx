@@ -5,20 +5,22 @@ import { Logo } from "@/components/Logo";
 import { PortalSignOut } from "@/components/app/PortalSignOut";
 import { parseEmployeeAccess } from "@/lib/employeeAccess";
 import { planHasFeature, type PlanId } from "@/lib/constants";
+import { getT } from "@/lib/i18n/server";
 
 export default async function PortalLayout({ children }: { children: React.ReactNode }) {
+  const { t } = await getT();
   // Гарантира, че само роля employee (с активен план Бизнес/Про) вижда портала.
   const { employee } = await requireEmployee();
   const access = parseEmployeeAccess(employee.company.employeeAccess);
   const hasPm = planHasFeature((employee.company.subscription?.plan ?? "free") as PlanId, "project_management");
   const tabs = [
-    { href: "/portal", label: "Моят профил", on: true },
-    { href: "/portal/pm", label: "Project Management", on: hasPm },
-    { href: "/portal/clients", label: "Клиенти", on: access.clients },
-    { href: "/portal/projects", label: "Проекти", on: access.projects },
-    { href: "/portal/suppliers", label: "Доставчици", on: access.suppliers },
-    { href: "/portal/warehouse", label: "Склад", on: access.warehouse },
-  ].filter((t) => t.on);
+    { href: "/portal", label: t("portal.layout.tabs.profile"), on: true },
+    { href: "/portal/pm", label: t("portal.layout.tabs.pm"), on: hasPm },
+    { href: "/portal/clients", label: t("portal.layout.tabs.clients"), on: access.clients },
+    { href: "/portal/projects", label: t("portal.layout.tabs.projects"), on: access.projects },
+    { href: "/portal/suppliers", label: t("portal.layout.tabs.suppliers"), on: access.suppliers },
+    { href: "/portal/warehouse", label: t("portal.layout.tabs.warehouse"), on: access.warehouse },
+  ].filter((x) => x.on);
 
   return (
     <div style={{ minHeight: "100vh", position: "relative" }}>
@@ -29,14 +31,14 @@ export default async function PortalLayout({ children }: { children: React.React
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ textAlign: "right" }}>
               <div style={{ fontSize: 13, fontWeight: 700 }}>{employee.name}</div>
-              <div style={{ fontSize: 11.5, color: "var(--muted)" }}>Служител · {employee.company.name}</div>
+              <div style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("portal.layout.employeeOf", { company: employee.company.name })}</div>
             </div>
             <PortalSignOut />
           </div>
         </div>
         {tabs.length > 1 && (
           <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
-            {tabs.map((t) => <Link key={t.href} href={t.href} className="filter-tab">{t.label}</Link>)}
+            {tabs.map((x) => <Link key={x.href} href={x.href} className="filter-tab">{x.label}</Link>)}
           </div>
         )}
         {children}
