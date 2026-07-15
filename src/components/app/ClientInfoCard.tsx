@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { formatCurrency } from "@/lib/constants";
+import { ClientEmailsEditor, type EmailRow } from "@/components/app/ClientEmailsEditor";
 
 type Client = {
   id: string; name: string; eik: string | null; vatNumber: string | null;
@@ -10,13 +11,14 @@ type Client = {
   address: string | null; contactEmail: string | null; phone: string | null;
 };
 
-export function ClientInfoCard({ client, totalInvoiced }: { client: Client; totalInvoiced: number }) {
+export function ClientInfoCard({ client, totalInvoiced, initialEmails = [] }: { client: Client; totalInvoiced: number; initialEmails?: EmailRow[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [editing, setEditing] = useState(searchParams.get("edit") === "1");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState(client);
+  const [emails, setEmails] = useState<EmailRow[]>(initialEmails);
 
   const set = (k: keyof Client, v: string) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -24,7 +26,7 @@ export function ClientInfoCard({ client, totalInvoiced }: { client: Client; tota
     setSaving(true); setError("");
     const res = await fetch(`/api/clients/${client.id}`, {
       method: "PUT", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, emails: emails.filter((e) => e.email.trim()) }),
     });
     setSaving(false);
     if (res.ok) { setEditing(false); router.refresh(); }
@@ -52,8 +54,11 @@ export function ClientInfoCard({ client, totalInvoiced }: { client: Client; tota
             </div>
           ))}
         </div>
+        <div style={{ marginTop: 14 }}>
+          <ClientEmailsEditor value={emails} onChange={setEmails} defaultOpen={emails.length > 0} />
+        </div>
         <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-          <button className="btn btn-ghost btn-sm" onClick={() => { setForm(client); setEditing(false); }} disabled={saving}>Отказ</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => { setForm(client); setEmails(initialEmails); setEditing(false); }} disabled={saving}>Отказ</button>
           <button className="btn btn-primary btn-sm" onClick={save} disabled={saving}>{saving ? "Записване…" : "Запази"}</button>
         </div>
       </div>

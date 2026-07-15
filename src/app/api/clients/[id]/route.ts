@@ -2,7 +2,21 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCompany } from "@/lib/session";
 import { validateEik } from "@/lib/validation/eik";
+import { prepareClientEmails } from "@/lib/clientEmails";
 import { z } from "zod";
+
+const emailInputSchema = z.object({
+  id: z.string().optional(),
+  email: z.string(),
+  contactName: z.string().optional().nullable(),
+  type: z.string().optional().nullable(),
+  isPrimary: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+  receivesInvoices: z.boolean().optional(),
+  receivesReminders: z.boolean().optional(),
+  receivesOffers: z.boolean().optional(),
+  receivesGeneral: z.boolean().optional(),
+});
 
 const schema = z.object({
   name: z.string().min(2),
@@ -23,6 +37,7 @@ const schema = z.object({
   clientSince: z.string().optional().nullable(),
   openingRevenue: z.number().optional().nullable(),
   monthlyRetainer: z.number().optional().nullable(),
+  emails: z.array(emailInputSchema).optional(),
 });
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -43,14 +58,35 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ error: "Не е намерен." }, { status: 404 });
     }
 
-    const { birthday, clientSince, ...rest } = data;
-    const client = await prisma.client.update({
-      where: { id },
-      data: {
-        ...rest, contactEmail: data.contactEmail || null,
-        ...(birthday !== undefined ? { birthday: birthday ? new Date(birthday) : null } : {}),
-        ...(clientSince !== undefined ? { clientSince: clientSince ? new Date(clientSince) : null } : {}),
-      },
+    const { birthday, clientSince, emails: emailsInput, ...rest } = data;
+
+    // Синхронизираме структурираните имейли само ако са подадени (обратна съвместимост).
+    let prepared: ReturnType<typeof prepareClientEmails> | null = null;
+    if (emailsInput !== undefined) {
+      try { prepared = prepareClientEmails(emailsInput); }
+      catch (e) { return NextResponse.json({ error: (e as Error).message }, { status: 400 }); }
+    }
+
+    const client = await prisma.$transaction(async (tx) => {
+      if (prepared) {
+        // delete-all + recreate: малък набор, каскадно; пази точно един primary.
+        await tx.clientEmail.deleteMany({ where: { clientId: id } });
+        if (prepared.emails.length) {
+          await tx.clientEmail.createMany({
+            data: prepared.emails.map(({ id: _id, ...e }) => ({ clientId: id, ...e })),
+          });
+        }
+      }
+      return tx.client.update({
+        where: { id },
+        data: {
+          ...rest,
+          // primary имейлът се синхронизира с contactEmail (обратна съвместимост)
+          contactEmail: prepared ? (prepared.primaryEmail ?? null) : (data.contactEmail || null),
+          ...(birthday !== undefined ? { birthday: birthday ? new Date(birthday) : null } : {}),
+          ...(clientSince !== undefined ? { clientSince: clientSince ? new Date(clientSince) : null } : {}),
+        },
+      });
     });
     return NextResponse.json(client);
   } catch (err) {
