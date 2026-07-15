@@ -1,0 +1,316 @@
+{
+  "title": "Super Admin",
+  "companiesCount": "{n} companii înregistrate",
+  "backToAdmin": "← Super Admin",
+  "nav": {
+    "emails": "E-mailuri și notificări",
+    "blog": "Blog",
+    "businesses": "Afaceri (filtre după sector/plan)"
+  },
+  "companiesWord": "companii",
+  "ranges": {
+    "7d": "7 zile",
+    "30d": "30 zile",
+    "90d": "90 zile",
+    "12m": "12 luni",
+    "all": "Toată perioada"
+  },
+  "pvRanges": {
+    "today": "Azi",
+    "7d": "7 zile",
+    "30d": "30 zile",
+    "12m": "12 luni",
+    "all": "Toată perioada"
+  },
+  "plan": {
+    "free": "Gratuit",
+    "start": "Start",
+    "business": "Business",
+    "pro": "Pro"
+  },
+  "docType": {
+    "invoice": "Facturi",
+    "quote": "Oferte",
+    "proforma": "Proforme",
+    "credit_note": "Note de credit",
+    "debit_note": "Note de debit",
+    "receipt": "Chitanțe",
+    "protocol": "Protocoale",
+    "declaration": "Declarații"
+  },
+  "awaiting": {
+    "title": "Așteaptă confirmarea plății ({n})",
+    "desc": "Aceste companii au ales un plan plătit, dar plata nu este încă confirmată. Verificați și marcați „Plată primită” pe rândul companiei pentru a intra în venituri."
+  },
+  "kpi": {
+    "registeredCompanies": "Companii înregistrate",
+    "registeredCompaniesInfo": "Numărul total de companii active (nearhivate) pe platformă.",
+    "registeredUsers": "Utilizatori înregistrați",
+    "registeredUsersInfo": "Numărul total de conturi de utilizatori pe întreaga platformă — proprietari, angajați invitați și toate celelalte roluri ale companiilor.",
+    "issuedDocs": "Documente emise",
+    "mrr": "Venit lunar estimat (MRR)",
+    "mrrInfo": "MRR (Monthly Recurring Revenue) = venitul lunar total din abonamentele companiilor cu plată CONFIRMATĂ. Perioadele de probă și plățile neconfirmate NU se numără.",
+    "mrrPaying": "{n} cu plată confirmată",
+    "mrrAwaiting": " · {n} așteaptă plata",
+    "mrrTrialing": " · {n} perioadă de probă",
+    "conversion": "Conversie către un plan plătit",
+    "conversionInfo": "Procentul companiilor cu plan plătit (Start/Business/Pro) din toate companiile înregistrate.",
+    "conversionSub": "{paid} din {total} companii"
+  },
+  "revenue": {
+    "mrr": "MRR",
+    "mrrInfo": "Venit lunar din abonamente cu plată confirmată (venitul nostru).",
+    "arr": "ARR",
+    "arrInfo": "ARR (Annual Recurring Revenue) = venit anual din abonamente = MRR × 12.",
+    "turnoverThis": "Cifra de afaceri a companiilor (luna aceasta)",
+    "turnoverInfo": "Valoarea totală a facturilor emise de COMPANIILE de pe platformă luna aceasta — este cifra lor de afaceri, NU venitul nostru din abonamente. (O factură de test intră tot aici.)",
+    "turnoverLast": "Cifra de afaceri a companiilor (luna trecută)",
+    "growth": "Creșterea cifrei de afaceri",
+    "growthInfo": "Modificarea cifrei de afaceri a companiilor față de luna trecută."
+  },
+  "growth": {
+    "newThisMonth": "Companii noi (luna aceasta)",
+    "newInfo": "Companii înregistrate de la începutul lunii curente.",
+    "newPrevMonth": "({n} luna trec.)",
+    "active30": "Companii active (30 zile)",
+    "active30Info": "Companii cu autentificare în aplicație în ultimele 30 de zile.",
+    "activated": "Companii activate",
+    "activatedInfo": "Ponderea companiilor care au început efectiv lucrul (au un client sau un document).",
+    "avgDocs": "Doc. medii/companie",
+    "avgDocsInfo": "Media documentelor emise per companie înregistrată.",
+    "churnRisk": "Risc de pierdere",
+    "churnRiskInfo": "Companii plătite fără activitate de 21+ zile — churn potențial. Luați legătura cu ele."
+  },
+  "docs": {
+    "totalValue": "Valoarea totală a tuturor facturilor",
+    "totalValueInfo": "Suma tuturor facturilor emise de companiile de pe platformă (cifra lor de afaceri, nu venitul nostru)."
+  },
+  "alerts": {
+    "title": "Alerte automate",
+    "nearLimit": "{name} este aproape de limită ({used}/{limit}) — upgrade probabil.",
+    "hotLead": "Lead fierbinte: {name} (score {score}/100) — pregătit pentru un plan plătit.",
+    "turnover": "Cifra de afaceri a platformei luna aceasta: {amount} €."
+  },
+  "funnel": {
+    "title": "Pâlnia de vânzări",
+    "visitors": "Vizitatori",
+    "registrations": "Înregistrări (companii)",
+    "activated": "Companii activate",
+    "firstInvoice": "Au emis prima factură",
+    "paid": "Abonament plătit",
+    "ofPrev": "({n}% din precedentul)"
+  },
+  "pageViews": {
+    "title": "Vizualizări pe pagini",
+    "show": "Afișează",
+    "noData": "Încă nu există date.",
+    "home": "Pagina principală",
+    "login": "Pagina de autentificare",
+    "register": "Pagina de înregistrare",
+    "allPublic": "Toate publice",
+    "inApp": "În aplicație",
+    "thPage": "Pagină",
+    "thPath": "Cale",
+    "thViews": "Vizualizări",
+    "note": "Numărul reprezintă toate vizualizările (page views), inclusiv repetate de la același vizitator."
+  },
+  "pageLabels": {
+    "/": "Pagina principală",
+    "/blog": "Blog",
+    "/faq": "Întrebări frecvente",
+    "/contact": "Contact",
+    "/about": "Despre noi",
+    "/software": "Despre software",
+    "/accountants": "Pentru contabili",
+    "/register": "Înregistrare",
+    "/login": "Autentificare",
+    "/terms": "Termeni",
+    "/privacy": "Confidențialitate",
+    "/security": "Securitate",
+    "/tools": "Instrumente"
+  },
+  "modules": {
+    "title": "Utilizarea modulelor",
+    "noData": "Încă nu există date."
+  },
+  "moduleNames": {
+    "invoices": "Facturi",
+    "documents": "Documente",
+    "clients": "Clienți",
+    "suppliers": "Furnizori",
+    "warehouse": "Depozit",
+    "production": "Producție",
+    "employees": "Angajați",
+    "haccp": "HACCP",
+    "cash": "Casă",
+    "expenses": "Cheltuieli",
+    "contracts": "Contracte",
+    "projects": "Proiecte",
+    "archive": "Arhivă",
+    "assets": "Active",
+    "analytics": "Analize",
+    "tax-calendar": "Calendar fiscal",
+    "tools": "Instrumente",
+    "settings": "Profil",
+    "subscription": "Abonament"
+  },
+  "tools": {
+    "title": "Instrumente publice",
+    "calcSuffix": "calculator",
+    "note": "Numărul de vizite pentru fiecare instrument public."
+  },
+  "toolNames": {
+    "currency": "Valutar",
+    "salary": "Salarii",
+    "vat": "TVA",
+    "interest": "Dobândă",
+    "markup": "Adaos"
+  },
+  "leads": {
+    "hotTitle": "Lead-uri fierbinți (free)",
+    "upgradeTitle": "Oportunități de upgrade",
+    "inactiveTitle": "Companii inactive",
+    "allActive": "Toate sunt active",
+    "never": "niciodată",
+    "days": "{n} zile"
+  },
+  "visits": {
+    "title": "Vizite și activitate pe site",
+    "todayVisitors": "Vizitatori azi",
+    "todayActive": "Înregistrați activi azi",
+    "visitorsRange": "Vizitatori ({range})",
+    "activeRange": "Înregistrați activi ({range})",
+    "noData": "Încă nu s-au acumulat date pentru această perioadă.",
+    "legendVisitors": "Vizitatori (persoane)",
+    "legendActive": "Utilizatori înregistrați activi",
+    "allTime": "Total pe perioadă pe site: {v} vizitatori · {u} activi",
+    "barTitle": "{label}: {v} vizitatori · {u} înregistrați activi"
+  },
+  "sectors": {
+    "title": "Companii pe sector",
+    "unspecified": "Nespecificat"
+  },
+  "growthPanel": {
+    "title": "Creștere",
+    "newCompanies": "Companii noi ({range})",
+    "total": "Total companii",
+    "paid": "Companii plătite",
+    "free": "Companii gratuite"
+  },
+  "companies": {
+    "title": "Toate companiile",
+    "subtitle": "Companii standard și companii client (firmele de contabilitate sunt în secțiunea de mai sus).",
+    "thCompany": "Companie",
+    "thActivity": "Activitate",
+    "thEik": "Nr. înreg.",
+    "thUsers": "Utiliz.",
+    "thDocs": "Doc.",
+    "thRegistration": "Înregistrare",
+    "thSubscription": "Abonament",
+    "note": "Schimbarea abonamentului intră în vigoare imediat — funcțiile se deblochează/blochează automat pentru compania respectivă. „Intră în cont” vă oferă acces tehnic la contul companiei pentru asistență. Ștergerea arhivează compania (vezi secțiunea de jos) — datele se păstrează și pot fi restaurate."
+  },
+  "businesses": {
+    "title": "Afaceri",
+    "all": "Toate",
+    "filter": "Filtrează",
+    "clear": "Șterge",
+    "found": "Găsite:",
+    "foundSuffix": "companii",
+    "countryPh": "Bulgaria",
+    "dash": "—",
+    "fSector": "Sector",
+    "fCategory": "Subcategorie",
+    "fSize": "Mărime",
+    "fPlan": "Plan",
+    "fCountry": "Țară",
+    "fFrom": "Înregistrare de la",
+    "fTo": "până la",
+    "thCompany": "Companie",
+    "thSector": "Sector",
+    "thCategory": "Subcategorie",
+    "thSize": "Mărime",
+    "thCountry": "Țară",
+    "thPlan": "Plan",
+    "thRegistration": "Înregistrare"
+  },
+  "emails": {
+    "title": "E-mailuri și Notification Center",
+    "all": "Toate",
+    "noEmails": "Niciun e-mail",
+    "cat": {
+      "account": "Cont",
+      "subscription": "Abonament",
+      "document": "Document",
+      "reminder": "Memento",
+      "admin": "Admin",
+      "system": "Sistem",
+      "client_decision": "Decizie",
+      "product": "Produs"
+    },
+    "status": {
+      "sent": "Trimis",
+      "queued": "În coadă",
+      "failed": "Eșuat",
+      "skipped": "Omis"
+    },
+    "statSent": "Trimise",
+    "statSentSub": "din {n} total",
+    "statOpened": "Deschise",
+    "statOpenedSub": "{n} e-mailuri",
+    "statClickRate": "Click rate",
+    "statClickSub": "{n} clicuri",
+    "statDeliveryRate": "Delivery rate",
+    "statBounce": "Bounce",
+    "statUnsubscribe": "Unsubscribe",
+    "statFailed": "Eșuate",
+    "statJoined": "Alăturați dintr-o factură",
+    "statJoinedSub": "prin portalul clientului",
+    "thRecipient": "Destinatar",
+    "thSubject": "Subiect",
+    "thCategory": "Categorie",
+    "thStatus": "Stare",
+    "thOpens": "Desch.",
+    "thDate": "Dată",
+    "blacklist": "Blacklist ({n})",
+    "blEmail": "E-mail",
+    "blReason": "Motiv",
+    "blErrors": "Erori",
+    "blUnsub": "Dezabonat",
+    "blDate": "Dată",
+    "blEmpty": "Gol — nicio adresă problematică",
+    "blYes": "Da",
+    "note": "Reîncercare la eroare SMTP: 5 min → 30 min → 2 h → 24 h. După epuizare adresa este adăugată în Blacklist. Coada și mementourile sunt procesate de {cron} (cron zilnic)."
+  },
+  "blog": {
+    "title": "Blog ({n})",
+    "new": "+ Articol nou",
+    "empty": "Niciun articol. Apăsați „Încarcă 10 articole SEO” sau creați unul nou.",
+    "thTitle": "Titlu",
+    "thCategory": "Categorie",
+    "thStatus": "Stare",
+    "thViews": "Vizualizări",
+    "thDate": "Dată",
+    "dash": "—",
+    "edit": "✎ Editează",
+    "status": {
+      "published": "Publicat",
+      "hidden": "Ascuns",
+      "draft": "Ciornă"
+    }
+  },
+  "firm": {
+    "badge": "FIRMĂ DE CONTABILITATE",
+    "subscription": "Abonament",
+    "subBack": "← Panou",
+    "subTitle": "Abonament firmă de contabilitate",
+    "subCurrentPlan": "PLAN CURENT",
+    "subNote": "Schimbarea planului se confirmă după plata prin transfer bancar. Contactați-ne sau alegeți un plan mai mare mai jos.",
+    "bankTitle": "Plată prin transfer bancar",
+    "bankRecipient": "Beneficiar",
+    "bankIban": "IBAN",
+    "bankBank": "Bancă",
+    "bankReason": "Detalii plată",
+    "bankReasonValue": "Abonament firmă de contabilitate — {name}",
+    "bankNote": "După primirea plății activăm planul selectat și emitem o factură. Toate prețurile sunt fără TVA. 1 EUR = {rate} BGN."
+  }
+}
