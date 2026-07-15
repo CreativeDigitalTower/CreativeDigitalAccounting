@@ -3,7 +3,21 @@ import { prisma } from "@/lib/prisma";
 import { requireCompany, getPlan } from "@/lib/session";
 import { SUBSCRIPTION_PLANS } from "@/lib/constants";
 import { validateEik } from "@/lib/validation/eik";
+import { prepareClientEmails } from "@/lib/clientEmails";
 import { z } from "zod";
+
+const emailInputSchema = z.object({
+  id: z.string().optional(),
+  email: z.string(),
+  contactName: z.string().optional().nullable(),
+  type: z.string().optional().nullable(),
+  isPrimary: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+  receivesInvoices: z.boolean().optional(),
+  receivesReminders: z.boolean().optional(),
+  receivesOffers: z.boolean().optional(),
+  receivesGeneral: z.boolean().optional(),
+});
 
 const schema = z.object({
   name: z.string().min(2),
@@ -15,6 +29,7 @@ const schema = z.object({
   contactPerson: z.string().optional(),
   contactEmail: z.string().email().optional().or(z.literal("")),
   phone: z.string().optional(),
+  emails: z.array(emailInputSchema).optional(),
 });
 
 export async function GET() {
@@ -43,23 +58,39 @@ export async function POST(req: Request) {
     }
     const body = await req.json();
     const data = schema.parse(body);
+    const { emails: emailsInput, ...clientData } = data;
+
+    // Валидираме структурираните имейли предварително (за да върнем ясна грешка)
+    let prepared: ReturnType<typeof prepareClientEmails> | null = null;
+    if (emailsInput !== undefined) {
+      try { prepared = prepareClientEmails(emailsInput); }
+      catch (e) { return NextResponse.json({ error: (e as Error).message }, { status: 400 }); }
+    }
 
     // ── Валидация на ЕИК/БУЛСТАT (формат + контролна цифра), ако е попълнен ──
-    if (data.eik && data.eik.trim() !== "") {
-      const c = validateEik(data.eik);
+    if (clientData.eik && clientData.eik.trim() !== "") {
+      const c = validateEik(clientData.eik);
       if (!c.isValid) return NextResponse.json({ error: c.error ?? "Невалиден ЕИК/БУЛСТАТ." }, { status: 400 });
-      data.eik = c.normalized;
+      clientData.eik = c.normalized;
     }
 
     // Без дублиране: ако вече има клиент със същия ЕИК (или същото име), връщаме него.
-    const eik = data.eik?.trim();
+    const eik = clientData.eik?.trim();
     const dup = await prisma.client.findFirst({
-      where: { companyId, OR: [...(eik ? [{ eik }] : []), { name: { equals: data.name.trim(), mode: "insensitive" as const } }] },
+      where: { companyId, OR: [...(eik ? [{ eik }] : []), { name: { equals: clientData.name.trim(), mode: "insensitive" as const } }] },
     });
     if (dup) return NextResponse.json(dup);
 
+    // primary имейлът се синхронизира с Client.contactEmail (обратна съвместимост)
+    const primaryEmail = prepared ? prepared.primaryEmail : null;
     const client = await prisma.client.create({
-      data: { companyId, ...data, contactEmail: data.contactEmail || null },
+      data: {
+        companyId, ...clientData,
+        contactEmail: primaryEmail ?? clientData.contactEmail ?? null,
+        ...(prepared && prepared.emails.length
+          ? { emails: { create: prepared.emails.map(({ id: _id, ...e }) => e) } }
+          : {}),
+      },
     });
 
     // ─── Meta: първи създаден клиент ───

@@ -23,6 +23,7 @@ export default async function ClientDossierPage({ params }: { params: Promise<{ 
       contacts: { orderBy: { isPrimary: "desc" } },
       tasks: { orderBy: [{ done: "asc" }, { dueDate: "asc" }] },
       files: { orderBy: { uploadedAt: "desc" } },
+      emails: { orderBy: [{ isPrimary: "desc" }, { createdAt: "asc" }] },
     },
   });
   if (!client) notFound();
@@ -63,6 +64,10 @@ export default async function ClientDossierPage({ params }: { params: Promise<{ 
       contacts={client.contacts.map((c) => ({ id: c.id, name: c.name, position: c.position, phone: c.phone, email: c.email }))}
       tasks={client.tasks.map((t) => ({ id: t.id, title: t.title, type: t.type, dueDate: t.dueDate?.toISOString() ?? null, done: t.done }))}
       files={client.files.map((f) => ({ id: f.id, name: f.name, size: f.size, uploadedAt: f.uploadedAt.toISOString() }))}
+      clientEmails={client.emails.map((e) => ({
+        id: e.id, email: e.email, contactName: e.contactName ?? "", type: e.type, isPrimary: e.isPrimary, isActive: e.isActive,
+        receivesInvoices: e.receivesInvoices, receivesReminders: e.receivesReminders, receivesOffers: e.receivesOffers, receivesGeneral: e.receivesGeneral,
+      }))}
       timeline={timeline}
     />
   );

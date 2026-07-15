@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, PAYMENT_METHODS, formatCurrency, VAT_EXEMPT_REASONS } from "@/lib/constants";
 import { useT } from "@/components/i18n/I18nProvider";
+import { InvoiceAttachments } from "@/components/app/InvoiceAttachments";
 
 type Line = { description: string; quantity: number; unitPrice: number; vatRate: number };
 type ClientFields = { name: string; eik: string; vatNumber: string; mol: string; city: string; address: string; contactEmail: string; phone: string };
@@ -186,6 +187,11 @@ export default function EditDocumentPage({ params }: { params: Promise<{ id: str
           <Link href={`/dashboard/documents/${id}`} className="btn btn-ghost">{t("documents.form.cancel")}</Link>
           <button onClick={save} className="btn btn-primary" disabled={saving}>{saving ? t("documents.form.saving") : t("documents.form.saveChanges")}</button>
         </div>
+      </div>
+
+      {/* Приложения към фактурата (PDF) — не влияят на стойности/номерация */}
+      <div style={{ marginTop: 4 }}>
+        <InvoiceAttachments documentId={id} />
       </div>
     </>
   );

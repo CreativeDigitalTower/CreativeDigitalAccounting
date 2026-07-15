@@ -8,6 +8,7 @@ import { STATUSES, STAGES, TASK_TYPES } from "@/lib/crm";
 import { confirmDelete } from "@/lib/confirmDelete";
 import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 import { useT, useI18n } from "@/components/i18n/I18nProvider";
+import { ClientEmailsEditor, type EmailRow } from "@/components/app/ClientEmailsEditor";
 
 // Рендерира иконата на CRM задача (ключ → SVG пиктограма)
 function taskIcon(key: string | null | undefined) {
@@ -42,7 +43,7 @@ type Note = { id: string; note: string; createdAt: string };
 
 export function ClientCrm(props: {
   client: Client; totalInvoiced: number; paidTotal: number; documents: Doc[]; contracts: Named[]; projects: Named[];
-  notes: Note[]; contacts: Contact[]; tasks: Task[]; files: FileRow[]; timeline: TimelineEvent[];
+  notes: Note[]; contacts: Contact[]; tasks: Task[]; files: FileRow[]; timeline: TimelineEvent[]; clientEmails?: EmailRow[];
 }) {
   const t = useT();
   const router = useRouter();
@@ -113,6 +114,7 @@ export function ClientCrm(props: {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, alignItems: "start" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <InfoCard client={client} onSave={saveClient} />
+            <EmailsCard clientId={client.id} clientName={client.name} initial={props.clientEmails ?? []} />
             <ContactsCard clientId={client.id} initial={props.contacts} />
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -141,6 +143,36 @@ export function ClientCrm(props: {
 
 function Kpi({ label, value, color }: { label: string; value: string; color: string }) {
   return <div style={{ textAlign: "right" }}><div style={{ fontSize: 11, color: "var(--muted)" }}>{label}</div><div className="num" style={{ fontSize: 16, fontWeight: 700, color }}>{value}</div></div>;
+}
+
+// Секция „Имейл адреси и получатели" — структурирано управление на няколко адреса.
+function EmailsCard({ clientId, clientName, initial }: { clientId: string; clientName: string; initial: EmailRow[] }) {
+  const t = useT();
+  const router = useRouter();
+  const [emails, setEmails] = useState<EmailRow[]>(initial);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  async function save() {
+    setSaving(true); setMsg(null);
+    const res = await fetch(`/api/clients/${clientId}`, {
+      method: "PUT", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: clientName, emails: emails.filter((e) => e.email.trim()) }),
+    });
+    setSaving(false);
+    if (res.ok) { setMsg({ ok: true, text: t("mailattach.emails.saved") }); router.refresh(); }
+    else setMsg({ ok: false, text: (await res.json()).error ?? t("mailattach.emails.errSave") });
+  }
+
+  return (
+    <div>
+      <ClientEmailsEditor value={emails} onChange={setEmails} defaultOpen={emails.length > 0} />
+      <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: -6 }}>
+        <button className="btn btn-primary btn-sm" onClick={save} disabled={saving}>{saving ? t("mailattach.emails.saving") : t("mailattach.emails.save")}</button>
+        {msg && <span style={{ fontSize: 12, color: msg.ok ? "var(--emerald-dark)" : "var(--brick)" }}>{msg.text}</span>}
+      </div>
+    </div>
+  );
 }
 
 function InfoCard({ client, onSave }: { client: Client; onSave: (p: Partial<Client>) => void }) {

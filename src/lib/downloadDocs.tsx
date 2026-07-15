@@ -110,6 +110,32 @@ function addCanvas(pdf: any, canvas: HTMLCanvasElement) {
  * се пакетират в ZIP архив (не се обединяват в един PDF). При един документ се
  * сваля директно PDF.
  */
+/**
+ * Генерира PDF на документа (фактура/оферта) от клиента и връща base64 data URL
+ * заедно с човешко име на файла. Използва се при изпращане по имейл (прикача се
+ * „Фактура.pdf"). Връща null, ако документът не може да се зареди.
+ */
+export async function generateDocPdfDataUrl(id: string): Promise<{ name: string; dataUrl: string } | null> {
+  const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+    import("html2canvas-pro"), import("jspdf"),
+  ]);
+  const host = document.createElement("div");
+  host.style.position = "fixed"; host.style.left = "-10000px"; host.style.top = "0";
+  document.body.appendChild(host);
+  try {
+    const data = await fetchViewData(id);
+    if (!data) return null;
+    const canvas = await renderCanvas(host, data, html2canvas);
+    const pdf = new jsPDF("p", "mm", "a4");
+    addCanvas(pdf, canvas);
+    const name = `${TYPE_FILE[data.type] ?? "Документ"}-${sanitize(data.number)}.pdf`;
+    const dataUrl = pdf.output("datauristring"); // data:application/pdf;base64,...
+    return { name, dataUrl };
+  } finally {
+    document.body.removeChild(host);
+  }
+}
+
 export async function downloadDocsAsZip(ids: string[], zipBaseName: string): Promise<void> {
   if (ids.length === 0) return;
   const [{ default: html2canvas }, { jsPDF }] = await Promise.all([

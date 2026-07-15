@@ -292,6 +292,30 @@ model Client {
   contacts  ClientContact[]
   tasks     ClientTask[]
   files     ClientFile[]
+  emails    ClientEmail[]
+}
+
+// Структурирани имейл адреси на клиента + предпочитания за получаване.
+// Client.contactEmail остава (обратна съвместимост) и се синхронизира с primary.
+model ClientEmail {
+  id               String   @id @default(cuid())
+  clientId         String
+  email            String
+  contactName      String?
+  type             String   @default("primary") // primary | accounting | manager | payments | invoices | other
+  isPrimary        Boolean  @default(false)
+  isActive         Boolean  @default(true)
+  receivesInvoices Boolean  @default(true)
+  receivesReminders Boolean @default(true)
+  receivesOffers   Boolean  @default(true)
+  receivesGeneral  Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@unique([clientId, email])
+  @@index([clientId])
 }
 
 model ClientContact {
@@ -744,8 +768,27 @@ model Document {
   parentDocument Document?      @relation("DocumentChain", fields: [parentDocumentId], references: [id])
   childDocuments Document[]     @relation("DocumentChain")
   lines          DocumentLine[]
+  attachments    DocumentAttachment[]
 
   @@index([recipientCompanyId])
+}
+
+// Прикачени PDF документи към фактура/документ (протоколи, приложения и др.).
+// Съхранение като base64 data URL (както ClientFile/EmployeeFile/ArchiveFile).
+model DocumentAttachment {
+  id               String   @id @default(cuid())
+  documentId       String
+  filename         String   // почистено име за показване/сваляне
+  originalFilename String
+  mimeType         String
+  size             Int
+  dataUrl          String   @db.Text
+  uploadedById     String?
+  createdAt        DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
 }
 
 // In-app нотификации (вкл. получени документи между фирми)
@@ -1161,6 +1204,9 @@ model EmailLog {
   clickedAt   DateTime?
   bounced     Boolean   @default(false)
   scheduledFor DateTime?
+  // Свързан документ + метаданни за прикачените файлове (име/размер), без secret URL.
+  documentId  String?
+  attachmentsMeta Json?
   createdAt   DateTime  @default(now())
   sentAt      DateTime?
 
@@ -1168,6 +1214,7 @@ model EmailLog {
   @@index([status])
   @@index([type])
   @@index([createdAt])
+  @@index([documentId])
 }
 
 model EmailBlacklist {

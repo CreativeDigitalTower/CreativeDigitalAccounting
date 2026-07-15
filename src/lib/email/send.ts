@@ -83,6 +83,10 @@ export interface SendArgs {
   force?: boolean;
   /** прикачени файлове (base64) */
   attachments?: MailAttachment[];
+  /** свързан документ (за EmailLog) */
+  documentId?: string | null;
+  /** метаданни за приложенията (име/размер) — без secret URL/съдържание */
+  attachmentsMeta?: { filename: string; size: number }[] | null;
 }
 
 function toNodemailerAttachments(atts?: MailAttachment[]) {
@@ -108,6 +112,7 @@ export async function sendEmail(args: SendArgs): Promise<{ id: string; status: s
       data: {
         companyId: args.companyId ?? null, toEmail: to, toName: args.toName ?? null,
         category: args.category, type: args.type, subject: args.subject,
+        documentId: args.documentId ?? null, attachmentsMeta: args.attachmentsMeta ?? undefined,
         status: "skipped", error: black.unsubscribed ? "Отписан" : "В черен списък",
       },
     });
@@ -124,6 +129,7 @@ export async function sendEmail(args: SendArgs): Promise<{ id: string; status: s
         data: {
           companyId: args.companyId, toEmail: to, toName: args.toName ?? null,
           category: args.category, type: args.type, subject: args.subject,
+          documentId: args.documentId ?? null, attachmentsMeta: args.attachmentsMeta ?? undefined,
           status: "skipped", error: "Изключено от настройките на фирмата",
         },
       });
@@ -136,6 +142,7 @@ export async function sendEmail(args: SendArgs): Promise<{ id: string; status: s
     data: {
       companyId: args.companyId ?? null, toEmail: to, toName: args.toName ?? null,
       category: args.category, type: args.type, subject: args.subject,
+      documentId: args.documentId ?? null, attachmentsMeta: args.attachmentsMeta ?? undefined,
       status: "queued", scheduledFor: args.scheduledFor ?? null,
     },
   });

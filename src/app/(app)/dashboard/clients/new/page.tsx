@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { validateEik } from "@/lib/validation/eik";
 import { useT } from "@/components/i18n/I18nProvider";
+import { ClientEmailsEditor, type EmailRow } from "@/components/app/ClientEmailsEditor";
 
 type Form = { name: string; eik: string; vatNumber: string; contactPerson: string; mol: string; address: string; city: string; contactEmail: string; phone: string };
 const EMPTY: Form = { name: "", eik: "", vatNumber: "", contactPerson: "", mol: "", address: "", city: "", contactEmail: "", phone: "" };
@@ -17,6 +18,7 @@ export default function NewClientPage() {
   const [error, setError] = useState("");
   const [match, setMatch] = useState<{ name: string; eik: string; vatNumber: string | null; address: string | null; city: string | null; mol: string | null } | null>(null);
   const [eikErr, setEikErr] = useState("");
+  const [emails, setEmails] = useState<EmailRow[]>([]);
 
   function set<K extends keyof Form>(k: K, v: string) { setF((p) => ({ ...p, [k]: v })); }
 
@@ -63,6 +65,7 @@ export default function NewClientPage() {
         name: f.name, eik: f.eik || undefined, vatNumber: f.vatNumber || undefined,
         contactPerson: f.contactPerson || undefined, mol: f.mol || undefined, address: f.address || undefined,
         city: f.city || undefined, contactEmail: f.contactEmail || undefined, phone: f.phone || undefined,
+        ...(emails.filter((e) => e.email.trim()).length ? { emails: emails.filter((e) => e.email.trim()) } : {}),
       }),
     });
     setSaving(false);
@@ -107,6 +110,8 @@ export default function NewClientPage() {
             <div><label>{t("clients.new.f.phone")}</label><input value={f.phone} onChange={(e) => set("phone", e.target.value)} placeholder="+359 2 123 4567" /></div>
           </div>
         </div>
+
+        <ClientEmailsEditor value={emails} onChange={setEmails} defaultOpen={false} />
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
           <Link href="/dashboard/clients" className="btn btn-ghost">{t("clients.new.cancel")}</Link>
