@@ -1,0 +1,316 @@
+{
+  "title": "Super Admin",
+  "companiesCount": "{n} registered companies",
+  "backToAdmin": "← Super Admin",
+  "nav": {
+    "emails": "Emails & notifications",
+    "blog": "Blog",
+    "businesses": "Businesses (filter by sector/plan)"
+  },
+  "companiesWord": "companies",
+  "ranges": {
+    "7d": "7 days",
+    "30d": "30 days",
+    "90d": "90 days",
+    "12m": "12 months",
+    "all": "All time"
+  },
+  "pvRanges": {
+    "today": "Today",
+    "7d": "7 days",
+    "30d": "30 days",
+    "12m": "12 months",
+    "all": "All time"
+  },
+  "plan": {
+    "free": "Free",
+    "start": "Start",
+    "business": "Business",
+    "pro": "Pro"
+  },
+  "docType": {
+    "invoice": "Invoices",
+    "quote": "Quotes",
+    "proforma": "Proformas",
+    "credit_note": "Credit notes",
+    "debit_note": "Debit notes",
+    "receipt": "Receipts",
+    "protocol": "Protocols",
+    "declaration": "Declarations"
+  },
+  "awaiting": {
+    "title": "Awaiting your payment confirmation ({n})",
+    "desc": "These companies have selected a paid plan, but the payment is not yet confirmed. Review and mark “Payment received” on the company row so it counts toward revenue."
+  },
+  "kpi": {
+    "registeredCompanies": "Registered companies",
+    "registeredCompaniesInfo": "Total active (non-archived) companies on the platform.",
+    "registeredUsers": "Registered users",
+    "registeredUsersInfo": "Total user accounts across the whole platform — owners, invited employees and all other company roles.",
+    "issuedDocs": "Documents issued",
+    "mrr": "Expected monthly revenue (MRR)",
+    "mrrInfo": "MRR (Monthly Recurring Revenue) = the total monthly revenue from subscriptions of companies with CONFIRMED payment. Trial periods and unconfirmed payments are NOT counted.",
+    "mrrPaying": "{n} with confirmed payment",
+    "mrrAwaiting": " · {n} awaiting payment",
+    "mrrTrialing": " · {n} on trial",
+    "conversion": "Conversion to a paid plan",
+    "conversionInfo": "Percentage of companies on a paid plan (Start/Business/Pro) out of all registered companies.",
+    "conversionSub": "{paid} of {total} companies"
+  },
+  "revenue": {
+    "mrr": "MRR",
+    "mrrInfo": "Monthly subscription revenue with confirmed payment (our revenue).",
+    "arr": "ARR",
+    "arrInfo": "ARR (Annual Recurring Revenue) = annual subscription revenue = MRR × 12.",
+    "turnoverThis": "Company turnover (this month)",
+    "turnoverInfo": "The total value of invoices issued by the COMPANIES on the platform this month — this is their business turnover, NOT our subscription revenue. (A test invoice also counts here.)",
+    "turnoverLast": "Company turnover (last month)",
+    "growth": "Turnover growth",
+    "growthInfo": "Change in company turnover compared with last month."
+  },
+  "growth": {
+    "newThisMonth": "New companies (this month)",
+    "newInfo": "Companies registered since the start of the current month.",
+    "newPrevMonth": "({n} prev. mo.)",
+    "active30": "Active companies (30 days)",
+    "active30Info": "Companies that logged into the app in the last 30 days.",
+    "activated": "Activated companies",
+    "activatedInfo": "Share of companies that actually started working (have a client or document).",
+    "avgDocs": "Avg. documents/company",
+    "avgDocsInfo": "Average documents issued per registered company.",
+    "churnRisk": "Churn risk",
+    "churnRiskInfo": "Paid companies with no activity for 21+ days — potential churn. Consider reaching out to them."
+  },
+  "docs": {
+    "totalValue": "Total value of all invoices",
+    "totalValueInfo": "The sum of all invoices issued by companies on the platform (their turnover, not our revenue)."
+  },
+  "alerts": {
+    "title": "Automatic alerts",
+    "nearLimit": "{name} is near its limit ({used}/{limit}) — likely upgrade.",
+    "hotLead": "Hot lead: {name} (score {score}/100) — ready for a paid plan.",
+    "turnover": "Platform turnover this month: {amount} €."
+  },
+  "funnel": {
+    "title": "Sales funnel",
+    "visitors": "Visitors",
+    "registrations": "Registrations (companies)",
+    "activated": "Activated companies",
+    "firstInvoice": "Issued first invoice",
+    "paid": "Paid subscription",
+    "ofPrev": "({n}% of previous)"
+  },
+  "pageViews": {
+    "title": "Page views",
+    "show": "Show",
+    "noData": "No data yet.",
+    "home": "Home page",
+    "login": "Login page",
+    "register": "Registration page",
+    "allPublic": "All public",
+    "inApp": "In app",
+    "thPage": "Page",
+    "thPath": "Path",
+    "thViews": "Views",
+    "note": "Counts are all page views, including repeats from the same visitor."
+  },
+  "pageLabels": {
+    "/": "Home page",
+    "/blog": "Blog",
+    "/faq": "FAQ",
+    "/contact": "Contact",
+    "/about": "About",
+    "/software": "About the software",
+    "/accountants": "For accountants",
+    "/register": "Registration",
+    "/login": "Login",
+    "/terms": "Terms",
+    "/privacy": "Privacy",
+    "/security": "Security",
+    "/tools": "Tools"
+  },
+  "modules": {
+    "title": "Module usage",
+    "noData": "No data yet."
+  },
+  "moduleNames": {
+    "invoices": "Invoices",
+    "documents": "Documents",
+    "clients": "Clients",
+    "suppliers": "Suppliers",
+    "warehouse": "Warehouse",
+    "production": "Production",
+    "employees": "Employees",
+    "haccp": "HACCP",
+    "cash": "Cash",
+    "expenses": "Expenses",
+    "contracts": "Contracts",
+    "projects": "Projects",
+    "archive": "Archive",
+    "assets": "Assets",
+    "analytics": "Analytics",
+    "tax-calendar": "Tax calendar",
+    "tools": "Tools",
+    "settings": "Profile",
+    "subscription": "Subscription"
+  },
+  "tools": {
+    "title": "Public tools",
+    "calcSuffix": "calculator",
+    "note": "Number of visits to each public tool."
+  },
+  "toolNames": {
+    "currency": "Currency",
+    "salary": "Salary",
+    "vat": "VAT",
+    "interest": "Interest",
+    "markup": "Markup"
+  },
+  "leads": {
+    "hotTitle": "Hot leads (free)",
+    "upgradeTitle": "Upgrade opportunities",
+    "inactiveTitle": "Inactive companies",
+    "allActive": "All are active",
+    "never": "never",
+    "days": "{n} days"
+  },
+  "visits": {
+    "title": "Site visits and activity",
+    "todayVisitors": "Visitors today",
+    "todayActive": "Active registered today",
+    "visitorsRange": "Visitors ({range})",
+    "activeRange": "Active registered ({range})",
+    "noData": "No data accumulated for this period yet.",
+    "legendVisitors": "Visitors (people)",
+    "legendActive": "Active registered users",
+    "allTime": "All-time on the site: {v} visitors · {u} active",
+    "barTitle": "{label}: {v} visitors · {u} active registered"
+  },
+  "sectors": {
+    "title": "Companies by sector",
+    "unspecified": "Unspecified"
+  },
+  "growthPanel": {
+    "title": "Growth",
+    "newCompanies": "New companies ({range})",
+    "total": "Total companies",
+    "paid": "Paid companies",
+    "free": "Free companies"
+  },
+  "companies": {
+    "title": "All companies",
+    "subtitle": "Standard companies and client companies (accounting firms are in the section above).",
+    "thCompany": "Company",
+    "thActivity": "Activity",
+    "thEik": "Reg. No",
+    "thUsers": "Users",
+    "thDocs": "Docs",
+    "thRegistration": "Registration",
+    "thSubscription": "Subscription",
+    "note": "A subscription change takes effect immediately — features are unlocked/locked automatically for that company. “Log into account” gives you technical access to the company’s account for assistance. Deleting archives the company (see the section below) — data is kept and can be restored."
+  },
+  "businesses": {
+    "title": "Businesses",
+    "all": "All",
+    "filter": "Filter",
+    "clear": "Clear",
+    "found": "Found:",
+    "foundSuffix": "companies",
+    "countryPh": "Bulgaria",
+    "dash": "—",
+    "fSector": "Sector",
+    "fCategory": "Subcategory",
+    "fSize": "Size",
+    "fPlan": "Plan",
+    "fCountry": "Country",
+    "fFrom": "Registered from",
+    "fTo": "to",
+    "thCompany": "Company",
+    "thSector": "Sector",
+    "thCategory": "Subcategory",
+    "thSize": "Size",
+    "thCountry": "Country",
+    "thPlan": "Plan",
+    "thRegistration": "Registration"
+  },
+  "emails": {
+    "title": "Emails & Notification Center",
+    "all": "All",
+    "noEmails": "No emails",
+    "cat": {
+      "account": "Account",
+      "subscription": "Subscription",
+      "document": "Document",
+      "reminder": "Reminder",
+      "admin": "Admin",
+      "system": "System",
+      "client_decision": "Decision",
+      "product": "Product"
+    },
+    "status": {
+      "sent": "Sent",
+      "queued": "Queued",
+      "failed": "Failed",
+      "skipped": "Skipped"
+    },
+    "statSent": "Sent",
+    "statSentSub": "of {n} total",
+    "statOpened": "Opened",
+    "statOpenedSub": "{n} emails",
+    "statClickRate": "Click rate",
+    "statClickSub": "{n} clicks",
+    "statDeliveryRate": "Delivery rate",
+    "statBounce": "Bounce",
+    "statUnsubscribe": "Unsubscribe",
+    "statFailed": "Failed",
+    "statJoined": "Joined from an invoice",
+    "statJoinedSub": "via the client portal",
+    "thRecipient": "Recipient",
+    "thSubject": "Subject",
+    "thCategory": "Category",
+    "thStatus": "Status",
+    "thOpens": "Opens",
+    "thDate": "Date",
+    "blacklist": "Blacklist ({n})",
+    "blEmail": "Email",
+    "blReason": "Reason",
+    "blErrors": "Errors",
+    "blUnsub": "Unsubscribed",
+    "blDate": "Date",
+    "blEmpty": "Empty — no problem addresses",
+    "blYes": "Yes",
+    "note": "Retry on SMTP error: 5 min → 30 min → 2 h → 24 h. After exhaustion the address is added to the Blacklist. The queue and reminders are processed by {cron} (daily cron)."
+  },
+  "blog": {
+    "title": "Blog ({n})",
+    "new": "+ New article",
+    "empty": "No articles. Click “Load 10 SEO articles” or create a new one.",
+    "thTitle": "Title",
+    "thCategory": "Category",
+    "thStatus": "Status",
+    "thViews": "Views",
+    "thDate": "Date",
+    "dash": "—",
+    "edit": "✎ Edit",
+    "status": {
+      "published": "Published",
+      "hidden": "Hidden",
+      "draft": "Draft"
+    }
+  },
+  "firm": {
+    "badge": "ACCOUNTING FIRM",
+    "subscription": "Subscription",
+    "subBack": "← Dashboard",
+    "subTitle": "Accounting firm subscription",
+    "subCurrentPlan": "CURRENT PLAN",
+    "subNote": "A plan change is confirmed after payment by bank transfer. Contact us or select a higher plan below.",
+    "bankTitle": "Payment by bank transfer",
+    "bankRecipient": "Recipient",
+    "bankIban": "IBAN",
+    "bankBank": "Bank",
+    "bankReason": "Reference",
+    "bankReasonValue": "Accounting firm subscription — {name}",
+    "bankNote": "Once payment is received we activate the selected plan and issue an invoice. All prices are excl. VAT. 1 EUR = {rate} BGN."
+  }
+}

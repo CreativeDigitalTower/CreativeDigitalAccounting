@@ -1,0 +1,316 @@
+{
+  "title": "Süper Yönetici",
+  "companiesCount": "{n} kayıtlı şirket",
+  "backToAdmin": "← Süper Yönetici",
+  "nav": {
+    "emails": "E-postalar ve bildirimler",
+    "blog": "Blog",
+    "businesses": "İşletmeler (sektör/plan filtreleri)"
+  },
+  "companiesWord": "şirket",
+  "ranges": {
+    "7d": "7 gün",
+    "30d": "30 gün",
+    "90d": "90 gün",
+    "12m": "12 ay",
+    "all": "Tüm dönem"
+  },
+  "pvRanges": {
+    "today": "Bugün",
+    "7d": "7 gün",
+    "30d": "30 gün",
+    "12m": "12 ay",
+    "all": "Tüm dönem"
+  },
+  "plan": {
+    "free": "Ücretsiz",
+    "start": "Start",
+    "business": "Business",
+    "pro": "Pro"
+  },
+  "docType": {
+    "invoice": "Faturalar",
+    "quote": "Teklifler",
+    "proforma": "Proformalar",
+    "credit_note": "Alacak dekontları",
+    "debit_note": "Borç dekontları",
+    "receipt": "Makbuzlar",
+    "protocol": "Protokoller",
+    "declaration": "Beyannameler"
+  },
+  "awaiting": {
+    "title": "Ödeme onayınızı bekliyor ({n})",
+    "desc": "Bu şirketler ücretli bir plan seçti ancak ödeme henüz onaylanmadı. Gelire dahil olması için şirket satırında „Ödeme alındı“ olarak işaretleyin."
+  },
+  "kpi": {
+    "registeredCompanies": "Kayıtlı şirketler",
+    "registeredCompaniesInfo": "Platformdaki toplam aktif (arşivlenmemiş) şirket sayısı.",
+    "registeredUsers": "Kayıtlı kullanıcılar",
+    "registeredUsersInfo": "Tüm platformdaki toplam kullanıcı hesabı — sahipler, davetli çalışanlar ve tüm diğer şirket rolleri.",
+    "issuedDocs": "Düzenlenen belgeler",
+    "mrr": "Beklenen aylık gelir (MRR)",
+    "mrrInfo": "MRR (Monthly Recurring Revenue) = ödemesi ONAYLANMIŞ şirketlerin aboneliklerinden gelen toplam aylık gelir. Deneme süreleri ve onaylanmamış ödemeler sayılmaz.",
+    "mrrPaying": "{n} onaylı ödemeyle",
+    "mrrAwaiting": " · {n} ödeme bekliyor",
+    "mrrTrialing": " · {n} deneme süresi",
+    "conversion": "Ücretli plana dönüşüm",
+    "conversionInfo": "Tüm kayıtlı şirketler içinde ücretli plandaki (Start/Business/Pro) şirketlerin yüzdesi.",
+    "conversionSub": "{total} şirketten {paid}"
+  },
+  "revenue": {
+    "mrr": "MRR",
+    "mrrInfo": "Ödemesi onaylanmış aboneliklerden aylık gelir (bizim gelirimiz).",
+    "arr": "ARR",
+    "arrInfo": "ARR (Annual Recurring Revenue) = yıllık abonelik geliri = MRR × 12.",
+    "turnoverThis": "Şirket cirosu (bu ay)",
+    "turnoverInfo": "Platformdaki ŞİRKETLERİN bu ay düzenlediği faturaların toplam değeri — bu onların iş cirosudur, bizim abonelik gelirimiz DEĞİL. (Bir test faturası da buraya dahildir.)",
+    "turnoverLast": "Şirket cirosu (geçen ay)",
+    "growth": "Ciro artışı",
+    "growthInfo": "Şirket cirosunun geçen aya göre değişimi."
+  },
+  "growth": {
+    "newThisMonth": "Yeni şirketler (bu ay)",
+    "newInfo": "Bu ayın başından beri kayıt olan şirketler.",
+    "newPrevMonth": "({n} önceki ay)",
+    "active30": "Aktif şirketler (30 gün)",
+    "active30Info": "Son 30 günde uygulamaya giriş yapan şirketler.",
+    "activated": "Etkinleştirilen şirketler",
+    "activatedInfo": "Gerçekten çalışmaya başlayan (bir müşteri veya belge olan) şirketlerin oranı.",
+    "avgDocs": "Ort. belge/şirket",
+    "avgDocsInfo": "Kayıtlı şirket başına ortalama düzenlenen belge.",
+    "churnRisk": "Kayıp riski",
+    "churnRiskInfo": "21+ gündür etkinliği olmayan ücretli şirketler — potansiyel churn. Onlarla iletişime geçmeyi düşünün."
+  },
+  "docs": {
+    "totalValue": "Tüm faturaların toplam değeri",
+    "totalValueInfo": "Platformdaki şirketlerin düzenlediği tüm faturaların toplamı (onların cirosu, bizim gelirimiz değil)."
+  },
+  "alerts": {
+    "title": "Otomatik uyarılar",
+    "nearLimit": "{name} limitine yakın ({used}/{limit}) — muhtemel yükseltme.",
+    "hotLead": "Sıcak lead: {name} (skor {score}/100) — ücretli plana hazır.",
+    "turnover": "Bu ay platform cirosu: {amount} €."
+  },
+  "funnel": {
+    "title": "Satış hunisi",
+    "visitors": "Ziyaretçiler",
+    "registrations": "Kayıtlar (şirketler)",
+    "activated": "Etkinleştirilen şirketler",
+    "firstInvoice": "İlk faturayı düzenleyen",
+    "paid": "Ücretli abonelik",
+    "ofPrev": "(öncekinin %{n}’i)"
+  },
+  "pageViews": {
+    "title": "Sayfa görüntülemeleri",
+    "show": "Göster",
+    "noData": "Henüz veri yok.",
+    "home": "Ana sayfa",
+    "login": "Giriş sayfası",
+    "register": "Kayıt sayfası",
+    "allPublic": "Tüm herkese açık",
+    "inApp": "Uygulamada",
+    "thPage": "Sayfa",
+    "thPath": "Yol",
+    "thViews": "Görüntüleme",
+    "note": "Sayılar tüm sayfa görüntülemeleridir (page views), aynı ziyaretçinin tekrarları dahil."
+  },
+  "pageLabels": {
+    "/": "Ana sayfa",
+    "/blog": "Blog",
+    "/faq": "SSS",
+    "/contact": "İletişim",
+    "/about": "Hakkımızda",
+    "/software": "Yazılım hakkında",
+    "/accountants": "Muhasebeciler için",
+    "/register": "Kayıt",
+    "/login": "Giriş",
+    "/terms": "Koşullar",
+    "/privacy": "Gizlilik",
+    "/security": "Güvenlik",
+    "/tools": "Araçlar"
+  },
+  "modules": {
+    "title": "Modül kullanımı",
+    "noData": "Henüz veri yok."
+  },
+  "moduleNames": {
+    "invoices": "Faturalar",
+    "documents": "Belgeler",
+    "clients": "Müşteriler",
+    "suppliers": "Tedarikçiler",
+    "warehouse": "Depo",
+    "production": "Üretim",
+    "employees": "Çalışanlar",
+    "haccp": "HACCP",
+    "cash": "Kasa",
+    "expenses": "Giderler",
+    "contracts": "Sözleşmeler",
+    "projects": "Projeler",
+    "archive": "Arşiv",
+    "assets": "Varlıklar",
+    "analytics": "Analizler",
+    "tax-calendar": "Vergi takvimi",
+    "tools": "Araçlar",
+    "settings": "Profil",
+    "subscription": "Abonelik"
+  },
+  "tools": {
+    "title": "Herkese açık araçlar",
+    "calcSuffix": "hesaplayıcı",
+    "note": "Her herkese açık aracın ziyaret sayısı."
+  },
+  "toolNames": {
+    "currency": "Döviz",
+    "salary": "Maaş",
+    "vat": "KDV",
+    "interest": "Faiz",
+    "markup": "Kâr marjı"
+  },
+  "leads": {
+    "hotTitle": "Sıcak lead’ler (free)",
+    "upgradeTitle": "Yükseltme fırsatları",
+    "inactiveTitle": "Pasif şirketler",
+    "allActive": "Hepsi aktif",
+    "never": "hiçbir zaman",
+    "days": "{n} gün"
+  },
+  "visits": {
+    "title": "Site ziyaretleri ve etkinliği",
+    "todayVisitors": "Bugünkü ziyaretçiler",
+    "todayActive": "Bugün aktif kayıtlı",
+    "visitorsRange": "Ziyaretçiler ({range})",
+    "activeRange": "Aktif kayıtlı ({range})",
+    "noData": "Bu dönem için henüz veri birikmedi.",
+    "legendVisitors": "Ziyaretçiler (kişi)",
+    "legendActive": "Aktif kayıtlı kullanıcılar",
+    "allTime": "Sitede dönem toplamı: {v} ziyaretçi · {u} aktif",
+    "barTitle": "{label}: {v} ziyaretçi · {u} aktif kayıtlı"
+  },
+  "sectors": {
+    "title": "Sektöre göre şirketler",
+    "unspecified": "Belirtilmemiş"
+  },
+  "growthPanel": {
+    "title": "Büyüme",
+    "newCompanies": "Yeni şirketler ({range})",
+    "total": "Toplam şirket",
+    "paid": "Ücretli şirketler",
+    "free": "Ücretsiz şirketler"
+  },
+  "companies": {
+    "title": "Tüm şirketler",
+    "subtitle": "Standart şirketler ve müşteri şirketleri (muhasebe firmaları yukarıdaki bölümde).",
+    "thCompany": "Şirket",
+    "thActivity": "Etkinlik",
+    "thEik": "Sicil No",
+    "thUsers": "Kull.",
+    "thDocs": "Blg.",
+    "thRegistration": "Kayıt",
+    "thSubscription": "Abonelik",
+    "note": "Abonelik değişikliği hemen yürürlüğe girer — özellikler ilgili şirket için otomatik açılır/kilitlenir. „Hesaba gir“ destek için şirketin hesabına teknik erişim verir. Silme şirketi arşivler (aşağıdaki bölüme bakın) — veriler saklanır ve geri yüklenebilir."
+  },
+  "businesses": {
+    "title": "İşletmeler",
+    "all": "Tümü",
+    "filter": "Filtrele",
+    "clear": "Temizle",
+    "found": "Bulunan:",
+    "foundSuffix": "şirket",
+    "countryPh": "Bulgaristan",
+    "dash": "—",
+    "fSector": "Sektör",
+    "fCategory": "Alt kategori",
+    "fSize": "Büyüklük",
+    "fPlan": "Plan",
+    "fCountry": "Ülke",
+    "fFrom": "Kayıt başlangıcı",
+    "fTo": "bitiş",
+    "thCompany": "Şirket",
+    "thSector": "Sektör",
+    "thCategory": "Alt kategori",
+    "thSize": "Büyüklük",
+    "thCountry": "Ülke",
+    "thPlan": "Plan",
+    "thRegistration": "Kayıt"
+  },
+  "emails": {
+    "title": "E-postalar ve Notification Center",
+    "all": "Tümü",
+    "noEmails": "E-posta yok",
+    "cat": {
+      "account": "Hesap",
+      "subscription": "Abonelik",
+      "document": "Belge",
+      "reminder": "Hatırlatma",
+      "admin": "Yönetici",
+      "system": "Sistem",
+      "client_decision": "Karar",
+      "product": "Ürün"
+    },
+    "status": {
+      "sent": "Gönderildi",
+      "queued": "Kuyrukta",
+      "failed": "Başarısız",
+      "skipped": "Atlandı"
+    },
+    "statSent": "Gönderilen",
+    "statSentSub": "toplam {n} içinden",
+    "statOpened": "Açılan",
+    "statOpenedSub": "{n} e-posta",
+    "statClickRate": "Click rate",
+    "statClickSub": "{n} tıklama",
+    "statDeliveryRate": "Delivery rate",
+    "statBounce": "Bounce",
+    "statUnsubscribe": "Unsubscribe",
+    "statFailed": "Başarısız",
+    "statJoined": "Faturadan katılanlar",
+    "statJoinedSub": "müşteri portalı üzerinden",
+    "thRecipient": "Alıcı",
+    "thSubject": "Konu",
+    "thCategory": "Kategori",
+    "thStatus": "Durum",
+    "thOpens": "Açl.",
+    "thDate": "Tarih",
+    "blacklist": "Blacklist ({n})",
+    "blEmail": "E-posta",
+    "blReason": "Neden",
+    "blErrors": "Hatalar",
+    "blUnsub": "Abonelikten çıktı",
+    "blDate": "Tarih",
+    "blEmpty": "Boş — sorunlu adres yok",
+    "blYes": "Evet",
+    "note": "SMTP hatasında yeniden deneme: 5 dk → 30 dk → 2 sa → 24 sa. Tükenince adres Blacklist’e eklenir. Kuyruk ve hatırlatmalar {cron} tarafından işlenir (günlük cron)."
+  },
+  "blog": {
+    "title": "Blog ({n})",
+    "new": "+ Yeni makale",
+    "empty": "Makale yok. „10 SEO makalesi yükle“ düğmesine basın veya yeni oluşturun.",
+    "thTitle": "Başlık",
+    "thCategory": "Kategori",
+    "thStatus": "Durum",
+    "thViews": "Görüntüleme",
+    "thDate": "Tarih",
+    "dash": "—",
+    "edit": "✎ Düzenle",
+    "status": {
+      "published": "Yayımlandı",
+      "hidden": "Gizli",
+      "draft": "Taslak"
+    }
+  },
+  "firm": {
+    "badge": "MUHASEBE FİRMASI",
+    "subscription": "Abonelik",
+    "subBack": "← Panel",
+    "subTitle": "Muhasebe firması aboneliği",
+    "subCurrentPlan": "MEVCUT PLAN",
+    "subNote": "Plan değişikliği banka havalesiyle ödeme sonrası onaylanır. Bizimle iletişime geçin veya aşağıdan daha yüksek bir plan seçin.",
+    "bankTitle": "Banka havalesiyle ödeme",
+    "bankRecipient": "Alıcı",
+    "bankIban": "IBAN",
+    "bankBank": "Banka",
+    "bankReason": "Açıklama",
+    "bankReasonValue": "Muhasebe firması aboneliği — {name}",
+    "bankNote": "Ödeme alındıktan sonra seçilen planı etkinleştirir ve fatura düzenleriz. Tüm fiyatlar KDV hariçtir. 1 EUR = {rate} BGN."
+  }
+}
