@@ -228,5 +228,202 @@
       }
     ]
   },
-  "menu": "Menü"
+  "menu": "Menü",
+  "about": {
+    "title": "Hakkımızda",
+    "intro": "Creative Digital Accounting, küçük işletmelerin de kurumlarla aynı güçlü araçları hak ettiği inancıyla kuruldu — yalnızca daha basit ve daha erişilebilir.",
+    "cards": [
+      {
+        "title": "Misyonumuz",
+        "text": "Girişimcileri idari yükten kurtarmak, böylece gerçekten önemli olana — işi büyütmeye — odaklanabilsinler."
+      },
+      {
+        "title": "Yaklaşımımız",
+        "text": "Bir „muhasebe yazılımı” değil, sezgisel tasarıma sahip modern bir iş platformu. Her özellik KOBİ'lerin gerçek ihtiyaçlarından doğar."
+      },
+      {
+        "title": "Uyumluluk",
+        "text": "Çift EUR/BGN gösterimi, KDV oranları %20/%9/%0, SAF-T hazırlığı ve VIES doğrulaması — tüm yerel gereklilikleri karşılıyoruz."
+      },
+      {
+        "title": "Güvenlik",
+        "text": "Çok kiracılı izolasyon — her firma yalnızca kendi verilerini görür. Veriler güvenli bir PostgreSQL ortamında düzenli yedeklerle saklanır."
+      }
+    ],
+    "ctaTitle": "Denemeye hazır mısınız?",
+    "ctaText": "Kayıt 2 dakika sürer.",
+    "ctaRegister": "Ücretsiz kayıt ol",
+    "ctaContact": "Bize ulaşın"
+  },
+  "contact": {
+    "title": "İletişim",
+    "intro": "Sorunuz veya öneriniz mi var? Bize yazın, bir iş günü içinde yanıtlayalım.",
+    "emailLabel": "E-posta",
+    "fbLabel": "Facebook / Messenger",
+    "fbCta": "Messenger'dan yazın →",
+    "sentTitle": "Mesajınız gönderildi!",
+    "sentText": "Belirttiğiniz e-postaya 1 iş günü içinde yanıt vereceğiz.",
+    "error": "Bir hata oluştu. Tekrar deneyin veya doğrudan bize yazın.",
+    "fName": "Ad",
+    "fNamePh": "Ahmet Yılmaz",
+    "fEmail": "E-posta",
+    "fEmailPh": "ahmet@firma.com",
+    "fCompany": "Firma (isteğe bağlı)",
+    "fCompanyPh": "Örnek Ltd",
+    "fMessage": "Mesaj",
+    "fMessagePh": "Nasıl yardımcı olabiliriz?",
+    "submit": "Mesaj gönder",
+    "submitting": "Gönderiliyor…"
+  },
+  "services": {
+    "metaTitle": "Hizmetler — web, pazarlama, reklam ve dijital hizmet",
+    "metaDesc": "Muhasebe yazılımının yanı sıra işinizi büyütmek için tüm dijital hizmetleri sunuyoruz: web sitesi tasarımı ve bakımı, pazarlama, grafik tasarım, reklam ve sosyal medya yönetimi. Uzun yıllara dayanan kanıtlanmış deneyime sahip bir firma.",
+    "badge": "DİJİTAL HİZMETLER",
+    "title": "İşinizin eksiksiz büyümesi için her şey",
+    "intro1": "Muhasebe ve iş yazılımımızın yanı sıra, eksiksiz bir dijital hizmet yelpazesi sunuyoruz. Bu alanda",
+    "introStrong": " uzun yıllara dayanan kanıtlanmış deneyime",
+    "intro2": " sahip bir firmayız — işletmelerin fikirden sonuca online büyümesine yardımcı oluyoruz.",
+    "items": [
+      {
+        "title": "Web sitesi tasarımı ve bakımı",
+        "text": "Modern, hızlı ve duyarlı web siteleri ve online mağazalar — sürekli teknik destek ve güncelleme ile."
+      },
+      {
+        "title": "Pazarlama",
+        "text": "Gerçek müşteri ve büyüme getiren eksiksiz pazarlama stratejileri — veriye ve kanıtlanmış deneyime dayalı."
+      },
+      {
+        "title": "Grafik tasarım",
+        "text": "Markanızı profesyonelce öne çıkaran logo, kurumsal kimlik, reklam materyalleri ve görseller."
+      },
+      {
+        "title": "Reklam oluşturma ve yönetimi",
+        "text": "Facebook, Instagram ve Google'da reklam kampanyalarının kurulması, optimizasyonu ve yönetimi."
+      },
+      {
+        "title": "Sosyal medya yönetimi",
+        "text": "Görünür ve aktif kalmanız için içerik, gönderiler ve sosyal profillerinizin aktif yönetimi."
+      },
+      {
+        "title": "Eksiksiz dijital hizmet",
+        "text": "İşiniz için tam pazarlama ve dijital hizmet — stratejiden uygulamaya, tek yerde."
+      }
+    ],
+    "ctaTitle": "İşinizi birlikte büyütelim mi?",
+    "ctaText": "Listelenen hizmetlerden biri veya tümüyle nasıl yardımcı olabileceğimizi görüşmek için bize ulaşın.",
+    "ctaBtn": "Bize ulaşın →"
+  },
+  "faq": {
+    "metaTitle": "Sıkça sorulan sorular (SSS) | Creative Digital Accounting",
+    "metaDesc": "Online faturalama, başka yazılımdan geçiş, abonelikler ve Creative Digital Accounting platformunda çalışma hakkında en sık sorulan soruların yanıtları.",
+    "eyebrow": "Yardım merkezi",
+    "title": "Sıkça sorulan sorular",
+    "intro": "Online faturalama, geçiş ve platformda çalışma hakkında bilmeniz gereken her şey.",
+    "notFoundTitle": "Yanıt bulamadınız mı?",
+    "notFoundText": "Bize yazın — memnuniyetle yardımcı oluruz.",
+    "contactBtn": "Bize ulaşın",
+    "registerBtn": "Ücretsiz başla",
+    "groups": [
+      {
+        "title": "Başlangıç ve geçiş",
+        "items": [
+          {
+            "q": "Halihazırda başka bir faturalama yazılımı kullanıyorum. Creative Digital Accounting'e sorunsuz geçebilir miyim?",
+            "a": [
+              "Evet, tamamen. Yeni bir faturalama platformuna istediğiniz zaman geçmenizde hiçbir muhasebe veya hukuki sorun yoktur.",
+              "Daha önce düzenlediğiniz tüm faturalar korunur — geçerli kalır ve etkilenmez. Tek önemli şey belge numaralandırmasıdır: kesintisiz ve tekrarsız devam etmelidir.",
+              "Platformda faturalamanın hangi sıra numarasından devam edeceğini serbestçe belirleyebilirsiniz (her faturada numarayı kilidini açma ve düzenleme seçeneği vardır), böylece tam kaldığınız yerden devam edersiniz."
+            ]
+          },
+          {
+            "q": "Geçişte verilerimi kaybeder miyim?",
+            "a": [
+              "Hayır. Mevcut müşterilerinizi ve her biriyle daha önce gerçekleştirdiğiniz ciroyu (geriye dönük) girebilirsiniz. Sistemdeki yeni faturalar bu açılış cirosunun üzerine eklenir, böylece istatistikleriniz kesintisiz devam eder."
+            ]
+          },
+          {
+            "q": "Ne kadar hızlı başlayabilirim?",
+            "a": [
+              "Kayıt 2 dakikadan kısa sürer. Ardından firma bilgilerini bir kez doldurup ilk faturanızı hemen düzenlersiniz."
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Faturalama ve belgeler",
+        "items": [
+          {
+            "q": "Yeni bir hesap için fatura numaralandırması nasıl başlar?",
+            "a": [
+              "Numaralandırma otomatiktir ve baştan başlar (0000000001). Her faturada sıra numarasını kilidini açıp elle düzenleme seçeneği vardır — X numarasını ayarlarsanız numaralandırma oradan devam eder."
+            ]
+          },
+          {
+            "q": "Hangi belgeleri düzenleyebilirim?",
+            "a": [
+              "Faturalar, proformalar, teklifler, alacak ve borç dekontları ve profesyonel tasarımlı 100'den fazla iş belgesi şablonu."
+            ]
+          },
+          {
+            "q": "KDV kaydı zorunlu mu?",
+            "a": [
+              "Hayır. Platform, KDV kaydı olmayan firmalar için de çalışır — o zaman faturalar KDV'siz düzenlenir. Kayıtlı olanlar için sistem vergiyi otomatik hesaplar."
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Abonelikler ve ödemeler",
+        "items": [
+          {
+            "q": "Ücretsiz plan ve ücretsiz deneme var mı?",
+            "a": [
+              "Evet. Sonsuza kadar ücretsiz bir plan var; Start ve Business planlarında ise tek seferlik 7 günlük ücretsiz deneme bulunuyor."
+            ]
+          },
+          {
+            "q": "Abonelik nasıl ödenir?",
+            "a": [
+              "Banka havalesiyle. Talepten sonra ödeme bilgilerini içeren bir e-posta alırsınız (IBAN, alıcı, açıklama ve tutar). Ödeme alındıktan sonra planınızı etkinleştiririz."
+            ]
+          },
+          {
+            "q": "Planımı değiştirebilir miyim?",
+            "a": [
+              "Evet, istediğiniz zaman — daha yüksek veya daha düşük bir plana. Ücretli dönem yenilenmeden sona erdiğinde hesap Ücretsiz plana döner ve verileriniz korunur."
+            ]
+          },
+          {
+            "q": "Ödenen abonelikleri iade ediyor musunuz?",
+            "a": [
+              "Abonelik ödemesi iade edilmez. Bu yüzden platformun ihtiyaçlarınızı karşıladığından emin olmak için önce ücretsiz planı ve ücretsiz denemeyi kullanmanızı öneririz."
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Güvenlik ve hesap",
+        "items": [
+          {
+            "q": "Verilerim güvende mi?",
+            "a": [
+              "Evet. Veriler şifreli saklanır, parolalar hashlenir ve erişim firmalar arasında izole edilir. Daha fazlası Bilgi Güvenliği Politikası'nda."
+            ]
+          },
+          {
+            "q": "Firma hesabımı silebilir miyim?",
+            "a": [
+              "Evet. Firma Profili → Tehlikeli Bölge'den onayın ardından hesabı silebilirsiniz. İşlem geri alınamaz ve tüm ilgili verileri kaldırır."
+            ]
+          },
+          {
+            "q": "Mobil uygulama olacak mı?",
+            "a": [
+              "Evet — iOS ve Android için mobil uygulama ve yeni platform özellikleri yakında geliyor."
+            ]
+          }
+        ]
+      }
+    ]
+  }
 }
