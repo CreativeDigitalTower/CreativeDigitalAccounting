@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { EUR_TO_BGN, isPromoActive, BILLING_PERIODS } from "@/lib/constants";
 import { IconSeed, IconRocket, IconTrophy, IconCrown, IconBuilding } from "@/components/Icons";
+import { useI18n } from "@/components/i18n/I18nProvider";
 
 type Plan = {
   id: string; Icon: typeof IconSeed; name: string; tagline: string; price: number; regularPrice: number;
@@ -33,16 +34,18 @@ export const PLAN_DETAILS: Plan[] = [
 export { BILLING_PERIODS };
 
 export function Pricing() {
+  const { t, messages } = useI18n();
+  const P = (messages as unknown as { pricing: { plans: Record<string, { name: string; tagline: string; blurb: string; suited: string; cta: string; features: string[] }> } }).pricing;
   const [period, setPeriod] = useState<(typeof BILLING_PERIODS)[number]>(BILLING_PERIODS[0]);
   const promo = isPromoActive();
 
   return (
     <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 80px" }}>
       <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 36, fontWeight: 700, textAlign: "center", marginBottom: 8 }}>
-        Абонаментни планове
+        {t("pricing.title")}
       </h2>
       <p style={{ textAlign: "center", color: "var(--muted)", marginBottom: 20, fontSize: 14 }}>
-        Всички цени са без ДДС · 1 EUR = {EUR_TO_BGN.toFixed(5)} лв
+        {t("pricing.pricesNote", { rate: EUR_TO_BGN.toFixed(5) })}
       </p>
 
       {/* Период на плащане */}
@@ -55,13 +58,13 @@ export function Pricing() {
                 background: period.id === p.id ? "var(--emerald)" : "transparent",
                 color: period.id === p.id ? "#fff" : "var(--ink-soft)",
               }}>
-              {p.label}{p.discount > 0 && <span style={{ marginLeft: 6, fontSize: 11, color: period.id === p.id ? "#fff" : "var(--brass)" }}>−{p.discount * 100}%</span>}
+              {t(`pricing.periods.${p.id}`)}{p.discount > 0 && <span style={{ marginLeft: 6, fontSize: 11, color: period.id === p.id ? "#fff" : "var(--brass)" }}>−{p.discount * 100}%</span>}
             </button>
           ))}
         </div>
       </div>
       <p style={{ textAlign: "center", color: "var(--emerald)", fontSize: 12.5, fontWeight: 600, marginBottom: 28, minHeight: 18 }}>
-        {period.discount > 0 ? `Спестявате ${period.discount * 100}% при плащане за ${period.label.toLowerCase()}` : " "}
+        {period.discount > 0 ? t("pricing.saveNote", { pct: period.discount * 100, period: t(`pricing.periods.${period.id}`).toLowerCase() }) : " "}
       </p>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 16 }}>
@@ -72,18 +75,19 @@ export function Pricing() {
           const fullTotal = plan.price * period.months;
           const Icon = plan.Icon;
           const hasPromo = promo && plan.regularPrice > plan.price;
+          const pt = P.plans[plan.id];
           return (
             <div key={plan.id} className="glass panel"
               style={{ padding: "24px 20px", position: "relative", display: "flex", flexDirection: "column", border: plan.recommended ? "2px solid var(--brass)" : undefined }}>
-              {plan.recommended && <span className="ribbon">Препоръчан</span>}
+              {plan.recommended && <span className="ribbon">{t("pricing.recommended")}</span>}
               {hasPromo && (
-                <span style={{ position: "absolute", top: 12, left: 12, background: "var(--brick)", color: "#fff", fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, letterSpacing: .3 }}>Специална цена</span>
+                <span style={{ position: "absolute", top: 12, left: 12, background: "var(--brick)", color: "#fff", fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, letterSpacing: .3 }}>{t("pricing.specialPrice")}</span>
               )}
               <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, marginTop: hasPromo ? 12 : 0 }}>
                 <div className="icon-tile" style={{ width: 56, height: 56 }}><Icon /></div>
               </div>
-              <div style={{ fontFamily: "'Fraunces', serif", fontSize: 21, fontWeight: 700, textAlign: "center" }}>{plan.name}</div>
-              <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 2, minHeight: 34, textAlign: "center" }}>{plan.tagline}</div>
+              <div style={{ fontFamily: "'Fraunces', serif", fontSize: 21, fontWeight: 700, textAlign: "center" }}>{pt.name}</div>
+              <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 2, minHeight: 34, textAlign: "center" }}>{pt.tagline}</div>
 
               <div style={{ textAlign: "center", margin: "12px 0 0" }}>
                 {hasPromo && (
@@ -94,29 +98,29 @@ export function Pricing() {
                 <span className="num" style={{ fontSize: 32, fontWeight: 700, color: hasPromo ? "var(--emerald-dark)" : "var(--ink)" }}>
                   {plan.price === 0 ? "0" : promoMonthly.toFixed(promoMonthly % 1 === 0 ? 0 : 2)}
                 </span>
-                <span style={{ fontSize: 14, color: "var(--muted)", fontWeight: 500 }}> € / месец</span>
+                <span style={{ fontSize: 14, color: "var(--muted)", fontWeight: 500 }}> {t("pricing.perMonth")}</span>
               </div>
               {plan.price > 0 && period.months > 1 && (
                 <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 2, textAlign: "center" }}>
-                  {total.toFixed(2)} € общо за {period.months} м. <span style={{ color: "var(--brass)" }}>(−{(fullTotal - total).toFixed(2)} €)</span>
+                  {t("pricing.totalFor", { total: total.toFixed(2), months: period.months })} <span style={{ color: "var(--brass)" }}>{t("pricing.saved", { amount: (fullTotal - total).toFixed(2) })}</span>
                 </div>
               )}
               {plan.price > 0 && period.months === 1 && (
-                <div className="num" style={{ fontSize: 11, color: "var(--muted)", marginBottom: 6, textAlign: "center" }}>≈ {(plan.price * EUR_TO_BGN).toFixed(2)} лв/месец</div>
+                <div className="num" style={{ fontSize: 11, color: "var(--muted)", marginBottom: 6, textAlign: "center" }}>{t("pricing.approxBgn", { amount: (plan.price * EUR_TO_BGN).toFixed(2) })}</div>
               )}
 
-              <p style={{ fontSize: 12.5, color: "var(--ink-soft)", margin: "10px 0 14px", lineHeight: 1.5, textAlign: "center" }}>{plan.blurb}</p>
+              <p style={{ fontSize: 12.5, color: "var(--ink-soft)", margin: "10px 0 14px", lineHeight: 1.5, textAlign: "center" }}>{pt.blurb}</p>
 
               <ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px", display: "flex", flexDirection: "column", gap: 7, flex: 1 }}>
-                {plan.features.map((f) => (
+                {pt.features.map((f: string) => (
                   <li key={f} style={{ fontSize: 12.5, color: "var(--ink-soft)", paddingLeft: 18, position: "relative" }}>
                     <span style={{ position: "absolute", left: 0, color: "var(--emerald)", fontWeight: 700 }}>✓</span>{f}
                   </li>
                 ))}
               </ul>
 
-              <div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 14, fontStyle: "italic" }}>Подходящ за: {plan.suited}</div>
-              <Link href={`${plan.href}&period=${period.id}`} className={plan.recommended ? "btn btn-primary" : "btn btn-ghost"} style={{ width: "100%", justifyContent: "center" }}>{plan.cta}</Link>
+              <div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 14, fontStyle: "italic" }}>{t("pricing.suitedFor", { text: pt.suited })}</div>
+              <Link href={`${plan.href}&period=${period.id}`} className={plan.recommended ? "btn btn-primary" : "btn btn-ghost"} style={{ width: "100%", justifyContent: "center" }}>{pt.cta}</Link>
             </div>
           );
         })}
@@ -125,9 +129,9 @@ export function Pricing() {
       {/* Специално предложение */}
       {promo && (
         <div className="glass panel" style={{ marginTop: 18, padding: "16px 24px", textAlign: "center", borderLeft: "4px solid var(--brick)", background: "var(--brick-soft)" }}>
-          <strong style={{ color: "var(--brick)", fontSize: 15 }}>Спестете до 20 € всеки месец.</strong>{" "}
+          <strong style={{ color: "var(--brick)", fontSize: 15 }}>{t("pricing.promoStrong")}</strong>{" "}
           <span style={{ fontSize: 13.5, color: "var(--ink-soft)" }}>
-            Регистрирайте се до 31.12.2026 г. и се възползвайте от специалните стартови цени на Creative Digital Accounting.
+            {t("pricing.promoText")}
           </span>
         </div>
       )}
@@ -137,21 +141,21 @@ export function Pricing() {
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
             <span style={{ color: "var(--navy)" }}><IconBuilding /></span>
-            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, margin: 0 }}>Корпоративни</h3>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, margin: 0 }}>{t("pricing.corpTitle")}</h3>
           </div>
           <p style={{ margin: 0, color: "var(--ink-soft)", fontSize: 13.5, maxWidth: 620 }}>
-            Индивидуални предложения с изработка на специфични софтуерни решения, създадени точно за нуждите на вашата фирма — интеграции, персонализирани модули и специализирана поддръжка.
+            {t("pricing.corpText")}
           </p>
         </div>
-        <Link href="/contact" className="btn btn-primary" style={{ flexShrink: 0 }}>Свържете се с нас</Link>
+        <Link href="/contact" className="btn btn-primary" style={{ flexShrink: 0 }}>{t("pricing.corpCta")}</Link>
       </div>
 
       <div style={{ marginTop: 24, textAlign: "center", display: "flex", flexDirection: "column", gap: 8 }}>
         <p style={{ fontSize: 13.5, color: "var(--ink-soft)", margin: 0 }}>
-          <strong>7 дни безплатен тест</strong> (еднократно) на плановете Старт и Бизнес.
+          <strong>{t("pricing.trialBold")}</strong>{t("pricing.trialRest")}
         </p>
         <p style={{ fontSize: 13, color: "var(--emerald)", margin: 0, fontWeight: 600 }}>
-          Автоматично преминаване към еврото и пълна готовност за въвеждането на EUR в България
+          {t("pricing.euroNote")}
         </p>
       </div>
     </section>
