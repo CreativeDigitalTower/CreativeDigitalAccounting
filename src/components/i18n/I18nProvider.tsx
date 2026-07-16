@@ -8,6 +8,8 @@ import { fmtMoney, fmtNumber, fmtPercent, fmtDate, fmtDateShort } from "@/lib/i1
 type Ctx = {
   locale: Locale;
   t: TFunc;
+  /** Суровите съобщения за текущия език — за четене на масиви/обекти в client компоненти. */
+  messages: Messages;
   money: (v: number, currency?: string) => string;
   num: (v: number, opts?: Intl.NumberFormatOptions) => string;
   percent: (v: number, digits?: number) => string;
@@ -21,7 +23,7 @@ export function I18nProvider({ locale, messages, children }: { locale: Locale; m
   const value = useMemo<Ctx>(() => {
     const t = makeT(messages);
     return {
-      locale, t,
+      locale, t, messages,
       money: (v, c) => fmtMoney(v, locale, c),
       num: (v, o) => fmtNumber(v, locale, o),
       percent: (v, d) => fmtPercent(v, locale, d),

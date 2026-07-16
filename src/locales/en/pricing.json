@@ -1,0 +1,149 @@
+{
+  "title": "Subscription plans",
+  "pricesNote": "All prices excl. VAT · 1 EUR = {rate} BGN",
+  "recommended": "Recommended",
+  "specialPrice": "Special price",
+  "active": "Active",
+  "perMonth": "€ / month",
+  "perMonthShort": "€ / mo",
+  "totalFor": "{total} € total for {months} mo.",
+  "totalForShort": "{total} € for {months} mo.",
+  "saved": "(−{amount} €)",
+  "approxBgn": "≈ {amount} BGN/month",
+  "approxBgnShort": "≈ {amount} BGN/mo",
+  "suitedFor": "Suited for: {text}",
+  "saveNote": "You save {pct}% paying for {period}",
+  "promoStrong": "Save up to 20 € every month.",
+  "promoText": "Register by 31.12.2026 and take advantage of Creative Digital Accounting's special launch prices.",
+  "corpTitle": "Enterprise",
+  "corpText": "Individual offers with custom software solutions built exactly for your company's needs — integrations, custom modules and dedicated support.",
+  "corpCta": "Get in touch",
+  "trialBold": "7-day free trial",
+  "trialRest": " (one-time) on the Start and Business plans.",
+  "euroNote": "Automatic switch to the euro and full readiness for the introduction of EUR in Bulgaria",
+  "periods": {
+    "monthly": "Monthly",
+    "semiannual": "6 months",
+    "annual": "1 year"
+  },
+  "byArrangement": "by arrangement",
+  "unlimitedClients": "Unlimited clients",
+  "upToClients": "Up to {n} clients",
+  "unlimitedUsers": "Unlimited users",
+  "upToUsers": "Up to {n} users",
+  "firmFeatures": [
+    "Each client gets free START access",
+    "Manage all client companies from one place",
+    "Consolidated report for all clients",
+    "Quick switching between client companies",
+    "Separate invoices, inventory, expenses and analytics per company",
+    "VAT threshold and tax calendar tracking per client",
+    "Client invitations by email and referral link"
+  ],
+  "firmPlans": {
+    "acc_start": {
+      "name": "Accounting Start",
+      "tagline": "For independent accountants"
+    },
+    "acc_pro": {
+      "name": "Accounting Pro",
+      "tagline": "For small accounting teams"
+    },
+    "acc_office": {
+      "name": "Accounting Office",
+      "tagline": "For medium accounting offices"
+    },
+    "acc_enterprise": {
+      "name": "Accounting Firm",
+      "tagline": "For large accounting firms"
+    }
+  },
+  "plans": {
+    "free": {
+      "name": "Free",
+      "tagline": "For startups and freelancers",
+      "blurb": "Perfect for your business's first steps.",
+      "suited": "freelancers, consultants, newly registered companies.",
+      "cta": "Start free",
+      "features": [
+        "Up to 5 documents per month",
+        "1 company",
+        "1 user",
+        "Invoices, proformas and quotes",
+        "Up to 5 clients and suppliers",
+        "Basic inventory",
+        "Financial dashboard",
+        "Tax calendar",
+        "Dual EUR/BGN display",
+        "2 professional PDF templates"
+      ]
+    },
+    "start": {
+      "name": "Start",
+      "tagline": "For small companies with active daily work",
+      "blurb": "The best-selling package for small companies.",
+      "suited": "small trading companies, agencies, online stores and services.",
+      "cta": "Choose Start",
+      "features": [
+        "Everything in Free",
+        "Up to 30 documents per month",
+        "Expenses and incoming documents",
+        "Recurring invoices",
+        "Automatic reminders",
+        "Expense management with attachments",
+        "Standard business analytics",
+        "Revenue and inventory-price simulation",
+        "Branded PDF documents (company logo)",
+        "Document archive",
+        "3 professional PDF templates",
+        "1 user + 1 guest"
+      ]
+    },
+    "business": {
+      "name": "Business",
+      "tagline": "For growing companies",
+      "blurb": "The most preferred package by growing companies.",
+      "suited": "growing companies, production, food industry, more complex processes.",
+      "cta": "Choose Business",
+      "features": [
+        "Everything in Start",
+        "Up to 300 documents per month",
+        "Project Management",
+        "HR portal for employees",
+        "Salaries and social contributions",
+        "Online leave requests",
+        "Leave approvals",
+        "Task assignment and tracking",
+        "Full inventory and stock",
+        "Production and cost",
+        "Contracts",
+        "Assets and depreciation",
+        "HACCP technological documentation",
+        "SAF-T generation (monthly/annual)",
+        "Advanced analytics and KPIs",
+        "Over 100 business document templates",
+        "Full archive",
+        "Up to 5 users",
+        "All PDF templates"
+      ]
+    },
+    "pro": {
+      "name": "Pro",
+      "tagline": "For companies wanting maximum automation",
+      "blurb": "The most powerful version of Creative Digital Accounting.",
+      "suited": "accounting offices, company groups, manufacturers, larger businesses.",
+      "cta": "Choose Pro",
+      "features": [
+        "Everything in Business",
+        "Unlimited documents",
+        "Unlimited users",
+        "Unlimited companies",
+        "API integrations",
+        "AI CFO Assistant",
+        "Custom PDF templates",
+        "Priority support",
+        "Early access to new features"
+      ]
+    }
+  }
+}

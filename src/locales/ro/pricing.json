@@ -1,0 +1,149 @@
+{
+  "title": "Planuri de abonament",
+  "pricesNote": "Toate prețurile fără TVA · 1 EUR = {rate} BGN",
+  "recommended": "Recomandat",
+  "specialPrice": "Preț special",
+  "active": "Activ",
+  "perMonth": "€ / lună",
+  "perMonthShort": "€ / lună",
+  "totalFor": "{total} € total pentru {months} luni",
+  "totalForShort": "{total} € pentru {months} luni",
+  "saved": "(−{amount} €)",
+  "approxBgn": "≈ {amount} BGN/lună",
+  "approxBgnShort": "≈ {amount} BGN/lună",
+  "suitedFor": "Potrivit pentru: {text}",
+  "saveNote": "Economisiți {pct}% plătind pentru {period}",
+  "promoStrong": "Economisiți până la 20 € în fiecare lună.",
+  "promoText": "Înregistrați-vă până la 31.12.2026 și profitați de prețurile speciale de lansare Creative Digital Accounting.",
+  "corpTitle": "Corporate",
+  "corpText": "Oferte individuale cu dezvoltarea de soluții software specifice, create exact pentru nevoile firmei dvs. — integrări, module personalizate și suport dedicat.",
+  "corpCta": "Contactați-ne",
+  "trialBold": "7 zile de probă gratuită",
+  "trialRest": " (o singură dată) pe planurile Start și Business.",
+  "euroNote": "Trecere automată la euro și pregătire deplină pentru introducerea EUR în Bulgaria",
+  "periods": {
+    "monthly": "Lunar",
+    "semiannual": "6 luni",
+    "annual": "1 an"
+  },
+  "byArrangement": "la înțelegere",
+  "unlimitedClients": "Clienți nelimitați",
+  "upToClients": "Până la {n} clienți",
+  "unlimitedUsers": "Utilizatori nelimitați",
+  "upToUsers": "Până la {n} utilizatori",
+  "firmFeatures": [
+    "Fiecare client primește acces START gratuit",
+    "Gestionarea tuturor firmelor client dintr-un singur loc",
+    "Raport consolidat pentru toți clienții",
+    "Comutare rapidă între firmele clienților",
+    "Facturi, depozit, cheltuieli și analize separate pentru fiecare firmă",
+    "Urmărirea pragului de TVA și a calendarului fiscal pe client",
+    "Invitații de clienți prin e-mail și link de recomandare"
+  ],
+  "firmPlans": {
+    "acc_start": {
+      "name": "Contabil Start",
+      "tagline": "Pentru contabili independenți"
+    },
+    "acc_pro": {
+      "name": "Contabil Pro",
+      "tagline": "Pentru echipe mici de contabilitate"
+    },
+    "acc_office": {
+      "name": "Birou de contabilitate",
+      "tagline": "Pentru birouri medii de contabilitate"
+    },
+    "acc_enterprise": {
+      "name": "Firmă de contabilitate",
+      "tagline": "Pentru firme mari de contabilitate"
+    }
+  },
+  "plans": {
+    "free": {
+      "name": "Gratuit",
+      "tagline": "Pentru firme la început și liber-profesioniști",
+      "blurb": "Perfect pentru primii pași ai afacerii tale.",
+      "suited": "freelanceri, consultanți, firme nou înregistrate.",
+      "cta": "Începe gratuit",
+      "features": [
+        "Până la 5 documente pe lună",
+        "1 firmă",
+        "1 utilizator",
+        "Facturi, proforme și oferte",
+        "Până la 5 clienți și furnizori",
+        "Depozit de bază",
+        "Tablou financiar",
+        "Calendar fiscal",
+        "Afișare dublă EUR/BGN",
+        "2 șabloane PDF profesionale"
+      ]
+    },
+    "start": {
+      "name": "Start",
+      "tagline": "Pentru firme mici cu activitate zilnică",
+      "blurb": "Cel mai vândut pachet pentru firme mici.",
+      "suited": "firme comerciale mici, agenții, magazine online și servicii.",
+      "cta": "Alegeți Start",
+      "features": [
+        "Tot din Gratuit",
+        "Până la 30 de documente pe lună",
+        "Cheltuieli și documente primite",
+        "Facturi recurente",
+        "Mementouri automate",
+        "Gestionarea cheltuielilor cu fișiere atașate",
+        "Analize de business standard",
+        "Simulare de venituri și prețuri de stoc",
+        "Documente PDF brandate (logo firmă)",
+        "Arhivă de documente",
+        "3 șabloane PDF profesionale",
+        "1 utilizator + 1 invitat"
+      ]
+    },
+    "business": {
+      "name": "Business",
+      "tagline": "Pentru companii în creștere",
+      "blurb": "Cel mai preferat pachet de companiile în creștere.",
+      "suited": "companii în creștere, producție, industrie alimentară, procese mai complexe.",
+      "cta": "Alegeți Business",
+      "features": [
+        "Tot din Start",
+        "Până la 300 de documente pe lună",
+        "Management de proiect (Project Management)",
+        "Portal HR pentru angajați",
+        "Salarii și contribuții",
+        "Cereri de concediu online",
+        "Aprobarea concediilor",
+        "Atribuirea și urmărirea sarcinilor",
+        "Depozit și stoc complet",
+        "Producție și cost",
+        "Contracte",
+        "Active și amortizări",
+        "Documentație tehnologică HACCP",
+        "Generare SAF-T (lunar/anual)",
+        "Analize avansate și KPI",
+        "Peste 100 de șabloane de documente de business",
+        "Arhivă completă",
+        "Până la 5 utilizatori",
+        "Toate șabloanele PDF"
+      ]
+    },
+    "pro": {
+      "name": "Pro",
+      "tagline": "Pentru companii care doresc automatizare maximă",
+      "blurb": "Cea mai puternică versiune a Creative Digital Accounting.",
+      "suited": "birouri de contabilitate, grupuri de firme, producători, afaceri mai mari.",
+      "cta": "Alegeți Pro",
+      "features": [
+        "Tot din Business",
+        "Documente nelimitate",
+        "Utilizatori nelimitați",
+        "Număr nelimitat de firme",
+        "Integrări API",
+        "AI CFO Assistant",
+        "Șabloane PDF personalizate",
+        "Suport prioritar",
+        "Acces timpuriu la funcțiile noi"
+      ]
+    }
+  }
+}

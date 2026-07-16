@@ -1,0 +1,149 @@
+{
+  "title": "Abonelik planları",
+  "pricesNote": "Tüm fiyatlar KDV hariç · 1 EUR = {rate} BGN",
+  "recommended": "Önerilen",
+  "specialPrice": "Özel fiyat",
+  "active": "Aktif",
+  "perMonth": "€ / ay",
+  "perMonthShort": "€ / ay",
+  "totalFor": "{months} ay için toplam {total} €",
+  "totalForShort": "{months} ay için {total} €",
+  "saved": "(−{amount} €)",
+  "approxBgn": "≈ {amount} BGN/ay",
+  "approxBgnShort": "≈ {amount} BGN/ay",
+  "suitedFor": "Uygun: {text}",
+  "saveNote": "{period} ödeyerek %{pct} tasarruf edersiniz",
+  "promoStrong": "Her ay 20 €'ya kadar tasarruf edin.",
+  "promoText": "31.12.2026'ya kadar kaydolun ve Creative Digital Accounting'in özel lansman fiyatlarından yararlanın.",
+  "corpTitle": "Kurumsal",
+  "corpText": "Firmanızın ihtiyaçlarına tam olarak uygun özel yazılım çözümleriyle bireysel teklifler — entegrasyonlar, özel modüller ve özel destek.",
+  "corpCta": "Bize ulaşın",
+  "trialBold": "7 gün ücretsiz deneme",
+  "trialRest": " (tek seferlik) Start ve Business planlarında.",
+  "euroNote": "Euro'ya otomatik geçiş ve Bulgaristan'da EUR'nun kullanıma girmesine tam hazırlık",
+  "periods": {
+    "monthly": "Aylık",
+    "semiannual": "6 ay",
+    "annual": "1 yıl"
+  },
+  "byArrangement": "anlaşmaya göre",
+  "unlimitedClients": "Sınırsız müşteri",
+  "upToClients": "{n} müşteriye kadar",
+  "unlimitedUsers": "Sınırsız kullanıcı",
+  "upToUsers": "{n} kullanıcıya kadar",
+  "firmFeatures": [
+    "Her müşteri ücretsiz START erişimi alır",
+    "Tüm müşteri firmalarını tek yerden yönetin",
+    "Tüm müşteriler için birleştirilmiş rapor",
+    "Müşteri firmaları arasında hızlı geçiş",
+    "Her firma için ayrı fatura, depo, gider ve analiz",
+    "Müşteri bazında KDV eşiği ve vergi takvimi takibi",
+    "E-posta ve referans bağlantısıyla müşteri davetleri"
+  ],
+  "firmPlans": {
+    "acc_start": {
+      "name": "Muhasebe Start",
+      "tagline": "Bağımsız muhasebeciler için"
+    },
+    "acc_pro": {
+      "name": "Muhasebe Pro",
+      "tagline": "Küçük muhasebe ekipleri için"
+    },
+    "acc_office": {
+      "name": "Muhasebe Ofisi",
+      "tagline": "Orta ölçekli muhasebe ofisleri için"
+    },
+    "acc_enterprise": {
+      "name": "Muhasebe Firması",
+      "tagline": "Büyük muhasebe firmaları için"
+    }
+  },
+  "plans": {
+    "free": {
+      "name": "Ücretsiz",
+      "tagline": "Yeni firmalar ve serbest meslekler için",
+      "blurb": "İşinizin ilk adımları için mükemmel.",
+      "suited": "serbest çalışanlar, danışmanlar, yeni kayıtlı firmalar.",
+      "cta": "Ücretsiz başla",
+      "features": [
+        "Ayda 5 belgeye kadar",
+        "1 firma",
+        "1 kullanıcı",
+        "Faturalar, proformalar ve teklifler",
+        "5 müşteri ve tedarikçiye kadar",
+        "Temel depo",
+        "Finansal pano",
+        "Vergi takvimi",
+        "Çift EUR/BGN gösterimi",
+        "2 profesyonel PDF şablonu"
+      ]
+    },
+    "start": {
+      "name": "Start",
+      "tagline": "Günlük aktif çalışan küçük firmalar için",
+      "blurb": "Küçük firmalar için en çok satan paket.",
+      "suited": "küçük ticaret firmaları, ajanslar, online mağazalar ve hizmetler.",
+      "cta": "Start'ı seçin",
+      "features": [
+        "Ücretsiz'deki her şey",
+        "Ayda 30 belgeye kadar",
+        "Giderler ve gelen belgeler",
+        "Tekrarlayan faturalar",
+        "Otomatik hatırlatmalar",
+        "Ekli dosyalarla gider yönetimi",
+        "Standart iş analizleri",
+        "Gelir ve stok fiyatı simülasyonu",
+        "Markalı PDF belgeleri (firma logosu)",
+        "Belge arşivi",
+        "3 profesyonel PDF şablonu",
+        "1 kullanıcı + 1 misafir"
+      ]
+    },
+    "business": {
+      "name": "Business",
+      "tagline": "Büyüyen şirketler için",
+      "blurb": "Büyüyen şirketlerin en çok tercih ettiği paket.",
+      "suited": "büyüyen şirketler, üretim, gıda sektörü, daha karmaşık süreçler.",
+      "cta": "Business'ı seçin",
+      "features": [
+        "Start'taki her şey",
+        "Ayda 300 belgeye kadar",
+        "Proje Yönetimi (Project Management)",
+        "Çalışanlar için İK portalı",
+        "Maaşlar ve sigorta",
+        "Online izin talepleri",
+        "İzin onayları",
+        "Görev atama ve takibi",
+        "Tam depo ve stok",
+        "Üretim ve maliyet",
+        "Sözleşmeler",
+        "Varlıklar ve amortisman",
+        "HACCP teknolojik dokümantasyonu",
+        "SAF-T üretimi (aylık/yıllık)",
+        "Gelişmiş analizler ve KPI",
+        "100'den fazla iş belgesi şablonu",
+        "Tam arşiv",
+        "5 kullanıcıya kadar",
+        "Tüm PDF şablonları"
+      ]
+    },
+    "pro": {
+      "name": "Pro",
+      "tagline": "Maksimum otomasyon isteyen şirketler için",
+      "blurb": "Creative Digital Accounting'in en güçlü sürümü.",
+      "suited": "muhasebe ofisleri, firma grupları, üreticiler, daha büyük işletmeler.",
+      "cta": "Pro'yu seçin",
+      "features": [
+        "Business'taki her şey",
+        "Sınırsız belge",
+        "Sınırsız kullanıcı",
+        "Sınırsız firma",
+        "API entegrasyonları",
+        "AI CFO Assistant",
+        "Özel PDF şablonları",
+        "Öncelikli destek",
+        "Yeni özelliklere erken erişim"
+      ]
+    }
+  }
+}
