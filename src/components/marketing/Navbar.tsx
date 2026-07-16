@@ -13,11 +13,11 @@ const links = [
 ];
 
 const toolsLinks = [
-  { href: "/tools/currency", label: "Валутен калкулатор" },
-  { href: "/tools/salary", label: "Калкулатор за заплати" },
-  { href: "/tools/vat", label: "ДДС калкулатор" },
-  { href: "/tools/interest", label: "Лихвен калкулатор" },
-  { href: "/tools/markup", label: "Надценка и печалба" },
+  { href: "/tools/currency", key: "marketing.nav.tools.currency" },
+  { href: "/tools/salary", key: "marketing.nav.tools.salary" },
+  { href: "/tools/vat", key: "marketing.nav.tools.vat" },
+  { href: "/tools/interest", key: "marketing.nav.tools.interest" },
+  { href: "/tools/markup", key: "marketing.nav.tools.markup" },
 ];
 
 // Блог и „За нас" са преместени във футъра (колона „КОМПАНИЯ"), за да е
@@ -58,9 +58,9 @@ export function MarketingNavbar() {
             </Link>
             {toolsOpen && (
               <div className="glass" style={{ position: "absolute", top: "100%", left: 0, minWidth: 230, borderRadius: 10, padding: 6, boxShadow: "0 12px 32px rgba(0,0,0,.14)", zIndex: 60 }}>
-                {toolsLinks.map((t) => (
-                  <Link key={t.href} href={t.href} style={{ display: "block", padding: "9px 12px", borderRadius: 7, fontSize: 13, color: "var(--ink-soft)", textDecoration: "none" }}>
-                    {t.label}
+                {toolsLinks.map((tool) => (
+                  <Link key={tool.href} href={tool.href} style={{ display: "block", padding: "9px 12px", borderRadius: 7, fontSize: 13, color: "var(--ink-soft)", textDecoration: "none" }}>
+                    {t(tool.key)}
                   </Link>
                 ))}
               </div>
@@ -86,7 +86,7 @@ export function MarketingNavbar() {
           className="mobile-only btn btn-ghost btn-sm"
           style={{ marginLeft: "auto" }}
           onClick={() => setOpen(!open)}
-          aria-label="Меню"
+          aria-label={t("marketing.menu")}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             {open
@@ -107,9 +107,9 @@ export function MarketingNavbar() {
           <Link href="/tools" onClick={() => setOpen(false)} style={{ padding: "11px 8px", fontSize: 15, fontWeight: 600, color: "var(--ink)", textDecoration: "none" }}>
             {t('navigation.tools')}
           </Link>
-          {toolsLinks.map((t) => (
-            <Link key={t.href} href={t.href} onClick={() => setOpen(false)} style={{ padding: "9px 8px 9px 22px", fontSize: 14, color: "var(--ink-soft)", textDecoration: "none" }}>
-              · {t.label}
+          {toolsLinks.map((tool) => (
+            <Link key={tool.href} href={tool.href} onClick={() => setOpen(false)} style={{ padding: "9px 8px 9px 22px", fontSize: 14, color: "var(--ink-soft)", textDecoration: "none" }}>
+              · {t(tool.key)}
             </Link>
           ))}
           {linksAfter.map((l) => (

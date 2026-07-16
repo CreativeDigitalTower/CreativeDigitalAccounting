@@ -1,0 +1,232 @@
+{
+  "nav": {
+    "tools": {
+      "currency": "Döviz hesaplayıcı",
+      "salary": "Maaş hesaplayıcı",
+      "vat": "KDV hesaplayıcı",
+      "interest": "Faiz hesaplayıcı",
+      "markup": "Kâr marjı ve kâr"
+    }
+  },
+  "footer": {
+    "tagline": "Faturalama, stok ve finansal analiz için akıllı bir iş platformu.",
+    "product": "ÜRÜN",
+    "company": "ŞİRKET",
+    "legal": "YASAL",
+    "links": {
+      "software": "Yazılım hakkında",
+      "services": "Hizmetler",
+      "register": "Ücretsiz kayıt",
+      "login": "Firma girişi",
+      "about": "Hakkımızda",
+      "accountants": "Muhasebeciler için",
+      "faq": "Sıkça sorulan sorular",
+      "blog": "Blog",
+      "contact": "İletişim",
+      "terms": "Kullanım koşulları",
+      "privacy": "Gizlilik politikası",
+      "cookies": "Çerez politikası",
+      "dpa": "Veri işleme (DPA)",
+      "license": "Lisans sözleşmesi",
+      "ip": "Fikri mülkiyet",
+      "security": "Bilgi güvenliği"
+    },
+    "soonBadge": "YAKINDA",
+    "soonLabel": "Yakında:",
+    "soonText": "iOS ve Android için mobil uygulama ve daha fazla yeni platform özelliği.",
+    "rights": "Tüm hakları saklıdır.",
+    "createdBy": "Hazırlayan"
+  },
+  "home": {
+    "heroBadge": "✦ Yeni — 08.08.2026'ya kadar çift EUR/BGN gösterimi",
+    "heroTitle1": "Tüm işiniz,",
+    "heroTitle2": "tek bir yerde düzenli.",
+    "heroSubtitle": "Faturalar, stok, üretim, giderler, CRM, sözleşmeler ve finansal analiz — işletmeler için tek bir modern platformda birleşti.",
+    "heroCtaStart": "Ücretsiz başla →",
+    "heroCtaFeatures": "Özellikleri keşfet",
+    "perk1": "✓ Sonsuza kadar ücretsiz plan",
+    "perk2": "✓ Kayıtta kart yok",
+    "perk3": "✓ 2 dakikada hazır",
+    "artDashboard": "Panel",
+    "artThisMonth": "bu ay",
+    "artRevenue": "Gelir",
+    "artExpenses": "Giderler",
+    "artProfit": "Kâr",
+    "artInvoices": "Faturalar",
+    "artInvoiceLabel": "FATURA · 0000000037",
+    "artConsulting": "Danışmanlık",
+    "artHosting": "Barındırma",
+    "artTotal": "Toplam",
+    "artPaid": "● Ödendi",
+    "newEyebrow": "Platformda yeni",
+    "newTitle": "En yeni güçlü özellikler",
+    "newSubtitle": "Platformu sürekli genişletiyoruz. İşiniz ve ekibiniz için eklediğimiz en büyük üç yeni özellik.",
+    "newBadge": "Yeni",
+    "featuresEyebrow": "Platform",
+    "featuresTitle": "İşiniz için her şey tek bir yerde",
+    "featuresSubtitle": "İlk faturadan üretime, stok izlenebilirliğine ve finansal analize kadar.",
+    "whyEyebrow": "Avantajlar",
+    "whyTitle": "Neden Creative Digital Accounting",
+    "whySubtitle": "Tüm temel iş süreçlerini tek bir ERP platformunda birleştirin ve firmanızın günlük işlerini otomatikleştirin. Daha az yönetim. Daha iyi kontrol. İşi büyütmek için daha çok zaman.",
+    "anyTitle": "Her şirkete uygun",
+    "anyText": "İster serbest çalışan, ister ticaret firması, üretici, restoran, muhasebe firması ya da büyüyen bir işletme olun — Creative Digital Accounting süreçlerinize uyum sağlar.",
+    "resultsEyebrow": "Sonuçlar",
+    "resultsTitle": "Neler elde edersiniz",
+    "resultsNote": "İşinizin büyümesini desteklemek için sisteme sürekli yeni özellikler eklenir ve güncellenir.",
+    "howEyebrow": "Kolay başlangıç",
+    "howTitle": "Creative Digital Accounting nasıl çalışır",
+    "ctaEyebrow": "BİR ŞEY DAHA",
+    "ctaTitle": "İşinizi büyütmek için tüm dijital hizmetleri de sunuyoruz",
+    "ctaText1": "Web sitesi tasarımı ve bakımı, pazarlama, grafik tasarım, reklam oluşturma ve yönetimi, sosyal medya desteği ve eksiksiz pazarlama ve dijital hizmetler. Bu alanda",
+    "ctaTextStrong": " uzun yıllara dayanan kanıtlanmış deneyime",
+    "ctaText2": " sahip bir firmayız. Hizmetlerimizden yararlanmak isterseniz — bize ulaşın.",
+    "ctaServices": "Hizmetleri keşfet →",
+    "ctaContact": "Bize ulaşın",
+    "jsonldDesc": "Firmalar için faturalama, stok izlenebilirliği, üretim, HACCP, çalışanlar, giderler ve finansal analiz web yazılımı. Euro'ya hazır.",
+    "statsBar": [
+      {
+        "num": "2",
+        "unit": "dk",
+        "label": "kayıt için"
+      },
+      {
+        "num": "1,95583",
+        "unit": "BGN/EUR",
+        "label": "sabit kur"
+      },
+      {
+        "num": "20 / 9 / 0",
+        "unit": "%",
+        "label": "KDV oranları"
+      },
+      {
+        "num": "SAF-T",
+        "unit": "",
+        "label": "baştan hazır"
+      }
+    ],
+    "stats": [
+      {
+        "num": "17+",
+        "label": "iş modülü"
+      },
+      {
+        "num": "100+",
+        "label": "özellik"
+      },
+      {
+        "num": "100+",
+        "label": "belge şablonu"
+      },
+      {
+        "num": "12+",
+        "label": "belge türü"
+      },
+      {
+        "num": "6",
+        "label": "kullanıcı rolü"
+      },
+      {
+        "num": "4",
+        "label": "abonelik planı"
+      }
+    ],
+    "steps": [
+      {
+        "title": "Kayıt olun",
+        "desc": "Firma profilinizi 2 dakikadan kısa sürede oluşturun."
+      },
+      {
+        "title": "Kurun",
+        "desc": "Platformu işinizin ihtiyaçlarına göre özelleştirin."
+      },
+      {
+        "title": "Yönetin",
+        "desc": "Fatura kesin, finansı takip edin ve işinizi tek yerden yönetin."
+      }
+    ],
+    "newFeatures": [
+      {
+        "title": "Proje Yönetimi (Project Management)",
+        "desc": "Firma ve projeye göre modern görev panoları — her firma ayrı bir sütun. Görevleri öncelik, sorumlu ve son tarihle atayın, durumu ve tamamlanma yüzdesini izleyin, ekip olarak çalışın. Aylık tekrarlayan görevler için ayrı bölüm ve tamamlananların otomatik arşivi."
+      },
+      {
+        "title": "Çalışanlar için İK portalı",
+        "desc": "Ekip için tam self-servis: kişisel profil, çevrimiçi izin talepleri ve onaylar, görev atama ve takibi, maaşlar ve sigorta — her çalışan için güvenli, kısıtlı erişimle."
+      },
+      {
+        "title": "Büyüme tahminleri ve simülatörleri",
+        "desc": "Ciroya göre zorunlu KDV kaydı tahmini, gelir ve stok fiyatı simülatörleri ve KPI ile yıllık karşılaştırmalı gelişmiş analizler — güvenli iş kararları için."
+      }
+    ],
+    "features": [
+      {
+        "title": "Faturalama",
+        "desc": "Faturaları, proformaları, teklifleri, alacak ve borç dekontlarını, teslim tutanaklarını ve diğer iş belgelerini otomatik numaralandırma ve profesyonel PDF şablonlarıyla saniyeler içinde düzenleyin."
+      },
+      {
+        "title": "Depo ve stok",
+        "desc": "Stokları, partileri, depolar arası hareketleri ve sayımları gerçek zamanlı izleyin. Girişi, çıkışı ve envanter yönetimini otomatikleştirin."
+      },
+      {
+        "title": "Giderler ve nakit akışı",
+        "desc": "Tüm firma giderlerini, gelen faturaları, kasa işlemlerini ve banka hareketlerini net bir finansal tabloyla takip edin."
+      },
+      {
+        "title": "Finansal analiz",
+        "desc": "Gelir, kâr, nakit akışı, KPI ve iş sağlığı endeksini etkileşimli raporlar ve grafiklerle izleyin."
+      },
+      {
+        "title": "Müşteriler, tedarikçiler ve CRM",
+        "desc": "Tam kayıtları, belge geçmişini, gelirleri, sözleşmeleri, notları ve kişileri tek yerde tutun."
+      },
+      {
+        "title": "Üretim ve maliyet",
+        "desc": "Reçeteler oluşturun, maliyeti hesaplayın, hammaddeleri yönetin ve biten ürünleri otomatik olarak stoğa alın."
+      },
+      {
+        "title": "Belge arşivi",
+        "desc": "Tüm firma belgelerini, sözleşmeleri ve dosyaları güvenli, düzenli ve her zaman erişilebilir şekilde saklayın."
+      },
+      {
+        "title": "Projeler ve sözleşmeler",
+        "desc": "Projeleri, sözleşmeleri, bütçeleri, gelirleri, giderleri ve önemli son tarihler için otomatik hatırlatmaları yönetin."
+      },
+      {
+        "title": "Çalışanlar",
+        "desc": "Ekibinizi pozisyon, izin, hastalık günleri, maaşlar ve biriken günler bilgileriyle merkezi tek bir dosyada yönetin."
+      },
+      {
+        "title": "HACCP dokümantasyonu",
+        "desc": "Gıda güvenliği otoritesinin gerekliliklerine uygun teknolojik belgeler, reçeteler ve HACCP dokümantasyonu oluşturun."
+      },
+      {
+        "title": "Vergi takvimi",
+        "desc": "Önemli bir yükümlülüğü kaçırmamak için vergi ve sigorta son tarihleri için otomatik hatırlatmalar alın."
+      },
+      {
+        "title": "İş belgesi oluşturma",
+        "desc": "Sözleşmeler, emirler, vekâletnameler, tutanaklar ve beyannameler için 100'den fazla hazır şablon — firma verilerinizle otomatik doldurulur (Business ve Pro)."
+      }
+    ],
+    "highlights": [
+      {
+        "title": "Her şey tek platformda",
+        "desc": "Birçok ayrı programı unutun. Faturalama, stok, üretim, finans, CRM, belgeler ve analizi tek sistemde yönetin."
+      },
+      {
+        "title": "İş sağlığı endeksi",
+        "desc": "Finansal sonuçları grafikler, KPI ve iş analizleriyle izleyin."
+      },
+      {
+        "title": "Güvenlik ve kontrol",
+        "desc": "Kullanıcı rolleri, erişim kontrolü, tüm işlemlerin günlüğü ve maksimum güvenlik için firma verilerinin korunması."
+      },
+      {
+        "title": "Otomatik hatırlatmalar",
+        "desc": "Ödemeleri, vergi son tarihlerini, sözleşmeleri ve önemli olayları kaçırma riski olmadan takip edin."
+      }
+    ]
+  },
+  "menu": "Menü"
+}

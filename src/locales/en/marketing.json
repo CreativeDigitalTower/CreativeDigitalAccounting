@@ -1,0 +1,232 @@
+{
+  "nav": {
+    "tools": {
+      "currency": "Currency calculator",
+      "salary": "Salary calculator",
+      "vat": "VAT calculator",
+      "interest": "Interest calculator",
+      "markup": "Markup & profit"
+    }
+  },
+  "footer": {
+    "tagline": "A smart business platform for invoicing, inventory and financial analytics.",
+    "product": "PRODUCT",
+    "company": "COMPANY",
+    "legal": "LEGAL",
+    "links": {
+      "software": "The Software",
+      "services": "Services",
+      "register": "Free registration",
+      "login": "Business login",
+      "about": "About Us",
+      "accountants": "For accountants",
+      "faq": "Frequently asked questions",
+      "blog": "Blog",
+      "contact": "Contact",
+      "terms": "Terms of use",
+      "privacy": "Privacy policy",
+      "cookies": "Cookie policy",
+      "dpa": "Data processing (DPA)",
+      "license": "License agreement",
+      "ip": "Intellectual property",
+      "security": "Information security"
+    },
+    "soonBadge": "SOON",
+    "soonLabel": "Soon:",
+    "soonText": "a mobile app for iOS and Android, plus more new platform features.",
+    "rights": "All rights reserved.",
+    "createdBy": "Created by"
+  },
+  "home": {
+    "heroBadge": "✦ New — dual EUR/BGN display until 08.08.2026",
+    "heroTitle1": "Your entire business,",
+    "heroTitle2": "organized in one place.",
+    "heroSubtitle": "Invoices, inventory, production, expenses, CRM, contracts and financial analytics — unified in one modern platform for business.",
+    "heroCtaStart": "Start free →",
+    "heroCtaFeatures": "Explore the features",
+    "perk1": "✓ Free plan forever",
+    "perk2": "✓ No card at sign-up",
+    "perk3": "✓ Ready in 2 minutes",
+    "artDashboard": "Dashboard",
+    "artThisMonth": "this month",
+    "artRevenue": "Revenue",
+    "artExpenses": "Expenses",
+    "artProfit": "Profit",
+    "artInvoices": "Invoices",
+    "artInvoiceLabel": "INVOICE · 0000000037",
+    "artConsulting": "Consulting",
+    "artHosting": "Hosting",
+    "artTotal": "Total",
+    "artPaid": "● Paid",
+    "newEyebrow": "New on the platform",
+    "newTitle": "The newest powerful features",
+    "newSubtitle": "We keep expanding the platform. Here are the three biggest new features we added for your business and team.",
+    "newBadge": "New",
+    "featuresEyebrow": "The platform",
+    "featuresTitle": "Everything for your business in one place",
+    "featuresSubtitle": "From the first invoice to production, inventory traceability and financial analytics.",
+    "whyEyebrow": "Advantages",
+    "whyTitle": "Why choose Creative Digital Accounting",
+    "whySubtitle": "Unite all core business processes in one ERP platform and automate your company's daily work. Less admin. Better control. More time to grow the business.",
+    "anyTitle": "Suitable for any company",
+    "anyText": "Whether you are a freelancer, a trading company, a manufacturer, a restaurant, an accounting firm or a growing business, Creative Digital Accounting adapts to your processes.",
+    "resultsEyebrow": "Results",
+    "resultsTitle": "What you get",
+    "resultsNote": "Continuous upgrades and updates with even more features to support the growth of your business.",
+    "howEyebrow": "Easy start",
+    "howTitle": "How Creative Digital Accounting works",
+    "ctaEyebrow": "ONE MORE THING",
+    "ctaTitle": "We also offer every digital service to grow your business",
+    "ctaText1": "Website design and maintenance, marketing, graphic design, ad creation and management, social media support and complete marketing and digital services. We are a company with",
+    "ctaTextStrong": " many years of proven experience",
+    "ctaText2": " in this field. If you'd like to use our services — get in touch.",
+    "ctaServices": "Explore the services →",
+    "ctaContact": "Get in touch",
+    "jsonldDesc": "Web software for invoicing, inventory traceability, production, HACCP, employees, expenses and financial analytics for businesses. Euro-ready.",
+    "statsBar": [
+      {
+        "num": "2",
+        "unit": "min",
+        "label": "to sign up"
+      },
+      {
+        "num": "1.95583",
+        "unit": "BGN/EUR",
+        "label": "fixed rate"
+      },
+      {
+        "num": "20 / 9 / 0",
+        "unit": "%",
+        "label": "VAT rates"
+      },
+      {
+        "num": "SAF-T",
+        "unit": "",
+        "label": "ready from the start"
+      }
+    ],
+    "stats": [
+      {
+        "num": "17+",
+        "label": "business modules"
+      },
+      {
+        "num": "100+",
+        "label": "features"
+      },
+      {
+        "num": "100+",
+        "label": "document templates"
+      },
+      {
+        "num": "12+",
+        "label": "document types"
+      },
+      {
+        "num": "6",
+        "label": "user roles"
+      },
+      {
+        "num": "4",
+        "label": "subscription plans"
+      }
+    ],
+    "steps": [
+      {
+        "title": "Sign up",
+        "desc": "Create your company profile in under 2 minutes."
+      },
+      {
+        "title": "Set up",
+        "desc": "Customize the platform to your business needs."
+      },
+      {
+        "title": "Manage",
+        "desc": "Invoice, track finances and run your business from one place."
+      }
+    ],
+    "newFeatures": [
+      {
+        "title": "Project Management",
+        "desc": "Modern task boards by company and project — each company is a separate column. Assign tasks with priority, assignee and deadline, track status and completion, work as a team. A separate section for recurring monthly tasks and an automatic archive of completed ones."
+      },
+      {
+        "title": "HR portal for employees",
+        "desc": "Full self-service for the team: personal profile, online leave requests and approvals, task assignment and tracking, salaries and social contributions — with secure, restricted access for each employee."
+      },
+      {
+        "title": "Growth forecasts and simulators",
+        "desc": "Forecast of mandatory VAT registration against turnover, revenue and inventory-price simulators, and advanced analytics with KPIs and year-over-year comparison — for confident business decisions."
+      }
+    ],
+    "features": [
+      {
+        "title": "Invoicing",
+        "desc": "Issue invoices, proformas, quotes, credit and debit notes, handover protocols and other business documents in seconds with automatic numbering and professional PDF templates."
+      },
+      {
+        "title": "Inventory & stock",
+        "desc": "Track stock, batches, movements between warehouses and stocktakes in real time. Automate receiving, write-offs and inventory management."
+      },
+      {
+        "title": "Expenses & cash flow",
+        "desc": "Track all company expenses, incoming invoices, cash operations and bank movements with a clear financial picture."
+      },
+      {
+        "title": "Financial analytics",
+        "desc": "Track revenue, profit, cash flow, KPIs and a business health index through interactive reports and charts."
+      },
+      {
+        "title": "Clients, suppliers & CRM",
+        "desc": "Keep complete records, document history, revenue, contracts, notes and contacts in one place."
+      },
+      {
+        "title": "Production & cost",
+        "desc": "Create recipes, calculate cost, manage raw materials and automatically receive finished goods into stock."
+      },
+      {
+        "title": "Document archive",
+        "desc": "Store all company documents, contracts and files securely, organized and always accessible."
+      },
+      {
+        "title": "Projects & contracts",
+        "desc": "Manage projects, contracts, budgets, revenue, expenses and automatic reminders for important deadlines."
+      },
+      {
+        "title": "Employees",
+        "desc": "Manage your team with information on positions, leave, sick days, salaries and accrued days in one centralized record."
+      },
+      {
+        "title": "HACCP documentation",
+        "desc": "Create technological documents, recipes and HACCP documentation compliant with the requirements of the food safety authority."
+      },
+      {
+        "title": "Tax calendar",
+        "desc": "Receive automatic reminders for tax and social-security deadlines so you never miss an important obligation."
+      },
+      {
+        "title": "Business document generation",
+        "desc": "Over 100 ready templates for contracts, orders, powers of attorney, protocols and declarations — auto-filled with your company data (Business and Pro)."
+      }
+    ],
+    "highlights": [
+      {
+        "title": "Everything in one platform",
+        "desc": "Forget about many separate programs. Manage invoicing, inventory, production, finances, CRM, documents and analytics in one system."
+      },
+      {
+        "title": "Business health index",
+        "desc": "Track financial results with charts, KPIs and business analytics."
+      },
+      {
+        "title": "Security & control",
+        "desc": "User roles, access control, a log of all actions and protection of company data for maximum security."
+      },
+      {
+        "title": "Automatic reminders",
+        "desc": "Track payments, tax deadlines, contracts and important events with no risk of missing them."
+      }
+    ]
+  },
+  "menu": "Menu"
+}
