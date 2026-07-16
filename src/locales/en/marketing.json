@@ -228,5 +228,202 @@
       }
     ]
   },
-  "menu": "Menu"
+  "menu": "Menu",
+  "about": {
+    "title": "About us",
+    "intro": "Creative Digital Accounting is built on the belief that small business deserves the same powerful tools as corporations — only simpler and more accessible.",
+    "cards": [
+      {
+        "title": "Our mission",
+        "text": "To free entrepreneurs from the administrative burden so they can focus on what truly matters — growing the business."
+      },
+      {
+        "title": "Our approach",
+        "text": "Not \"accounting software\", but a modern business platform with an intuitive design. Every feature comes from the real needs of small and medium businesses."
+      },
+      {
+        "title": "Compliance",
+        "text": "Dual EUR/BGN display, VAT rates 20%/9%/0%, SAF-T readiness and Bulgarian VIES validation — we cover all local requirements."
+      },
+      {
+        "title": "Security",
+        "text": "Multi-tenant isolation — each company sees only its own data. Data is stored in a secure PostgreSQL environment with regular backups."
+      }
+    ],
+    "ctaTitle": "Ready to try it?",
+    "ctaText": "Registration takes 2 minutes.",
+    "ctaRegister": "Register for free",
+    "ctaContact": "Get in touch"
+  },
+  "contact": {
+    "title": "Contact",
+    "intro": "Have a question or suggestion? Write to us and we'll reply within one business day.",
+    "emailLabel": "Email",
+    "fbLabel": "Facebook / Messenger",
+    "fbCta": "Message us on Messenger →",
+    "sentTitle": "Your message has been sent!",
+    "sentText": "We'll reply within 1 business day to the email you provided.",
+    "error": "An error occurred. Please try again or write to us directly.",
+    "fName": "Name",
+    "fNamePh": "John Smith",
+    "fEmail": "Email",
+    "fEmailPh": "john@company.com",
+    "fCompany": "Company (optional)",
+    "fCompanyPh": "Example Ltd",
+    "fMessage": "Message",
+    "fMessagePh": "How can we help?",
+    "submit": "Send message",
+    "submitting": "Sending…"
+  },
+  "services": {
+    "metaTitle": "Services — web, marketing, ads and digital support",
+    "metaDesc": "Beyond the accounting software we offer every digital service to grow your business: website design and maintenance, marketing, graphic design, ads and social media management. A company with many years of proven experience.",
+    "badge": "DIGITAL SERVICES",
+    "title": "Everything for the complete growth of your business",
+    "intro1": "Beyond our accounting and business software, we offer a full range of digital services. We are a company with",
+    "introStrong": " many years of proven experience",
+    "intro2": " in this field — we help businesses grow online from idea to result.",
+    "items": [
+      {
+        "title": "Website design & maintenance",
+        "text": "Modern, fast and responsive websites and online stores — with ongoing technical support and updates."
+      },
+      {
+        "title": "Marketing",
+        "text": "Complete marketing strategies that bring real customers and growth — data-driven and backed by proven experience."
+      },
+      {
+        "title": "Graphic design",
+        "text": "Logo, brand identity, advertising materials and visuals that make your brand stand out professionally."
+      },
+      {
+        "title": "Ad creation & management",
+        "text": "Building, optimizing and managing advertising campaigns on Facebook, Instagram and Google."
+      },
+      {
+        "title": "Social media management",
+        "text": "Content, posts and active management of your social profiles so you stay visible and active."
+      },
+      {
+        "title": "Complete digital service",
+        "text": "Full marketing and digital service for your business — from strategy to execution, all in one place."
+      }
+    ],
+    "ctaTitle": "Want us to grow your business together?",
+    "ctaText": "Get in touch to discuss how we can help — with one or all of the listed services.",
+    "ctaBtn": "Get in touch →"
+  },
+  "faq": {
+    "metaTitle": "Frequently asked questions (FAQ) | Creative Digital Accounting",
+    "metaDesc": "Answers to the most common questions about online invoicing, migrating from other software, subscriptions and working with the Creative Digital Accounting platform.",
+    "eyebrow": "Help center",
+    "title": "Frequently asked questions",
+    "intro": "Everything you need to know about online invoicing, migration and working with the platform.",
+    "notFoundTitle": "Didn't find an answer?",
+    "notFoundText": "Write to us — we'll be happy to help.",
+    "contactBtn": "Get in touch",
+    "registerBtn": "Start free",
+    "groups": [
+      {
+        "title": "Getting started & migration",
+        "items": [
+          {
+            "q": "I already use other invoicing software. Can I switch to Creative Digital Accounting without issues?",
+            "a": [
+              "Yes, completely. There is no accounting or legal problem with switching to a new invoicing platform at any time.",
+              "All your previously issued invoices are preserved — they remain valid and unaffected. The only important thing is document numbering: it must continue without gaps and without duplication.",
+              "In the platform you can freely set which sequence number invoicing continues from (there's an option to unlock and edit the number on each invoice), so you continue exactly where you left off."
+            ]
+          },
+          {
+            "q": "Will I lose my data during migration?",
+            "a": [
+              "No. You can enter your existing clients as well as the turnover you've already achieved with each of them (backdated). New invoices in the system are added on top of this opening turnover, so your statistics continue uninterrupted."
+            ]
+          },
+          {
+            "q": "How quickly can I start?",
+            "a": [
+              "Registration takes under 2 minutes. Then you fill in the company details once and issue your first invoice right away."
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Invoicing & documents",
+        "items": [
+          {
+            "q": "How does invoice numbering start for a new account?",
+            "a": [
+              "Numbering is automatic and starts from the beginning (0000000001). Each invoice has an option to unlock and manually edit the sequence number — if you set number X, numbering continues from there."
+            ]
+          },
+          {
+            "q": "What documents can I issue?",
+            "a": [
+              "Invoices, proformas, quotes, credit and debit notes, plus over 100 business document templates with a professional design."
+            ]
+          },
+          {
+            "q": "Is VAT registration mandatory?",
+            "a": [
+              "No. The platform works for companies not registered for VAT too — then invoices are issued without VAT. For registered ones the system calculates the tax automatically."
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Subscriptions & payments",
+        "items": [
+          {
+            "q": "Is there a free plan and a free trial?",
+            "a": [
+              "Yes. There's a free plan forever, and the Start and Business plans have a one-time 7-day free trial."
+            ]
+          },
+          {
+            "q": "How is the subscription paid?",
+            "a": [
+              "By bank transfer. After a request you receive an email with the payment details (IBAN, recipient, reference and amount). Once payment is received we activate your plan."
+            ]
+          },
+          {
+            "q": "Can I change my plan?",
+            "a": [
+              "Yes, at any time — to a higher or lower plan. When a paid period ends without renewal the account reverts to the Free plan, and your data is preserved."
+            ]
+          },
+          {
+            "q": "Do you refund paid subscriptions?",
+            "a": [
+              "Subscription payments are non-refundable. That's why we recommend first using the free plan and the free trial to make sure the platform meets your needs."
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Security & account",
+        "items": [
+          {
+            "q": "Is my data secure?",
+            "a": [
+              "Yes. Data is stored encrypted, passwords are hashed, and access is isolated between companies. More in the Information Security Policy."
+            ]
+          },
+          {
+            "q": "Can I delete my company account?",
+            "a": [
+              "Yes. From Company Profile → Danger Zone you can delete the account after confirmation. The action is irreversible and removes all related data."
+            ]
+          },
+          {
+            "q": "Will there be a mobile app?",
+            "a": [
+              "Yes — a mobile app for iOS and Android is coming soon, along with new platform features."
+            ]
+          }
+        ]
+      }
+    ]
+  }
 }

@@ -228,5 +228,202 @@
       }
     ]
   },
-  "menu": "Meniu"
+  "menu": "Meniu",
+  "about": {
+    "title": "Despre noi",
+    "intro": "Creative Digital Accounting este construită pe convingerea că afacerile mici merită aceleași instrumente puternice ca și corporațiile — doar mai simple și mai accesibile.",
+    "cards": [
+      {
+        "title": "Misiunea noastră",
+        "text": "Să eliberăm antreprenorii de povara administrativă, ca să se poată concentra pe ceea ce contează cu adevărat — dezvoltarea afacerii."
+      },
+      {
+        "title": "Abordarea noastră",
+        "text": "Nu un „software de contabilitate”, ci o platformă de business modernă cu design intuitiv. Fiecare funcție pornește de la nevoile reale ale IMM-urilor."
+      },
+      {
+        "title": "Conformitate",
+        "text": "Afișare dublă EUR/BGN, cote TVA 20%/9%/0%, pregătire SAF-T și validare VIES — acoperim toate cerințele locale."
+      },
+      {
+        "title": "Securitate",
+        "text": "Izolare multi-tenant — fiecare firmă vede doar datele proprii. Datele sunt stocate într-un mediu PostgreSQL securizat, cu copii de rezervă regulate."
+      }
+    ],
+    "ctaTitle": "Gata să încercați?",
+    "ctaText": "Înregistrarea durează 2 minute.",
+    "ctaRegister": "Înregistrează-te gratuit",
+    "ctaContact": "Contactează-ne"
+  },
+  "contact": {
+    "title": "Contact",
+    "intro": "Aveți o întrebare sau o sugestie? Scrieți-ne și vă răspundem în cel mult o zi lucrătoare.",
+    "emailLabel": "E-mail",
+    "fbLabel": "Facebook / Messenger",
+    "fbCta": "Scrieți-ne pe Messenger →",
+    "sentTitle": "Mesajul a fost trimis!",
+    "sentText": "Vă răspundem în cel mult 1 zi lucrătoare la e-mailul indicat.",
+    "error": "A apărut o eroare. Încercați din nou sau scrieți-ne direct.",
+    "fName": "Nume",
+    "fNamePh": "Ion Popescu",
+    "fEmail": "E-mail",
+    "fEmailPh": "ion@firma.ro",
+    "fCompany": "Firmă (opțional)",
+    "fCompanyPh": "Exemplu SRL",
+    "fMessage": "Mesaj",
+    "fMessagePh": "Cum vă putem ajuta?",
+    "submit": "Trimite mesajul",
+    "submitting": "Se trimite…"
+  },
+  "services": {
+    "metaTitle": "Servicii — web, marketing, reclame și servicii digitale",
+    "metaDesc": "Pe lângă software-ul de contabilitate oferim toate serviciile digitale pentru dezvoltarea afacerii: creare și mentenanță site, marketing, design grafic, reclame și administrarea rețelelor sociale. O firmă cu experiență îndelungată și dovedită.",
+    "badge": "SERVICII DIGITALE",
+    "title": "Tot pentru dezvoltarea completă a afacerii tale",
+    "intro1": "Pe lângă software-ul nostru de contabilitate și business, oferim o gamă completă de servicii digitale. Suntem o firmă cu",
+    "introStrong": " experiență îndelungată și dovedită",
+    "intro2": " în acest domeniu — ajutăm afacerile să crească online, de la idee la rezultat.",
+    "items": [
+      {
+        "title": "Creare și mentenanță site",
+        "text": "Site-uri și magazine online moderne, rapide și adaptive — cu suport tehnic și actualizări permanente."
+      },
+      {
+        "title": "Marketing",
+        "text": "Strategii de marketing complete care aduc clienți reali și creștere — bazate pe date și experiență dovedită."
+      },
+      {
+        "title": "Design grafic",
+        "text": "Logo, identitate de firmă, materiale publicitare și vizualuri care evidențiază brandul profesional."
+      },
+      {
+        "title": "Creare și administrare reclame",
+        "text": "Construirea, optimizarea și administrarea campaniilor publicitare pe Facebook, Instagram și Google."
+      },
+      {
+        "title": "Administrare rețele sociale",
+        "text": "Conținut, postări și administrare activă a profilurilor sociale, ca să fiți vizibili și activi."
+      },
+      {
+        "title": "Serviciu digital complet",
+        "text": "Serviciu complet de marketing și digital pentru afacerea ta — de la strategie la execuție, într-un singur loc."
+      }
+    ],
+    "ctaTitle": "Vreți să dezvoltăm afacerea împreună?",
+    "ctaText": "Contactați-ne pentru a discuta cum vă putem ajuta — cu unul sau cu toate serviciile enumerate.",
+    "ctaBtn": "Contactați-ne →"
+  },
+  "faq": {
+    "metaTitle": "Întrebări frecvente (FAQ) | Creative Digital Accounting",
+    "metaDesc": "Răspunsuri la cele mai frecvente întrebări despre facturare online, migrare de la alt software, abonamente și lucrul cu platforma Creative Digital Accounting.",
+    "eyebrow": "Centru de ajutor",
+    "title": "Întrebări frecvente",
+    "intro": "Tot ce trebuie să știți despre facturarea online, migrare și lucrul cu platforma.",
+    "notFoundTitle": "Nu ați găsit un răspuns?",
+    "notFoundText": "Scrieți-ne — vă ajutăm cu plăcere.",
+    "contactBtn": "Contactați-ne",
+    "registerBtn": "Începe gratuit",
+    "groups": [
+      {
+        "title": "Început și migrare",
+        "items": [
+          {
+            "q": "Folosesc deja alt software de facturare. Pot trece la Creative Digital Accounting fără probleme?",
+            "a": [
+              "Da, complet. Nu există nicio problemă contabilă sau juridică să treceți la o nouă platformă de facturare oricând.",
+              "Toate facturile emise anterior se păstrează — rămân valabile și neafectate. Singurul lucru important este numerotarea documentelor: trebuie să continue fără întreruperi și fără duplicare.",
+              "În platformă puteți seta liber de la ce număr de ordine continuă facturarea (există opțiunea de deblocare și editare a numărului la fiecare factură), ca să continuați exact de unde ați rămas."
+            ]
+          },
+          {
+            "q": "Îmi voi pierde datele la migrare?",
+            "a": [
+              "Nu. Puteți introduce clienții existenți, precum și cifra de afaceri deja realizată cu fiecare dintre ei (retroactiv). Facturile noi din sistem se adaugă peste această cifră inițială, astfel încât statisticile continuă neîntrerupt."
+            ]
+          },
+          {
+            "q": "Cât de repede pot începe?",
+            "a": [
+              "Înregistrarea durează sub 2 minute. Apoi completați datele firmei o singură dată și emiteți imediat prima factură."
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Facturare și documente",
+        "items": [
+          {
+            "q": "Cum începe numerotarea facturilor pentru un cont nou?",
+            "a": [
+              "Numerotarea este automată și începe de la început (0000000001). Fiecare factură are o opțiune de deblocare și editare manuală a numărului de ordine — dacă setați numărul X, numerotarea continuă de acolo."
+            ]
+          },
+          {
+            "q": "Ce documente pot emite?",
+            "a": [
+              "Facturi, proforme, oferte, note de credit și de debit, plus peste 100 de șabloane de documente de business cu design profesional."
+            ]
+          },
+          {
+            "q": "Este obligatorie înregistrarea în scopuri de TVA?",
+            "a": [
+              "Nu. Platforma funcționează și pentru firmele neînregistrate în scopuri de TVA — atunci facturile se emit fără TVA. Pentru cele înregistrate, sistemul calculează automat taxa."
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Abonamente și plăți",
+        "items": [
+          {
+            "q": "Există un plan gratuit și o perioadă de probă gratuită?",
+            "a": [
+              "Da. Există un plan gratuit pentru totdeauna, iar planurile Start și Business au o perioadă de probă gratuită unică de 7 zile."
+            ]
+          },
+          {
+            "q": "Cum se plătește abonamentul?",
+            "a": [
+              "Prin transfer bancar. După solicitare primiți un e-mail cu detaliile de plată (IBAN, beneficiar, detalii și sumă). După primirea plății activăm planul."
+            ]
+          },
+          {
+            "q": "Pot să-mi schimb planul?",
+            "a": [
+              "Da, oricând — către un plan mai mare sau mai mic. La expirarea unei perioade plătite fără reînnoire, contul revine la planul Gratuit, iar datele se păstrează."
+            ]
+          },
+          {
+            "q": "Rambursați abonamentele plătite?",
+            "a": [
+              "Plata pentru abonament nu se rambursează. De aceea recomandăm să folosiți mai întâi planul gratuit și perioada de probă, ca să vă asigurați că platforma corespunde nevoilor."
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Securitate și cont",
+        "items": [
+          {
+            "q": "Datele mele sunt în siguranță?",
+            "a": [
+              "Da. Datele sunt stocate criptat, parolele sunt hash-uite, iar accesul este izolat între firme. Mai multe în Politica de securitate a informației."
+            ]
+          },
+          {
+            "q": "Pot șterge contul firmei?",
+            "a": [
+              "Da. Din Profilul firmei → Zona periculoasă puteți șterge contul după confirmare. Acțiunea este ireversibilă și elimină toate datele asociate."
+            ]
+          },
+          {
+            "q": "Va exista o aplicație mobilă?",
+            "a": [
+              "Da — o aplicație mobilă pentru iOS și Android urmează în curând, alături de noi funcții ale platformei."
+            ]
+          }
+        ]
+      }
+    ]
+  }
 }

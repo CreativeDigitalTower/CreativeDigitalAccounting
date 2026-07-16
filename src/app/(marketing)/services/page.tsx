@@ -1,62 +1,38 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getT, getLocale } from "@/lib/i18n/server";
+import { getMessages } from "@/lib/i18n/messages";
 
-export const metadata: Metadata = {
-  title: "Услуги — уеб, маркетинг, реклами и дигитално обслужване",
-  description: "Освен счетоводния софтуер предлагаме и всички дигитални услуги за развитието на вашия бизнес: изработка и поддръжка на сайт, маркетинг, графичен дизайн, реклами и управление на социални мрежи. Фирма с дългогодишен и доказан опит.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getT();
+  return {
+    title: t("marketing.services.metaTitle"),
+    description: t("marketing.services.metaDesc"),
+  };
+}
 
-const SERVICES: { title: string; text: string; icon: React.ReactNode }[] = [
-  {
-    title: "Изработка и поддръжка на сайт",
-    text: "Модерни, бързи и адаптивни уебсайтове и онлайн магазини — с постоянна техническа поддръжка и обновяване.",
-    icon: <IconMonitor />,
-  },
-  {
-    title: "Маркетинг",
-    text: "Цялостни маркетингови стратегии, които водят реални клиенти и растеж — базирани на данни и доказан опит.",
-    icon: <IconTrend />,
-  },
-  {
-    title: "Графичен дизайн",
-    text: "Лого, фирмена идентичност, рекламни материали и визии, които открояват бранда ви професионално.",
-    icon: <IconPen />,
-  },
-  {
-    title: "Създаване и управление на реклами",
-    text: "Изграждане, оптимизация и управление на рекламни кампании във Facebook, Instagram и Google.",
-    icon: <IconMegaphone />,
-  },
-  {
-    title: "Поддръжка на социални мрежи",
-    text: "Съдържание, публикации и активно управление на социалните ви профили, за да сте видими и активни.",
-    icon: <IconChat />,
-  },
-  {
-    title: "Цялостно дигитално обслужване",
-    text: "Пълно маркетингово и дигитално обслужване на бизнеса ви — от стратегия до изпълнение, на едно място.",
-    icon: <IconGrid />,
-  },
-];
+export default async function ServicesPage() {
+  const { t } = await getT();
+  const S = getMessages(await getLocale()).marketing.services as unknown as { items: { title: string; text: string }[] };
+  const serviceIcons = [<IconMonitor key="1" />, <IconTrend key="2" />, <IconPen key="3" />, <IconMegaphone key="4" />, <IconChat key="5" />, <IconGrid key="6" />];
+  const services = S.items.map((s, i) => ({ ...s, icon: serviceIcons[i] }));
 
-export default function ServicesPage() {
   return (
     <div style={{ maxWidth: 1000, margin: "0 auto", padding: "60px 32px 100px" }}>
       <div style={{ marginBottom: 44, maxWidth: 680 }}>
         <div style={{ display: "inline-block", background: "var(--emerald-soft)", color: "var(--emerald-dark)", borderRadius: 20, padding: "5px 16px", fontSize: 12.5, fontWeight: 700, letterSpacing: 1, marginBottom: 18 }}>
-          ДИГИТАЛНИ УСЛУГИ
+          {t("marketing.services.badge")}
         </div>
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 700, margin: "0 0 20px" }}>
-          Всичко за цялостното развитие на вашия бизнес
+          {t("marketing.services.title")}
         </h1>
         <p style={{ fontSize: 17, color: "var(--ink-soft)", lineHeight: 1.7 }}>
-          Освен нашия счетоводен и бизнес софтуер, предлагаме и пълен набор от дигитални услуги. Ние сме фирма с
-          <strong> дългогодишен и доказан опит</strong> в тази сфера — помагаме на бизнеси да растат онлайн от идея до резултат.
+          {t("marketing.services.intro1")}<strong>{t("marketing.services.introStrong")}</strong>{t("marketing.services.intro2")}
         </p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, marginBottom: 44 }}>
-        {SERVICES.map((s) => (
+        {services.map((s) => (
           <div key={s.title} className="glass panel" style={{ padding: "26px 24px" }}>
             <div className="icon-tile" style={{ width: 46, height: 46, borderRadius: 13, marginBottom: 16 }}>{s.icon}</div>
             <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, margin: "0 0 10px" }}>{s.title}</h3>
@@ -67,13 +43,13 @@ export default function ServicesPage() {
 
       <div className="glass panel" style={{ padding: "36px 32px", textAlign: "center" }}>
         <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 26, margin: "0 0 12px" }}>
-          Искате да развием бизнеса ви заедно?
+          {t("marketing.services.ctaTitle")}
         </h2>
         <p style={{ color: "var(--ink-soft)", marginBottom: 24, maxWidth: 520, marginLeft: "auto", marginRight: "auto" }}>
-          Свържете се с нас, за да обсъдим как можем да помогнем — с една или всички от изброените услуги.
+          {t("marketing.services.ctaText")}
         </p>
         <Link href="/contact" className="btn btn-primary" style={{ fontSize: 15, padding: "12px 28px" }}>
-          Свържете се с нас →
+          {t("marketing.services.ctaBtn")}
         </Link>
       </div>
     </div>
