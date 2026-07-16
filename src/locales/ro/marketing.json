@@ -1,0 +1,232 @@
+{
+  "nav": {
+    "tools": {
+      "currency": "Calculator valutar",
+      "salary": "Calculator de salarii",
+      "vat": "Calculator TVA",
+      "interest": "Calculator de dobândă",
+      "markup": "Adaos și profit"
+    }
+  },
+  "footer": {
+    "tagline": "O platformă de business inteligentă pentru facturare, stocuri și analize financiare.",
+    "product": "PRODUS",
+    "company": "COMPANIE",
+    "legal": "LEGAL",
+    "links": {
+      "software": "Despre software",
+      "services": "Servicii",
+      "register": "Înregistrare gratuită",
+      "login": "Autentificare firme",
+      "about": "Despre noi",
+      "accountants": "Pentru contabili",
+      "faq": "Întrebări frecvente",
+      "blog": "Blog",
+      "contact": "Contact",
+      "terms": "Termeni de utilizare",
+      "privacy": "Politica de confidențialitate",
+      "cookies": "Politica de cookie-uri",
+      "dpa": "Prelucrarea datelor (DPA)",
+      "license": "Acord de licență",
+      "ip": "Proprietate intelectuală",
+      "security": "Securitatea informației"
+    },
+    "soonBadge": "ÎN CURÂND",
+    "soonLabel": "În curând:",
+    "soonText": "o aplicație mobilă pentru iOS și Android, plus mai multe funcții noi ale platformei.",
+    "rights": "Toate drepturile rezervate.",
+    "createdBy": "Creat de"
+  },
+  "home": {
+    "heroBadge": "✦ Nou — afișare dublă EUR/BGN până la 08.08.2026",
+    "heroTitle1": "Întreaga ta afacere,",
+    "heroTitle2": "organizată într-un singur loc.",
+    "heroSubtitle": "Facturi, stocuri, producție, cheltuieli, CRM, contracte și analize financiare — unite într-o platformă modernă pentru afaceri.",
+    "heroCtaStart": "Începe gratuit →",
+    "heroCtaFeatures": "Explorează funcțiile",
+    "perk1": "✓ Plan gratuit pentru totdeauna",
+    "perk2": "✓ Fără card la înregistrare",
+    "perk3": "✓ Gata în 2 minute",
+    "artDashboard": "Tablou de bord",
+    "artThisMonth": "luna aceasta",
+    "artRevenue": "Venituri",
+    "artExpenses": "Cheltuieli",
+    "artProfit": "Profit",
+    "artInvoices": "Facturi",
+    "artInvoiceLabel": "FACTURĂ · 0000000037",
+    "artConsulting": "Consultanță",
+    "artHosting": "Găzduire",
+    "artTotal": "Total",
+    "artPaid": "● Plătită",
+    "newEyebrow": "Nou pe platformă",
+    "newTitle": "Cele mai noi funcții puternice",
+    "newSubtitle": "Extindem constant platforma. Iată cele mai mari trei funcții noi adăugate pentru afacerea și echipa ta.",
+    "newBadge": "Nou",
+    "featuresEyebrow": "Platforma",
+    "featuresTitle": "Tot pentru afacerea ta într-un singur loc",
+    "featuresSubtitle": "De la prima factură la producție, trasabilitatea stocurilor și analize financiare.",
+    "whyEyebrow": "Avantaje",
+    "whyTitle": "De ce să alegi Creative Digital Accounting",
+    "whySubtitle": "Uniți toate procesele de bază într-o singură platformă ERP și automatizați munca zilnică a firmei. Mai puțină administrare. Control mai bun. Mai mult timp pentru dezvoltarea afacerii.",
+    "anyTitle": "Potrivit pentru orice companie",
+    "anyText": "Fie că ești freelancer, firmă comercială, producător, restaurant, firmă de contabilitate sau o afacere în creștere, Creative Digital Accounting se adaptează proceselor tale.",
+    "resultsEyebrow": "Rezultate",
+    "resultsTitle": "Ce primești",
+    "resultsNote": "Actualizare și îmbunătățire continuă a sistemului cu funcții suplimentare pentru a sprijini creșterea afacerii tale.",
+    "howEyebrow": "Început ușor",
+    "howTitle": "Cum funcționează Creative Digital Accounting",
+    "ctaEyebrow": "ȘI ÎNCĂ CEVA",
+    "ctaTitle": "Oferim și toate serviciile digitale pentru dezvoltarea afacerii tale",
+    "ctaText1": "Creare și mentenanță site, marketing, design grafic, creare și administrare reclame, gestionarea rețelelor sociale și servicii complete de marketing și digitale. Suntem o firmă cu",
+    "ctaTextStrong": " experiență îndelungată și dovedită",
+    "ctaText2": " în acest domeniu. Dacă doriți să apelați la serviciile noastre — contactați-ne.",
+    "ctaServices": "Explorează serviciile →",
+    "ctaContact": "Contactează-ne",
+    "jsonldDesc": "Software web pentru facturare, trasabilitatea stocurilor, producție, HACCP, angajați, cheltuieli și analize financiare pentru firme. Pregatit pentru euro.",
+    "statsBar": [
+      {
+        "num": "2",
+        "unit": "min",
+        "label": "pentru înregistrare"
+      },
+      {
+        "num": "1,95583",
+        "unit": "BGN/EUR",
+        "label": "curs fix"
+      },
+      {
+        "num": "20 / 9 / 0",
+        "unit": "%",
+        "label": "cote TVA"
+      },
+      {
+        "num": "SAF-T",
+        "unit": "",
+        "label": "pregătit de la start"
+      }
+    ],
+    "stats": [
+      {
+        "num": "17+",
+        "label": "module de business"
+      },
+      {
+        "num": "100+",
+        "label": "funcții"
+      },
+      {
+        "num": "100+",
+        "label": "șabloane de documente"
+      },
+      {
+        "num": "12+",
+        "label": "tipuri de documente"
+      },
+      {
+        "num": "6",
+        "label": "roluri de utilizator"
+      },
+      {
+        "num": "4",
+        "label": "planuri de abonament"
+      }
+    ],
+    "steps": [
+      {
+        "title": "Înregistrează-te",
+        "desc": "Creează profilul firmei în mai puțin de 2 minute."
+      },
+      {
+        "title": "Configurează",
+        "desc": "Personalizează platforma după nevoile afacerii tale."
+      },
+      {
+        "title": "Administrează",
+        "desc": "Facturează, urmărește finanțele și conduce afacerea dintr-un singur loc."
+      }
+    ],
+    "newFeatures": [
+      {
+        "title": "Management de proiect (Project Management)",
+        "desc": "Panouri moderne de sarcini pe firme și proiecte — fiecare firmă este o coloană separată. Atribuiți sarcini cu prioritate, responsabil și termen, urmăriți statusul și procentul de finalizare, lucrați în echipă. O secțiune separată pentru sarcini lunare recurente și arhivă automată a celor finalizate."
+      },
+      {
+        "title": "Portal HR pentru angajați",
+        "desc": "Autoservire completă pentru echipă: profil personal, cereri de concediu online și aprobări, atribuirea și urmărirea sarcinilor, salarii și contribuții — cu acces sigur și restricționat pentru fiecare angajat."
+      },
+      {
+        "title": "Prognoze și simulatoare de creștere",
+        "desc": "Prognoză a înregistrării obligatorii în scopuri de TVA în funcție de cifra de afaceri, simulatoare de venituri și prețuri de stoc și analize avansate cu KPI și comparație anuală — pentru decizii de afaceri sigure."
+      }
+    ],
+    "features": [
+      {
+        "title": "Facturare",
+        "desc": "Emiteți facturi, proforme, oferte, note de credit și de debit, procese-verbale de predare-primire și alte documente de business în câteva secunde, cu numerotare automată și șabloane PDF profesionale."
+      },
+      {
+        "title": "Stocuri și inventar",
+        "desc": "Urmăriți stocuri, loturi, mișcări între depozite și inventare în timp real. Automatizați recepția, ieșirile și gestiunea inventarului."
+      },
+      {
+        "title": "Cheltuieli și flux de numerar",
+        "desc": "Urmăriți toate cheltuielile firmei, facturile primite, operațiunile de casă și mișcările bancare cu o imagine financiară clară."
+      },
+      {
+        "title": "Analize financiare",
+        "desc": "Urmăriți venituri, profit, flux de numerar, KPI și un indice de sănătate a afacerii prin rapoarte și grafice interactive."
+      },
+      {
+        "title": "Clienți, furnizori și CRM",
+        "desc": "Păstrați dosare complete, istoricul documentelor, venituri, contracte, note și contacte într-un singur loc."
+      },
+      {
+        "title": "Producție și cost",
+        "desc": "Creați rețete, calculați costul, gestionați materiile prime și recepționați automat produsele finite în stoc."
+      },
+      {
+        "title": "Arhivă de documente",
+        "desc": "Păstrați toate documentele, contractele și fișierele firmei în siguranță, organizat și mereu accesibile."
+      },
+      {
+        "title": "Proiecte și contracte",
+        "desc": "Gestionați proiecte, contracte, bugete, venituri, cheltuieli și mementouri automate pentru termene importante."
+      },
+      {
+        "title": "Angajați",
+        "desc": "Gestionați echipa cu informații despre poziții, concedii, zile de boală, salarii și zile acumulate într-un dosar centralizat."
+      },
+      {
+        "title": "Documentație HACCP",
+        "desc": "Creați documente tehnologice, rețete și documentație HACCP conformă cu cerințele autorității pentru siguranța alimentelor."
+      },
+      {
+        "title": "Calendar fiscal",
+        "desc": "Primiți mementouri automate pentru termenele fiscale și de asigurări, ca să nu ratați o obligație importantă."
+      },
+      {
+        "title": "Generare de documente de business",
+        "desc": "Peste 100 de șabloane gata pentru contracte, ordine, împuterniciri, procese-verbale și declarații — completate automat cu datele firmei (Business și Pro)."
+      }
+    ],
+    "highlights": [
+      {
+        "title": "Totul într-o singură platformă",
+        "desc": "Uitați de multe programe separate. Gestionați facturarea, stocurile, producția, finanțele, CRM, documentele și analizele într-un singur sistem."
+      },
+      {
+        "title": "Indice de sănătate a afacerii",
+        "desc": "Urmăriți rezultatele financiare cu grafice, KPI și analize de business."
+      },
+      {
+        "title": "Securitate și control",
+        "desc": "Roluri de utilizator, control al accesului, jurnal al tuturor acțiunilor și protecția datelor firmei pentru securitate maximă."
+      },
+      {
+        "title": "Mementouri automate",
+        "desc": "Urmăriți plăți, termene fiscale, contracte și evenimente importante fără riscul de a le rata."
+      }
+    ]
+  },
+  "menu": "Meniu"
+}

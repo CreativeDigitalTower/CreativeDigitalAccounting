@@ -1,7 +1,43 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
+import { getT } from "@/lib/i18n/server";
 
-export function MarketingFooter() {
+export async function MarketingFooter() {
+  const { t } = await getT();
+  const columns: { title: string; links: { href: string; label: string }[] }[] = [
+    {
+      title: t("marketing.footer.product"),
+      links: [
+        { href: "/software", label: t("marketing.footer.links.software") },
+        { href: "/services", label: t("marketing.footer.links.services") },
+        { href: "/register", label: t("marketing.footer.links.register") },
+        { href: "/login", label: t("marketing.footer.links.login") },
+      ],
+    },
+    {
+      title: t("marketing.footer.company"),
+      links: [
+        { href: "/about", label: t("marketing.footer.links.about") },
+        { href: "/accountants", label: t("marketing.footer.links.accountants") },
+        { href: "/faq", label: t("marketing.footer.links.faq") },
+        { href: "/blog", label: t("marketing.footer.links.blog") },
+        { href: "/contact", label: t("marketing.footer.links.contact") },
+      ],
+    },
+    {
+      title: t("marketing.footer.legal"),
+      links: [
+        { href: "/terms", label: t("marketing.footer.links.terms") },
+        { href: "/privacy", label: t("marketing.footer.links.privacy") },
+        { href: "/cookies", label: t("marketing.footer.links.cookies") },
+        { href: "/dpa", label: t("marketing.footer.links.dpa") },
+        { href: "/license", label: t("marketing.footer.links.license") },
+        { href: "/ip-policy", label: t("marketing.footer.links.ip") },
+        { href: "/security", label: t("marketing.footer.links.security") },
+      ],
+    },
+  ];
+
   return (
     <footer
       style={{
@@ -16,65 +52,31 @@ export function MarketingFooter() {
           <div>
             <Logo dark size="md" />
             <p style={{ marginTop: 14, fontSize: 13, lineHeight: 1.6, color: "#8A8878" }}>
-              Умна бизнес платформа за фактуриране,
-              склад и финансови анализи.
+              {t("marketing.footer.tagline")}
             </p>
           </div>
-          <div>
-            <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--brass)", letterSpacing: 1, marginBottom: 14 }}>ПРОДУКТ</div>
-            {[
-              { href: "/software", label: "За Софтуера" },
-              { href: "/services", label: "Услуги" },
-              { href: "/register", label: "Безплатна регистрация" },
-              { href: "/login", label: "Вход за фирми" },
-            ].map((l) => (
-              <Link key={l.href} href={l.href} style={{ display: "block", color: "#C9C7B6", textDecoration: "none", fontSize: 13.5, marginBottom: 8 }}>
-                {l.label}
-              </Link>
-            ))}
-          </div>
-          <div>
-            <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--brass)", letterSpacing: 1, marginBottom: 14 }}>КОМПАНИЯ</div>
-            {[
-              { href: "/about", label: "За Нас" },
-              { href: "/accountants", label: "За счетоводители" },
-              { href: "/faq", label: "Често задавани въпроси" },
-              { href: "/blog", label: "Блог" },
-              { href: "/contact", label: "Контакти" },
-            ].map((l) => (
-              <Link key={l.href} href={l.href} style={{ display: "block", color: "#C9C7B6", textDecoration: "none", fontSize: 13.5, marginBottom: 8 }}>
-                {l.label}
-              </Link>
-            ))}
-          </div>
-          <div>
-            <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--brass)", letterSpacing: 1, marginBottom: 14 }}>ПРАВНО</div>
-            {[
-              { href: "/terms", label: "Общи условия" },
-              { href: "/privacy", label: "Политика за поверителност" },
-              { href: "/cookies", label: "Политика за бисквитки" },
-              { href: "/dpa", label: "Обработване на данни (DPA)" },
-              { href: "/license", label: "Лицензионно споразумение" },
-              { href: "/ip-policy", label: "Интелектуална собственост" },
-              { href: "/security", label: "Информационна сигурност" },
-            ].map((l) => (
-              <Link key={l.href} href={l.href} style={{ display: "block", color: "#C9C7B6", textDecoration: "none", fontSize: 13.5, marginBottom: 8 }}>
-                {l.label}
-              </Link>
-            ))}
-          </div>
+          {columns.map((col) => (
+            <div key={col.title}>
+              <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--brass)", letterSpacing: 1, marginBottom: 14 }}>{col.title}</div>
+              {col.links.map((l) => (
+                <Link key={l.href} href={l.href} style={{ display: "block", color: "#C9C7B6", textDecoration: "none", fontSize: 13.5, marginBottom: 8 }}>
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+          ))}
         </div>
         {/* Скоро: мобилно приложение */}
         <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 12, padding: "12px 16px", marginBottom: 20, flexWrap: "wrap" }}>
           <span style={{ display:"inline-flex", color:"var(--brass)" }}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></span>
           <span style={{ fontSize: 13, color: "#C9C7B6" }}>
-            <strong style={{ color: "#E9E7DA" }}>Скоро:</strong> мобилно приложение за iOS и Android, както и още нови функционалности към платформата.
+            <strong style={{ color: "#E9E7DA" }}>{t("marketing.footer.soonLabel")}</strong> {t("marketing.footer.soonText")}
           </span>
-          <span style={{ marginLeft: "auto", fontSize: 10.5, fontWeight: 700, letterSpacing: 1, color: "var(--brass)", border: "1px solid var(--brass)", borderRadius: 12, padding: "2px 10px" }}>СКОРО</span>
+          <span style={{ marginLeft: "auto", fontSize: 10.5, fontWeight: 700, letterSpacing: 1, color: "var(--brass)", border: "1px solid var(--brass)", borderRadius: 12, padding: "2px 10px" }}>{t("marketing.footer.soonBadge")}</span>
         </div>
         <div style={{ borderTop: "1px solid rgba(255,255,255,.08)", paddingTop: 20, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
           <span style={{ fontSize: 12.5, color: "#8A8878" }}>
-            © {new Date().getFullYear()} Creative Digital Accounting. Всички права запазени.
+            © {new Date().getFullYear()} Creative Digital Accounting. {t("marketing.footer.rights")}
           </span>
           <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
             <a
@@ -105,7 +107,7 @@ export function MarketingFooter() {
 
         {/* Кредит към Creative Digital Tower */}
         <div style={{ marginTop: 16, textAlign: "center", fontSize: 12.5, color: "#8A8878" }}>
-          Създадено от{" "}
+          {t("marketing.footer.createdBy")}{" "}
           <a
             href="https://creativedigitaltower.com/"
             target="_blank"
