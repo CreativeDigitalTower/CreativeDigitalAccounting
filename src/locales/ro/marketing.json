@@ -425,5 +425,228 @@
         ]
       }
     ]
+  },
+  "software": {
+    "title1": "Tot ce are nevoie",
+    "titleEm": "afacerea ta",
+    "subtitle": "Platforma acoperă întregul ciclu financiar — de la ofertă până la încasarea plății.",
+    "ctaStart": "Începe gratuit →",
+    "newEyebrow": "CELE MAI NOI PE PLATFORMĂ",
+    "newTitle": "Funcții noi puternice",
+    "newBadge": "Nou",
+    "highlights": [
+      {
+        "title": "Management de proiect (Project Management)",
+        "text": "Panouri moderne de sarcini pe firme și proiecte — fiecare firmă este o coloană separată. Atribuiți sarcini cu prioritate, responsabil, termen și procent de finalizare, urmăriți statusul și lucrați în echipă. O secțiune separată pentru sarcini lunare recurente și o arhivă automată a celor finalizate pentru rapoarte pe perioade."
+      },
+      {
+        "title": "Portal HR pentru angajați",
+        "text": "Un portal complet de autoservire pentru angajați: profil personal, cereri de concediu online și aprobări, atribuirea și urmărirea sarcinilor, salarii și contribuții. Fiecare angajat vede exact ce are dreptul — cu acces sigur și restricționat."
+      },
+      {
+        "title": "Prognoze și simulatoare de creștere",
+        "text": "Prognoză a înregistrării obligatorii în scopuri de TVA în funcție de cifra de afaceri pe anul calendaristic, simulatoare de venituri și prețuri de stoc (creștere/scădere) și analize avansate cu KPI și comparație anuală — ca să decideți cu o imagine financiară clară."
+      }
+    ],
+    "modules": [
+      {
+        "title": "Documente",
+        "items": [
+          "Facturi, proforme, oferte, note de credit și de debit",
+          "Procese-verbale de predare-primire și declarații de conformitate",
+          "Generare de documente de business (contracte, împuterniciri etc. — Business/Pro, în curând)",
+          "Numerotare automată pe tip și an (CDA-2026-####)",
+          "Lanț de documente: Ofertă → Proformă → Factură",
+          "15 șabloane profesionale de facturi cu stiluri diferite",
+          "Afișare dublă EUR/BGN (obligatorie până la 08.08.2026)",
+          "Facturi recurente (de abonament)",
+          "Stări: ciornă, trimisă, plătită, restantă, anulată"
+        ]
+      },
+      {
+        "title": "Clienți și Furnizori",
+        "items": [
+          "Dosar complet al clientului cu istoricul documentelor",
+          "Note CRM pentru fiecare client",
+          "Completare automată după nr. înreg./VIES la înregistrare",
+          "Furnizori cu rating, istoric și documente atașate",
+          "Venituri/cheltuieli pe partener"
+        ]
+      },
+      {
+        "title": "Depozit",
+        "items": [
+          "Multiple locații/depozite",
+          "Recepție de la furnizor",
+          "Ieșiri și producție (desfacere de materiale)",
+          "Alertă la atingerea stocului minim",
+          "Istoric complet al mișcărilor"
+        ]
+      },
+      {
+        "title": "Cheltuieli",
+        "items": [
+          "Introducere manuală cu categorii",
+          "Facturi primite de la furnizori",
+          "Categorii de cheltuieli personalizate",
+          "Atașare de fișiere (PDF, foto)",
+          "Urmărirea TVA pe cheltuieli"
+        ]
+      },
+      {
+        "title": "Analize financiare",
+        "items": [
+          "Cifra de afaceri și cheltuieli pe perioadă",
+          "Flux de numerar",
+          "Obiectiv financiar pentru an",
+          "Calendar fiscal",
+          "Raport PDF pentru investitori",
+          "Indicator „sănătate financiară” (bazat pe reguli, fără IA)"
+        ]
+      },
+      {
+        "title": "Proiecte",
+        "items": [
+          "Venituri și cheltuieli pe proiect",
+          "Procent real de finalizare",
+          "Utilizator responsabil și termen",
+          "Fișiere atașate",
+          "Buget planificat vs. real"
+        ]
+      },
+      {
+        "title": "Contracte",
+        "items": [
+          "Contracte cu clienți și furnizori",
+          "Memento de expirare",
+          "Reînnoire automată",
+          "PDF-ul contractului atașat"
+        ]
+      },
+      {
+        "title": "Active",
+        "items": [
+          "Registrul mijloacelor fixe",
+          "Amortizare automată",
+          "Garanție și asigurare",
+          "Jurnal de service"
+        ]
+      },
+      {
+        "title": "Abonament",
+        "items": [
+          "Model freemium — 5 documente/lună gratuit",
+          "Facturare Stripe cu taxare automată",
+          "Upgrade/downgrade oricând",
+          "4 planuri: Gratuit, Start, Business, Pro"
+        ]
+      }
+    ],
+    "saftTitle": "Pregătire SAF-T — modul integrat",
+    "saftText1": "Țara introduce raportarea SAF-T obligatorie în etape — firme mari din 2026, IMM-uri din 2027. Platforma are un ",
+    "saftBold": "modul SAF-T integrat",
+    "saftText2": " care generează fișierele XML gata (lunare, anuale și la cerere) direct din datele dvs. — parteneri, documente, taxe, cartea mare și active. Fără pregătire manuală și fără restructurarea datelor."
+  },
+  "accountants": {
+    "metaTitle": "Pentru contabili și firme de contabilitate | Creative Digital Accounting",
+    "metaDesc": "Oferiți acces START gratuit tuturor clienților și gestionați toate firmele dintr-un singur loc — cu rapoarte consolidate și date separate pentru fiecare firmă.",
+    "badge": "PENTRU CONTABILI ȘI FIRME DE CONTABILITATE",
+    "heroTitle1": "Oferiți acces START gratuit la",
+    "heroTitleEm": "Creative Digital Accounting tuturor clienților dvs.",
+    "heroSubtitle": "Gestionați toate firmele client dintr-un singur loc. Clienții folosesc START gratuit și pot face upgrade la un plan superior oricând.",
+    "ctaStart": "Începeți ca contabil →",
+    "ctaContact": "Contactați-ne",
+    "howTitle": "Cum funcționează",
+    "steps": [
+      {
+        "title": "Vă înregistrați ca firmă de contabilitate",
+        "desc": "Creați un profil în sub 2 minute."
+      },
+      {
+        "title": "Alegeți un plan de contabilitate",
+        "desc": "În funcție de numărul de clienți deserviți."
+      },
+      {
+        "title": "Vă invitați clienții",
+        "desc": "Prin e-mail sau cu un link de recomandare personal."
+      },
+      {
+        "title": "Fiecare client primește un START gratuit",
+        "desc": "Fără taxă și fără card la înregistrare."
+      },
+      {
+        "title": "Gestionați toate firmele dintr-un singur loc",
+        "desc": "Rapoarte consolidate și comutare rapidă."
+      },
+      {
+        "title": "Clienții cresc împreună cu dvs.",
+        "desc": "Fac upgrade la un plan plătit la nevoie."
+      }
+    ],
+    "freeStartTitle": "Fiecare client al dvs. primește acces START gratuit",
+    "freeStartText": "START include facturare, clienți și furnizori, depozit de bază, cheltuieli, calendar fiscal și afișare dublă EUR/BGN — complet gratuit pentru client. Dacă clientul dorește mai multe funcții, poate face upgrade oricând.",
+    "firmTitle": "Pentru firma de contabilitate",
+    "firmBenefits": [
+      {
+        "title": "Toți clienții într-un singur loc",
+        "desc": "Un profil separat pentru fiecare firmă și comutare cu un clic."
+      },
+      {
+        "title": "Rapoarte consolidate",
+        "desc": "Venituri, cheltuieli, profit, status TVA și documente pentru toți clienții."
+      },
+      {
+        "title": "Invitații și link de recomandare",
+        "desc": "Invitați clienți prin e-mail sau cu propriul link de recomandare."
+      },
+      {
+        "title": "Control complet și securitate",
+        "desc": "Gestionați datele fiecărui client cu drepturi clare și protecție."
+      }
+    ],
+    "clientTitle": "Pentru clienți",
+    "clientBenefits": [
+      {
+        "title": "Acces START gratuit",
+        "desc": "Facturare completă, clienți, depozit și calendar fiscal — fără taxă."
+      },
+      {
+        "title": "Pregătit pentru euro",
+        "desc": "Afișare dublă EUR/BGN și compatibilitate deplină cu noile cerințe."
+      },
+      {
+        "title": "Lucru în comun cu contabilul",
+        "desc": "Contabilul vede și gestionează datele, fără schimb de fișiere."
+      }
+    ],
+    "plansTitle": "Planuri pentru contabili",
+    "plansSubtitle": "Alegeți în funcție de numărul de firme deservite · Toate prețurile sunt fără TVA",
+    "faqTitle": "Întrebări frecvente",
+    "faq": [
+      {
+        "q": "Plătesc clienții mei pentru a folosi platforma?",
+        "a": "Nu. Fiecare client pe care îl invitați primește acces START gratuit. Plătește doar dacă decide singur să facă upgrade la un plan superior."
+      },
+      {
+        "q": "Pot trece de la sistemul meu contabil anterior la Creative Digital Accounting?",
+        "a": "Da. Puteți trece liniștit de la sistemul actual — la nevoie echipa noastră vă va asista cu transferul și configurarea, ca să începeți lucrul fără probleme."
+      },
+      {
+        "q": "Pot gestiona totul pentru client?",
+        "a": "Da. Intrați în fiecare firmă client și lucrați complet — facturi, cheltuieli, depozit, salarii, analize și tot restul."
+      },
+      {
+        "q": "Există o limită de clienți?",
+        "a": "Depinde de plan: Contabil Start — până la 10, Contabil Pro — până la 50, Birou de contabilitate — până la 150, Firmă de contabilitate — nelimitat."
+      },
+      {
+        "q": "Ce include accesul START gratuit pentru client?",
+        "a": "Facturare, clienți și furnizori, depozit de bază, cheltuieli, calendar fiscal și afișare dublă EUR/BGN — complet gratuit."
+      }
+    ],
+    "finalTitle": "Sunteți gata să începeți?",
+    "finalText": "Înregistrați-vă ca firmă de contabilitate, invitați-vă clienții și gestionați toate firmele dintr-un singur loc.",
+    "finalStart": "Începeți ca contabil",
+    "finalContact": "Contactați-ne"
   }
 }
