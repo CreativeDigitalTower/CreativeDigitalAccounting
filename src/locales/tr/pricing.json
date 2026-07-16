@@ -145,5 +145,33 @@
         "Yeni özelliklere erken erişim"
       ]
     }
+  },
+  "sub": {
+    "currentPlan": "Mevcut plan",
+    "freeBtn": "Ücretsiz",
+    "upgrade": "Yükselt",
+    "changePlan": "Planı değiştir",
+    "trial7": "▶ 7 gün ücretsiz",
+    "trialError": "Deneme etkinleştirilirken hata.",
+    "bankTitle": "Banka havalesiyle ödeme",
+    "bankChosenPrefix": "Seçilen plan: ",
+    "bankChosenSuffix": " · {period}. Tutarı aşağıdaki hesaba gönderin. Ödeme alındıktan sonra planınızı etkinleştiririz.",
+    "bankIntroEmpty": "Ödenecek tam tutarı görmek için yukarıdan „Yükselt/Planı değiştir” düğmesiyle bir plan seçin. Kartla ödeme yakında eklenecek.",
+    "bankRecipient": "Alıcı",
+    "bankBank": "Banka",
+    "bankReason": "Açıklama",
+    "bankReasonValue": "CDA aboneliği — {name} ({period})",
+    "bankAmount": "Gönderilecek tutar",
+    "pricesVatNote": "Tüm fiyatlar KDV hariçtir. 1 EUR = {rate} BGN.",
+    "modalTitle": "Abonelik ödemesi",
+    "modalIntroPrefix": "",
+    "modalIntroSuffix": " planını seçtiniz · {period}.",
+    "modalIntro2": "Tutarı aşağıdaki bilgilerle banka hesabımıza gönderin.",
+    "modalReasonLabel": "Ödeme açıklaması",
+    "modalNote": "Havaleyi alır almaz, ödeme için size bir fatura göndereceğiz ve seçilen aboneliği hemen etkinleştireceğiz.",
+    "genProforma": "Proforma oluşturuluyor…",
+    "downloadProforma": "Proforma faturayı indir",
+    "gotIt": "Anladım, ödemeyi yapacağım",
+    "proformaAvail": "Proforma No. {number} „Gelen belgeler”de de mevcuttur."
   }
 }
