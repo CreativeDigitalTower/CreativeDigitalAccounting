@@ -20,10 +20,10 @@ const toolsLinks = [
   { href: "/tools/markup", label: "Надценка и печалба" },
 ];
 
+// Блог и „За нас" са преместени във футъра (колона „КОМПАНИЯ"), за да е
+// главното меню по-подредено. Тук остават само основните продуктови връзки.
 const linksAfter = [
   { href: "/accountants", key: "navigation.public.accountants" },
-  { href: "/blog", key: "navigation.public.blog" },
-  { href: "/about", key: "navigation.public.about" },
   { href: "/contact", key: "navigation.public.contact" },
 ];
 
