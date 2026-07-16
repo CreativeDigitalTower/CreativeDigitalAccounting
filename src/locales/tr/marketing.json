@@ -425,5 +425,228 @@
         ]
       }
     ]
+  },
+  "software": {
+    "title1": "İşinizin ihtiyaç",
+    "titleEm": "duyduğu her şey",
+    "subtitle": "Platform tüm finansal döngüyü kapsar — tekliften ödemenin alınmasına kadar.",
+    "ctaStart": "Ücretsiz başla →",
+    "newEyebrow": "PLATFORMDA EN YENİ",
+    "newTitle": "Güçlü yeni özellikler",
+    "newBadge": "Yeni",
+    "highlights": [
+      {
+        "title": "Proje Yönetimi (Project Management)",
+        "text": "Firma ve projeye göre modern görev panoları — her firma ayrı bir sütun. Görevleri öncelik, sorumlu, son tarih ve tamamlanma yüzdesiyle atayın, durumu izleyin ve ekip olarak çalışın. Aylık tekrarlayan görevler için ayrı bölüm ve dönem raporları için tamamlananların otomatik arşivi."
+      },
+      {
+        "title": "Çalışanlar için İK portalı",
+        "text": "Çalışanlar için tam bir self-servis portalı: kişisel profil, çevrimiçi izin talepleri ve onaylar, görev atama ve takibi, maaşlar ve sigorta. Her çalışan tam olarak yetkisi olanı görür — güvenli, kısıtlı erişimle."
+      },
+      {
+        "title": "Büyüme tahminleri ve simülatörleri",
+        "text": "Takvim yılı cirosuna göre zorunlu KDV kaydı tahmini, gelir ve stok fiyatı simülatörleri (artış/azalış) ve KPI ile yıllık karşılaştırmalı gelişmiş analizler — kararlarınızı net bir finansal tabloyla verin."
+      }
+    ],
+    "modules": [
+      {
+        "title": "Belgeler",
+        "items": [
+          "Faturalar, proformalar, teklifler, alacak ve borç dekontları",
+          "Teslim tutanakları ve uygunluk beyanları",
+          "İş belgesi oluşturma (sözleşmeler, vekâletnameler vb. — Business/Pro, yakında)",
+          "Tür ve yıla göre otomatik numaralandırma (CDA-2026-####)",
+          "Belge zinciri: Teklif → Proforma → Fatura",
+          "Farklı stillerde 15 profesyonel fatura şablonu",
+          "Çift EUR/BGN gösterimi (08.08.2026'ya kadar zorunlu)",
+          "Tekrarlayan (abonelik) faturalar",
+          "Durumlar: taslak, gönderildi, ödendi, gecikmiş, iptal"
+        ]
+      },
+      {
+        "title": "Müşteriler ve Tedarikçiler",
+        "items": [
+          "Belge geçmişiyle tam müşteri kaydı",
+          "Her müşteri için CRM notları",
+          "Kayıtta sicil no/VIES otomatik doldurma",
+          "Puan, geçmiş ve ekli belgelerle tedarikçiler",
+          "Cari bazında gelir/gider"
+        ]
+      },
+      {
+        "title": "Depo",
+        "items": [
+          "Birden fazla konum/depo",
+          "Tedarikçiden giriş",
+          "Çıkış ve üretim (malzeme ayrıştırma)",
+          "Asgari stoğa ulaşınca uyarı",
+          "Tam hareket geçmişi"
+        ]
+      },
+      {
+        "title": "Giderler",
+        "items": [
+          "Kategorilerle elle giriş",
+          "Tedarikçilerden gelen faturalar",
+          "Özel gider kategorileri",
+          "Dosya ekleme (PDF, fotoğraf)",
+          "Giderlerde KDV takibi"
+        ]
+      },
+      {
+        "title": "Finansal Analizler",
+        "items": [
+          "Döneme göre ciro ve giderler",
+          "Nakit akışı",
+          "Yıl için finansal hedef",
+          "Vergi takvimi",
+          "Yatırımcı PDF raporu",
+          "„Finansal sağlık” göstergesi (kural tabanlı, yapay zekâsız)"
+        ]
+      },
+      {
+        "title": "Projeler",
+        "items": [
+          "Proje bazında gelir ve gider",
+          "Gerçek tamamlanma yüzdesi",
+          "Sorumlu kullanıcı ve son tarih",
+          "Ekli dosyalar",
+          "Planlanan vs. gerçek bütçe"
+        ]
+      },
+      {
+        "title": "Sözleşmeler",
+        "items": [
+          "Müşteri ve tedarikçi sözleşmeleri",
+          "Sona erme hatırlatması",
+          "Otomatik yenileme",
+          "Ekli sözleşme PDF'i"
+        ]
+      },
+      {
+        "title": "Varlıklar",
+        "items": [
+          "Sabit varlık kaydı",
+          "Otomatik amortisman",
+          "Garanti ve sigorta",
+          "Servis günlüğü"
+        ]
+      },
+      {
+        "title": "Abonelik",
+        "items": [
+          "Freemium model — ayda 5 belge ücretsiz",
+          "Otomatik tahsilatlı Stripe faturalama",
+          "İstediğiniz zaman upgrade/downgrade",
+          "4 plan: Ücretsiz, Start, Business, Pro"
+        ]
+      }
+    ],
+    "saftTitle": "SAF-T hazırlığı — yerleşik modül",
+    "saftText1": "Ülke, zorunlu SAF-T raporlamasını aşamalı olarak getiriyor — büyük firmalar 2026'dan, KOBİ'ler 2027'den. Platformda ",
+    "saftBold": "yerleşik bir SAF-T modülü",
+    "saftText2": " bulunur; hazır XML dosyalarını (aylık, yıllık ve talep üzerine) doğrudan verilerinizden üretir — cariler, belgeler, vergiler, defterikebir ve varlıklar. Elle hazırlık ve veri yeniden yapılandırması olmadan."
+  },
+  "accountants": {
+    "metaTitle": "Muhasebeciler ve muhasebe firmaları için | Creative Digital Accounting",
+    "metaDesc": "Tüm müşterilerinize ücretsiz START erişimi verin ve tüm firmaları tek yerden yönetin — birleştirilmiş raporlar ve her firma için ayrı verilerle.",
+    "badge": "MUHASEBECİLER VE MUHASEBE FİRMALARI İÇİN",
+    "heroTitle1": "Ücretsiz START erişimi verin —",
+    "heroTitleEm": "tüm müşterilerinize Creative Digital Accounting",
+    "heroSubtitle": "Tüm müşteri firmalarını tek yerden yönetin. Müşterileriniz START'ı ücretsiz kullanır ve istediği zaman daha yüksek bir plana geçebilir.",
+    "ctaStart": "Muhasebeci olarak başlayın →",
+    "ctaContact": "Bize ulaşın",
+    "howTitle": "Nasıl çalışır",
+    "steps": [
+      {
+        "title": "Muhasebe firması olarak kaydolun",
+        "desc": "2 dakikadan kısa sürede profil oluşturun."
+      },
+      {
+        "title": "Bir muhasebe planı seçin",
+        "desc": "Hizmet verdiğiniz müşteri sayısına göre."
+      },
+      {
+        "title": "Müşterilerinizi davet edin",
+        "desc": "E-posta veya kişisel referans bağlantısıyla."
+      },
+      {
+        "title": "Her müşteri ücretsiz START alır",
+        "desc": "Kayıtta ücret ve kart yok."
+      },
+      {
+        "title": "Tüm firmaları tek yerden yönetin",
+        "desc": "Birleştirilmiş raporlar ve hızlı geçiş."
+      },
+      {
+        "title": "Müşteriler sizinle birlikte büyür",
+        "desc": "Gerektiğinde ücretli plana geçerler."
+      }
+    ],
+    "freeStartTitle": "Her müşteriniz ücretsiz START erişimi alır",
+    "freeStartText": "START; faturalama, müşteriler ve tedarikçiler, temel depo, giderler, vergi takvimi ve çift EUR/BGN gösterimini içerir — müşteri için tamamen ücretsiz. Müşteri daha fazla özellik isterse istediği zaman daha yüksek bir plana geçebilir.",
+    "firmTitle": "Muhasebe firması için",
+    "firmBenefits": [
+      {
+        "title": "Tüm müşteriler tek yerde",
+        "desc": "Her firma için ayrı profil ve tek tıkla geçiş."
+      },
+      {
+        "title": "Birleştirilmiş raporlar",
+        "desc": "Tüm müşterilerin gelir, gider, kâr, KDV durumu ve belgeleri."
+      },
+      {
+        "title": "Davetler ve referans bağlantısı",
+        "desc": "Müşterileri e-posta veya kendi referans bağlantınızla davet edin."
+      },
+      {
+        "title": "Tam kontrol ve güvenlik",
+        "desc": "Her müşterinin verilerini net yetkiler ve korumayla yönetin."
+      }
+    ],
+    "clientTitle": "Müşteriler için",
+    "clientBenefits": [
+      {
+        "title": "Ücretsiz START erişimi",
+        "desc": "Tam faturalama, müşteriler, depo ve vergi takvimi — ücretsiz."
+      },
+      {
+        "title": "Euro'ya hazır",
+        "desc": "Çift EUR/BGN gösterimi ve yeni gerekliliklerle tam uyum."
+      },
+      {
+        "title": "Muhasebeciyle ortak çalışma",
+        "desc": "Muhasebeci verileri görür ve yönetir, dosya alışverişi olmadan."
+      }
+    ],
+    "plansTitle": "Muhasebeciler için planlar",
+    "plansSubtitle": "Hizmet verdiğiniz firma sayısına göre seçin · Tüm fiyatlar KDV hariçtir",
+    "faqTitle": "Sıkça sorulan sorular",
+    "faq": [
+      {
+        "q": "Müşterilerim platformu kullanmak için ödeme yapıyor mu?",
+        "a": "Hayır. Davet ettiğiniz her müşteri ücretsiz START erişimi alır. Yalnızca kendisi daha yüksek bir plana geçmeye karar verirse öder."
+      },
+      {
+        "q": "Önceki muhasebe sistemimden Creative Digital Accounting'e geçebilir miyim?",
+        "a": "Evet. Mevcut sisteminizden rahatça geçebilirsiniz — gerekirse ekibimiz aktarım ve kurulumda size yardımcı olur, böylece sorunsuz başlarsınız."
+      },
+      {
+        "q": "Müşteri adına her şeyi yönetebilir miyim?",
+        "a": "Evet. Her müşteri firmasına girip tam olarak çalışırsınız — faturalar, giderler, depo, maaşlar, analizler ve geri kalan her şey."
+      },
+      {
+        "q": "Müşteri limiti var mı?",
+        "a": "Plana bağlıdır: Muhasebe Start — 10'a kadar, Muhasebe Pro — 50'ye kadar, Muhasebe Ofisi — 150'ye kadar, Muhasebe Firması — sınırsız."
+      },
+      {
+        "q": "Müşteri için ücretsiz START erişimi neleri içerir?",
+        "a": "Faturalama, müşteriler ve tedarikçiler, temel depo, giderler, vergi takvimi ve çift EUR/BGN gösterimi — tamamen ücretsiz."
+      }
+    ],
+    "finalTitle": "Başlamaya hazır mısınız?",
+    "finalText": "Muhasebe firması olarak kaydolun, müşterilerinizi davet edin ve tüm firmaları tek yerden yönetin.",
+    "finalStart": "Muhasebeci olarak başlayın",
+    "finalContact": "Bize ulaşın"
   }
 }

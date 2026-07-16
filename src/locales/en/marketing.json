@@ -425,5 +425,228 @@
         ]
       }
     ]
+  },
+  "software": {
+    "title1": "Everything your",
+    "titleEm": "business needs",
+    "subtitle": "The platform covers the entire financial cycle — from the quote to receiving payment.",
+    "ctaStart": "Start free →",
+    "newEyebrow": "THE NEWEST ON THE PLATFORM",
+    "newTitle": "Powerful new features",
+    "newBadge": "New",
+    "highlights": [
+      {
+        "title": "Project Management",
+        "text": "Modern task boards by company and project — each company is a separate column. Assign tasks with priority, assignee, deadline and completion percentage, track status and work as a team. A separate section for recurring monthly tasks and an automatic archive of completed ones for period reports."
+      },
+      {
+        "title": "HR portal for employees",
+        "text": "A full self-service portal for employees: personal profile, online leave requests and approvals, task assignment and tracking, salaries and social contributions. Each employee sees exactly what they have rights to — with secure, restricted access."
+      },
+      {
+        "title": "Growth forecasts and simulators",
+        "text": "Forecast of mandatory VAT registration against turnover for the calendar year, revenue and inventory-price simulators (increase/decrease) and advanced analytics with KPIs and year-over-year comparison — so you decide with a clear financial picture."
+      }
+    ],
+    "modules": [
+      {
+        "title": "Documents",
+        "items": [
+          "Invoices, proformas, quotes, credit and debit notes",
+          "Handover protocols and conformity declarations",
+          "Business document generation (contracts, powers of attorney, etc. — Business/Pro, soon)",
+          "Automatic numbering by type and year (CDA-2026-####)",
+          "Document chain: Quote → Proforma → Invoice",
+          "15 professional invoice templates with different styles",
+          "Dual EUR/BGN display (mandatory until 08.08.2026)",
+          "Recurring (subscription) invoices",
+          "Statuses: draft, sent, paid, overdue, cancelled"
+        ]
+      },
+      {
+        "title": "Clients & Suppliers",
+        "items": [
+          "Full client record with document history",
+          "CRM notes for each client",
+          "Reg. No/VIES auto-fill on registration",
+          "Suppliers with rating, history and attached documents",
+          "Revenue/expenses per counterparty"
+        ]
+      },
+      {
+        "title": "Inventory",
+        "items": [
+          "Multiple locations/warehouses",
+          "Receiving from a supplier",
+          "Write-offs and production (material breakdown)",
+          "Alert on reaching minimum stock",
+          "Full movement history"
+        ]
+      },
+      {
+        "title": "Expenses",
+        "items": [
+          "Manual entry with categories",
+          "Incoming invoices from suppliers",
+          "Custom expense categories",
+          "File attachments (PDF, photo)",
+          "VAT tracking on expenses"
+        ]
+      },
+      {
+        "title": "Financial Analytics",
+        "items": [
+          "Turnover and expenses by period",
+          "Cash flow",
+          "Financial goal for the year",
+          "Tax calendar",
+          "Investor PDF report",
+          "\"Financial health\" indicator (rule-based, no AI)"
+        ]
+      },
+      {
+        "title": "Projects",
+        "items": [
+          "Revenue and expenses per project",
+          "Real completion percentage",
+          "Responsible user and deadline",
+          "Attached files",
+          "Budget planned vs. actual"
+        ]
+      },
+      {
+        "title": "Contracts",
+        "items": [
+          "Client and supplier contracts",
+          "Expiry reminder",
+          "Automatic renewal",
+          "Attached contract PDF"
+        ]
+      },
+      {
+        "title": "Assets",
+        "items": [
+          "Fixed-asset register",
+          "Automatic depreciation",
+          "Warranty and insurance",
+          "Service log"
+        ]
+      },
+      {
+        "title": "Subscription",
+        "items": [
+          "Freemium model — 5 documents/month free",
+          "Stripe billing with automatic charging",
+          "Upgrade/downgrade at any time",
+          "4 plans: Free, Start, Business, Pro"
+        ]
+      }
+    ],
+    "saftTitle": "SAF-T readiness — built-in module",
+    "saftText1": "The country is introducing mandatory SAF-T reporting in phases — large companies from 2026, SMEs from 2027. The platform has a ",
+    "saftBold": "built-in SAF-T module",
+    "saftText2": " that generates the ready XML files (monthly, annual and on demand) directly from your data — counterparties, documents, taxes, general ledger and assets. No manual preparation and no data restructuring."
+  },
+  "accountants": {
+    "metaTitle": "For accountants and accounting firms | Creative Digital Accounting",
+    "metaDesc": "Give free START access to all your clients and manage every company from one place — with consolidated reports and separate data for each company.",
+    "badge": "FOR ACCOUNTANTS AND ACCOUNTING FIRMS",
+    "heroTitle1": "Give free START access to",
+    "heroTitleEm": "Creative Digital Accounting for all your clients",
+    "heroSubtitle": "Manage all client companies from one place. Your clients use START for free and can upgrade to a higher plan at any time.",
+    "ctaStart": "Start as an accountant →",
+    "ctaContact": "Get in touch",
+    "howTitle": "How it works",
+    "steps": [
+      {
+        "title": "Register as an accounting firm",
+        "desc": "Create a profile in under 2 minutes."
+      },
+      {
+        "title": "Choose an accounting plan",
+        "desc": "Based on the number of clients you serve."
+      },
+      {
+        "title": "Invite your clients",
+        "desc": "By email or with a personal referral link."
+      },
+      {
+        "title": "Each client gets a free START",
+        "desc": "No fee and no card at registration."
+      },
+      {
+        "title": "Manage all companies from one place",
+        "desc": "Consolidated reports and quick switching."
+      },
+      {
+        "title": "Clients grow together with you",
+        "desc": "They upgrade to a paid plan when needed."
+      }
+    ],
+    "freeStartTitle": "Every client of yours gets free START access",
+    "freeStartText": "START includes invoicing, clients and suppliers, basic inventory, expenses, tax calendar and dual EUR/BGN display — completely free for the client. If the client needs more features, they can upgrade to a higher plan at any time.",
+    "firmTitle": "For the accounting firm",
+    "firmBenefits": [
+      {
+        "title": "All clients in one place",
+        "desc": "A separate profile for each company and one-click switching."
+      },
+      {
+        "title": "Consolidated reports",
+        "desc": "Revenue, expenses, profit, VAT status and documents for all clients."
+      },
+      {
+        "title": "Invitations and referral link",
+        "desc": "Invite clients by email or with your own referral link."
+      },
+      {
+        "title": "Full control and security",
+        "desc": "Manage each client's data with clear permissions and protection."
+      }
+    ],
+    "clientTitle": "For the clients",
+    "clientBenefits": [
+      {
+        "title": "Free START access",
+        "desc": "Full invoicing, clients, inventory and tax calendar — no fee."
+      },
+      {
+        "title": "Euro-ready",
+        "desc": "Dual EUR/BGN display and full compatibility with the new requirements."
+      },
+      {
+        "title": "Working together with the accountant",
+        "desc": "The accountant sees and manages the data, with no file exchange."
+      }
+    ],
+    "plansTitle": "Plans for accountants",
+    "plansSubtitle": "Choose based on the number of companies you serve · All prices are excl. VAT",
+    "faqTitle": "Frequently asked questions",
+    "faq": [
+      {
+        "q": "Do my clients pay to use the platform?",
+        "a": "No. Every client you invite gets free START access. They only pay if they decide to upgrade to a higher plan themselves."
+      },
+      {
+        "q": "Can I switch from my previous accounting system to Creative Digital Accounting?",
+        "a": "Yes. You can switch calmly from your current system — if needed our team will assist with the transfer and setup so you start working smoothly."
+      },
+      {
+        "q": "Can I manage everything for the client?",
+        "a": "Yes. You log into each client company and work fully — invoices, expenses, inventory, salaries, analytics and everything else."
+      },
+      {
+        "q": "Is there a limit on clients?",
+        "a": "It depends on the plan: Accounting Start — up to 10, Accounting Pro — up to 50, Accounting Office — up to 150, Accounting Firm — unlimited."
+      },
+      {
+        "q": "What does the free START access include for the client?",
+        "a": "Invoicing, clients and suppliers, basic inventory, expenses, tax calendar and dual EUR/BGN display — completely free."
+      }
+    ],
+    "finalTitle": "Ready to get started?",
+    "finalText": "Register as an accounting firm, invite your clients and manage all companies from one place.",
+    "finalStart": "Start as an accountant",
+    "finalContact": "Get in touch"
   }
 }
