@@ -29,8 +29,11 @@ export async function POST(req: Request) {
       await notifyAdmin(a.subject, a.html, "admin_account_deleted");
     } catch {}
 
-    // каскадно изтриване на всички данни на фирмата
-    await prisma.company.delete({ where: { id: companyId } });
+    // МЕКО архивиране (както при изтриване от Супер Админ): данните се пазят и
+    // фирмата се вижда в раздел „Архивирани/изтрити фирми". Така всяка изтрита
+    // фирма — независимо дали от админ или самата фирма — остава видима и
+    // възстановима. Окончателното изтриване става само от Супер Админ.
+    await prisma.company.update({ where: { id: companyId }, data: { archivedAt: new Date() } });
     return NextResponse.json({ ok: true });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: "Моля потвърдете и посочете причина." }, { status: 400 });

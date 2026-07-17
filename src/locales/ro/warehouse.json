@@ -200,11 +200,13 @@
       "qty": "Stoc",
       "minQty": "Stoc min.",
       "price": "Preț unitar (€)",
-      "expiry": "Data expirării"
+      "expiry": "Data expirării",
+      "category": "Categorie"
     },
     "cancel": "Anulează",
     "save": "Salvează",
-    "saving": "Se salvează…"
+    "saving": "Se salvează…",
+    "noCategory": "Fără categorie"
   },
   "simulator": {
     "title": "Simulare: modificarea prețurilor în depozit",

@@ -37,8 +37,11 @@ export async function getCompanyId(userId: string): Promise<string> {
     if (member) return member.companyId;
   }
 
+  // Архивираните/изтритите фирми не се третират като активни — собственикът,
+  // който си е изтрил профила, се води без активна фирма (→ онбординг), но
+  // данните остават в „Архивирани фирми" и подлежат на възстановяване от админ.
   const cu = await prisma.companyUser.findFirst({
-    where: { userId },
+    where: { userId, company: { archivedAt: null } },
     orderBy: { company: { createdAt: "asc" } },
   });
   if (!cu) redirect("/onboarding");

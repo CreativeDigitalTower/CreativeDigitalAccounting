@@ -10,6 +10,7 @@ import { ImpersonationBanner } from "@/components/app/ImpersonationBanner";
 import { FirmClientBanner } from "@/components/app/FirmClientBanner";
 import { VisitTracker } from "@/components/VisitTracker";
 import { TrialEndedPopup } from "@/components/app/TrialEndedPopup";
+import { TrialBanner } from "@/components/app/TrialBanner";
 import { enforceSubscription } from "@/lib/subscription";
 import { effectiveManagedPlan } from "@/lib/constants";
 
@@ -41,6 +42,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     : company.managedByFirmId ? effectiveManagedPlan(sub.plan) : sub.plan;
   const isSuperAdmin = !!me?.isSuperAdmin;
   const impersonating = isSuperAdmin && !!jar.get(IMPERSONATE_COOKIE)?.value;
+  // Подсещане за безплатен пробен период: показва се на стандартни фирми на
+  // БЕЗПЛАТЕН план, които още не са ползвали теста (не за клиенти на счет. къща,
+  // не за самите счетоводни къщи, не при импърсонация).
+  const showTrialBanner = plan === "free" && !sub.trialUsed && !company.managedByFirmId && !company.isAccountingFirm && !impersonating;
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", position: "relative" }}>
@@ -49,6 +54,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <div style={{ position: "relative", zIndex: 1, display: "flex", width: "100%" }}>
         <SidebarShell companyName={company.name} plan={plan} isSuperAdmin={isSuperAdmin} logoUrl={plan !== "free" ? company.logoUrl : null} inboxUnread={inboxUnread} />
         <main style={{ flex: 1, minWidth: 0, maxWidth: 1180 }}>
+          {showTrialBanner && <TrialBanner />}
           {impersonating && <ImpersonationBanner companyName={company.name} />}
           {company.managedByFirmId && <FirmClientBanner companyName={company.name} />}
           {company.isAccountingFirm && <FirmClientBanner companyName={company.name} own />}

@@ -2,17 +2,52 @@
   "appName": "Creative Digital Accounting",
   "language": "Dil",
   "actions": {
-    "save": "Kaydet", "cancel": "İptal", "delete": "Sil", "edit": "Düzenle", "create": "Oluştur",
-    "close": "Kapat", "confirm": "Onayla", "search": "Ara", "back": "Geri", "next": "İleri",
-    "download": "İndir", "send": "Gönder", "add": "Ekle", "open": "Aç", "view": "Görüntüle",
-    "apply": "Uygula", "reset": "Sıfırla", "export": "Dışa aktar", "print": "Yazdır", "copy": "Kopyala", "select": "Seç"
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "create": "Oluştur",
+    "close": "Kapat",
+    "confirm": "Onayla",
+    "search": "Ara",
+    "back": "Geri",
+    "next": "İleri",
+    "download": "İndir",
+    "send": "Gönder",
+    "add": "Ekle",
+    "open": "Aç",
+    "view": "Görüntüle",
+    "apply": "Uygula",
+    "reset": "Sıfırla",
+    "export": "Dışa aktar",
+    "print": "Yazdır",
+    "copy": "Kopyala",
+    "select": "Seç"
   },
   "state": {
-    "loading": "Yükleniyor…", "saving": "Kaydediliyor…", "empty": "Veri yok", "noResults": "Sonuç yok",
-    "error": "Bir hata oluştu", "success": "Tamamlandı", "notEnoughData": "Güvenilir bir analiz için henüz yeterli veri yok."
+    "loading": "Yükleniyor…",
+    "saving": "Kaydediliyor…",
+    "empty": "Veri yok",
+    "noResults": "Sonuç yok",
+    "error": "Bir hata oluştu",
+    "success": "Tamamlandı",
+    "notEnoughData": "Güvenilir bir analiz için henüz yeterli veri yok."
   },
   "common": {
-    "yes": "Evet", "no": "Hayır", "all": "Tümü", "from": "Başlangıç", "to": "Bitiş", "date": "Tarih",
-    "status": "Durum", "total": "Toplam", "period": "Dönem", "actions": "İşlemler", "details": "Ayrıntılar"
+    "yes": "Evet",
+    "no": "Hayır",
+    "all": "Tümü",
+    "from": "Başlangıç",
+    "to": "Bitiş",
+    "date": "Tarih",
+    "status": "Durum",
+    "total": "Toplam",
+    "period": "Dönem",
+    "actions": "İşlemler",
+    "details": "Ayrıntılar"
+  },
+  "trialBanner": {
+    "text": "<b>Tüm özellikleri ücretsiz</b> keşfedin — seçtiğiniz bir planın deneme süresini etkinleştirin.",
+    "cta": "Ücretsiz denemeyi başlat"
   }
 }
