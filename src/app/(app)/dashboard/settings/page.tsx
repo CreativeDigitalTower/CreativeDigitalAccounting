@@ -184,7 +184,7 @@ export default function SettingsPage() {
           <div>
             <label>{t("account.settings.currency")}</label>
             <select value={c.defaultCurrency} onChange={(e) => set("defaultCurrency", e.target.value)}>
-              {CURRENCIES.map((cu) => <option key={cu.code} value={cu.code}>{cu.label}</option>)}
+              {CURRENCIES.map((cu) => <option key={cu.code} value={cu.code}>{t(`enums.currency.${cu.code}`)}</option>)}
             </select>
           </div>
           <div>

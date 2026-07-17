@@ -305,7 +305,7 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
       )}
 
       <div style={{ marginTop: 16, borderTop: "1px solid var(--border)", paddingTop: 14, fontSize: 12.5, color: "var(--ink-soft)" }}>
-        <strong style={{ color: accent }}>{L("paymentMethod")}:</strong> {paymentMethodLabel(data.paymentMethod)}
+        <strong style={{ color: accent }}>{L("paymentMethod")}:</strong> {(() => { const k = dt(`enums.payment.${data.paymentMethod}`); return k.startsWith("enums.") ? paymentMethodLabel(data.paymentMethod) : k; })()}
         {data.paymentMethod === "bank_transfer" && company.bankIban && (
           <div style={{ marginTop: 8, lineHeight: 1.7 }}>
             <div>{L("recipientLabel")}: <strong>{company.name}</strong></div>

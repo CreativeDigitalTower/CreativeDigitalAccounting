@@ -1,0 +1,35 @@
+{
+  "payment": {
+    "cash": "Cash",
+    "bank_transfer": "Bank transfer",
+    "cod": "Cash on delivery",
+    "card": "Card",
+    "payment_order": "Payment order",
+    "cheque": "Cheque / Voucher",
+    "offset": "Set-off",
+    "money_transfer": "Money transfer",
+    "epay": "ePay",
+    "paypal": "PayPal",
+    "stripe": "Stripe",
+    "revolut": "Revolut",
+    "easypay": "EasyPay",
+    "postal": "Postal money transfer",
+    "other": "Other"
+  },
+  "currency": {
+    "EUR": "Euro (€)",
+    "USD": "US dollar ($)",
+    "GBP": "British pound (£)",
+    "CHF": "Swiss franc",
+    "RON": "Romanian leu",
+    "TRY": "Turkish lira (₺)",
+    "PLN": "Polish zloty",
+    "CZK": "Czech koruna",
+    "SEK": "Swedish krona",
+    "NOK": "Norwegian krone",
+    "CAD": "Canadian dollar",
+    "AUD": "Australian dollar",
+    "JPY": "Japanese yen (¥)",
+    "CNY": "Chinese yuan"
+  }
+}

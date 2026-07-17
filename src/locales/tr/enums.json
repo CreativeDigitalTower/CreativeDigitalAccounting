@@ -1,0 +1,35 @@
+{
+  "payment": {
+    "cash": "Nakit",
+    "bank_transfer": "Banka havalesi",
+    "cod": "Kapıda ödeme",
+    "card": "Kart",
+    "payment_order": "Ödeme talimatı",
+    "cheque": "Çek / Kupon",
+    "offset": "Mahsuplaşma",
+    "money_transfer": "Para transferi",
+    "epay": "ePay",
+    "paypal": "PayPal",
+    "stripe": "Stripe",
+    "revolut": "Revolut",
+    "easypay": "EasyPay",
+    "postal": "Posta havalesi",
+    "other": "Diğer"
+  },
+  "currency": {
+    "EUR": "Euro (€)",
+    "USD": "ABD doları ($)",
+    "GBP": "İngiliz sterlini (£)",
+    "CHF": "İsviçre frangı",
+    "RON": "Romen leyi",
+    "TRY": "Türk lirası (₺)",
+    "PLN": "Polonya zlotisi",
+    "CZK": "Çek korunası",
+    "SEK": "İsveç kronu",
+    "NOK": "Norveç kronu",
+    "CAD": "Kanada doları",
+    "AUD": "Avustralya doları",
+    "JPY": "Japon yeni (¥)",
+    "CNY": "Çin yuanı"
+  }
+}

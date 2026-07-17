@@ -1,0 +1,35 @@
+{
+  "payment": {
+    "cash": "Numerar",
+    "bank_transfer": "Transfer bancar",
+    "cod": "Ramburs",
+    "card": "Card",
+    "payment_order": "Ordin de plată",
+    "cheque": "Cec / Voucher",
+    "offset": "Compensare",
+    "money_transfer": "Transfer de bani",
+    "epay": "ePay",
+    "paypal": "PayPal",
+    "stripe": "Stripe",
+    "revolut": "Revolut",
+    "easypay": "EasyPay",
+    "postal": "Mandat poștal",
+    "other": "Altul"
+  },
+  "currency": {
+    "EUR": "Euro (€)",
+    "USD": "Dolar american ($)",
+    "GBP": "Liră sterlină (£)",
+    "CHF": "Franc elvețian",
+    "RON": "Leu românesc",
+    "TRY": "Liră turcească (₺)",
+    "PLN": "Zlot polonez",
+    "CZK": "Coroană cehă",
+    "SEK": "Coroană suedeză",
+    "NOK": "Coroană norvegiană",
+    "CAD": "Dolar canadian",
+    "AUD": "Dolar australian",
+    "JPY": "Yen japonez (¥)",
+    "CNY": "Yuan chinezesc"
+  }
+}

@@ -109,10 +109,10 @@ export default function EditDocumentPage({ params }: { params: Promise<{ id: str
           <div><label>{t("documents.form.issueDate")}</label><input type="date" value={issueDate} onChange={(e) => setIssueDate(e.target.value)} /></div>
           <div><label>{t("documents.form.taxEventShort")}</label><input type="date" value={taxEventDate} onChange={(e) => setTaxEventDate(e.target.value)} /></div>
           <div><label>{t("documents.form.dueDate")}</label><input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} /></div>
-          <div><label>{t("documents.form.currency")}</label><select value={currency} onChange={(e) => setCurrency(e.target.value)}>{CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.label}</option>)}</select></div>
+          <div><label>{t("documents.form.currency")}</label><select value={currency} onChange={(e) => setCurrency(e.target.value)}>{CURRENCIES.map((c) => <option key={c.code} value={c.code}>{t(`enums.currency.${c.code}`)}</option>)}</select></div>
           <div><label>{t("documents.form.languageEdit")}</label><select value={language} onChange={(e) => setLanguage(e.target.value)}>{DOC_LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}</select></div>
           <div><label>{t("documents.form.templateEdit")}</label><select value={template} onChange={(e) => setTemplate(e.target.value)}>{INVOICE_TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}</select></div>
-          <div><label>{t("documents.form.paymentMethod")}</label><select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>{PAYMENT_METHODS.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}</select></div>
+          <div><label>{t("documents.form.paymentMethod")}</label><select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>{PAYMENT_METHODS.map((m) => <option key={m.id} value={m.id}>{t(`enums.payment.${m.id}`)}</option>)}</select></div>
         </div>
 
         {/* Получател — избор + редакция на данните */}
