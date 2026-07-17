@@ -200,11 +200,13 @@
       "qty": "Stok",
       "minQty": "Min. stok",
       "price": "Birim fiyat (€)",
-      "expiry": "Son kullanma tarihi"
+      "expiry": "Son kullanma tarihi",
+      "category": "Kategori"
     },
     "cancel": "İptal",
     "save": "Kaydet",
-    "saving": "Kaydediliyor…"
+    "saving": "Kaydediliyor…",
+    "noCategory": "Kategori yok"
   },
   "simulator": {
     "title": "Simülasyon: depo fiyatlarını değiştir",

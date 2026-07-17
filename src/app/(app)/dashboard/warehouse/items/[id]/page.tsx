@@ -16,12 +16,14 @@ export default async function StockItemDetailPage({ params }: { params: Promise<
   });
   if (!item) notFound();
 
+  const categories = await prisma.stockCategory.findMany({ where: { companyId }, orderBy: { name: "asc" }, select: { id: true, name: true } });
+
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20, flexWrap: "wrap" }}>
         <Link href="/dashboard/warehouse" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>{t("warehouse.common.back")}</Link>
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{item.name}</h1>
-        <StockItemActions item={{ id: item.id, name: item.name, sku: item.sku, unit: item.unit, quantity: item.quantity, minQuantity: item.minQuantity, unitCost: item.unitCost, expiryDate: item.expiryDate ? item.expiryDate.toISOString() : null }} />
+        <StockItemActions item={{ id: item.id, name: item.name, sku: item.sku, unit: item.unit, quantity: item.quantity, minQuantity: item.minQuantity, unitCost: item.unitCost, expiryDate: item.expiryDate ? item.expiryDate.toISOString() : null, categoryId: item.categoryId }} categories={categories} />
         <Link href="/dashboard/warehouse/receive" className="btn btn-ghost btn-sm">{t("warehouse.itemDetail.receiveBtn")}</Link>
       </div>
 

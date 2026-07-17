@@ -200,11 +200,13 @@
       "qty": "Stock",
       "minQty": "Min. stock",
       "price": "Unit price (€)",
-      "expiry": "Expiry date"
+      "expiry": "Expiry date",
+      "category": "Category"
     },
     "cancel": "Cancel",
     "save": "Save",
-    "saving": "Saving…"
+    "saving": "Saving…",
+    "noCategory": "No category"
   },
   "simulator": {
     "title": "Simulation: change warehouse prices",

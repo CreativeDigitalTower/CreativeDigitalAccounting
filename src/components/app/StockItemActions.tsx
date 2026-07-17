@@ -9,9 +9,10 @@ import { useT } from "@/components/i18n/I18nProvider";
 type Item = {
   id: string; name: string; sku: string | null; unit: string;
   quantity: number; minQuantity: number | null; unitCost: number | null; expiryDate: string | null;
+  categoryId: string | null;
 };
 
-export function StockItemActions({ item }: { item: Item }) {
+export function StockItemActions({ item, categories = [] }: { item: Item; categories?: { id: string; name: string }[] }) {
   const t = useT();
   const router = useRouter();
   const [edit, setEdit] = useState(false);
@@ -24,7 +25,7 @@ export function StockItemActions({ item }: { item: Item }) {
     const res = await fetch(`/api/warehouse/items/${item.id}`, {
       method: "PUT", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name: f.name, sku: f.sku, unit: f.unit,
+        name: f.name, sku: f.sku, unit: f.unit, categoryId: f.categoryId || null,
         quantity: Number(f.quantity), minQuantity: f.minQuantity != null ? Number(f.minQuantity) : null,
         unitCost: f.unitCost != null ? Number(f.unitCost) : null,
         expiryDate: f.expiryDate || null,
@@ -54,12 +55,18 @@ export function StockItemActions({ item }: { item: Item }) {
       </button>
 
       {edit && (
-        <div onClick={() => setEdit(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 }}>
-          <div onClick={(e) => e.stopPropagation()} className="glass panel" style={{ width: "min(520px, 100%)", padding: 22 }}>
+        <div onClick={() => setEdit(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.4)", display: "flex", alignItems: "flex-start", justifyContent: "center", zIndex: 1000, padding: "16px", overflowY: "auto" }}>
+          <div onClick={(e) => e.stopPropagation()} className="glass panel" style={{ width: "min(520px, 100%)", padding: 22, margin: "auto", maxHeight: "calc(100vh - 32px)", overflowY: "auto" }}>
             <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 17, margin: "0 0 14px" }}>{t("warehouse.actions.modalTitle")}</h3>
             {err && <div style={{ background: "var(--brick-soft)", color: "var(--brick)", borderRadius: 6, padding: "8px 12px", fontSize: 12.5, marginBottom: 12 }}>{err}</div>}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <div style={{ gridColumn: "1 / -1" }}><label>{t("warehouse.actions.f.name")}</label><input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></div>
+              <div style={{ gridColumn: "1 / -1" }}><label>{t("warehouse.actions.f.category")}</label>
+                <select value={f.categoryId ?? ""} onChange={(e) => setF({ ...f, categoryId: e.target.value || null })}>
+                  <option value="">{t("warehouse.actions.noCategory")}</option>
+                  {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
               <div><label>{t("warehouse.actions.f.sku")}</label><input value={f.sku ?? ""} onChange={(e) => setF({ ...f, sku: e.target.value })} /></div>
               <div><label>{t("warehouse.actions.f.unit")}</label><input value={f.unit} onChange={(e) => setF({ ...f, unit: e.target.value })} /></div>
               <div><label>{t("warehouse.actions.f.qty")}</label><input type="number" value={f.quantity} onChange={(e) => setF({ ...f, quantity: Number(e.target.value) })} /></div>
