@@ -145,5 +145,33 @@
         "Early access to new features"
       ]
     }
+  },
+  "sub": {
+    "currentPlan": "Current plan",
+    "freeBtn": "Free",
+    "upgrade": "Upgrade",
+    "changePlan": "Change plan",
+    "trial7": "▶ 7 days free",
+    "trialError": "Error activating the trial.",
+    "bankTitle": "Payment by bank transfer",
+    "bankChosenPrefix": "Selected plan: ",
+    "bankChosenSuffix": " · {period}. Transfer the amount to the account below. Once payment is received we'll activate your plan.",
+    "bankIntroEmpty": "Select a plan above with the “Upgrade/Change plan” button to see the exact amount to pay. Card payment is coming soon.",
+    "bankRecipient": "Recipient",
+    "bankBank": "Bank",
+    "bankReason": "Reference",
+    "bankReasonValue": "CDA subscription — {name} ({period})",
+    "bankAmount": "Amount to transfer",
+    "pricesVatNote": "All prices excl. VAT. 1 EUR = {rate} BGN.",
+    "modalTitle": "Subscription payment",
+    "modalIntroPrefix": "You chose the ",
+    "modalIntroSuffix": " plan · {period}.",
+    "modalIntro2": "Transfer the amount to our bank account using the details below.",
+    "modalReasonLabel": "Payment reference",
+    "modalNote": "As soon as we receive the transfer, we'll send you an invoice for the payment and immediately activate the selected subscription.",
+    "genProforma": "Generating proforma…",
+    "downloadProforma": "Download proforma invoice",
+    "gotIt": "Got it, I'll make the payment",
+    "proformaAvail": "Proforma No. {number} is also available in “Incoming documents”."
   }
 }

@@ -145,5 +145,33 @@
         "Acces timpuriu la funcțiile noi"
       ]
     }
+  },
+  "sub": {
+    "currentPlan": "Plan curent",
+    "freeBtn": "Gratuit",
+    "upgrade": "Upgrade",
+    "changePlan": "Schimbă planul",
+    "trial7": "▶ 7 zile gratuit",
+    "trialError": "Eroare la activarea probei.",
+    "bankTitle": "Plată prin transfer bancar",
+    "bankChosenPrefix": "Plan selectat: ",
+    "bankChosenSuffix": " · {period}. Transferați suma în contul de mai jos. După primirea plății vă activăm planul.",
+    "bankIntroEmpty": "Selectați un plan mai sus cu butonul „Upgrade/Schimbă planul” pentru a vedea suma exactă de plată. Plata cu cardul urmează în curând.",
+    "bankRecipient": "Beneficiar",
+    "bankBank": "Bancă",
+    "bankReason": "Detalii plată",
+    "bankReasonValue": "Abonament CDA — {name} ({period})",
+    "bankAmount": "Sumă de transferat",
+    "pricesVatNote": "Toate prețurile fără TVA. 1 EUR = {rate} BGN.",
+    "modalTitle": "Plata abonamentului",
+    "modalIntroPrefix": "Ați ales planul ",
+    "modalIntroSuffix": " · {period}.",
+    "modalIntro2": "Transferați suma în contul nostru bancar folosind datele de mai jos.",
+    "modalReasonLabel": "Detalii plată",
+    "modalNote": "Imediat ce primim transferul, vă trimitem o factură pentru plată și activăm imediat abonamentul selectat.",
+    "genProforma": "Se generează proforma…",
+    "downloadProforma": "Descarcă factura proformă",
+    "gotIt": "Am înțeles, voi efectua plata",
+    "proformaAvail": "Proforma nr. {number} este disponibilă și în „Documente primite”."
   }
 }
