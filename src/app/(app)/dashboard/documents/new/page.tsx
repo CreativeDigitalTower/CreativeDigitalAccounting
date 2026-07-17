@@ -255,7 +255,7 @@ function NewDocumentForm() {
           <div>
             <label>{t("documents.form.currency")}</label>
             <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
-              {CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.label}</option>)}
+              {CURRENCIES.map((c) => <option key={c.code} value={c.code}>{t(`enums.currency.${c.code}`)}</option>)}
             </select>
           </div>
           <div>
@@ -273,7 +273,7 @@ function NewDocumentForm() {
           <div>
             <label>{t("documents.form.paymentMethod")}</label>
             <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
-              {PAYMENT_METHODS.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
+              {PAYMENT_METHODS.map((m) => <option key={m.id} value={m.id}>{t(`enums.payment.${m.id}`)}</option>)}
             </select>
           </div>
         </div>

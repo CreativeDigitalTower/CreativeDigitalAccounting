@@ -111,7 +111,7 @@ export function OfferDocument({ data }: { data: InvoiceData }) {
         </div>
 
         <div style={{ marginTop: 20, borderTop: "1px solid var(--border)", paddingTop: 14, fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.7 }}>
-          <div><strong style={{ color: accent }}>{L("offer.paymentTerms")}:</strong> {paymentMethodLabel(data.paymentMethod)}</div>
+          <div><strong style={{ color: accent }}>{L("offer.paymentTerms")}:</strong> {(() => { const k = dt(`enums.payment.${data.paymentMethod}`); return k.startsWith("enums.") ? paymentMethodLabel(data.paymentMethod) : k; })()}</div>
           {data.dueDate && <div><strong style={{ color: accent }}>{L("offer.validityTerm")}:</strong> {L("offer.until")} {fmtDate(data.dueDate)}</div>}
           {dual && <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 6 }}>{L("offer.fixedRate", { rate: EUR_TO_BGN })}</div>}
         </div>
