@@ -1,5 +1,6 @@
 import type { Insight, MetricCard, Severity } from "@/lib/bi/overview";
 import type { PartnerStats } from "@/lib/partner";
+import type { TFunc } from "@/lib/i18n/messages";
 
 // ─────────────────────────────────────────────────────────────────────────
 // Accounting Firm Executive Overview — от реалните данни на всички клиенти.
@@ -24,7 +25,8 @@ export type FirmOverview = {
   tasks: FirmTask[];
 };
 
-const money = (v: number) => Math.round(v).toLocaleString("bg-BG") + " €";
+/** Преводено име на план по id (реюз на pricing namespace). */
+const planName = (t: TFunc, id: string) => t(`pricing.plans.${id}.name`);
 
 /** Business Health на клиентска фирма — само от реални показатели. */
 export function clientHealth(c: { profit: number; revenue: number; overdue: number; unpaid: number; lastActivityDays: number | null; vatState: string }): { score: number; tone: Severity } {
@@ -42,31 +44,32 @@ export function clientHealth(c: { profit: number; revenue: number; overdue: numb
 }
 
 /** Кратко Executive Summary за клиент — редове, съставени от реални сигнали. */
-export function clientSummary(c: EnrichedClient): string[] {
+export function clientSummary(c: EnrichedClient, t: TFunc): string[] {
   const out: string[] = [];
-  if (c.revThisMonth > c.revLastMonth && c.revLastMonth > 0) out.push("Приходите растат.");
-  else if (c.revThisMonth < c.revLastMonth) out.push("Приходите намаляват.");
-  if (c.profit < 0) out.push("Разходите надвишават приходите."); else if (c.revenue > 0 && c.profit / c.revenue < 0.1) out.push("Нисък марж на печалба.");
-  if (c.overdue > 0) out.push(`${c.overdue} просрочени фактури.`);
-  else if (c.unpaid > 0) out.push("Има неплатени фактури."); else out.push("Няма просрочени задължения.");
-  if (c.lastActivityDays != null && c.lastActivityDays > 30) out.push(`Без активност от ${c.lastActivityDays} дни.`);
-  if (c.vatState === "over") out.push("Надхвърли прага за ДДС регистрация.");
-  else if (c.vatState === "near") out.push("Наближава прага за ДДС.");
+  if (c.revThisMonth > c.revLastMonth && c.revLastMonth > 0) out.push(t("firmbi.summary.revUp"));
+  else if (c.revThisMonth < c.revLastMonth) out.push(t("firmbi.summary.revDown"));
+  if (c.profit < 0) out.push(t("firmbi.summary.expExceed")); else if (c.revenue > 0 && c.profit / c.revenue < 0.1) out.push(t("firmbi.summary.lowMargin"));
+  if (c.overdue > 0) out.push(t("firmbi.summary.overdueN", { n: c.overdue }));
+  else if (c.unpaid > 0) out.push(t("firmbi.summary.hasUnpaid")); else out.push(t("firmbi.summary.noOverdue"));
+  if (c.lastActivityDays != null && c.lastActivityDays > 30) out.push(t("firmbi.summary.inactiveDays", { n: c.lastActivityDays }));
+  if (c.vatState === "over") out.push(t("firmbi.summary.vatOver"));
+  else if (c.vatState === "near") out.push(t("firmbi.summary.vatNear"));
   const sug = upgradeSuggestion(c);
-  if (sug) out.push(`Добър кандидат за ${sug}.`);
+  if (sug) out.push(t("firmbi.summary.candidate", { plan: planName(t, sug) }));
   return out;
 }
 
-/** Предложение за по-висок план, изчислено само от оборота/активността. */
-export function upgradeSuggestion(c: EnrichedClient): string | null {
+/** Предложение за по-висок план (id), изчислено само от оборота/активността. */
+export function upgradeSuggestion(c: EnrichedClient): "pro" | "business" | null {
   if (c.status === "paid") return null;
-  if (c.revenue >= 60000 || c.vatState === "over") return "Про";
-  if (c.revenue >= 20000 || c.invoices >= 60) return "Бизнес";
+  if (c.revenue >= 60000 || c.vatState === "over") return "pro";
+  if (c.revenue >= 20000 || c.invoices >= 60) return "business";
   return null;
 }
 
-export function buildFirmOverview(input: { clients: EnrichedClient[]; monthToDate: { revenue: number; expenses: number; vat: number; progressPct: number }; partner: PartnerStats; pendingPayoutCount: number }): FirmOverview {
+export function buildFirmOverview(input: { clients: EnrichedClient[]; monthToDate: { revenue: number; expenses: number; vat: number; progressPct: number }; partner: PartnerStats; pendingPayoutCount: number }, t: TFunc, locale: string): FirmOverview {
   const { clients, monthToDate, partner, pendingPayoutCount } = input;
+  const money = (v: number) => Math.round(v).toLocaleString(locale) + " €";
   const total = clients.length;
   const paid = clients.filter((c) => c.status === "paid").length;
   const startClients = clients.filter((c) => c.status !== "paid").length;
@@ -87,25 +90,25 @@ export function buildFirmOverview(input: { clients: EnrichedClient[]; monthToDat
     forecast = { revenue: p(monthToDate.revenue), expenses: p(monthToDate.expenses), profit: p(monthToDate.revenue - monthToDate.expenses), vat: p(monthToDate.vat), documents: 0, progressPct: monthToDate.progressPct };
   }
 
-  const flat = (key: string, label: string, value: number, m: boolean, caption = "текуща стойност"): MetricCard =>
-    ({ key, label, value, money: m, deltaPct: null, direction: "flat", goodWhenUp: true, caption, spark: [] });
+  const flat = (key: string, value: number, m: boolean, caption = t("firmbi.card.captionFlat")): MetricCard =>
+    ({ key, label: t(`firmbi.card.${key}`), value, money: m, deltaPct: null, direction: "flat", goodWhenUp: true, caption, spark: [] });
   const cards: MetricCard[] = [
-    flat("total", "Клиентски фирми", total, false),
-    flat("active", "Активни (30 дни)", active, false),
-    flat("new", "Нови този месец", newThisMonth, false),
-    flat("start", "Клиенти на СТАРТ", startClients, false),
-    flat("paid", "Клиенти на платен план", paid, false),
-    flat("conv", "Конверсия към платен", conversion, false, `${paid} от ${total} фирми`),
-    flat("revenue", "Общ оборот (година)", revenue, true),
-    flat("expenses", "Общи разходи (година)", expenses, true),
-    flat("profit", "Обща печалба", profit, true),
-    flat("vat", "Очакван ДДС (месец)", forecast?.vat ?? 0, true),
-    flat("docs", "Общо документи", docs, false),
-    flat("unpaid", "Клиенти с неплатени", unpaidCount, false),
-    flat("overdue", "Просрочени фактури", overdueCount, false),
-    flat("commission", "Очаквана комисионна/мес", partner.monthlyCommission, true),
-    flat("paidcomm", "Изплатени комисионни", partner.paidTotal, true),
-    flat("pending", "Чакащи заявки", pendingPayoutCount, false),
+    flat("total", total, false),
+    flat("active", active, false),
+    flat("new", newThisMonth, false),
+    flat("start", startClients, false),
+    flat("paid", paid, false),
+    flat("conv", conversion, false, t("firmbi.card.captionConv", { paid, total })),
+    flat("revenue", revenue, true),
+    flat("expenses", expenses, true),
+    flat("profit", profit, true),
+    flat("vat", forecast?.vat ?? 0, true),
+    flat("docs", docs, false),
+    flat("unpaid", unpaidCount, false),
+    flat("overdue", overdueCount, false),
+    flat("commission", partner.monthlyCommission, true),
+    flat("paidcomm", partner.paidTotal, true),
+    flat("pending", pendingPayoutCount, false),
   ];
 
   const healthDist = { good: 0, ok: 0, attention: 0, critical: 0 };
@@ -115,29 +118,29 @@ export function buildFirmOverview(input: { clients: EnrichedClient[]; monthToDat
   const insights: Insight[] = [];
   const growing = clients.filter((c) => c.revLastMonth > 0 && c.revThisMonth > c.revLastMonth).length;
   const declining = clients.filter((c) => c.revThisMonth < c.revLastMonth).length;
-  if (growing > 0 || declining > 0) insights.push({ icon: growing >= declining ? "trending-up" : "trending-down", severity: growing >= declining ? "good" : "attention", text: `${growing} клиенти увеличават приходите, ${declining} са в спад този месец.` });
+  if (growing > 0 || declining > 0) insights.push({ icon: growing >= declining ? "trending-up" : "trending-down", severity: growing >= declining ? "good" : "attention", text: t("firmbi.insight.growDecline", { growing, declining }) });
   const critical = clients.filter((c) => c.healthTone === "critical").length;
-  if (critical > 0) insights.push({ icon: "alert", severity: "critical", text: `${critical} клиентски фирми са в критично състояние и изискват внимание.` });
-  if (overdueCount > 0) insights.push({ icon: "clock", severity: "attention", text: `Общо ${overdueCount} просрочени фактури при клиентите.` });
-  if (partner.monthlyCommission > 0) insights.push({ icon: "trending-up", severity: "good", text: `Очаквана месечна партньорска комисионна: ${money(partner.monthlyCommission)}.` });
-  if (insights.length === 0) insights.push({ icon: "check", severity: "good", text: "Няма отклонения при клиентите. Всичко е под контрол." });
+  if (critical > 0) insights.push({ icon: "alert", severity: "critical", text: t("firmbi.insight.critical", { n: critical }) });
+  if (overdueCount > 0) insights.push({ icon: "clock", severity: "attention", text: t("firmbi.insight.overdue", { n: overdueCount }) });
+  if (partner.monthlyCommission > 0) insights.push({ icon: "trending-up", severity: "good", text: t("firmbi.insight.commission", { amount: money(partner.monthlyCommission) }) });
+  if (insights.length === 0) insights.push({ icon: "check", severity: "good", text: t("firmbi.insight.allGood") });
 
   // ─── Възможности (надграждания) ───
   const opportunities: Insight[] = [];
-  for (const c of clients) { const s = upgradeSuggestion(c); if (s) opportunities.push({ icon: "bulb", severity: "good", text: `„${c.name}" е подходящ за ${s} (оборот ${money(c.revenue)}).` }); }
-  if (opportunities.length === 0) opportunities.push({ icon: "bulb", severity: "ok", text: "Все още няма клиенти, готови за надграждане към по-висок план." });
+  for (const c of clients) { const s = upgradeSuggestion(c); if (s) opportunities.push({ icon: "bulb", severity: "good", text: t("firmbi.opp.candidate", { name: c.name, plan: planName(t, s), amount: money(c.revenue) }) }); }
+  if (opportunities.length === 0) opportunities.push({ icon: "bulb", severity: "ok", text: t("firmbi.opp.none") });
   const trimmedOpp = opportunities.slice(0, 6);
 
   // ─── Task Center (Изисква внимание) ───
   const tasks: FirmTask[] = [];
   for (const c of clients.filter((x) => x.overdue > 0).sort((a, b) => b.overdue - a.overdue).slice(0, 6))
-    tasks.push({ severity: c.overdue >= 5 ? "critical" : "attention", icon: "clock", text: `${c.name}: ${c.overdue} просрочени фактури (${money(c.unpaid)}).`, clientId: c.id, cta: "Отиди" });
+    tasks.push({ severity: c.overdue >= 5 ? "critical" : "attention", icon: "clock", text: t("firmbi.task.overdue", { name: c.name, n: c.overdue, amount: money(c.unpaid) }), clientId: c.id, cta: t("firmbi.task.ctaGo") });
   for (const c of clients.filter((x) => x.lastActivityDays != null && x.lastActivityDays > 30).sort((a, b) => (b.lastActivityDays ?? 0) - (a.lastActivityDays ?? 0)).slice(0, 5))
-    tasks.push({ severity: "attention", icon: "alert", text: `${c.name}: няма издавани документи от ${c.lastActivityDays} дни.`, clientId: c.id, cta: "Отиди" });
+    tasks.push({ severity: "attention", icon: "alert", text: t("firmbi.task.inactive", { name: c.name, n: c.lastActivityDays ?? 0 }), clientId: c.id, cta: t("firmbi.task.ctaGo") });
   for (const c of clients.filter((x) => x.vatState === "over").slice(0, 4))
-    tasks.push({ severity: "attention", icon: "alert", text: `${c.name}: надхвърли прага за ДДС регистрация.`, clientId: c.id, cta: "Отиди" });
-  if (pendingPayoutCount > 0) tasks.push({ severity: "ok", icon: "bulb", text: `Имате ${pendingPayoutCount} чакащи заявки за изплащане на комисионна.`, href: "#partner", cta: "Виж" });
-  if (tasks.length === 0) tasks.push({ severity: "good", icon: "check", text: "Няма събития, изискващи внимание при клиентите." });
+    tasks.push({ severity: "attention", icon: "alert", text: t("firmbi.task.vatOver", { name: c.name }), clientId: c.id, cta: t("firmbi.task.ctaGo") });
+  if (pendingPayoutCount > 0) tasks.push({ severity: "ok", icon: "bulb", text: t("firmbi.task.payouts", { n: pendingPayoutCount }), href: "#partner", cta: t("firmbi.task.ctaSee") });
+  if (tasks.length === 0) tasks.push({ severity: "good", icon: "check", text: t("firmbi.task.none") });
 
   return { cards, healthDist, forecast, insights, opportunities: trimmedOpp, tasks };
 }

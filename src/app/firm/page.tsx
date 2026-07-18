@@ -5,11 +5,14 @@ import { computeFirmPartnerStats, generatePartnerCode } from "@/lib/partner";
 import { buildFirmOverview, clientHealth, type EnrichedClient } from "@/lib/bi/firm";
 import { upcomingStandard } from "@/lib/taxCalendar";
 import { FirmDashboard, type FirmInvite } from "@/components/app/FirmDashboard";
+import { getT } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function FirmPage() {
   const { firm } = await requireAccountingFirm();
+  const { t, locale } = await getT();
+  const planNameOf = (id: string) => { const l = t(`pricing.plans.${id}.name`); return l.startsWith("pricing.") ? planLabel(id) : l; };
 
   let partnerCode = firm.partnerCode;
   if (!partnerCode) {
@@ -74,7 +77,7 @@ export default async function FirmPage() {
     const h = clientHealth({ profit, revenue: a.revenue, overdue: a.overdue, unpaid: a.unpaid, lastActivityDays, vatState });
     return {
       id: c.id, name: c.name, eik: c.eik, vatRegistered: c.vatRegistered, city: c.city,
-      planLabel: planLabel(effectiveManagedPlan(plan)), plan: effectiveManagedPlan(plan), status,
+      planLabel: planNameOf(effectiveManagedPlan(plan)), plan: effectiveManagedPlan(plan), status,
       revenue: a.revenue, expenses: a.expenses, profit, docs: a.docs, invoices: a.invoices,
       overdue: a.overdue, unpaid: a.unpaid, vatState, lastActivityDays,
       revThisMonth: a.revThisMonth, revLastMonth: a.revLastMonth, isNewThisMonth: new Date(c.createdAt) >= monthStart,
@@ -98,7 +101,7 @@ export default async function FirmPage() {
     clients: rows,
     monthToDate: { revenue: mtdRevenue, expenses: mtdExpenses, vat: mtdVat, progressPct: Math.round((dayOfMonth / daysInMonth) * 100) },
     partner: stats, pendingPayoutCount,
-  });
+  }, t, locale);
 
   const deadlines = upcomingStandard(6)
     .filter((d) => d.date >= now)
