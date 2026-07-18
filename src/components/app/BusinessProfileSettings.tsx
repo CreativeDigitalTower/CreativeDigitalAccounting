@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SECTORS, COMPANY_SIZES, getSector } from "@/lib/workspaces";
-import { useT } from "@/components/i18n/I18nProvider";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 
 export function BusinessProfileSettings() {
   const t = useT();
+  const { messages } = useI18n();
+  const subLabels = (id: string): string[] => (messages as unknown as { sectors: { subcat: Record<string, string[]> } }).sectors.subcat[id] ?? [];
   const router = useRouter();
   const [sector, setSector] = useState("");
   const [category, setCategory] = useState("");
@@ -49,21 +51,21 @@ export function BusinessProfileSettings() {
           <label>{t("account.businessProfile.sector")}</label>
           <select value={sector} onChange={(e) => { setSector(e.target.value); setCategory(""); }}>
             <option value="">{t("account.businessProfile.select")}</option>
-            {SECTORS.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}
+            {SECTORS.map((s) => <option key={s.id} value={s.id}>{t(`sectors.sector.${s.id}`)}</option>)}
           </select>
         </div>
         <div>
           <label>{t("account.businessProfile.subcategory")}</label>
           <select value={category} onChange={(e) => setCategory(e.target.value)} disabled={!subs.length}>
             <option value="">{t("account.businessProfile.select")}</option>
-            {subs.map((c) => <option key={c} value={c}>{c}</option>)}
+            {subs.map((c, i) => <option key={c} value={c}>{subLabels(sector)[i] ?? c}</option>)}
           </select>
         </div>
         <div>
           <label>{t("account.businessProfile.size")}</label>
           <select value={size} onChange={(e) => setSize(e.target.value)}>
             <option value="">{t("account.businessProfile.select")}</option>
-            {COMPANY_SIZES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+            {COMPANY_SIZES.map((s) => <option key={s.id} value={s.id}>{t(`sectors.size.${s.id}`)}</option>)}
           </select>
         </div>
       </div>

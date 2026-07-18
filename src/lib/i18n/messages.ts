@@ -35,6 +35,7 @@ import bgAdmintools from "@/locales/bg/admintools.json";
 import bgProduction from "@/locales/bg/production.json";
 import bgMisc from "@/locales/bg/misc.json";
 import bgFirmbi from "@/locales/bg/firmbi.json";
+import bgSectors from "@/locales/bg/sectors.json";
 import enCommon from "@/locales/en/common.json";
 import enNav from "@/locales/en/navigation.json";
 import enAuth from "@/locales/en/auth.json";
@@ -67,6 +68,7 @@ import enAdmintools from "@/locales/en/admintools.json";
 import enProduction from "@/locales/en/production.json";
 import enMisc from "@/locales/en/misc.json";
 import enFirmbi from "@/locales/en/firmbi.json";
+import enSectors from "@/locales/en/sectors.json";
 import ruCommon from "@/locales/ru/common.json";
 import ruNav from "@/locales/ru/navigation.json";
 import ruAuth from "@/locales/ru/auth.json";
@@ -99,6 +101,7 @@ import ruAdmintools from "@/locales/ru/admintools.json";
 import ruProduction from "@/locales/ru/production.json";
 import ruMisc from "@/locales/ru/misc.json";
 import ruFirmbi from "@/locales/ru/firmbi.json";
+import ruSectors from "@/locales/ru/sectors.json";
 import roCommon from "@/locales/ro/common.json";
 import roNav from "@/locales/ro/navigation.json";
 import roAuth from "@/locales/ro/auth.json";
@@ -131,6 +134,7 @@ import roAdmintools from "@/locales/ro/admintools.json";
 import roProduction from "@/locales/ro/production.json";
 import roMisc from "@/locales/ro/misc.json";
 import roFirmbi from "@/locales/ro/firmbi.json";
+import roSectors from "@/locales/ro/sectors.json";
 import trCommon from "@/locales/tr/common.json";
 import trNav from "@/locales/tr/navigation.json";
 import trAuth from "@/locales/tr/auth.json";
@@ -163,6 +167,7 @@ import trAdmintools from "@/locales/tr/admintools.json";
 import trProduction from "@/locales/tr/production.json";
 import trMisc from "@/locales/tr/misc.json";
 import trFirmbi from "@/locales/tr/firmbi.json";
+import trSectors from "@/locales/tr/sectors.json";
 import elCommon from "@/locales/el/common.json";
 import elNav from "@/locales/el/navigation.json";
 import elAuth from "@/locales/el/auth.json";
@@ -195,17 +200,18 @@ import elAdmintools from "@/locales/el/admintools.json";
 import elProduction from "@/locales/el/production.json";
 import elMisc from "@/locales/el/misc.json";
 import elFirmbi from "@/locales/el/firmbi.json";
+import elSectors from "@/locales/el/sectors.json";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Messages = Record<string, any>;
 
 const DICTS: Record<Locale, Messages> = {
-  bg: { common: bgCommon, navigation: bgNav, auth: bgAuth, bi: bgBi, pdf: bgPdf, emails: bgEmails, notifications: bgNotif, clients: bgClients, suppliers: bgSuppliers, expenses: bgExpenses, contracts: bgContracts, projects: bgProjects, warehouse: bgWarehouse, employees: bgEmployees, documents: bgDocuments, assets: bgAssets, modules: bgModules, account: bgAccount, subdocs: bgSubdocs, haccp: bgHaccp, pm: bgPm, portal: bgPortal, admin: bgAdmin, mailattach: bgMailattach, marketing: bgMarketing, pricing: bgPricing, register: bgRegister, enums: bgEnums, admintools: bgAdmintools, production: bgProduction, misc: bgMisc, firmbi: bgFirmbi },
-  en: { common: enCommon, navigation: enNav, auth: enAuth, bi: enBi, pdf: enPdf, emails: enEmails, notifications: enNotif, clients: enClients, suppliers: enSuppliers, expenses: enExpenses, contracts: enContracts, projects: enProjects, warehouse: enWarehouse, employees: enEmployees, documents: enDocuments, assets: enAssets, modules: enModules, account: enAccount, subdocs: enSubdocs, haccp: enHaccp, pm: enPm, portal: enPortal, admin: enAdmin, mailattach: enMailattach, marketing: enMarketing, pricing: enPricing, register: enRegister, enums: enEnums, admintools: enAdmintools, production: enProduction, misc: enMisc, firmbi: enFirmbi },
-  ru: { common: ruCommon, navigation: ruNav, auth: ruAuth, bi: ruBi, pdf: ruPdf, emails: ruEmails, notifications: ruNotif, clients: ruClients, suppliers: ruSuppliers, expenses: ruExpenses, contracts: ruContracts, projects: ruProjects, warehouse: ruWarehouse, employees: ruEmployees, documents: ruDocuments, assets: ruAssets, modules: ruModules, account: ruAccount, subdocs: ruSubdocs, haccp: ruHaccp, pm: ruPm, portal: ruPortal, admin: ruAdmin, mailattach: ruMailattach, marketing: ruMarketing, pricing: ruPricing, register: ruRegister, enums: ruEnums, admintools: ruAdmintools, production: ruProduction, misc: ruMisc, firmbi: ruFirmbi },
-  ro: { common: roCommon, navigation: roNav, auth: roAuth, bi: roBi, pdf: roPdf, emails: roEmails, notifications: roNotif, clients: roClients, suppliers: roSuppliers, expenses: roExpenses, contracts: roContracts, projects: roProjects, warehouse: roWarehouse, employees: roEmployees, documents: roDocuments, assets: roAssets, modules: roModules, account: roAccount, subdocs: roSubdocs, haccp: roHaccp, pm: roPm, portal: roPortal, admin: roAdmin, mailattach: roMailattach, marketing: roMarketing, pricing: roPricing, register: roRegister, enums: roEnums, admintools: roAdmintools, production: roProduction, misc: roMisc, firmbi: roFirmbi },
-  tr: { common: trCommon, navigation: trNav, auth: trAuth, bi: trBi, pdf: trPdf, emails: trEmails, notifications: trNotif, clients: trClients, suppliers: trSuppliers, expenses: trExpenses, contracts: trContracts, projects: trProjects, warehouse: trWarehouse, employees: trEmployees, documents: trDocuments, assets: trAssets, modules: trModules, account: trAccount, subdocs: trSubdocs, haccp: trHaccp, pm: trPm, portal: trPortal, admin: trAdmin, mailattach: trMailattach, marketing: trMarketing, pricing: trPricing, register: trRegister, enums: trEnums, admintools: trAdmintools, production: trProduction, misc: trMisc, firmbi: trFirmbi },
-  el: { common: elCommon, navigation: elNav, auth: elAuth, bi: elBi, pdf: elPdf, emails: elEmails, notifications: elNotif, clients: elClients, suppliers: elSuppliers, expenses: elExpenses, contracts: elContracts, projects: elProjects, warehouse: elWarehouse, employees: elEmployees, documents: elDocuments, assets: elAssets, modules: elModules, account: elAccount, subdocs: elSubdocs, haccp: elHaccp, pm: elPm, portal: elPortal, admin: elAdmin, mailattach: elMailattach, marketing: elMarketing, pricing: elPricing, register: elRegister, enums: elEnums, admintools: elAdmintools, production: elProduction, misc: elMisc, firmbi: elFirmbi },
+  bg: { common: bgCommon, navigation: bgNav, auth: bgAuth, bi: bgBi, pdf: bgPdf, emails: bgEmails, notifications: bgNotif, clients: bgClients, suppliers: bgSuppliers, expenses: bgExpenses, contracts: bgContracts, projects: bgProjects, warehouse: bgWarehouse, employees: bgEmployees, documents: bgDocuments, assets: bgAssets, modules: bgModules, account: bgAccount, subdocs: bgSubdocs, haccp: bgHaccp, pm: bgPm, portal: bgPortal, admin: bgAdmin, mailattach: bgMailattach, marketing: bgMarketing, pricing: bgPricing, register: bgRegister, enums: bgEnums, admintools: bgAdmintools, production: bgProduction, misc: bgMisc, firmbi: bgFirmbi, sectors: bgSectors },
+  en: { common: enCommon, navigation: enNav, auth: enAuth, bi: enBi, pdf: enPdf, emails: enEmails, notifications: enNotif, clients: enClients, suppliers: enSuppliers, expenses: enExpenses, contracts: enContracts, projects: enProjects, warehouse: enWarehouse, employees: enEmployees, documents: enDocuments, assets: enAssets, modules: enModules, account: enAccount, subdocs: enSubdocs, haccp: enHaccp, pm: enPm, portal: enPortal, admin: enAdmin, mailattach: enMailattach, marketing: enMarketing, pricing: enPricing, register: enRegister, enums: enEnums, admintools: enAdmintools, production: enProduction, misc: enMisc, firmbi: enFirmbi, sectors: enSectors },
+  ru: { common: ruCommon, navigation: ruNav, auth: ruAuth, bi: ruBi, pdf: ruPdf, emails: ruEmails, notifications: ruNotif, clients: ruClients, suppliers: ruSuppliers, expenses: ruExpenses, contracts: ruContracts, projects: ruProjects, warehouse: ruWarehouse, employees: ruEmployees, documents: ruDocuments, assets: ruAssets, modules: ruModules, account: ruAccount, subdocs: ruSubdocs, haccp: ruHaccp, pm: ruPm, portal: ruPortal, admin: ruAdmin, mailattach: ruMailattach, marketing: ruMarketing, pricing: ruPricing, register: ruRegister, enums: ruEnums, admintools: ruAdmintools, production: ruProduction, misc: ruMisc, firmbi: ruFirmbi, sectors: ruSectors },
+  ro: { common: roCommon, navigation: roNav, auth: roAuth, bi: roBi, pdf: roPdf, emails: roEmails, notifications: roNotif, clients: roClients, suppliers: roSuppliers, expenses: roExpenses, contracts: roContracts, projects: roProjects, warehouse: roWarehouse, employees: roEmployees, documents: roDocuments, assets: roAssets, modules: roModules, account: roAccount, subdocs: roSubdocs, haccp: roHaccp, pm: roPm, portal: roPortal, admin: roAdmin, mailattach: roMailattach, marketing: roMarketing, pricing: roPricing, register: roRegister, enums: roEnums, admintools: roAdmintools, production: roProduction, misc: roMisc, firmbi: roFirmbi, sectors: roSectors },
+  tr: { common: trCommon, navigation: trNav, auth: trAuth, bi: trBi, pdf: trPdf, emails: trEmails, notifications: trNotif, clients: trClients, suppliers: trSuppliers, expenses: trExpenses, contracts: trContracts, projects: trProjects, warehouse: trWarehouse, employees: trEmployees, documents: trDocuments, assets: trAssets, modules: trModules, account: trAccount, subdocs: trSubdocs, haccp: trHaccp, pm: trPm, portal: trPortal, admin: trAdmin, mailattach: trMailattach, marketing: trMarketing, pricing: trPricing, register: trRegister, enums: trEnums, admintools: trAdmintools, production: trProduction, misc: trMisc, firmbi: trFirmbi, sectors: trSectors },
+  el: { common: elCommon, navigation: elNav, auth: elAuth, bi: elBi, pdf: elPdf, emails: elEmails, notifications: elNotif, clients: elClients, suppliers: elSuppliers, expenses: elExpenses, contracts: elContracts, projects: elProjects, warehouse: elWarehouse, employees: elEmployees, documents: elDocuments, assets: elAssets, modules: elModules, account: elAccount, subdocs: elSubdocs, haccp: elHaccp, pm: elPm, portal: elPortal, admin: elAdmin, mailattach: elMailattach, marketing: elMarketing, pricing: elPricing, register: elRegister, enums: elEnums, admintools: elAdmintools, production: elProduction, misc: elMisc, firmbi: elFirmbi, sectors: elSectors },
 };
 
 // Дълбоко сливане: липсващ ключ пада обратно към българския (никога raw key на екрана).

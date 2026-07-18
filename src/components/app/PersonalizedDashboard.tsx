@@ -4,10 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { DASHBOARD_CARDS } from "@/lib/workspaces";
+import { useT } from "@/components/i18n/I18nProvider";
 
-export function PersonalizedDashboard({ initialOrder, initialHidden, sectorTitle }: {
-  initialOrder: string[]; initialHidden: string[]; sectorTitle: string;
+export function PersonalizedDashboard({ initialOrder, initialHidden, sectorId }: {
+  initialOrder: string[]; initialHidden: string[]; sectorId: string | null;
 }) {
+  const t = useT();
   const router = useRouter();
   const [order, setOrder] = useState<string[]>(initialOrder);
   const [hidden, setHidden] = useState<string[]>(initialHidden.filter((k) => DASHBOARD_CARDS[k]));
@@ -45,21 +47,21 @@ export function PersonalizedDashboard({ initialOrder, initialHidden, sectorTitle
     <div style={{ marginTop: 28 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
         <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 16, fontWeight: 700, margin: 0 }}>
-          Бързи действия за вашия бизнес <span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 400 }}>· {sectorTitle}</span>
+          {t("sectors.pd.quickActions")}{sectorId && <span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 400 }}> · {t(`sectors.sector.${sectorId}`)}</span>}
         </h3>
         <div style={{ display: "flex", gap: 8 }}>
           {edit ? (
             <>
-              <button className="btn btn-ghost btn-sm" onClick={reset} disabled={saving}>Възстанови препоръчителното</button>
-              <button className="btn btn-primary btn-sm" onClick={save} disabled={saving}>{saving ? "…" : "Запази"}</button>
+              <button className="btn btn-ghost btn-sm" onClick={reset} disabled={saving}>{t("sectors.pd.restore")}</button>
+              <button className="btn btn-primary btn-sm" onClick={save} disabled={saving}>{saving ? "…" : t("sectors.pd.save")}</button>
             </>
           ) : (
-            <button className="btn btn-ghost btn-sm" onClick={() => setEdit(true)}>✎ Персонализирай таблото</button>
+            <button className="btn btn-ghost btn-sm" onClick={() => setEdit(true)}>{t("sectors.pd.customize")}</button>
           )}
         </div>
       </div>
 
-      {edit && <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 10 }}>Плъзнете картите, за да ги подредите. Натиснете ✕, за да скриете карта. Лявото меню остава непроменено — скриват се само бързите действия.</div>}
+      {edit && <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 10 }}>{t("sectors.pd.dragHint")}</div>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: 12 }}>
         {cards.map((k, i) => {
@@ -67,14 +69,14 @@ export function PersonalizedDashboard({ initialOrder, initialHidden, sectorTitle
           const inner = (
             <>
               <div className="icon-tile" style={{ marginBottom: 8 }}><c.Icon /></div>
-              <div style={{ fontSize: 13.5, fontWeight: 600 }}>{c.label}</div>
+              <div style={{ fontSize: 13.5, fontWeight: 600 }}>{t(`sectors.card.${k}`)}</div>
             </>
           );
           if (edit) {
             return (
               <div key={k} draggable onDragStart={() => setDragIdx(i)} onDragOver={(e) => e.preventDefault()} onDrop={() => onDrop(i)}
                 className="glass panel" style={{ padding: "16px 18px", position: "relative", cursor: "grab", border: dragIdx === i ? "2px dashed var(--emerald)" : undefined }}>
-                <button onClick={() => hideCard(k)} title="Скрий" style={{ position: "absolute", top: 6, right: 6, background: "none", border: "none", color: "var(--brick)", cursor: "pointer", fontSize: 14 }}>✕</button>
+                <button onClick={() => hideCard(k)} title={t("sectors.pd.hide")} style={{ position: "absolute", top: 6, right: 6, background: "none", border: "none", color: "var(--brick)", cursor: "pointer", fontSize: 14 }}>✕</button>
                 {inner}
               </div>
             );
@@ -89,11 +91,11 @@ export function PersonalizedDashboard({ initialOrder, initialHidden, sectorTitle
 
       {edit && hidden.length > 0 && (
         <div style={{ marginTop: 14 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--muted)", marginBottom: 6 }}>Скрити карти</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--muted)", marginBottom: 6 }}>{t("sectors.pd.hiddenCards")}</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {hidden.map((k) => DASHBOARD_CARDS[k] && (
               <button key={k} onClick={() => showCard(k)} style={{ cursor: "pointer", padding: "6px 12px", borderRadius: 16, border: "1px dashed var(--border)", background: "rgba(255,255,255,.5)", fontSize: 12.5 }}>
-                + {DASHBOARD_CARDS[k].label}
+                + {t(`sectors.card.${k}`)}
               </button>
             ))}
           </div>
