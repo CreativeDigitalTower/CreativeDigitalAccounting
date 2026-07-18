@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrency, ACCOUNTANT_PLANS } from "@/lib/constants";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 
 export type AdminFirmRow = {
   id: string; name: string; planLabel: string; firmPlan: string; paymentStatus: string; maxClients: string;
@@ -13,6 +14,9 @@ export type AdminFirmRow = {
 export type AdminPayoutRow = { id: string; firmId: string; firmName: string; amount: number; requestedAt: string };
 
 export function AdminFirmsPanel({ firms, payouts }: { firms: AdminFirmRow[]; payouts: AdminPayoutRow[] }) {
+  const t = useT();
+  const { locale, messages } = useI18n();
+  const firmPlanName = (id: string) => (messages as unknown as { pricing: { firmPlans: Record<string, { name: string }> } }).pricing.firmPlans[id]?.name ?? id;
   const router = useRouter();
   const [editId, setEditId] = useState<string | null>(null);
   const [pct, setPct] = useState("");
@@ -25,7 +29,7 @@ export function AdminFirmsPanel({ firms, payouts }: { firms: AdminFirmRow[]; pay
     setBusy(false); setEditId(null); router.refresh();
   }
   async function markPaid(id: string) {
-    if (!confirm("Да отбележа ли тази комисионна като изплатена?")) return;
+    if (!confirm(t("admintools.firms.confirmMarkPaid"))) return;
     await fetch(`/api/admin/payout/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "paid" }) });
     router.refresh();
   }
@@ -52,21 +56,21 @@ export function AdminFirmsPanel({ firms, payouts }: { firms: AdminFirmRow[]; pay
   const pendingPayoutTotal = payouts.reduce((s, p) => s + p.amount, 0);
 
   const kpis = [
-    { label: "Счетоводни къщи", value: String(firms.length), color: "var(--navy)" },
-    { label: "Клиентски фирми (общо)", value: String(agg.clients), color: "var(--ink)" },
-    { label: "Клиенти на СТАРТ", value: String(agg.start), color: "var(--brass)" },
-    { label: "Платени клиенти", value: String(agg.paid), color: "var(--emerald-dark)" },
-    { label: "Конверсия към платен", value: `${conversion}%`, color: "var(--navy)" },
-    { label: "Комисионни/месец (очаквани)", value: formatCurrency(agg.monthly), color: "var(--brick)" },
-    { label: "Комисионни/година (очаквани)", value: formatCurrency(agg.monthly * 12), color: "var(--brick)" },
-    { label: "Изплатени комисионни", value: formatCurrency(agg.paidOut), color: "var(--emerald-dark)" },
-    { label: "Чакащи заявки за изплащане", value: formatCurrency(pendingPayoutTotal), color: "var(--brass)" },
+    { label: t("admintools.firms.kpiFirms"), value: String(firms.length), color: "var(--navy)" },
+    { label: t("admintools.firms.kpiClients"), value: String(agg.clients), color: "var(--ink)" },
+    { label: t("admintools.firms.kpiStart"), value: String(agg.start), color: "var(--brass)" },
+    { label: t("admintools.firms.kpiPaid"), value: String(agg.paid), color: "var(--emerald-dark)" },
+    { label: t("admintools.firms.kpiConversion"), value: `${conversion}%`, color: "var(--navy)" },
+    { label: t("admintools.firms.kpiCommMonth"), value: formatCurrency(agg.monthly), color: "var(--brick)" },
+    { label: t("admintools.firms.kpiCommYear"), value: formatCurrency(agg.monthly * 12), color: "var(--brick)" },
+    { label: t("admintools.firms.kpiPaidOut"), value: formatCurrency(agg.paidOut), color: "var(--emerald-dark)" },
+    { label: t("admintools.firms.kpiPendingPayouts"), value: formatCurrency(pendingPayoutTotal), color: "var(--brass)" },
   ];
 
   return (
     <div style={{ marginBottom: 22 }}>
-      <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, fontWeight: 600, margin: "0 0 4px" }}>Счетоводни къщи · Партньорска програма</h2>
-      <div style={{ color: "var(--muted)", fontSize: 12.5, marginBottom: 12 }}>{firms.length} къщи · {agg.clients} клиентски фирми общо · {agg.paid} платени</div>
+      <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, fontWeight: 600, margin: "0 0 4px" }}>{t("admintools.firms.title")}</h2>
+      <div style={{ color: "var(--muted)", fontSize: 12.5, marginBottom: 12 }}>{t("admintools.firms.subtitle", { n: firms.length, clients: agg.clients, paid: agg.paid })}</div>
 
       {/* Обобщени показатели */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10, marginBottom: 16 }}>
@@ -79,13 +83,13 @@ export function AdminFirmsPanel({ firms, payouts }: { firms: AdminFirmRow[]; pay
       </div>
 
       {firms.length === 0 ? (
-        <div className="glass panel" style={{ textAlign: "center", padding: "32px 0", color: "var(--muted)", fontSize: 13 }}>Все още няма регистрирани счетоводни къщи.</div>
+        <div className="glass panel" style={{ textAlign: "center", padding: "32px 0", color: "var(--muted)", fontSize: 13 }}>{t("admintools.firms.empty")}</div>
       ) : (
       <div className="glass panel bi-table" style={{ padding: "8px 0", overflowX: "auto", marginBottom: payouts.length ? 16 : 0 }}>
         <table>
           <thead><tr>
-            <th>Счетоводна къща</th><th>Абонамент</th><th>Плащане</th><th className="num">Клиенти / лимит</th><th className="num">Платени</th>
-            <th className="num">Комисионна/мес</th><th>Процент</th><th className="num">Изплатена</th><th></th>
+            <th>{t("admintools.firms.thFirm")}</th><th>{t("admintools.firms.thSubscription")}</th><th>{t("admintools.firms.thPayment")}</th><th className="num">{t("admintools.firms.thClientsLimit")}</th><th className="num">{t("admintools.firms.thPaid")}</th>
+            <th className="num">{t("admintools.firms.thCommMonth")}</th><th>{t("admintools.firms.thPercent")}</th><th className="num">{t("admintools.firms.thPaidOut")}</th><th></th>
           </tr></thead>
           <tbody>
             {firms.map((f) => (
@@ -93,13 +97,13 @@ export function AdminFirmsPanel({ firms, payouts }: { firms: AdminFirmRow[]; pay
                 <td style={{ fontWeight: 600 }}>{f.name}</td>
                 <td>
                   <select value={f.firmPlan} onChange={(e) => setPlan(f.id, e.target.value)} style={{ fontSize: 12, padding: "3px 6px" }}>
-                    {ACCOUNTANT_PLANS.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                    {ACCOUNTANT_PLANS.map((p) => <option key={p.id} value={p.id}>{firmPlanName(p.id)}</option>)}
                   </select>
                 </td>
                 <td>
                   {f.paymentStatus === "received"
-                    ? <button onClick={() => setPayment(f.id, "pending")} title="Отмени потвърждението" style={{ background: "none", border: "none", cursor: "pointer", fontSize: 11, fontWeight: 700, color: "var(--emerald-dark)" }}>● Платено</button>
-                    : <button onClick={() => setPayment(f.id, "received")} className="btn btn-primary btn-sm" style={{ fontSize: 11 }}>Потвърди плащане</button>}
+                    ? <button onClick={() => setPayment(f.id, "pending")} title={t("admintools.firms.cancelConfirmTitle")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 11, fontWeight: 700, color: "var(--emerald-dark)" }}>{t("admintools.firms.paidBtn")}</button>
+                    : <button onClick={() => setPayment(f.id, "received")} className="btn btn-primary btn-sm" style={{ fontSize: 11 }}>{t("admintools.firms.confirmPayment")}</button>}
                 </td>
                 <td className="num">{f.totalClients} / {f.maxClients}</td>
                 <td className="num" style={{ fontWeight: 700, color: "var(--emerald-dark)" }}>{f.paidClients}</td>
@@ -118,7 +122,7 @@ export function AdminFirmsPanel({ firms, payouts }: { firms: AdminFirmRow[]; pay
                 </td>
                 <td className="num">{formatCurrency(f.paidTotal)}</td>
                 <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                  <button className="btn btn-ghost btn-sm" onClick={() => viewClients(f.id)}>Клиенти →</button>
+                  <button className="btn btn-ghost btn-sm" onClick={() => viewClients(f.id)}>{t("admintools.firms.clients")}</button>
                 </td>
               </tr>
             ))}
@@ -129,17 +133,17 @@ export function AdminFirmsPanel({ firms, payouts }: { firms: AdminFirmRow[]; pay
 
       {payouts.length > 0 && (
         <>
-          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, fontWeight: 600, margin: "0 0 8px" }}>Чакащи заявки за изплащане</h3>
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, fontWeight: 600, margin: "0 0 8px" }}>{t("admintools.firms.payoutsTitle")}</h3>
           <div className="glass panel bi-table" style={{ padding: "8px 0", overflowX: "auto" }}>
             <table>
-              <thead><tr><th>Счетоводна къща</th><th className="num">Сума</th><th>Заявена</th><th></th></tr></thead>
+              <thead><tr><th>{t("admintools.firms.pThFirm")}</th><th className="num">{t("admintools.firms.pThAmount")}</th><th>{t("admintools.firms.pThRequested")}</th><th></th></tr></thead>
               <tbody>
                 {payouts.map((p) => (
                   <tr key={p.id}>
                     <td style={{ fontWeight: 600 }}>{p.firmName}</td>
                     <td className="num" style={{ fontWeight: 700 }}>{formatCurrency(p.amount)}</td>
-                    <td style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>{new Date(p.requestedAt).toLocaleDateString("bg-BG")}</td>
-                    <td style={{ textAlign: "right" }}><button className="btn btn-primary btn-sm" onClick={() => markPaid(p.id)}>Маркирай като изплатена</button></td>
+                    <td style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>{new Date(p.requestedAt).toLocaleDateString(locale)}</td>
+                    <td style={{ textAlign: "right" }}><button className="btn btn-primary btn-sm" onClick={() => markPaid(p.id)}>{t("admintools.firms.markPaid")}</button></td>
                   </tr>
                 ))}
               </tbody>
