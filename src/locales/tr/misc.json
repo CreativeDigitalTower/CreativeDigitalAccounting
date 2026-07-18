@@ -1,0 +1,53 @@
+{
+  "rte": {
+    "linkUrl": "Bağlantı URL'si:",
+    "imgChoice": "Tamam = bilgisayardan görsel yükle\nİptal = görsel URL'si yapıştır",
+    "imgTooBig": "Görsel 3MB'nin altında olmalıdır.",
+    "imgUrl": "Görsel URL'si:",
+    "h2": "Başlık 2",
+    "h3": "Başlık 3",
+    "normal": "Normal metin",
+    "bold": "Kalın",
+    "italic": "İtalik",
+    "underline": "Altı çizili",
+    "strike": "Üstü çizili",
+    "bullet": "Madde işaretli liste",
+    "numbered": "Numaralı liste",
+    "quote": "Alıntı",
+    "left": "Sol",
+    "center": "Orta",
+    "right": "Sağ",
+    "link": "Bağlantı",
+    "image": "Görsel",
+    "clear": "Biçimlendirmeyi temizle",
+    "placeholder": "Buraya yazmaya başlayın…",
+    "bBtn": "B",
+    "iBtn": "I",
+    "uBtn": "U",
+    "sBtn": "S"
+  },
+  "attachment": {
+    "maxMB": "En fazla {n}MB",
+    "error": "Hata",
+    "confirmRemove": "Dosya kaldırılsın mı?",
+    "view": "Görüntüle",
+    "download": "İndir",
+    "replace": "Değiştir",
+    "remove": "Kaldır",
+    "attach": "Dosya ekle",
+    "attachLabel": "＋ dosya"
+  },
+  "welcome": {
+    "companyData": "Firma bilgilerini doldurun",
+    "logo": "Logo yükleyin",
+    "firstClient": "İlk müşterinizi ekleyin",
+    "firstInvoice": "İlk faturanızı düzenleyin",
+    "allDoneTitle": "Her şey hazır!",
+    "allDoneText": "Profiliniz tamamen ayarlandı. Creative Digital Accounting ile başarı ve büyüme dileriz!",
+    "toWork": "İşe başla →",
+    "welcomeTitle": "Creative Digital Accounting'e hoş geldiniz",
+    "welcomeText": "Profesyonelce faturalamaya başlamak için bu adımları tamamlayın.",
+    "skip": "Atla",
+    "step": "Adım {n}"
+  }
+}

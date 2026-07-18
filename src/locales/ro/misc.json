@@ -1,0 +1,53 @@
+{
+  "rte": {
+    "linkUrl": "URL link:",
+    "imgChoice": "OK = încarcă imagine din calculator\nAnulare = lipește URL imagine",
+    "imgTooBig": "Imaginea trebuie să fie sub 3MB.",
+    "imgUrl": "URL imagine:",
+    "h2": "Titlu 2",
+    "h3": "Titlu 3",
+    "normal": "Text normal",
+    "bold": "Îngroșat",
+    "italic": "Cursiv",
+    "underline": "Subliniat",
+    "strike": "Tăiat",
+    "bullet": "Listă cu marcatori",
+    "numbered": "Listă numerotată",
+    "quote": "Citat",
+    "left": "Stânga",
+    "center": "Centru",
+    "right": "Dreapta",
+    "link": "Link",
+    "image": "Imagine",
+    "clear": "Șterge formatarea",
+    "placeholder": "Începeți să scrieți aici…",
+    "bBtn": "B",
+    "iBtn": "I",
+    "uBtn": "U",
+    "sBtn": "S"
+  },
+  "attachment": {
+    "maxMB": "Max {n}MB",
+    "error": "Eroare",
+    "confirmRemove": "Eliminați fișierul?",
+    "view": "Vizualizare",
+    "download": "Descarcă",
+    "replace": "Înlocuiește",
+    "remove": "Elimină",
+    "attach": "Atașează fișier",
+    "attachLabel": "＋ fișier"
+  },
+  "welcome": {
+    "companyData": "Completați datele firmei",
+    "logo": "Încărcați un logo",
+    "firstClient": "Adăugați primul client",
+    "firstInvoice": "Emiteți prima factură",
+    "allDoneTitle": "Totul e gata!",
+    "allDoneText": "Profilul dvs. este complet configurat. Vă dorim succes și dezvoltare cu Creative Digital Accounting!",
+    "toWork": "La treabă →",
+    "welcomeTitle": "Bine ați venit la Creative Digital Accounting",
+    "welcomeText": "Finalizați acești pași pentru a începe să facturați profesional.",
+    "skip": "Omite",
+    "step": "Pasul {n}"
+  }
+}
