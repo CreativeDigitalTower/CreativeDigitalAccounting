@@ -5,25 +5,28 @@ import { TrendArea } from "./TrendArea";
 import { HealthGauge } from "./HealthGauge";
 import { InsightFeed } from "./InsightFeed";
 import { BiIcon } from "./BiIcon";
+import { getT } from "@/lib/i18n/server";
+import { PLATFORM_NAME } from "@/lib/constants";
 
 const TONE_TEXT: Record<string, string> = { good: "var(--emerald-dark)", ok: "var(--navy)", attention: "var(--brass)", critical: "var(--brick)" };
 
 const QUICK_ACTIONS = [
-  { label: "Имейли & известия", href: "/dashboard/admin/emails" },
-  { label: "Бизнеси (филтри)", href: "/dashboard/admin/businesses" },
-  { label: "Неплатени заявки", href: "#awaiting" },
-  { label: "Счетоводни къщи", href: "#firms" },
-  { label: "Блог", href: "/dashboard/admin/blog" },
+  { key: "qEmails", href: "/dashboard/admin/emails" },
+  { key: "qBusinesses", href: "/dashboard/admin/businesses" },
+  { key: "qAwaiting", href: "#awaiting" },
+  { key: "qFirms", href: "#firms" },
+  { key: "qBlog", href: "/dashboard/admin/blog" },
 ];
 
-export function PlatformOverview({ data }: { data: POData }) {
+export async function PlatformOverview({ data }: { data: POData }) {
+  const { t } = await getT();
   const maxPlan = Math.max(1, ...data.planDistribution.map((p) => p.value));
 
   return (
     <section style={{ marginBottom: 26 }}>
       <div style={{ marginBottom: 14 }}>
-        <div className="bi-eyebrow">Обзор на платформата</div>
-        <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 700, margin: "2px 0 0" }}>Състояние на Creative Digital Accounting</h2>
+        <div className="bi-eyebrow">{t("platformbi.chrome.eyebrow")}</div>
+        <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 700, margin: "2px 0 0" }}>{t("platformbi.chrome.statusOf", { name: PLATFORM_NAME })}</h2>
       </div>
 
       {/* KPI карти */}
@@ -34,20 +37,20 @@ export function PlatformOverview({ data }: { data: POData }) {
       {/* Здраве + Регистрации + План разпределение */}
       <div style={{ display: "grid", gridTemplateColumns: "minmax(240px, 1fr) minmax(0, 1.5fr) minmax(220px, 1fr)", gap: 14, marginBottom: 16 }} className="bi-overview-main">
         <div className="bi-card bi-flat bi-in" style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
-          <div className="bi-eyebrow" style={{ color: data.health ? TONE_TEXT[data.health.tone] : "var(--muted)", alignSelf: "flex-start" }}>Здраве на платформата</div>
+          <div className="bi-eyebrow" style={{ color: data.health ? TONE_TEXT[data.health.tone] : "var(--muted)", alignSelf: "flex-start" }}>{t("platformbi.chrome.healthTitle")}</div>
           {data.health ? (
             <>
               <HealthGauge score={data.health.score} tone={data.health.tone} />
               <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginTop: 2 }}>{data.health.label}</div>
             </>
-          ) : <div style={{ fontSize: 13, color: "var(--muted)", padding: "34px 0" }}>Все още няма достатъчно данни за надежден анализ.</div>}
+          ) : <div style={{ fontSize: 13, color: "var(--muted)", padding: "34px 0" }}>{t("platformbi.chrome.noHealthData")}</div>}
         </div>
         <div className="bi-card bi-flat bi-in">
-          <div className="bi-eyebrow" style={{ color: "var(--emerald-dark)", marginBottom: 8 }}>Регистрации по месеци</div>
-          <TrendArea labels={data.registrations.labels} series={[{ name: "Нови фирми", color: "var(--emerald)", data: data.registrations.data, kind: "area" }]} height={200} />
+          <div className="bi-eyebrow" style={{ color: "var(--emerald-dark)", marginBottom: 8 }}>{t("platformbi.chrome.regTitle")}</div>
+          <TrendArea labels={data.registrations.labels} series={[{ name: t("platformbi.chrome.newFirms"), color: "var(--emerald)", data: data.registrations.data, kind: "area" }]} height={200} />
         </div>
         <div className="bi-card bi-flat bi-in">
-          <div className="bi-eyebrow" style={{ color: "var(--navy)", marginBottom: 12 }}>Разпределение по план</div>
+          <div className="bi-eyebrow" style={{ color: "var(--navy)", marginBottom: 12 }}>{t("platformbi.chrome.planTitle")}</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {data.planDistribution.map((p) => (
               <div key={p.label}>
@@ -66,7 +69,7 @@ export function PlatformOverview({ data }: { data: POData }) {
 
       {/* Изисква внимание */}
       <div className="bi-card bi-flat bi-in" style={{ marginBottom: 16, borderLeft: "3px solid var(--brass)" }}>
-        <div className="bi-eyebrow" style={{ color: "var(--brass)", marginBottom: 6 }}>Изисква внимание</div>
+        <div className="bi-eyebrow" style={{ color: "var(--brass)", marginBottom: 6 }}>{t("platformbi.chrome.attentionTitle")}</div>
         <div>
           {data.attention.map((a, i) => (
             <div key={i} className="bi-insight">
@@ -83,16 +86,16 @@ export function PlatformOverview({ data }: { data: POData }) {
 
       {/* Insights + Възможности */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 14, marginBottom: 16 }}>
-        <InsightFeed title="Управленски изводи" items={data.insights} eyebrowColor="var(--emerald-dark)" />
-        <InsightFeed title="Възможности" items={data.opportunities} eyebrowColor="var(--brass)" />
+        <InsightFeed title={t("platformbi.chrome.insightsTitle")} items={data.insights} eyebrowColor="var(--emerald-dark)" />
+        <InsightFeed title={t("platformbi.chrome.oppTitle")} items={data.opportunities} eyebrowColor="var(--brass)" />
       </div>
 
       {/* Бързи действия */}
       <div className="bi-card bi-flat bi-in" style={{ marginBottom: 4 }}>
-        <div className="bi-eyebrow" style={{ color: "var(--navy)", marginBottom: 10 }}>Бързи действия</div>
+        <div className="bi-eyebrow" style={{ color: "var(--navy)", marginBottom: 10 }}>{t("platformbi.chrome.quickTitle")}</div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {QUICK_ACTIONS.map((a) => (
-            <Link key={a.label} href={a.href} className="btn btn-ghost btn-sm">{a.label}</Link>
+            <Link key={a.key} href={a.href} className="btn btn-ghost btn-sm">{t(`platformbi.chrome.${a.key}`)}</Link>
           ))}
         </div>
       </div>

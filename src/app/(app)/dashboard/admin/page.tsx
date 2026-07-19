@@ -322,7 +322,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     upgradeOpportunities: upgradeOpportunities.map((o) => ({ id: o.id, name: o.name, plan: o.plan, used: o.used, limit: o.limit })),
     hotLeads: hotLeads.map((l) => ({ id: l.id, name: l.name, plan: l.plan, score: l.score })),
     inactivePaid: inactivePaidList,
-  });
+  }, t, locale);
 
   return (
     <>
