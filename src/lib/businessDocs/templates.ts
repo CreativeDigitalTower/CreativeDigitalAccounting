@@ -17,6 +17,9 @@ export type CategoryDef = {
   title: string;
   icon: string;
   description: string;
+  // Държава/юрисдикция, за която важат шаблоните (за бъдещо локализиране по
+  // държава — напр. отделни английски/румънски набори). Засега всички са "BG".
+  country?: string;
   templates: TemplateDef[];
 };
 
@@ -25,6 +28,7 @@ export type Template = TemplateDef & {
   categoryId: string;
   categoryTitle: string;
   categoryIcon: string;
+  country: string;
   version: number;
   description: string;
   whenToUse: string;
@@ -771,6 +775,7 @@ export const TEMPLATES: Template[] = CATEGORIES.flatMap((cat) =>
     categoryId: cat.id,
     categoryTitle: cat.title,
     categoryIcon: cat.icon,
+    country: cat.country ?? "BG",
     version: 1,
     description: t.description ?? `Готов професионален шаблон „${t.title}", който се попълва автоматично с данните на вашата фирма.`,
     whenToUse: t.whenToUse ?? `Използвайте „${t.title}", когато Ви е необходим официален документ от този тип за дейността на фирмата.`,
@@ -787,6 +792,18 @@ export function getTemplate(id: string): Template | undefined {
 
 export function getCategory(id: string): CategoryDef | undefined {
   return CATEGORIES.find((c) => c.id === id);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Архитектура за бъдещо локализиране по държава.
+// Когато се добавят държавно-специфични набори (напр. EN/UK, RO), филтрирай
+// по държавата на фирмата. Засега всички шаблони са с country "BG".
+// ─────────────────────────────────────────────────────────────────────────
+export function templatesForCountry(country = "BG"): Template[] {
+  return TEMPLATES.filter((t) => t.country === country);
+}
+export function categoriesForCountry(country = "BG"): CategoryDef[] {
+  return CATEGORIES.filter((c) => (c.country ?? "BG") === country);
 }
 
 /** Генерира HTML на документа от шаблон + автоматично попълнени фирмени данни. */

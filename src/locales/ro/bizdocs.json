@@ -10,5 +10,189 @@
     "Salvare, stări, favorite și istoricul documentelor"
   ],
   "cta": "Treci la Business sau Pro →",
-  "note": "Deblocați modulul și zeci de alte funcții pentru a gestiona întreaga afacere."
+  "note": "Deblocați modulul și zeci de alte funcții pentru a gestiona întreaga afacere.",
+  "ui": {
+    "status": {
+      "draft": "Ciornă",
+      "final": "Finalizat",
+      "archived": "Arhivat"
+    },
+    "complexity": {
+      "easy": "Ușor",
+      "medium": "Mediu",
+      "detailed": "Detaliat"
+    },
+    "home": {
+      "title": "Centru de documente de business",
+      "subtitle": "{n} șabloane profesionale · {m} categorii — completate automat cu datele firmei",
+      "searchPh": "Căutați un document… (ex. contract, împuternicire, ordin)",
+      "myDocs": "Documentele mele create",
+      "myDocsSub": "Toate contractele și documentele generate de dvs. — într-un singur loc.",
+      "open": "Deschide →",
+      "newContract": "Contract nou",
+      "orderDecision": "Ordin / Decizie",
+      "hrDoc": "Document de personal",
+      "disclaimer": "Acestea sunt <strong>șabloane standard</strong> sugerate pentru a vă ușura munca. Pentru situații juridice specifice, vă recomandăm să consultați un specialist (avocat/contabil) înainte de a folosi documentul.",
+      "recent": "Utilizate recent",
+      "recentEmpty": "Încă nu aveți documente generate.",
+      "favorites": "Favorite",
+      "favEmpty": "Marcați documentele ca favorite pentru acces rapid.",
+      "categories": "Categorii",
+      "tplCount": "{n} șabloane →",
+      "aiTitle": "Documente de business AI",
+      "aiSub": "În curând — generarea documentelor cu AI.",
+      "recommended": "Șabloane recomandate"
+    },
+    "mydocs": {
+      "ready": "Documente gata ({n})",
+      "drafts": "Ciorne ({n})",
+      "searchPh": "Caută document…",
+      "downloadSel": "Descarcă selectate ({n})",
+      "downloading": "Se descarcă…",
+      "downloadAll": "Descarcă tot",
+      "noDrafts": "Nicio ciornă.",
+      "noReady": "Niciun document gata.",
+      "none": "Niciun document.",
+      "colDoc": "Document",
+      "colCategory": "Categorie",
+      "colStatus": "Stare",
+      "open": "Deschide",
+      "openTitle": "Deschide / editează",
+      "deleteTitle": "Șterge",
+      "confirmDelete": "documentul „{title}”",
+      "errDelete": "Eroare la ștergere.",
+      "dlFail": "Descărcare eșuată."
+    },
+    "editor": {
+      "back": "← Documente de business",
+      "save": "Salvează",
+      "saving": "Se salvează…",
+      "savedAt": "Salvat {time}",
+      "favorite": "Favorit",
+      "pin": "Fixează",
+      "confirmDelete": "Ștergeți documentul?",
+      "print": "Tipărește",
+      "bold": "Îngroșat",
+      "italic": "Cursiv",
+      "underline": "Subliniat",
+      "size": "Dimensiune",
+      "sizeSmall": "Mic",
+      "sizeNormal": "Normal",
+      "sizeBig": "Mare",
+      "ul": "Listă",
+      "ol": "Listă numerotată",
+      "left": "Stânga",
+      "center": "Centru",
+      "right": "Dreapta",
+      "indent": "Indentare",
+      "outdent": "Micșorează indentarea",
+      "undo": "Anulează",
+      "redo": "Refă",
+      "image": "Imagine",
+      "imageUrl": "URL imagine:",
+      "table": "Tabel",
+      "pageBreak": "Pagină nouă",
+      "sizeHeading": "Titlu",
+      "printBtn": "Tipărește",
+      "deleteBtn": "Șterge"
+    },
+    "category": {
+      "back": "← Documente de business",
+      "preview": "Previzualizare →"
+    }
+  },
+  "cat": {
+    "company": {
+      "title": "Documente de firmă",
+      "desc": "Decizii, ordine, procese-verbale și împuterniciri."
+    },
+    "contracts": {
+      "title": "Contracte",
+      "desc": "Contracte gata pentru servicii, livrare, închiriere și parteneriat."
+    },
+    "hr": {
+      "title": "Personal",
+      "desc": "Contracte de muncă și civile, ordine și fișe de post."
+    },
+    "finance": {
+      "title": "Documente financiare",
+      "desc": "Documente financiare de business — cereri, chitanțe, rapoarte."
+    },
+    "clients": {
+      "title": "Clienți",
+      "desc": "Oferte, propuneri de preț și procese-verbale pentru clienți."
+    },
+    "suppliers": {
+      "title": "Furnizori",
+      "desc": "Cereri, comenzi și recepția livrărilor."
+    },
+    "gdpr": {
+      "title": "GDPR",
+      "desc": "Documente pentru protecția datelor personale."
+    },
+    "inventory": {
+      "title": "Inventariere",
+      "desc": "Liste și procese-verbale de inventariere."
+    },
+    "vehicles": {
+      "title": "Vehicule",
+      "desc": "Foi de parcurs, rapoarte de combustibil și deplasări."
+    },
+    "construction": {
+      "title": "Construcții",
+      "desc": "Procese-verbale de recepție și lucrări efectuate."
+    },
+    "production": {
+      "title": "Producție",
+      "desc": "Comenzi de producție și fișe de control."
+    },
+    "projects": {
+      "title": "Proiecte",
+      "desc": "Planuri, briefuri și rapoarte de proiect."
+    },
+    "marketing": {
+      "title": "Marketing",
+      "desc": "Briefuri, planuri media și rapoarte de campanie."
+    },
+    "legal": {
+      "title": "Documente juridice",
+      "desc": "Invitații, notificări, preavize și cereri."
+    },
+    "bank": {
+      "title": "Documente bancare",
+      "desc": "Cereri de garanții bancare și confirmări."
+    },
+    "iso": {
+      "title": "Documente ISO",
+      "desc": "Fișe de control, rapoarte și audituri interne."
+    },
+    "policies": {
+      "title": "Politici de firmă",
+      "desc": "Politici de securitate, GDPR, concedii și cod etic."
+    },
+    "analysis": {
+      "title": "Analize de business",
+      "desc": "SWOT, PESTEL, Canvas și matrice de risc."
+    },
+    "letters": {
+      "title": "Scrisori",
+      "desc": "Scrisori de afaceri către clienți, furnizori și instituții."
+    },
+    "protocols": {
+      "title": "Procese-verbale",
+      "desc": "Procese-verbale de predare-primire și de constatare."
+    },
+    "forms": {
+      "title": "Formulare",
+      "desc": "Cereri, solicitări, plângeri și sesizări."
+    },
+    "declarations": {
+      "title": "Declarații",
+      "desc": "Cele mai des folosite declarații de business."
+    },
+    "correspondence": {
+      "title": "Corespondență",
+      "desc": "Șabloane de e-mail, invitații și scrisori de mulțumire."
+    }
+  }
 }

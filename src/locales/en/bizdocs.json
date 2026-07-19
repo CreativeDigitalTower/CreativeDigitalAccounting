@@ -10,5 +10,189 @@
     "Saving, statuses, favorites and document history"
   ],
   "cta": "Upgrade to Business or Pro →",
-  "note": "Unlock the module and dozens more features to manage your whole business."
+  "note": "Unlock the module and dozens more features to manage your whole business.",
+  "ui": {
+    "status": {
+      "draft": "Draft",
+      "final": "Final",
+      "archived": "Archived"
+    },
+    "complexity": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "detailed": "Detailed"
+    },
+    "home": {
+      "title": "Business Documents Center",
+      "subtitle": "{n} professional templates · {m} categories — auto-filled with your company's data",
+      "searchPh": "Search for a document… (e.g. contract, power of attorney, order)",
+      "myDocs": "My created documents",
+      "myDocsSub": "All contracts and documents you've generated — in one place.",
+      "open": "Open →",
+      "newContract": "New contract",
+      "orderDecision": "Order / Resolution",
+      "hrDoc": "HR document",
+      "disclaimer": "These are suggested <strong>standard templates</strong> to make your work easier. For specific legal matters we recommend consulting a professional (lawyer/accountant) before using the document.",
+      "recent": "Recently used",
+      "recentEmpty": "You have no generated documents yet.",
+      "favorites": "Favorites",
+      "favEmpty": "Mark documents as favorites for quick access.",
+      "categories": "Categories",
+      "tplCount": "{n} templates →",
+      "aiTitle": "AI Business Documents",
+      "aiSub": "Coming soon — generating documents with AI.",
+      "recommended": "Recommended templates"
+    },
+    "mydocs": {
+      "ready": "Ready documents ({n})",
+      "drafts": "Drafts ({n})",
+      "searchPh": "Search document…",
+      "downloadSel": "Download selected ({n})",
+      "downloading": "Downloading…",
+      "downloadAll": "Download all",
+      "noDrafts": "No drafts.",
+      "noReady": "No ready documents.",
+      "none": "No documents.",
+      "colDoc": "Document",
+      "colCategory": "Category",
+      "colStatus": "Status",
+      "open": "Open",
+      "openTitle": "Open / edit",
+      "deleteTitle": "Delete",
+      "confirmDelete": "the document “{title}”",
+      "errDelete": "Error deleting.",
+      "dlFail": "Download failed."
+    },
+    "editor": {
+      "back": "← Business documents",
+      "save": "Save",
+      "saving": "Saving…",
+      "savedAt": "Saved {time}",
+      "favorite": "Favorite",
+      "pin": "Pin",
+      "confirmDelete": "Delete the document?",
+      "print": "Print",
+      "bold": "Bold",
+      "italic": "Italic",
+      "underline": "Underline",
+      "size": "Size",
+      "sizeSmall": "Small",
+      "sizeNormal": "Normal",
+      "sizeBig": "Large",
+      "ul": "List",
+      "ol": "Numbered list",
+      "left": "Left",
+      "center": "Center",
+      "right": "Right",
+      "indent": "Indent",
+      "outdent": "Outdent",
+      "undo": "Undo",
+      "redo": "Redo",
+      "image": "Image",
+      "imageUrl": "Image URL:",
+      "table": "Table",
+      "pageBreak": "New page",
+      "sizeHeading": "Heading",
+      "printBtn": "Print",
+      "deleteBtn": "Delete"
+    },
+    "category": {
+      "back": "← Business documents",
+      "preview": "Preview →"
+    }
+  },
+  "cat": {
+    "company": {
+      "title": "Company documents",
+      "desc": "Resolutions, orders, minutes and powers of attorney."
+    },
+    "contracts": {
+      "title": "Contracts",
+      "desc": "Ready contracts for services, supply, rent and partnership."
+    },
+    "hr": {
+      "title": "HR",
+      "desc": "Employment and civil contracts, orders and job descriptions."
+    },
+    "finance": {
+      "title": "Financial documents",
+      "desc": "Business financial documents — requests, receipts, reports."
+    },
+    "clients": {
+      "title": "Clients",
+      "desc": "Offers, price quotes and protocols for clients."
+    },
+    "suppliers": {
+      "title": "Suppliers",
+      "desc": "Requests, orders and delivery acceptance."
+    },
+    "gdpr": {
+      "title": "GDPR",
+      "desc": "Personal data protection documents."
+    },
+    "inventory": {
+      "title": "Inventory",
+      "desc": "Inventory lists and stocktaking protocols."
+    },
+    "vehicles": {
+      "title": "Vehicles",
+      "desc": "Trip logs, fuel reports and business trips."
+    },
+    "construction": {
+      "title": "Construction",
+      "desc": "Acceptance and completed-works protocols."
+    },
+    "production": {
+      "title": "Production",
+      "desc": "Production orders and control sheets."
+    },
+    "projects": {
+      "title": "Projects",
+      "desc": "Plans, briefs and project reports."
+    },
+    "marketing": {
+      "title": "Marketing",
+      "desc": "Briefs, media plans and campaign reports."
+    },
+    "legal": {
+      "title": "Legal documents",
+      "desc": "Invitations, notices, notifications and requests."
+    },
+    "bank": {
+      "title": "Bank documents",
+      "desc": "Requests for bank guarantees and confirmations."
+    },
+    "iso": {
+      "title": "ISO documents",
+      "desc": "Control sheets, reports and internal audits."
+    },
+    "policies": {
+      "title": "Company policies",
+      "desc": "Security, GDPR, leave policies and code of ethics."
+    },
+    "analysis": {
+      "title": "Business analyses",
+      "desc": "SWOT, PESTEL, Canvas and risk matrices."
+    },
+    "letters": {
+      "title": "Letters",
+      "desc": "Business letters to clients, suppliers and institutions."
+    },
+    "protocols": {
+      "title": "Protocols",
+      "desc": "Handover and assessment protocols."
+    },
+    "forms": {
+      "title": "Forms",
+      "desc": "Applications, requests, complaints and reports."
+    },
+    "declarations": {
+      "title": "Declarations",
+      "desc": "The most commonly used business declarations."
+    },
+    "correspondence": {
+      "title": "Correspondence",
+      "desc": "Email templates, invitations and thank-you letters."
+    }
+  }
 }
