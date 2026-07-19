@@ -1,4 +1,5 @@
 "use client";
+import { NumberField } from "@/components/i18n/NumberField";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -56,9 +57,13 @@ export function AssetDetail({ asset, children }: { asset: Asset; children?: Reac
 
   const F = ({ label, k, type = "text" }: { label: string; k: keyof Asset; type?: string }) => (
     <div><label style={{ fontSize: 12 }}>{label}</label>
-      <input type={type} value={type === "date" ? ((a[k] as string)?.slice(0, 10) ?? "") : ((a[k] as string | number) ?? "")}
-        onChange={(e) => setA({ ...a, [k]: type === "number" ? Number(e.target.value) : e.target.value })}
-        onBlur={() => save({})} style={{ padding: "6px 9px", fontSize: 13 }} />
+      {type === "number" ? (
+        <NumberField value={a[k] as number | null} onValueChange={(n) => setA({ ...a, [k]: n ?? 0 })} onBlur={() => save({})} style={{ padding: "6px 9px", fontSize: 13 }} />
+      ) : (
+        <input type={type} value={type === "date" ? ((a[k] as string)?.slice(0, 10) ?? "") : ((a[k] as string | number) ?? "")}
+          onChange={(e) => setA({ ...a, [k]: e.target.value })}
+          onBlur={() => save({})} style={{ padding: "6px 9px", fontSize: 13 }} />
+      )}
     </div>
   );
 

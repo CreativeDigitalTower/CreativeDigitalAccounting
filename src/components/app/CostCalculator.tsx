@@ -1,4 +1,5 @@
 "use client";
+import { NumberField } from "@/components/i18n/NumberField";
 
 import { useState } from "react";
 import { useT } from "@/components/i18n/I18nProvider";
@@ -35,7 +36,7 @@ export function CostCalculator() {
         <div style={{ marginTop: 14 }}>
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 12, marginBottom: 14 }}>
             <div><label>{t("production.cost.productName")}</label><input value={product} onChange={(e) => setProduct(e.target.value)} placeholder={t("production.cost.productNamePh")} /></div>
-            <div><label>{t("production.cost.outputCount")}</label><input type="number" step="any" min="1" value={output} onChange={(e) => setOutput(e.target.value)} /></div>
+            <div><label>{t("production.cost.outputCount")}</label><NumberField value={output} decimals={3} onChange={setOutput} /></div>
           </div>
 
           <div style={{ overflowX: "auto" }}>
@@ -54,9 +55,9 @@ export function CostCalculator() {
                 {rows.map((r, i) => (
                   <tr key={i}>
                     <td><input value={r.name} onChange={(e) => update(i, "name", e.target.value)} placeholder={t("production.cost.ingredientPh")} style={{ padding: "6px 8px", fontSize: 13 }} /></td>
-                    <td><input type="number" step="any" value={r.used} onChange={(e) => update(i, "used", e.target.value)} style={{ padding: "6px 8px", fontSize: 13, textAlign: "right", maxWidth: 110 }} /></td>
-                    <td><input type="number" step="any" value={r.purchased} onChange={(e) => update(i, "purchased", e.target.value)} style={{ padding: "6px 8px", fontSize: 13, textAlign: "right", maxWidth: 110 }} /></td>
-                    <td><input type="number" step="any" value={r.price} onChange={(e) => update(i, "price", e.target.value)} style={{ padding: "6px 8px", fontSize: 13, textAlign: "right", maxWidth: 120 }} /></td>
+                    <td><NumberField value={r.used} decimals={3} onChange={(v) => update(i, "used", v)} style={{ padding: "6px 8px", fontSize: 13, textAlign: "right", maxWidth: 110 }} /></td>
+                    <td><NumberField value={r.purchased} decimals={3} onChange={(v) => update(i, "purchased", v)} style={{ padding: "6px 8px", fontSize: 13, textAlign: "right", maxWidth: 110 }} /></td>
+                    <td><NumberField value={r.price} decimals={3} onChange={(v) => update(i, "price", v)} style={{ padding: "6px 8px", fontSize: 13, textAlign: "right", maxWidth: 120 }} /></td>
                     <td className="num" style={{ fontWeight: 600 }}>{rowCost(r).toFixed(2)}</td>
                     <td>{rows.length > 1 && <button onClick={() => setRows(rows.filter((_, idx) => idx !== i))} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer", fontSize: 16 }}>×</button>}</td>
                   </tr>

@@ -1,4 +1,5 @@
 "use client";
+import { toNumber } from "@/lib/number";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -29,7 +30,7 @@ export default function IssueStockPage() {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         stockItemId: fd.get("stockItemId"),
-        quantity: Number(fd.get("quantity")),
+        quantity: toNumber(fd.get("quantity")),
         date: fd.get("date"),
         note: fd.get("note") || null,
       }),
@@ -58,7 +59,7 @@ export default function IssueStockPage() {
           {selected && <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>{t("warehouse.issue.f.avail")} <strong>{selected.quantity} {selected.unit}</strong></div>}
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-          <div><label>{selected ? t("warehouse.issue.f.qtyIn", { unit: selected.unit }) : t("warehouse.issue.f.qty")}</label><input type="number" name="quantity" step="any" min="0" max={selected?.quantity} required placeholder={selected ? t("warehouse.issue.f.qtyPhUnit", { unit: selected.unit }) : t("warehouse.issue.f.qtyPh")} /></div>
+          <div><label>{selected ? t("warehouse.issue.f.qtyIn", { unit: selected.unit }) : t("warehouse.issue.f.qty")}</label><input type="text" inputMode="decimal" name="quantity" required placeholder={selected ? t("warehouse.issue.f.qtyPhUnit", { unit: selected.unit }) : t("warehouse.issue.f.qtyPh")} /></div>
           <div><label>{t("warehouse.issue.f.date")}</label><input type="date" name="date" defaultValue={new Date().toISOString().slice(0, 10)} required /></div>
         </div>
         <div>

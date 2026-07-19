@@ -49,5 +49,6 @@
   "trialBanner": {
     "text": "<b>Tüm özellikleri ücretsiz</b> keşfedin — seçtiğiniz bir planın deneme süresini etkinleştirin.",
     "cta": "Ücretsiz denemeyi başlat"
-  }
+  },
+  "numberInvalid": "Geçersiz sayı. Rakamları ve ondalık ayırıcı olarak \",\" veya \".\" kullanın."
 }

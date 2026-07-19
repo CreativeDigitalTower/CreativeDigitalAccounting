@@ -1,4 +1,5 @@
 "use client";
+import { NumberField } from "@/components/i18n/NumberField";
 
 import { useEffect, useState, Fragment } from "react";
 import { formatCurrency } from "@/lib/constants";
@@ -127,7 +128,7 @@ export function EmployeesPanel({ initial, access }: { initial: Employee[]; acces
             <div><label>{t("employees.form.position")}</label><input value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} /></div>
             <div><label>{t("employees.form.phone")}</label><input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
             <div><label>{t("employees.form.email")}</label><input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
-            <div><label>{t("employees.form.salary")}</label><input type="number" value={form.salary} onChange={(e) => setForm({ ...form, salary: e.target.value })} /></div>
+            <div><label>{t("employees.form.salary")}</label><NumberField value={form.salary} onChange={(v) => setForm({ ...form, salary: v })} /></div>
             <div><label>{t("employees.form.hiredAt")}</label><input type="date" value={form.hiredAt} onChange={(e) => setForm({ ...form, hiredAt: e.target.value })} /></div>
             <div><label>{t("employees.form.leaveDays")}</label><input type="number" min="0" value={form.paidLeaveDays} onChange={(e) => setForm({ ...form, paidLeaveDays: e.target.value })} /></div>
             <div><label>{t("employees.form.department")}</label><input value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} /></div>
@@ -521,7 +522,7 @@ function BonusesPanel({ employeeId }: { employeeId: string }) {
       <div style={{ display: "flex", gap: 8, alignItems: "flex-end", flexWrap: "wrap", marginBottom: 10 }}>
         <div><label style={{ fontSize: 11 }}>{t("employees.bonuses.month")}</label><select value={f.month} onChange={(e) => setF({ ...f, month: e.target.value })} style={{ padding: "6px 8px", fontSize: 12.5 }}>{Array.from({ length: 12 }, (_, i) => <option key={i} value={i}>{monthName(locale, i)}</option>)}</select></div>
         <div><label style={{ fontSize: 11 }}>{t("employees.bonuses.year")}</label><input type="number" value={f.year} onChange={(e) => setF({ ...f, year: e.target.value })} style={{ width: 80, padding: "6px 8px", fontSize: 12.5 }} /></div>
-        <div><label style={{ fontSize: 11 }}>{t("employees.bonuses.amount")}</label><input type="number" value={f.amount} onChange={(e) => setF({ ...f, amount: e.target.value })} style={{ width: 90, padding: "6px 8px", fontSize: 12.5 }} /></div>
+        <div><label style={{ fontSize: 11 }}>{t("employees.bonuses.amount")}</label><NumberField value={f.amount} onChange={(v) => setF({ ...f, amount: v })} style={{ width: 90, padding: "6px 8px", fontSize: 12.5 }} /></div>
         <div><label style={{ fontSize: 11 }}>{t("employees.bonuses.kind")}</label><select value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })} style={{ padding: "6px 8px", fontSize: 12.5 }}>{BONUS_KEYS.map((k) => <option key={k} value={k}>{t(`employees.bonusKind.${k}`)}</option>)}</select></div>
         <div style={{ flex: 1, minWidth: 100 }}><label style={{ fontSize: 11 }}>{t("employees.bonuses.note")}</label><input value={f.note} onChange={(e) => setF({ ...f, note: e.target.value })} style={{ padding: "6px 8px", fontSize: 12.5 }} /></div>
         <button className="btn btn-primary btn-sm" onClick={add}>{t("employees.bonuses.add")}</button>

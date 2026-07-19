@@ -1,4 +1,5 @@
 "use client";
+import { toNumber } from "@/lib/number";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -41,7 +42,7 @@ export default function NewExpensePage() {
     setSaving(true);
     setError("");
     const fd = new FormData(e.currentTarget);
-    const amount = parseFloat(fd.get("amount") as string);
+    const amount = toNumber(fd.get("amount"));
     const vatRate = parseFloat(fd.get("vatRate") as string) / 100;
     const vatAmount = amount * vatRate / (1 + vatRate);
 
@@ -115,7 +116,7 @@ export default function NewExpensePage() {
             </div>
             <div>
               <label>{t("expenses.new.f.gross")}</label>
-              <input type="number" name="amount" required min="0" step="0.01" placeholder="100.00" />
+              <input type="text" inputMode="decimal" name="amount" required placeholder="100.00" />
             </div>
             <div>
               <label>{t("expenses.new.f.vatRate")}</label>

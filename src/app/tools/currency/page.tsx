@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { NumberField } from "@/components/i18n/NumberField";
 import { useT } from "@/components/i18n/I18nProvider";
 import { EUR_TO_BGN } from "@/lib/constants";
 
@@ -25,7 +26,7 @@ export default function CurrencyCalc() {
 
       <div className="glass panel" style={{ padding: 28 }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 14, alignItems: "end" }}>
-          <div><label>{t("tools.amount")}</label><input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} /></div>
+          <div><label>{t("tools.amount")}</label><NumberField value={amount} onChange={setAmount} /></div>
           <div><label>{t("tools.from")}</label><select value={from} onChange={(e) => setFrom(e.target.value)}>{Object.keys(RATES).map((c) => <option key={c}>{c}</option>)}</select></div>
           <div><label>{t("tools.to")}</label><select value={to} onChange={(e) => setTo(e.target.value)}>{Object.keys(RATES).map((c) => <option key={c}>{c}</option>)}</select></div>
         </div>

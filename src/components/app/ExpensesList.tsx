@@ -1,4 +1,5 @@
 "use client";
+import { NumberField } from "@/components/i18n/NumberField";
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/constants";
@@ -147,8 +148,8 @@ function EditModal({ expense, categories, suppliers, onClose, onSaved }: {
         {error && <div style={{ background: "var(--brick-soft)", color: "var(--brick)", borderRadius: 8, padding: "8px 12px", fontSize: 12.5, marginBottom: 12 }}>{error}</div>}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div style={{ gridColumn: "1 / -1" }}><label style={{ fontSize: 12 }}>{t("expenses.editModal.description")}</label><input value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} /></div>
-          <div><label style={{ fontSize: 12 }}>{t("expenses.editModal.gross")}</label><input type="number" value={f.amount} onChange={(e) => setF({ ...f, amount: e.target.value })} /></div>
-          <div><label style={{ fontSize: 12 }}>{t("expenses.editModal.vat")}</label><input type="number" value={f.vatAmount} onChange={(e) => setF({ ...f, vatAmount: e.target.value })} /></div>
+          <div><label style={{ fontSize: 12 }}>{t("expenses.editModal.gross")}</label><NumberField value={f.amount} onChange={(v) => setF({ ...f, amount: v })} /></div>
+          <div><label style={{ fontSize: 12 }}>{t("expenses.editModal.vat")}</label><NumberField value={f.vatAmount} onChange={(v) => setF({ ...f, vatAmount: v })} /></div>
           <div><label style={{ fontSize: 12 }}>{t("expenses.editModal.date")}</label><input type="date" value={f.date} onChange={(e) => setF({ ...f, date: e.target.value })} /></div>
           <div><label style={{ fontSize: 12 }}>{t("expenses.editModal.category")}</label><select value={f.categoryId} onChange={(e) => setF({ ...f, categoryId: e.target.value })}>{categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
           <div><label style={{ fontSize: 12 }}>{t("expenses.editModal.supplier")}</label><select value={f.supplierId} onChange={(e) => setF({ ...f, supplierId: e.target.value })}><option value="">{t("expenses.editModal.noSupplier")}</option>{suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</select></div>

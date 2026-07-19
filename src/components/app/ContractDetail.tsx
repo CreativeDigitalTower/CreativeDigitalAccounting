@@ -1,4 +1,5 @@
 "use client";
+import { NumberField } from "@/components/i18n/NumberField";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -47,7 +48,7 @@ export function ContractDetail({ contract }: { contract: Contract }) {
             <div style={{ gridColumn: "1 / -1" }}><label style={{ fontSize: 12 }}>{t("contracts.detail.f.title")}</label><input value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} /></div>
             <div><label style={{ fontSize: 12 }}>{t("contracts.detail.f.start")}</label><input type="date" value={f.startDate?.slice(0, 10) ?? ""} onChange={(e) => setF({ ...f, startDate: e.target.value })} /></div>
             <div><label style={{ fontSize: 12 }}>{t("contracts.detail.f.end")}</label><input type="date" value={f.endDate?.slice(0, 10) ?? ""} onChange={(e) => setF({ ...f, endDate: e.target.value })} /></div>
-            <div><label style={{ fontSize: 12 }}>{t("contracts.detail.f.value")}</label><input type="number" value={f.value ?? ""} onChange={(e) => setF({ ...f, value: e.target.value ? Number(e.target.value) : null })} /></div>
+            <div><label style={{ fontSize: 12 }}>{t("contracts.detail.f.value")}</label><NumberField value={f.value} onValueChange={(n) => setF({ ...f, value: n })} /></div>
             <div><label style={{ fontSize: 12 }}>{t("contracts.detail.f.status")}</label>
               <select value={f.status} onChange={(e) => setF({ ...f, status: e.target.value })}>
                 {["active", "expired", "cancelled"].map((k) => <option key={k} value={k}>{t(`contracts.status.${k}`)}</option>)}

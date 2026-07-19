@@ -1,4 +1,6 @@
 "use client";
+import { toNumber, parseLocalizedNumber } from "@/lib/number";
+import { NumberField } from "@/components/i18n/NumberField";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/constants";
@@ -24,7 +26,7 @@ export function FinancialHistorySection({ initial, goalYear, goalTarget, goalRev
   async function saveRow(year: number, revenue: string, expenses: string, profit: string, employees: string) {
     await fetch("/api/financial-history", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ year, revenue: parseFloat(revenue) || 0, expenses: expenses ? parseFloat(expenses) : null, profit: profit ? parseFloat(profit) : null, employeeCount: employees ? parseInt(employees) : null }),
+      body: JSON.stringify({ year, revenue: toNumber(revenue), expenses: expenses ? parseLocalizedNumber(expenses) : null, profit: profit ? parseLocalizedNumber(profit) : null, employeeCount: employees ? parseLocalizedNumber(employees) : null }),
     });
     setEditYear(null); setAdding(false); setF({ year: new Date().getFullYear() - 1, revenue: "", expenses: "", profit: "", employees: "" });
     router.refresh();
@@ -35,8 +37,8 @@ export function FinancialHistorySection({ initial, goalYear, goalTarget, goalRev
     router.refresh();
   }
   async function saveGoal() {
-    const target = parseFloat(goal);
-    if (!(target >= 0)) return;
+    const target = parseLocalizedNumber(goal);
+    if (target == null || target < 0) return;
     const res = await fetch("/api/financial-goal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ year: goalYear, targetRevenue: target }) });
     if (res.ok) { setGoalMsg(t("finance.hist.saved")); setTimeout(() => setGoalMsg(""), 1500); router.refresh(); }
   }
@@ -61,7 +63,7 @@ export function FinancialHistorySection({ initial, goalYear, goalTarget, goalRev
         <div style={{ display: "flex", gap: 10, alignItems: "flex-end", flexWrap: "wrap" }}>
           <div style={{ flex: "0 1 220px" }}>
             <label style={{ fontSize: 12 }}>{t("finance.hist.goalTarget")}</label>
-            <input type="number" value={goal} onChange={(e) => setGoal(e.target.value)} placeholder={t("finance.hist.goalPh")} />
+            <NumberField value={goal} onChange={setGoal} placeholder={t("finance.hist.goalPh")} />
           </div>
           <button className="btn btn-primary btn-sm" onClick={saveGoal}>{t("finance.hist.saveGoal")}</button>
           {goalMsg && <span style={{ fontSize: 12.5, color: "var(--emerald-dark)" }}>{goalMsg}</span>}
@@ -89,9 +91,9 @@ export function FinancialHistorySection({ initial, goalYear, goalTarget, goalRev
         {adding && (
           <div className="glass" style={{ padding: "14px 16px", borderRadius: 10, marginBottom: 14, border: "1px solid var(--border)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px,1fr))", gap: 10, alignItems: "flex-end" }}>
             <div><label style={{ fontSize: 12 }}>{t("finance.hist.fYear")}</label><input type="number" value={f.year} onChange={(e) => setF({ ...f, year: Number(e.target.value) })} /></div>
-            <div><label style={{ fontSize: 12 }}>{t("finance.hist.fRevenue")}</label><input type="number" value={f.revenue} onChange={(e) => setF({ ...f, revenue: e.target.value })} /></div>
-            <div><label style={{ fontSize: 12 }}>{t("finance.hist.fExpenses")}</label><input type="number" value={f.expenses} onChange={(e) => setF({ ...f, expenses: e.target.value })} /></div>
-            <div><label style={{ fontSize: 12 }}>{t("finance.hist.fProfit")}</label><input type="number" value={f.profit} onChange={(e) => setF({ ...f, profit: e.target.value })} placeholder={t("finance.hist.auto")} /></div>
+            <div><label style={{ fontSize: 12 }}>{t("finance.hist.fRevenue")}</label><NumberField value={f.revenue} onChange={(v) => setF({ ...f, revenue: v })} /></div>
+            <div><label style={{ fontSize: 12 }}>{t("finance.hist.fExpenses")}</label><NumberField value={f.expenses} onChange={(v) => setF({ ...f, expenses: v })} /></div>
+            <div><label style={{ fontSize: 12 }}>{t("finance.hist.fProfit")}</label><NumberField value={f.profit} onChange={(v) => setF({ ...f, profit: v })} placeholder={t("finance.hist.auto")} /></div>
             <div><label style={{ fontSize: 12 }}>{t("finance.hist.fEmployees")}</label><input type="number" value={f.employees} onChange={(e) => setF({ ...f, employees: e.target.value })} /></div>
             <div style={{ display: "flex", gap: 6 }}>
               <button className="btn btn-primary btn-sm" disabled={!f.revenue} onClick={() => saveRow(f.year, f.revenue, f.expenses, f.profit, f.employees)}>{t("finance.hist.save")}</button>
@@ -199,9 +201,9 @@ function EditRow({ row, onSave, onCancel }: { row: Row; onSave: (y: number, r: s
   return (
     <tr>
       <td style={{ fontWeight: 600 }}>{row.year}</td>
-      <td><input type="number" value={revenue} onChange={(e) => setRevenue(e.target.value)} style={{ padding: "5px 7px", fontSize: 12.5, textAlign: "right" }} /></td>
-      <td><input type="number" value={expenses} onChange={(e) => setExpenses(e.target.value)} style={{ padding: "5px 7px", fontSize: 12.5, textAlign: "right" }} /></td>
-      <td><input type="number" value={profit} onChange={(e) => setProfit(e.target.value)} placeholder={t("finance.hist.auto")} style={{ padding: "5px 7px", fontSize: 12.5, textAlign: "right" }} /></td>
+      <td><NumberField value={revenue} onChange={setRevenue} style={{ padding: "5px 7px", fontSize: 12.5, textAlign: "right" }} /></td>
+      <td><NumberField value={expenses} onChange={setExpenses} style={{ padding: "5px 7px", fontSize: 12.5, textAlign: "right" }} /></td>
+      <td><NumberField value={profit} onChange={setProfit} placeholder={t("finance.hist.auto")} style={{ padding: "5px 7px", fontSize: 12.5, textAlign: "right" }} /></td>
       <td><input type="number" value={employees} onChange={(e) => setEmployees(e.target.value)} style={{ padding: "5px 7px", fontSize: 12.5, textAlign: "right" }} /></td>
       <td style={{ display: "flex", gap: 6 }}>
         <button className="btn btn-primary btn-sm" onClick={() => onSave(row.year, revenue, expenses, profit, employees)}>✓</button>

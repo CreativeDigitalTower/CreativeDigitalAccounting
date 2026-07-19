@@ -1,4 +1,5 @@
 "use client";
+import { toNumber, parseLocalizedNumber } from "@/lib/number";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -31,8 +32,8 @@ export default function ReceiveStockPage() {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         stockItemId: fd.get("stockItemId"),
-        quantity: Number(fd.get("quantity")),
-        unitPrice: fd.get("unitPrice") ? Number(fd.get("unitPrice")) : null,
+        quantity: toNumber(fd.get("quantity")),
+        unitPrice: fd.get("unitPrice") ? parseLocalizedNumber(fd.get("unitPrice") as string) : null,
         supplierId: fd.get("supplierId") || null,
         batchNumber: fd.get("batchNumber") || null,
         date: fd.get("date"),
@@ -58,8 +59,8 @@ export default function ReceiveStockPage() {
             <div style={{ gridColumn: "1 / -1" }}><label>{t("warehouse.receive.f.item")}</label>
               <select name="stockItemId" required value={selectedId} onChange={(e) => setSelectedId(e.target.value)}><option value="">{t("warehouse.common.select")}</option>{items.map((i)=><option key={i.id} value={i.id}>{t("warehouse.optStock", { name: i.name, q: i.quantity, u: i.unit })}</option>)}</select>
             </div>
-            <div><label>{selectedUnit ? t("warehouse.receive.f.qtyIn", { unit: selectedUnit }) : t("warehouse.receive.f.qty")}</label><input type="number" name="quantity" step="0.01" min="0.01" required placeholder={selectedUnit ? t("warehouse.receive.f.qtyPhUnit", { unit: selectedUnit }) : t("warehouse.receive.f.qtyPh")} /></div>
-            <div><label>{t("warehouse.receive.f.price")}</label><input type="number" name="unitPrice" step="0.01" min="0" /></div>
+            <div><label>{selectedUnit ? t("warehouse.receive.f.qtyIn", { unit: selectedUnit }) : t("warehouse.receive.f.qty")}</label><input type="text" inputMode="decimal" name="quantity" required placeholder={selectedUnit ? t("warehouse.receive.f.qtyPhUnit", { unit: selectedUnit }) : t("warehouse.receive.f.qtyPh")} /></div>
+            <div><label>{t("warehouse.receive.f.price")}</label><input type="text" inputMode="decimal" name="unitPrice" /></div>
             <div><label>{t("warehouse.receive.f.supplier")}</label><select name="supplierId"><option value="">—</option>{suppliers.map((s)=><option key={s.id} value={s.id}>{s.name}</option>)}</select></div>
             <div><label>{t("warehouse.receive.f.batch")}</label><input type="text" name="batchNumber" placeholder={t("warehouse.receive.f.batchPh")} /></div>
             <div><label>{t("warehouse.receive.f.date")}</label><input type="date" name="date" required defaultValue={new Date().toISOString().slice(0,10)} /></div>

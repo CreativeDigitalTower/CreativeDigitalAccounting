@@ -1,4 +1,5 @@
 "use client";
+import { NumberField } from "@/components/i18n/NumberField";
 
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
@@ -149,8 +150,8 @@ export default function EditDocumentPage({ params }: { params: Promise<{ id: str
             {lines.map((line, i) => (
               <tr key={i}>
                 <td><input value={line.description} onChange={(e) => updateLine(i, "description", e.target.value)} style={{ padding: "7px 8px", fontSize: 13 }} /></td>
-                <td><input type="number" value={line.quantity} onChange={(e) => updateLine(i, "quantity", e.target.value)} style={{ padding: "7px 8px", fontSize: 13, textAlign: "right" }} /></td>
-                <td><input type="number" value={line.unitPrice} onChange={(e) => updateLine(i, "unitPrice", e.target.value)} style={{ padding: "7px 8px", fontSize: 13, textAlign: "right" }} /></td>
+                <td><NumberField value={line.quantity} decimals={3} onValueChange={(n) => updateLine(i, "quantity", n ?? 0)} style={{ padding: "7px 8px", fontSize: 13, textAlign: "right" }} /></td>
+                <td><NumberField value={line.unitPrice} onValueChange={(n) => updateLine(i, "unitPrice", n ?? 0)} style={{ padding: "7px 8px", fontSize: 13, textAlign: "right" }} /></td>
                 <td><select value={line.vatRate} onChange={(e) => updateLine(i, "vatRate", e.target.value)} style={{ padding: "7px 8px", fontSize: 13 }}><option value={20}>20%</option><option value={9}>9%</option><option value={0}>0%</option></select></td>
                 <td>{lines.length > 1 && <button onClick={() => removeLine(i)} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer", fontSize: 16 }}>×</button>}</td>
               </tr>

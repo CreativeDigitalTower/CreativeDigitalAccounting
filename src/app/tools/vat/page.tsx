@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { NumberField } from "@/components/i18n/NumberField";
 import { useT } from "@/components/i18n/I18nProvider";
 
 export default function VatCalc() {
@@ -26,7 +27,7 @@ export default function VatCalc() {
           <button className={`filter-tab${mode === "extract" ? " active" : ""}`} onClick={() => setMode("extract")}>{t("tools.vatExtractTab")}</button>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-          <div><label>{mode === "add" ? t("tools.vatAmountNet") : t("tools.vatAmountGross")}</label><input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} /></div>
+          <div><label>{mode === "add" ? t("tools.vatAmountNet") : t("tools.vatAmountGross")}</label><NumberField value={amount} onChange={setAmount} /></div>
           <div><label>{t("tools.vatRate")}</label><select value={rate} onChange={(e) => setRate(Number(e.target.value))}><option value={20}>20%</option><option value={9}>9%</option><option value={0}>0%</option></select></div>
         </div>
         <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>

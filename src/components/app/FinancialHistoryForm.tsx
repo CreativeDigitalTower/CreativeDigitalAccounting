@@ -1,4 +1,6 @@
 "use client";
+import { toNumber, parseLocalizedNumber } from "@/lib/number";
+import { NumberField } from "@/components/i18n/NumberField";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -22,9 +24,9 @@ export function FinancialHistoryForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         year: Number(year),
-        revenue: parseFloat(revenue) || 0,
-        expenses: expenses ? parseFloat(expenses) : null,
-        profit: profit ? parseFloat(profit) : null,
+        revenue: toNumber(revenue),
+        expenses: expenses ? parseLocalizedNumber(expenses) : null,
+        profit: profit ? parseLocalizedNumber(profit) : null,
         employeeCount: employees ? parseInt(employees) : null,
       }),
     });
@@ -54,15 +56,15 @@ export function FinancialHistoryForm() {
         </div>
         <div>
           <label>{t("finance.form.fRevenue")}</label>
-          <input type="number" value={revenue} onChange={(e) => setRevenue(e.target.value)} step="0.01" placeholder={t("finance.form.fRevenuePh")} />
+          <NumberField value={revenue} onChange={setRevenue} placeholder={t("finance.form.fRevenuePh")} />
         </div>
         <div>
           <label>{t("finance.form.fExpenses")}</label>
-          <input type="number" value={expenses} onChange={(e) => setExpenses(e.target.value)} step="0.01" placeholder={t("finance.form.fExpensesPh")} />
+          <NumberField value={expenses} onChange={setExpenses} placeholder={t("finance.form.fExpensesPh")} />
         </div>
         <div>
           <label>{t("finance.form.fProfit")}</label>
-          <input type="number" value={profit} onChange={(e) => setProfit(e.target.value)} step="0.01" placeholder={t("finance.form.fProfitPh")} />
+          <NumberField value={profit} onChange={setProfit} placeholder={t("finance.form.fProfitPh")} />
         </div>
         <div>
           <label>{t("finance.form.fEmployees")}</label>

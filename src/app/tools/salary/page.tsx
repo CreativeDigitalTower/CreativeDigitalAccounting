@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { NumberField } from "@/components/i18n/NumberField";
 import { useT } from "@/components/i18n/I18nProvider";
 
 // Ориентировъчни ставки (България). Служител: осигуровки общо ~13.78%, данък 10%.
@@ -40,7 +41,7 @@ export default function SalaryCalc() {
       <div className="glass panel" style={{ padding: 28 }}>
         <div style={{ maxWidth: 280 }}>
           <label>{t("tools.grossSalaryInput")}</label>
-          <input type="number" value={gross} onChange={(e) => setGross(e.target.value)} />
+          <NumberField value={gross} onChange={setGross} />
         </div>
         <div style={{ marginTop: 22 }}>
           {rows.map((r) => (
