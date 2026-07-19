@@ -1,0 +1,20 @@
+{
+  "title": "Abonament",
+  "subtitle": "Gestionarea planului și a facturării",
+  "currentPlan": "PLAN CURENT",
+  "nextBilling": "Următoarea facturare: {date}",
+  "docsThisMonth": "Documente luna aceasta",
+  "footNote": "Deocamdată abonamentele se plătesc doar prin transfer bancar; plata cu cardul va fi disponibilă în curând. La schimbarea planului, modificarea intră în vigoare după confirmarea plății. După expirarea perioadei plătite, contul revine automat la Gratuit. 7 zile de test gratuit (o singură dată) pe planurile Start și Business.",
+  "trialEndedTitle": "Perioada gratuită a expirat",
+  "subEndedTitle": "Abonamentul a expirat",
+  "reverted": "Contul a fost readus la planul <strong>Gratuit</strong>. Abonează-te pentru a continua să folosești toate funcțiile planului ales.",
+  "revertedDated": "Contul a fost readus la planul <strong>Gratuit</strong> pe {date}. Abonează-te pentru a continua să folosești toate funcțiile planului ales.",
+  "later": "Mai târziu",
+  "viewPlans": "Vezi planurile →",
+  "featureLockTitle": "Disponibil în planul „{plan}” și superior",
+  "pdfNotFound": "Documentul nu a fost găsit pentru descărcare.",
+  "pdfFailed": "Generarea PDF a eșuat. Deschidem dialogul de tipărire — alegeți „Salvează ca PDF”.",
+  "print": "Tipărește",
+  "generating": "Se generează…",
+  "downloadPdf": "↓ Descarcă PDF"
+}
