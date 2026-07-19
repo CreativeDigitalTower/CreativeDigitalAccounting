@@ -191,13 +191,17 @@
       "needLines": "Each line must have a description and quantity.",
       "clientSave": "Error saving the client.",
       "save": "Error while saving."
-    }
+    },
+    "fromProforma": "New invoice from proforma №{number} — review and adjust before creating.",
+    "copyAttachments": "Copy attachments from the proforma"
   },
   "detail": {
     "back": "← Documents",
     "toProforma": "→ Proforma",
     "toInvoice": "→ Invoice",
-    "internalTitle": "Internal comment (not visible to the client)"
+    "internalTitle": "Internal comment (not visible to the client)",
+    "openInvoice": "Open invoice №{number}",
+    "fromProforma": "← Created from proforma №{number}"
   },
   "send": {
     "btn": "Send to client",

@@ -24,10 +24,16 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
       lines: true,
       company: { include: { subscription: true } },
       attachments: { orderBy: { createdAt: "asc" }, select: { id: true, filename: true, originalFilename: true, mimeType: true, size: true, createdAt: true } },
+      childDocuments: { where: { type: "invoice" }, select: { id: true, number: true }, orderBy: { createdAt: "asc" } },
+      parentDocument: { select: { id: true, number: true, type: true } },
     },
   });
 
   if (!doc || doc.companyId !== companyId) notFound();
+
+  // Проформа → фактура: ако вече има издадена фактура-дете, показваме връзка към нея.
+  const convertedInvoice = doc.type === "proforma" ? doc.childDocuments[0] ?? null : null;
+  const sourceProforma = doc.type === "invoice" && doc.parentDocument?.type === "proforma" ? doc.parentDocument : null;
 
   const sendPurpose = doc.type === "quote" ? "offer" : "invoice";
   const clientEmails = (doc.client?.emails ?? []).map((e) => ({
@@ -54,10 +60,20 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
         <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", position: "relative" }} className="no-print">
           <SendToClient id={doc.id} defaultEmail={doc.clientEmail ?? doc.client?.contactEmail} decision={doc.clientDecision} sentAt={doc.sentToClientAt?.toISOString() ?? null} purpose={sendPurpose} clientEmails={clientEmails} attachments={attachmentsForSend} />
           {doc.type === "quote" && <Link href={`/dashboard/documents/new?type=proforma&parent=${doc.id}`} className="btn btn-ghost btn-sm">{t("documents.detail.toProforma")}</Link>}
-          {doc.type === "proforma" && <Link href={`/dashboard/documents/new?type=invoice&parent=${doc.id}`} className="btn btn-ghost btn-sm">{t("documents.detail.toInvoice")}</Link>}
+          {doc.type === "proforma" && (convertedInvoice
+            ? <Link href={`/dashboard/documents/${convertedInvoice.id}`} className="btn btn-ghost btn-sm">{t("documents.detail.openInvoice", { number: convertedInvoice.number })}</Link>
+            : <Link href={`/dashboard/documents/new?type=invoice&parent=${doc.id}`} className="btn btn-primary btn-sm">{t("documents.detail.toInvoice")}</Link>)}
           <DocumentActions id={doc.id} status={doc.status} number={doc.number} />
         </div>
       </div>
+
+      {sourceProforma && (
+        <div style={{ marginBottom: 14, fontSize: 12.5 }} className="no-print">
+          <Link href={`/dashboard/documents/${sourceProforma.id}`} style={{ color: "var(--muted)", textDecoration: "none" }}>
+            {t("documents.detail.fromProforma", { number: sourceProforma.number })}
+          </Link>
+        </div>
+      )}
 
       {(() => {
         const docData = {

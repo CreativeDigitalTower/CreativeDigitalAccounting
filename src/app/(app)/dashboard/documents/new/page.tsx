@@ -59,6 +59,10 @@ function NewDocumentForm() {
   const allowedTpls = (() => { const n = allowedTemplateCount(plan); return n === Infinity ? INVOICE_TEMPLATES : INVOICE_TEMPLATES.slice(0, n); })();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  // Конвертиране от родителски документ (проформа → фактура)
+  const [parentId] = useState(searchParams.get("parent") ?? "");
+  const [parentInfo, setParentInfo] = useState<{ number: string; type: string } | null>(null);
+  const [copyAttachments, setCopyAttachments] = useState(true);
 
   // Предложения за клиент при ръчно въвеждане (по име или ЕИК)
   const suggestions = mClient.name.length >= 2 || mClient.eik.length >= 2
@@ -107,6 +111,32 @@ function NewDocumentForm() {
       setCompanyReady(!!(c?.name && c?.eik && c?.address));
     }).catch(() => {});
   }, []);
+
+  // Предварително попълване от родителски документ (проформа → фактура).
+  // Не създаваме фактурата тук — това е екранът за преглед преди създаване.
+  useEffect(() => {
+    if (!parentId) return;
+    fetch(`/api/documents/${parentId}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!d) return;
+        setParentInfo({ number: d.number, type: d.type });
+        if (d.client) { setClientMode("manual"); pickClient(d.client); }
+        if (Array.isArray(d.lines) && d.lines.length) {
+          setLines(d.lines.map((l: { description: string; quantity: number; unitPrice: number; vatRate: number }) => ({
+            description: l.description, quantity: l.quantity, unitPrice: l.unitPrice, vatRate: l.vatRate,
+          })));
+        }
+        if (d.currency) setCurrency(d.currency);
+        if (d.paymentMethod) setPaymentMethod(d.paymentMethod);
+        if (typeof d.vatExempt === "boolean") {
+          setVatExempt(d.vatExempt);
+          if (d.vatExempt && d.vatExemptReason) setVatReasonCode(d.vatExemptReason);
+        }
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parentId]);
 
   // Зареди предложен номер при смяна на типа
   useEffect(() => {
@@ -194,11 +224,15 @@ function NewDocumentForm() {
         issueDate, taxEventDate, dueDate, currency, language, template, paymentMethod,
         notes, internalComment, lines, status,
         vatExempt, vatExemptReason: vatExempt ? vatReason : null, clientIsIndividual,
+        parentDocumentId: parentId || undefined,
+        copyAttachmentsFrom: parentId && copyAttachments ? parentId : undefined,
       }),
     });
     setSaving(false);
     if (!res.ok) {
       const data = await res.json();
+      // Проформата вече е конвертирана → отвори съществуващата фактура.
+      if (res.status === 409 && data.invoiceId) { router.push(`/dashboard/documents/${data.invoiceId}`); return; }
       setError(data.error ?? t("documents.form.err.save"));
     } else {
       const doc = await res.json();
@@ -212,6 +246,16 @@ function NewDocumentForm() {
         <Link href="/dashboard/documents" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>{t("documents.form.back")}</Link>
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{t("documents.form.heading")}</h1>
       </div>
+
+      {parentInfo && (
+        <div className="glass panel" style={{ marginBottom: 18, padding: "12px 16px", borderLeft: "3px solid var(--brass)", display: "flex", flexWrap: "wrap", alignItems: "center", gap: 14 }}>
+          <span style={{ fontSize: 13 }}>{t("documents.form.fromProforma", { number: parentInfo.number })}</span>
+          <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--ink-soft)", marginLeft: "auto" }}>
+            <input type="checkbox" checked={copyAttachments} onChange={(e) => setCopyAttachments(e.target.checked)} style={{ width: "auto" }} />
+            {t("documents.form.copyAttachments")}
+          </label>
+        </div>
+      )}
 
       <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
         {DOC_TYPE_VALUES.map((v) => (

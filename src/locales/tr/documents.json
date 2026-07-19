@@ -191,13 +191,17 @@
       "needLines": "Her satırda açıklama ve miktar olmalı.",
       "clientSave": "Müşteri kaydetme hatası.",
       "save": "Kaydetme hatası."
-    }
+    },
+    "fromProforma": "Proforma №{number} belgesinden yeni fatura — oluşturmadan önce inceleyip düzenleyin.",
+    "copyAttachments": "Ekleri proformadan kopyala"
   },
   "detail": {
     "back": "← Belgeler",
     "toProforma": "→ Proforma",
     "toInvoice": "→ Fatura",
-    "internalTitle": "Dahili yorum (müşteriye görünmez)"
+    "internalTitle": "Dahili yorum (müşteriye görünmez)",
+    "openInvoice": "Faturayı aç №{number}",
+    "fromProforma": "← Proforma №{number} belgesinden oluşturuldu"
   },
   "send": {
     "btn": "Müşteriye gönder",

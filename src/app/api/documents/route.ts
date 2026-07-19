@@ -34,6 +34,8 @@ const schema = z.object({
   lines: z.array(lineSchema).min(1),
   status: z.enum(["draft", "issued", "sent"]).default("draft"),
   parentDocumentId: z.string().optional(),
+  // При конвертиране проформа → фактура: копирай прикачените файлове от този документ.
+  copyAttachmentsFrom: z.string().optional(),
   vatExempt: z.boolean().optional(),
   vatExemptReason: z.string().optional().nullable(),
   clientIsIndividual: z.boolean().optional(),
@@ -59,6 +61,31 @@ export async function POST(req: Request) {
           { error: "Достигнат месечен лимит за документи за вашия план. Надградете плана си, за да издавате повече." },
           { status: 403 }
         );
+      }
+    }
+
+    // ─── Конвертиране проформа → фактура: проверка на права и дублиране ───
+    // parentDocumentId трябва да е документ на същата фирма (защита от IDOR).
+    // Една проформа → една фактура: ако вече има издадена фактура-дете, спираме.
+    if (data.parentDocumentId) {
+      const parent = await prisma.document.findUnique({
+        where: { id: data.parentDocumentId },
+        select: { id: true, companyId: true, type: true },
+      });
+      if (!parent || parent.companyId !== companyId) {
+        return NextResponse.json({ error: "Изходният документ не е намерен." }, { status: 404 });
+      }
+      if (data.type === "invoice" && parent.type === "proforma") {
+        const existingInvoice = await prisma.document.findFirst({
+          where: { parentDocumentId: parent.id, type: "invoice" },
+          select: { id: true, number: true },
+        });
+        if (existingInvoice) {
+          return NextResponse.json(
+            { error: "Вече е създадена фактура от тази проформа.", invoiceId: existingInvoice.id, invoiceNumber: existingInvoice.number },
+            { status: 409 }
+          );
+        }
       }
     }
 
@@ -114,6 +141,28 @@ export async function POST(req: Request) {
 
     if (issued) {
       await incrementInvoiceCounter(companyId);
+    }
+
+    // ─── Копиране на приложенията от проформата (по избор при конвертиране) ───
+    // Копираме записите (не преместваме оригиналите); проверяваме, че източникът
+    // е на същата фирма и е родителят на новия документ.
+    if (data.copyAttachmentsFrom && data.copyAttachmentsFrom === data.parentDocumentId) {
+      const srcAttachments = await prisma.documentAttachment.findMany({
+        where: { documentId: data.copyAttachmentsFrom, document: { companyId } },
+      });
+      if (srcAttachments.length) {
+        await prisma.documentAttachment.createMany({
+          data: srcAttachments.map((a) => ({
+            documentId: document.id,
+            filename: a.filename,
+            originalFilename: a.originalFilename,
+            mimeType: a.mimeType,
+            size: a.size,
+            dataUrl: a.dataUrl,
+            uploadedById: userId,
+          })),
+        });
+      }
     }
 
     // Автоматично намаляване на склада при фактуриране (Бизнес + Про).

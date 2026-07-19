@@ -191,13 +191,17 @@
       "needLines": "Fiecare linie trebuie să aibă descriere și cantitate.",
       "clientSave": "Eroare la salvarea clientului.",
       "save": "Eroare la salvare."
-    }
+    },
+    "fromProforma": "Factură nouă din proforma №{number} — verificați și ajustați înainte de creare.",
+    "copyAttachments": "Copiază atașamentele din proformă"
   },
   "detail": {
     "back": "← Documente",
     "toProforma": "→ Proformă",
     "toInvoice": "→ Factură",
-    "internalTitle": "Comentariu intern (nevizibil clientului)"
+    "internalTitle": "Comentariu intern (nevizibil clientului)",
+    "openInvoice": "Deschide factura №{number}",
+    "fromProforma": "← Creată din proforma №{number}"
   },
   "send": {
     "btn": "Trimite clientului",
