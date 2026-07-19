@@ -1,0 +1,59 @@
+{
+  "hubTitle": "Free business tools",
+  "hubSubtitle": "Handy calculators for your business — available free to all registered users.",
+  "back": "← All tools",
+  "currency": {
+    "name": "Currency calculator",
+    "desc": "Convert EUR ↔ BGN at the fixed rate and other currencies."
+  },
+  "salary": {
+    "name": "Salary calculator",
+    "desc": "Gross/net, social contributions and income tax."
+  },
+  "vat": {
+    "name": "VAT calculator",
+    "desc": "Calculate VAT, net and gross amounts."
+  },
+  "interest": {
+    "name": "Interest calculator",
+    "desc": "Simple and compound interest for a chosen period."
+  },
+  "markup": {
+    "name": "Markup & profit",
+    "desc": "Calculate markup, margin and final price."
+  },
+  "vatAddTab": "Add VAT (to net)",
+  "vatExtractTab": "Extract VAT (from gross)",
+  "vatAmountNet": "Amount without VAT",
+  "vatAmountGross": "Amount with VAT",
+  "vatRate": "VAT rate",
+  "net": "Net",
+  "vatLabel": "VAT",
+  "gross": "Gross",
+  "cost": "Cost price",
+  "markupPct": "Markup (%)",
+  "sellPrice": "Selling price",
+  "profit": "Profit",
+  "margin": "Margin",
+  "simpleTab": "Simple interest",
+  "compoundTab": "Compound interest",
+  "principal": "Principal",
+  "annualRate": "Annual rate (%)",
+  "periodYears": "Period (years)",
+  "accruedInterest": "Accrued interest",
+  "finalAmount": "Final amount",
+  "amount": "Amount",
+  "from": "From",
+  "to": "To",
+  "fixedNote": "The EUR/BGN rate is fixed: 1 EUR = {rate} лв.",
+  "estNote": "Rates (except EUR/BGN) are approximate and subject to change.",
+  "grossSalaryInput": "Gross salary (BGN/EUR)",
+  "grossSalary": "Gross salary",
+  "empIns": "Contributions (employee, {pct}%)",
+  "taxable": "Taxable amount",
+  "incomeTax": "Income tax (10%)",
+  "netSalary": "Net salary (amount received)",
+  "employerIns": "Employer contributions ({pct}%)",
+  "employerTotal": "Total employer cost",
+  "salaryNote": "The values are approximate and depend on the labor category, the size of the insurable income and specific circumstances. They do not constitute accounting advice."
+}
