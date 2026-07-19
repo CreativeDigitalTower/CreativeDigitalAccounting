@@ -1,4 +1,6 @@
 "use client";
+import { toNumber } from "@/lib/number";
+import { NumberField } from "@/components/i18n/NumberField";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -53,7 +55,7 @@ export function ProjectDetail({ project, entries: initEntries, notes: initNotes,
           <div style={{ gridColumn: "1 / -1" }}><label style={{ fontSize: 12 }}>{t("projects.detail.f.name")}</label><input value={p.name} onChange={(e) => setP({ ...p, name: e.target.value })} onBlur={() => saveProject({})} /></div>
           <div style={{ gridColumn: "1 / -1" }}><label style={{ fontSize: 12 }}>{t("projects.detail.f.description")}</label><textarea rows={3} value={p.description ?? ""} onChange={(e) => setP({ ...p, description: e.target.value })} onBlur={() => saveProject({})} style={{ width: "100%" }} /></div>
           <div><label style={{ fontSize: 12 }}>{t("projects.detail.f.status")}</label><select value={p.status} onChange={(e) => saveProject({ status: e.target.value })}>{["active", "completed", "on_hold", "cancelled"].map((k) => <option key={k} value={k}>{t(`projects.status.${k}`)}</option>)}</select></div>
-          <div><label style={{ fontSize: 12 }}>{t("projects.detail.f.budget")}</label><input type="number" value={p.budget ?? ""} onChange={(e) => setP({ ...p, budget: e.target.value ? Number(e.target.value) : null })} onBlur={() => saveProject({})} /></div>
+          <div><label style={{ fontSize: 12 }}>{t("projects.detail.f.budget")}</label><NumberField value={p.budget} onValueChange={(n) => setP({ ...p, budget: n })} onBlur={() => saveProject({})} /></div>
           <div><label style={{ fontSize: 12 }}>{t("projects.detail.f.deadline")}</label><input type="date" value={p.deadline?.slice(0, 10) ?? ""} onChange={(e) => saveProject({ deadline: e.target.value || null })} /></div>
         </div>
       )}
@@ -109,7 +111,7 @@ function EntriesCard({ projectId, entries, setEntries, onChange }: { projectId: 
   const [desc, setDesc] = useState("");
 
   async function add() {
-    const a = Number(amount);
+    const a = toNumber(amount);
     if (!a || a <= 0) return;
     const res = await fetch(`/api/projects/${projectId}/entries`, {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -132,7 +134,7 @@ function EntriesCard({ projectId, entries, setEntries, onChange }: { projectId: 
       </div>
       <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
         <input placeholder={t("projects.detail.entries.descPh")} value={desc} onChange={(e) => setDesc(e.target.value)} style={{ flex: 2, minWidth: 120, padding: "6px 8px", fontSize: 12.5 }} />
-        <input type="number" placeholder={t("projects.detail.entries.amountPh")} value={amount} onChange={(e) => setAmount(e.target.value)} style={{ flex: 1, minWidth: 80, padding: "6px 8px", fontSize: 12.5 }} />
+        <NumberField placeholder={t("projects.detail.entries.amountPh")} value={amount} onChange={setAmount} style={{ flex: 1, minWidth: 80, padding: "6px 8px", fontSize: 12.5 }} />
         <button className="btn btn-primary btn-sm" onClick={add}>+</button>
       </div>
       {entries.length === 0 ? <div style={{ fontSize: 12.5, color: "var(--muted)" }}>{t("projects.detail.entries.empty")}</div> : entries.map((e) => (

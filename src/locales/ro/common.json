@@ -49,5 +49,6 @@
   "trialBanner": {
     "text": "Descoperiți <b>toate funcțiile gratuit</b> — activați o perioadă de probă a unui plan ales.",
     "cta": "Începe proba gratuită"
-  }
+  },
+  "numberInvalid": "Număr invalid. Folosiți cifre și „,” sau „.” ca separator zecimal."
 }

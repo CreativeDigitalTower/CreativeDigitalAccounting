@@ -1,4 +1,5 @@
 "use client";
+import { toNumber, parseLocalizedNumber } from "@/lib/number";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -19,8 +20,8 @@ export default function NewAssetPage() {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: fd.get("name"), category: fd.get("category"),
-        acquiredDate: fd.get("acquiredDate"), value: Number(fd.get("value")),
-        annualDepreciation: fd.get("annualDepreciation") ? Number(fd.get("annualDepreciation")) : 0,
+        acquiredDate: fd.get("acquiredDate"), value: toNumber(fd.get("value")),
+        annualDepreciation: fd.get("annualDepreciation") ? (parseLocalizedNumber(fd.get("annualDepreciation") as string) ?? 0) : 0,
         warrantyUntil: fd.get("warrantyUntil") || null,
         insuranceUntil: fd.get("insuranceUntil") || null,
       }),
@@ -48,8 +49,8 @@ export default function NewAssetPage() {
               </select>
             </div>
             <div><label>{t("assets.new.f.acquired")}</label><input type="date" name="acquiredDate" required defaultValue={new Date().toISOString().slice(0,10)} /></div>
-            <div><label>{t("assets.new.f.value")}</label><input type="number" name="value" step="0.01" min="0" required /></div>
-            <div><label>{t("assets.new.f.depreciation")}</label><input type="number" name="annualDepreciation" step="0.01" min="0" defaultValue={0} /></div>
+            <div><label>{t("assets.new.f.value")}</label><input type="text" inputMode="decimal" name="value" required /></div>
+            <div><label>{t("assets.new.f.depreciation")}</label><input type="text" inputMode="decimal" name="annualDepreciation" defaultValue={0} /></div>
             <div><label>{t("assets.new.f.warranty")}</label><input type="date" name="warrantyUntil" /></div>
             <div><label>{t("assets.new.f.insurance")}</label><input type="date" name="insuranceUntil" /></div>
           </div>

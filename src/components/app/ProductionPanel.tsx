@@ -1,4 +1,5 @@
 "use client";
+import { NumberField } from "@/components/i18n/NumberField";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -75,7 +76,7 @@ export function ProductionPanel({ initialRecipes, items, warehouses }: { initial
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 12, marginBottom: 12 }}>
             <div><label>{t("production.panel.fName")}</label><input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("production.panel.fNamePh")} /></div>
             <div><label>{t("production.panel.fOutput")}</label><select value={outputItemId} onChange={(e) => setOutputItemId(e.target.value)}><option value="">{t("production.panel.noOutput")}</option>{items.map((i) => <option key={i.id} value={i.id}>{i.name} ({i.unit})</option>)}</select></div>
-            <div><label>{t("production.panel.fYield")}{outputItemId ? t("production.panel.yieldIn", { unit: items.find((i) => i.id === outputItemId)?.unit ?? "" }) : ""}</label><input type="number" step="any" value={outputQuantity} onChange={(e) => setOutputQuantity(e.target.value)} /></div>
+            <div><label>{t("production.panel.fYield")}{outputItemId ? t("production.panel.yieldIn", { unit: items.find((i) => i.id === outputItemId)?.unit ?? "" }) : ""}</label><NumberField value={outputQuantity} decimals={3} onChange={setOutputQuantity} /></div>
           </div>
           <label>{t("production.panel.ingredients")}</label>
           {ings.map((ing, idx) => (
@@ -83,7 +84,7 @@ export function ProductionPanel({ initialRecipes, items, warehouses }: { initial
               <select value={ing.stockItemId} onChange={(e) => setIngs(ings.map((x, i) => i === idx ? { ...x, stockItemId: e.target.value } : x))} style={{ flex: 2 }}>
                 <option value="">{t("production.panel.ingredientOpt")}</option>{items.map((i) => <option key={i.id} value={i.id}>{i.name} ({i.unit})</option>)}
               </select>
-              <input type="number" step="any" placeholder={ing.stockItemId ? t("production.panel.qtyUnit", { unit: items.find((i) => i.id === ing.stockItemId)?.unit ?? "" }) : t("production.panel.qty")} value={ing.quantity} onChange={(e) => setIngs(ings.map((x, i) => i === idx ? { ...x, quantity: e.target.value } : x))} style={{ flex: 1 }} />
+              <NumberField decimals={3} placeholder={ing.stockItemId ? t("production.panel.qtyUnit", { unit: items.find((i) => i.id === ing.stockItemId)?.unit ?? "" }) : t("production.panel.qty")} value={ing.quantity} onChange={(v) => setIngs(ings.map((x, i) => i === idx ? { ...x, quantity: v } : x))} style={{ flex: 1 }} />
               {ings.length > 1 && <button onClick={() => setIngs(ings.filter((_, i) => i !== idx))} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer" }}>×</button>}
             </div>
           ))}
@@ -163,7 +164,7 @@ function RunModal({ recipe, items, warehouses, onClose, onDone }: {
         {error && <div style={{ background: "var(--brick-soft)", color: "var(--brick)", borderRadius: 6, padding: "8px 12px", fontSize: 12.5, marginBottom: 12 }}>{error}</div>}
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
-          <div><label style={{ fontSize: 12 }}>{t("production.run.multiplier")}</label><input type="number" step="any" value={multiplier} onChange={(e) => setMultiplier(e.target.value)} /></div>
+          <div><label style={{ fontSize: 12 }}>{t("production.run.multiplier")}</label><NumberField value={multiplier} decimals={3} onChange={setMultiplier} /></div>
           <div><label style={{ fontSize: 12 }}>{t("production.run.batchNumber")}</label><input value={batchNumber} onChange={(e) => setBatchNumber(e.target.value)} placeholder={t("production.run.optional")} /></div>
         </div>
 
@@ -185,8 +186,8 @@ function RunModal({ recipe, items, warehouses, onClose, onDone }: {
               <div style={{ gridColumn: "1 / -1" }}><label style={{ fontSize: 12 }}>{t("production.run.oName")}</label><input value={oName} onChange={(e) => setOName(e.target.value)} /></div>
               <div><label style={{ fontSize: 12 }}>{t("production.run.oWarehouse")}</label><select value={oWarehouse} onChange={(e) => setOWarehouse(e.target.value)}>{warehouses.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}</select></div>
               <div><label style={{ fontSize: 12 }}>{t("production.run.oUnit")}</label><input value={oUnit} onChange={(e) => setOUnit(e.target.value)} placeholder={t("production.run.oUnitPh")} /></div>
-              <div><label style={{ fontSize: 12 }}>{t("production.run.oQty")}</label><input type="number" step="any" value={oQty} onChange={(e) => setOQty(e.target.value)} /></div>
-              <div><label style={{ fontSize: 12 }}>{t("production.run.oCost")}</label><input type="number" step="any" value={oCost} onChange={(e) => setOCost(e.target.value)} placeholder={t("production.run.optional")} /></div>
+              <div><label style={{ fontSize: 12 }}>{t("production.run.oQty")}</label><NumberField value={oQty} decimals={3} onChange={setOQty} /></div>
+              <div><label style={{ fontSize: 12 }}>{t("production.run.oCost")}</label><NumberField value={oCost} onChange={setOCost} placeholder={t("production.run.optional")} /></div>
             </div>
           </div>
         ))}

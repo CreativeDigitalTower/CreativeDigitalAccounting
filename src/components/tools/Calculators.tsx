@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useT } from "@/components/i18n/I18nProvider";
+import { NumberField } from "@/components/i18n/NumberField";
 import { EUR_TO_BGN } from "@/lib/constants";
 
 const box = { textAlign: "center" as const, padding: 18, borderRadius: 12 };
@@ -18,7 +19,7 @@ export function CurrencyCalc() {
   return (
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 14, alignItems: "end" }}>
-        <div><label>{t("tools.amount")}</label><input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} /></div>
+        <div><label>{t("tools.amount")}</label><NumberField value={amount} onChange={setAmount} /></div>
         <div><label>{t("tools.from")}</label><select value={from} onChange={(e) => setFrom(e.target.value)}>{Object.keys(RATES).map((c) => <option key={c}>{c}</option>)}</select></div>
         <div><label>{t("tools.to")}</label><select value={to} onChange={(e) => setTo(e.target.value)}>{Object.keys(RATES).map((c) => <option key={c}>{c}</option>)}</select></div>
       </div>
@@ -49,7 +50,7 @@ export function VatCalc() {
         <button className={`filter-tab${mode === "extract" ? " active" : ""}`} onClick={() => setMode("extract")}>{t("tools.vatExtractTab")}</button>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-        <div><label>{mode === "add" ? t("tools.vatAmountNet") : t("tools.vatAmountGross")}</label><input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} /></div>
+        <div><label>{mode === "add" ? t("tools.vatAmountNet") : t("tools.vatAmountGross")}</label><NumberField value={amount} onChange={setAmount} /></div>
         <div><label>{t("tools.vatRate")}</label><select value={rate} onChange={(e) => setRate(Number(e.target.value))}><option value={20}>20%</option><option value={9}>9%</option><option value={0}>0%</option></select></div>
       </div>
       <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
@@ -85,7 +86,7 @@ export function SalaryCalc() {
   ];
   return (
     <div>
-      <div style={{ maxWidth: 280 }}><label>{t("tools.grossSalaryInput")}</label><input type="number" value={gross} onChange={(e) => setGross(e.target.value)} /></div>
+      <div style={{ maxWidth: 280 }}><label>{t("tools.grossSalaryInput")}</label><NumberField value={gross} onChange={setGross} /></div>
       <div style={{ marginTop: 22 }}>
         {rows.map((r) => (
           <div key={r.l} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid rgba(217,215,200,.6)", fontWeight: r.strong ? 700 : 400, fontSize: r.strong ? 16 : 13.5, color: r.strong ? "var(--emerald-dark)" : r.v < 0 ? "var(--brick)" : "var(--ink)" }}>
@@ -120,9 +121,9 @@ export function InterestCalc() {
         <button className={`filter-tab${type === "compound" ? " active" : ""}`} onClick={() => setType("compound")}>{t("tools.compoundTab")}</button>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
-        <div><label>{t("tools.principal")}</label><input type="number" value={principal} onChange={(e) => setPrincipal(e.target.value)} /></div>
-        <div><label>{t("tools.annualRate")}</label><input type="number" value={rate} onChange={(e) => setRate(e.target.value)} /></div>
-        <div><label>{t("tools.periodYears")}</label><input type="number" value={years} onChange={(e) => setYears(e.target.value)} /></div>
+        <div><label>{t("tools.principal")}</label><NumberField value={principal} onChange={setPrincipal} /></div>
+        <div><label>{t("tools.annualRate")}</label><NumberField value={rate} onChange={setRate} /></div>
+        <div><label>{t("tools.periodYears")}</label><NumberField value={years} onChange={setYears} /></div>
       </div>
       <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         <div style={{ ...box, background: "var(--brass-soft)" }}><div style={{ fontSize: 12, color: "var(--ink-soft)" }}>{t("tools.accruedInterest")}</div><div className="num" style={{ fontSize: 22, fontWeight: 700, color: "var(--brass)" }}>{interest.toFixed(2)}</div></div>
@@ -143,8 +144,8 @@ export function MarkupCalc() {
   return (
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-        <div><label>{t("tools.cost")}</label><input type="number" value={cost} onChange={(e) => setCost(e.target.value)} /></div>
-        <div><label>{t("tools.markupPct")}</label><input type="number" value={markup} onChange={(e) => setMarkup(e.target.value)} /></div>
+        <div><label>{t("tools.cost")}</label><NumberField value={cost} onChange={setCost} /></div>
+        <div><label>{t("tools.markupPct")}</label><NumberField value={markup} onChange={setMarkup} /></div>
       </div>
       <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
         {[

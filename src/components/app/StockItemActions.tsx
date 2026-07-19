@@ -1,4 +1,5 @@
 "use client";
+import { NumberField } from "@/components/i18n/NumberField";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -69,9 +70,9 @@ export function StockItemActions({ item, categories = [] }: { item: Item; catego
               </div>
               <div><label>{t("warehouse.actions.f.sku")}</label><input value={f.sku ?? ""} onChange={(e) => setF({ ...f, sku: e.target.value })} /></div>
               <div><label>{t("warehouse.actions.f.unit")}</label><input value={f.unit} onChange={(e) => setF({ ...f, unit: e.target.value })} /></div>
-              <div><label>{t("warehouse.actions.f.qty")}</label><input type="number" value={f.quantity} onChange={(e) => setF({ ...f, quantity: Number(e.target.value) })} /></div>
-              <div><label>{t("warehouse.actions.f.minQty")}</label><input type="number" value={f.minQuantity ?? ""} onChange={(e) => setF({ ...f, minQuantity: e.target.value ? Number(e.target.value) : null })} /></div>
-              <div><label>{t("warehouse.actions.f.price")}</label><input type="number" value={f.unitCost ?? ""} onChange={(e) => setF({ ...f, unitCost: e.target.value ? Number(e.target.value) : null })} /></div>
+              <div><label>{t("warehouse.actions.f.qty")}</label><NumberField decimals={3} value={f.quantity} onValueChange={(n) => setF({ ...f, quantity: n ?? 0 })} /></div>
+              <div><label>{t("warehouse.actions.f.minQty")}</label><NumberField decimals={3} value={f.minQuantity} onValueChange={(n) => setF({ ...f, minQuantity: n })} /></div>
+              <div><label>{t("warehouse.actions.f.price")}</label><NumberField value={f.unitCost} onValueChange={(n) => setF({ ...f, unitCost: n })} /></div>
               <div><label>{t("warehouse.actions.f.expiry")}</label><input type="date" value={f.expiryDate?.slice(0, 10) ?? ""} onChange={(e) => setF({ ...f, expiryDate: e.target.value })} /></div>
             </div>
             <div style={{ display: "flex", gap: 8, marginTop: 16, justifyContent: "flex-end" }}>

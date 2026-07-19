@@ -1,4 +1,5 @@
 "use client";
+import { NumberField } from "@/components/i18n/NumberField";
 
 import { useState } from "react";
 import { formatCurrency } from "@/lib/constants";
@@ -34,7 +35,7 @@ export function PriceIncreaseSimulator({ monthlyRetainer, goalTarget }: {
             <label style={{ fontSize: 13, fontWeight: 600 }}>{t("simulators.price.changeLabel")}</label>
             <input type="range" min={-50} max={100} step={1} value={pct} onChange={(e) => setPct(Number(e.target.value))} style={{ flex: "1 1 200px", minWidth: 160 }} />
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <input type="number" min={-100} max={500} value={pct} onChange={(e) => setPct(Number(e.target.value) || 0)} style={{ width: 74, padding: "5px 8px", textAlign: "right" }} />
+              <NumberField value={pct} onValueChange={(n) => setPct(n ?? 0)} style={{ width: 74, padding: "5px 8px", textAlign: "right" }} />
               <span style={{ fontWeight: 700 }}>%</span>
             </div>
           </div>

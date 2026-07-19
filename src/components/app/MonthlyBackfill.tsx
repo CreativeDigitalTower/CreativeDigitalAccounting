@@ -1,4 +1,5 @@
 "use client";
+import { NumberField } from "@/components/i18n/NumberField";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -73,18 +74,18 @@ export function MonthlyBackfill({ year, currentMonth, defaultPayroll, months }: 
                 <tr key={r.month} style={{ opacity: isFuture ? 0.55 : 1 }}>
                   <td style={{ fontWeight: 600 }}>{monthName(r.month)}</td>
                   <td className="num">
-                    <input type="number" value={r.revenue || ""} placeholder="0"
-                      onChange={(e) => setCell(r.month, "revenue", e.target.value ? Number(e.target.value) : 0)}
+                    <NumberField value={r.revenue || null} placeholder="0"
+                      onValueChange={(n) => setCell(r.month, "revenue", n ?? 0)}
                       style={{ width: 110, padding: "5px 8px", fontSize: 12.5, textAlign: "right" }} />
                   </td>
                   <td className="num">
-                    <input type="number" value={r.expenses || ""} placeholder="0"
-                      onChange={(e) => setCell(r.month, "expenses", e.target.value ? Number(e.target.value) : 0)}
+                    <NumberField value={r.expenses || null} placeholder="0"
+                      onValueChange={(n) => setCell(r.month, "expenses", n ?? 0)}
                       style={{ width: 110, padding: "5px 8px", fontSize: 12.5, textAlign: "right" }} />
                   </td>
                   <td className="num">
-                    <input type="number" value={r.payroll ?? ""} placeholder={t("finance.monthly.payrollAutoPh", { amount: defaultPayroll.toFixed(0) })}
-                      onChange={(e) => setCell(r.month, "payroll", e.target.value ? Number(e.target.value) : null)}
+                    <NumberField value={r.payroll ?? null} placeholder={t("finance.monthly.payrollAutoPh", { amount: defaultPayroll.toFixed(0) })}
+                      onValueChange={(n) => setCell(r.month, "payroll", n)}
                       title={r.payroll == null ? t("finance.monthly.payrollAutoTitle", { amount: formatCurrency(defaultPayroll) }) : t("finance.monthly.payrollManualTitle")}
                       style={{ width: 130, padding: "5px 8px", fontSize: 12.5, textAlign: "right", background: r.payroll != null ? "var(--brass-soft)" : undefined }} />
                   </td>

@@ -1,4 +1,6 @@
 "use client";
+import { parseLocalizedNumber } from "@/lib/number";
+import { NumberField } from "@/components/i18n/NumberField";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -93,7 +95,7 @@ export function ClientCrm(props: {
           </select>
         </label>
         <label style={{ margin: 0, display: "flex", alignItems: "center", gap: 6, fontSize: 12.5 }}>{t("clients.crm.dealValueLabel")}
-          <input type="number" defaultValue={client.dealValue ?? ""} onBlur={(e) => saveClient({ dealValue: e.target.value ? Number(e.target.value) : null })} style={{ width: 110, padding: "4px 8px", fontSize: 12.5 }} />
+          <input type="text" inputMode="decimal" defaultValue={client.dealValue ?? ""} onBlur={(e) => saveClient({ dealValue: e.target.value ? parseLocalizedNumber(e.target.value) : null })} style={{ width: 110, padding: "4px 8px", fontSize: 12.5 }} />
         </label>
         <div style={{ marginLeft: "auto", display: "flex", gap: 18, flexWrap: "wrap" }}>
           <Kpi label={t("clients.crm.kpi.turnover")} value={formatCurrency(props.totalInvoiced + (client.openingRevenue ?? 0))} color="var(--emerald-dark)" />
@@ -206,8 +208,8 @@ function InfoCard({ client, onSave }: { client: Client; onSave: (p: Partial<Clie
           ))}
           <div><label style={{ fontSize: 12 }}>{t("clients.crm.info.birthday")}</label><input type="date" value={f.birthday?.slice(0, 10) ?? ""} onChange={(e) => setF({ ...f, birthday: e.target.value })} style={{ padding: "6px 9px", fontSize: 13 }} /></div>
           <div><label style={{ fontSize: 12 }}>{t("clients.crm.info.clientSince")}</label><input type="date" value={f.clientSince?.slice(0, 10) ?? ""} onChange={(e) => setF({ ...f, clientSince: e.target.value })} style={{ padding: "6px 9px", fontSize: 13 }} /></div>
-          <div><label style={{ fontSize: 12 }}>{t("clients.crm.info.openingRevenue")}</label><input type="number" value={f.openingRevenue ?? ""} onChange={(e) => setF({ ...f, openingRevenue: e.target.value ? Number(e.target.value) : 0 })} placeholder={t("clients.crm.info.openingRevenuePh")} style={{ padding: "6px 9px", fontSize: 13 }} /></div>
-          <div><label style={{ fontSize: 12 }}>{t("clients.crm.info.monthlyRetainer")}</label><input type="number" value={f.monthlyRetainer ?? ""} onChange={(e) => setF({ ...f, monthlyRetainer: e.target.value ? Number(e.target.value) : null })} placeholder={t("clients.crm.info.monthlyRetainerPh")} style={{ padding: "6px 9px", fontSize: 13 }} /></div>
+          <div><label style={{ fontSize: 12 }}>{t("clients.crm.info.openingRevenue")}</label><NumberField value={f.openingRevenue} onValueChange={(n) => setF({ ...f, openingRevenue: n ?? 0 })} placeholder={t("clients.crm.info.openingRevenuePh")} style={{ padding: "6px 9px", fontSize: 13 }} /></div>
+          <div><label style={{ fontSize: 12 }}>{t("clients.crm.info.monthlyRetainer")}</label><NumberField value={f.monthlyRetainer} onValueChange={(n) => setF({ ...f, monthlyRetainer: n })} placeholder={t("clients.crm.info.monthlyRetainerPh")} style={{ padding: "6px 9px", fontSize: 13 }} /></div>
         </div>
       ) : (
         <dl style={{ margin: 0, fontSize: 13, display: "grid", gridTemplateColumns: "auto 1fr", gap: "7px 12px" }}>

@@ -1,4 +1,5 @@
 "use client";
+import { parseLocalizedNumber } from "@/lib/number";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -25,8 +26,8 @@ export default function NewProjectPage() {
       body: JSON.stringify({
         name: fd.get("name"),
         clientId: fd.get("clientId") || null,
-        budget: fd.get("budget") ? Number(fd.get("budget")) : null,
-        plannedBudget: fd.get("plannedBudget") ? Number(fd.get("plannedBudget")) : null,
+        budget: fd.get("budget") ? parseLocalizedNumber(fd.get("budget") as string) : null,
+        plannedBudget: fd.get("plannedBudget") ? parseLocalizedNumber(fd.get("plannedBudget") as string) : null,
         deadline: fd.get("deadline") || null,
         progressPercent: fd.get("progressPercent") ? Number(fd.get("progressPercent")) : 0,
         status: fd.get("status"),
@@ -50,8 +51,8 @@ export default function NewProjectPage() {
             <div style={{ gridColumn: "1 / -1" }}><label>{t("projects.new.f.name")}</label><input type="text" name="name" required /></div>
             <div><label>{t("projects.new.f.client")}</label><select name="clientId"><option value="">{t("projects.new.f.noClient")}</option>{clients.map((c)=><option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
             <div><label>{t("projects.new.f.status")}</label><select name="status" defaultValue="active"><option value="active">{t("projects.status.active")}</option><option value="on_hold">{t("projects.status.on_hold")}</option><option value="completed">{t("projects.status.completed")}</option><option value="cancelled">{t("projects.status.cancelled")}</option></select></div>
-            <div><label>{t("projects.new.f.budget")}</label><input type="number" name="budget" step="0.01" min="0" /></div>
-            <div><label>{t("projects.new.f.plannedBudget")}</label><input type="number" name="plannedBudget" step="0.01" min="0" /></div>
+            <div><label>{t("projects.new.f.budget")}</label><input type="text" inputMode="decimal" name="budget" /></div>
+            <div><label>{t("projects.new.f.plannedBudget")}</label><input type="text" inputMode="decimal" name="plannedBudget" /></div>
             <div><label>{t("projects.new.f.deadline")}</label><input type="date" name="deadline" /></div>
             <div><label>{t("projects.new.f.progress")}</label><input type="number" name="progressPercent" min="0" max="100" defaultValue={0} /></div>
           </div>

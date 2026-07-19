@@ -1,4 +1,5 @@
 "use client";
+import { NumberField } from "@/components/i18n/NumberField";
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -381,8 +382,8 @@ function NewDocumentForm() {
             {lines.map((line, idx) => (
               <tr key={idx}>
                 <td><input type="text" value={line.description} onChange={(e) => updateLine(idx, "description", e.target.value)} placeholder={t("documents.form.descPh")} style={{ padding: "7px 8px", fontSize: 13 }} /></td>
-                <td><input type="number" value={line.quantity} min="0" step="0.01" onChange={(e) => updateLine(idx, "quantity", e.target.value)} style={{ padding: "7px 8px", fontSize: 13, textAlign: "right" }} /></td>
-                <td><input type="number" value={line.unitPrice} min="0" step="0.01" onChange={(e) => updateLine(idx, "unitPrice", e.target.value)} style={{ padding: "7px 8px", fontSize: 13, textAlign: "right" }} /></td>
+                <td><NumberField value={line.quantity} decimals={3} onValueChange={(n) => updateLine(idx, "quantity", n ?? 0)} style={{ padding: "7px 8px", fontSize: 13, textAlign: "right" }} /></td>
+                <td><NumberField value={line.unitPrice} onValueChange={(n) => updateLine(idx, "unitPrice", n ?? 0)} style={{ padding: "7px 8px", fontSize: 13, textAlign: "right" }} /></td>
                 <td>
                   <select value={line.vatRate} onChange={(e) => updateLine(idx, "vatRate", e.target.value)} style={{ padding: "7px 8px", fontSize: 13 }}>
                     <option value={20}>20%</option>

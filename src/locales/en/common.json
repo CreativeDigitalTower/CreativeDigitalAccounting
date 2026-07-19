@@ -49,5 +49,6 @@
   "trialBanner": {
     "text": "Explore <b>all features for free</b> — activate a trial of a plan of your choice.",
     "cta": "Start free trial"
-  }
+  },
+  "numberInvalid": "Invalid number. Use digits and \",\" or \".\" as the decimal mark."
 }

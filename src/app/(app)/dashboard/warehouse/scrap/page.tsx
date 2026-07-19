@@ -1,4 +1,5 @@
 "use client";
+import { toNumber } from "@/lib/number";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -30,7 +31,7 @@ export default function ScrapStockPage() {
     const fd = new FormData(e.currentTarget);
     const res = await fetch("/api/warehouse/scrap", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ stockItemId: fd.get("stockItemId"), quantity: Number(fd.get("quantity")), date: fd.get("date"), note: fd.get("note") || null }),
+      body: JSON.stringify({ stockItemId: fd.get("stockItemId"), quantity: toNumber(fd.get("quantity")), date: fd.get("date"), note: fd.get("note") || null }),
     });
     setSaving(false);
     if (res.ok) router.push("/dashboard/warehouse");
@@ -54,7 +55,7 @@ export default function ScrapStockPage() {
           {selected && <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>{t("warehouse.scrap.f.avail")} <strong>{selected.quantity} {selected.unit}</strong></div>}
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-          <div><label>{selected ? t("warehouse.scrap.f.qtyIn", { unit: selected.unit }) : t("warehouse.scrap.f.qty")}</label><input type="number" name="quantity" step="any" min="0" max={selected?.quantity} required placeholder={selected ? t("warehouse.scrap.f.qtyPhUnit", { unit: selected.unit }) : t("warehouse.scrap.f.qtyPh")} /></div>
+          <div><label>{selected ? t("warehouse.scrap.f.qtyIn", { unit: selected.unit }) : t("warehouse.scrap.f.qty")}</label><input type="text" inputMode="decimal" name="quantity" required placeholder={selected ? t("warehouse.scrap.f.qtyPhUnit", { unit: selected.unit }) : t("warehouse.scrap.f.qtyPh")} /></div>
           <div><label>{t("warehouse.scrap.f.date")}</label><input type="date" name="date" defaultValue={new Date().toISOString().slice(0, 10)} required /></div>
         </div>
         <div><label>{t("warehouse.scrap.f.reason")}</label><input type="text" name="note" placeholder={t("warehouse.scrap.f.reasonPh")} /></div>

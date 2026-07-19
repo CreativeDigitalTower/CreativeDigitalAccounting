@@ -1,4 +1,5 @@
 "use client";
+import { NumberField } from "@/components/i18n/NumberField";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -77,7 +78,7 @@ export function RevisionForm({ items, warehouses }: { items: Item[]; warehouses:
                     <td style={{ fontWeight: 600 }}>{i.name} <span style={{ color: "var(--muted)", fontWeight: 400, fontSize: 12 }}>({i.unit})</span></td>
                     <td className="num">{i.quantity}</td>
                     <td className="num" style={{ width: 120 }}>
-                      <input type="number" step="any" value={counted ?? ""} onChange={(e) => setCounts({ ...counts, [i.id]: e.target.value })}
+                      <NumberField decimals={3} value={counted ?? ""} onChange={(v) => setCounts({ ...counts, [i.id]: v })}
                         style={{ padding: "5px 8px", fontSize: 13, textAlign: "right", width: 100 }} placeholder="—" />
                     </td>
                     <td className="num" style={{ color: diff == null ? "var(--muted)" : diff === 0 ? "var(--ink-soft)" : diff > 0 ? "var(--emerald-dark)" : "var(--brick)" }}>
@@ -105,8 +106,8 @@ export function RevisionForm({ items, warehouses }: { items: Item[]; warehouses:
             <input placeholder={t("warehouse.revision.namePh")} value={n.name} onChange={(e) => updNew(i, "name", e.target.value)} style={{ padding: "6px 8px", fontSize: 12.5 }} />
             <select value={n.warehouseId} onChange={(e) => updNew(i, "warehouseId", e.target.value)} style={{ padding: "6px 8px", fontSize: 12.5 }}>{warehouses.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}</select>
             <input placeholder={t("warehouse.revision.unitPh")} value={n.unit} onChange={(e) => updNew(i, "unit", e.target.value)} style={{ padding: "6px 8px", fontSize: 12.5 }} />
-            <input type="number" placeholder={t("warehouse.revision.qtyPh")} value={n.qty} onChange={(e) => updNew(i, "qty", e.target.value)} style={{ padding: "6px 8px", fontSize: 12.5, textAlign: "right" }} />
-            <input type="number" placeholder={t("warehouse.revision.pricePh")} value={n.unitCost} onChange={(e) => updNew(i, "unitCost", e.target.value)} style={{ padding: "6px 8px", fontSize: 12.5, textAlign: "right" }} />
+            <NumberField decimals={3} placeholder={t("warehouse.revision.qtyPh")} value={n.qty} onChange={(v) => updNew(i, "qty", v)} style={{ padding: "6px 8px", fontSize: 12.5, textAlign: "right" }} />
+            <NumberField placeholder={t("warehouse.revision.pricePh")} value={n.unitCost} onChange={(v) => updNew(i, "unitCost", v)} style={{ padding: "6px 8px", fontSize: 12.5, textAlign: "right" }} />
             <button onClick={() => delNew(i)} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer", fontSize: 16 }}>×</button>
           </div>
         ))}

@@ -1,4 +1,5 @@
 "use client";
+import { parseLocalizedNumber } from "@/lib/number";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -33,10 +34,10 @@ export default function NewStockItemPage() {
         warehouseId: fd.get("warehouseId"),
         categoryId: fd.get("categoryId") || null,
         name: fd.get("name"), sku: fd.get("sku") || null,
-        quantity: fd.get("quantity") ? Number(fd.get("quantity")) : 0,
-        minQuantity: fd.get("minQuantity") ? Number(fd.get("minQuantity")) : null,
+        quantity: fd.get("quantity") ? (parseLocalizedNumber(fd.get("quantity") as string) ?? 0) : 0,
+        minQuantity: fd.get("minQuantity") ? parseLocalizedNumber(fd.get("minQuantity") as string) : null,
         unit: fd.get("unit") || "бр",
-        unitCost: fd.get("unitCost") ? Number(fd.get("unitCost")) : null,
+        unitCost: fd.get("unitCost") ? parseLocalizedNumber(fd.get("unitCost") as string) : null,
         expiryDate: noExpiry ? null : (fd.get("expiryDate") || null),
       }),
     });
@@ -63,9 +64,9 @@ export default function NewStockItemPage() {
             <div style={{ gridColumn: "1 / -1" }}><label>{t("warehouse.itemsNew.f.name")}</label><input type="text" name="name" required /></div>
             <div><label>{t("warehouse.itemsNew.f.sku")}</label><input type="text" name="sku" /></div>
             <div><label>{t("warehouse.itemsNew.f.unit")}</label><select name="unit" defaultValue="бр">{STOCK_UNITS.map((u) => <option key={u} value={u}>{u}</option>)}</select></div>
-            <div><label>{t("warehouse.itemsNew.f.qty")}</label><input type="number" name="quantity" step="0.01" min="0" defaultValue={0} /></div>
-            <div><label>{t("warehouse.itemsNew.f.minQty")}</label><input type="number" name="minQuantity" step="0.01" min="0" /></div>
-            <div><label>{t("warehouse.itemsNew.f.price")}</label><input type="number" name="unitCost" step="0.01" min="0" /></div>
+            <div><label>{t("warehouse.itemsNew.f.qty")}</label><input type="text" inputMode="decimal" name="quantity" defaultValue={0} /></div>
+            <div><label>{t("warehouse.itemsNew.f.minQty")}</label><input type="text" inputMode="decimal" name="minQuantity" /></div>
+            <div><label>{t("warehouse.itemsNew.f.price")}</label><input type="text" inputMode="decimal" name="unitCost" /></div>
             <div style={{ gridColumn: "1 / -1", borderTop: "1px solid var(--border)", paddingTop: 12 }}>
               <label>{t("warehouse.itemsNew.f.expiryTitle")}</label>
               <label style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13, fontWeight: 400, marginBottom: 8 }}>

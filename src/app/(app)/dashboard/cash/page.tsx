@@ -1,4 +1,6 @@
 "use client";
+import { NumberField } from "@/components/i18n/NumberField";
+import { toNumber } from "@/lib/number";
 
 import { useEffect, useState } from "react";
 import { CURRENCIES, formatCurrency } from "@/lib/constants";
@@ -113,7 +115,7 @@ function CashCard({ register, onChange, t }: { register: Register; onChange: () 
   async function saveBalance() {
     await fetch(`/api/cash/${register.id}`, {
       method: "PUT", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ balance: parseFloat(balance) || 0 }),
+      body: JSON.stringify({ balance: toNumber(balance) }),
     });
     setEditingBalance(false);
     onChange();
@@ -145,7 +147,7 @@ function CashCard({ register, onChange, t }: { register: Register; onChange: () 
 
       {editingBalance ? (
         <div style={{ display: "flex", gap: 6 }}>
-          <input type="number" step="0.01" value={balance} onChange={(e) => setBalance(e.target.value)} style={{ fontSize: 15, fontFamily: "'IBM Plex Mono', monospace" }} />
+          <NumberField value={balance} onChange={setBalance} style={{ fontSize: 15, fontFamily: "'IBM Plex Mono', monospace" }} />
           <button onClick={saveBalance} className="btn btn-primary btn-sm">{t("modules.cash.save")}</button>
         </div>
       ) : (

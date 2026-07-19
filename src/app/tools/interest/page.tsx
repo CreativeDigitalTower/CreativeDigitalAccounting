@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { NumberField } from "@/components/i18n/NumberField";
 import { useT } from "@/components/i18n/I18nProvider";
 
 export default function InterestCalc() {
@@ -29,9 +30,9 @@ export default function InterestCalc() {
           <button className={`filter-tab${type === "compound" ? " active" : ""}`} onClick={() => setType("compound")}>{t("tools.compoundTab")}</button>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
-          <div><label>{t("tools.principal")}</label><input type="number" value={principal} onChange={(e) => setPrincipal(e.target.value)} /></div>
-          <div><label>{t("tools.annualRate")}</label><input type="number" value={rate} onChange={(e) => setRate(e.target.value)} /></div>
-          <div><label>{t("tools.periodYears")}</label><input type="number" value={years} onChange={(e) => setYears(e.target.value)} /></div>
+          <div><label>{t("tools.principal")}</label><NumberField value={principal} onChange={setPrincipal} /></div>
+          <div><label>{t("tools.annualRate")}</label><NumberField value={rate} onChange={setRate} /></div>
+          <div><label>{t("tools.periodYears")}</label><NumberField value={years} onChange={setYears} /></div>
         </div>
         <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div style={{ textAlign: "center", padding: 18, background: "var(--brass-soft)", borderRadius: 12 }}>

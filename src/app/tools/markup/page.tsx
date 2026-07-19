@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { NumberField } from "@/components/i18n/NumberField";
 import { useT } from "@/components/i18n/I18nProvider";
 
 export default function MarkupCalc() {
@@ -22,8 +23,8 @@ export default function MarkupCalc() {
 
       <div className="glass panel" style={{ padding: 28 }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-          <div><label>{t("tools.cost")}</label><input type="number" value={cost} onChange={(e) => setCost(e.target.value)} /></div>
-          <div><label>{t("tools.markupPct")}</label><input type="number" value={markup} onChange={(e) => setMarkup(e.target.value)} /></div>
+          <div><label>{t("tools.cost")}</label><NumberField value={cost} onChange={setCost} /></div>
+          <div><label>{t("tools.markupPct")}</label><NumberField value={markup} onChange={setMarkup} /></div>
         </div>
         <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
           {[
