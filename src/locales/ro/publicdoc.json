@@ -1,0 +1,13 @@
+{
+  "sentReview": "v-a trimis acest document. Vă rugăm să îl verificați și să alegeți:",
+  "accepted": "Ați acceptat {label}",
+  "rejected": "Ați respins {label}",
+  "docLabelDoc": "documentul",
+  "docLabelOffer": "oferta",
+  "accept": "✓ Accept",
+  "reject": "✕ Resping",
+  "downloadPdf": "Descarcă PDF",
+  "ctaTitle": "Emiteți și dumneavoastră facturi online în câteva minute",
+  "ctaText": "{name} este o platformă pentru facturare, CRM și administrarea afacerii. Începeți gratuit.",
+  "ctaButton": "Creează un cont gratuit"
+}

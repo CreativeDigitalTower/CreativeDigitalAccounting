@@ -1,0 +1,13 @@
+{
+  "sentReview": "size bu belgeyi gönderdi. Lütfen inceleyip seçim yapın:",
+  "accepted": "{label} kabul ettiniz",
+  "rejected": "{label} reddettiniz",
+  "docLabelDoc": "belgeyi",
+  "docLabelOffer": "teklifi",
+  "accept": "✓ Kabul et",
+  "reject": "✕ Reddet",
+  "downloadPdf": "PDF indir",
+  "ctaTitle": "Siz de dakikalar içinde online fatura kesin",
+  "ctaText": "{name}, faturalama, CRM ve işletme yönetimi için bir platformdur. Ücretsiz başlayın.",
+  "ctaButton": "Ücretsiz hesap oluştur"
+}
