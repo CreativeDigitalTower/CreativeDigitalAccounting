@@ -1,0 +1,13 @@
+{
+  "sentReview": "sent you this document. Please review it and choose:",
+  "accepted": "You accepted the {label}",
+  "rejected": "You rejected the {label}",
+  "docLabelDoc": "document",
+  "docLabelOffer": "offer",
+  "accept": "✓ Accept",
+  "reject": "✕ Reject",
+  "downloadPdf": "Download PDF",
+  "ctaTitle": "Issue invoices online in minutes too",
+  "ctaText": "{name} is a platform for invoicing, CRM and business management. Get started free.",
+  "ctaButton": "Create a free account"
+}

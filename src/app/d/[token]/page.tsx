@@ -5,6 +5,8 @@ import { InvoiceDocument } from "@/components/app/InvoiceDocument";
 import { OfferDocument } from "@/components/app/OfferDocument";
 import { PublicDocDecision } from "@/components/app/PublicDocDecision";
 import { PLATFORM_NAME } from "@/lib/constants";
+import { normalizeLocale } from "@/lib/i18n/config";
+import { getMessages, makeT } from "@/lib/i18n/messages";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +41,18 @@ export default async function PublicDocumentPage({ params }: { params: Promise<{
 
   const isOffer = doc.type === "quote";
 
+  // Публичният документ се показва на езика на самия документ (не на зрителя).
+  const t = makeT(getMessages(normalizeLocale(doc.language)));
+  const docLabel = t(isOffer ? "publicdoc.docLabelOffer" : "publicdoc.docLabelDoc");
+  const decisionLabels = {
+    sentReview: t("publicdoc.sentReview"),
+    accepted: t("publicdoc.accepted", { label: docLabel }),
+    rejected: t("publicdoc.rejected", { label: docLabel }),
+    accept: t("publicdoc.accept"),
+    reject: t("publicdoc.reject"),
+    download: t("publicdoc.downloadPdf"),
+  };
+
   return (
     <div style={{ minHeight: "100vh", background: "#F4F6F4", padding: "28px 12px" }}>
       <div style={{ maxWidth: 840, margin: "0 auto" }}>
@@ -50,8 +64,8 @@ export default async function PublicDocumentPage({ params }: { params: Promise<{
         <PublicDocDecision
           token={token}
           decision={doc.clientDecision}
-          docLabel={isOffer ? "офертата" : "документа"}
           from={doc.company.name}
+          labels={decisionLabels}
         />
 
         <div className="printable" style={{ marginTop: 16 }}>
@@ -61,13 +75,13 @@ export default async function PublicDocumentPage({ params }: { params: Promise<{
         {/* Покана за присъединяване към платформата */}
         <div className="no-print" style={{ marginTop: 18, background: "#fff", border: "1px solid #E7ECE9", borderRadius: 14, padding: "22px 26px", textAlign: "center" }}>
           <div style={{ fontFamily: "Georgia,serif", fontWeight: 700, fontSize: 18, color: "#1A2B26", marginBottom: 6 }}>
-            Издавайте и Вие фактури онлайн за минути
+            {t("publicdoc.ctaTitle")}
           </div>
           <div style={{ fontSize: 13.5, color: "#384842", maxWidth: 460, margin: "0 auto 14px", lineHeight: 1.6 }}>
-            {PLATFORM_NAME} е платформа за фактуриране, CRM и управление на бизнеса. Започнете безплатно.
+            {t("publicdoc.ctaText", { name: PLATFORM_NAME })}
           </div>
           <a href="/register?ref=invoice_portal" style={{ display: "inline-block", padding: "12px 28px", borderRadius: 10, background: "#0F8A6A", color: "#fff", fontWeight: 700, textDecoration: "none", fontSize: 14 }}>
-            Създай безплатен акаунт
+            {t("publicdoc.ctaButton")}
           </a>
         </div>
       </div>
