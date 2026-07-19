@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import { LegalDoc } from "@/components/marketing/LegalDoc";
+import { getLocale } from "@/lib/i18n/server";
+import { pickLegal, type LegalContent } from "@/content/legal";
 
-export const metadata: Metadata = { title: "Политика за информационна сигурност", description: "Мерки за сигурност на Creative Digital Accounting." };
+const PAGE = "security";
 
-export default function SecurityPage() {
-  return (
-    <LegalDoc
-      title="Политика за информационна сигурност"
-      sections={[
+// Българска базова версия (официална) — служи и за fallback.
+// Преводи по език/държава се добавят в src/content/legal (данни), без промяна тук.
+const bg: LegalContent = {
+  metaTitle: "Политика за информационна сигурност",
+  metaDescription: "Мерки за сигурност на Creative Digital Accounting.",
+  title: "Политика за информационна сигурност",
+  sections: [
         { h: "1. Цел на политиката", p: ["Настоящата политика описва мерките, които Creative Digital Accounting прилага за защита на информацията — поверителност, цялостност, наличност и проследимост на данните."] },
         { h: "2. Обхват", p: ["Политиката се прилага за всички потребители, служители, подизпълнители, технически доставчици, информационни системи и инфраструктурата на платформата."] },
         { h: "3. Основни принципи", p: ["Поверителност — достъп само за оторизирани лица. Цялостност — защита от неоторизирани промени. Наличност — поддръжка на работоспособност. Проследимост — регистриране на критични действия."] },
@@ -23,7 +27,15 @@ export default function SecurityPage() {
         { h: "13. Подизпълнители", p: ["Всички подизпълнители, обработващи информация от името на дружеството, прилагат адекватни мерки за сигурност."] },
         { h: "14. Непрекъснато подобрение", p: ["Политиката се преглежда и актуализира периодично в съответствие с развитието на технологиите и законодателството."] },
         { h: "15. Контакт", p: ["Въпроси относно сигурността: office@creativedigitalaccounting.com."] },
-      ]}
-    />
-  );
+      ],
+};
+
+export async function generateMetadata(): Promise<Metadata> {
+  const c = pickLegal(PAGE, await getLocale(), bg);
+  return { title: c.metaTitle, description: c.metaDescription };
+}
+
+export default async function LegalPage() {
+  const c = pickLegal(PAGE, await getLocale(), bg);
+  return <LegalDoc title={c.title} sections={c.sections} />;
 }

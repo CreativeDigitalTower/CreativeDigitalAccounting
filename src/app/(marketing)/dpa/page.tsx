@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import { LegalDoc } from "@/components/marketing/LegalDoc";
+import { getLocale } from "@/lib/i18n/server";
+import { pickLegal, type LegalContent } from "@/content/legal";
 
-export const metadata: Metadata = { title: "Споразумение за обработване на лични данни (DPA)", description: "Data Processing Agreement за Creative Digital Accounting." };
+const PAGE = "dpa";
 
-export default function DpaPage() {
-  return (
-    <LegalDoc
-      title="Споразумение за обработване на лични данни (DPA)"
-      sections={[
+// Българска базова версия (официална) — служи и за fallback.
+// Преводи по език/държава се добавят в src/content/legal (данни), без промяна тук.
+const bg: LegalContent = {
+  metaTitle: "Споразумение за обработване на лични данни (DPA)",
+  metaDescription: "Data Processing Agreement за Creative Digital Accounting.",
+  title: "Споразумение за обработване на лични данни (DPA)",
+  sections: [
         { h: "1. Страни по споразумението", p: ["Настоящото Споразумение е неразделна част от Общите условия. Между „Криейтив Диджитъл Тауър\" ЕООД, ЕИК 205748188 („Обработващ\"/Processor) и всяко лице, използващо платформата Creative Digital Accounting („Администратор\"/Controller)."] },
         { h: "2. Предмет", p: ["Споразумението урежда обработването на лични данни от страна на Обработващия от името на Администратора съгласно Регламент (ЕС) 2016/679 (GDPR)."] },
         { h: "3. Категории субекти на данни", list: ["служители;", "кандидати за работа;", "клиенти;", "доставчици;", "контрагенти;", "представители на юридически лица;", "други лица, въведени от Администратора."] },
@@ -23,7 +27,15 @@ export default function DpaPage() {
         { h: "13. Изтриване на данните", p: ["След прекратяване Администраторът може да поиска експортиране, изтриване или анонимизиране на данните, освен ако законът не изисква съхранение."] },
         { h: "14. Ограничение на отговорността", p: ["Отговорността се определя съгласно Общите условия и приложимото законодателство."] },
         { h: "15. Приложимо право", p: ["За всички неуредени въпроси се прилага законодателството на Република България."] },
-      ]}
-    />
-  );
+      ],
+};
+
+export async function generateMetadata(): Promise<Metadata> {
+  const c = pickLegal(PAGE, await getLocale(), bg);
+  return { title: c.metaTitle, description: c.metaDescription };
+}
+
+export default async function LegalPage() {
+  const c = pickLegal(PAGE, await getLocale(), bg);
+  return <LegalDoc title={c.title} sections={c.sections} />;
 }

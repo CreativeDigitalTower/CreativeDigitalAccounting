@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import { LegalDoc } from "@/components/marketing/LegalDoc";
+import { getLocale } from "@/lib/i18n/server";
+import { pickLegal, type LegalContent } from "@/content/legal";
 
-export const metadata: Metadata = { title: "Политика за интелектуална собственост", description: "Защита на интелектуалната собственост на Creative Digital Accounting." };
+const PAGE = "ip-policy";
 
-export default function IpPolicyPage() {
-  return (
-    <LegalDoc
-      title="Политика за интелектуална собственост"
-      sections={[
+// Българска базова версия (официална) — служи и за fallback.
+// Преводи по език/държава се добавят в src/content/legal (данни), без промяна тук.
+const bg: LegalContent = {
+  metaTitle: "Политика за интелектуална собственост",
+  metaDescription: "Защита на интелектуалната собственост на Creative Digital Accounting.",
+  title: "Политика за интелектуална собственост",
+  sections: [
         { h: "1. Въведение", p: ["Настоящата политика урежда правата върху платформата Creative Digital Accounting и всички свързани материали. CDA е разработена, поддържана и притежавана от „Криейтив Диджитъл Тауър\" ЕООД, ЕИК 205748188. Всички права са защитени съгласно българското, европейското и международното законодателство."] },
         { h: "2. Какво е защитено", p: ["Софтуер: изходен код, сървърен и клиентски код, логика, алгоритми, архитектура, бази данни, интеграции, API. Дизайн: интерфейс, графика, икони, навигация, UX. Бизнес логика: методологии, процеси, автоматизации, финансови алгоритми, AI. Съдържание: текстове, документация, маркетинг, изображения, видеа. Търговски марки: Creative Digital Accounting, CDA, логотипи, слогани."] },
         { h: "3. Авторски права", p: ["Всички авторски права принадлежат изключително на дружеството. Използването на платформата не предоставя право на собственост върху неин елемент — само ограничено право на използване."] },
@@ -18,7 +22,15 @@ export default function IpPolicyPage() {
         { h: "8. Отговорност", p: ["Нарушителите могат да носят гражданска, административна и наказателна отговорност съгласно приложимото законодателство."] },
         { h: "9. Подаване на сигнали", p: ["Сигнали за нарушения: office@creativedigitalaccounting.com."] },
         { h: "10. Промени", p: ["Политиката може да бъде актуализирана периодично. Актуалната версия е достъпна на официалния сайт."] },
-      ]}
-    />
-  );
+      ],
+};
+
+export async function generateMetadata(): Promise<Metadata> {
+  const c = pickLegal(PAGE, await getLocale(), bg);
+  return { title: c.metaTitle, description: c.metaDescription };
+}
+
+export default async function LegalPage() {
+  const c = pickLegal(PAGE, await getLocale(), bg);
+  return <LegalDoc title={c.title} sections={c.sections} />;
 }

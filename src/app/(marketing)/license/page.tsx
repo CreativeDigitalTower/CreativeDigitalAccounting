@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import { LegalDoc } from "@/components/marketing/LegalDoc";
+import { getLocale } from "@/lib/i18n/server";
+import { pickLegal, type LegalContent } from "@/content/legal";
 
-export const metadata: Metadata = { title: "Лицензионно споразумение", description: "Software License Agreement за Creative Digital Accounting." };
+const PAGE = "license";
 
-export default function LicensePage() {
-  return (
-    <LegalDoc
-      title="Лицензионно споразумение за ползване на софтуер"
-      sections={[
+// Българска базова версия (официална) — служи и за fallback.
+// Преводи по език/държава се добавят в src/content/legal (данни), без промяна тук.
+const bg: LegalContent = {
+  metaTitle: "Лицензионно споразумение",
+  metaDescription: "Software License Agreement за Creative Digital Accounting.",
+  title: "Лицензионно споразумение за ползване на софтуер",
+  sections: [
         { h: "1. Общи положения", p: ["Настоящото Лицензионно споразумение урежда условията за използване на софтуерната платформа Creative Digital Accounting, разработена и притежавана от „Криейтив Диджитъл Тауър\" ЕООД, ЕИК 205748188. Използването на Платформата означава приемане на настоящото споразумение."] },
         { h: "2. Собственост върху софтуера", p: ["Creative Digital Accounting е оригинален авторски софтуерен продукт. Всички права върху изходния код, програмната архитектура, структурата на базата данни, алгоритмите, потребителския интерфейс, дизайна, документацията, API интерфейсите, мобилните приложения, AI функционалностите, отчетите, шаблоните, логата, търговските марки и графичните елементи са изключителна собственост на дружеството."] },
         { h: "3. Предоставяне на лиценз", p: ["Предоставя се ограничен, неизключителен, непрехвърляем и отменим лиценз за използване на Платформата единствено за вътрешните бизнес нужди на потребителя. Лицензът не дава право на препродажба, лицензиране на трети лица, отдаване под наем или прехвърляне на права."] },
@@ -22,7 +26,15 @@ export default function LicensePage() {
         { h: "12. Запазване на права", p: ["Всички права, които не са изрично предоставени, остават запазени за „Криейтив Диджитъл Тауър\" ЕООД."] },
         { h: "13. Международна защита", p: ["Интелектуалната собственост се защитава съгласно Закона за авторското право и сродните му права, Закона за марките и географските означения, регламентите на ЕС, Бернската конвенция и приложимото международно право."] },
         { h: "14. Приложимо право", p: ["Споразумението се урежда от законодателството на Република България. Споровете се разглеждат от компетентния съд в град София."] },
-      ]}
-    />
-  );
+      ],
+};
+
+export async function generateMetadata(): Promise<Metadata> {
+  const c = pickLegal(PAGE, await getLocale(), bg);
+  return { title: c.metaTitle, description: c.metaDescription };
+}
+
+export default async function LegalPage() {
+  const c = pickLegal(PAGE, await getLocale(), bg);
+  return <LegalDoc title={c.title} sections={c.sections} />;
 }
