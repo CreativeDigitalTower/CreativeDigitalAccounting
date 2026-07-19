@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { PLATFORM_NAME } from "@/lib/constants";
 import { safeJsonLd } from "@/lib/jsonLd";
+import { getT } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,7 @@ const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.creativedigitalacco
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const post = await prisma.blogPost.findUnique({ where: { slug } });
-  if (!post || post.status !== "published") return { title: "Статия не е намерена" };
+  if (!post || post.status !== "published") { const { t } = await getT(); return { title: t("blogpublic.notFound") }; }
   const title = post.metaTitle || post.title;
   const description = post.metaDescription || post.excerpt || undefined;
   return {
@@ -31,6 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export default async function BlogArticle({ params }: { params: Promise<{ slug: string }> }) {
+  const { t, locale } = await getT();
   const { slug } = await params;
   const post = await prisma.blogPost.findUnique({ where: { slug } });
   if (!post || post.status !== "published") notFound();
@@ -54,11 +56,11 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
   return (
     <article style={{ maxWidth: 760, margin: "0 auto", padding: "40px 20px" }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
-      <Link href="/blog" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← Всички статии</Link>
+      <Link href="/blog" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>{t("blogpublic.back")}</Link>
       {post.category && <div style={{ fontSize: 12, fontWeight: 700, color: "var(--brass)", textTransform: "uppercase", letterSpacing: 1, margin: "18px 0 8px" }}>{post.category}</div>}
       <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 34, fontWeight: 700, margin: "0 0 12px", lineHeight: 1.2 }}>{post.title}</h1>
       <div style={{ fontSize: 13, color: "var(--muted)", marginBottom: 24 }}>
-        {post.author} · {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString("bg-BG") : ""}
+        {post.author} · {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString(locale) : ""}
       </div>
       {post.coverImage && (
         // eslint-disable-next-line @next/next/no-img-element
@@ -78,9 +80,9 @@ export default async function BlogArticle({ params }: { params: Promise<{ slug: 
       <div className="blog-content" style={{ fontSize: 16.5, lineHeight: 1.75, color: "var(--ink)" }} dangerouslySetInnerHTML={{ __html: post.content }} />
 
       <div className="glass panel" style={{ marginTop: 40, padding: "26px 28px", textAlign: "center" }}>
-        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, margin: "0 0 8px" }}>Издавайте фактури онлайн още днес</h3>
-        <p style={{ fontSize: 14, color: "var(--ink-soft)", margin: "0 0 16px" }}>Започнете безплатно с {PLATFORM_NAME} — фактури, CRM, склад и счетоводство на едно място.</p>
-        <Link href="/register" className="btn btn-primary">Създай безплатен акаунт</Link>
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 20, margin: "0 0 8px" }}>{t("blogpublic.ctaTitle")}</h3>
+        <p style={{ fontSize: 14, color: "var(--ink-soft)", margin: "0 0 16px" }}>{t("blogpublic.ctaText", { name: PLATFORM_NAME })}</p>
+        <Link href="/register" className="btn btn-primary">{t("blogpublic.ctaButton")}</Link>
       </div>
     </article>
   );
