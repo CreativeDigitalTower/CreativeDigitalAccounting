@@ -1,0 +1,166 @@
+{
+  "card": {
+    "invoice": "Issue invoice",
+    "offer": "New quote",
+    "sales": "Sales",
+    "orders": "Orders / Documents",
+    "client": "New client",
+    "project": "New project",
+    "expense": "New expense",
+    "analytics": "Financial analytics",
+    "warehouse": "Warehouse",
+    "materials": "Receiving",
+    "production": "Production",
+    "suppliers": "Suppliers",
+    "employees": "Employees",
+    "contracts": "Contracts",
+    "cash": "Cash",
+    "tax": "Tax calendar",
+    "documents": "Business documents"
+  },
+  "size": {
+    "solo": "Just me",
+    "2-5": "2–5 employees",
+    "6-20": "6–20 employees",
+    "21-50": "21–50 employees",
+    "50+": "Over 50 employees"
+  },
+  "sector": {
+    "services": "Services",
+    "trade": "Trade",
+    "production": "Manufacturing",
+    "construction": "Construction",
+    "horeca": "Hospitality",
+    "beauty": "Health & beauty",
+    "tourism": "Tourism",
+    "education": "Education",
+    "transport": "Transport & logistics",
+    "agriculture": "Agriculture",
+    "realestate": "Real estate",
+    "freelance": "Freelance",
+    "other": "Other"
+  },
+  "subcat": {
+    "services": [
+      "Digital agency",
+      "Marketing agency",
+      "IT company",
+      "Software company",
+      "Accounting firm",
+      "Law firm",
+      "Architecture studio",
+      "Consulting firm",
+      "Design studio",
+      "HR agency",
+      "Other service"
+    ],
+    "trade": [
+      "Online store",
+      "Retail",
+      "Wholesale",
+      "Shop",
+      "Distribution",
+      "Other trade"
+    ],
+    "production": [
+      "Food production",
+      "Bakery / Pastry",
+      "Furniture manufacturing",
+      "Textiles & clothing",
+      "Metal & machinery",
+      "Printing & packaging",
+      "Other manufacturing"
+    ],
+    "construction": [
+      "Construction company",
+      "Repairs & finishing works",
+      "Electrical services",
+      "Plumbing services",
+      "Architecture & design",
+      "Other"
+    ],
+    "horeca": [
+      "Restaurant",
+      "Café / Pastry shop",
+      "Bar",
+      "Catering",
+      "Hotel-restaurant",
+      "Other"
+    ],
+    "beauty": [
+      "Beauty salon",
+      "Hairdressing",
+      "Cosmetics",
+      "Spa & wellness",
+      "Fitness",
+      "Dentistry",
+      "Medical center",
+      "Other"
+    ],
+    "tourism": [
+      "Hotel",
+      "Guesthouse",
+      "Tour operator",
+      "Travel agency",
+      "Other"
+    ],
+    "education": [
+      "Training center",
+      "Language school",
+      "Kids center",
+      "Online courses",
+      "Other"
+    ],
+    "transport": [
+      "Transport",
+      "Freight forwarding",
+      "Courier services",
+      "Taxi service",
+      "Other"
+    ],
+    "agriculture": [
+      "Crop farming",
+      "Livestock",
+      "Beekeeping",
+      "Other"
+    ],
+    "realestate": [
+      "Real estate agency",
+      "Property management",
+      "Property developer",
+      "Other"
+    ],
+    "freelance": [
+      "Freelancer",
+      "Consultant",
+      "Designer",
+      "Developer",
+      "Other"
+    ],
+    "other": [
+      "Other"
+    ]
+  },
+  "wizard": {
+    "step1Title": "Choose your business's main sector",
+    "step1Desc": "Takes under 15 seconds — we'll arrange the dashboard to match your activity.",
+    "back": "← Back",
+    "step2Title": "What is your activity in “{sector}”?",
+    "step2Desc": "Choose the closest subcategory.",
+    "step3Title": "Business size",
+    "doneTitle": "Your workspace is ready",
+    "doneText1": "We've arranged the home dashboard to match your company's activity, so you find the most-used tools from your very first login.",
+    "doneText2": "All features included in your subscription remain available at any time. We only arrange the home screen so the most relevant tools are always at hand.",
+    "preparing": "Preparing…",
+    "toDashboard": "Continue to the dashboard →"
+  },
+  "pd": {
+    "quickActions": "Quick actions for your business",
+    "restore": "Restore recommended",
+    "save": "Save",
+    "customize": "✎ Customize dashboard",
+    "dragHint": "Drag the cards to reorder them. Click ✕ to hide a card. The left menu stays unchanged — only the quick actions are hidden.",
+    "hide": "Hide",
+    "hiddenCards": "Hidden cards"
+  }
+}

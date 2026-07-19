@@ -1,0 +1,166 @@
+{
+  "card": {
+    "invoice": "Fatura kes",
+    "offer": "Yeni teklif",
+    "sales": "Satışlar",
+    "orders": "Siparişler / Belgeler",
+    "client": "Yeni müşteri",
+    "project": "Yeni proje",
+    "expense": "Yeni gider",
+    "analytics": "Finansal analizler",
+    "warehouse": "Depo",
+    "materials": "Giriş",
+    "production": "Üretim",
+    "suppliers": "Tedarikçiler",
+    "employees": "Çalışanlar",
+    "contracts": "Sözleşmeler",
+    "cash": "Kasa",
+    "tax": "Vergi takvimi",
+    "documents": "İş belgeleri"
+  },
+  "size": {
+    "solo": "Sadece ben",
+    "2-5": "2–5 çalışan",
+    "6-20": "6–20 çalışan",
+    "21-50": "21–50 çalışan",
+    "50+": "50'den fazla çalışan"
+  },
+  "sector": {
+    "services": "Hizmetler",
+    "trade": "Ticaret",
+    "production": "Üretim",
+    "construction": "İnşaat",
+    "horeca": "Yeme-içme",
+    "beauty": "Sağlık ve güzellik",
+    "tourism": "Turizm",
+    "education": "Eğitim",
+    "transport": "Ulaşım ve lojistik",
+    "agriculture": "Tarım",
+    "realestate": "Gayrimenkul",
+    "freelance": "Serbest meslek",
+    "other": "Diğer"
+  },
+  "subcat": {
+    "services": [
+      "Dijital ajans",
+      "Pazarlama ajansı",
+      "BT şirketi",
+      "Yazılım şirketi",
+      "Muhasebe firması",
+      "Avukatlık bürosu",
+      "Mimarlık stüdyosu",
+      "Danışmanlık firması",
+      "Tasarım stüdyosu",
+      "İK ajansı",
+      "Diğer hizmet"
+    ],
+    "trade": [
+      "Online mağaza",
+      "Perakende",
+      "Toptan",
+      "Mağaza",
+      "Dağıtım",
+      "Diğer ticaret"
+    ],
+    "production": [
+      "Gıda üretimi",
+      "Fırın / Pastane",
+      "Mobilya üretimi",
+      "Tekstil ve giyim",
+      "Metal ve makine",
+      "Baskı ve ambalaj",
+      "Diğer üretim"
+    ],
+    "construction": [
+      "İnşaat firması",
+      "Tadilat ve son işler",
+      "Elektrik hizmetleri",
+      "Su tesisatı hizmetleri",
+      "Mimarlık ve tasarım",
+      "Diğer"
+    ],
+    "horeca": [
+      "Restoran",
+      "Kafe / Pastane",
+      "Bar",
+      "Catering",
+      "Otel-restoran",
+      "Diğer"
+    ],
+    "beauty": [
+      "Güzellik salonu",
+      "Kuaförlük",
+      "Kozmetik",
+      "Spa & wellness",
+      "Fitness",
+      "Diş hekimliği",
+      "Tıp merkezi",
+      "Diğer"
+    ],
+    "tourism": [
+      "Otel",
+      "Konuk evi",
+      "Tur operatörü",
+      "Seyahat acentesi",
+      "Diğer"
+    ],
+    "education": [
+      "Eğitim merkezi",
+      "Dil okulu",
+      "Çocuk merkezi",
+      "Online eğitim",
+      "Diğer"
+    ],
+    "transport": [
+      "Nakliye",
+      "Taşımacılık",
+      "Kurye hizmetleri",
+      "Taksi",
+      "Diğer"
+    ],
+    "agriculture": [
+      "Bitkisel üretim",
+      "Hayvancılık",
+      "Arıcılık",
+      "Diğer"
+    ],
+    "realestate": [
+      "Emlak ofisi",
+      "Gayrimenkul yönetimi",
+      "Müteahhit",
+      "Diğer"
+    ],
+    "freelance": [
+      "Serbest çalışan",
+      "Danışman",
+      "Tasarımcı",
+      "Yazılımcı",
+      "Diğer"
+    ],
+    "other": [
+      "Diğer"
+    ]
+  },
+  "wizard": {
+    "step1Title": "İşinizin ana sektörünü seçin",
+    "step1Desc": "15 saniyeden kısa sürer — panoyu faaliyetinize göre düzenleriz.",
+    "back": "← Geri",
+    "step2Title": "„{sector}” alanında faaliyetiniz nedir?",
+    "step2Desc": "En yakın alt kategoriyi seçin.",
+    "step3Title": "İş büyüklüğü",
+    "doneTitle": "Çalışma alanınız hazır",
+    "doneText1": "En çok kullanılan araçları ilk girişten itibaren bulmanız için ana panoyu firmanızın faaliyetine göre düzenledik.",
+    "doneText2": "Aboneliğinize dahil tüm özellikler her zaman erişilebilir kalır. Yalnızca en uygun araçlar her zaman elinizin altında olsun diye ana ekranı düzenliyoruz.",
+    "preparing": "Hazırlanıyor…",
+    "toDashboard": "Panoya devam et →"
+  },
+  "pd": {
+    "quickActions": "İşiniz için hızlı işlemler",
+    "restore": "Önerileni geri yükle",
+    "save": "Kaydet",
+    "customize": "✎ Panoyu özelleştir",
+    "dragHint": "Kartları yeniden sıralamak için sürükleyin. Bir kartı gizlemek için ✕ tıklayın. Sol menü değişmez — yalnızca hızlı işlemler gizlenir.",
+    "hide": "Gizle",
+    "hiddenCards": "Gizli kartlar"
+  }
+}

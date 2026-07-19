@@ -13,7 +13,7 @@ import { SmartGreeting, type TodayItem } from "@/components/app/SmartGreeting";
 import { KpiStrip, type Kpi } from "@/components/app/KpiStrip";
 import { DashboardPeriodSelector } from "@/components/app/DashboardPeriodSelector";
 import { WidgetBoard, type WidgetData } from "@/components/app/WidgetBoard";
-import { resolveLayout, SECTOR_TITLE } from "@/lib/workspaces";
+import { resolveLayout } from "@/lib/workspaces";
 import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 import { reminderStatus, PRIORITY_META } from "@/lib/reminderColor";
 import { computeBusinessOverview } from "@/lib/bi/overview";
@@ -578,7 +578,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         <PersonalizedDashboard
           initialOrder={layoutOrder}
           initialHidden={hiddenCards}
-          sectorTitle={SECTOR_TITLE(profile?.businessSector)}
+          sectorId={profile?.businessSector ?? null}
         />
       )}
     </>

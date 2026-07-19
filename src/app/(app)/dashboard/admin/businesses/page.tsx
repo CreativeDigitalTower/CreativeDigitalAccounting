@@ -1,16 +1,20 @@
 import { requireSuperAdmin } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { SECTORS, COMPANY_SIZES, getSector, SECTOR_TITLE, SIZE_LABEL } from "@/lib/workspaces";
+import { SECTORS, COMPANY_SIZES, getSector } from "@/lib/workspaces";
 import { planLabel } from "@/lib/constants";
 import type { Prisma } from "@prisma/client";
 import { getT } from "@/lib/i18n/server";
+import { getMessages } from "@/lib/i18n/messages";
 
 type SP = { sector?: string; category?: string; size?: string; country?: string; plan?: string; from?: string; to?: string };
 
 export default async function BusinessesPage({ searchParams }: { searchParams: Promise<SP> }) {
   await requireSuperAdmin();
   const { t, locale } = await getT();
+  const secName = (id: string | null) => { if (!id) return "—"; const l = t(`sectors.sector.${id}`); return l.startsWith("sectors.") ? id : l; };
+  const sizeName = (id: string | null) => { if (!id) return "—"; const l = t(`sectors.size.${id}`); return l.startsWith("sectors.") ? id : l; };
+  const subLabels = (id: string | undefined): string[] => id ? ((getMessages(locale).sectors as unknown as { subcat: Record<string, string[]> }).subcat[id] ?? []) : [];
   const sp = await searchParams;
 
   const where: Prisma.CompanyWhereInput = {};
@@ -44,13 +48,13 @@ export default async function BusinessesPage({ searchParams }: { searchParams: P
       <form className="glass panel" style={{ padding: "16px 20px", marginBottom: 16 }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px,1fr))", gap: 10, alignItems: "end" }}>
           <div><label style={{ fontSize: 11 }}>{t("admin.businesses.fSector")}</label>
-            <select name="sector" defaultValue={sp.sector ?? ""} style={inputStyle}><option value="">{t("admin.businesses.all")}</option>{SECTORS.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}</select>
+            <select name="sector" defaultValue={sp.sector ?? ""} style={inputStyle}><option value="">{t("admin.businesses.all")}</option>{SECTORS.map((s) => <option key={s.id} value={s.id}>{t(`sectors.sector.${s.id}`)}</option>)}</select>
           </div>
           <div><label style={{ fontSize: 11 }}>{t("admin.businesses.fCategory")}</label>
-            <select name="category" defaultValue={sp.category ?? ""} style={inputStyle} disabled={!subs.length}><option value="">{t("admin.businesses.all")}</option>{subs.map((c) => <option key={c} value={c}>{c}</option>)}</select>
+            <select name="category" defaultValue={sp.category ?? ""} style={inputStyle} disabled={!subs.length}><option value="">{t("admin.businesses.all")}</option>{subs.map((c, i) => <option key={c} value={c}>{subLabels(sp.sector)[i] ?? c}</option>)}</select>
           </div>
           <div><label style={{ fontSize: 11 }}>{t("admin.businesses.fSize")}</label>
-            <select name="size" defaultValue={sp.size ?? ""} style={inputStyle}><option value="">{t("admin.businesses.all")}</option>{COMPANY_SIZES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}</select>
+            <select name="size" defaultValue={sp.size ?? ""} style={inputStyle}><option value="">{t("admin.businesses.all")}</option>{COMPANY_SIZES.map((s) => <option key={s.id} value={s.id}>{t(`sectors.size.${s.id}`)}</option>)}</select>
           </div>
           <div><label style={{ fontSize: 11 }}>{t("admin.businesses.fPlan")}</label>
             <select name="plan" defaultValue={sp.plan ?? ""} style={inputStyle}><option value="">{t("admin.businesses.all")}</option>{["free", "start", "business", "pro"].map((p) => <option key={p} value={p}>{planLabel(p)}</option>)}</select>
@@ -74,9 +78,9 @@ export default async function BusinessesPage({ searchParams }: { searchParams: P
             {companies.map((c) => (
               <tr key={c.id}>
                 <td style={{ fontWeight: 600 }}>{c.name}</td>
-                <td style={{ fontSize: 12.5 }}>{SECTOR_TITLE(c.businessSector)}</td>
+                <td style={{ fontSize: 12.5 }}>{secName(c.businessSector)}</td>
                 <td style={{ fontSize: 12.5 }}>{c.businessCategory ?? t("admin.businesses.dash")}</td>
-                <td style={{ fontSize: 12.5 }}>{SIZE_LABEL(c.companySize)}</td>
+                <td style={{ fontSize: 12.5 }}>{sizeName(c.companySize)}</td>
                 <td style={{ fontSize: 12.5 }}>{c.country ?? t("admin.businesses.dash")}</td>
                 <td><span style={{ fontSize: 11.5, fontWeight: 700, color: (c.subscription?.plan ?? "free") === "free" ? "var(--muted)" : "var(--emerald-dark)" }}>{planLabel(c.subscription?.plan ?? "free")}</span></td>
                 <td style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>{new Date(c.createdAt).toLocaleDateString(locale)}</td>

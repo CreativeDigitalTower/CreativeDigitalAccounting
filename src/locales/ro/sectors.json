@@ -1,0 +1,166 @@
+{
+  "card": {
+    "invoice": "Emite factură",
+    "offer": "Ofertă nouă",
+    "sales": "Vânzări",
+    "orders": "Comenzi / Documente",
+    "client": "Client nou",
+    "project": "Proiect nou",
+    "expense": "Cheltuială nouă",
+    "analytics": "Analize financiare",
+    "warehouse": "Depozit",
+    "materials": "Recepție",
+    "production": "Producție",
+    "suppliers": "Furnizori",
+    "employees": "Angajați",
+    "contracts": "Contracte",
+    "cash": "Casă",
+    "tax": "Calendar fiscal",
+    "documents": "Documente de business"
+  },
+  "size": {
+    "solo": "Doar eu",
+    "2-5": "2–5 angajați",
+    "6-20": "6–20 angajați",
+    "21-50": "21–50 angajați",
+    "50+": "Peste 50 de angajați"
+  },
+  "sector": {
+    "services": "Servicii",
+    "trade": "Comerț",
+    "production": "Producție",
+    "construction": "Construcții",
+    "horeca": "HoReCa",
+    "beauty": "Sănătate și frumusețe",
+    "tourism": "Turism",
+    "education": "Educație",
+    "transport": "Transport și logistică",
+    "agriculture": "Agricultură",
+    "realestate": "Imobiliare",
+    "freelance": "Profesie liberală",
+    "other": "Altul"
+  },
+  "subcat": {
+    "services": [
+      "Agenție digitală",
+      "Agenție de marketing",
+      "Companie IT",
+      "Companie de software",
+      "Firmă de contabilitate",
+      "Cabinet de avocatură",
+      "Studio de arhitectură",
+      "Firmă de consultanță",
+      "Studio de design",
+      "Agenție HR",
+      "Alt serviciu"
+    ],
+    "trade": [
+      "Magazin online",
+      "Comerț cu amănuntul",
+      "Comerț cu ridicata",
+      "Magazin",
+      "Distribuție",
+      "Alt comerț"
+    ],
+    "production": [
+      "Producție alimentară",
+      "Brutărie / Cofetărie",
+      "Producție de mobilă",
+      "Textile și îmbrăcăminte",
+      "Metal și utilaje",
+      "Tipar și ambalaje",
+      "Altă producție"
+    ],
+    "construction": [
+      "Firmă de construcții",
+      "Reparații și finisaje",
+      "Servicii electrice",
+      "Servicii sanitare",
+      "Arhitectură și proiectare",
+      "Altul"
+    ],
+    "horeca": [
+      "Restaurant",
+      "Cafenea / Cofetărie",
+      "Bar",
+      "Catering",
+      "Hotel-restaurant",
+      "Altul"
+    ],
+    "beauty": [
+      "Salon de înfrumusețare",
+      "Coafură",
+      "Cosmetică",
+      "Spa & wellness",
+      "Fitness",
+      "Stomatologie",
+      "Centru medical",
+      "Altul"
+    ],
+    "tourism": [
+      "Hotel",
+      "Casă de oaspeți",
+      "Tur operator",
+      "Agenție de turism",
+      "Altul"
+    ],
+    "education": [
+      "Centru de instruire",
+      "Școală de limbi",
+      "Centru pentru copii",
+      "Cursuri online",
+      "Altul"
+    ],
+    "transport": [
+      "Transport",
+      "Expediție",
+      "Servicii de curierat",
+      "Taxi",
+      "Altul"
+    ],
+    "agriculture": [
+      "Cultura plantelor",
+      "Zootehnie",
+      "Apicultură",
+      "Altul"
+    ],
+    "realestate": [
+      "Agenție imobiliară",
+      "Administrare proprietăți",
+      "Dezvoltator imobiliar",
+      "Altul"
+    ],
+    "freelance": [
+      "Freelancer",
+      "Consultant",
+      "Designer",
+      "Programator",
+      "Altul"
+    ],
+    "other": [
+      "Altul"
+    ]
+  },
+  "wizard": {
+    "step1Title": "Alegeți sectorul principal al afacerii dvs.",
+    "step1Desc": "Durează sub 15 secunde — vom aranja tabloul după activitatea dvs.",
+    "back": "← Înapoi",
+    "step2Title": "Care este activitatea dvs. în „{sector}”?",
+    "step2Desc": "Alegeți subcategoria cea mai apropiată.",
+    "step3Title": "Mărimea afacerii",
+    "doneTitle": "Spațiul dvs. de lucru este gata",
+    "doneText1": "Am aranjat tabloul de start după activitatea firmei, ca să găsiți cele mai folosite instrumente încă de la prima autentificare.",
+    "doneText2": "Toate funcțiile incluse în abonamentul dvs. rămân disponibile oricând. Doar aranjăm ecranul de start astfel încât cele mai potrivite instrumente să fie mereu la îndemână.",
+    "preparing": "Se pregătește…",
+    "toDashboard": "Continuă spre tablou →"
+  },
+  "pd": {
+    "quickActions": "Acțiuni rapide pentru afacerea ta",
+    "restore": "Restaurează recomandările",
+    "save": "Salvează",
+    "customize": "✎ Personalizează tabloul",
+    "dragHint": "Trageți cardurile pentru a le reordona. Apăsați ✕ pentru a ascunde un card. Meniul din stânga rămâne neschimbat — se ascund doar acțiunile rapide.",
+    "hide": "Ascunde",
+    "hiddenCards": "Carduri ascunse"
+  }
+}
