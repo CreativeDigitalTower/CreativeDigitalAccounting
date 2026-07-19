@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { COMPANY_EIK, planLabel, type PlanId } from "@/lib/constants";
 import { generateDocumentNumber } from "@/lib/documents";
+import { proformaDescribesPlan } from "@/lib/proforma";
 
 /**
  * Автоматично генерира проформа фактура за избран абонамент.
@@ -33,6 +34,17 @@ export async function generateSubscriptionProforma(opts: {
     select: { id: true, name: true, eik: true, vatNumber: true, vatRegistered: true, address: true, city: true, mol: true, email: true, phone: true },
   });
   if (!client) return null;
+
+  // ─── Идемпотентност: не създавай втора проформа за същия план към същия
+  // получател (защита от refresh / double-click / повторен request). Ако вече
+  // има „жива" (неанулирана) проформа за този план — върни нея.
+  const existingProformas = await prisma.document.findMany({
+    where: { companyId: platform.id, type: "proforma", recipientCompanyId: client.id, status: { not: "cancelled" } },
+    select: { id: true, number: true, publicToken: true, lines: { select: { description: true } } },
+    orderBy: { createdAt: "desc" },
+  });
+  const dup = existingProformas.find((d) => d.lines.some((l) => proformaDescribesPlan(l.description, plan)));
+  if (dup?.publicToken) return { token: dup.publicToken, number: dup.number, documentId: dup.id };
 
   // Намираме или създаваме клиента в CRM на платформата (по ЕИК, иначе по име)
   let crmClient = await prisma.client.findFirst({
