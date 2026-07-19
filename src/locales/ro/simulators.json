@@ -1,0 +1,28 @@
+{
+  "vat": {
+    "title": "Prognoză: înregistrare TVA",
+    "intro": "Firma nu este înregistrată în scopuri de TVA. Pragul pentru înregistrarea <strong>obligatorie</strong> este <strong>{threshold}</strong> (≈ {thresholdBgn} BGN) cifră de afaceri impozabilă pentru <strong>anul calendaristic {year}</strong>, urmărit zilnic (art. 168c din Legea TVA).",
+    "reached": "Cifra de afaceri a anului depășește deja pragul — apare obligația de înregistrare TVA (cerere în termen de 7 zile de la depășire).",
+    "noData": "Date insuficiente pentru prognoză (introduceți venituri lunare sau emiteți facturi).",
+    "notReachedByYear": "La ritmul curent, pragul cel mai probabil NU va fi atins până la sfârșitul lui {year} (cifra de afaceri se resetează la 1 ianuarie).",
+    "expectedAround": "La ritmul curent, pragul se estimează a fi atins în jurul {date}. Atunci cererea se depune în 7 zile.",
+    "turnoverYear": "Cifra de afaceri pentru {year}",
+    "reachedPct": "Din prag atins",
+    "remaining": "Rămas până la prag",
+    "note": "Prognoza este orientativă, pe baza veniturilor anului și a ritmului estimat. Cifra de afaceri conform art. 168c include și unele livrări conexe — pentru o evaluare exactă consultați un contabil."
+  },
+  "price": {
+    "title": "Simulare: schimbarea prețurilor (abonamente)",
+    "intro": "Dacă <strong>creșteți sau scădeți</strong> abonamentele lunare cu un anumit procent — care ar fi veniturile lunare și anuale estimate față de cele curente și cum ajută la obiectivul financiar.",
+    "noData": "Introduceți abonamentele lunare ale clienților pentru a folosi simularea.",
+    "changeLabel": "Schimbare:",
+    "curMonthly": "Venituri lunare curente",
+    "newMonthly": "Venituri lunare noi ({sign}{pct}%)",
+    "perMonth": "{sign}{amount} / lună",
+    "curAnnual": "Venituri anuale curente estimate",
+    "newAnnual": "Venituri anuale noi ({sign}{pct}%)",
+    "perYear": "{sign}{amount} / an",
+    "goalContrib": "Contribuție la obiectivul financiar ({target}):",
+    "goalSuffix": " (doar abonamente, anual)"
+  }
+}

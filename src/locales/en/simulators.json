@@ -1,0 +1,28 @@
+{
+  "vat": {
+    "title": "Forecast: VAT registration",
+    "intro": "The company is not registered for VAT. The threshold for <strong>mandatory</strong> registration is <strong>{threshold}</strong> (≈ {thresholdBgn} BGN) of taxable turnover for the <strong>calendar year {year}</strong>, tracked daily (art. 168c of the VAT Act).",
+    "reached": "The year's turnover already exceeds the threshold — a VAT registration obligation arises (application within 7 days of exceeding it).",
+    "noData": "Not enough data for a forecast (enter monthly revenue or issue invoices).",
+    "notReachedByYear": "At the current pace the threshold most likely will NOT be reached by the end of {year} (turnover resets on 1 January).",
+    "expectedAround": "At the current pace the threshold is expected to be reached around {date}. An application is then filed within 7 days.",
+    "turnoverYear": "Turnover for {year}",
+    "reachedPct": "Of the threshold reached",
+    "remaining": "Remaining to the threshold",
+    "note": "The forecast is indicative, based on the year's revenue and the expected pace. Turnover under art. 168c also includes certain ancillary supplies — for an accurate assessment consult an accountant."
+  },
+  "price": {
+    "title": "Simulation: price change (subscriptions)",
+    "intro": "If you <strong>increase or decrease</strong> the monthly subscriptions by a given percentage — what would the forecast monthly and annual revenue be vs. current, and how it helps toward the financial goal.",
+    "noData": "Enter clients' monthly subscriptions to use the simulation.",
+    "changeLabel": "Change:",
+    "curMonthly": "Current monthly revenue",
+    "newMonthly": "New monthly revenue ({sign}{pct}%)",
+    "perMonth": "{sign}{amount} / month",
+    "curAnnual": "Expected current annual revenue",
+    "newAnnual": "New annual revenue ({sign}{pct}%)",
+    "perYear": "{sign}{amount} / year",
+    "goalContrib": "Contribution to the financial goal ({target}):",
+    "goalSuffix": " (subscriptions only, annual)"
+  }
+}

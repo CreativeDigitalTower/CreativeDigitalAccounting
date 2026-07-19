@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/constants";
 import { NavIcon, UiIcon } from "@/components/app/NavIcons";
+import { useT } from "@/components/i18n/I18nProvider";
 
 export type WidgetData = {
   recentInvoices: { id: string; number: string; client: string; total: number; currency: string; status: string }[];
@@ -17,22 +18,24 @@ export type WidgetData = {
   clientsCount: number;
 };
 
-type WidgetDef = { id: string; title: string; icon: React.ReactNode };
+type WidgetDef = { id: string; icon: React.ReactNode };
 const wi = { width: 15, height: 15 };
 const CATALOG: WidgetDef[] = [
-  { id: "recent_invoices", title: "Последни фактури", icon: <NavIcon.invoice {...wi} /> },
-  { id: "revenue_expense", title: "Приходи / Разходи", icon: <NavIcon.analytics {...wi} /> },
-  { id: "top_clients", title: "Най-добри клиенти", icon: <UiIcon.star {...wi} /> },
-  { id: "reminders", title: "Напомняния за плащане", icon: <UiIcon.bell {...wi} /> },
-  { id: "tasks", title: "Задачи", icon: <UiIcon.check {...wi} /> },
-  { id: "stock", title: "Склад", icon: <NavIcon.warehouse {...wi} /> },
-  { id: "low_stock", title: "Ниски наличности", icon: <UiIcon.warning {...wi} /> },
-  { id: "ai", title: "AI препоръки", icon: <NavIcon.dashboard {...wi} /> },
+  { id: "recent_invoices", icon: <NavIcon.invoice {...wi} /> },
+  { id: "revenue_expense", icon: <NavIcon.analytics {...wi} /> },
+  { id: "top_clients", icon: <UiIcon.star {...wi} /> },
+  { id: "reminders", icon: <UiIcon.bell {...wi} /> },
+  { id: "tasks", icon: <UiIcon.check {...wi} /> },
+  { id: "stock", icon: <NavIcon.warehouse {...wi} /> },
+  { id: "low_stock", icon: <UiIcon.warning {...wi} /> },
+  { id: "ai", icon: <NavIcon.dashboard {...wi} /> },
 ];
 const DEFAULT_ORDER = ["recent_invoices", "revenue_expense", "top_clients", "reminders", "tasks", "stock"];
 const KEY = "cda_widgets_v2";
 
 export function WidgetBoard({ data }: { data: WidgetData }) {
+  const t = useT();
+  const catTitle = (id: string) => t(`widgets.cat.${id}`);
   const [order, setOrder] = useState<string[]>(DEFAULT_ORDER);
   const [hidden, setHidden] = useState<string[]>(CATALOG.map((c) => c.id).filter((id) => !DEFAULT_ORDER.includes(id)));
   const [edit, setEdit] = useState(false);
@@ -62,20 +65,20 @@ export function WidgetBoard({ data }: { data: WidgetData }) {
   return (
     <div style={{ marginTop: 28 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
-        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 16, fontWeight: 700, margin: 0 }}>Моето табло <span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 400 }}>· персонализируемо</span></h3>
-        <button onClick={() => setEdit((v) => !v)} className="btn btn-ghost btn-sm" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>{edit ? "Готово" : <><UiIcon.edit width={14} height={14} /> Персонализирай</>}</button>
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 16, fontWeight: 700, margin: 0 }}>{t("widgets.boardTitle")} <span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 400 }}>· {t("widgets.customizable")}</span></h3>
+        <button onClick={() => setEdit((v) => !v)} className="btn btn-ghost btn-sm" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>{edit ? t("widgets.done") : <><UiIcon.edit width={14} height={14} /> {t("widgets.customize")}</>}</button>
       </div>
 
       {edit && (
         <div className="glass panel pop-in" style={{ padding: "14px 18px", marginBottom: 14 }}>
-          <div style={{ fontSize: 12.5, color: "var(--muted)", marginBottom: 10 }}>Изберете кои widget-и да виждате. Влачете картите, за да ги подредите.</div>
+          <div style={{ fontSize: 12.5, color: "var(--muted)", marginBottom: 10 }}>{t("widgets.editHint")}</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {CATALOG.map((w) => {
               const on = !hidden.includes(w.id);
               return (
                 <button key={w.id} onClick={() => (on ? hide(w.id) : show(w.id))}
                   className={`filter-tab${on ? " active" : ""}`} style={{ fontSize: 12, display: "inline-flex", alignItems: "center", gap: 6 }}>
-                  {on ? <UiIcon.check width={13} height={13} /> : <span style={{ width: 13, height: 13, border: "1.5px solid currentColor", borderRadius: 3, display: "inline-block", opacity: .5 }} />} {w.icon} {w.title}
+                  {on ? <UiIcon.check width={13} height={13} /> : <span style={{ width: 13, height: 13, border: "1.5px solid currentColor", borderRadius: 3, display: "inline-block", opacity: .5 }} />} {w.icon} {catTitle(w.id)}
                 </button>
               );
             })}
@@ -93,9 +96,9 @@ export function WidgetBoard({ data }: { data: WidgetData }) {
               className="glass panel kpi-anim" style={{ padding: "16px 18px", cursor: edit ? "grab" : "default", border: drag === idx ? "2px dashed var(--emerald)" : undefined }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                 <h4 style={{ fontFamily: "'Fraunces', serif", fontSize: 14.5, margin: 0, display: "flex", alignItems: "center", gap: 7 }}>
-                  <span style={{ display: "inline-flex" }}>{def.icon}</span> {def.title}
+                  <span style={{ display: "inline-flex" }}>{def.icon}</span> {catTitle(def.id)}
                 </h4>
-                {edit ? <button onClick={() => hide(id)} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer", fontSize: 15 }} title="Скрий">×</button>
+                {edit ? <button onClick={() => hide(id)} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer", fontSize: 15 }} title={t("widgets.hide")}>×</button>
                       : <span style={{ color: "var(--muted)", fontSize: 12 }}>⠿</span>}
               </div>
               <Widget id={id} data={data} />
@@ -111,9 +114,10 @@ function Empty({ text }: { text: string }) { return <div style={{ fontSize: 12.5
 const rowS: React.CSSProperties = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 0", borderBottom: "1px solid rgba(217,215,200,.4)", fontSize: 13 };
 
 function Widget({ id, data }: { id: string; data: WidgetData }) {
+  const t = useT();
   switch (id) {
     case "recent_invoices":
-      return data.recentInvoices.length === 0 ? <Empty text="Няма фактури." /> : <>
+      return data.recentInvoices.length === 0 ? <Empty text={t("widgets.noInvoices")} /> : <>
         {data.recentInvoices.slice(0, 5).map((d) => (
           <Link key={d.id} href={`/dashboard/documents/${d.id}`} style={{ ...rowS, textDecoration: "none", color: "inherit" }}>
             <span><strong className="num" style={{ fontSize: 12.5 }}>{d.number}</strong> · {d.client}</span>
@@ -130,55 +134,55 @@ function Widget({ id, data }: { id: string; data: WidgetData }) {
         </div>
       );
       return <>
-        <Bar label="Приходи" v={data.revenue} c="var(--emerald)" />
-        <Bar label="Разходи" v={data.expenses} c="var(--brick)" />
-        <div style={{ fontSize: 12.5, marginTop: 6 }}>Печалба: <strong className="num" style={{ color: data.revenue - data.expenses >= 0 ? "var(--emerald-dark)" : "var(--brick)" }}>{formatCurrency(data.revenue - data.expenses)}</strong></div>
+        <Bar label={t("widgets.revenue")} v={data.revenue} c="var(--emerald)" />
+        <Bar label={t("widgets.expenses")} v={data.expenses} c="var(--brick)" />
+        <div style={{ fontSize: 12.5, marginTop: 6 }}>{t("widgets.profit")} <strong className="num" style={{ color: data.revenue - data.expenses >= 0 ? "var(--emerald-dark)" : "var(--brick)" }}>{formatCurrency(data.revenue - data.expenses)}</strong></div>
       </>;
     }
     case "top_clients":
-      return data.topClients.length === 0 ? <Empty text="Няма данни." /> : <>
+      return data.topClients.length === 0 ? <Empty text={t("widgets.noData")} /> : <>
         {data.topClients.slice(0, 5).map((c, i) => (
           <div key={i} style={rowS}><span>{i + 1}. {c.name}</span><span className="num" style={{ fontWeight: 600, color: "var(--emerald-dark)" }}>{formatCurrency(c.revenue)}</span></div>
         ))}
       </>;
     case "reminders":
-      return data.reminders.length === 0 ? <Empty text="Няма предстоящи плащания." /> : <>
+      return data.reminders.length === 0 ? <Empty text={t("widgets.noReminders")} /> : <>
         {data.reminders.slice(0, 5).map((r) => (
           <Link key={r.id} href={`/dashboard/documents/${r.id}`} style={{ ...rowS, textDecoration: "none", color: "inherit" }}>
             <span>{r.number} · {r.client}</span>
-            <span style={{ fontWeight: 700, fontSize: 11.5, color: r.daysOverdue > 0 ? "var(--brick)" : "var(--brass)" }}>{r.daysOverdue > 0 ? `просрочена ${r.daysOverdue}д` : `до падеж ${-r.daysOverdue}д`}</span>
+            <span style={{ fontWeight: 700, fontSize: 11.5, color: r.daysOverdue > 0 ? "var(--brick)" : "var(--brass)" }}>{r.daysOverdue > 0 ? t("widgets.overdueDays", { n: r.daysOverdue }) : t("widgets.dueDays", { n: -r.daysOverdue })}</span>
           </Link>
         ))}
       </>;
     case "tasks":
       return <div style={{ textAlign: "center", padding: "10px 0" }}>
         <div className="num" style={{ fontSize: 34, fontWeight: 700, color: data.openTasks > 0 ? "var(--brass)" : "var(--emerald-dark)" }}>{data.openTasks}</div>
-        <div style={{ fontSize: 12.5, color: "var(--muted)", marginBottom: 10 }}>отворени CRM задачи</div>
-        <Link href="/dashboard/clients" className="btn btn-ghost btn-sm">Виж задачите</Link>
+        <div style={{ fontSize: 12.5, color: "var(--muted)", marginBottom: 10 }}>{t("widgets.openTasks")}</div>
+        <Link href="/dashboard/clients" className="btn btn-ghost btn-sm">{t("widgets.viewTasks")}</Link>
       </div>;
     case "stock":
       return <div style={{ textAlign: "center", padding: "10px 0" }}>
         <div className="num" style={{ fontSize: 26, fontWeight: 700, color: "var(--emerald-dark)" }}>{formatCurrency(data.stockValue)}</div>
-        <div style={{ fontSize: 12.5, color: "var(--muted)", marginBottom: 10 }}>обща стойност на склада</div>
-        <Link href="/dashboard/warehouse" className="btn btn-ghost btn-sm">Към склада</Link>
+        <div style={{ fontSize: 12.5, color: "var(--muted)", marginBottom: 10 }}>{t("widgets.stockValue")}</div>
+        <Link href="/dashboard/warehouse" className="btn btn-ghost btn-sm">{t("widgets.toWarehouse")}</Link>
       </div>;
     case "low_stock":
-      return data.lowStock.length === 0 ? <Empty text="Всички наличности са в норма ✓" /> : <>
+      return data.lowStock.length === 0 ? <Empty text={t("widgets.stockOk")} /> : <>
         {data.lowStock.slice(0, 6).map((i, k) => (
           <div key={k} style={rowS}><span>{i.name}</span><span className="num" style={{ color: "var(--brick)", fontWeight: 600 }}>{i.quantity} {i.unit}</span></div>
         ))}
       </>;
     case "tax":
-      return data.taxDeadlines.length === 0 ? <Empty text="Няма предстоящи срокове." /> : <>
-        {data.taxDeadlines.slice(0, 5).map((t, i) => (
-          <div key={i} style={rowS}><span>{t.label}</span><span className="num" style={{ color: "var(--brass)", fontWeight: 600 }}>{t.date}</span></div>
+      return data.taxDeadlines.length === 0 ? <Empty text={t("widgets.noDeadlines")} /> : <>
+        {data.taxDeadlines.slice(0, 5).map((td, i) => (
+          <div key={i} style={rowS}><span>{td.label}</span><span className="num" style={{ color: "var(--brass)", fontWeight: 600 }}>{td.date}</span></div>
         ))}
       </>;
     case "ai":
       return <div style={{ textAlign: "center", padding: "14px 0" }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 6, color: "var(--muted)" }}><NavIcon.dashboard width={28} height={28} /></div>
-        <div style={{ display: "inline-block", fontSize: 10.5, fontWeight: 700, letterSpacing: 1, color: "var(--brass)", border: "1px solid var(--brass)", borderRadius: 12, padding: "2px 10px" }}>СКОРО</div>
-        <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 8 }}>Интелигентни препоръки за бизнеса Ви.</div>
+        <div style={{ display: "inline-block", fontSize: 10.5, fontWeight: 700, letterSpacing: 1, color: "var(--brass)", border: "1px solid var(--brass)", borderRadius: 12, padding: "2px 10px" }}>{t("widgets.aiSoon")}</div>
+        <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 8 }}>{t("widgets.aiText")}</div>
       </div>;
     default:
       return null;

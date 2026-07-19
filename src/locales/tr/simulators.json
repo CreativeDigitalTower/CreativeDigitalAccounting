@@ -1,0 +1,28 @@
+{
+  "vat": {
+    "title": "Tahmin: KDV kaydı",
+    "intro": "Firma KDV kayıtlı değil. <strong>Zorunlu</strong> kayıt eşiği, <strong>{year} takvim yılı</strong> için <strong>{threshold}</strong> (≈ {thresholdBgn} BGN) vergilendirilebilir cirodur ve günlük izlenir (KDV Kanunu md. 168c).",
+    "reached": "Yılın cirosu eşiği zaten aşıyor — KDV kayıt yükümlülüğü doğar (aşımdan itibaren 7 gün içinde başvuru).",
+    "noData": "Tahmin için yeterli veri yok (aylık gelir girin veya fatura düzenleyin).",
+    "notReachedByYear": "Mevcut hızda eşik büyük olasılıkla {year} sonuna kadar aşılMAYacak (ciro 1 Ocak'ta sıfırlanır).",
+    "expectedAround": "Mevcut hızda eşiğin yaklaşık {date} tarihinde aşılması bekleniyor. O zaman başvuru 7 gün içinde yapılır.",
+    "turnoverYear": "{year} cirosu",
+    "reachedPct": "Eşiğin ne kadarı",
+    "remaining": "Eşiğe kalan",
+    "note": "Tahmin, yılın gelirine ve beklenen hıza göre gösterge niteliğindedir. Md. 168c kapsamındaki ciroya bazı yan teslimatlar da dahildir — kesin değerlendirme için bir muhasebeciye danışın."
+  },
+  "price": {
+    "title": "Simülasyon: fiyat değişimi (abonelikler)",
+    "intro": "Aylık abonelikleri belirli bir yüzde <strong>artırır veya azaltırsanız</strong> — tahmini aylık ve yıllık gelirler mevcuda göre ne olur ve finansal hedefe nasıl katkı sağlar.",
+    "noData": "Simülasyonu kullanmak için müşterilerin aylık aboneliklerini girin.",
+    "changeLabel": "Değişim:",
+    "curMonthly": "Mevcut aylık gelir",
+    "newMonthly": "Yeni aylık gelir ({sign}{pct}%)",
+    "perMonth": "{sign}{amount} / ay",
+    "curAnnual": "Beklenen mevcut yıllık gelir",
+    "newAnnual": "Yeni yıllık gelir ({sign}{pct}%)",
+    "perYear": "{sign}{amount} / yıl",
+    "goalContrib": "Finansal hedefe katkı ({target}):",
+    "goalSuffix": " (yalnızca abonelikler, yıllık)"
+  }
+}
