@@ -1,0 +1,59 @@
+{
+  "hubTitle": "Ücretsiz iş araçları",
+  "hubSubtitle": "İşiniz için pratik hesaplayıcılar — tüm kayıtlı kullanıcılara ücretsiz.",
+  "back": "← Tüm araçlar",
+  "currency": {
+    "name": "Döviz hesaplayıcı",
+    "desc": "Sabit kurdan EUR ↔ BGN ve diğer para birimleri dönüşümü."
+  },
+  "salary": {
+    "name": "Maaş hesaplayıcı",
+    "desc": "Brüt/net, sigorta primleri ve gelir vergisi."
+  },
+  "vat": {
+    "name": "KDV hesaplayıcı",
+    "desc": "KDV, net ve brüt tutar hesaplama."
+  },
+  "interest": {
+    "name": "Faiz hesaplayıcı",
+    "desc": "Seçilen dönem için basit ve bileşik faiz."
+  },
+  "markup": {
+    "name": "Kâr marjı ve kâr",
+    "desc": "Kâr payı, marj ve nihai fiyat hesaplama."
+  },
+  "vatAddTab": "KDV ekle (nete)",
+  "vatExtractTab": "KDV çıkar (brütten)",
+  "vatAmountNet": "KDV'siz tutar",
+  "vatAmountGross": "KDV'li tutar",
+  "vatRate": "KDV oranı",
+  "net": "Net",
+  "vatLabel": "KDV",
+  "gross": "Brüt",
+  "cost": "Maliyet",
+  "markupPct": "Kâr payı (%)",
+  "sellPrice": "Satış fiyatı",
+  "profit": "Kâr",
+  "margin": "Marj",
+  "simpleTab": "Basit faiz",
+  "compoundTab": "Bileşik faiz",
+  "principal": "Anapara",
+  "annualRate": "Yıllık oran (%)",
+  "periodYears": "Süre (yıl)",
+  "accruedInterest": "Birikmiş faiz",
+  "finalAmount": "Nihai tutar",
+  "amount": "Tutar",
+  "from": "Kaynak",
+  "to": "Hedef",
+  "fixedNote": "EUR/BGN kuru sabittir: 1 EUR = {rate} лв.",
+  "estNote": "Kurlar (EUR/BGN hariç) yaklaşıktır ve değişebilir.",
+  "grossSalaryInput": "Brüt maaş (BGN/EUR)",
+  "grossSalary": "Brüt maaş",
+  "empIns": "Primler (çalışan, %{pct})",
+  "taxable": "Vergiye tabi tutar",
+  "incomeTax": "Gelir vergisi (%10)",
+  "netSalary": "Net maaş (ele geçen)",
+  "employerIns": "İşveren primleri (%{pct})",
+  "employerTotal": "Toplam işveren maliyeti",
+  "salaryNote": "Değerler yaklaşıktır ve iş kategorisine, sigortalanabilir gelirin büyüklüğüne ve özel koşullara bağlıdır. Muhasebe tavsiyesi niteliği taşımaz."
+}

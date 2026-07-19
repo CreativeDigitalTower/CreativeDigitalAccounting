@@ -1,0 +1,59 @@
+{
+  "hubTitle": "Instrumente de business gratuite",
+  "hubSubtitle": "Calculatoare utile pentru afacerea ta — gratuite pentru toți utilizatorii înregistrați.",
+  "back": "← Toate instrumentele",
+  "currency": {
+    "name": "Calculator valutar",
+    "desc": "Conversie EUR ↔ BGN la cursul fix și alte valute."
+  },
+  "salary": {
+    "name": "Calculator de salarii",
+    "desc": "Brut/net, contribuții și impozit pe venit."
+  },
+  "vat": {
+    "name": "Calculator TVA",
+    "desc": "Calcul TVA, sume nete și brute."
+  },
+  "interest": {
+    "name": "Calculator de dobândă",
+    "desc": "Dobândă simplă și compusă pentru o perioadă aleasă."
+  },
+  "markup": {
+    "name": "Adaos și profit",
+    "desc": "Calcul adaos, marjă și preț final."
+  },
+  "vatAddTab": "Adaugă TVA (la net)",
+  "vatExtractTab": "Extrage TVA (din brut)",
+  "vatAmountNet": "Sumă fără TVA",
+  "vatAmountGross": "Sumă cu TVA",
+  "vatRate": "Cotă TVA",
+  "net": "Net",
+  "vatLabel": "TVA",
+  "gross": "Brut",
+  "cost": "Cost",
+  "markupPct": "Adaos (%)",
+  "sellPrice": "Preț de vânzare",
+  "profit": "Profit",
+  "margin": "Marjă",
+  "simpleTab": "Dobândă simplă",
+  "compoundTab": "Dobândă compusă",
+  "principal": "Capital",
+  "annualRate": "Rată anuală (%)",
+  "periodYears": "Perioadă (ani)",
+  "accruedInterest": "Dobândă acumulată",
+  "finalAmount": "Sumă finală",
+  "amount": "Sumă",
+  "from": "Din",
+  "to": "În",
+  "fixedNote": "Cursul EUR/BGN este fix: 1 EUR = {rate} лв.",
+  "estNote": "Cursurile (cu excepția EUR/BGN) sunt orientative și se pot modifica.",
+  "grossSalaryInput": "Salariu brut (BGN/EUR)",
+  "grossSalary": "Salariu brut",
+  "empIns": "Contribuții (angajat, {pct}%)",
+  "taxable": "Sumă impozabilă",
+  "incomeTax": "Impozit pe venit (10%)",
+  "netSalary": "Salariu net (sumă de încasat)",
+  "employerIns": "Contribuții angajator ({pct}%)",
+  "employerTotal": "Cost total angajator",
+  "salaryNote": "Valorile sunt orientative și depind de categoria de muncă, mărimea venitului asigurabil și circumstanțe specifice. Nu constituie consultanță contabilă."
+}

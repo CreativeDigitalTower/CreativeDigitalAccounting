@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useT } from "@/components/i18n/I18nProvider";
 
 // Ориентировъчни ставки (България). Служител: осигуровки общо ~13.78%, данък 10%.
 // Работодател: осигуровки общо ~18.92% – 19.62% според категорията труд.
@@ -11,6 +12,7 @@ const TAX = 0.10;
 const MAX_INS_BASE = 4130; // максимален осигурителен доход (ориентировъчно)
 
 export default function SalaryCalc() {
+  const t = useT();
   const [gross, setGross] = useState("2000");
 
   const g = parseFloat(gross) || 0;
@@ -23,21 +25,21 @@ export default function SalaryCalc() {
   const totalCost = g + employerIns;
 
   const rows = [
-    { l: "Бруто заплата", v: g, strong: false },
-    { l: `Осигуровки (служител, ${(EMPLOYEE_INS * 100).toFixed(2)}%)`, v: -empIns, strong: false },
-    { l: "Облагаема сума", v: taxable, strong: false },
-    { l: "Данък общ доход (10%)", v: -tax, strong: false },
-    { l: "Нето заплата (сума за получаване)", v: net, strong: true },
+    { l: t("tools.grossSalary"), v: g, strong: false },
+    { l: t("tools.empIns", { pct: (EMPLOYEE_INS * 100).toFixed(2) }), v: -empIns, strong: false },
+    { l: t("tools.taxable"), v: taxable, strong: false },
+    { l: t("tools.incomeTax"), v: -tax, strong: false },
+    { l: t("tools.netSalary"), v: net, strong: true },
   ];
 
   return (
     <>
-      <Link href="/tools" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← Всички инструменти</Link>
-      <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 26, fontWeight: 700, margin: "10px 0 20px" }}>Калкулатор за заплати</h1>
+      <Link href="/tools" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>{t("tools.back")}</Link>
+      <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 26, fontWeight: 700, margin: "10px 0 20px" }}>{t("tools.salary.name")}</h1>
 
       <div className="glass panel" style={{ padding: 28 }}>
         <div style={{ maxWidth: 280 }}>
-          <label>Бруто заплата (BGN/EUR)</label>
+          <label>{t("tools.grossSalaryInput")}</label>
           <input type="number" value={gross} onChange={(e) => setGross(e.target.value)} />
         </div>
         <div style={{ marginTop: 22 }}>
@@ -48,11 +50,11 @@ export default function SalaryCalc() {
           ))}
         </div>
         <div style={{ marginTop: 18, padding: "14px 16px", background: "var(--navy-soft)", borderRadius: 10, fontSize: 13 }}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}><span>Осигуровки за сметка на работодателя ({(EMPLOYER_INS * 100).toFixed(2)}%)</span><span className="num">{employerIns.toFixed(2)}</span></div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, marginTop: 6 }}><span>Общ разход за работодателя</span><span className="num">{totalCost.toFixed(2)}</span></div>
+          <div style={{ display: "flex", justifyContent: "space-between" }}><span>{t("tools.employerIns", { pct: (EMPLOYER_INS * 100).toFixed(2) })}</span><span className="num">{employerIns.toFixed(2)}</span></div>
+          <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, marginTop: 6 }}><span>{t("tools.employerTotal")}</span><span className="num">{totalCost.toFixed(2)}</span></div>
         </div>
         <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 14 }}>
-          Стойностите са ориентировъчни и зависят от категорията труд, размера на осигурителния доход и конкретни обстоятелства. Не представляват счетоводен съвет.
+{t("tools.salaryNote")}
         </p>
       </div>
     </>
