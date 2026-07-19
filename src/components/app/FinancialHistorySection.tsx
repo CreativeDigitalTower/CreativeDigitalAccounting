@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrency } from "@/lib/constants";
+import { useT } from "@/components/i18n/I18nProvider";
 
 type Row = { year: number; revenue: number; expenses: number | null; profit: number | null; employeeCount: number | null };
 
@@ -9,6 +10,7 @@ export function FinancialHistorySection({ initial, goalYear, goalTarget, goalRev
   initial: Row[]; goalYear: number; goalTarget: number | null; goalRevenue: number;
   currentExpenses: number; currentProfit: number;
 }) {
+  const t = useT();
   const router = useRouter();
   const [rows, setRows] = useState<Row[]>(initial);
   // Синхронизираме с новите данни след router.refresh() (иначе се показват едва след пълен презареждане).
@@ -28,15 +30,15 @@ export function FinancialHistorySection({ initial, goalYear, goalTarget, goalRev
     router.refresh();
   }
   async function delRow(year: number) {
-    if (!confirm(`Изтриване на данните за ${year}?`)) return;
+    if (!confirm(t("finance.hist.confirmDelete", { year }))) return;
     await fetch(`/api/financial-history?year=${year}`, { method: "DELETE" });
     router.refresh();
   }
   async function saveGoal() {
-    const t = parseFloat(goal);
-    if (!(t >= 0)) return;
-    const res = await fetch("/api/financial-goal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ year: goalYear, targetRevenue: t }) });
-    if (res.ok) { setGoalMsg("Запазено ✓"); setTimeout(() => setGoalMsg(""), 1500); router.refresh(); }
+    const target = parseFloat(goal);
+    if (!(target >= 0)) return;
+    const res = await fetch("/api/financial-goal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ year: goalYear, targetRevenue: target }) });
+    if (res.ok) { setGoalMsg(t("finance.hist.saved")); setTimeout(() => setGoalMsg(""), 1500); router.refresh(); }
   }
 
   const max = Math.max(1, ...rows.map((r) => Math.max(r.revenue, r.expenses ?? 0, Math.abs(r.profit ?? 0))));
@@ -55,19 +57,19 @@ export function FinancialHistorySection({ initial, goalYear, goalTarget, goalRev
     <>
       {/* Финансова цел */}
       <div className="glass panel" style={{ marginBottom: 18 }}>
-        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 10px" }}>Финансова цел за {goalYear}</h3>
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 10px" }}>{t("finance.hist.goalTitle", { year: goalYear })}</h3>
         <div style={{ display: "flex", gap: 10, alignItems: "flex-end", flexWrap: "wrap" }}>
           <div style={{ flex: "0 1 220px" }}>
-            <label style={{ fontSize: 12 }}>Целеви оборот (EUR)</label>
-            <input type="number" value={goal} onChange={(e) => setGoal(e.target.value)} placeholder="напр. 100000" />
+            <label style={{ fontSize: 12 }}>{t("finance.hist.goalTarget")}</label>
+            <input type="number" value={goal} onChange={(e) => setGoal(e.target.value)} placeholder={t("finance.hist.goalPh")} />
           </div>
-          <button className="btn btn-primary btn-sm" onClick={saveGoal}>Запази цел</button>
+          <button className="btn btn-primary btn-sm" onClick={saveGoal}>{t("finance.hist.saveGoal")}</button>
           {goalMsg && <span style={{ fontSize: 12.5, color: "var(--emerald-dark)" }}>{goalMsg}</span>}
         </div>
         {goalPct != null && (
           <div style={{ marginTop: 12 }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 4 }}>
-              <span>Изпълнение: {formatCurrency(goalRevenue)} / {formatCurrency(goalTarget!)}</span>
+              <span>{t("finance.hist.goalProgress", { have: formatCurrency(goalRevenue), target: formatCurrency(goalTarget!) })}</span>
               <strong style={{ color: goalPct >= 70 ? "var(--emerald-dark)" : "var(--brass)" }}>{goalPct}%</strong>
             </div>
             <div style={{ height: 8, background: "rgba(217,215,200,.5)", borderRadius: 4, overflow: "hidden" }}>
@@ -80,35 +82,35 @@ export function FinancialHistorySection({ initial, goalYear, goalTarget, goalRev
       {/* Историческа справка + графика */}
       <div className="glass panel">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, gap: 12, flexWrap: "wrap" }}>
-          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>Историческа справка (приходи · разходи · печалба)</h3>
-          {!adding && <button className="btn btn-ghost btn-sm" onClick={() => setAdding(true)}>+ Въведи данни със задна дата</button>}
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>{t("finance.hist.histTitle")}</h3>
+          {!adding && <button className="btn btn-ghost btn-sm" onClick={() => setAdding(true)}>{t("finance.hist.addBackdated")}</button>}
         </div>
 
         {adding && (
           <div className="glass" style={{ padding: "14px 16px", borderRadius: 10, marginBottom: 14, border: "1px solid var(--border)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px,1fr))", gap: 10, alignItems: "flex-end" }}>
-            <div><label style={{ fontSize: 12 }}>Година</label><input type="number" value={f.year} onChange={(e) => setF({ ...f, year: Number(e.target.value) })} /></div>
-            <div><label style={{ fontSize: 12 }}>Оборот</label><input type="number" value={f.revenue} onChange={(e) => setF({ ...f, revenue: e.target.value })} /></div>
-            <div><label style={{ fontSize: 12 }}>Разходи</label><input type="number" value={f.expenses} onChange={(e) => setF({ ...f, expenses: e.target.value })} /></div>
-            <div><label style={{ fontSize: 12 }}>Печалба</label><input type="number" value={f.profit} onChange={(e) => setF({ ...f, profit: e.target.value })} placeholder="авто" /></div>
-            <div><label style={{ fontSize: 12 }}>Служители</label><input type="number" value={f.employees} onChange={(e) => setF({ ...f, employees: e.target.value })} /></div>
+            <div><label style={{ fontSize: 12 }}>{t("finance.hist.fYear")}</label><input type="number" value={f.year} onChange={(e) => setF({ ...f, year: Number(e.target.value) })} /></div>
+            <div><label style={{ fontSize: 12 }}>{t("finance.hist.fRevenue")}</label><input type="number" value={f.revenue} onChange={(e) => setF({ ...f, revenue: e.target.value })} /></div>
+            <div><label style={{ fontSize: 12 }}>{t("finance.hist.fExpenses")}</label><input type="number" value={f.expenses} onChange={(e) => setF({ ...f, expenses: e.target.value })} /></div>
+            <div><label style={{ fontSize: 12 }}>{t("finance.hist.fProfit")}</label><input type="number" value={f.profit} onChange={(e) => setF({ ...f, profit: e.target.value })} placeholder={t("finance.hist.auto")} /></div>
+            <div><label style={{ fontSize: 12 }}>{t("finance.hist.fEmployees")}</label><input type="number" value={f.employees} onChange={(e) => setF({ ...f, employees: e.target.value })} /></div>
             <div style={{ display: "flex", gap: 6 }}>
-              <button className="btn btn-primary btn-sm" disabled={!f.revenue} onClick={() => saveRow(f.year, f.revenue, f.expenses, f.profit, f.employees)}>Запази</button>
+              <button className="btn btn-primary btn-sm" disabled={!f.revenue} onClick={() => saveRow(f.year, f.revenue, f.expenses, f.profit, f.employees)}>{t("finance.hist.save")}</button>
               <button className="btn btn-ghost btn-sm" onClick={() => setAdding(false)}>×</button>
             </div>
           </div>
         )}
 
         {rows.length === 0 ? (
-          <div style={{ fontSize: 13, color: "var(--muted)", padding: "12px 0" }}>Въведете оборотите, разходите и печалбата от предходни години, за да следите растежа.</div>
+          <div style={{ fontSize: 13, color: "var(--muted)", padding: "12px 0" }}>{t("finance.hist.emptyHist")}</div>
         ) : (
           <>
             {/* Групирана диаграма */}
             <div style={{ display: "flex", gap: 20, alignItems: "flex-end", height: 168, padding: "8px 4px 0", overflowX: "auto", marginBottom: 8 }}>
               {chartRows.map((r, i) => {
                 const bars = [
-                  { label: "Приходи", v: r.revenue, c: "var(--emerald)" },
-                  { label: "Разходи", v: r.expenses ?? 0, c: "var(--brick)" },
-                  { label: "Печалба", v: r.profit ?? 0, c: "var(--navy)" },
+                  { label: t("finance.hist.barRevenue"), v: r.revenue, c: "var(--emerald)" },
+                  { label: t("finance.hist.barExpenses"), v: r.expenses ?? 0, c: "var(--brick)" },
+                  { label: t("finance.hist.barProfit"), v: r.profit ?? 0, c: "var(--navy)" },
                 ];
                 // Ръст/спад на приходите спрямо предходната година
                 const prev = chartRows[i - 1];
@@ -126,7 +128,7 @@ export function FinancialHistorySection({ initial, goalYear, goalTarget, goalRev
                     </div>
                     <span style={{ fontSize: 12, fontWeight: 600 }}>{r.year}</span>
                     {yoy != null && (
-                      <span style={{ fontSize: 10.5, fontWeight: 700, color: yoyUp ? "var(--emerald-dark)" : "var(--brick)", background: yoyUp ? "rgba(15,138,106,.12)" : "var(--brick-soft)", borderRadius: 10, padding: "1px 7px" }} title="Промяна на приходите спрямо предходната година">
+                      <span style={{ fontSize: 10.5, fontWeight: 700, color: yoyUp ? "var(--emerald-dark)" : "var(--brick)", background: yoyUp ? "rgba(15,138,106,.12)" : "var(--brick-soft)", borderRadius: 10, padding: "1px 7px" }} title={t("finance.hist.yoyTitle")}>
                         {yoyUp ? "▲ +" : "▼ "}{yoy.toFixed(1)}%
                       </span>
                     )}
@@ -135,14 +137,14 @@ export function FinancialHistorySection({ initial, goalYear, goalTarget, goalRev
               })}
             </div>
             <div style={{ display: "flex", gap: 16, fontSize: 11.5, marginBottom: 12 }}>
-              <span><span style={{ display: "inline-block", width: 9, height: 9, background: "var(--emerald)", borderRadius: 2, marginRight: 4 }} />Приходи</span>
-              <span><span style={{ display: "inline-block", width: 9, height: 9, background: "var(--brick)", borderRadius: 2, marginRight: 4 }} />Разходи</span>
-              <span><span style={{ display: "inline-block", width: 9, height: 9, background: "var(--navy)", borderRadius: 2, marginRight: 4 }} />Печалба</span>
+              <span><span style={{ display: "inline-block", width: 9, height: 9, background: "var(--emerald)", borderRadius: 2, marginRight: 4 }} />{t("finance.hist.barRevenue")}</span>
+              <span><span style={{ display: "inline-block", width: 9, height: 9, background: "var(--brick)", borderRadius: 2, marginRight: 4 }} />{t("finance.hist.barExpenses")}</span>
+              <span><span style={{ display: "inline-block", width: 9, height: 9, background: "var(--navy)", borderRadius: 2, marginRight: 4 }} />{t("finance.hist.barProfit")}</span>
             </div>
 
             {/* Таблица с редакция */}
             <table>
-              <thead><tr><th>Година</th><th className="num">Приходи</th><th className="num">Разходи</th><th className="num">Печалба</th><th className="num">Служители</th><th></th></tr></thead>
+              <thead><tr><th>{t("finance.hist.thYear")}</th><th className="num">{t("finance.hist.thRevenue")}</th><th className="num">{t("finance.hist.thExpenses")}</th><th className="num">{t("finance.hist.thProfit")}</th><th className="num">{t("finance.hist.thEmployees")}</th><th></th></tr></thead>
               <tbody>
                 {rows.map((r) => editYear === r.year ? (
                   <EditRow key={r.year} row={r} onSave={saveRow} onCancel={() => setEditYear(null)} />
@@ -167,15 +169,15 @@ export function FinancialHistorySection({ initial, goalYear, goalTarget, goalRev
 
       {/* Обобщено за целия период на съществуване на фирмата */}
       <div className="glass panel" style={{ marginTop: 18 }}>
-        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 4px" }}>Обобщено за целия период</h3>
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 4px" }}>{t("finance.hist.allTitle")}</h3>
         <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 14px" }}>
-          Сумарно за всички {yearsCount} {yearsCount === 1 ? "година" : "години"} (историческите данни + текущата {goalYear} г.) — движение и развитие на фирмата.
+          {t("finance.hist.allDesc", { n: yearsCount, yearWord: yearsCount === 1 ? t("finance.hist.yearOne") : t("finance.hist.yearMany"), year: goalYear })}
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px,1fr))", gap: 14 }}>
           {([
-            ["Общи приходи", allTimeRevenue, "var(--emerald-dark)"],
-            ["Общи разходи", allTimeExpenses, "var(--brick)"],
-            ["Обща печалба", allTimeProfit, allTimeProfit >= 0 ? "var(--navy)" : "var(--brick)"],
+            [t("finance.hist.allRevenue"), allTimeRevenue, "var(--emerald-dark)"],
+            [t("finance.hist.allExpenses"), allTimeExpenses, "var(--brick)"],
+            [t("finance.hist.allProfit"), allTimeProfit, allTimeProfit >= 0 ? "var(--navy)" : "var(--brick)"],
           ] as [string, number, string][]).map(([l, v, c]) => (
             <div key={l}>
               <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 4 }}>{l}</div>
@@ -189,6 +191,7 @@ export function FinancialHistorySection({ initial, goalYear, goalTarget, goalRev
 }
 
 function EditRow({ row, onSave, onCancel }: { row: Row; onSave: (y: number, r: string, e: string, p: string, emp: string) => void; onCancel: () => void }) {
+  const t = useT();
   const [revenue, setRevenue] = useState(String(row.revenue));
   const [expenses, setExpenses] = useState(row.expenses != null ? String(row.expenses) : "");
   const [profit, setProfit] = useState(row.profit != null ? String(row.profit) : "");
@@ -198,7 +201,7 @@ function EditRow({ row, onSave, onCancel }: { row: Row; onSave: (y: number, r: s
       <td style={{ fontWeight: 600 }}>{row.year}</td>
       <td><input type="number" value={revenue} onChange={(e) => setRevenue(e.target.value)} style={{ padding: "5px 7px", fontSize: 12.5, textAlign: "right" }} /></td>
       <td><input type="number" value={expenses} onChange={(e) => setExpenses(e.target.value)} style={{ padding: "5px 7px", fontSize: 12.5, textAlign: "right" }} /></td>
-      <td><input type="number" value={profit} onChange={(e) => setProfit(e.target.value)} placeholder="авто" style={{ padding: "5px 7px", fontSize: 12.5, textAlign: "right" }} /></td>
+      <td><input type="number" value={profit} onChange={(e) => setProfit(e.target.value)} placeholder={t("finance.hist.auto")} style={{ padding: "5px 7px", fontSize: 12.5, textAlign: "right" }} /></td>
       <td><input type="number" value={employees} onChange={(e) => setEmployees(e.target.value)} style={{ padding: "5px 7px", fontSize: 12.5, textAlign: "right" }} /></td>
       <td style={{ display: "flex", gap: 6 }}>
         <button className="btn btn-primary btn-sm" onClick={() => onSave(row.year, revenue, expenses, profit, employees)}>✓</button>
