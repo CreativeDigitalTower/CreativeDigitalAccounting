@@ -5,14 +5,17 @@ import { useRouter } from "next/navigation";
 import { UiIcon } from "@/components/app/NavIcons";
 import { confirmDelete } from "@/lib/confirmDelete";
 import { downloadPdfBlobs, sanitizeFileName, todayStamp } from "@/lib/downloadDocs";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 
 type Doc = { id: string; title: string; category: string; categoryLabel: string; status: string; createdAt: string; updatedAt: string };
-const STATUS_LABEL: Record<string, string> = { draft: "Чернова", final: "Завършен", archived: "Архивиран" };
 const STATUS_COLOR: Record<string, string> = { draft: "var(--brass)", final: "var(--emerald)", archived: "var(--muted)" };
-const MONTHS = ["Януари", "Февруари", "Март", "Април", "Май", "Юни", "Юли", "Август", "Септември", "Октомври", "Ноември", "Декември"];
 
 export function MyDocsList({ docs }: { docs: Doc[] }) {
   const router = useRouter();
+  const t = useT();
+  const { locale } = useI18n();
+  const monthFmt = new Intl.DateTimeFormat(locale, { month: "long" });
+  const catLabel = (id: string, fb: string) => { const v = t(`bizdocs.cat.${id}.title`); return v.startsWith("bizdocs.") ? fb : v; };
   const [sel, setSel] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
   const [q, setQ] = useState("");
@@ -26,10 +29,10 @@ export function MyDocsList({ docs }: { docs: Doc[] }) {
   const filtered = byTab.filter((d) => !q.trim() || [d.title, d.categoryLabel].some((v) => v.toLowerCase().includes(q.toLowerCase())));
 
   async function remove(d: Doc) {
-    if (!(await confirmDelete(`документа „${d.title}"`))) return;
+    if (!(await confirmDelete(t("bizdocs.ui.mydocs.confirmDelete", { title: d.title })))) return;
     const res = await fetch(`/api/business-docs/${d.id}`, { method: "DELETE" });
     if (res.ok) router.refresh();
-    else alert((await res.json().catch(() => ({}))).error ?? "Грешка при изтриване.");
+    else alert((await res.json().catch(() => ({}))).error ?? t("bizdocs.ui.mydocs.errDelete"));
   }
 
   // групиране по година → месец
@@ -84,25 +87,25 @@ export function MyDocsList({ docs }: { docs: Doc[] }) {
       }
       document.body.removeChild(host);
       await downloadPdfBlobs(files, `Документи-${todayStamp()}`);
-    } catch { alert("Неуспешно сваляне."); } finally { setBusy(false); }
+    } catch { alert(t("bizdocs.ui.mydocs.dlFail")); } finally { setBusy(false); }
   }
 
   return (
     <>
       <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
-        <button className={`filter-tab${tab === "ready" ? " active" : ""}`} onClick={() => { setTab("ready"); setSel(new Set()); }}>Готови документи ({readyCount})</button>
-        <button className={`filter-tab${tab === "draft" ? " active" : ""}`} onClick={() => { setTab("draft"); setSel(new Set()); }}>Чернови ({draftCount})</button>
+        <button className={`filter-tab${tab === "ready" ? " active" : ""}`} onClick={() => { setTab("ready"); setSel(new Set()); }}>{t("bizdocs.ui.mydocs.ready", { n: readyCount })}</button>
+        <button className={`filter-tab${tab === "draft" ? " active" : ""}`} onClick={() => { setTab("draft"); setSel(new Set()); }}>{t("bizdocs.ui.mydocs.drafts", { n: draftCount })}</button>
       </div>
 
       <div className="glass panel" style={{ padding: "12px 16px", marginBottom: 14, display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
-        <input placeholder="Търси документ…" value={q} onChange={(e) => setQ(e.target.value)} style={{ flex: "1 1 240px", minWidth: 200, padding: "8px 12px" }} />
-        <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => downloadIds([...sel])}>{busy ? "Сваляне…" : `Свали избраните (${sel.size})`}</button>
-        <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => downloadIds(filtered.map((d) => d.id))}>Свали всички</button>
+        <input placeholder={t("bizdocs.ui.mydocs.searchPh")} value={q} onChange={(e) => setQ(e.target.value)} style={{ flex: "1 1 240px", minWidth: 200, padding: "8px 12px" }} />
+        <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => downloadIds([...sel])}>{busy ? t("bizdocs.ui.mydocs.downloading") : t("bizdocs.ui.mydocs.downloadSel", { n: sel.size })}</button>
+        <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => downloadIds(filtered.map((d) => d.id))}>{t("bizdocs.ui.mydocs.downloadAll")}</button>
       </div>
 
       {filtered.length === 0 && (
         <div className="glass panel" style={{ textAlign: "center", padding: "34px 0", color: "var(--muted)", fontSize: 13 }}>
-          {tab === "draft" ? "Няма чернови." : "Няма готови документи."}
+          {tab === "draft" ? t("bizdocs.ui.mydocs.noDrafts") : t("bizdocs.ui.mydocs.noReady")}
         </div>
       )}
 
@@ -113,22 +116,22 @@ export function MyDocsList({ docs }: { docs: Doc[] }) {
           <div key={key} style={{ marginBottom: 16 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "0 0 8px" }}>
               <input type="checkbox" checked={allSel} onChange={() => toggleGroup(rows)} style={{ width: "auto" }} />
-              <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>{MONTHS[Number(m)]} {y} <span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 400 }}>({rows.length})</span></h3>
+              <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>{monthFmt.format(new Date(Number(y), Number(m), 1))} {y} <span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 400 }}>({rows.length})</span></h3>
             </div>
             <div className="glass panel" style={{ padding: "8px 0" }}>
               <table>
-                <thead><tr><th style={{ width: 30 }}></th><th>Документ</th><th>Категория</th><th>Статус</th><th></th></tr></thead>
+                <thead><tr><th style={{ width: 30 }}></th><th>{t("bizdocs.ui.mydocs.colDoc")}</th><th>{t("bizdocs.ui.mydocs.colCategory")}</th><th>{t("bizdocs.ui.mydocs.colStatus")}</th><th></th></tr></thead>
                 <tbody>
                   {rows.map((d) => (
                     <tr key={d.id}>
                       <td><input type="checkbox" checked={sel.has(d.id)} onChange={() => toggle(d.id)} style={{ width: "auto" }} /></td>
                       <td style={{ fontWeight: 600 }}><Link href={`/dashboard/business-docs/doc/${d.id}`} style={{ color: "inherit", textDecoration: "none" }}>{d.title}</Link></td>
-                      <td style={{ fontSize: 12.5 }}>{d.categoryLabel}</td>
-                      <td><span style={{ fontSize: 11.5, fontWeight: 700, color: STATUS_COLOR[d.status] }}>{STATUS_LABEL[d.status] ?? d.status}</span></td>
+                      <td style={{ fontSize: 12.5 }}>{catLabel(d.category, d.categoryLabel)}</td>
+                      <td><span style={{ fontSize: 11.5, fontWeight: 700, color: STATUS_COLOR[d.status] }}>{d.status in { draft: 1, final: 1, archived: 1 } ? t(`bizdocs.ui.status.${d.status}`) : d.status}</span></td>
                       <td style={{ display: "flex", gap: 6 }}>
-                        <Link href={`/dashboard/business-docs/doc/${d.id}`} className="btn btn-ghost btn-sm" title="Отвори / редактирай">Отвори</Link>
+                        <Link href={`/dashboard/business-docs/doc/${d.id}`} className="btn btn-ghost btn-sm" title={t("bizdocs.ui.mydocs.openTitle")}>{t("bizdocs.ui.mydocs.open")}</Link>
                         <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => downloadIds([d.id])}>↓ PDF</button>
-                        <button className="btn btn-ghost btn-sm" title="Изтрий" onClick={() => remove(d)} style={{ color: "var(--brick)", borderColor: "var(--brick)", display: "inline-flex", alignItems: "center" }}><UiIcon.trash /></button>
+                        <button className="btn btn-ghost btn-sm" title={t("bizdocs.ui.mydocs.deleteTitle")} onClick={() => remove(d)} style={{ color: "var(--brick)", borderColor: "var(--brick)", display: "inline-flex", alignItems: "center" }}><UiIcon.trash /></button>
                       </td>
                     </tr>
                   ))}
@@ -138,7 +141,7 @@ export function MyDocsList({ docs }: { docs: Doc[] }) {
           </div>
         );
       })}
-      {filtered.length === 0 && <div className="glass panel" style={{ textAlign: "center", padding: "40px 0", color: "var(--muted)" }}>Няма документи.</div>}
+      {filtered.length === 0 && <div className="glass panel" style={{ textAlign: "center", padding: "40px 0", color: "var(--muted)" }}>{t("bizdocs.ui.mydocs.none")}</div>}
     </>
   );
 }

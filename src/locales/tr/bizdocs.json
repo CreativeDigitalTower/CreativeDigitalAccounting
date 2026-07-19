@@ -10,5 +10,189 @@
     "Kaydetme, durumlar, favoriler ve belge geçmişi"
   ],
   "cta": "Business veya Pro'ya geç →",
-  "note": "Modülü ve tüm işinizi yönetmek için düzinelerce özelliği daha açın."
+  "note": "Modülü ve tüm işinizi yönetmek için düzinelerce özelliği daha açın.",
+  "ui": {
+    "status": {
+      "draft": "Taslak",
+      "final": "Tamamlandı",
+      "archived": "Arşivlendi"
+    },
+    "complexity": {
+      "easy": "Kolay",
+      "medium": "Orta",
+      "detailed": "Ayrıntılı"
+    },
+    "home": {
+      "title": "İş Belgeleri Merkezi",
+      "subtitle": "{n} profesyonel şablon · {m} kategori — firmanızın verileriyle otomatik doldurulur",
+      "searchPh": "Belge arayın… (örn. sözleşme, vekâletname, emir)",
+      "myDocs": "Oluşturduğum belgeler",
+      "myDocsSub": "Oluşturduğunuz tüm sözleşmeler ve belgeler — tek yerde.",
+      "open": "Aç →",
+      "newContract": "Yeni sözleşme",
+      "orderDecision": "Emir / Karar",
+      "hrDoc": "Personel belgesi",
+      "disclaimer": "Bunlar, işinizi kolaylaştırmak için önerilen <strong>standart şablonlardır</strong>. Belirli hukuki durumlar için belgeyi kullanmadan önce bir uzmana (avukat/muhasebeci) danışmanızı öneririz.",
+      "recent": "Son kullanılanlar",
+      "recentEmpty": "Henüz oluşturulmuş belgeniz yok.",
+      "favorites": "Favoriler",
+      "favEmpty": "Hızlı erişim için belgeleri favori olarak işaretleyin.",
+      "categories": "Kategoriler",
+      "tplCount": "{n} şablon →",
+      "aiTitle": "AI İş Belgeleri",
+      "aiSub": "Yakında — yapay zeka ile belge oluşturma.",
+      "recommended": "Önerilen şablonlar"
+    },
+    "mydocs": {
+      "ready": "Hazır belgeler ({n})",
+      "drafts": "Taslaklar ({n})",
+      "searchPh": "Belge ara…",
+      "downloadSel": "Seçilenleri indir ({n})",
+      "downloading": "İndiriliyor…",
+      "downloadAll": "Tümünü indir",
+      "noDrafts": "Taslak yok.",
+      "noReady": "Hazır belge yok.",
+      "none": "Belge yok.",
+      "colDoc": "Belge",
+      "colCategory": "Kategori",
+      "colStatus": "Durum",
+      "open": "Aç",
+      "openTitle": "Aç / düzenle",
+      "deleteTitle": "Sil",
+      "confirmDelete": "„{title}“ belgesini",
+      "errDelete": "Silme hatası.",
+      "dlFail": "İndirme başarısız."
+    },
+    "editor": {
+      "back": "← İş belgeleri",
+      "save": "Kaydet",
+      "saving": "Kaydediliyor…",
+      "savedAt": "Kaydedildi {time}",
+      "favorite": "Favori",
+      "pin": "Sabitle",
+      "confirmDelete": "Belge silinsin mi?",
+      "print": "Yazdır",
+      "bold": "Kalın",
+      "italic": "İtalik",
+      "underline": "Altı çizili",
+      "size": "Boyut",
+      "sizeSmall": "Küçük",
+      "sizeNormal": "Normal",
+      "sizeBig": "Büyük",
+      "ul": "Liste",
+      "ol": "Numaralı liste",
+      "left": "Sola",
+      "center": "Ortala",
+      "right": "Sağa",
+      "indent": "Girinti",
+      "outdent": "Girintiyi azalt",
+      "undo": "Geri al",
+      "redo": "Yinele",
+      "image": "Görsel",
+      "imageUrl": "Görsel URL'si:",
+      "table": "Tablo",
+      "pageBreak": "Yeni sayfa",
+      "sizeHeading": "Başlık",
+      "printBtn": "Yazdır",
+      "deleteBtn": "Sil"
+    },
+    "category": {
+      "back": "← İş belgeleri",
+      "preview": "Önizleme →"
+    }
+  },
+  "cat": {
+    "company": {
+      "title": "Firma belgeleri",
+      "desc": "Kararlar, emirler, tutanaklar ve vekâletnameler."
+    },
+    "contracts": {
+      "title": "Sözleşmeler",
+      "desc": "Hizmet, tedarik, kira ve ortaklık için hazır sözleşmeler."
+    },
+    "hr": {
+      "title": "Personel",
+      "desc": "İş ve hizmet sözleşmeleri, emirler ve görev tanımları."
+    },
+    "finance": {
+      "title": "Finansal belgeler",
+      "desc": "İşletme finansal belgeleri — talepler, makbuzlar, raporlar."
+    },
+    "clients": {
+      "title": "Müşteriler",
+      "desc": "Teklifler, fiyat teklifleri ve müşteri tutanakları."
+    },
+    "suppliers": {
+      "title": "Tedarikçiler",
+      "desc": "Talepler, siparişler ve teslimat kabulü."
+    },
+    "gdpr": {
+      "title": "GDPR",
+      "desc": "Kişisel verilerin korunması belgeleri."
+    },
+    "inventory": {
+      "title": "Envanter",
+      "desc": "Envanter listeleri ve sayım tutanakları."
+    },
+    "vehicles": {
+      "title": "Araçlar",
+      "desc": "Sefer kayıtları, yakıt raporları ve iş seyahatleri."
+    },
+    "construction": {
+      "title": "İnşaat",
+      "desc": "Kabul ve yapılan işler tutanakları."
+    },
+    "production": {
+      "title": "Üretim",
+      "desc": "Üretim emirleri ve kontrol formları."
+    },
+    "projects": {
+      "title": "Projeler",
+      "desc": "Planlar, brifler ve proje raporları."
+    },
+    "marketing": {
+      "title": "Pazarlama",
+      "desc": "Brifler, medya planları ve kampanya raporları."
+    },
+    "legal": {
+      "title": "Hukuki belgeler",
+      "desc": "Davetler, bildirimler, ihtarlar ve talepler."
+    },
+    "bank": {
+      "title": "Banka belgeleri",
+      "desc": "Banka teminatı talepleri ve teyitler."
+    },
+    "iso": {
+      "title": "ISO belgeleri",
+      "desc": "Kontrol formları, raporlar ve iç denetimler."
+    },
+    "policies": {
+      "title": "Firma politikaları",
+      "desc": "Güvenlik, GDPR, izin politikaları ve etik kuralları."
+    },
+    "analysis": {
+      "title": "İş analizleri",
+      "desc": "SWOT, PESTEL, Canvas ve risk matrisleri."
+    },
+    "letters": {
+      "title": "Mektuplar",
+      "desc": "Müşterilere, tedarikçilere ve kurumlara iş mektupları."
+    },
+    "protocols": {
+      "title": "Tutanaklar",
+      "desc": "Teslim-tesellüm ve tespit tutanakları."
+    },
+    "forms": {
+      "title": "Formlar",
+      "desc": "Başvurular, talepler, şikayetler ve bildirimler."
+    },
+    "declarations": {
+      "title": "Beyanlar",
+      "desc": "En sık kullanılan iş beyanları."
+    },
+    "correspondence": {
+      "title": "Yazışma",
+      "desc": "E-posta şablonları, davetler ve teşekkür mektupları."
+    }
+  }
 }

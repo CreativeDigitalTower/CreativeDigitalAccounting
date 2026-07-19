@@ -4,13 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { UiIcon } from "@/components/app/NavIcons";
+import { useT } from "@/components/i18n/I18nProvider";
 
 type Doc = { id: string; title: string; contentHtml: string; status: string; favorite: boolean; pinned: boolean };
 
-const STATUSES = [{ v: "draft", l: "Чернова" }, { v: "final", l: "Завършен" }, { v: "archived", l: "Архивиран" }];
+const STATUSES = [{ v: "draft" }, { v: "final" }, { v: "archived" }];
 
 export function DocEditor({ doc, logoUrl, companyName }: { doc: Doc; logoUrl: string | null; companyName: string }) {
   const router = useRouter();
+  const t = useT();
   const editorRef = useRef<HTMLDivElement>(null);
   const [title, setTitle] = useState(doc.title);
   const [status, setStatus] = useState(doc.status);
@@ -46,7 +48,7 @@ export function DocEditor({ doc, logoUrl, companyName }: { doc: Doc; logoUrl: st
   }
 
   async function remove() {
-    if (!confirm("Изтриване на документа?")) return;
+    if (!confirm(t("bizdocs.ui.editor.confirmDelete"))) return;
     const res = await fetch(`/api/business-docs/${doc.id}`, { method: "DELETE" });
     if (res.ok) router.push("/dashboard/business-docs");
   }
@@ -103,51 +105,51 @@ export function DocEditor({ doc, logoUrl, companyName }: { doc: Doc; logoUrl: st
     <>
       {/* Top bar */}
       <div className="no-print" style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
-        <Link href="/dashboard/business-docs" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← Бизнес документи</Link>
+        <Link href="/dashboard/business-docs" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>{t("bizdocs.ui.editor.back")}</Link>
         <input value={title} onChange={(e) => setTitle(e.target.value)} style={{ flex: 1, minWidth: 200, maxWidth: 420, fontWeight: 600, fontSize: 15 }} />
         <select value={status} onChange={(e) => setStatus(e.target.value)} style={{ width: "auto", padding: "6px 10px", fontSize: 12.5 }}>
-          {STATUSES.map((s) => <option key={s.v} value={s.v}>{s.l}</option>)}
+          {STATUSES.map((s) => <option key={s.v} value={s.v}>{t(`bizdocs.ui.status.${s.v}`)}</option>)}
         </select>
-        <button className="btn btn-ghost btn-sm" onClick={() => { setFavorite(!favorite); patch({ favorite: !favorite }); }} title="Любим" style={{ display: "inline-flex", alignItems: "center", color: favorite ? "var(--brass)" : undefined }}>{favorite ? <UiIcon.starFill /> : <UiIcon.star />}</button>
-        <button className="btn btn-ghost btn-sm" onClick={() => { setPinned(!pinned); patch({ pinned: !pinned }); }} title="Закачи" style={{ display: "inline-flex", alignItems: "center", color: pinned ? "var(--navy)" : undefined }}><UiIcon.pin /></button>
-        <button className="btn btn-primary btn-sm" onClick={save} disabled={saving} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>{saving ? "Запазване…" : <><UiIcon.save /> Запази</>}</button>
-        {savedAt && <span style={{ fontSize: 11.5, color: "var(--emerald)" }}>Запазено {savedAt}</span>}
+        <button className="btn btn-ghost btn-sm" onClick={() => { setFavorite(!favorite); patch({ favorite: !favorite }); }} title={t("bizdocs.ui.editor.favorite")} style={{ display: "inline-flex", alignItems: "center", color: favorite ? "var(--brass)" : undefined }}>{favorite ? <UiIcon.starFill /> : <UiIcon.star />}</button>
+        <button className="btn btn-ghost btn-sm" onClick={() => { setPinned(!pinned); patch({ pinned: !pinned }); }} title={t("bizdocs.ui.editor.pin")} style={{ display: "inline-flex", alignItems: "center", color: pinned ? "var(--navy)" : undefined }}><UiIcon.pin /></button>
+        <button className="btn btn-primary btn-sm" onClick={save} disabled={saving} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>{saving ? t("bizdocs.ui.editor.saving") : <><UiIcon.save /> {t("bizdocs.ui.editor.save")}</>}</button>
+        {savedAt && <span style={{ fontSize: 11.5, color: "var(--emerald)" }}>{t("bizdocs.ui.editor.savedAt", { time: savedAt })}</span>}
       </div>
 
       {/* Export bar */}
       <div className="no-print" style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
         <button className="btn btn-ghost btn-sm" onClick={downloadPdf} disabled={busy}>{busy ? "…" : "↓ PDF"}</button>
         <button className="btn btn-ghost btn-sm" onClick={downloadDocx}>↓ DOCX</button>
-        <button className="btn btn-ghost btn-sm" onClick={printDoc} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><UiIcon.print /> Печат</button>
-        <button className="btn btn-ghost btn-sm" style={{ marginLeft: "auto", color: "var(--brick)" }} onClick={remove}>Изтрий</button>
+        <button className="btn btn-ghost btn-sm" onClick={printDoc} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><UiIcon.print /> {t("bizdocs.ui.editor.printBtn")}</button>
+        <button className="btn btn-ghost btn-sm" style={{ marginLeft: "auto", color: "var(--brick)" }} onClick={remove}>{t("bizdocs.ui.editor.deleteBtn")}</button>
       </div>
 
       {/* Toolbar */}
       <div className="no-print glass" style={{ display: "flex", gap: 4, flexWrap: "wrap", padding: 8, borderRadius: 10, marginBottom: 12, position: "sticky", top: 8, zIndex: 20 }}>
-        <Btn onClick={() => cmd("undo")} title="Отмени">↶</Btn>
-        <Btn onClick={() => cmd("redo")} title="Възстанови">↷</Btn>
+        <Btn onClick={() => cmd("undo")} title={t("bizdocs.ui.editor.undo")}>↶</Btn>
+        <Btn onClick={() => cmd("redo")} title={t("bizdocs.ui.editor.redo")}>↷</Btn>
         <Sep />
-        <Btn onClick={() => cmd("bold")} title="Удебелен"><b>Б</b></Btn>
-        <Btn onClick={() => cmd("italic")} title="Курсив"><i>К</i></Btn>
-        <Btn onClick={() => cmd("underline")} title="Подчертан"><u>П</u></Btn>
+        <Btn onClick={() => cmd("bold")} title={t("bizdocs.ui.editor.bold")}><b>B</b></Btn>
+        <Btn onClick={() => cmd("italic")} title={t("bizdocs.ui.editor.italic")}><i>I</i></Btn>
+        <Btn onClick={() => cmd("underline")} title={t("bizdocs.ui.editor.underline")}><u>U</u></Btn>
         <Sep />
         <select onMouseDown={(e) => e.preventDefault()} onChange={(e) => { cmd("fontSize", e.target.value); e.target.selectedIndex = 0; }} style={{ width: "auto", padding: "0 6px", height: 30, fontSize: 12.5 }} defaultValue="">
-          <option value="" disabled>Размер</option>
-          <option value="2">Малък</option><option value="3">Нормален</option><option value="5">Голям</option><option value="6">Заглавие</option>
+          <option value="" disabled>{t("bizdocs.ui.editor.size")}</option>
+          <option value="2">{t("bizdocs.ui.editor.sizeSmall")}</option><option value="3">{t("bizdocs.ui.editor.sizeNormal")}</option><option value="5">{t("bizdocs.ui.editor.sizeBig")}</option><option value="6">{t("bizdocs.ui.editor.sizeHeading")}</option>
         </select>
         <Sep />
-        <Btn onClick={() => cmd("insertUnorderedList")} title="Списък">•</Btn>
-        <Btn onClick={() => cmd("insertOrderedList")} title="Номериран списък">1.</Btn>
-        <Btn onClick={() => cmd("outdent")} title="Намали отстъп">⇤</Btn>
-        <Btn onClick={() => cmd("indent")} title="Отстъп">⇥</Btn>
+        <Btn onClick={() => cmd("insertUnorderedList")} title={t("bizdocs.ui.editor.ul")}>•</Btn>
+        <Btn onClick={() => cmd("insertOrderedList")} title={t("bizdocs.ui.editor.ol")}>1.</Btn>
+        <Btn onClick={() => cmd("outdent")} title={t("bizdocs.ui.editor.outdent")}>⇤</Btn>
+        <Btn onClick={() => cmd("indent")} title={t("bizdocs.ui.editor.indent")}>⇥</Btn>
         <Sep />
-        <Btn onClick={() => cmd("justifyLeft")} title="Ляво">⯇</Btn>
-        <Btn onClick={() => cmd("justifyCenter")} title="Център">≡</Btn>
-        <Btn onClick={() => cmd("justifyRight")} title="Дясно">⯈</Btn>
+        <Btn onClick={() => cmd("justifyLeft")} title={t("bizdocs.ui.editor.left")}>⯇</Btn>
+        <Btn onClick={() => cmd("justifyCenter")} title={t("bizdocs.ui.editor.center")}>≡</Btn>
+        <Btn onClick={() => cmd("justifyRight")} title={t("bizdocs.ui.editor.right")}>⯈</Btn>
         <Sep />
-        <Btn onClick={() => insertHtml('<table style="width:100%;border-collapse:collapse;margin:8px 0;"><tr><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td></tr><tr><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td></tr></table>')} title="Таблица">▦</Btn>
-        <Btn onClick={() => { const url = prompt("URL на изображение:"); if (url) insertHtml(`<img src="${url}" style="max-width:100%;" />`); }} title="Изображение"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8.5" cy="9.5" r="1.5" /><path d="m4 17 5-5 4 4 3-3 4 4" /></svg></Btn>
-        <Btn onClick={() => insertHtml('<div style="page-break-after:always;border-top:1px dashed #bbb;margin:18px 0;"></div>')} title="Нова страница">⤓</Btn>
+        <Btn onClick={() => insertHtml('<table style="width:100%;border-collapse:collapse;margin:8px 0;"><tr><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td></tr><tr><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td></tr></table>')} title={t("bizdocs.ui.editor.table")}>▦</Btn>
+        <Btn onClick={() => { const url = prompt(t("bizdocs.ui.editor.imageUrl")); if (url) insertHtml(`<img src="${url}" style="max-width:100%;" />`); }} title={t("bizdocs.ui.editor.image")}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8.5" cy="9.5" r="1.5" /><path d="m4 17 5-5 4 4 3-3 4 4" /></svg></Btn>
+        <Btn onClick={() => insertHtml('<div style="page-break-after:always;border-top:1px dashed #bbb;margin:18px 0;"></div>')} title={t("bizdocs.ui.editor.pageBreak")}>⤓</Btn>
       </div>
 
       {/* Document page */}
