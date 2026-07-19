@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useT } from "@/components/i18n/I18nProvider";
 
 export function DownloadButtons({ filename = "document", selector = ".printable" }: { filename?: string; selector?: string }) {
+  const t = useT();
   const [busy, setBusy] = useState(false);
 
   function printDoc() {
@@ -13,7 +15,7 @@ export function DownloadButtons({ filename = "document", selector = ".printable"
 
   async function downloadPdf() {
     const el = document.querySelector(selector) as HTMLElement | null;
-    if (!el) { alert("Документът не е намерен за изтегляне."); return; }
+    if (!el) { alert(t("billing.pdfNotFound")); return; }
     setBusy(true);
     try {
       const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
@@ -41,7 +43,7 @@ export function DownloadButtons({ filename = "document", selector = ".printable"
       pdf.save(`${filename}.pdf`);
     } catch (err) {
       console.error("PDF export failed", err);
-      alert("Неуспешно генериране на PDF. Отваряме диалога за печат — изберете „Запази като PDF“ (Save as PDF).");
+      alert(t("billing.pdfFailed"));
       printDoc();
     } finally {
       setBusy(false);
@@ -50,9 +52,9 @@ export function DownloadButtons({ filename = "document", selector = ".printable"
 
   return (
     <div style={{ display: "flex", gap: 8 }} className="no-print">
-      <button onClick={printDoc} className="btn btn-ghost btn-sm"style={{display:"inline-flex",alignItems:"center",gap:6}}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><path d="M7 9V3h10v6M7 18H5a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-2"/><rect x="7" y="15" width="10" height="6"/></svg> Отпечатай</button>
+      <button onClick={printDoc} className="btn btn-ghost btn-sm"style={{display:"inline-flex",alignItems:"center",gap:6}}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign:"-2px"}}><path d="M7 9V3h10v6M7 18H5a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-2"/><rect x="7" y="15" width="10" height="6"/></svg> {t("billing.print")}</button>
       <button onClick={downloadPdf} className="btn btn-primary btn-sm" disabled={busy}>
-        {busy ? "Генериране…" : "↓ Изтегли PDF"}
+        {busy ? t("billing.generating") : t("billing.downloadPdf")}
       </button>
     </div>
   );

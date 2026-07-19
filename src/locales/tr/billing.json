@@ -1,0 +1,20 @@
+{
+  "title": "Abonelik",
+  "subtitle": "Plan ve faturalandırma yönetimi",
+  "currentPlan": "MEVCUT PLAN",
+  "nextBilling": "Sonraki faturalandırma: {date}",
+  "docsThisMonth": "Bu ayki belgeler",
+  "footNote": "Şimdilik abonelikler yalnızca banka havalesiyle ödenir; kart ödemesi yakında eklenecek. Plan değişikliğinde değişiklik, ödeme onaylandıktan sonra yürürlüğe girer. Ücretli dönem bittiğinde hesap otomatik olarak Ücretsiz'e döner. Start ve Business planlarında 7 gün ücretsiz deneme (bir kez).",
+  "trialEndedTitle": "Ücretsiz deneme süreniz sona erdi",
+  "subEndedTitle": "Aboneliğinizin süresi doldu",
+  "reverted": "Hesabınız <strong>Ücretsiz</strong> plana geri döndürüldü. Seçtiğiniz planın tüm özelliklerini kullanmaya devam etmek için abone olun.",
+  "revertedDated": "Hesabınız {date} tarihinde <strong>Ücretsiz</strong> plana geri döndürüldü. Seçtiğiniz planın tüm özelliklerini kullanmaya devam etmek için abone olun.",
+  "later": "Daha sonra",
+  "viewPlans": "Planları gör →",
+  "featureLockTitle": "“{plan}” planında ve üzerinde kullanılabilir",
+  "pdfNotFound": "İndirilecek belge bulunamadı.",
+  "pdfFailed": "PDF oluşturulamadı. Yazdırma penceresi açılıyor — “PDF olarak kaydet”i seçin.",
+  "print": "Yazdır",
+  "generating": "Oluşturuluyor…",
+  "downloadPdf": "↓ PDF indir"
+}

@@ -1,0 +1,20 @@
+{
+  "title": "Subscription",
+  "subtitle": "Manage your plan and billing",
+  "currentPlan": "CURRENT PLAN",
+  "nextBilling": "Next billing: {date}",
+  "docsThisMonth": "Documents this month",
+  "footNote": "For now subscriptions are paid only by bank transfer; card payment is coming soon. When you change plan, the change takes effect after the payment is confirmed. After the paid period ends the account automatically reverts to Free. 7-day free trial (once) on the Start and Business plans.",
+  "trialEndedTitle": "Your free trial has ended",
+  "subEndedTitle": "Your subscription has expired",
+  "reverted": "Your account was reverted to the <strong>Free</strong> plan. Subscribe to keep using all the features of your chosen plan.",
+  "revertedDated": "Your account was reverted to the <strong>Free</strong> plan on {date}. Subscribe to keep using all the features of your chosen plan.",
+  "later": "Later",
+  "viewPlans": "View plans →",
+  "featureLockTitle": "Available on the “{plan}” plan and higher",
+  "pdfNotFound": "The document was not found for download.",
+  "pdfFailed": "PDF generation failed. Opening the print dialog — choose “Save as PDF”.",
+  "print": "Print",
+  "generating": "Generating…",
+  "downloadPdf": "↓ Download PDF"
+}
