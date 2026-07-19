@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useT } from "@/components/i18n/I18nProvider";
 
 export function CookieConsent() {
+  const t = useT();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -27,13 +29,12 @@ export function CookieConsent() {
       }}
     >
       <div style={{ flex: 1, minWidth: 240, fontSize: 13, color: "var(--ink-soft)", lineHeight: 1.5 }}>
-        Използваме бисквитки за функционирането на платформата и за анализ. Можете да приемете всички или само
-        задължителните. Вижте{" "}
-        <Link href="/cookies" style={{ color: "var(--navy)", fontWeight: 600 }}>Политиката за бисквитки</Link>.
+        {t("chrome.cookieText")}{" "}
+        <Link href="/cookies" style={{ color: "var(--navy)", fontWeight: 600 }}>{t("chrome.cookiePolicy")}</Link>.
       </div>
       <div style={{ display: "flex", gap: 8 }}>
-        <button onClick={() => decide("necessary")} className="btn btn-ghost btn-sm">Само задължителни</button>
-        <button onClick={() => decide("all")} className="btn btn-primary btn-sm">Приемам всички</button>
+        <button onClick={() => decide("necessary")} className="btn btn-ghost btn-sm">{t("chrome.cookieNecessary")}</button>
+        <button onClick={() => decide("all")} className="btn btn-primary btn-sm">{t("chrome.cookieAll")}</button>
       </div>
     </div>
   );
