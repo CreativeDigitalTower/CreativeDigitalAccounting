@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import { LegalDoc } from "@/components/marketing/LegalDoc";
+import { getLocale } from "@/lib/i18n/server";
+import { pickLegal, type LegalContent } from "@/content/legal";
 
-export const metadata: Metadata = { title: "Политика за поверителност", description: "Как Creative Digital Accounting обработва и защитава личните данни съгласно GDPR." };
+const PAGE = "privacy";
 
-export default function PrivacyPage() {
-  return (
-    <LegalDoc
-      title="Политика за поверителност"
-      sections={[
+// Българска базова версия (официална) — служи и за fallback.
+// Преводи по език/държава се добавят в src/content/legal (данни), без промяна тук.
+const bg: LegalContent = {
+  metaTitle: "Политика за поверителност",
+  metaDescription: "Как Creative Digital Accounting обработва и защитава личните данни съгласно GDPR.",
+  title: "Политика за поверителност",
+  sections: [
         { h: "1. Обща информация", p: ["Настоящата Политика описва начина, по който „Криейтив Диджитъл Тауър\" ЕООД, ЕИК 205748188 („Администратор\"), обработва личните данни на потребителите на платформата Creative Digital Accounting в съответствие с Регламент (ЕС) 2016/679 (GDPR), Закона за защита на личните данни, Закона за електронната търговия и приложимото законодателство."] },
         { h: "2. Данни за администратора", list: ["Наименование: „Криейтив Диджитъл Тауър\" ЕООД", "ЕИК: 205748188", "Имейл: office@creativedigitalaccounting.com", "Уебсайт: creativedigitaltower.com", "Платформа: Creative Digital Accounting"] },
         { h: "3. Категории лични данни", p: ["Данни за регистрация: име и фамилия, имейл, телефон, криптирана парола, потребителско име. Данни за фирмата: наименование, ЕИК/Булстат, ДДС номер, адрес, лице за контакт, банкови данни, лого. Данни за клиенти и доставчици, въведени от потребителите. Данни за служители (при използване на съответните модули): имена, ЕГН, адрес, длъжност, възнаграждения, осигурителни данни. Технически данни: IP адрес, дата и час на достъп, браузър, ОС, журнали за сигурност."] },
@@ -24,7 +28,15 @@ export default function PrivacyPage() {
         { h: "14. Жалби", p: ["Имате право да подадете жалба до Комисията за защита на личните данни (КЗЛД), гр. София 1592, бул. „Проф. Цветан Лазаров\" № 2, www.cpdp.bg."] },
         { h: "15. Промени", p: ["Настоящата политика може да бъде актуализирана периодично. Промените се публикуват на официалния сайт."] },
         { h: "16. Контакт", p: ["За въпроси относно личните данни: office@creativedigitalaccounting.com или чрез контактната форма на сайта."] },
-      ]}
-    />
-  );
+      ],
+};
+
+export async function generateMetadata(): Promise<Metadata> {
+  const c = pickLegal(PAGE, await getLocale(), bg);
+  return { title: c.metaTitle, description: c.metaDescription };
+}
+
+export default async function LegalPage() {
+  const c = pickLegal(PAGE, await getLocale(), bg);
+  return <LegalDoc title={c.title} sections={c.sections} />;
 }

@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import { LegalDoc } from "@/components/marketing/LegalDoc";
+import { getLocale } from "@/lib/i18n/server";
+import { pickLegal, type LegalContent } from "@/content/legal";
 
-export const metadata: Metadata = { title: "Политика за бисквитки", description: "Как Creative Digital Accounting използва бисквитки." };
+const PAGE = "cookies";
 
-export default function CookiesPage() {
-  return (
-    <LegalDoc
-      title="Политика за бисквитки (Cookie Policy)"
-      sections={[
+// Българска базова версия (официална) — служи и за fallback.
+// Преводи по език/държава се добавят в src/content/legal (данни), без промяна тук.
+const bg: LegalContent = {
+  metaTitle: "Политика за бисквитки",
+  metaDescription: "Как Creative Digital Accounting използва бисквитки.",
+  title: "Политика за бисквитки (Cookie Policy)",
+  sections: [
         { h: "1. Какво представляват бисквитките", p: ["Бисквитките (Cookies) са малки текстови файлове, които се съхраняват на устройството на потребителя при посещение на уебсайтове. Те позволяват на сайта да разпознава устройството, да запомня настройки и да подобрява изживяването."] },
         { h: "2. Кой използва бисквитките", p: ["Бисквитките се използват от „Криейтив Диджитъл Тауър\" ЕООД, ЕИК 205748188, като собственик и оператор на платформата Creative Digital Accounting."] },
         { h: "3. Видове бисквитки", p: ["Необходими — задължителни за функционирането (вход, сесия, защита, настройки); не изискват съгласие. Функционални — запомняне на език и интерфейсни настройки. Аналитични — анализ на използването (напр. Google Analytics, Microsoft Clarity); активират се само след съгласие. Маркетингови — рекламни кампании и ремаркетинг (напр. Meta Pixel, Google Ads, LinkedIn Insight Tag); активират се само след съгласие."] },
@@ -17,7 +21,15 @@ export default function CookiesPage() {
         { h: "7. Международни трансфери", p: ["При използване на услуги на трети страни определени данни могат да бъдат обработвани извън ЕИП, с прилагане на подходящи механизми съгласно GDPR."] },
         { h: "8. Промени в политиката", p: ["Политиката може да бъде актуализирана периодично. Промените се публикуват на официалния сайт."] },
         { h: "9. Контакт", p: ["За въпроси относно бисквитките: office@creativedigitalaccounting.com."] },
-      ]}
-    />
-  );
+      ],
+};
+
+export async function generateMetadata(): Promise<Metadata> {
+  const c = pickLegal(PAGE, await getLocale(), bg);
+  return { title: c.metaTitle, description: c.metaDescription };
+}
+
+export default async function LegalPage() {
+  const c = pickLegal(PAGE, await getLocale(), bg);
+  return <LegalDoc title={c.title} sections={c.sections} />;
 }
