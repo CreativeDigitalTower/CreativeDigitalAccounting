@@ -1,0 +1,100 @@
+{
+  "chrome": {
+    "eyebrow": "Prezentare platformă",
+    "statusOf": "Starea {name}",
+    "healthTitle": "Sănătatea platformei",
+    "regTitle": "Înregistrări pe luni",
+    "planTitle": "Distribuție pe plan",
+    "attentionTitle": "Necesită atenție",
+    "insightsTitle": "Concluzii de management",
+    "oppTitle": "Oportunități",
+    "quickTitle": "Acțiuni rapide",
+    "noHealthData": "Încă nu sunt destule date pentru o analiză fiabilă.",
+    "newFirms": "Companii noi",
+    "qEmails": "E-mailuri & notificări",
+    "qBusinesses": "Companii (filtre)",
+    "qAwaiting": "Cereri neplătite",
+    "qFirms": "Firme de contabilitate",
+    "qBlog": "Blog"
+  },
+  "topClients": {
+    "title": "Top 5 clienți după venit",
+    "noData": "Încă nu există date despre venitul din facturi.",
+    "total": "Total"
+  },
+  "card": {
+    "total": "Companii înregistrate",
+    "new": "Noi luna aceasta",
+    "active": "Active (30 zile)",
+    "paid": "Clienți plătitori",
+    "free": "Clienți gratuiti",
+    "trial": "Clienți trial",
+    "mrr": "MRR (venit lunar)",
+    "arr": "ARR (venit anual)",
+    "arpu": "Venit mediu/client",
+    "conv": "Conversie către plătit",
+    "awaiting": "Cereri neplătite",
+    "firms": "Firme de contabilitate",
+    "managed": "Clienți administrați",
+    "commission": "Comisioane estimate"
+  },
+  "caption": {
+    "current": "valoare curentă",
+    "noPeriod": "nicio perioadă comparabilă",
+    "better": "mai bine decât luna trecută",
+    "worse": "mai slab decât luna trecută",
+    "conv": "{paid} plătitori din {total} companii"
+  },
+  "health": {
+    "lowActivity": "Activitate scăzută a companiilor (sub 30%).",
+    "modActivity": "Activitate moderată a companiilor.",
+    "lowConv": "Conversie scăzută către un plan plătit.",
+    "regDrop": "Scădere a înregistrărilor noi față de luna trecută.",
+    "awaitingN": "{n} cereri de abonament neplătite.",
+    "churn": "Pondere mare de companii plătitoare fără activitate (risc de pierdere).",
+    "failedN": "{n} e-mailuri eșuate (30 zile).",
+    "trialN": "{n} conturi trial expiră curând.",
+    "allNorm": "Toți indicatorii cheie sunt în normă.",
+    "labelExcellent": "Stare excelentă a platformei.",
+    "labelGood": "Stare bună cu potenţial.",
+    "labelAttention": "Necesită atenție.",
+    "labelCritical": "Critic — sunt necesare acțiuni."
+  },
+  "insight": {
+    "regHigher": "mai mari",
+    "regLower": "mai mici",
+    "reg": "Înregistrările sunt cu {pct}% {dir} față de luna trecută.",
+    "ctaBusinesses": "Vezi companiile",
+    "conv": "Conversia către un plan plătit este {conv}% ({paid} din {total}).",
+    "awaiting": "{n} companii au cerut un plan plătit, dar fără plată înregistrată.",
+    "ctaConfirmPayments": "Confirmă plățile",
+    "trialExp": "{n} conturi trial expiră în următoarele 7 zile.",
+    "managed": "Firmele de contabilitate au adus {pct}% dintre companiile noi luna aceasta.",
+    "ctaFirms": "Firme de contabilitate",
+    "topPlan": "Cel mai ales plan plătit este {plan} ({n} companii).",
+    "planChanges": "{n} modificări de abonament în ultimele 30 de zile.",
+    "cancellations": "{n} abonamente anulate/expirate în ultimele 30 de zile.",
+    "none": "Încă nu sunt destule date pentru o analiză fiabilă."
+  },
+  "opp": {
+    "nearLimit": "{name} este aproape de limita planului ({used}/{limit}) — upgrade probabil.",
+    "ctaOpen": "Deschide",
+    "hotLead": "Lead fierbinte: {name} (scor {score}/100) — gata pentru un plan plătit.",
+    "firmNearLimit": "Firma de contabilitate „{name}” se apropie de limita de {limit} clienți — potențial pentru un plan superior.",
+    "ctaView": "Vezi",
+    "none": "Continuați monitorizarea — oportunitățile vor apărea pe măsură ce se acumulează date."
+  },
+  "attention": {
+    "awaiting": "Cerere de abonament neplătită — {name}",
+    "ctaConfirm": "Confirmă",
+    "payout": "Cerere de plată a comisionului — {name} ({amount})",
+    "ctaProcess": "Procesează",
+    "trial": "Trial expiră curând — {name}",
+    "ctaView": "Vezi",
+    "inactivePaid": "Companie plătitoare inactivă de {days} zile — {name}",
+    "ctaContact": "Contactează",
+    "failed": "{n} e-mailuri eșuate în ultimele 30 de zile",
+    "ctaCheck": "Verifică",
+    "none": "Momentan nu există evenimente care necesită atenție."
+  }
+}

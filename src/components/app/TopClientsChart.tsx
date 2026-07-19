@@ -2,11 +2,14 @@
 import { useState, useEffect } from "react";
 import { formatCurrency } from "@/lib/constants";
 import type { ClientRevenue } from "@/lib/clientRevenue";
+import { useT } from "@/components/i18n/I18nProvider";
 
 const COLORS = ["#0F8A6A", "#2C4A66", "#A5812E", "#3F9C82", "#A23B2B"];
 
 /** Топ 5 клиента по приход (на база издадени фактури) с процентно разпределение. */
-export function TopClientsChart({ data, title = "Топ 5 клиента по приход" }: { data: ClientRevenue[]; title?: string }) {
+export function TopClientsChart({ data, title }: { data: ClientRevenue[]; title?: string }) {
+  const t = useT();
+  const heading = title ?? t("platformbi.topClients.title");
   const [hover, setHover] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
   useEffect(() => { const t = setTimeout(() => setMounted(true), 40); return () => clearTimeout(t); }, []);
@@ -18,8 +21,8 @@ export function TopClientsChart({ data, title = "Топ 5 клиента по п
   if (top.length === 0 || grand === 0) {
     return (
       <div className="glass panel">
-        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 12px" }}>{title}</h3>
-        <div style={{ fontSize: 13, color: "var(--muted)", padding: "16px 0" }}>Все още няма данни за приходи от фактури.</div>
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 12px" }}>{heading}</h3>
+        <div style={{ fontSize: 13, color: "var(--muted)", padding: "16px 0" }}>{t("platformbi.topClients.noData")}</div>
       </div>
     );
   }
@@ -37,7 +40,7 @@ export function TopClientsChart({ data, title = "Топ 5 клиента по п
 
   return (
     <div className="glass panel">
-      <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>{title}</h3>
+      <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>{heading}</h3>
       <div style={{ display: "flex", gap: 20, alignItems: "center", flexWrap: "wrap" }}>
         <div style={{ position: "relative", width: 120, height: 120, flexShrink: 0 }}>
           <div style={{ width: 120, height: 120, borderRadius: "50%", background: gradient, transition: "transform .35s cubic-bezier(.22,1,.36,1), box-shadow .3s", transform: hover !== null ? "scale(1.07) rotate(3deg)" : "scale(1)", boxShadow: hover !== null ? `0 8px 26px ${COLORS[hover % COLORS.length]}55` : "none" }} />
@@ -50,7 +53,7 @@ export function TopClientsChart({ data, title = "Топ 5 клиента по п
               </>
             ) : (
               <>
-                <div style={{ fontSize: 10, color: "var(--muted)" }}>Общо</div>
+                <div style={{ fontSize: 10, color: "var(--muted)" }}>{t("platformbi.topClients.total")}</div>
                 <div className="num" style={{ fontSize: 13, fontWeight: 700 }}>{formatCurrency(grand)}</div>
               </>
             )}

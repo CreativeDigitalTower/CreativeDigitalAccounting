@@ -1,0 +1,100 @@
+{
+  "chrome": {
+    "eyebrow": "Platform genel bakış",
+    "statusOf": "{name} durumu",
+    "healthTitle": "Platform sağlığı",
+    "regTitle": "Aylara göre kayıtlar",
+    "planTitle": "Plana göre dağılım",
+    "attentionTitle": "Dikkat gerekiyor",
+    "insightsTitle": "Yönetim içgörüleri",
+    "oppTitle": "Fırsatlar",
+    "quickTitle": "Hızlı işlemler",
+    "noHealthData": "Güvenilir bir analiz için henüz yeterli veri yok.",
+    "newFirms": "Yeni şirketler",
+    "qEmails": "E-postalar & bildirimler",
+    "qBusinesses": "İşletmeler (filtreler)",
+    "qAwaiting": "Ödenmemiş talepler",
+    "qFirms": "Muhasebe firmaları",
+    "qBlog": "Blog"
+  },
+  "topClients": {
+    "title": "Gelire göre ilk 5 müşteri",
+    "noData": "Henüz fatura geliri verisi yok.",
+    "total": "Toplam"
+  },
+  "card": {
+    "total": "Kayıtlı şirketler",
+    "new": "Bu ay yeni",
+    "active": "Aktif (30 gün)",
+    "paid": "Ücretli müşteriler",
+    "free": "Ücretsiz müşteriler",
+    "trial": "Deneme müşterileri",
+    "mrr": "MRR (aylık gelir)",
+    "arr": "ARR (yıllık gelir)",
+    "arpu": "Ort. gelir/müşteri",
+    "conv": "Ücretliye dönüşüm",
+    "awaiting": "Ödenmemiş talepler",
+    "firms": "Muhasebe firmaları",
+    "managed": "Yönetilen müşteriler",
+    "commission": "Beklenen komisyonlar"
+  },
+  "caption": {
+    "current": "güncel değer",
+    "noPeriod": "karşılaştırılabilir dönem yok",
+    "better": "geçen aydan daha iyi",
+    "worse": "geçen aydan daha kötü",
+    "conv": "{total} şirketten {paid} ücretli"
+  },
+  "health": {
+    "lowActivity": "Düşük şirket etkinliği (%30 altı).",
+    "modActivity": "Orta düzeyde şirket etkinliği.",
+    "lowConv": "Ücretli plana düşük dönüşüm.",
+    "regDrop": "Geçen aya göre yeni kayıtlarda düşüş.",
+    "awaitingN": "{n} ödenmemiş abonelik talebi.",
+    "churn": "Etkinliği olmayan ücretli şirketlerin yüksek payı (kayıp riski).",
+    "failedN": "{n} başarısız e-posta (30 gün).",
+    "trialN": "{n} deneme hesabı yakında sona eriyor.",
+    "allNorm": "Tüm ana göstergeler normal.",
+    "labelExcellent": "Mükemmel platform sağlığı.",
+    "labelGood": "Potansiyelli iyi durum.",
+    "labelAttention": "Dikkat gerekiyor.",
+    "labelCritical": "Kritik — işlem gerekiyor."
+  },
+  "insight": {
+    "regHigher": "daha yüksek",
+    "regLower": "daha düşük",
+    "reg": "Kayıtlar geçen aya göre %{pct} {dir}.",
+    "ctaBusinesses": "Şirketleri gör",
+    "conv": "Ücretli plana dönüşüm %{conv} ({total} şirketten {paid}).",
+    "awaiting": "{n} şirket ücretli plan istedi ama kayıtlı ödeme yok.",
+    "ctaConfirmPayments": "Ödemeleri onayla",
+    "trialExp": "{n} deneme hesabı önümüzdeki 7 gün içinde sona eriyor.",
+    "managed": "Muhasebe firmaları bu ayki yeni şirketlerin %{pct} kısmını getirdi.",
+    "ctaFirms": "Muhasebe firmaları",
+    "topPlan": "En çok seçilen ücretli plan {plan} ({n} şirket).",
+    "planChanges": "Son 30 günde {n} abonelik değişikliği.",
+    "cancellations": "Son 30 günde {n} iptal/süresi dolmuş abonelik.",
+    "none": "Güvenilir bir analiz için henüz yeterli veri yok."
+  },
+  "opp": {
+    "nearLimit": "{name} plan limitine yakın ({used}/{limit}) — olası yükseltme.",
+    "ctaOpen": "Aç",
+    "hotLead": "Sıcak aday: {name} (skor {score}/100) — ücretli plana hazır.",
+    "firmNearLimit": "Muhasebe firması „{name}“ {limit} müşteri limitine yaklaşıyor — daha yüksek plan potansiyeli.",
+    "ctaView": "Gör",
+    "none": "İzlemeye devam edin — veri biriktikçe fırsatlar ortaya çıkacak."
+  },
+  "attention": {
+    "awaiting": "Ödenmemiş abonelik talebi — {name}",
+    "ctaConfirm": "Onayla",
+    "payout": "Komisyon ödeme talebi — {name} ({amount})",
+    "ctaProcess": "İşle",
+    "trial": "Deneme yakında sona eriyor — {name}",
+    "ctaView": "Gör",
+    "inactivePaid": "{days} gündür etkin olmayan ücretli şirket — {name}",
+    "ctaContact": "İletişime geç",
+    "failed": "Son 30 günde {n} başarısız e-posta",
+    "ctaCheck": "Kontrol et",
+    "none": "Şu anda dikkat gerektiren olay yok."
+  }
+}

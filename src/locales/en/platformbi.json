@@ -1,0 +1,100 @@
+{
+  "chrome": {
+    "eyebrow": "Platform overview",
+    "statusOf": "State of {name}",
+    "healthTitle": "Platform health",
+    "regTitle": "Registrations by month",
+    "planTitle": "Distribution by plan",
+    "attentionTitle": "Needs attention",
+    "insightsTitle": "Management insights",
+    "oppTitle": "Opportunities",
+    "quickTitle": "Quick actions",
+    "noHealthData": "Not enough data yet for a reliable analysis.",
+    "newFirms": "New companies",
+    "qEmails": "Emails & notifications",
+    "qBusinesses": "Businesses (filters)",
+    "qAwaiting": "Unpaid requests",
+    "qFirms": "Accounting firms",
+    "qBlog": "Blog"
+  },
+  "topClients": {
+    "title": "Top 5 clients by revenue",
+    "noData": "No invoice revenue data yet.",
+    "total": "Total"
+  },
+  "card": {
+    "total": "Registered companies",
+    "new": "New this month",
+    "active": "Active (30 days)",
+    "paid": "Paid clients",
+    "free": "Free clients",
+    "trial": "Trial clients",
+    "mrr": "MRR (monthly revenue)",
+    "arr": "ARR (annual revenue)",
+    "arpu": "Avg revenue/client",
+    "conv": "Conversion to paid",
+    "awaiting": "Unpaid requests",
+    "firms": "Accounting firms",
+    "managed": "Managed clients",
+    "commission": "Expected commissions"
+  },
+  "caption": {
+    "current": "current value",
+    "noPeriod": "no comparable period",
+    "better": "better than last month",
+    "worse": "worse than last month",
+    "conv": "{paid} paid of {total} companies"
+  },
+  "health": {
+    "lowActivity": "Low company activity (below 30%).",
+    "modActivity": "Moderate company activity.",
+    "lowConv": "Low conversion to a paid plan.",
+    "regDrop": "Drop in new registrations vs last month.",
+    "awaitingN": "{n} unpaid subscription requests.",
+    "churn": "High share of paid companies without activity (churn risk).",
+    "failedN": "{n} failed emails (30 days).",
+    "trialN": "{n} trial accounts expiring soon.",
+    "allNorm": "All key metrics are within norm.",
+    "labelExcellent": "Excellent platform health.",
+    "labelGood": "Good health with potential.",
+    "labelAttention": "Needs attention.",
+    "labelCritical": "Critical — action needed."
+  },
+  "insight": {
+    "regHigher": "higher",
+    "regLower": "lower",
+    "reg": "Registrations are {pct}% {dir} than last month.",
+    "ctaBusinesses": "View companies",
+    "conv": "Conversion to a paid plan is {conv}% ({paid} of {total}).",
+    "awaiting": "{n} companies requested a paid plan but have no recorded payment.",
+    "ctaConfirmPayments": "Confirm payments",
+    "trialExp": "{n} trial accounts expire within the next 7 days.",
+    "managed": "Accounting firms brought {pct}% of the new companies this month.",
+    "ctaFirms": "Accounting firms",
+    "topPlan": "The most chosen paid plan is {plan} ({n} companies).",
+    "planChanges": "{n} subscription changes in the last 30 days.",
+    "cancellations": "{n} cancelled/expired subscriptions in the last 30 days.",
+    "none": "Not enough data yet for a reliable analysis."
+  },
+  "opp": {
+    "nearLimit": "{name} is near its plan limit ({used}/{limit}) — likely upgrade.",
+    "ctaOpen": "Open",
+    "hotLead": "Hot lead: {name} (score {score}/100) — ready for a paid plan.",
+    "firmNearLimit": "Accounting firm “{name}” is nearing its limit of {limit} clients — potential for a higher plan.",
+    "ctaView": "View",
+    "none": "Keep monitoring — opportunities will appear as data accumulates."
+  },
+  "attention": {
+    "awaiting": "Unpaid subscription request — {name}",
+    "ctaConfirm": "Confirm",
+    "payout": "Commission payout request — {name} ({amount})",
+    "ctaProcess": "Process",
+    "trial": "Trial expiring soon — {name}",
+    "ctaView": "View",
+    "inactivePaid": "Paid company inactive for {days} days — {name}",
+    "ctaContact": "Contact",
+    "failed": "{n} failed emails in the last 30 days",
+    "ctaCheck": "Check",
+    "none": "No events requiring attention right now."
+  }
+}
