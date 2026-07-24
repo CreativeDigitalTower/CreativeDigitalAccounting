@@ -1,4 +1,5 @@
 import { requireCompany } from "@/lib/session";
+import { DOC_ORDER } from "@/lib/documentSort";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { InboxDocuments, type InboxDoc } from "@/components/app/InboxDocuments";
@@ -15,7 +16,7 @@ export default async function InboxPage() {
     prisma.document.findMany({
       where: { recipientCompanyId: companyId },
       include: { company: { select: { name: true } }, lines: { select: { lineTotal: true } } },
-      orderBy: { issueDate: "desc" },
+      orderBy: DOC_ORDER,
     }),
     prisma.notification.findMany({ where: { companyId }, orderBy: { createdAt: "desc" }, take: 50 }),
   ]);

@@ -230,5 +230,38 @@
     "paid": "PLĂTITĂ",
     "overdue": "RESTANTĂ",
     "cancelled": "ANULATĂ"
+  },
+  "sort": {
+    "issueDesc": "Data emiterii ↓",
+    "issueAsc": "Data emiterii ↑",
+    "numberDesc": "Număr ↓",
+    "numberAsc": "Număr ↑",
+    "dueDesc": "Data scadenței ↓",
+    "dueAsc": "Data scadenței ↑",
+    "clientAsc": "Client A→Z",
+    "clientDesc": "Client Z→A",
+    "valueDesc": "Valoare ↓",
+    "valueAsc": "Valoare ↑",
+    "status": "Stare"
+  },
+  "browser": {
+    "sortBy": "Sortare",
+    "from": "De la",
+    "to": "Până la",
+    "client": "Client",
+    "status": "Stare",
+    "type": "Tip",
+    "payment": "Plată",
+    "allClients": "Toți clienții",
+    "allStatuses": "Toate stările",
+    "allTypes": "Toate tipurile",
+    "allPayment": "Plătită/neplătită",
+    "paid": "Plătită",
+    "unpaid": "Neplătită",
+    "overdue": "Doar restante",
+    "reset": "Șterge",
+    "filters": "Filtre",
+    "count": "{n} documente",
+    "empty": "Niciun document nu corespunde criteriilor selectate."
   }
 }

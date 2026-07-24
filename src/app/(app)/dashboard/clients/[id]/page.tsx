@@ -1,4 +1,5 @@
 import { requireCompany } from "@/lib/session";
+import { DOC_ORDER } from "@/lib/documentSort";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { ClientCrm } from "@/components/app/ClientCrm";
@@ -17,7 +18,7 @@ export default async function ClientDossierPage({ params }: { params: Promise<{ 
     where: { id, companyId },
     include: {
       notes: { orderBy: { createdAt: "desc" } },
-      documents: { include: { lines: true }, orderBy: { issueDate: "desc" } },
+      documents: { include: { lines: true }, orderBy: DOC_ORDER },
       contracts: true,
       projects: true,
       contacts: { orderBy: { isPrimary: "desc" } },

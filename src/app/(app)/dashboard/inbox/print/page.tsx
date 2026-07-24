@@ -1,4 +1,5 @@
 import { requireCompany } from "@/lib/session";
+import { DOC_ORDER } from "@/lib/documentSort";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { InvoiceDocument } from "@/components/app/InvoiceDocument";
@@ -17,7 +18,7 @@ export default async function InboxPrintPage({ searchParams }: { searchParams: P
   const docs = await prisma.document.findMany({
     where: { id: { in: idList }, recipientCompanyId: companyId },
     include: { client: true, lines: true, company: { include: { subscription: true } } },
-    orderBy: { issueDate: "desc" },
+    orderBy: DOC_ORDER,
   });
   if (!docs.length) notFound();
 

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { DOC_ORDER } from "@/lib/documentSort";
 import { prisma } from "@/lib/prisma";
 import { requireCompany, getPlan } from "@/lib/session";
 import { planHasFeature } from "@/lib/constants";
@@ -260,7 +261,7 @@ export async function GET() {
     const docs = await prisma.document.findMany({
       where: { companyId },
       include: { client: true, lines: true },
-      orderBy: { createdAt: "desc" },
+      orderBy: DOC_ORDER,
     });
     return NextResponse.json(docs);
   } catch {

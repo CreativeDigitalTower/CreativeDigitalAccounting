@@ -1,5 +1,6 @@
 import { requireCompany } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { DOC_ORDER } from "@/lib/documentSort";
 import Link from "next/link";
 import { Stamp } from "@/components/Stamp";
 import { WelcomeWizard } from "@/components/app/WelcomeWizard";
@@ -97,11 +98,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       prisma.document.count({
         where: { companyId, type: "invoice", status: "overdue" },
       }),
-      // Recent documents
+      // Recent documents (по хронология: дата на издаване ↓, номер ↓)
       prisma.document.findMany({
         where: { companyId },
         include: { client: true, lines: true },
-        orderBy: { createdAt: "desc" },
+        orderBy: DOC_ORDER,
         take: 8,
       }),
       // Usage this month

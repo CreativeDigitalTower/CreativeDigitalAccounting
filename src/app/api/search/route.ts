@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { DOC_ORDER } from "@/lib/documentSort";
 import { prisma } from "@/lib/prisma";
 import { requireCompany } from "@/lib/session";
 
@@ -14,7 +15,7 @@ export async function GET(req: Request) {
     const [clients, suppliers, docs] = await Promise.all([
       prisma.client.findMany({ where: { companyId, OR: [{ name: like }, { eik: like }, { phone: like }, { contactPerson: like }] }, select: { id: true, name: true, eik: true }, take: 6 }),
       prisma.supplier.findMany({ where: { companyId, OR: [{ name: like }, { eik: like }] }, select: { id: true, name: true }, take: 4 }),
-      prisma.document.findMany({ where: { companyId, OR: [{ number: like }, { client: { name: like } }] }, select: { id: true, number: true, type: true, client: { select: { name: true } } }, orderBy: { createdAt: "desc" }, take: 6 }),
+      prisma.document.findMany({ where: { companyId, OR: [{ number: like }, { client: { name: like } }] }, select: { id: true, number: true, type: true, client: { select: { name: true } } }, orderBy: DOC_ORDER, take: 6 }),
     ]);
 
     const results = [

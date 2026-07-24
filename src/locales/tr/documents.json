@@ -230,5 +230,38 @@
     "paid": "ÖDENDİ",
     "overdue": "GECİKMİŞ",
     "cancelled": "İPTAL"
+  },
+  "sort": {
+    "issueDesc": "Düzenleme tarihi ↓",
+    "issueAsc": "Düzenleme tarihi ↑",
+    "numberDesc": "Numara ↓",
+    "numberAsc": "Numara ↑",
+    "dueDesc": "Vade tarihi ↓",
+    "dueAsc": "Vade tarihi ↑",
+    "clientAsc": "Müşteri A→Z",
+    "clientDesc": "Müşteri Z→A",
+    "valueDesc": "Tutar ↓",
+    "valueAsc": "Tutar ↑",
+    "status": "Durum"
+  },
+  "browser": {
+    "sortBy": "Sırala",
+    "from": "Başlangıç",
+    "to": "Bitiş",
+    "client": "Müşteri",
+    "status": "Durum",
+    "type": "Tür",
+    "payment": "Ödeme",
+    "allClients": "Tüm müşteriler",
+    "allStatuses": "Tüm durumlar",
+    "allTypes": "Tüm türler",
+    "allPayment": "Ödendi/ödenmedi",
+    "paid": "Ödendi",
+    "unpaid": "Ödenmedi",
+    "overdue": "Yalnızca gecikmiş",
+    "reset": "Temizle",
+    "filters": "Filtreler",
+    "count": "{n} belge",
+    "empty": "Seçilen kriterlere uygun belge yok."
   }
 }
