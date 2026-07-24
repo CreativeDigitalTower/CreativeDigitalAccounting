@@ -1,4 +1,5 @@
 import { requireCompany, getPlan } from "@/lib/session";
+import { DOC_ORDER } from "@/lib/documentSort";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { InvoicesTable } from "@/components/app/InvoicesTable";
@@ -20,7 +21,7 @@ export default async function InvoicesPage({
   const invoices = await prisma.document.findMany({
     where: { companyId, type: "invoice", ...(params.status ? { status: params.status as never } : {}) },
     include: { client: true, lines: true },
-    orderBy: { createdAt: "desc" },
+    orderBy: DOC_ORDER,
   });
 
   const totals = invoices.reduce(

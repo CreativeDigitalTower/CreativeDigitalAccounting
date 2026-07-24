@@ -230,5 +230,38 @@
     "paid": "PAID",
     "overdue": "OVERDUE",
     "cancelled": "CANCELLED"
+  },
+  "sort": {
+    "issueDesc": "Issue date ↓",
+    "issueAsc": "Issue date ↑",
+    "numberDesc": "Number ↓",
+    "numberAsc": "Number ↑",
+    "dueDesc": "Due date ↓",
+    "dueAsc": "Due date ↑",
+    "clientAsc": "Client A→Z",
+    "clientDesc": "Client Z→A",
+    "valueDesc": "Value ↓",
+    "valueAsc": "Value ↑",
+    "status": "Status"
+  },
+  "browser": {
+    "sortBy": "Sort",
+    "from": "From",
+    "to": "To",
+    "client": "Client",
+    "status": "Status",
+    "type": "Type",
+    "payment": "Payment",
+    "allClients": "All clients",
+    "allStatuses": "All statuses",
+    "allTypes": "All types",
+    "allPayment": "Paid/unpaid",
+    "paid": "Paid",
+    "unpaid": "Unpaid",
+    "overdue": "Overdue only",
+    "reset": "Clear",
+    "filters": "Filters",
+    "count": "{n} documents",
+    "empty": "No documents match the selected criteria."
   }
 }

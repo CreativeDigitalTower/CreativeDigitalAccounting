@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { StatusSelect, statusMeta } from "@/components/app/StatusSelect";
@@ -9,6 +9,7 @@ import { formatCurrency, groupByMonth } from "@/lib/constants";
 import { downloadDocsAsZip, todayStamp } from "@/lib/downloadDocs";
 import { UiIcon } from "@/components/app/NavIcons";
 import { useI18n } from "@/components/i18n/I18nProvider";
+import { SORT_OPTIONS, sortDocs, DEFAULT_SORT, type SortKey } from "@/lib/documentSort";
 
 export type InvoiceRow = {
   id: string; number: string; clientName: string; issueDate: string; dueDate: string | null;
@@ -22,6 +23,10 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
   const [downloading, setDownloading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [menu, setMenu] = useState<{ x: number; y: number; doc: InvoiceRow } | null>(null);
+  const [sort, setSort] = useState<SortKey>(DEFAULT_SORT);
+  const [ready, setReady] = useState(false);
+  useEffect(() => { try { const s = localStorage.getItem("cda_inv_sort"); if (s) setSort(s as SortKey); } catch { /* ignore */ } setReady(true); }, []);
+  useEffect(() => { if (ready) try { localStorage.setItem("cda_inv_sort", sort); } catch { /* ignore */ } }, [sort, ready]);
 
   async function setStatus(id: string, status: string) {
     await fetch(`/api/documents/${id}/status`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
@@ -39,7 +44,7 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
     ];
   }
 
-  const groups = groupByMonth(invoices);
+  const groups = groupByMonth(sortDocs(invoices, sort));
   const allIds = invoices.map((i) => i.id);
   const allSelected = selected.size > 0 && selected.size === allIds.length;
 
@@ -83,6 +88,14 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
 
   return (
     <>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
+        <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--muted)" }}>
+          {t("documents.browser.sortBy")}
+          <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)} style={{ padding: "6px 10px", fontSize: 12.5, width: "auto" }}>
+            {SORT_OPTIONS.map((o) => <option key={o.key} value={o.key}>{t(o.labelKey)}</option>)}
+          </select>
+        </label>
+      </div>
       {(overdueCount > 0 || soonCount > 0) && (
         <div style={{ display: "flex", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
           {overdueCount > 0 && (
