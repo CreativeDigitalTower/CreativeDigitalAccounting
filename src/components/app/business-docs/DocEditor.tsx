@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { UiIcon } from "@/components/app/NavIcons";
 import { useT } from "@/components/i18n/I18nProvider";
+import { AttachProtocolToInvoice } from "@/components/app/AttachProtocolToInvoice";
 
 type Doc = { id: string; title: string; contentHtml: string; status: string; favorite: boolean; pinned: boolean };
+type Inv = { id: string; number: string; type: string };
 
 const STATUSES = [{ v: "draft" }, { v: "final" }, { v: "archived" }];
 
-export function DocEditor({ doc, logoUrl, companyName }: { doc: Doc; logoUrl: string | null; companyName: string }) {
+export function DocEditor({ doc, logoUrl, companyName, invoices = [] }: { doc: Doc; logoUrl: string | null; companyName: string; invoices?: Inv[] }) {
   const router = useRouter();
   const t = useT();
   const editorRef = useRef<HTMLDivElement>(null);
@@ -33,8 +35,18 @@ export function DocEditor({ doc, logoUrl, companyName }: { doc: Doc; logoUrl: st
     document.execCommand("insertHTML", false, html);
   }
 
+  // Отразява текущото състояние на чекбоксовете в HTML атрибута `checked`,
+  // за да се запази при съхранение/експорт (иначе innerHTML не го сериализира).
+  function syncCheckboxes(root?: HTMLElement | null) {
+    root?.querySelectorAll('input[type="checkbox"]').forEach((el) => {
+      const cb = el as HTMLInputElement;
+      if (cb.checked) cb.setAttribute("checked", ""); else cb.removeAttribute("checked");
+    });
+  }
+
   async function save() {
     setSaving(true);
+    syncCheckboxes(editorRef.current);
     const res = await fetch(`/api/business-docs/${doc.id}`, {
       method: "PUT", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, contentHtml: editorRef.current?.innerHTML ?? "", status }),
@@ -85,6 +97,7 @@ export function DocEditor({ doc, logoUrl, companyName }: { doc: Doc; logoUrl: st
   }
 
   function downloadDocx() {
+    syncCheckboxes(document.querySelector(".bizdoc-page") as HTMLElement | null);
     const raw = document.querySelector(".bizdoc-page")?.innerHTML ?? "";
     const content = raw.replace(/background:\s*#FCEFC7;?/gi, ""); // премахва жълтите подсветки
     const html = `<!DOCTYPE html><html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>${title}</title></head><body>${content}</body></html>`;
@@ -121,6 +134,7 @@ export function DocEditor({ doc, logoUrl, companyName }: { doc: Doc; logoUrl: st
         <button className="btn btn-ghost btn-sm" onClick={downloadPdf} disabled={busy}>{busy ? "…" : "↓ PDF"}</button>
         <button className="btn btn-ghost btn-sm" onClick={downloadDocx}>↓ DOCX</button>
         <button className="btn btn-ghost btn-sm" onClick={printDoc} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><UiIcon.print /> {t("bizdocs.ui.editor.printBtn")}</button>
+        {invoices.length > 0 && <AttachProtocolToInvoice protocolNumber={title || "document"} invoices={invoices} selector=".bizdoc-page" />}
         <button className="btn btn-ghost btn-sm" style={{ marginLeft: "auto", color: "var(--brick)" }} onClick={remove}>{t("bizdocs.ui.editor.deleteBtn")}</button>
       </div>
 

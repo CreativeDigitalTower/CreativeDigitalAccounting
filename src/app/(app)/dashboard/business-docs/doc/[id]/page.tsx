@@ -11,9 +11,10 @@ export default async function BusinessDocEditorPage({ params }: { params: Promis
   if (!planHasFeature(plan, "doc_templates")) return <LockedScreen />;
 
   const { id } = await params;
-  const [doc, company] = await Promise.all([
+  const [doc, company, invoices] = await Promise.all([
     prisma.businessDocument.findUnique({ where: { id } }),
     prisma.company.findUnique({ where: { id: companyId }, include: { subscription: true } }),
+    prisma.document.findMany({ where: { companyId, type: { in: ["invoice", "proforma"] } }, select: { id: true, number: true, type: true }, orderBy: { issueDate: "desc" }, take: 100 }),
   ]);
   if (!doc || doc.companyId !== companyId) notFound();
 
@@ -24,6 +25,7 @@ export default async function BusinessDocEditorPage({ params }: { params: Promis
       doc={{ id: doc.id, title: doc.title, contentHtml: doc.contentHtml, status: doc.status, favorite: doc.favorite, pinned: doc.pinned }}
       logoUrl={showLogo ? company!.logoUrl : null}
       companyName={company?.name ?? ""}
+      invoices={invoices}
     />
   );
 }

@@ -110,43 +110,52 @@ function genericBody(title: string): string {
   `;
 }
 
-// ── Протокол за ДДД обработка (Наредба №1 на МЗ) — редактируема таблица ──
-const DDD_TD = "border:1px solid #999;padding:4px 6px;font-size:11px;vertical-align:top;";
-function dddCheckList(opts: string[]): string {
-  return opts.map((o) => `☐ ${o}`).join("<br>");
+// ── Протокол за ДДД обработка (Наредба №1 на МЗ) — редактируем 1:1 по образеца ──
+const DDD_TD = "border:1px solid #333;padding:4px 6px;font-size:10.5px;vertical-align:top;line-height:1.35;";
+// Реален, кликаем чекбокс (contenteditable=false, за да се отмята в редактора).
+function chk(label: string): string {
+  return `<span style="white-space:nowrap;display:inline-block;"><input type="checkbox" contenteditable="false" style="width:12px;height:12px;margin:0 4px 0 0;vertical-align:middle;">${label}</span>`;
 }
-function dddRow(no: string, label: string, cells = 3, pad = false): string {
-  const tds = Array.from({ length: cells }).map(() => `<td style="${DDD_TD}">&nbsp;</td>`).join("");
-  return `<tr><td style="${DDD_TD}">${no}</td><td style="${DDD_TD}${pad ? "padding-left:16px;" : ""}">${label}</td>${tds}</tr>`;
+// Двуколонният списък с вредители за Дезинсекция (както е в образеца).
+function dez2col(rows: [string, string?][]): string {
+  const body = rows.map(([a, b]) => `<tr><td style="border:0;padding:1px 6px 1px 0;font-size:10.5px;">${chk(a)}</td><td style="border:0;padding:1px 0;font-size:10.5px;">${b ? chk(b) : ""}</td></tr>`).join("");
+  return `<table style="border-collapse:collapse;width:100%;">${body}</table>`;
+}
+function dezStack(opts: string[]): string {
+  return opts.map((o) => `<div style="padding:1px 0;">${chk(o)}</div>`).join("");
+}
+// Ред с попълваеми клетки по трите вида обработка.
+function dddRow(no: string, label: string, pad = false): string {
+  return `<tr><td style="${DDD_TD}text-align:center;">${no}</td><td style="${DDD_TD}${pad ? "padding-left:16px;" : ""}">${label}</td><td style="${DDD_TD}">&nbsp;</td><td style="${DDD_TD}">&nbsp;</td><td style="${DDD_TD}">&nbsp;</td></tr>`;
 }
 function dddBody(): string {
   return `
-    <h1 style="font-family:'Fraunces',serif;text-align:center;font-size:15px;font-weight:700;margin:0 0 12px;">Протокол за ДДД обработка съгласно Наредба №1 на МЗ от 05.01.2018 г.</h1>
-    <table style="width:100%;border-collapse:collapse;margin-bottom:10px;">
+    <h1 style="font-family:'Fraunces',serif;text-align:center;font-size:14px;font-weight:700;margin:0 0 12px;">Протокол за ДДД обработка съгласно Наредба №1 на МЗ от 05.01.2018 г.</h1>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:0;">
       <tr>
-        <td style="${DDD_TD}width:50%;"><strong>Данни за заявителя на извършената ДДД обработка</strong></td>
-        <td style="${DDD_TD}width:50%;"><strong>Данни за обекта, в който е извършена ДДД обработката</strong></td>
+        <td style="${DDD_TD}width:50%;text-align:center;"><strong>Данни за заявителя на извършената ДДД обработка</strong></td>
+        <td style="${DDD_TD}width:50%;text-align:center;"><strong>Данни за обекта, в който е извършена ДДД обработката</strong></td>
       </tr>
       <tr>
         <td style="${DDD_TD}">Име: {{Фирма.Име}}<br>ЕИК: {{Фирма.ЕИК}}<br>Адрес: {{Фирма.Адрес}}, {{Фирма.Град}}<br>Мобилен: {{Фирма.Телефон}}</td>
-        <td style="${DDD_TD}">Име: {{Клиент.Име}}<br>Лице за контакт: {{Клиент.ЛицеЗаКонтакт}}<br>Адрес: {{Клиент.Адрес}}<br>Телефон: {{Клиент.Телефон}}</td>
+        <td style="${DDD_TD}">Име (обект): {{Клиент.Име}}<br>Лице за контакт: {{Клиент.ЛицеЗаКонтакт}}<br>Адрес: {{Клиент.Адрес}}<br>Телефон: {{Клиент.Телефон}}</td>
       </tr>
-      <tr><td style="${DDD_TD}" colspan="2">Обработката е по: &nbsp; ☐ еднократна заявка &nbsp;&nbsp; ☐ дългосрочен договор</td></tr>
+      <tr><td style="${DDD_TD}" colspan="2">Обработката е по: &nbsp;&nbsp; ${chk("еднократна заявка")} &nbsp;&nbsp;&nbsp; ${chk("дългосрочен договор")}</td></tr>
     </table>
     <table style="width:100%;border-collapse:collapse;">
       <tr>
-        <td style="${DDD_TD}width:28px;"><strong>№</strong></td>
-        <td style="${DDD_TD}"><strong>Данни за извършените в обекта ДДД обработки</strong></td>
+        <td style="${DDD_TD}width:26px;text-align:center;"><strong>№</strong></td>
+        <td style="${DDD_TD}width:34%;"><strong>Данни за извършените в обекта ДДД обработки</strong></td>
         <td style="${DDD_TD}"><strong>Дезинсекция и дезакаризация</strong></td>
-        <td style="${DDD_TD}"><strong>Дератизация</strong></td>
-        <td style="${DDD_TD}"><strong>Дезинфекция</strong></td>
+        <td style="${DDD_TD}width:16%;"><strong>Дератизация</strong></td>
+        <td style="${DDD_TD}width:16%;"><strong>Дезинфекция</strong></td>
       </tr>
       <tr>
-        <td style="${DDD_TD}">1.</td>
+        <td style="${DDD_TD}text-align:center;">1.</td>
         <td style="${DDD_TD}">Вид на вредителите, срещу които е извършена обработката/спектър на действие при дезинфектантите</td>
-        <td style="${DDD_TD}">${dddCheckList(["хлебарки", "мухи", "мравки", "комари", "бълхи", "оси", "дървеници", "кърлежи", "Други"])}</td>
-        <td style="${DDD_TD}">${dddCheckList(["сив плъх", "черен плъх", "домашна мишка", "Други"])}</td>
-        <td style="${DDD_TD}">${dddCheckList(["бактерицидно", "фунгицидно", "спороцидно", "вирусоцидно", "алгицидно"])}</td>
+        <td style="${DDD_TD}">${dez2col([["хлебарки", "мухи"], ["мравки", "комари"], ["бълхи", "оси"], ["дървеници", "кърлежи"], ["Други", undefined]])}</td>
+        <td style="${DDD_TD}">${dezStack(["сив плъх", "черен плъх", "домашна мишка", "Други"])}</td>
+        <td style="${DDD_TD}">${dezStack(["бактерицидно", "фунгицидно", "спороцидно", "вирусоцидно", "алгицидно"])}</td>
       </tr>
       ${dddRow("2.", "Обработена площ (m2)")}
       ${dddRow("3.", "Вид на обработените площи/помещения/повърхности:")}
@@ -158,18 +167,21 @@ function dddBody(): string {
       ${dddRow("9.", "Наименование на активните вещества и концентрацията им в състава на биоцида:")}
       ${dddRow("10.", "Информация за работния разтвор - концентрация и разходна норма:")}
       ${dddRow("11.", "Общо количество изразходван препарат/работен разтвор. Брой на поставените/заредени дератизационни кутии* и количеството родентицид, заложено в една дератизационна кутия (g).")}
-      <tr><td style="${DDD_TD}">12.</td><td style="${DDD_TD}" colspan="4">Указания за мерки за безопасност в обекта:</td></tr>
-      ${dddRow("12.1.", "Време на въздействие на биоцида:", 3, true)}
-      ${dddRow("12.2.", "Достъп на хора и животни до обработените площи/повърхности. Време за проветряване на помещенията:", 3, true)}
-      ${dddRow("12.3.", "Повърхности, подлежащи на забърсване/изплакване след изтичане времето на въздействие:", 3, true)}
-      ${dddRow("12.4.", "Антидот", 3, true)}
-      ${dddRow("12.5.", "Други", 3, true)}
+      <tr><td style="${DDD_TD}text-align:center;">12.</td><td style="${DDD_TD}" colspan="4"><strong>Указания за мерки за безопасност в обекта:</strong></td></tr>
+      ${dddRow("12.1.", "Време на въздействие на биоцида:", true)}
+      ${dddRow("12.2.", "Достъп на хора и животни до обработените площи/повърхности. Време за проветряване на помещенията:", true)}
+      ${dddRow("12.3.", "Повърхности, подлежащи на забърсване/изплакване след изтичане времето на въздействие:", true)}
+      ${dddRow("12.4.", "Антидот", true)}
+      ${dddRow("12.5.", "Други", true)}
       ${dddRow("13.", "Препоръки към заявителя за подобряване на санитарно-хигиенните и технически условия в обекта, свързани с появата и разпространението на вредители:")}
       ${dddRow("14.", "Наложили се промени и корекции на данните в протокола:")}
     </table>
-    <p style="${P}margin-top:14px;display:flex;justify-content:space-between;"><span>Протоколът е подготвен от: ____________________</span><span>Заверка: ____________</span></p>
-    <p style="${P}display:flex;justify-content:space-between;"><span>Обработката е извършена от: ____________________</span><span>Месец на изпълнение: ____________</span></p>
-    <p style="${P}">Подпис на заявителя на обработката или на упълномощено от него лице: ____________________</p>
+    <table style="width:100%;border-collapse:collapse;margin-top:12px;font-size:11px;">
+      <tr><td style="border:0;padding:2px 0;">Протоколът е подготвен от: ____________________</td><td style="border:0;padding:2px 0;text-align:right;">Заверка: ____________</td></tr>
+      <tr><td style="border:0;padding:2px 0;">Обработката е извършена от: ____________________</td><td style="border:0;padding:2px 0;text-align:right;">Месец на изпълнение: ____________</td></tr>
+    </table>
+    <p style="${P}margin-top:6px;">Подпис на заявителя на обработката или на упълномощено от него лице: ____________________</p>
+    <p style="font-size:9px;color:#777;margin-top:6px;">* Брой и вид на използваните капани / дератизационни кутии.</p>
   `;
 }
 
