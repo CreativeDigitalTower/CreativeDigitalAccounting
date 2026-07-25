@@ -10,6 +10,7 @@ import { STATUSES, STAGES, TASK_TYPES } from "@/lib/crm";
 import { confirmDelete } from "@/lib/confirmDelete";
 import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 import { useT, useI18n } from "@/components/i18n/I18nProvider";
+import { formatDuration, type ClientTracking } from "@/lib/trackingAnalytics";
 import { ClientEmailsEditor, type EmailRow } from "@/components/app/ClientEmailsEditor";
 
 // Рендерира иконата на CRM задача (ключ → SVG пиктограма)
@@ -46,8 +47,10 @@ type Note = { id: string; note: string; createdAt: string };
 export function ClientCrm(props: {
   client: Client; totalInvoiced: number; paidTotal: number; documents: Doc[]; contracts: Named[]; projects: Named[];
   notes: Note[]; contacts: Contact[]; tasks: Task[]; files: FileRow[]; timeline: TimelineEvent[]; clientEmails?: EmailRow[];
+  tracking?: ClientTracking;
 }) {
   const t = useT();
+  const { locale } = useI18n();
   const router = useRouter();
   const [client, setClient] = useState(props.client);
   const [tab, setTab] = useState<"overview" | "timeline" | "docs" | "files">("overview");
@@ -104,6 +107,33 @@ export function ClientCrm(props: {
           <Kpi label={t("clients.crm.kpi.documents")} value={String(props.documents.length)} color="var(--ink)" />
         </div>
       </div>
+
+      {props.tracking && props.tracking.sentCount > 0 && (() => {
+        const tr = props.tracking!;
+        const dl = { hours: (n: number) => t("tracking.client.hours", { n }), days: (n: number) => t("tracking.client.days", { n }), na: t("tracking.client.na") };
+        const dt = (ms: number | null) => ms != null ? new Date(ms).toLocaleDateString(locale) : t("tracking.client.na");
+        const items = [
+          { l: t("tracking.client.openRate"), v: tr.openRate != null ? `${tr.openRate}%` : t("tracking.client.na") },
+          { l: t("tracking.client.avgOpen"), v: formatDuration(tr.avgOpenMs, dl) },
+          { l: t("tracking.client.avgPay"), v: formatDuration(tr.avgPayMs, dl) },
+          { l: t("tracking.client.lastOpen"), v: dt(tr.lastOpen) },
+          { l: t("tracking.client.lastDownload"), v: dt(tr.lastDownload) },
+          { l: t("tracking.client.lastPaid"), v: dt(tr.lastPaid) },
+        ];
+        return (
+          <div className="glass panel" style={{ padding: "14px 18px", marginBottom: 16 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--brass)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>{t("tracking.client.title")}</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 14 }}>
+              {items.map((it) => (
+                <div key={it.l}>
+                  <div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 3 }}>{it.l}</div>
+                  <div className="num" style={{ fontSize: 15, fontWeight: 600 }}>{it.v}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Tabs */}
       <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>

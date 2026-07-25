@@ -3,6 +3,7 @@ import { DOC_ORDER } from "@/lib/documentSort";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { ClientCrm } from "@/components/app/ClientCrm";
+import { computeClientTracking } from "@/lib/trackingAnalytics";
 import { getT } from "@/lib/i18n/server";
 
 export default async function ClientDossierPage({ params }: { params: Promise<{ id: string }> }) {
@@ -18,7 +19,7 @@ export default async function ClientDossierPage({ params }: { params: Promise<{ 
     where: { id, companyId },
     include: {
       notes: { orderBy: { createdAt: "desc" } },
-      documents: { include: { lines: true }, orderBy: DOC_ORDER },
+      documents: { include: { lines: true, events: { select: { type: true, at: true } } }, orderBy: DOC_ORDER },
       contracts: true,
       projects: true,
       contacts: { orderBy: { isPrimary: "desc" } },
@@ -58,6 +59,7 @@ export default async function ClientDossierPage({ params }: { params: Promise<{ 
       }}
       totalInvoiced={totalInvoiced}
       paidTotal={paidTotal}
+      tracking={computeClientTracking(client.documents.map((d) => ({ events: d.events.map((e) => ({ type: e.type, at: e.at.toISOString() })), status: d.status })))}
       documents={client.documents.map((d) => ({ id: d.id, type: d.type, number: d.number, issueDate: d.issueDate.toISOString(), total: docTotal(d), currency: d.currency, status: d.status }))}
       contracts={client.contracts.map((c) => ({ id: c.id, label: c.title }))}
       projects={client.projects.map((p) => ({ id: p.id, label: p.name }))}
