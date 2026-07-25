@@ -13,7 +13,9 @@
         "date": "Dată",
         "receiver": "Parte primitoare",
         "subject": "Obiect"
-      }
+      },
+      "kindHandover": "Predare-primire",
+      "kindDdd": "DDD"
     },
     "form": {
       "back": "← Procese-verbale",
@@ -43,7 +45,11 @@
       "personPh": "Nume și prenume",
       "cancel": "Anulează",
       "saving": "Se salvează…",
-      "submit": "Creează PV"
+      "submit": "Creează PV",
+      "activity": "Activitate",
+      "activityPh": "ex. Curățenie birou",
+      "period": "Perioadă",
+      "periodPh": "ex. aprilie 2026"
     },
     "doc": {
       "back": "← Procese-verbale",
@@ -57,6 +63,36 @@
       "notesLabel": "NOTE",
       "handed": "Predat de:",
       "received": "Primit de:"
+    },
+    "pick": {
+      "title": "Protocol nou — alegeți un șablon",
+      "handover": "Proces-verbal de predare-primire",
+      "handoverDesc": "Proces-verbal de recepție/predare a lucrărilor sau bunurilor.",
+      "ddd": "Protocol DDD (deratizare)",
+      "dddDesc": "Protocol de dezinsecție, deratizare și dezinfecție conform Ordinului nr.1 al MS."
+    },
+    "ddd": {
+      "formTitle": "Protocol DDD",
+      "applicant": "Date solicitant",
+      "mobile": "Mobil",
+      "object": "Date obiectiv",
+      "contact": "Persoană de contact",
+      "basisTitle": "Tratament pe baza:",
+      "single": "cerere unică",
+      "contract": "contract pe termen lung",
+      "pestsTitle": "Tip dăunători / spectru de acțiune",
+      "tableTitle": "Date despre tratamente",
+      "preparedBy": "Protocol întocmit de",
+      "certification": "Certificare",
+      "performedBy": "Tratament efectuat de",
+      "executionMonth": "Luna executării"
+    },
+    "attach": {
+      "btn": "Atașează la factură",
+      "pick": "Alegeți factura…",
+      "confirm": "Atașează",
+      "done": "Atașat la factură.",
+      "err": "Atașare eșuată."
     }
   },
   "decl": {

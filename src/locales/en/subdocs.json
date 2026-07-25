@@ -13,7 +13,9 @@
         "date": "Date",
         "receiver": "Receiving party",
         "subject": "Subject"
-      }
+      },
+      "kindHandover": "Handover",
+      "kindDdd": "Pest control (DDD)"
     },
     "form": {
       "back": "← Protocols",
@@ -43,7 +45,11 @@
       "personPh": "Full name",
       "cancel": "Cancel",
       "saving": "Saving…",
-      "submit": "Create GRN"
+      "submit": "Create GRN",
+      "activity": "Activity",
+      "activityPh": "e.g. Office cleaning",
+      "period": "Period",
+      "periodPh": "e.g. April 2026"
     },
     "doc": {
       "back": "← Protocols",
@@ -57,6 +63,36 @@
       "notesLabel": "NOTES",
       "handed": "Handed over by:",
       "received": "Received by:"
+    },
+    "pick": {
+      "title": "New protocol — choose a template",
+      "handover": "Handover protocol",
+      "handoverDesc": "Protocol for acceptance/handover of performed work or goods.",
+      "ddd": "Pest control (DDD) protocol",
+      "dddDesc": "Disinsection, deratisation and disinfection protocol per Ordinance No.1 of the MoH."
+    },
+    "ddd": {
+      "formTitle": "Pest control (DDD) protocol",
+      "applicant": "Applicant details",
+      "mobile": "Mobile",
+      "object": "Site details",
+      "contact": "Contact person",
+      "basisTitle": "Treatment based on:",
+      "single": "single request",
+      "contract": "long-term contract",
+      "pestsTitle": "Pest type / spectrum of action",
+      "tableTitle": "Treatment data",
+      "preparedBy": "Protocol prepared by",
+      "certification": "Certified",
+      "performedBy": "Treatment performed by",
+      "executionMonth": "Month of execution"
+    },
+    "attach": {
+      "btn": "Attach to invoice",
+      "pick": "Choose invoice…",
+      "confirm": "Attach",
+      "done": "Attached to the invoice.",
+      "err": "Attachment failed."
     }
   },
   "decl": {

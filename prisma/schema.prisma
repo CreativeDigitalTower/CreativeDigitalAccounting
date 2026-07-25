@@ -1021,6 +1021,8 @@ model HandoverProtocol {
   id             String   @id @default(cuid())
   companyId      String
   number         String
+  // Тип протокол: "handover" (приемо-предавателен) | "ddd" (ДДД обработка)
+  kind           String   @default("handover")
   counterpartyId String?
   // Свободни данни на приемащата страна
   counterpartyName    String?
@@ -1031,6 +1033,11 @@ model HandoverProtocol {
   handedBy       String?
   receivedBy     String?
   items          String?  @db.Text
+  // Приемо-предавателен: дейност + период (по образец)
+  activity       String?  @db.Text
+  period         String?
+  // ДДД и допълнителни структурирани полета по образец
+  data           Json?
   date           DateTime
   description    String?  @db.Text
   createdAt      DateTime @default(now())
