@@ -7,6 +7,7 @@ import { PublicDocDecision } from "@/components/app/PublicDocDecision";
 import { PLATFORM_NAME } from "@/lib/constants";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { getMessages, makeT } from "@/lib/i18n/messages";
+import { DocTrackBeacon } from "@/components/app/DocTrackBeacon";
 
 export const dynamic = "force-dynamic";
 
@@ -55,6 +56,7 @@ export default async function PublicDocumentPage({ params }: { params: Promise<{
 
   return (
     <div style={{ minHeight: "100vh", background: "#F4F6F4", padding: "28px 12px" }}>
+      <DocTrackBeacon token={token} />
       <div style={{ maxWidth: 840, margin: "0 auto" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, justifyContent: "center" }}>
           <span style={{ width: 30, height: 30, borderRadius: 8, background: "#0B5E4A", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontFamily: "Georgia,serif" }}>C</span>

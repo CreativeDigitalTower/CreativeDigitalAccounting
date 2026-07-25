@@ -1,0 +1,93 @@
+{
+  "event": {
+    "sent": "Document trimis",
+    "smtp_accepted": "E-mail acceptat de SMTP",
+    "delivered": "E-mail livrat",
+    "email_opened": "Destinatarul a deschis e-mailul",
+    "viewed": "Document vizualizat online",
+    "downloaded": "PDF descărcat",
+    "printed": "Document tipărit/salvat",
+    "link_visited": "Link vizitat",
+    "paid": "Plată primită",
+    "overdue": "Document restant",
+    "bounced": "E-mail returnat (Bounce)",
+    "failed": "Eroare la trimitere",
+    "invalid_email": "Adresă de e-mail invalidă",
+    "reminder_sent": "Memento trimis"
+  },
+  "status": {
+    "not_sent": "Netrimis",
+    "sent": "Trimis",
+    "delivered": "Livrat",
+    "opened": "Deschis",
+    "viewed": "Vizualizat",
+    "downloaded": "PDF descărcat",
+    "awaiting_payment": "Așteaptă plata",
+    "paid": "Plătit",
+    "overdue": "Restant",
+    "bounced": "Returnat",
+    "failed": "Eroare"
+  },
+  "chip": {
+    "sent": "Trimis",
+    "delivered": "Livrat",
+    "opened": "Citit",
+    "downloaded": "PDF descărcat",
+    "paid": "Plătit",
+    "error": "Eroare",
+    "stale": "Nedeschis >7 zile"
+  },
+  "timeline": {
+    "title": "Istoricul documentului",
+    "empty": "Încă nu există evenimente urmărite. Trimiteți documentul pentru a începe urmărirea.",
+    "via": "prin",
+    "status": "Stare urmărire"
+  },
+  "sendings": {
+    "title": "Trimiteri",
+    "subtitle": "Urmărirea documentelor trimise — livrare, deschideri, descărcări și plată.",
+    "colDocument": "Document",
+    "colRecipient": "Destinatar",
+    "colDate": "Trimis",
+    "colLast": "Ultima acțiune",
+    "colStatus": "Stare",
+    "colRead": "Citit",
+    "colDownloaded": "Descărcat",
+    "colPaid": "Plătit",
+    "empty": "Încă nu există documente trimise.",
+    "yes": "Da",
+    "no": "—"
+  },
+  "insight": {
+    "notOpenedDays": "Documentul nu a fost deschis de {n} zile.",
+    "viewedNotPaid": "Documentul a fost primit, dar încă neplătit.",
+    "bounced": "E-mailul a fost returnat. Probabil adresa este invalidă.",
+    "never": "Documentul nu a fost deschis niciodată.",
+    "openedAgo": "Clientul a deschis documentul acum {n} zile, dar nu a plătit."
+  },
+  "cta": {
+    "resend": "Retrimite",
+    "remindPay": "Trimite memento de plată",
+    "open": "Deschide"
+  },
+  "client": {
+    "title": "Urmărire",
+    "avgOpen": "Timp mediu până la deschidere",
+    "avgPay": "Timp mediu până la plată",
+    "lastOpen": "Ultima deschidere",
+    "lastDownload": "Ultima descărcare",
+    "lastPaid": "Ultima plată",
+    "openRate": "Rată de deschidere",
+    "hours": "{n}h",
+    "days": "{n}z",
+    "na": "—"
+  },
+  "analytics": {
+    "title": "Analiză trimiteri",
+    "sent": "Trimise",
+    "opened": "Deschise",
+    "unopened": "Nedeschise",
+    "avgOpen": "Timp mediu până la deschidere",
+    "avgPay": "Timp mediu până la plată"
+  }
+}

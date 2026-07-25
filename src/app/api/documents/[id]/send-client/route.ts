@@ -8,6 +8,7 @@ import { APP_URL } from "@/lib/email/templates";
 import { normalizeLocale, intlLocale } from "@/lib/i18n/config";
 import { dedupeRecipients, isValidEmail } from "@/lib/clientEmails";
 import { MAX_EMAIL_ATTACHMENTS_BYTES, formatFileSize } from "@/lib/attachments";
+import { recordDocumentEvent, maskEmail } from "@/lib/documentTracking";
 import { z } from "zod";
 
 const schema = z.object({
@@ -105,6 +106,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         documentId: id, attachmentsMeta: attMeta.length ? attMeta : null,
       });
       results.push({ email: to, status: r.status });
+      // Document Tracking: записваме събитие за всеки получател.
+      await recordDocumentEvent(id, r.status === "failed" ? "failed" : "sent", {
+        companyId, channel: "email", recipient: maskEmail(to),
+      });
+      if (r.status === "sent") await recordDocumentEvent(id, "smtp_accepted", { companyId, channel: "email", recipient: maskEmail(to) });
     }
 
     return NextResponse.json({
