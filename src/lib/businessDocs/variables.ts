@@ -7,6 +7,11 @@ export type VariableContext = {
     address?: string | null; city?: string | null; phone?: string | null;
     email?: string | null; mol?: string | null;
   } | null;
+  client?: {
+    name?: string | null; eik?: string | null; vatNumber?: string | null;
+    address?: string | null; city?: string | null; phone?: string | null;
+    contactEmail?: string | null; mol?: string | null; contactPerson?: string | null;
+  } | null;
   docNumber?: string;
   docDate?: Date;
 };
@@ -25,6 +30,9 @@ export const VARIABLE_LABELS: Record<string, string> = {
   "Клиент.ЕИК": "ЕИК на клиента",
   "Клиент.Адрес": "Адрес на клиента",
   "Клиент.МОЛ": "МОЛ на клиента",
+  "Клиент.Телефон": "Телефон на клиента",
+  "Клиент.Email": "Имейл на клиента",
+  "Клиент.ЛицеЗаКонтакт": "Лице за контакт",
   "Доставчик.Име": "Име на доставчика",
   "Доставчик.ЕИК": "ЕИК на доставчика",
   "Служител.Име": "Име на служителя",
@@ -51,8 +59,16 @@ function fmtDate(d: Date) { return d.toLocaleDateString("bg-BG"); }
 
 export function resolveVariables(ctx: VariableContext): Record<string, string> {
   const c = ctx.company ?? {};
+  const cl = ctx.client ?? {};
   const now = ctx.docDate ?? new Date();
   return {
+    "Клиент.Име": cl.name ?? "",
+    "Клиент.ЕИК": cl.eik ?? "",
+    "Клиент.Адрес": [cl.address, cl.city].filter(Boolean).join(", "),
+    "Клиент.МОЛ": cl.mol ?? cl.contactPerson ?? "",
+    "Клиент.Телефон": cl.phone ?? "",
+    "Клиент.Email": cl.contactEmail ?? "",
+    "Клиент.ЛицеЗаКонтакт": cl.contactPerson ?? "",
     "Фирма.Име": c.name ?? "",
     "Фирма.ЕИК": c.eik ?? "",
     "Фирма.ДДС": c.vatNumber ?? "",

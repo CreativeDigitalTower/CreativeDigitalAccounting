@@ -194,5 +194,12 @@
       "title": "Corespondență",
       "desc": "Șabloane de e-mail, invitații și scrisori de mulțumire."
     }
+  },
+  "create": {
+    "pickClient": "Client (pentru completare automată)",
+    "noClient": "Fără client",
+    "creating": "Se creează…",
+    "create": "Creează document →",
+    "err": "Eroare la creare."
   }
 }

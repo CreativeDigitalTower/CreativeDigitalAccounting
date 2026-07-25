@@ -2,7 +2,8 @@ import { requireCompany, getPlan } from "@/lib/session";
 import { planHasFeature } from "@/lib/constants";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getTemplate } from "@/lib/businessDocs/templates";
+import { getTemplate, canAccessTemplate } from "@/lib/businessDocs/templates";
+import { prisma } from "@/lib/prisma";
 import { CreateDocButton } from "@/components/app/business-docs/CreateDocButton";
 import { LockedScreen } from "@/components/app/business-docs/LockedScreen";
 
@@ -20,6 +21,8 @@ export default async function TemplateInfoPage({ params }: { params: Promise<{ i
   const { id } = await params;
   const t = getTemplate(id);
   if (!t) notFound();
+  const comp = await prisma.company.findUnique({ where: { id: companyId }, select: { eik: true } });
+  if (!canAccessTemplate(t.id, comp?.eik ?? null)) notFound();
   const cx = COMPLEXITY[t.complexity];
 
   return (
