@@ -109,12 +109,12 @@ export function deriveTrackingStatus(
 export function statusChips(events: { type: string }[], doc: { status?: string | null; sentToClientAt?: Date | string | null }): { icon: string; key: string; tone: "good" | "ok" | "attention" | "muted" }[] {
   const has = (t: string) => events.some((e) => e.type === t);
   const chips: { icon: string; key: string; tone: "good" | "ok" | "attention" | "muted" }[] = [];
-  if (has("sent") || doc.sentToClientAt) chips.push({ icon: "📨", key: "tracking.chip.sent", tone: "muted" });
-  if (has("delivered") || has("smtp_accepted")) chips.push({ icon: "📬", key: "tracking.chip.delivered", tone: "muted" });
-  if (has("email_opened") || has("viewed")) chips.push({ icon: "👁", key: "tracking.chip.opened", tone: "ok" });
-  if (has("downloaded")) chips.push({ icon: "📄", key: "tracking.chip.downloaded", tone: "ok" });
-  if (doc.status === "paid" || has("paid")) chips.push({ icon: "💰", key: "tracking.chip.paid", tone: "good" });
-  if (has("bounced") || has("invalid_email") || has("failed")) chips.push({ icon: "❌", key: "tracking.chip.error", tone: "attention" });
+  if (has("sent") || doc.sentToClientAt) chips.push({ icon: "sent", key: "tracking.chip.sent", tone: "muted" });
+  if (has("delivered") || has("smtp_accepted")) chips.push({ icon: "delivered", key: "tracking.chip.delivered", tone: "muted" });
+  if (has("email_opened") || has("viewed")) chips.push({ icon: "opened", key: "tracking.chip.opened", tone: "ok" });
+  if (has("downloaded")) chips.push({ icon: "downloaded", key: "tracking.chip.downloaded", tone: "ok" });
+  if (doc.status === "paid" || has("paid")) chips.push({ icon: "paid", key: "tracking.chip.paid", tone: "good" });
+  if (has("bounced") || has("invalid_email") || has("failed")) chips.push({ icon: "error", key: "tracking.chip.error", tone: "attention" });
   return chips;
 }
 
