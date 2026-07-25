@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCompany } from "@/lib/session";
+import { recordDocumentEvent } from "@/lib/documentTracking";
 import { redirect } from "next/navigation";
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -17,6 +18,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       where: { id },
       data: { status: "paid" },
     });
+    if (doc.status !== "paid") await recordDocumentEvent(id, "paid", { companyId, channel: "system" });
 
     return NextResponse.redirect(new URL(`/dashboard/documents/${id}`, req.url));
   } catch {

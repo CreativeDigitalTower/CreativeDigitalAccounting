@@ -10,6 +10,8 @@ import { EditableDocNumber } from "@/components/app/EditableDocNumber";
 import { InvoiceDocument } from "@/components/app/InvoiceDocument";
 import { OfferDocument } from "@/components/app/OfferDocument";
 import { InvoiceAttachments } from "@/components/app/InvoiceAttachments";
+import { DocumentTimeline } from "@/components/app/DocumentTimeline";
+import { deriveTrackingStatus, daysSinceSentUnopened } from "@/lib/documentTracking";
 import { getT } from "@/lib/i18n/server";
 
 export default async function DocumentDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -26,10 +28,19 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
       attachments: { orderBy: { createdAt: "asc" }, select: { id: true, filename: true, originalFilename: true, mimeType: true, size: true, createdAt: true } },
       childDocuments: { where: { type: "invoice" }, select: { id: true, number: true }, orderBy: { createdAt: "asc" } },
       parentDocument: { select: { id: true, number: true, type: true } },
+      events: { orderBy: { at: "asc" }, select: { type: true, at: true, channel: true, recipient: true, device: true } },
     },
   });
 
   if (!doc || doc.companyId !== companyId) notFound();
+
+  // Document Tracking: производен статус + предложение.
+  const trackStatus = deriveTrackingStatus(doc.events, doc);
+  const daysUnopened = daysSinceSentUnopened(doc.events.map((e) => ({ type: e.type, at: e.at })));
+  const viewedNotPaid = doc.events.some((e) => e.type === "email_opened" || e.type === "viewed") && doc.status !== "paid";
+  const suggestion = (doc.events.some((e) => e.type === "bounced" || e.type === "invalid_email")) ? { key: "bounced" }
+    : (daysUnopened != null && daysUnopened >= 3) ? { key: "notOpenedDays", n: daysUnopened }
+    : viewedNotPaid ? { key: "viewedNotPaid" } : null;
 
   // Проформа → фактура: ако вече има издадена фактура-дете, показваме връзка към нея.
   const convertedInvoice = doc.type === "proforma" ? doc.childDocuments[0] ?? null : null;
@@ -99,6 +110,17 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
       {/* Приложени файлове — извън документа, не влияят на стойности/номерация */}
       <div className="no-print" style={{ maxWidth: 800, marginTop: 16 }}>
         <InvoiceAttachments documentId={doc.id} initial={attachmentsInitial} />
+      </div>
+
+      {/* Document Tracking — времева линия на изпратения документ */}
+      <div className="no-print" style={{ maxWidth: 800, marginTop: 16 }}>
+        <DocumentTimeline
+          documentId={doc.id}
+          events={doc.events.map((e) => ({ type: e.type, at: e.at.toISOString(), channel: e.channel, recipient: e.recipient, device: e.device }))}
+          status={trackStatus}
+          suggestion={suggestion}
+          canRemind={!!(doc.clientEmail || doc.client?.contactEmail)}
+        />
       </div>
 
       {/* Вътрешен коментар — само за вашия екип, НЕ е част от документа */}

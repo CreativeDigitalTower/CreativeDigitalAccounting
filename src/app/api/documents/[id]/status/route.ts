@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCompany } from "@/lib/session";
 import { audit } from "@/lib/documents";
+import { recordDocumentEvent } from "@/lib/documentTracking";
 import { z } from "zod";
 
 const schema = z.object({
@@ -21,6 +22,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     await prisma.document.update({ where: { id }, data: { status } });
     await audit(companyId, userId, "status_change", "Document", id, `${doc.number} → ${status}`);
+    // Document Tracking: отбелязваме плащане/просрочие в времевата линия.
+    if (status === "paid" && doc.status !== "paid") await recordDocumentEvent(id, "paid", { companyId, channel: "system" });
+    else if (status === "overdue" && doc.status !== "overdue") await recordDocumentEvent(id, "overdue", { companyId, channel: "system" });
 
     return NextResponse.json({ success: true });
   } catch (err) {

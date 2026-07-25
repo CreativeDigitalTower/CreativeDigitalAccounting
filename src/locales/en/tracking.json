@@ -1,0 +1,93 @@
+{
+  "event": {
+    "sent": "Document sent",
+    "smtp_accepted": "Email accepted by SMTP",
+    "delivered": "Email delivered",
+    "email_opened": "Recipient opened the email",
+    "viewed": "Document viewed online",
+    "downloaded": "PDF downloaded",
+    "printed": "Document printed/saved",
+    "link_visited": "Link visited",
+    "paid": "Payment received",
+    "overdue": "Document overdue",
+    "bounced": "Email bounced",
+    "failed": "Send error",
+    "invalid_email": "Invalid email address",
+    "reminder_sent": "Reminder sent"
+  },
+  "status": {
+    "not_sent": "Not sent",
+    "sent": "Sent",
+    "delivered": "Delivered",
+    "opened": "Opened",
+    "viewed": "Viewed",
+    "downloaded": "PDF downloaded",
+    "awaiting_payment": "Awaiting payment",
+    "paid": "Paid",
+    "overdue": "Overdue",
+    "bounced": "Bounced",
+    "failed": "Error"
+  },
+  "chip": {
+    "sent": "Sent",
+    "delivered": "Delivered",
+    "opened": "Read",
+    "downloaded": "PDF downloaded",
+    "paid": "Paid",
+    "error": "Error",
+    "stale": "Unopened >7 days"
+  },
+  "timeline": {
+    "title": "Document history",
+    "empty": "No tracked events yet. Send the document to start tracking.",
+    "via": "via",
+    "status": "Tracking status"
+  },
+  "sendings": {
+    "title": "Sendings",
+    "subtitle": "Track sent documents — delivery, opens, downloads and payment.",
+    "colDocument": "Document",
+    "colRecipient": "Recipient",
+    "colDate": "Sent",
+    "colLast": "Last action",
+    "colStatus": "Status",
+    "colRead": "Read",
+    "colDownloaded": "Downloaded",
+    "colPaid": "Paid",
+    "empty": "No sent documents yet.",
+    "yes": "Yes",
+    "no": "—"
+  },
+  "insight": {
+    "notOpenedDays": "The document hasn't been opened for {n} days.",
+    "viewedNotPaid": "The document was received but not paid yet.",
+    "bounced": "The email bounced. The address is probably invalid.",
+    "never": "The document was never opened.",
+    "openedAgo": "The client opened the document {n} days ago but hasn't paid."
+  },
+  "cta": {
+    "resend": "Resend",
+    "remindPay": "Send payment reminder",
+    "open": "Open"
+  },
+  "client": {
+    "title": "Tracking",
+    "avgOpen": "Avg time to open",
+    "avgPay": "Avg time to pay",
+    "lastOpen": "Last open",
+    "lastDownload": "Last download",
+    "lastPaid": "Last payment",
+    "openRate": "Open rate",
+    "hours": "{n}h",
+    "days": "{n}d",
+    "na": "—"
+  },
+  "analytics": {
+    "title": "Sending analytics",
+    "sent": "Sent",
+    "opened": "Opened",
+    "unopened": "Unopened",
+    "avgOpen": "Avg time to open",
+    "avgPay": "Avg time to pay"
+  }
+}

@@ -769,8 +769,31 @@ model Document {
   childDocuments Document[]     @relation("DocumentChain")
   lines          DocumentLine[]
   attachments    DocumentAttachment[]
+  events         DocumentEvent[]
 
   @@index([recipientCompanyId])
+}
+
+// ─── Document Tracking ───────────────────────────────────────────────────
+// Времева линия на събитията по изпратен документ (жизнен цикъл):
+// изпратен → SMTP приет → доставен → имейлът отворен → прегледан онлайн →
+// PDF свален → отпечатан → платен; както и bounce/грешка/напомняне.
+// GDPR: пазим само хеширан IP и груб (браузър/ОС) User-Agent, без излишни данни.
+model DocumentEvent {
+  id         String   @id @default(cuid())
+  documentId String
+  companyId  String
+  type       String   // sent | smtp_accepted | delivered | email_opened | viewed | downloaded | printed | link_visited | paid | overdue | bounced | failed | invalid_email | reminder_sent
+  at         DateTime @default(now())
+  channel    String?  // email | portal | system
+  recipient  String?  // маскиран имейл (напр. j***@doe.com)
+  meta       Json?
+  ipHash     String?  // GDPR: хеширан IP, не суров
+  device     String?  // груб UA: „Chrome · Windows"
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId, at])
+  @@index([companyId, type])
 }
 
 // Прикачени PDF документи към фактура/документ (протоколи, приложения и др.).

@@ -13,6 +13,7 @@ export type DocRow = {
   clientId: string | null; clientName: string | null;
   issueDate: string; dueDate: string | null; createdAt: string;
   total: number; currency: string; status: string;
+  chips?: { icon: string; key: string }[];
 };
 
 type Filters = { from: string; to: string; clientId: string; status: string; type: string; payment: string; overdue: boolean };
@@ -121,7 +122,7 @@ export function DocumentBrowser({ docs }: { docs: DocRow[] }) {
                 <thead>
                   <tr>
                     <th>{t("documents.page.th.number")}</th><th>{t("documents.page.th.type")}</th><th>{t("documents.page.th.client")}</th><th>{t("documents.page.th.date")}</th><th>{t("documents.page.th.due")}</th>
-                    <th className="num">{t("documents.page.th.amount")}</th>{dual && <th className="num">BGN</th>}<th>{t("documents.page.th.status")}</th><th></th>
+                    <th className="num">{t("documents.page.th.amount")}</th>{dual && <th className="num">BGN</th>}<th>{t("documents.page.th.status")}</th><th></th><th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -135,6 +136,9 @@ export function DocumentBrowser({ docs }: { docs: DocRow[] }) {
                       <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(doc.total, doc.currency)}</td>
                       {dual && <td className="num" style={{ fontSize: 11.5, color: "var(--muted)" }}>{formatCurrency(toBGN(doc.total), "BGN")}</td>}
                       <td><StatusSelect id={doc.id} status={doc.status} /></td>
+                      <td style={{ whiteSpace: "nowrap", fontSize: 13 }}>
+                        {(doc.chips ?? []).map((c, i) => <span key={i} title={t(c.key)} style={{ marginRight: 3, cursor: "default" }}>{c.icon}</span>)}
+                      </td>
                       <td style={{ display: "flex", gap: 6 }}>
                         <Link href={`/dashboard/documents/${doc.id}`} className="btn btn-ghost btn-sm">{t("documents.page.view")}</Link>
                         <Link href={`/dashboard/documents/${doc.id}/edit`} className="btn btn-ghost btn-sm" title={t("documents.page.edit")} style={{ display: "inline-flex", alignItems: "center" }}><UiIcon.edit /></Link>

@@ -1,0 +1,93 @@
+{
+  "event": {
+    "sent": "Belge gönderildi",
+    "smtp_accepted": "E-posta SMTP tarafından kabul edildi",
+    "delivered": "E-posta teslim edildi",
+    "email_opened": "Alıcı e-postayı açtı",
+    "viewed": "Belge çevrimiçi görüntülendi",
+    "downloaded": "PDF indirildi",
+    "printed": "Belge yazdırıldı/kaydedildi",
+    "link_visited": "Bağlantı ziyaret edildi",
+    "paid": "Ödeme alındı",
+    "overdue": "Belge gecikmiş",
+    "bounced": "E-posta geri döndü (Bounce)",
+    "failed": "Gönderim hatası",
+    "invalid_email": "Geçersiz e-posta adresi",
+    "reminder_sent": "Hatırlatma gönderildi"
+  },
+  "status": {
+    "not_sent": "Gönderilmedi",
+    "sent": "Gönderildi",
+    "delivered": "Teslim edildi",
+    "opened": "Açıldı",
+    "viewed": "Görüntülendi",
+    "downloaded": "PDF indirildi",
+    "awaiting_payment": "Ödeme bekliyor",
+    "paid": "Ödendi",
+    "overdue": "Gecikmiş",
+    "bounced": "Geri döndü",
+    "failed": "Hata"
+  },
+  "chip": {
+    "sent": "Gönderildi",
+    "delivered": "Teslim",
+    "opened": "Okundu",
+    "downloaded": "PDF indirildi",
+    "paid": "Ödendi",
+    "error": "Hata",
+    "stale": "7+ gün açılmadı"
+  },
+  "timeline": {
+    "title": "Belge geçmişi",
+    "empty": "Henüz izlenen olay yok. İzlemeyi başlatmak için belgeyi gönderin.",
+    "via": "—",
+    "status": "İzleme durumu"
+  },
+  "sendings": {
+    "title": "Gönderimler",
+    "subtitle": "Gönderilen belgeleri izleyin — teslim, açılma, indirme ve ödeme.",
+    "colDocument": "Belge",
+    "colRecipient": "Alıcı",
+    "colDate": "Gönderildi",
+    "colLast": "Son işlem",
+    "colStatus": "Durum",
+    "colRead": "Okundu",
+    "colDownloaded": "İndirildi",
+    "colPaid": "Ödendi",
+    "empty": "Henüz gönderilmiş belge yok.",
+    "yes": "Evet",
+    "no": "—"
+  },
+  "insight": {
+    "notOpenedDays": "Belge {n} gündür açılmadı.",
+    "viewedNotPaid": "Belge alındı ama henüz ödenmedi.",
+    "bounced": "E-posta geri döndü. Adres muhtemelen geçersiz.",
+    "never": "Belge hiç açılmadı.",
+    "openedAgo": "Müşteri belgeyi {n} gün önce açtı ama ödemedi."
+  },
+  "cta": {
+    "resend": "Tekrar gönder",
+    "remindPay": "Ödeme hatırlatması gönder",
+    "open": "Aç"
+  },
+  "client": {
+    "title": "İzleme",
+    "avgOpen": "Ortalama açılma süresi",
+    "avgPay": "Ortalama ödeme süresi",
+    "lastOpen": "Son açılma",
+    "lastDownload": "Son indirme",
+    "lastPaid": "Son ödeme",
+    "openRate": "Açılma oranı",
+    "hours": "{n} sa",
+    "days": "{n} gün",
+    "na": "—"
+  },
+  "analytics": {
+    "title": "Gönderim analizi",
+    "sent": "Gönderilen",
+    "opened": "Açılan",
+    "unopened": "Açılmayan",
+    "avgOpen": "Ortalama açılma süresi",
+    "avgPay": "Ortalama ödeme süresi"
+  }
+}

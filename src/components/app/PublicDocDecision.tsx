@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { trackDoc } from "@/components/app/DocTrackBeacon";
 
 export function PublicDocDecision({ token, decision, from, labels }: {
   token: string; decision: string | null; from: string;
@@ -19,6 +20,7 @@ export function PublicDocDecision({ token, decision, from, labels }: {
   }
 
   function download() {
+    trackDoc(token, "printed");
     window.print();
   }
 
