@@ -78,6 +78,54 @@ export function computeSendingAnalytics(docs: DocWithEvents[]): SendingAnalytics
   return { sent, opened, unopened: sent - opened, avgOpenMs: mean(openDur), avgPayMs: mean(payDur) };
 }
 
+export type ClientDoc = { clientId: string | null; clientName: string | null; events: EvtLite[]; status?: string | null; dueDate?: string | Date | null };
+
+export type ClientRankings = {
+  fastestPaying: { clientId: string; name: string; avgPayMs: number; paidCount: number }[];
+  neverOpen: { clientId: string; name: string; sentCount: number }[];
+  mostOverdue: { clientId: string; name: string; overdueCount: number }[];
+};
+
+/** Класации по клиенти: най-бързо плащащи, никога неотварящи, най-много просрочия. */
+export function computeClientRankings(docs: ClientDoc[], limit = 5): ClientRankings {
+  const now = Date.now();
+  type Agg = { name: string; payDur: number[]; sent: number; opened: number; overdue: number };
+  const map = new Map<string, Agg>();
+  for (const d of docs) {
+    if (!d.clientId) continue;
+    const a = map.get(d.clientId) ?? { name: d.clientName ?? "—", payDur: [], sent: 0, opened: 0, overdue: 0 };
+    const sent = firstAt(d.events, ["sent"]);
+    if (sent != null) {
+      a.sent++;
+      if (firstAt(d.events, OPEN_TYPES) != null) a.opened++;
+      const paid = firstAt(d.events, ["paid"]);
+      if (paid != null && paid >= sent) a.payDur.push(paid - sent);
+    }
+    const isPaid = d.status === "paid" || d.events.some((e) => e.type === "paid");
+    const overdue = d.status === "overdue" || (!!d.dueDate && new Date(d.dueDate).getTime() < now && !isPaid);
+    if (overdue) a.overdue++;
+    map.set(d.clientId, a);
+  }
+
+  const entries = [...map.entries()];
+  const fastestPaying = entries
+    .filter(([, a]) => a.payDur.length > 0)
+    .map(([clientId, a]) => ({ clientId, name: a.name, avgPayMs: a.payDur.reduce((s, x) => s + x, 0) / a.payDur.length, paidCount: a.payDur.length }))
+    .sort((x, y) => x.avgPayMs - y.avgPayMs)
+    .slice(0, limit);
+  const neverOpen = entries
+    .filter(([, a]) => a.sent > 0 && a.opened === 0)
+    .map(([clientId, a]) => ({ clientId, name: a.name, sentCount: a.sent }))
+    .sort((x, y) => y.sentCount - x.sentCount)
+    .slice(0, limit);
+  const mostOverdue = entries
+    .filter(([, a]) => a.overdue > 0)
+    .map(([clientId, a]) => ({ clientId, name: a.name, overdueCount: a.overdue }))
+    .sort((x, y) => y.overdueCount - x.overdueCount)
+    .slice(0, limit);
+  return { fastestPaying, neverOpen, mostOverdue };
+}
+
 /** Форматира продължителност (ms) като „{n} ч." или „{n} дни" през подадени етикети. */
 export function formatDuration(ms: number | null, labels: { hours: (n: number) => string; days: (n: number) => string; na: string }): string {
   if (ms == null) return labels.na;

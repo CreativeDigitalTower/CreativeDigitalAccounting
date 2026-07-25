@@ -88,6 +88,13 @@
     "opened": "Açılan",
     "unopened": "Açılmayan",
     "avgOpen": "Ortalama açılma süresi",
-    "avgPay": "Ortalama ödeme süresi"
+    "avgPay": "Ortalama ödeme süresi",
+    "rankings": "Müşteri sıralamaları",
+    "fastestPaying": "En hızlı ödeyen müşteriler",
+    "neverOpen": "Belgeleri açmayan müşteriler",
+    "mostOverdue": "En çok gecikmesi olan müşteriler",
+    "noData": "Yeterli veri yok.",
+    "docsN": "{n} belge",
+    "overdueN": "{n} gecikmiş"
   }
 }
