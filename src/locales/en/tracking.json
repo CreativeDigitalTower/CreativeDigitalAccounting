@@ -88,6 +88,13 @@
     "opened": "Opened",
     "unopened": "Unopened",
     "avgOpen": "Avg time to open",
-    "avgPay": "Avg time to pay"
+    "avgPay": "Avg time to pay",
+    "rankings": "Client rankings",
+    "fastestPaying": "Fastest-paying clients",
+    "neverOpen": "Clients who don't open documents",
+    "mostOverdue": "Clients with most overdue",
+    "noData": "Not enough data.",
+    "docsN": "{n} docs",
+    "overdueN": "{n} overdue"
   }
 }

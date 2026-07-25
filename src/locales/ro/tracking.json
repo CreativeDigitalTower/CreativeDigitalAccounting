@@ -88,6 +88,13 @@
     "opened": "Deschise",
     "unopened": "Nedeschise",
     "avgOpen": "Timp mediu până la deschidere",
-    "avgPay": "Timp mediu până la plată"
+    "avgPay": "Timp mediu până la plată",
+    "rankings": "Clasamente clienți",
+    "fastestPaying": "Clienți care plătesc cel mai rapid",
+    "neverOpen": "Clienți care nu deschid documentele",
+    "mostOverdue": "Clienți cu cele mai multe restanțe",
+    "noData": "Date insuficiente.",
+    "docsN": "{n} doc.",
+    "overdueN": "{n} restante"
   }
 }
