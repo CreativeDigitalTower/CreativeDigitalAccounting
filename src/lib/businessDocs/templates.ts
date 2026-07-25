@@ -20,6 +20,10 @@ export type CategoryDef = {
   // Държава/юрисдикция, за която важат шаблоните (за бъдещо локализиране по
   // държава — напр. отделни английски/румънски набори). Засега всички са "BG".
   country?: string;
+  // Ограничена видимост: ако е зададено, категорията се вижда САМО от фирми с
+  // тези ЕИК. За да стане публична — премахни полето. За още фирми — добави ЕИК.
+  // (архитектура за персонализирани → публични функционалности)
+  restrictToEiks?: string[];
   templates: TemplateDef[];
 };
 
@@ -105,6 +109,96 @@ function genericBody(title: string): string {
     ${signatures("Съставил / За издателя", "Получил / За страната")}
   `;
 }
+
+// ── Протокол за ДДД обработка (Наредба №1 на МЗ) — редактируема таблица ──
+const DDD_TD = "border:1px solid #999;padding:4px 6px;font-size:11px;vertical-align:top;";
+function dddCheckList(opts: string[]): string {
+  return opts.map((o) => `☐ ${o}`).join("<br>");
+}
+function dddRow(no: string, label: string, cells = 3, pad = false): string {
+  const tds = Array.from({ length: cells }).map(() => `<td style="${DDD_TD}">&nbsp;</td>`).join("");
+  return `<tr><td style="${DDD_TD}">${no}</td><td style="${DDD_TD}${pad ? "padding-left:16px;" : ""}">${label}</td>${tds}</tr>`;
+}
+function dddBody(): string {
+  return `
+    <h1 style="font-family:'Fraunces',serif;text-align:center;font-size:15px;font-weight:700;margin:0 0 12px;">Протокол за ДДД обработка съгласно Наредба №1 на МЗ от 05.01.2018 г.</h1>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:10px;">
+      <tr>
+        <td style="${DDD_TD}width:50%;"><strong>Данни за заявителя на извършената ДДД обработка</strong></td>
+        <td style="${DDD_TD}width:50%;"><strong>Данни за обекта, в който е извършена ДДД обработката</strong></td>
+      </tr>
+      <tr>
+        <td style="${DDD_TD}">Име: {{Фирма.Име}}<br>ЕИК: {{Фирма.ЕИК}}<br>Адрес: {{Фирма.Адрес}}, {{Фирма.Град}}<br>Мобилен: {{Фирма.Телефон}}</td>
+        <td style="${DDD_TD}">Име: {{Клиент.Име}}<br>Лице за контакт: {{Клиент.ЛицеЗаКонтакт}}<br>Адрес: {{Клиент.Адрес}}<br>Телефон: {{Клиент.Телефон}}</td>
+      </tr>
+      <tr><td style="${DDD_TD}" colspan="2">Обработката е по: &nbsp; ☐ еднократна заявка &nbsp;&nbsp; ☐ дългосрочен договор</td></tr>
+    </table>
+    <table style="width:100%;border-collapse:collapse;">
+      <tr>
+        <td style="${DDD_TD}width:28px;"><strong>№</strong></td>
+        <td style="${DDD_TD}"><strong>Данни за извършените в обекта ДДД обработки</strong></td>
+        <td style="${DDD_TD}"><strong>Дезинсекция и дезакаризация</strong></td>
+        <td style="${DDD_TD}"><strong>Дератизация</strong></td>
+        <td style="${DDD_TD}"><strong>Дезинфекция</strong></td>
+      </tr>
+      <tr>
+        <td style="${DDD_TD}">1.</td>
+        <td style="${DDD_TD}">Вид на вредителите, срещу които е извършена обработката/спектър на действие при дезинфектантите</td>
+        <td style="${DDD_TD}">${dddCheckList(["хлебарки", "мухи", "мравки", "комари", "бълхи", "оси", "дървеници", "кърлежи", "Други"])}</td>
+        <td style="${DDD_TD}">${dddCheckList(["сив плъх", "черен плъх", "домашна мишка", "Други"])}</td>
+        <td style="${DDD_TD}">${dddCheckList(["бактерицидно", "фунгицидно", "спороцидно", "вирусоцидно", "алгицидно"])}</td>
+      </tr>
+      ${dddRow("2.", "Обработена площ (m2)")}
+      ${dddRow("3.", "Вид на обработените площи/помещения/повърхности:")}
+      ${dddRow("4.", "Вид на обработката (механична, физична, биологична, химична с биоцидни препарати):")}
+      ${dddRow("5.", "Наименование и брой на използваните нехимични средства: Брой и вид (убиващи, живоловни, лепливи) на използваните капани.*")}
+      ${dddRow("6.", "Търговско наименование на биоцида:")}
+      ${dddRow("7.", "Номер на разрешението за пускане на пазара на биоцида:")}
+      ${dddRow("8.", "Формулация на биоцида:")}
+      ${dddRow("9.", "Наименование на активните вещества и концентрацията им в състава на биоцида:")}
+      ${dddRow("10.", "Информация за работния разтвор - концентрация и разходна норма:")}
+      ${dddRow("11.", "Общо количество изразходван препарат/работен разтвор. Брой на поставените/заредени дератизационни кутии* и количеството родентицид, заложено в една дератизационна кутия (g).")}
+      <tr><td style="${DDD_TD}">12.</td><td style="${DDD_TD}" colspan="4">Указания за мерки за безопасност в обекта:</td></tr>
+      ${dddRow("12.1.", "Време на въздействие на биоцида:", 3, true)}
+      ${dddRow("12.2.", "Достъп на хора и животни до обработените площи/повърхности. Време за проветряване на помещенията:", 3, true)}
+      ${dddRow("12.3.", "Повърхности, подлежащи на забърсване/изплакване след изтичане времето на въздействие:", 3, true)}
+      ${dddRow("12.4.", "Антидот", 3, true)}
+      ${dddRow("12.5.", "Други", 3, true)}
+      ${dddRow("13.", "Препоръки към заявителя за подобряване на санитарно-хигиенните и технически условия в обекта, свързани с появата и разпространението на вредители:")}
+      ${dddRow("14.", "Наложили се промени и корекции на данните в протокола:")}
+    </table>
+    <p style="${P}margin-top:14px;display:flex;justify-content:space-between;"><span>Протоколът е подготвен от: ____________________</span><span>Заверка: ____________</span></p>
+    <p style="${P}display:flex;justify-content:space-between;"><span>Обработката е извършена от: ____________________</span><span>Месец на изпълнение: ____________</span></p>
+    <p style="${P}">Подпис на заявителя на обработката или на упълномощено от него лице: ____________________</p>
+  `;
+}
+
+// Приемо-предавателен протокол (услуги) — по образец
+function handoverServicesBody(): string {
+  return `
+    <h1 style="${H}">ПРИЕМО-ПРЕДАВАТЕЛЕН ПРОТОКОЛ</h1>
+    <p style="${P}">Изх.№: {{Документ.Номер}} / {{ТекущаДата}} г.</p>
+    <p style="${P}"><strong>Възложител:</strong> {{Клиент.Име}}</p>
+    <p style="${P}"><strong>Изпълнител:</strong> {{Фирма.Име}}</p>
+    <p style="${P}"><strong>Дейност:</strong> {{Предмет}}</p>
+    <p style="${P}">Днес, {{ТекущаДата}} г., долуподписаните представители на:</p>
+    <p style="${P}">Възложителя: - {{Клиент.Име}}</p>
+    <p style="${P}">и</p>
+    <p style="${P}">Изпълнителя: - {{Фирма.Име}}</p>
+    <p style="${P}">съставиха настоящия Приемо-предавателен протокол, в уверение на това, че е извършено {{Предмет}} за период – {{Срок}}.</p>
+    <p style="${P}">Всички дейности са извършени в срок, с добро качество, съгласно нормативните и договорни изисквания.</p>
+    <p style="${P}">Забележки: <span class="cda-fill" style="background:#FCEFC7;">[Забележки]</span></p>
+    <p style="${P}">Настоящият Приемо-предавателен протокол е изготвен и подписан в 2 (два) еднообразни екземпляра – по един за всяка от Страните.</p>
+    ${signatures("ЗА ВЪЗЛОЖИТЕЛЯ", "ЗА ИЗПЪЛНИТЕЛЯ")}
+  `;
+}
+
+// Специфични тела по ИД на шаблона (не по заглавие — за да няма колизии с
+// генеричните шаблони със същото име). Проверява се преди CUSTOM по заглавие.
+const CUSTOM_BY_ID: Record<string, (v: Record<string, string>) => string> = {
+  "acceptance-1": handoverServicesBody,
+  "acceptance-2": dddBody,
+};
 
 // ─── Специфични шаблони (професионална структура) ───
 const CUSTOM: Record<string, (v: Record<string, string>) => string> = {
@@ -717,6 +811,13 @@ const CUSTOM: Record<string, (v: Record<string, string>) => string> = {
 
 // ─── Категории и техните шаблони ───
 export const CATEGORIES: CategoryDef[] = [
+  // Персонализирана категория — видима само за конкретни фирми (по ЕИК).
+  // За публична: премахни restrictToEiks. За още фирми: добави ЕИК.
+  { id: "acceptance", title: "Приемо-предавателни протоколи", icon: "", description: "Приемо-предавателни протоколи и протоколи за ДДД обработка — напълно редактируеми шаблони.", restrictToEiks: ["204618149"],
+    templates: [
+      { title: "Приемо-предавателен протокол", complexity: "easy" as Complexity },
+      { title: "Протокол за ДДД обработка съгласно Наредба №1 на МЗ", complexity: "detailed" as Complexity },
+    ] },
   { id: "company", title: "Фирмени документи", icon: "", description: "Решения, заповеди, протоколи и пълномощни.",
     templates: ["Решение на едноличния собственик", "Решение на управителя", "Протокол от общо събрание", "Заповед", "Вътрешна заповед", "Пълномощно", "Служебна бележка", "Вътрешно уведомление", "Декларация", "Протокол", "Заповед за вътрешен трудов ред", "Уведомление до НАП", "Декларация по чл. 313 от НК"].map((t) => ({ title: t })) },
   { id: "contracts", title: "Договори", icon: "", description: "Готови договори за услуги, доставка, наем и партньорство.",
@@ -795,6 +896,31 @@ export function getCategory(id: string): CategoryDef | undefined {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
+// Видимост по фирма (entitlement). Ограничените категории се виждат само от
+// фирми с изброените ЕИК. Публичните нямат restrictToEiks. Архитектурата
+// позволява лесно: публикуване (махни restrictToEiks), добавяне на фирми
+// (добави ЕИК), добавяне на шаблони (в templates масива).
+// ─────────────────────────────────────────────────────────────────────────
+export function isCategoryVisibleTo(cat: CategoryDef, eik?: string | null): boolean {
+  if (!cat.restrictToEiks || cat.restrictToEiks.length === 0) return true;
+  return !!eik && cat.restrictToEiks.includes(eik);
+}
+export function visibleCategories(eik?: string | null): CategoryDef[] {
+  return CATEGORIES.filter((c) => isCategoryVisibleTo(c, eik));
+}
+export function visibleTemplates(eik?: string | null): Template[] {
+  const allowed = new Set(visibleCategories(eik).map((c) => c.id));
+  return TEMPLATES.filter((t) => allowed.has(t.categoryId));
+}
+/** Дали фирма (по ЕИК) има достъп до конкретен шаблон (през категорията му). */
+export function canAccessTemplate(templateId: string, eik?: string | null): boolean {
+  const tpl = getTemplate(templateId);
+  if (!tpl) return false;
+  const cat = getCategory(tpl.categoryId);
+  return !cat || isCategoryVisibleTo(cat, eik);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 // Архитектура за бъдещо локализиране по държава.
 // Когато се добавят държавно-специфични набори (напр. EN/UK, RO), филтрирай
 // по държавата на фирмата. Засега всички шаблони са с country "BG".
@@ -809,7 +935,7 @@ export function categoriesForCountry(country = "BG"): CategoryDef[] {
 /** Генерира HTML на документа от шаблон + автоматично попълнени фирмени данни. */
 export function buildDocumentHtml(template: Template, ctx: VariableContext): string {
   const vars = resolveVariables(ctx);
-  const raw = (CUSTOM[template.title] ?? (() => genericBody(template.title)))(vars);
+  const raw = (CUSTOM_BY_ID[template.id] ?? CUSTOM[template.title] ?? (() => genericBody(template.title)))(vars);
   return applyVariables(raw, vars);
 }
 

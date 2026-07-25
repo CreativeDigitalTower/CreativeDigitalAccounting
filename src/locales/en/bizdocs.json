@@ -194,5 +194,12 @@
       "title": "Correspondence",
       "desc": "Email templates, invitations and thank-you letters."
     }
+  },
+  "create": {
+    "pickClient": "Client (for auto-fill)",
+    "noClient": "No client",
+    "creating": "Creating…",
+    "create": "Create document →",
+    "err": "Error creating."
   }
 }

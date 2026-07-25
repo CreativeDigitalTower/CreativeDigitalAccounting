@@ -1,8 +1,9 @@
 import { requireCompany, getPlan } from "@/lib/session";
 import { planHasFeature } from "@/lib/constants";
 import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { getCategory, TEMPLATES } from "@/lib/businessDocs/templates";
+import { getCategory, TEMPLATES, isCategoryVisibleTo } from "@/lib/businessDocs/templates";
 import { LockedScreen } from "@/components/app/business-docs/LockedScreen";
 import { docCategoryIcon } from "@/components/app/NavIcons";
 import { getT } from "@/lib/i18n/server";
@@ -20,6 +21,8 @@ export default async function CategoryPage({ params }: { params: Promise<{ cat: 
   const { cat } = await params;
   const category = getCategory(cat);
   if (!category) notFound();
+  const comp = await prisma.company.findUnique({ where: { id: companyId }, select: { eik: true } });
+  if (!isCategoryVisibleTo(category, comp?.eik ?? null)) notFound();
   const templates = TEMPLATES.filter((t) => t.categoryId === cat);
 
   return (

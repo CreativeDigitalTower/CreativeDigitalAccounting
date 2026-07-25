@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireCompany, getPlan } from "@/lib/session";
 import { planHasFeature } from "@/lib/constants";
 import { audit } from "@/lib/documents";
-import { getTemplate, buildDocumentHtml } from "@/lib/businessDocs/templates";
+import { getTemplate, buildDocumentHtml, canAccessTemplate } from "@/lib/businessDocs/templates";
 import { z } from "zod";
 
 export async function GET() {
@@ -27,15 +27,17 @@ export async function POST(req: Request) {
     if (!planHasFeature(plan, "doc_templates")) {
       return NextResponse.json({ error: "Модулът е достъпен само за планове Бизнес и Про." }, { status: 403 });
     }
-    const { templateId } = z.object({ templateId: z.string() }).parse(await req.json());
+    const { templateId, clientId } = z.object({ templateId: z.string(), clientId: z.string().optional().nullable() }).parse(await req.json());
     const template = getTemplate(templateId);
     if (!template) return NextResponse.json({ error: "Невалиден шаблон." }, { status: 400 });
 
     const company = await prisma.company.findUnique({ where: { id: companyId } });
+    if (!canAccessTemplate(template.id, company?.eik ?? null)) return NextResponse.json({ error: "Нямате достъп до този шаблон." }, { status: 403 });
+    const client = clientId ? await prisma.client.findFirst({ where: { id: clientId, companyId } }) : null;
     // Индивидуална номерация ПО КАТЕГОРИЯ, започваща от 0001 за всяка категория
     const count = await prisma.businessDocument.count({ where: { companyId, category: template.categoryId } });
     const docNumber = `${template.categoryId.toUpperCase()}-${new Date().getFullYear()}-${String(count + 1).padStart(4, "0")}`;
-    const contentHtml = buildDocumentHtml(template, { company, docNumber, docDate: new Date() });
+    const contentHtml = buildDocumentHtml(template, { company, client, docNumber, docDate: new Date() });
 
     const doc = await prisma.businessDocument.create({
       data: {
