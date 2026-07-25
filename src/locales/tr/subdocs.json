@@ -13,7 +13,9 @@
         "date": "Tarih",
         "receiver": "Teslim alan taraf",
         "subject": "Konu"
-      }
+      },
+      "kindHandover": "Teslim-tesellüm",
+      "kindDdd": "İlaçlama (DDD)"
     },
     "form": {
       "back": "← Tutanaklar",
@@ -43,7 +45,11 @@
       "personPh": "Ad ve soyad",
       "cancel": "İptal",
       "saving": "Kaydediliyor…",
-      "submit": "Tutanak oluştur"
+      "submit": "Tutanak oluştur",
+      "activity": "Faaliyet",
+      "activityPh": "örn. Ofis temizliği",
+      "period": "Dönem",
+      "periodPh": "örn. Nisan 2026"
     },
     "doc": {
       "back": "← Tutanaklar",
@@ -57,6 +63,36 @@
       "notesLabel": "NOTLAR",
       "handed": "Teslim eden:",
       "received": "Teslim alan:"
+    },
+    "pick": {
+      "title": "Yeni protokol — bir şablon seçin",
+      "handover": "Teslim-tesellüm tutanağı",
+      "handoverDesc": "Yapılan iş veya malların kabul/teslim tutanağı.",
+      "ddd": "İlaçlama (DDD) tutanağı",
+      "dddDesc": "Sağlık Bakanlığı 1 No'lu Yönetmeliğe göre dezenfeksiyon tutanağı."
+    },
+    "ddd": {
+      "formTitle": "İlaçlama (DDD) tutanağı",
+      "applicant": "Başvuran bilgileri",
+      "mobile": "Cep",
+      "object": "Tesis bilgileri",
+      "contact": "İletişim kişisi",
+      "basisTitle": "İşlem şu temelde:",
+      "single": "tek seferlik talep",
+      "contract": "uzun vadeli sözleşme",
+      "pestsTitle": "Zararlı türü / etki spektrumu",
+      "tableTitle": "İşlem verileri",
+      "preparedBy": "Tutanağı hazırlayan",
+      "certification": "Onay",
+      "performedBy": "İşlemi yapan",
+      "executionMonth": "Uygulama ayı"
+    },
+    "attach": {
+      "btn": "Faturaya ekle",
+      "pick": "Fatura seçin…",
+      "confirm": "Ekle",
+      "done": "Faturaya eklendi.",
+      "err": "Ekleme başarısız."
     }
   },
   "decl": {

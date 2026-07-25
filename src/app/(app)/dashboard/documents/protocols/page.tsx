@@ -30,12 +30,13 @@ export default async function ProtocolsPage() {
           </div>
         ) : (
           <table>
-            <thead><tr><th>{t("subdocs.prot.list.th.number")}</th><th>{t("subdocs.prot.list.th.date")}</th><th>{t("subdocs.prot.list.th.receiver")}</th><th>{t("subdocs.prot.list.th.subject")}</th><th></th></tr></thead>
+            <thead><tr><th>{t("subdocs.prot.list.th.number")}</th><th>{t("subdocs.prot.list.th.date")}</th><th>{t("documents.page.th.type")}</th><th>{t("subdocs.prot.list.th.receiver")}</th><th>{t("subdocs.prot.list.th.subject")}</th><th></th></tr></thead>
             <tbody>
               {protocols.map((p) => (
                 <tr key={p.id}>
                   <td className="num" style={{ color: "var(--muted)", fontSize: 12 }}>{p.number}</td>
                   <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>{new Date(p.date).toLocaleDateString(locale)}</td>
+                  <td style={{ fontSize: 12 }}>{p.kind === "ddd" ? t("subdocs.prot.list.kindDdd") : t("subdocs.prot.list.kindHandover")}</td>
                   <td style={{ fontSize: 13, fontWeight: 600 }}>{p.counterpartyName ?? "—"}</td>
                   <td style={{ fontSize: 13, color: "var(--ink-soft)", maxWidth: 280, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.items ?? p.description ?? "—"}</td>
                   <td><Link href={`/dashboard/documents/protocols/${p.id}`} className="btn btn-ghost btn-sm">{t("subdocs.prot.list.view")}</Link></td>

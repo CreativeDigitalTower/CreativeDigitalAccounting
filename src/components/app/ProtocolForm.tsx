@@ -34,8 +34,11 @@ export function ProtocolForm() {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         number: fd.get("number") || undefined,
+        kind: "handover",
         date: fd.get("date"),
         place: fd.get("place") || null,
+        activity: fd.get("activity") || null,
+        period: fd.get("period") || null,
         counterpartyId: cp.counterpartyId || null,
         counterpartyName: cp.counterpartyName || null,
         counterpartyEik: cp.counterpartyEik || null,
@@ -92,6 +95,10 @@ export function ProtocolForm() {
         {/* Предмет */}
         <div className="glass panel" style={{ padding: 24, marginBottom: 16 }}>
           <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>{t("subdocs.prot.form.subjectTitle")}</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 12 }}>
+            <div><label>{t("subdocs.prot.form.activity")}</label><input type="text" name="activity" placeholder={t("subdocs.prot.form.activityPh")} /></div>
+            <div><label>{t("subdocs.prot.form.period")}</label><input type="text" name="period" placeholder={t("subdocs.prot.form.periodPh")} /></div>
+          </div>
           <div><label>{t("subdocs.prot.form.items")}</label><textarea name="items" rows={5} required placeholder={t("subdocs.prot.form.itemsPh")} /></div>
           <div style={{ marginTop: 12 }}><label>{t("subdocs.prot.form.notes")}</label><textarea name="description" rows={3} placeholder={t("subdocs.prot.form.notesPh")} /></div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 12 }}>
