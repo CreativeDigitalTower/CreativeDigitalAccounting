@@ -7,6 +7,7 @@ import { UiIcon } from "@/components/app/NavIcons";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { formatCurrency, toBGN, isDualCurrencyActive, groupByMonth } from "@/lib/constants";
 import { SORT_OPTIONS, sortDocs, DEFAULT_SORT, type SortKey } from "@/lib/documentSort";
+import { TrackIcon } from "@/components/app/TrackIcon";
 
 export type DocRow = {
   id: string; number: string; type: string;
@@ -136,8 +137,8 @@ export function DocumentBrowser({ docs }: { docs: DocRow[] }) {
                       <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(doc.total, doc.currency)}</td>
                       {dual && <td className="num" style={{ fontSize: 11.5, color: "var(--muted)" }}>{formatCurrency(toBGN(doc.total), "BGN")}</td>}
                       <td><StatusSelect id={doc.id} status={doc.status} /></td>
-                      <td style={{ whiteSpace: "nowrap", fontSize: 13 }}>
-                        {(doc.chips ?? []).map((c, i) => <span key={i} title={t(c.key)} style={{ marginRight: 3, cursor: "default" }}>{c.icon}</span>)}
+                      <td style={{ whiteSpace: "nowrap", color: "var(--muted)" }}>
+                        {(doc.chips ?? []).map((c, i) => <span key={i} title={t(c.key)} style={{ marginRight: 5, cursor: "default", display: "inline-flex" }}><TrackIcon name={c.icon} /></span>)}
                       </td>
                       <td style={{ display: "flex", gap: 6 }}>
                         <Link href={`/dashboard/documents/${doc.id}`} className="btn btn-ghost btn-sm">{t("documents.page.view")}</Link>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useI18n, useT } from "@/components/i18n/I18nProvider";
+import { TrackIcon } from "@/components/app/TrackIcon";
 
 export type SendingRow = {
   id: string; number: string; type: string; clientName: string | null; recipient: string | null;
@@ -57,7 +58,7 @@ export function SendingsList({ rows }: { rows: SendingRow[] }) {
               <td style={{ fontSize: 12.5 }}>{yn(r.paid)}</td>
               <td>
                 {r.canRemind && !r.paid && (done.has(r.id)
-                  ? <span style={{ fontSize: 11.5, color: "var(--emerald-dark)", fontWeight: 600 }}>✓</span>
+                  ? <span style={{ color: "var(--emerald-dark)", display: "inline-flex" }}><TrackIcon name="check" size={15} /></span>
                   : <button className="btn btn-ghost btn-sm" disabled={busy === r.id} onClick={() => remind(r.id)}>{busy === r.id ? "…" : t("tracking.cta.resend")}</button>)}
               </td>
             </tr>

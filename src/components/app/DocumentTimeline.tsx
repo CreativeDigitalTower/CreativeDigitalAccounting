@@ -2,14 +2,10 @@
 
 import { useState } from "react";
 import { useI18n, useT } from "@/components/i18n/I18nProvider";
+import { TrackIcon } from "@/components/app/TrackIcon";
 
 export type TimelineEvent = { type: string; at: string; channel?: string | null; recipient?: string | null; device?: string | null };
 
-const ICON: Record<string, string> = {
-  sent: "📨", smtp_accepted: "📤", delivered: "📬", email_opened: "👁", viewed: "🔎",
-  downloaded: "📄", printed: "🖨", link_visited: "🔗", paid: "💰", overdue: "⏰",
-  bounced: "↩️", failed: "❌", invalid_email: "⚠️", reminder_sent: "🔔",
-};
 const STATUS_TONE: Record<string, string> = {
   paid: "var(--emerald)", overdue: "var(--brick)", bounced: "var(--brick)", failed: "var(--brick)",
   downloaded: "var(--emerald-dark)", viewed: "var(--emerald-dark)", opened: "var(--navy)",
@@ -52,7 +48,7 @@ export function DocumentTimeline({
         <div style={{ background: "var(--brass-soft)", border: "1px solid var(--brass)", borderRadius: 10, padding: "10px 14px", marginBottom: 14, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
           <span style={{ fontSize: 13, color: "var(--ink)", flex: 1 }}>{t(`tracking.insight.${suggestion.key}`, suggestion.n != null ? { n: suggestion.n } : undefined)}</span>
           {canRemind && !sent && <button className="btn btn-primary btn-sm" disabled={busy} onClick={remind}>{busy ? "…" : t("tracking.cta.remindPay")}</button>}
-          {sent && <span style={{ fontSize: 12, color: "var(--emerald-dark)", fontWeight: 600 }}>✓ {t("tracking.event.reminder_sent")}</span>}
+          {sent && <span style={{ fontSize: 12, color: "var(--emerald-dark)", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4 }}><TrackIcon name="check" size={13} /> {t("tracking.event.reminder_sent")}</span>}
         </div>
       )}
       {err && <div style={{ fontSize: 12, color: "var(--brick)", marginBottom: 10 }}>{err}</div>}
@@ -64,7 +60,7 @@ export function DocumentTimeline({
           {ordered.map((e, i) => (
             <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <span style={{ fontSize: 15, lineHeight: "22px" }}>{ICON[e.type] ?? "•"}</span>
+                <span style={{ lineHeight: "22px", color: "var(--ink-soft)", display: "inline-flex" }}><TrackIcon name={e.type} size={15} /></span>
                 {i < ordered.length - 1 && <span style={{ width: 2, flex: 1, minHeight: 18, background: "var(--border)" }} />}
               </div>
               <div style={{ paddingBottom: 14, flex: 1 }}>
@@ -80,7 +76,7 @@ export function DocumentTimeline({
 
       {canRemind && !suggestion && (
         <div style={{ marginTop: 6 }}>
-          {sent ? <span style={{ fontSize: 12, color: "var(--emerald-dark)", fontWeight: 600 }}>✓ {t("tracking.event.reminder_sent")}</span>
+          {sent ? <span style={{ fontSize: 12, color: "var(--emerald-dark)", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4 }}><TrackIcon name="check" size={13} /> {t("tracking.event.reminder_sent")}</span>
                 : <button className="btn btn-ghost btn-sm" disabled={busy} onClick={remind}>{busy ? "…" : t("tracking.cta.resend")}</button>}
         </div>
       )}
