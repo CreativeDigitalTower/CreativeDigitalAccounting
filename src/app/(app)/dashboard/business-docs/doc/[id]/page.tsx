@@ -18,7 +18,9 @@ export default async function BusinessDocEditorPage({ params }: { params: Promis
   ]);
   if (!doc || doc.companyId !== companyId) notFound();
 
-  const showLogo = plan !== "free" && !!company?.logoUrl;
+  // Протоколите за приемо-предаване носят собствен подпис/печат в тялото —
+  // затова НЕ добавяме автоматичното фирмено лого най-горе за тях.
+  const showLogo = plan !== "free" && !!company?.logoUrl && !doc.templateId.startsWith("acceptance");
 
   return (
     <DocEditor

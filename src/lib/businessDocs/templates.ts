@@ -201,7 +201,13 @@ function handoverServicesBody(): string {
     <p style="${P}">Всички дейности са извършени в срок, с добро качество, съгласно нормативните и договорни изисквания.</p>
     <p style="${P}">Забележки: <span class="cda-fill" style="background:#FCEFC7;">[Забележки]</span></p>
     <p style="${P}">Настоящият Приемо-предавателен протокол е изготвен и подписан в 2 (два) еднообразни екземпляра – по един за всяка от Страните.</p>
-    ${signatures("ЗА ВЪЗЛОЖИТЕЛЯ", "ЗА ИЗПЪЛНИТЕЛЯ")}
+    <table style="width:100%;margin-top:44px;border-collapse:collapse;">
+      <tr>
+        <td style="width:48%;text-align:center;vertical-align:bottom;">ЗА ВЪЗЛОЖИТЕЛЯ:<div style="border-top:1px solid #16201C;margin-top:64px;padding-top:4px;">(подпис)</div></td>
+        <td style="width:4%;"></td>
+        <td style="width:48%;text-align:center;vertical-align:bottom;">ЗА ИЗПЪЛНИТЕЛЯ:<div style="margin:6px 0 0;"><img src="/templates/starclean-stamp.png" alt="{{Фирма.Име}}" style="max-width:230px;height:auto;" /></div><div style="border-top:1px solid #16201C;padding-top:4px;">(подпис и печат)</div></td>
+      </tr>
+    </table>
   `;
 }
 
