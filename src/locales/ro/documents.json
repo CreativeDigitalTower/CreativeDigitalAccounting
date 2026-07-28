@@ -298,6 +298,8 @@
     "colReason": "Motiv",
     "colStatus": "Stare",
     "autoIn": "auto-ștergere în {days} zile",
-    "confirmDelete": "Mutați în Coș?"
+    "confirmDelete": "Mutați în Coș?",
+    "colCompany": "Firmă",
+    "allCompanies": "Toate firmele"
   }
 }

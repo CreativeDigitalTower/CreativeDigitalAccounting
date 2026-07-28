@@ -298,6 +298,8 @@
     "colReason": "Причина",
     "colStatus": "Статус",
     "autoIn": "авто-изтриване след {days} дни",
-    "confirmDelete": "Преместване в Кошчето?"
+    "confirmDelete": "Преместване в Кошчето?",
+    "colCompany": "Фирма",
+    "allCompanies": "Всички фирми"
   }
 }

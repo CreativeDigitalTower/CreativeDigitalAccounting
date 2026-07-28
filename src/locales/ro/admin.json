@@ -5,7 +5,8 @@
   "nav": {
     "emails": "E-mailuri și notificări",
     "blog": "Blog",
-    "businesses": "Afaceri (filtre după sector/plan)"
+    "businesses": "Afaceri (filtre după sector/plan)",
+    "deletedDocs": "Documente șterse"
   },
   "companiesWord": "companii",
   "ranges": {
@@ -312,5 +313,11 @@
     "bankReason": "Detalii plată",
     "bankReasonValue": "Abonament firmă de contabilitate — {name}",
     "bankNote": "După primirea plății activăm planul selectat și emitem o factură. Toate prețurile sunt fără TVA. 1 EUR = {rate} BGN."
+  },
+  "deletedDocs": {
+    "back": "← Admin",
+    "title": "Documente șterse",
+    "subtitle": "{n} documente șterse din toate firmele — restaurare și ștergere definitivă.",
+    "nav": "Documente șterse"
   }
 }

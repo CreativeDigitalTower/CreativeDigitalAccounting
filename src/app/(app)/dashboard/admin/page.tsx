@@ -337,6 +337,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           <Link href="/dashboard/admin/emails" className="btn btn-ghost btn-sm">{t("admin.nav.emails")}</Link>
           <Link href="/dashboard/admin/blog" className="btn btn-ghost btn-sm">{t("admin.nav.blog")}</Link>
           <Link href="/dashboard/admin/businesses" className="btn btn-ghost btn-sm">{t("admin.nav.businesses")}</Link>
+          <Link href="/dashboard/admin/deleted-documents" className="btn btn-ghost btn-sm">{t("admin.nav.deletedDocs")}</Link>
         </div>
       </div>
 

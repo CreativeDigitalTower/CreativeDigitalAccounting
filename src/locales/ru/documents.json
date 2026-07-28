@@ -298,6 +298,8 @@
     "colReason": "Причина",
     "colStatus": "Статус",
     "autoIn": "авто-удаление через {days} дн.",
-    "confirmDelete": "Переместить в Корзину?"
+    "confirmDelete": "Переместить в Корзину?",
+    "colCompany": "Компания",
+    "allCompanies": "Все компании"
   }
 }
