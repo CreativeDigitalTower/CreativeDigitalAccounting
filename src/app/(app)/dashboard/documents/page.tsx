@@ -6,6 +6,8 @@ import { FeatureLink, FeatureTab } from "@/components/app/FeatureLink";
 import { DocumentBrowser, type DocRow } from "@/components/app/DocumentBrowser";
 import { statusChips } from "@/lib/documentTracking";
 import { getT } from "@/lib/i18n/server";
+import { Suspense } from "react";
+import { TrashToast } from "@/components/app/TrashToast";
 
 export default async function DocumentsPage() {
   const { companyId } = await requireCompany();
@@ -13,7 +15,7 @@ export default async function DocumentsPage() {
   const { t } = await getT();
 
   const docs = await prisma.document.findMany({
-    where: { companyId },
+    where: { companyId, deletedAt: null },
     include: {
       client: { select: { id: true, name: true } },
       lines: { select: { lineTotal: true } },
@@ -32,6 +34,7 @@ export default async function DocumentsPage() {
 
   return (
     <>
+      <Suspense fallback={null}><TrashToast /></Suspense>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 18, marginBottom: 18, flexWrap: "wrap" }}>
         <div>
           <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>{t("documents.page.title")}</h1>
@@ -41,6 +44,7 @@ export default async function DocumentsPage() {
           <FeatureLink plan={plan} feature="protocols" href="/dashboard/documents/protocols">{t("documents.page.ppp")}</FeatureLink>
           <FeatureLink plan={plan} feature="declarations" href="/dashboard/documents/declarations">{t("documents.page.declarations")}</FeatureLink>
           <Link href="/dashboard/sendings" className="btn btn-ghost">{t("tracking.sendings.title")}</Link>
+          <Link href="/dashboard/documents/trash" className="btn btn-ghost">{t("documents.trash.nav")}</Link>
           <Link href="/dashboard/documents/new" className="btn btn-primary">{t("documents.page.newDoc")}</Link>
         </div>
       </div>

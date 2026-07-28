@@ -25,14 +25,14 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
       client: { include: { emails: { orderBy: [{ isPrimary: "desc" }, { createdAt: "asc" }] } } },
       lines: true,
       company: { include: { subscription: true } },
-      attachments: { orderBy: { createdAt: "asc" }, select: { id: true, filename: true, originalFilename: true, mimeType: true, size: true, createdAt: true } },
+      attachments: { orderBy: { createdAt: "asc" }, select: { id: true, filename: true, originalFilename: true, mimeType: true, size: true, pages: true, createdAt: true } },
       childDocuments: { where: { type: "invoice" }, select: { id: true, number: true }, orderBy: { createdAt: "asc" } },
       parentDocument: { select: { id: true, number: true, type: true } },
       events: { orderBy: { at: "asc" }, select: { type: true, at: true, channel: true, recipient: true, device: true } },
     },
   });
 
-  if (!doc || doc.companyId !== companyId) notFound();
+  if (!doc || doc.companyId !== companyId || doc.deletedAt) notFound(); // изтритите са в Кошчето
 
   // Document Tracking: производен статус + предложение.
   const trackStatus = deriveTrackingStatus(doc.events, doc);

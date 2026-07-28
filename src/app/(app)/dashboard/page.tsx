@@ -83,6 +83,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       prisma.document.findMany({
         where: {
           companyId,
+          deletedAt: null,
           type: "invoice",
           status: { in: ["paid", "sent"] },
           issueDate: { gte: periodStart, lte: periodEnd },
@@ -96,11 +97,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       }),
       // Overdue invoices
       prisma.document.count({
-        where: { companyId, type: "invoice", status: "overdue" },
+        where: { companyId, deletedAt: null, type: "invoice", status: "overdue" },
       }),
       // Recent documents (по хронология: дата на издаване ↓, номер ↓)
       prisma.document.findMany({
-        where: { companyId },
+        where: { companyId, deletedAt: null },
         include: { client: true, lines: true },
         orderBy: DOC_ORDER,
         take: 8,
@@ -145,7 +146,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
   // Приходи по клиент (за топ 5 диаграмата)
   const clientRevenueInvoices = await prisma.document.findMany({
-    where: { companyId, type: "invoice", clientId: { not: null } },
+    where: { companyId, deletedAt: null, type: "invoice", clientId: { not: null } },
     select: { client: { select: { name: true } }, lines: { select: { lineTotal: true } } },
   });
   const clientRevenue = aggregateClientRevenue(clientRevenueInvoices);
@@ -202,10 +203,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const [meUser, openTasksCount, allInvoices, bdayClients, expiringOffersCount, unpaidInvoices, clientsCount] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId }, select: { name: true } }),
     prisma.clientTask.count({ where: { done: false, client: { companyId } } }),
-    prisma.document.findMany({ where: { companyId, type: "invoice" }, select: { issueDate: true, dueDate: true, lines: { select: { lineTotal: true } } } }),
+    prisma.document.findMany({ where: { companyId, deletedAt: null, type: "invoice" }, select: { issueDate: true, dueDate: true, lines: { select: { lineTotal: true } } } }),
     prisma.client.findMany({ where: { companyId, birthday: { not: null } }, select: { birthday: true } }),
     prisma.document.count({ where: { companyId, type: "quote", dueDate: { gte: now, lte: next7 }, clientDecision: null } }),
-    prisma.document.findMany({ where: { companyId, type: "invoice", status: { in: ["sent", "overdue", "issued"] } }, select: { lines: { select: { lineTotal: true } } } }),
+    prisma.document.findMany({ where: { companyId, deletedAt: null, type: "invoice", status: { in: ["sent", "overdue", "issued"] } }, select: { lines: { select: { lineTotal: true } } } }),
     prisma.client.count({ where: { companyId } }),
   ]);
 

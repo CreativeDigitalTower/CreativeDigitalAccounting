@@ -18,7 +18,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ token: 
     const type = ALLOWED[String(body?.action)];
     if (!type) return NextResponse.json({ ok: false }, { status: 400 });
 
-    const doc = await prisma.document.findUnique({ where: { publicToken: token }, select: { id: true, companyId: true } });
+    const doc = await prisma.document.findUnique({ where: { publicToken: token, deletedAt: null }, select: { id: true, companyId: true } });
     if (!doc) return NextResponse.json({ ok: false }, { status: 404 });
 
     await recordDocumentEvent(doc.id, type, {

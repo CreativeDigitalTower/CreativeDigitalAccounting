@@ -27,7 +27,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
 
   // ─── Годишни инструменти (независими от избора на период) ───
   const [invoices, goal, financialHistory] = await Promise.all([
-    prisma.document.findMany({ where: { companyId, type: "invoice", issueDate: { gte: yearStart } }, include: { lines: true } }),
+    prisma.document.findMany({ where: { companyId, deletedAt: null, type: "invoice", issueDate: { gte: yearStart } }, include: { lines: true } }),
     prisma.financialGoal.findUnique({ where: { companyId_year: { companyId, year } } }),
     prisma.financialHistory.findMany({ where: { companyId }, orderBy: { year: "asc" } }),
   ]);
@@ -51,7 +51,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   const [retainerAgg, recurringExpenses, monthInvoices, expensesYearAgg] = await Promise.all([
     prisma.client.aggregate({ where: { companyId, monthlyRetainer: { not: null } }, _sum: { monthlyRetainer: true } }),
     prisma.expense.findMany({ where: { companyId, isRecurring: true }, include: { category: true } }),
-    prisma.document.findMany({ where: { companyId, type: "invoice", issueDate: { gte: monthStart } }, include: { lines: true } }),
+    prisma.document.findMany({ where: { companyId, deletedAt: null, type: "invoice", issueDate: { gte: monthStart } }, include: { lines: true } }),
     prisma.expense.aggregate({ where: { companyId, date: { gte: yearStart } }, _sum: { amount: true } }),
   ]);
   const expectedRetainer = retainerAgg._sum.monthlyRetainer ?? 0;

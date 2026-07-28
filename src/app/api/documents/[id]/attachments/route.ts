@@ -14,6 +14,7 @@ const schema = z.object({
   filename: z.string().min(1).max(255),
   mimeType: z.string().min(1),
   size: z.number().int().positive().max(MAX_ATTACHMENT_BYTES, "Файлът е твърде голям (макс. 8 MB)."),
+  pages: z.number().int().positive().max(100000).optional().nullable(),
   dataUrl: z.string().min(1),
 });
 
@@ -25,7 +26,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     if (!(await ownedDoc(companyId, id))) return NextResponse.json({ error: "Не е намерен." }, { status: 404 });
     const list = await prisma.documentAttachment.findMany({
       where: { documentId: id },
-      select: { id: true, filename: true, originalFilename: true, mimeType: true, size: true, createdAt: true },
+      select: { id: true, filename: true, originalFilename: true, mimeType: true, size: true, pages: true, createdAt: true },
       orderBy: { createdAt: "asc" },
     });
     return NextResponse.json(list);
@@ -47,9 +48,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const att = await prisma.documentAttachment.create({
       data: {
         documentId: id, filename, originalFilename: data.filename.slice(0, 255),
-        mimeType: "application/pdf", size: data.size, dataUrl: data.dataUrl, uploadedById: userId,
+        mimeType: "application/pdf", size: data.size, pages: data.pages ?? null, dataUrl: data.dataUrl, uploadedById: userId,
       },
-      select: { id: true, filename: true, originalFilename: true, mimeType: true, size: true, createdAt: true },
+      select: { id: true, filename: true, originalFilename: true, mimeType: true, size: true, pages: true, createdAt: true },
     });
     return NextResponse.json(att);
   } catch (err) {

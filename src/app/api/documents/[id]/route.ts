@@ -95,3 +95,20 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
   }
 }
+
+// DELETE → „меко" изтриване (преместване в Кошчето). Номерът НЕ се освобождава.
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { companyId, userId } = await requireCompany();
+    const { id } = await params;
+    const reason = (await req.json().catch(() => ({})))?.reason ?? null;
+    const doc = await prisma.document.findUnique({ where: { id }, select: { companyId: true, number: true, deletedAt: true } });
+    if (!doc || doc.companyId !== companyId) return NextResponse.json({ error: "Не е намерен." }, { status: 404 });
+    if (doc.deletedAt) return NextResponse.json({ success: true }); // вече е в Кошчето
+    await prisma.document.update({ where: { id }, data: { deletedAt: new Date(), deletedById: userId, deleteReason: reason } });
+    await audit(companyId, userId, "delete", "Document", id, `Преместен в Кошчето: ${doc.number}${reason ? ` · ${reason}` : ""}`);
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
+  }
+}

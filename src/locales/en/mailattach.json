@@ -46,7 +46,12 @@
     "preview": "Preview",
     "download": "Download",
     "replace": "Replace",
-    "remove": "Remove"
+    "remove": "Remove",
+    "errNetwork": "No connection to the server. Check your internet and try again.",
+    "errServerTooLarge": "The file is too large for the server. Reduce its size or contact an admin (server limit).",
+    "errForbidden": "You don't have permission for this action.",
+    "errSave": "Server save error. Please try again.",
+    "pages": "{n} pages"
   },
   "send": {
     "invalidManual": "Invalid email address.",

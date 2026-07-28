@@ -268,5 +268,36 @@
     "count": "{n} documents",
     "empty": "No documents match the selected criteria."
   },
-  "duplicate": "Duplicate"
+  "duplicate": "Duplicate",
+  "trash": {
+    "nav": "Trash",
+    "title": "Trash",
+    "subtitle": "Deleted documents are kept here and can be restored.",
+    "back": "← Documents",
+    "empty": "Trash is empty.",
+    "count": "{n} documents",
+    "oldest": "The oldest will be permanently deleted in {days} days",
+    "delete": "Delete",
+    "deleteTitle": "Move to Trash",
+    "toastMoved": "Document moved to Trash.",
+    "undo": "Undo",
+    "restore": "Restore",
+    "permanent": "Delete permanently",
+    "confirmPermanent": "Are you sure? This action cannot be undone.",
+    "restoreSel": "Restore selected ({n})",
+    "permanentSel": "Delete selected permanently ({n})",
+    "search": "Search by number/client…",
+    "allTypes": "All types",
+    "allUsers": "All users",
+    "colNumber": "№",
+    "colType": "Document",
+    "colClient": "Client",
+    "colDate": "Date",
+    "colDeletedBy": "Deleted by",
+    "colDeletedAt": "Deleted at",
+    "colReason": "Reason",
+    "colStatus": "Status",
+    "autoIn": "auto-delete in {days} days",
+    "confirmDelete": "Move to Trash?"
+  }
 }

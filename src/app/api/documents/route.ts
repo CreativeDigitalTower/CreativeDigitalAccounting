@@ -268,7 +268,7 @@ export async function GET() {
   try {
     const { companyId } = await requireCompany();
     const docs = await prisma.document.findMany({
-      where: { companyId },
+      where: { companyId, deletedAt: null },
       include: { client: true, lines: true },
       orderBy: DOC_ORDER,
     });

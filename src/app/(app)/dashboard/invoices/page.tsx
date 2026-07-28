@@ -19,7 +19,7 @@ export default async function InvoicesPage({
   const { t } = await getT();
 
   const invoices = await prisma.document.findMany({
-    where: { companyId, type: "invoice", ...(params.status ? { status: params.status as never } : {}) },
+    where: { companyId, deletedAt: null, type: "invoice", ...(params.status ? { status: params.status as never } : {}) },
     include: { client: true, lines: true },
     orderBy: DOC_ORDER,
   });

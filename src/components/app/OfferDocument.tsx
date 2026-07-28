@@ -87,7 +87,8 @@ export function OfferDocument({ data }: { data: InvoiceData }) {
                 <td className="num">{line.quantity}</td>
                 <td className="num">{formatCurrency(line.unitPrice, data.currency)}</td>
                 <td className="num">{line.vatRate}%</td>
-                <td className="num" style={{ fontWeight: 600, paddingRight: 12 }}>{formatCurrency(line.lineTotal, data.currency)}</td>
+                {/* НЕТО стойност по ред (без ДДС) — ДДС е отделно долу */}
+                <td className="num" style={{ fontWeight: 600, paddingRight: 12 }}>{formatCurrency(line.quantity * line.unitPrice, data.currency)}</td>
               </tr>
             ))}
           </tbody>

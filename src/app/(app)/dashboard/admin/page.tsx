@@ -116,7 +116,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const mStart = new Date(nowD.getFullYear(), nowD.getMonth(), 1);
   const lmStart = new Date(nowD.getFullYear(), nowD.getMonth() - 1, 1);
   const platformInvoices = await prisma.document.findMany({
-    where: { type: "invoice", issueDate: { gte: lmStart } },
+    where: { deletedAt: null, type: "invoice", issueDate: { gte: lmStart } },
     select: { issueDate: true, lines: { select: { lineTotal: true } } },
   });
   let invThisMonth = 0, invLastMonth = 0;

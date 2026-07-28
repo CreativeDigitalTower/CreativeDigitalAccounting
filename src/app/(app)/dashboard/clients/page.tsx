@@ -24,7 +24,7 @@ export default async function ClientsPage({ searchParams }: { searchParams: Prom
       orderBy: { name: "asc" },
     }),
     prisma.document.findMany({
-      where: { companyId, type: "invoice", clientId: { not: null } },
+      where: { companyId, deletedAt: null, type: "invoice", clientId: { not: null } },
       select: { clientId: true, issueDate: true, lines: { select: { lineTotal: true } } },
     }),
   ]);

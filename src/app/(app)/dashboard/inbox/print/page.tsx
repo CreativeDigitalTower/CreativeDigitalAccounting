@@ -16,7 +16,7 @@ export default async function InboxPrintPage({ searchParams }: { searchParams: P
   if (!idList.length) notFound();
 
   const docs = await prisma.document.findMany({
-    where: { id: { in: idList }, recipientCompanyId: companyId },
+    where: { id: { in: idList }, recipientCompanyId: companyId, deletedAt: null },
     include: { client: true, lines: true, company: { include: { subscription: true } } },
     orderBy: DOC_ORDER,
   });

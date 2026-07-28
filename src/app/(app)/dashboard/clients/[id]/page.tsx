@@ -19,7 +19,7 @@ export default async function ClientDossierPage({ params }: { params: Promise<{ 
     where: { id, companyId },
     include: {
       notes: { orderBy: { createdAt: "desc" } },
-      documents: { include: { lines: true, events: { select: { type: true, at: true } } }, orderBy: DOC_ORDER },
+      documents: { where: { deletedAt: null }, include: { lines: true, events: { select: { type: true, at: true } } }, orderBy: DOC_ORDER },
       contracts: true,
       projects: true,
       contacts: { orderBy: { isPrimary: "desc" } },

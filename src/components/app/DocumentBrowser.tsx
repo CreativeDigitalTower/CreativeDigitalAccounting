@@ -8,6 +8,7 @@ import { useI18n } from "@/components/i18n/I18nProvider";
 import { formatCurrency, toBGN, isDualCurrencyActive, groupByMonth } from "@/lib/constants";
 import { SORT_OPTIONS, sortDocs, DEFAULT_SORT, type SortKey } from "@/lib/documentSort";
 import { TrackIcon } from "@/components/app/TrackIcon";
+import { TrashDeleteButton } from "@/components/app/TrashDeleteButton";
 
 export type DocRow = {
   id: string; number: string; type: string;
@@ -146,6 +147,7 @@ export function DocumentBrowser({ docs }: { docs: DocRow[] }) {
                         <Link href={`/dashboard/documents/new?duplicate=${doc.id}`} className="btn btn-ghost btn-sm" title={t("documents.duplicate")} style={{ display: "inline-flex", alignItems: "center" }}>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
                         </Link>
+                        <TrashDeleteButton id={doc.id} number={doc.number} iconOnly />
                       </td>
                     </tr>
                   ))}

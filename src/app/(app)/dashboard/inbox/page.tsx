@@ -14,7 +14,7 @@ export default async function InboxPage() {
 
   const [docs, notifications] = await Promise.all([
     prisma.document.findMany({
-      where: { recipientCompanyId: companyId },
+      where: { recipientCompanyId: companyId, deletedAt: null },
       include: { company: { select: { name: true } }, lines: { select: { lineTotal: true } } },
       orderBy: DOC_ORDER,
     }),

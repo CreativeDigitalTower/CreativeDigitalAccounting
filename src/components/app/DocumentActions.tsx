@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { DOC_STATUSES } from "@/lib/constants";
 import { DownloadButtons } from "@/components/app/DownloadButtons";
+import { TrashDeleteButton } from "@/components/app/TrashDeleteButton";
 import { useT } from "@/components/i18n/I18nProvider";
 
 export function DocumentActions({ id, status, number }: { id: string; status: string; number?: string }) {
@@ -41,6 +42,7 @@ export function DocumentActions({ id, status, number }: { id: string; status: st
         </select>
       </div>
       <Link href={`/dashboard/documents/${id}/edit`} className="btn btn-ghost btn-sm">{t("documents.actions.edit")}</Link>
+      <TrashDeleteButton id={id} number={number} />
       <DownloadButtons filename={number ?? "document"} />
     </div>
   );
