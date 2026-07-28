@@ -1,4 +1,5 @@
-import { requireCompany, getPlan } from "@/lib/session";
+import { requireCompany, getPlan, getMyRole } from "@/lib/session";
+import { canTrash } from "@/lib/permissions";
 import { DOC_ORDER } from "@/lib/documentSort";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -10,8 +11,9 @@ import { Suspense } from "react";
 import { TrashToast } from "@/components/app/TrashToast";
 
 export default async function DocumentsPage() {
-  const { companyId } = await requireCompany();
+  const { companyId, userId } = await requireCompany();
   const plan = await getPlan(companyId);
+  const canDelete = canTrash(await getMyRole(userId, companyId), "delete");
   const { t } = await getT();
 
   const docs = await prisma.document.findMany({
@@ -64,7 +66,7 @@ export default async function DocumentsPage() {
           <Link href="/dashboard/documents/new" className="btn btn-primary btn-sm">{t("documents.page.createFirst")}</Link>
         </div>
       ) : (
-        <DocumentBrowser docs={rows} />
+        <DocumentBrowser docs={rows} canDelete={canDelete} />
       )}
     </>
   );

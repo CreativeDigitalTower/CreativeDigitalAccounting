@@ -16,7 +16,7 @@ export type InvoiceRow = {
   total: number; currency: string; status: string;
 };
 
-export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
+export function InvoicesTable({ invoices, canDelete = true }: { invoices: InvoiceRow[]; canDelete?: boolean }) {
   const { t, locale } = useI18n();
   const router = useRouter();
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -46,8 +46,10 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
       { divider: true, label: "", onClick: () => {} },
       { label: t("documents.table.menu.markPaid"), icon: <UiIcon.check width={15} height={15} />, onClick: () => setStatus(doc.id, "paid") },
       { label: t("documents.table.menu.markOverdue"), icon: <UiIcon.warning width={15} height={15} />, onClick: () => setStatus(doc.id, "overdue") },
+      ...(canDelete ? [
       { divider: true, label: "", onClick: () => {} },
       { label: t("documents.trash.delete"), icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>, onClick: () => trashDoc(doc) },
+      ] : []),
     ];
   }
 

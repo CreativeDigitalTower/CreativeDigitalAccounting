@@ -1,4 +1,5 @@
-import { requireCompany, getPlan } from "@/lib/session";
+import { requireCompany, getPlan, getMyRole } from "@/lib/session";
+import { canTrash } from "@/lib/permissions";
 import { DOC_ORDER } from "@/lib/documentSort";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -12,7 +13,8 @@ export default async function InvoicesPage({
 }: {
   searchParams: Promise<{ status?: string }>;
 }) {
-  const { companyId } = await requireCompany();
+  const { companyId, userId } = await requireCompany();
+  const canDeleteDocs = canTrash(await getMyRole(userId, companyId), "delete");
   const plan = await getPlan(companyId);
   const params = await searchParams;
   const dual = isDualCurrencyActive();
@@ -76,6 +78,7 @@ export default async function InvoicesPage({
         </div>
       ) : (
         <InvoicesTable
+          canDelete={canDeleteDocs}
           invoices={invoices.map((doc) => ({
             id: doc.id, number: doc.number, clientName: doc.client?.name ?? "—",
             issueDate: doc.issueDate.toISOString(), dueDate: doc.dueDate ? doc.dueDate.toISOString() : null,

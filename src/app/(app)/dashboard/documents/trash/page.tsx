@@ -1,4 +1,5 @@
 import { requireCompany, getMyRole } from "@/lib/session";
+import { trashCaps } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { getT } from "@/lib/i18n/server";
@@ -11,6 +12,7 @@ export default async function TrashPage() {
   const { companyId, userId } = await requireCompany();
   const { t } = await getT();
   const role = await getMyRole(userId, companyId);
+  const caps = trashCaps(role);
 
   const docs = await prisma.document.findMany({
     where: { companyId, deletedAt: { not: null } },
@@ -46,7 +48,7 @@ export default async function TrashPage() {
         {oldestDays != null && <> · {t("documents.trash.oldest", { days: oldestDays })}</>}
       </div>
 
-      <TrashList rows={rows} canPermanent={role === "owner"} />
+      <TrashList rows={rows} canPermanent={caps.canPermanent} canRestore={caps.canRestore} />
     </>
   );
 }

@@ -142,6 +142,12 @@
       "assets": "Varlıklar",
       "users": "Kullanıcılar",
       "subscription": "Abonelik"
+    },
+    "trashPerms": {
+      "trashTitle": "Çöp Kutusu izinleri",
+      "delete": "Sil",
+      "restore": "Geri yükle",
+      "permanent": "Kalıcı sil"
     }
   },
   "invite": {

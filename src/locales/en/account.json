@@ -142,6 +142,12 @@
       "assets": "Assets",
       "users": "Users",
       "subscription": "Subscription"
+    },
+    "trashPerms": {
+      "trashTitle": "Trash permissions",
+      "delete": "Delete",
+      "restore": "Restore",
+      "permanent": "Delete permanently"
     }
   },
   "invite": {

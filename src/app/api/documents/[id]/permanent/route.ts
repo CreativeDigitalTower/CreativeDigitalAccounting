@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCompany, getMyRole } from "@/lib/session";
 import { audit } from "@/lib/documents";
+import { canTrash } from "@/lib/permissions";
 
 // Окончателно изтриване — премахва физически записа (и приложенията чрез cascade).
 // Само от Кошчето и само за собственик на фирмата. Номерът остава използван
@@ -9,8 +10,7 @@ import { audit } from "@/lib/documents";
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { companyId, userId } = await requireCompany();
-    const role = await getMyRole(userId, companyId);
-    if (role !== "owner") return NextResponse.json({ error: "Само собственик може да изтрива окончателно." }, { status: 403 });
+    if (!canTrash(await getMyRole(userId, companyId), "permanent")) return NextResponse.json({ error: "Нямате право да изтривате окончателно." }, { status: 403 });
     const { id } = await params;
     const doc = await prisma.document.findUnique({ where: { id }, select: { companyId: true, number: true, deletedAt: true } });
     if (!doc || doc.companyId !== companyId) return NextResponse.json({ error: "Не е намерен." }, { status: 404 });
