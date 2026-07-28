@@ -14,7 +14,7 @@ export default async function SendingsPage() {
   const { t } = await getT();
 
   const docs = await prisma.document.findMany({
-    where: { companyId, OR: [{ sentToClientAt: { not: null } }, { events: { some: {} } }] },
+    where: { companyId, deletedAt: null, OR: [{ sentToClientAt: { not: null } }, { events: { some: {} } }] },
     include: {
       client: { select: { id: true, name: true, contactEmail: true } },
       events: { orderBy: { at: "asc" }, select: { type: true, at: true, recipient: true } },

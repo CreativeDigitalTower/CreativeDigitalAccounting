@@ -32,6 +32,10 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
     await fetch(`/api/documents/${id}/status`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
     router.refresh();
   }
+  async function trashDoc(doc: InvoiceRow) {
+    const res = await fetch(`/api/documents/${doc.id}`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: "{}" });
+    if (res.ok) { router.push(`/dashboard/documents?trashed=${doc.id}&n=${encodeURIComponent(doc.number)}`); router.refresh(); }
+  }
   function menuItems(doc: InvoiceRow): MenuItem[] {
     return [
       { label: t("documents.table.menu.open"), icon: <UiIcon.doc width={15} height={15} />, onClick: () => router.push(`/dashboard/documents/${doc.id}`) },
@@ -42,6 +46,8 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
       { divider: true, label: "", onClick: () => {} },
       { label: t("documents.table.menu.markPaid"), icon: <UiIcon.check width={15} height={15} />, onClick: () => setStatus(doc.id, "paid") },
       { label: t("documents.table.menu.markOverdue"), icon: <UiIcon.warning width={15} height={15} />, onClick: () => setStatus(doc.id, "overdue") },
+      { divider: true, label: "", onClick: () => {} },
+      { label: t("documents.trash.delete"), icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>, onClick: () => trashDoc(doc) },
     ];
   }
 

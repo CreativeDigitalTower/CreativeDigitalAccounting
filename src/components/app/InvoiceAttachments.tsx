@@ -5,7 +5,7 @@ import { useI18n } from "@/components/i18n/I18nProvider";
 import { validatePdfUpload, formatFileSize, MAX_ATTACHMENT_BYTES } from "@/lib/attachments";
 
 export type Attachment = {
-  id: string; filename: string; originalFilename: string; mimeType: string; size: number; createdAt: string;
+  id: string; filename: string; originalFilename: string; mimeType: string; size: number; pages?: number | null; createdAt: string;
 };
 
 function fileToDataUrl(file: File): Promise<string> {
@@ -15,6 +15,17 @@ function fileToDataUrl(file: File): Promise<string> {
     r.onerror = reject;
     r.readAsDataURL(file);
   });
+}
+
+/** Груб брой страници на PDF (по /Type /Page обектите). „ако може" — best-effort. */
+async function countPdfPages(file: File): Promise<number | undefined> {
+  try {
+    const buf = new Uint8Array(await file.arrayBuffer());
+    const s = new TextDecoder("latin1").decode(buf);
+    const m = s.match(/\/Type\s*\/Page[^s]/g);
+    const n = m ? m.length : 0;
+    return n > 0 ? n : undefined;
+  } catch { return undefined; }
 }
 
 /** Секция „Приложения към фактурата" — drag&drop, качване, преглед/сваляне/замяна/премахване на PDF. */
@@ -47,15 +58,30 @@ export function InvoiceAttachments({ documentId, initial }: { documentId: string
     if (file.size > MAX_ATTACHMENT_BYTES) { setError(t("mailattach.attach.tooLarge")); return; }
     setBusy(true);
     try {
-      const dataUrl = await fileToDataUrl(file);
-      const payload = { filename: file.name, mimeType: file.type || "application/pdf", size: file.size, dataUrl };
+      const [dataUrl, pages] = await Promise.all([fileToDataUrl(file), countPdfPages(file)]);
+      const payload = { filename: file.name, mimeType: file.type || "application/pdf", size: file.size, pages, dataUrl };
       const url = replaceAttId ? `${base}/${replaceAttId}` : base;
-      const res = await fetch(url, {
-        method: replaceAttId ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
-      });
+      let res: Response;
+      try {
+        res = await fetch(url, {
+          method: replaceAttId ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+        });
+      } catch {
+        // Мрежова/сървърна грешка преди отговор (напр. прекъсната връзка)
+        setError(t("mailattach.attach.errNetwork")); return;
+      }
+      if (!res.ok) {
+        // Показваме реалната причина, не общо „Неуспешно качване".
+        // 413 обикновено идва от лимит на реверс-прокси (client_max_body_size).
+        if (res.status === 413) { setError(t("mailattach.attach.errServerTooLarge")); return; }
+        if (res.status === 401 || res.status === 403) { setError(t("mailattach.attach.errForbidden")); return; }
+        let msg = "";
+        try { msg = (await res.json())?.error ?? ""; } catch { /* не-JSON отговор (HTML от прокси/сървър) */ }
+        if (!msg) msg = res.status >= 500 ? t("mailattach.attach.errSave") : t("mailattach.attach.errUpload");
+        setError(msg); return;
+      }
       const data = await res.json();
-      if (!res.ok) { setError(data.error ?? t("mailattach.attach.errUpload")); return; }
       setItems((prev) => replaceAttId ? prev.map((a) => (a.id === replaceAttId ? data : a)) : [...prev, data]);
     } catch {
       setError(t("mailattach.attach.errUpload"));
@@ -122,7 +148,7 @@ export function InvoiceAttachments({ documentId, initial }: { documentId: string
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brick)" strokeWidth="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
               <div style={{ flex: 1, minWidth: 140 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, wordBreak: "break-all" }}>{a.filename}</div>
-                <div style={{ fontSize: 11, color: "var(--muted)" }}>{formatFileSize(a.size)} · {new Date(a.createdAt).toLocaleDateString(locale)}</div>
+                <div style={{ fontSize: 11, color: "var(--muted)" }}>{formatFileSize(a.size)}{a.pages ? ` · ${t("mailattach.attach.pages", { n: a.pages })}` : ""} · {new Date(a.createdAt).toLocaleDateString(locale)}</div>
               </div>
               <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
                 <a href={`${base}/${a.id}?inline=1`} target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm">{t("mailattach.attach.preview")}</a>

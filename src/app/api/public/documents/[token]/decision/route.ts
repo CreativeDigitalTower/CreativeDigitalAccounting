@@ -12,7 +12,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ token: 
     const { decision } = z.object({ decision: z.enum(["accepted", "rejected"]) }).parse(await req.json());
 
     const doc = await prisma.document.findUnique({
-      where: { publicToken: token },
+      where: { publicToken: token, deletedAt: null },
       include: { client: true, company: { select: { name: true, companyUsers: { where: { role: "owner" }, select: { user: { select: { email: true, name: true, preferredLanguage: true } } } } } } },
     });
     if (!doc) return NextResponse.json({ error: "Не е намерен" }, { status: 404 });

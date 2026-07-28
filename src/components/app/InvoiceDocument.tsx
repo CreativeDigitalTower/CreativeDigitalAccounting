@@ -269,7 +269,9 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
               <td className="num">{line.quantity}</td>
               <td className="num">{formatCurrency(line.unitPrice, data.currency)}</td>
               <td className="num">{line.vatRate}%</td>
-              <td className="num" style={{ fontWeight: 600, paddingRight: filledHead ? 12 : undefined }}>{formatCurrency(line.lineTotal, data.currency)}</td>
+              {/* „Сума" по ред = НЕТО стойност (кол. × ед. цена без ДДС). ДДС се показва
+                  отделно в Нето/ДДС/Общо долу — не се начислява втори път визуално. */}
+              <td className="num" style={{ fontWeight: 600, paddingRight: filledHead ? 12 : undefined }}>{formatCurrency(line.quantity * line.unitPrice, data.currency)}</td>
             </tr>
           ))}
         </tbody>

@@ -46,7 +46,12 @@
     "preview": "Previzualizare",
     "download": "Descarcă",
     "replace": "Înlocuiește",
-    "remove": "Elimină"
+    "remove": "Elimină",
+    "errNetwork": "Fără conexiune la server. Verificați internetul și reîncercați.",
+    "errServerTooLarge": "Fișierul este prea mare pentru server. Reduceți dimensiunea sau contactați un administrator (limită server).",
+    "errForbidden": "Nu aveți permisiune pentru această acțiune.",
+    "errSave": "Eroare la salvarea pe server. Reîncercați.",
+    "pages": "{n} pag."
   },
   "send": {
     "invalidManual": "Adresă de email invalidă.",

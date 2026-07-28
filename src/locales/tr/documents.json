@@ -268,5 +268,36 @@
     "count": "{n} belge",
     "empty": "Seçilen kriterlere uygun belge yok."
   },
-  "duplicate": "Çoğalt"
+  "duplicate": "Çoğalt",
+  "trash": {
+    "nav": "Çöp Kutusu",
+    "title": "Çöp Kutusu",
+    "subtitle": "Silinen belgeler burada tutulur ve geri yüklenebilir.",
+    "back": "← Belgeler",
+    "empty": "Çöp kutusu boş.",
+    "count": "{n} belge",
+    "oldest": "En eski {days} gün içinde kalıcı olarak silinecek",
+    "delete": "Sil",
+    "deleteTitle": "Çöp Kutusuna taşı",
+    "toastMoved": "Belge Çöp Kutusuna taşındı.",
+    "undo": "Geri al",
+    "restore": "Geri yükle",
+    "permanent": "Kalıcı olarak sil",
+    "confirmPermanent": "Emin misiniz? Bu işlem geri alınamaz.",
+    "restoreSel": "Seçilenleri geri yükle ({n})",
+    "permanentSel": "Seçilenleri kalıcı sil ({n})",
+    "search": "Numara/müşteri ara…",
+    "allTypes": "Tüm türler",
+    "allUsers": "Tüm kullanıcılar",
+    "colNumber": "№",
+    "colType": "Belge",
+    "colClient": "Müşteri",
+    "colDate": "Tarih",
+    "colDeletedBy": "Silen",
+    "colDeletedAt": "Silinme",
+    "colReason": "Neden",
+    "colStatus": "Durum",
+    "autoIn": "{days} gün içinde otomatik silme",
+    "confirmDelete": "Çöp Kutusuna taşınsın mı?"
+  }
 }

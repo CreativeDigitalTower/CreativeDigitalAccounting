@@ -33,6 +33,7 @@ const putSchema = z.object({
   filename: z.string().min(1).max(255),
   mimeType: z.string().min(1),
   size: z.number().int().positive().max(MAX_ATTACHMENT_BYTES, "Файлът е твърде голям (макс. 8 MB)."),
+  pages: z.number().int().positive().max(100000).optional().nullable(),
   dataUrl: z.string().min(1),
 });
 
@@ -49,9 +50,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       where: { id: attId },
       data: {
         filename: sanitizePdfFilename(data.filename), originalFilename: data.filename.slice(0, 255),
-        mimeType: "application/pdf", size: data.size, dataUrl: data.dataUrl, uploadedById: userId,
+        mimeType: "application/pdf", size: data.size, pages: data.pages ?? null, dataUrl: data.dataUrl, uploadedById: userId,
       },
-      select: { id: true, filename: true, originalFilename: true, mimeType: true, size: true, createdAt: true },
+      select: { id: true, filename: true, originalFilename: true, mimeType: true, size: true, pages: true, createdAt: true },
     });
     return NextResponse.json(att);
   } catch (err) {

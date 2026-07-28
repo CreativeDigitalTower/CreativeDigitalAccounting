@@ -1,4 +1,7 @@
 export const EUR_TO_BGN = 1.95583;
+// Кошче: колко дни се пазят изтритите документи преди автоматично изтриване.
+// (В бъдеще — конфигурируемо от Супер Админ: 30/60/90/180/365/никога.)
+export const TRASH_RETENTION_DAYS = 90;
 export const DUAL_CURRENCY_UNTIL = new Date("2026-08-08");
 export const FREE_PLAN_LIMIT = 5; // документа/месец
 

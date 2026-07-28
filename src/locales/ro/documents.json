@@ -268,5 +268,36 @@
     "count": "{n} documente",
     "empty": "Niciun document nu corespunde criteriilor selectate."
   },
-  "duplicate": "Duplică"
+  "duplicate": "Duplică",
+  "trash": {
+    "nav": "Coș",
+    "title": "Coș de gunoi",
+    "subtitle": "Documentele șterse sunt păstrate aici și pot fi restaurate.",
+    "back": "← Documente",
+    "empty": "Coșul este gol.",
+    "count": "{n} documente",
+    "oldest": "Cel mai vechi va fi șters definitiv peste {days} zile",
+    "delete": "Șterge",
+    "deleteTitle": "Mută în Coș",
+    "toastMoved": "Documentul a fost mutat în Coș.",
+    "undo": "Anulează",
+    "restore": "Restaurează",
+    "permanent": "Șterge definitiv",
+    "confirmPermanent": "Sigur? Această acțiune nu poate fi anulată.",
+    "restoreSel": "Restaurează selectate ({n})",
+    "permanentSel": "Șterge definitiv selectate ({n})",
+    "search": "Caută după număr/client…",
+    "allTypes": "Toate tipurile",
+    "allUsers": "Toți utilizatorii",
+    "colNumber": "№",
+    "colType": "Document",
+    "colClient": "Client",
+    "colDate": "Data",
+    "colDeletedBy": "Șters de",
+    "colDeletedAt": "Șters la",
+    "colReason": "Motiv",
+    "colStatus": "Stare",
+    "autoIn": "auto-ștergere în {days} zile",
+    "confirmDelete": "Mutați în Coș?"
+  }
 }

@@ -761,6 +761,12 @@ model Document {
   sentToClientAt     DateTime?
   // Inter-company sharing — ако получателят е регистрирана фирма в платформата
   recipientCompanyId String?
+  // Soft delete (Кошче). deletedAt != null → документът е в Кошчето.
+  // Записът остава физически (номерът не се освобождава); възстановяване връща
+  // документа непроменен. Окончателното изтриване премахва записа.
+  deletedAt          DateTime?
+  deletedById        String?
+  deleteReason       String?
   createdAt          DateTime       @default(now())
 
   company        Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
@@ -772,6 +778,7 @@ model Document {
   events         DocumentEvent[]
 
   @@index([recipientCompanyId])
+  @@index([companyId, deletedAt])
 }
 
 // ─── Document Tracking ───────────────────────────────────────────────────
@@ -805,6 +812,7 @@ model DocumentAttachment {
   originalFilename String
   mimeType         String
   size             Int
+  pages            Int?     // брой страници на PDF-а (ако е засечен)
   dataUrl          String   @db.Text
   uploadedById     String?
   createdAt        DateTime @default(now())

@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 export default async function PublicDocumentPage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   const doc = await prisma.document.findUnique({
-    where: { publicToken: token },
+    where: { publicToken: token, deletedAt: null },
     include: { client: true, lines: true, company: { include: { subscription: true } } },
   });
   if (!doc) notFound();

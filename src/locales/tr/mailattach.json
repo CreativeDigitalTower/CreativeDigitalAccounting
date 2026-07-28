@@ -46,7 +46,12 @@
     "preview": "Önizleme",
     "download": "İndir",
     "replace": "Değiştir",
-    "remove": "Kaldır"
+    "remove": "Kaldır",
+    "errNetwork": "Sunucuya bağlantı yok. İnternetinizi kontrol edip tekrar deneyin.",
+    "errServerTooLarge": "Dosya sunucu için çok büyük. Boyutu küçültün veya yöneticiyle iletişime geçin (sunucu limiti).",
+    "errForbidden": "Bu işlem için yetkiniz yok.",
+    "errSave": "Sunucuya kaydetme hatası. Tekrar deneyin.",
+    "pages": "{n} sayfa"
   },
   "send": {
     "invalidManual": "Geçersiz e-posta adresi.",

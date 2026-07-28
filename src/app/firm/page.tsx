@@ -42,7 +42,7 @@ export default async function FirmPage() {
   if (clientIds.length) {
     const [invoices, expensesYear, expensesMonth, docCounts] = await Promise.all([
       prisma.document.findMany({
-        where: { companyId: { in: clientIds }, type: "invoice" },
+        where: { companyId: { in: clientIds }, deletedAt: null, type: "invoice" },
         select: { companyId: true, issueDate: true, createdAt: true, dueDate: true, status: true, paidAmount: true, lines: { select: { lineTotal: true, quantity: true, unitPrice: true, vatRate: true } } },
       }),
       prisma.expense.groupBy({ by: ["companyId"], where: { companyId: { in: clientIds }, date: { gte: yearStart } }, _sum: { amount: true } }),
