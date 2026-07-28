@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { logSubscriptionEvent } from "@/lib/subscriptionEvents";
+import { billingMode } from "@/lib/billing";
 
 export const TRIAL_DAYS = 7;
 
@@ -13,7 +14,11 @@ export async function enforceSubscription(companyId: string) {
   if (!sub) return { plan: "free" as const, status: "active", justExpired: false, trialUsed: false, currentPeriodEnd: null, currentPeriodStart: null, wasTrial: false };
 
   const now = new Date();
-  const expired = sub.plan !== "free" && sub.currentPeriodEnd != null && new Date(sub.currentPeriodEnd) < now;
+  // CDT/вътрешни фирми НЕ се сваляют автоматично към Безплатен — достъпът им е
+  // предоставен без такса. (Изтичане на CDT крайна дата се обработва отделно —
+  // маркира се „Изисква преглед", без автоматично деактивиране.)
+  const standardBilling = billingMode(sub) === "standard";
+  const expired = standardBilling && sub.plan !== "free" && sub.currentPeriodEnd != null && new Date(sub.currentPeriodEnd) < now;
 
   if (expired) {
     const wasTrial = sub.status === "trialing";

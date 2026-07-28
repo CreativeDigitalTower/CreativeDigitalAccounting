@@ -21,6 +21,7 @@ export default async function SubscriptionPage() {
   const currentPlan = (subscription?.plan ?? "free") as PlanId;
   const docsUsed = counter?.documentsIssuedCount ?? 0;
   const docsLimit = SUBSCRIPTION_PLANS[currentPlan].docsPerMonth;
+  const isCdt = subscription?.billingMode === "cdt_client";
 
   return (
     <>
@@ -37,7 +38,11 @@ export default async function SubscriptionPage() {
             <div style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600 }}>
               {planLabel(currentPlan)}
             </div>
-            {subscription?.currentPeriodEnd && (
+            {isCdt ? (
+              <div style={{ fontSize: 12.5, color: "var(--emerald-dark)", fontWeight: 600, marginTop: 4 }}>
+                {t("billing.cdt.status")}
+              </div>
+            ) : subscription?.currentPeriodEnd && (
               <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginTop: 4 }}>
                 {t("billing.nextBilling", { date: new Date(subscription.currentPeriodEnd).toLocaleDateString(locale) })}
               </div>
@@ -57,12 +62,32 @@ export default async function SubscriptionPage() {
         </div>
       </div>
 
-      {/* Plans grid + плащане по банков път (със СУМА) */}
-      <SubscriptionPlans currentPlan={currentPlan} trialUsed={subscription?.trialUsed ?? false} bank={BANK_DETAILS} />
+      {isCdt ? (
+        <>
+          {/* CDT клиент — безплатен достъп, без плащане/проформа */}
+          <div className="glass panel" style={{ marginBottom: 24, padding: "22px 24px", borderLeft: "3px solid var(--emerald)" }}>
+            <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, fontWeight: 600, margin: "0 0 6px" }}>{t("billing.cdt.title")}</h2>
+            <p style={{ fontSize: 13.5, color: "var(--ink-soft)", margin: "0 0 8px", maxWidth: 680, lineHeight: 1.6 }}>
+              {t("billing.cdt.body", { plan: planLabel(currentPlan) })}
+            </p>
+            {subscription?.cdtEndsAt && (
+              <p style={{ fontSize: 12.5, color: "var(--ink-soft)", margin: "0 0 8px" }}>
+                {t("billing.cdt.until", { date: new Date(subscription.cdtEndsAt).toLocaleDateString(locale) })}
+              </p>
+            )}
+            <p style={{ fontSize: 12.5, color: "var(--muted)", margin: 0 }}>{t("billing.cdt.upgrade")}</p>
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Plans grid + плащане по банков път (със СУМА) */}
+          <SubscriptionPlans currentPlan={currentPlan} trialUsed={subscription?.trialUsed ?? false} bank={BANK_DETAILS} />
 
-      <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 16, maxWidth: 680 }}>
-        {t("billing.footNote")}
-      </p>
+          <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 16, maxWidth: 680 }}>
+            {t("billing.footNote")}
+          </p>
+        </>
+      )}
     </>
   );
 }

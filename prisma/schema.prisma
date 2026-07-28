@@ -1169,6 +1169,16 @@ model Subscription {
   // Ръчно потвърждение от Супер Админ за реално получено плащане.
   // Само „received" се отчита като продаден абонамент в статистиките (MRR/ARR).
   paymentStatus        PaymentStatus      @default(pending)
+  // Начин на таксуване (billing), НЕЗАВИСИМ от функционалния план и paymentStatus:
+  //   "standard"   — нормална логика (платен/безплатен според плана и плащането)
+  //   "cdt_client" — клиент на „Криейтив Диджитъл Тауър" ЕООД: пълен план без
+  //                  такса; НЕ влиза в MRR/ARR/приходи/комисионни/чакащи плащания
+  //   "internal"   — вътрешна фирма (също изключена от приходите)
+  billingMode          String             @default("standard")
+  cdtActivatedAt       DateTime?          // кога е активиран CDT достъпът
+  cdtActivatedById     String?            // кой Супер Админ го е активирал
+  cdtEndsAt            DateTime?          // опционална крайна дата (null = безсрочен)
+  cdtNote              String?            @db.Text // административна бележка
   stripeSubscriptionId String?
   stripeCustomerId     String?
   currentPeriodStart   DateTime?

@@ -16,5 +16,12 @@
   "pdfFailed": "Generarea PDF a eșuat. Deschidem dialogul de tipărire — alegeți „Salvează ca PDF”.",
   "print": "Tipărește",
   "generating": "Se generează…",
-  "downloadPdf": "↓ Descarcă PDF"
+  "downloadPdf": "↓ Descarcă PDF",
+  "cdt": {
+    "status": "Activ · acces gratuit ca client CDT",
+    "title": "Acces oferit de Creative Digital Tower",
+    "body": "Accesul dvs. la platformă este oferit ca client al Creative Digital Tower. Beneficiați de planul {plan} complet gratuit — nu se datorează nicio plată și nu se emite proformă.",
+    "until": "Accesul este valabil până la {date}.",
+    "upgrade": "Doriți un plan superior sau aveți o întrebare? Contactați-ne."
+  }
 }

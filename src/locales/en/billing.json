@@ -16,5 +16,12 @@
   "pdfFailed": "PDF generation failed. Opening the print dialog — choose “Save as PDF”.",
   "print": "Print",
   "generating": "Generating…",
-  "downloadPdf": "↓ Download PDF"
+  "downloadPdf": "↓ Download PDF",
+  "cdt": {
+    "status": "Active · free access as a CDT client",
+    "title": "Access provided by Creative Digital Tower",
+    "body": "Your access to the platform is provided as a client of Creative Digital Tower Ltd. You enjoy the full {plan} plan at no charge — no payment is due and no proforma is issued.",
+    "until": "Access is valid until {date}.",
+    "upgrade": "Would you like a higher plan or have a question? Get in touch with us."
+  }
 }

@@ -11,6 +11,7 @@ import { PlatformOverview } from "@/components/bi/PlatformOverview";
 import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 import { getT } from "@/lib/i18n/server";
 import { getMessages } from "@/lib/i18n/messages";
+import { isPayingSubscriber, isAwaitingPayment, isRevenueExcluded, isCdtClient } from "@/lib/billing";
 
 const RANGES = [
   { id: "7d", days: 7, bucket: "day" as const },
@@ -80,22 +81,25 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   ]);
   const allTimeVisitors = allTimeVisitorRows.length;
   const allTimeUsers = allTimeUserRows.length;
-  const paidCount = (counts.start ?? 0) + (counts.business ?? 0) + (counts.pro ?? 0);
   // Собственият акаунт не се заплаща — сумата му не се отчита като приход (MRR/ARR).
   const OWN_ACCOUNT_EMAIL = "office@creativedigitaltower.com";
   const isOwnAccount = (c: (typeof companies)[number]) =>
     c.companyUsers.some((cu) => cu.user?.email?.toLowerCase() === OWN_ACCOUNT_EMAIL);
-  // Реален платящ абонат: платен план + статус „active" + РЪЧНО потвърдено
-  // получено плащане (paymentStatus === "received") и да не е собственият акаунт.
-  // Само тези влизат в MRR/ARR — така статистиката отчита реални продажби.
-  const isPaying = (c: (typeof companies)[number]) => {
+  // Реален платящ абонат: платен план + активен + потвърдено плащане + СТАНДАРТЕН
+  // billing (изключва CDT/вътрешни) + да не е собственият акаунт. Само тези →
+  // MRR/ARR/платени/конверсия. CDT клиентите имат пълен план, но НЕ са приход.
+  const isPaying = (c: (typeof companies)[number]) => isPayingSubscriber(c.subscription, { isOwnAccount: isOwnAccount(c) });
+  // Платени клиенти (по план), но БЕЗ CDT/вътрешни/собствен акаунт.
+  const paidCount = companies.filter((c) => {
     const plan = c.subscription?.plan ?? "free";
-    return plan !== "free" && c.subscription?.status === "active"
-      && c.subscription?.paymentStatus === "received" && !isOwnAccount(c);
-  };
+    return plan !== "free" && !isRevenueExcluded(c.subscription) && !isOwnAccount(c);
+  }).length;
   const payingCount = companies.filter(isPaying).length;
-  // Платен план, но плащането още не е потвърдено (изчаква се / не е получено) — не влиза в приход.
-  const awaitingList = companies.filter((c) => (c.subscription?.plan ?? "free") !== "free" && c.subscription?.status === "active" && c.subscription?.paymentStatus !== "received" && !isOwnAccount(c));
+  // CDT клиенти (безплатен достъп като клиент на CDT) — оперативна статистика, не приход.
+  const cdtClients = companies.filter((c) => isCdtClient(c.subscription));
+  const cdtCount = cdtClients.length;
+  // Платен план, но плащането още не е потвърдено (изчаква се) — не влиза в приход.
+  const awaitingList = companies.filter((c) => isAwaitingPayment(c.subscription, { isOwnAccount: isOwnAccount(c) }));
   const awaitingPaymentCount = awaitingList.length;
   // Фирми в пробен (безплатен) период — показваме ги отделно, но НЕ като приход.
   const trialingCount = companies.filter((c) => c.subscription?.status === "trialing" && (c.subscription?.plan ?? "free") !== "free").length;
@@ -653,6 +657,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             <div>{t("admin.growthPanel.total")}: <strong className="num">{companies.length}</strong></div>
             <div>{t("admin.growthPanel.paid")}: <strong className="num">{paidCount}</strong></div>
             <div>{t("admin.growthPanel.free")}: <strong className="num">{counts.free ?? 0}</strong></div>
+            <div>{t("admin.cdt.kpiLabel")}: <strong className="num">{cdtCount}</strong>{cdtCount > 0 ? <span style={{ color: "var(--muted)", fontSize: 11.5 }}> ({["start", "business", "pro"].map((p) => { const n = cdtClients.filter((c) => (c.subscription?.plan ?? "free") === p).length; return n ? `${(planLabels[p] ?? p)}: ${n}` : null; }).filter(Boolean).join(" · ")})</span> : null}</div>
           </div>
         </div>
       </div>
@@ -702,6 +707,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                   periodStart: c.subscription?.currentPeriodStart?.toISOString() ?? null,
                   periodEnd: c.subscription?.currentPeriodEnd?.toISOString() ?? null,
                   trialUsed: c.subscription?.trialUsed ?? false,
+                  billingMode: c.subscription?.billingMode ?? "standard",
+                  cdtEndsAt: c.subscription?.cdtEndsAt?.toISOString() ?? null,
+                  cdtNote: c.subscription?.cdtNote ?? null,
                 }}
                 events={c.subscriptionEvents.map((e) => ({ type: e.type, plan: e.plan, status: e.status, period: e.period, amount: e.amount, note: e.note, createdAt: e.createdAt.toISOString() }))}
               />

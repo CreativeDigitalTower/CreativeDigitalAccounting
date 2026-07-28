@@ -319,5 +319,13 @@
     "title": "Deleted documents",
     "subtitle": "{n} deleted documents across all companies — restore and permanent delete.",
     "nav": "Deleted documents"
+  },
+  "cdt": {
+    "kpiLabel": "CDT clients",
+    "mode": {
+      "standard": "Paid (standard billing)",
+      "cdt": "CDT client (free)",
+      "internal": "Internal company"
+    }
   }
 }
