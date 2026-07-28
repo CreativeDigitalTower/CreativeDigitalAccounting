@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireCompany } from "@/lib/session";
+import { requireCompany, getMyRole } from "@/lib/session";
+import { canTrash } from "@/lib/permissions";
 import { audit, isNumberTaken } from "@/lib/documents";
 import { z } from "zod";
 
@@ -100,6 +101,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { companyId, userId } = await requireCompany();
+    if (!canTrash(await getMyRole(userId, companyId), "delete")) return NextResponse.json({ error: "Нямате право да изтривате документи." }, { status: 403 });
     const { id } = await params;
     const reason = (await req.json().catch(() => ({})))?.reason ?? null;
     const doc = await prisma.document.findUnique({ where: { id }, select: { companyId: true, number: true, deletedAt: true } });

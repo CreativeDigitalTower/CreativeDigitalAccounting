@@ -32,7 +32,7 @@ function isOverdue(d: DocRow): boolean {
   return due.getTime() < today.getTime();
 }
 
-export function DocumentBrowser({ docs }: { docs: DocRow[] }) {
+export function DocumentBrowser({ docs, canDelete = true }: { docs: DocRow[]; canDelete?: boolean }) {
   const { t, locale } = useI18n();
   const dual = isDualCurrencyActive();
   const [sort, setSort] = useState<SortKey>(DEFAULT_SORT);
@@ -147,7 +147,7 @@ export function DocumentBrowser({ docs }: { docs: DocRow[] }) {
                         <Link href={`/dashboard/documents/new?duplicate=${doc.id}`} className="btn btn-ghost btn-sm" title={t("documents.duplicate")} style={{ display: "inline-flex", alignItems: "center" }}>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
                         </Link>
-                        <TrashDeleteButton id={doc.id} number={doc.number} iconOnly />
+                        {canDelete && <TrashDeleteButton id={doc.id} number={doc.number} iconOnly />}
                       </td>
                     </tr>
                   ))}

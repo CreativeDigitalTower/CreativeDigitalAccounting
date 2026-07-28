@@ -10,7 +10,7 @@ export type TrashRow = {
   autoDeleteDays: number; // дни до автоматично изтриване
 };
 
-export function TrashList({ rows, canPermanent }: { rows: TrashRow[]; canPermanent: boolean }) {
+export function TrashList({ rows, canPermanent, canRestore = true }: { rows: TrashRow[]; canPermanent: boolean; canRestore?: boolean }) {
   const t = useT();
   const { locale } = useI18n();
   const router = useRouter();
@@ -62,7 +62,7 @@ export function TrashList({ rows, canPermanent }: { rows: TrashRow[]; canPermane
         </select>
         {sel.size > 0 && (
           <span style={{ marginLeft: "auto", display: "inline-flex", gap: 8 }}>
-            <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => bulk("restore")}>{t("documents.trash.restoreSel", { n: sel.size })}</button>
+            {canRestore && <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => bulk("restore")}>{t("documents.trash.restoreSel", { n: sel.size })}</button>}
             {canPermanent && <button className="btn btn-ghost btn-sm" style={{ color: "var(--brick)" }} disabled={busy} onClick={() => bulk("permanent")}>{t("documents.trash.permanentSel", { n: sel.size })}</button>}
           </span>
         )}
@@ -91,7 +91,7 @@ export function TrashList({ rows, canPermanent }: { rows: TrashRow[]; canPermane
                   <td style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>{fmt(r.deletedAt)}<div style={{ fontSize: 10.5, color: "var(--muted)" }}>{t("documents.trash.autoIn", { days: r.autoDeleteDays })}</div></td>
                   <td style={{ fontSize: 12, color: "var(--ink-soft)", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.reason ?? "—"}</td>
                   <td style={{ display: "flex", gap: 5 }}>
-                    <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => one(r.id, "restore")}>{t("documents.trash.restore")}</button>
+                    {canRestore && <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => one(r.id, "restore")}>{t("documents.trash.restore")}</button>}
                     {canPermanent && <button className="btn btn-ghost btn-sm" style={{ color: "var(--brick)" }} disabled={busy} onClick={() => one(r.id, "permanent")}>{t("documents.trash.permanent")}</button>}
                   </td>
                 </tr>

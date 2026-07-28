@@ -2,6 +2,7 @@ import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { UserRowActions } from "@/components/app/UserRowActions";
+import { canTrash } from "@/lib/permissions";
 import { getT } from "@/lib/i18n/server";
 
 const ROLE_KEYS = ["owner", "manager", "accountant", "sales", "warehouse", "viewer", "employee"];
@@ -74,6 +75,35 @@ export default async function UsersPage() {
                 </tr>
               );
             })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Кошче — групирани права по роля */}
+      <div className="glass panel" style={{ marginBottom: 18, padding: "20px 24px", overflowX: "auto" }}>
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 14px" }}>{t("account.users.trashPerms.trashTitle")}</h3>
+        <table style={{ fontSize: 12.5 }}>
+          <thead>
+            <tr>
+              <th style={{ minWidth: 130 }}>{t("account.users.roleCol")}</th>
+              {(["delete", "restore", "permanent"] as const).map((p) => (
+                <th key={p} style={{ textAlign: "center", minWidth: 110 }}>{t(`account.users.trashPerms.${p}`)}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {ROLE_KEYS.map((role) => (
+              <tr key={role}>
+                <td><span style={{ fontWeight: 600, fontSize: 13 }}>{t(`account.users.roles.${role}`)}</span></td>
+                {(["delete", "restore", "permanent"] as const).map((p) => (
+                  <td key={p} style={{ textAlign: "center" }}>
+                    {canTrash(role, p)
+                      ? <span style={{ color: "var(--emerald)", fontWeight: 700 }}>✓</span>
+                      : <span style={{ color: "rgba(116,120,110,.3)" }}>—</span>}
+                  </td>
+                ))}
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

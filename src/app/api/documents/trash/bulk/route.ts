@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCompany, getMyRole } from "@/lib/session";
 import { audit } from "@/lib/documents";
+import { canTrash } from "@/lib/permissions";
 import { z } from "zod";
 
 const schema = z.object({
@@ -14,6 +15,9 @@ export async function POST(req: Request) {
   try {
     const { companyId, userId } = await requireCompany();
     const { action, ids } = schema.parse(await req.json());
+    if (!canTrash(await getMyRole(userId, companyId), action === "permanent" ? "permanent" : "restore")) {
+      return NextResponse.json({ error: "Нямате нужните права." }, { status: 403 });
+    }
     // само документи на фирмата, които са в Кошчето
     const docs = await prisma.document.findMany({
       where: { id: { in: ids }, companyId, deletedAt: { not: null } },
@@ -23,8 +27,6 @@ export async function POST(req: Request) {
     if (okIds.length === 0) return NextResponse.json({ count: 0 });
 
     if (action === "permanent") {
-      const role = await getMyRole(userId, companyId);
-      if (role !== "owner") return NextResponse.json({ error: "Само собственик може да изтрива окончателно." }, { status: 403 });
       await prisma.document.deleteMany({ where: { id: { in: okIds } } });
       await audit(companyId, userId, "permanent_delete", "Document", "bulk", `Окончателно изтрити ${okIds.length} документа`);
     } else {

@@ -1,4 +1,5 @@
-import { requireCompany } from "@/lib/session";
+import { requireCompany, getMyRole } from "@/lib/session";
+import { canTrash } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { vatExemptReasonText } from "@/lib/constants";
 import { notFound } from "next/navigation";
@@ -15,7 +16,7 @@ import { deriveTrackingStatus, daysSinceSentUnopened } from "@/lib/documentTrack
 import { getT } from "@/lib/i18n/server";
 
 export default async function DocumentDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { companyId } = await requireCompany();
+  const { companyId, userId } = await requireCompany();
   const { t } = await getT();
   const { id } = await params;
 
@@ -81,7 +82,7 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
             {t("documents.duplicate")}
           </Link>
-          <DocumentActions id={doc.id} status={doc.status} number={doc.number} />
+          <DocumentActions id={doc.id} status={doc.status} number={doc.number} canDelete={canTrash(await getMyRole(userId, companyId), "delete")} />
         </div>
       </div>
 

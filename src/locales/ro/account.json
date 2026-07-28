@@ -142,6 +142,12 @@
       "assets": "Active",
       "users": "Utilizatori",
       "subscription": "Abonament"
+    },
+    "trashPerms": {
+      "trashTitle": "Permisiuni Coș",
+      "delete": "Șterge",
+      "restore": "Restaurează",
+      "permanent": "Șterge definitiv"
     }
   },
   "invite": {
