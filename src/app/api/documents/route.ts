@@ -37,6 +37,8 @@ const schema = z.object({
   parentDocumentId: z.string().optional(),
   // При конвертиране проформа → фактура: копирай прикачените файлове от този документ.
   copyAttachmentsFrom: z.string().optional(),
+  // Дублиране на документ (за история/одит + копиране на приложения по избор).
+  duplicate: z.boolean().optional(),
   vatExempt: z.boolean().optional(),
   vatExemptReason: z.string().optional().nullable(),
   clientIsIndividual: z.boolean().optional(),
@@ -71,7 +73,7 @@ export async function POST(req: Request) {
     if (data.parentDocumentId) {
       const parent = await prisma.document.findUnique({
         where: { id: data.parentDocumentId },
-        select: { id: true, companyId: true, type: true },
+        select: { id: true, companyId: true, type: true, number: true },
       });
       if (!parent || parent.companyId !== companyId) {
         return NextResponse.json({ error: "Изходният документ не е намерен." }, { status: 404 });
@@ -226,7 +228,14 @@ export async function POST(req: Request) {
       }
     } catch (e) { console.error("inter-company share", e); }
 
-    await audit(companyId, userId, "create", "Document", document.id, `${data.type} ${number}${stockNote ? ` · ${stockNote}` : ""}${sharedWith ? ` · споделен с ${sharedWith}` : ""}`);
+    // История: ако е създаден чрез дублиране, записваме източника.
+    if (data.duplicate && data.parentDocumentId) {
+      const src = await prisma.document.findUnique({ where: { id: data.parentDocumentId }, select: { number: true } });
+      if (src) await audit(companyId, userId, "create", "Document", document.id, `${data.type} ${number} · създадена чрез дублиране на № ${src.number}`);
+      else await audit(companyId, userId, "create", "Document", document.id, `${data.type} ${number}`);
+    } else {
+      await audit(companyId, userId, "create", "Document", document.id, `${data.type} ${number}${stockNote ? ` · ${stockNote}` : ""}${sharedWith ? ` · споделен с ${sharedWith}` : ""}`);
+    }
 
     // ─── Meta: първа издадена фактура ───
     if (data.type === "invoice" && issued) {

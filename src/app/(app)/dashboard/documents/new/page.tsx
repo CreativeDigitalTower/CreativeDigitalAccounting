@@ -59,10 +59,12 @@ function NewDocumentForm() {
   const allowedTpls = (() => { const n = allowedTemplateCount(plan); return n === Infinity ? INVOICE_TEMPLATES : INVOICE_TEMPLATES.slice(0, n); })();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  // Конвертиране от родителски документ (проформа → фактура)
-  const [parentId] = useState(searchParams.get("parent") ?? "");
+  // Общ механизъм: източник за попълване (конвертиране проформа→фактура ИЛИ
+  // дублиране на документ). При дублиране копираме и типа/бележките/падежа.
+  const [isDuplicate] = useState(!!searchParams.get("duplicate"));
+  const [parentId] = useState(searchParams.get("parent") ?? searchParams.get("duplicate") ?? "");
   const [parentInfo, setParentInfo] = useState<{ number: string; type: string } | null>(null);
-  const [copyAttachments, setCopyAttachments] = useState(true);
+  const [copyAttachments, setCopyAttachments] = useState(!searchParams.get("duplicate")); // при дублиране по подразбиране Не
 
   // Предложения за клиент при ръчно въвеждане (по име или ЕИК)
   const suggestions = mClient.name.length >= 2 || mClient.eik.length >= 2
@@ -132,6 +134,20 @@ function NewDocumentForm() {
         if (typeof d.vatExempt === "boolean") {
           setVatExempt(d.vatExempt);
           if (d.vatExempt && d.vatExemptReason) setVatReasonCode(d.vatExemptReason);
+        }
+        // Дублиране: копираме и типа, езика, шаблона, бележките и падежа (като срок).
+        // Нови остават: номер, дати (днес), статус (чернова) — те не се копират.
+        if (isDuplicate) {
+          if (d.type) setType(d.type);
+          if (d.language) setLanguage(d.language);
+          if (d.template) setTemplate(d.template);
+          if (d.notes) setNotes(d.notes);
+          if (d.internalComment) setInternalComment(d.internalComment);
+          if (typeof d.clientIsIndividual === "boolean") setClientIsIndividual(d.clientIsIndividual);
+          if (d.issueDate && d.dueDate) {
+            const days = Math.round((new Date(d.dueDate).getTime() - new Date(d.issueDate).getTime()) / 86400000);
+            const nd = new Date(); nd.setDate(nd.getDate() + days); setDueDate(nd.toISOString().slice(0, 10));
+          }
         }
       })
       .catch(() => {});
@@ -226,6 +242,7 @@ function NewDocumentForm() {
         vatExempt, vatExemptReason: vatExempt ? vatReason : null, clientIsIndividual,
         parentDocumentId: parentId || undefined,
         copyAttachmentsFrom: parentId && copyAttachments ? parentId : undefined,
+        duplicate: isDuplicate || undefined,
       }),
     });
     setSaving(false);
@@ -249,10 +266,12 @@ function NewDocumentForm() {
 
       {parentInfo && (
         <div className="glass panel" style={{ marginBottom: 18, padding: "12px 16px", borderLeft: "3px solid var(--brass)", display: "flex", flexWrap: "wrap", alignItems: "center", gap: 14 }}>
-          <span style={{ fontSize: 13 }}>{t("documents.form.fromProforma", { number: parentInfo.number })}</span>
+          <span style={{ fontSize: 13 }}>{isDuplicate
+            ? t("documents.form.duplicateBanner", { type: t(`documents.types.${parentInfo.type}`), number: parentInfo.number })
+            : t("documents.form.fromProforma", { number: parentInfo.number })}</span>
           <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "var(--ink-soft)", marginLeft: "auto" }}>
             <input type="checkbox" checked={copyAttachments} onChange={(e) => setCopyAttachments(e.target.checked)} style={{ width: "auto" }} />
-            {t("documents.form.copyAttachments")}
+            {isDuplicate ? t("documents.form.copyAttachmentsAsk") : t("documents.form.copyAttachments")}
           </label>
         </div>
       )}

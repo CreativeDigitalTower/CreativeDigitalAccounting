@@ -36,6 +36,7 @@ export function InvoicesTable({ invoices }: { invoices: InvoiceRow[] }) {
     return [
       { label: t("documents.table.menu.open"), icon: <UiIcon.doc width={15} height={15} />, onClick: () => router.push(`/dashboard/documents/${doc.id}`) },
       { label: t("documents.table.menu.edit"), icon: <UiIcon.edit width={15} height={15} />, onClick: () => router.push(`/dashboard/documents/${doc.id}/edit`) },
+      { label: t("documents.duplicate"), icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>, onClick: () => router.push(`/dashboard/documents/new?duplicate=${doc.id}`) },
       { label: t("documents.table.menu.downloadPdf"), icon: "↓", onClick: () => downloadOne(doc) },
       { label: t("documents.table.menu.copyNumber"), icon: "⧉", onClick: () => navigator.clipboard?.writeText(doc.number) },
       { divider: true, label: "", onClick: () => {} },

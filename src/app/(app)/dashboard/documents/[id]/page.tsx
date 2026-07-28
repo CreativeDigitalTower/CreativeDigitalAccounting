@@ -45,6 +45,9 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
   // Проформа → фактура: ако вече има издадена фактура-дете, показваме връзка към нея.
   const convertedInvoice = doc.type === "proforma" ? doc.childDocuments[0] ?? null : null;
   const sourceProforma = doc.type === "invoice" && doc.parentDocument?.type === "proforma" ? doc.parentDocument : null;
+  // Обща връзка към документа-източник (дублиране / конвертиране от оферта и др.),
+  // когато не е специфичният случай проформа → фактура.
+  const basedOn = doc.parentDocument && !sourceProforma ? doc.parentDocument : null;
 
   const sendPurpose = doc.type === "quote" ? "offer" : "invoice";
   const clientEmails = (doc.client?.emails ?? []).map((e) => ({
@@ -74,6 +77,10 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
           {doc.type === "proforma" && (convertedInvoice
             ? <Link href={`/dashboard/documents/${convertedInvoice.id}`} className="btn btn-ghost btn-sm">{t("documents.detail.openInvoice", { number: convertedInvoice.number })}</Link>
             : <Link href={`/dashboard/documents/new?type=invoice&parent=${doc.id}`} className="btn btn-primary btn-sm">{t("documents.detail.toInvoice")}</Link>)}
+          <Link href={`/dashboard/documents/new?duplicate=${doc.id}`} className="btn btn-ghost btn-sm" title={t("documents.duplicate")} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            {t("documents.duplicate")}
+          </Link>
           <DocumentActions id={doc.id} status={doc.status} number={doc.number} />
         </div>
       </div>
@@ -82,6 +89,14 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
         <div style={{ marginBottom: 14, fontSize: 12.5 }} className="no-print">
           <Link href={`/dashboard/documents/${sourceProforma.id}`} style={{ color: "var(--muted)", textDecoration: "none" }}>
             {t("documents.detail.fromProforma", { number: sourceProforma.number })}
+          </Link>
+        </div>
+      )}
+
+      {basedOn && (
+        <div style={{ marginBottom: 14, fontSize: 12.5 }} className="no-print">
+          <Link href={`/dashboard/documents/${basedOn.id}`} style={{ color: "var(--muted)", textDecoration: "none" }}>
+            {t("documents.detail.basedOn", { type: t(`documents.types.${basedOn.type}`), number: basedOn.number })}
           </Link>
         </div>
       )}
