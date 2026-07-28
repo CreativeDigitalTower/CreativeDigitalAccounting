@@ -319,5 +319,13 @@
     "title": "Documente șterse",
     "subtitle": "{n} documente șterse din toate firmele — restaurare și ștergere definitivă.",
     "nav": "Documente șterse"
+  },
+  "cdt": {
+    "kpiLabel": "Clienți CDT",
+    "mode": {
+      "standard": "Plătit (facturare standard)",
+      "cdt": "Client CDT (gratuit)",
+      "internal": "Companie internă"
+    }
   }
 }

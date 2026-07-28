@@ -16,5 +16,12 @@
   "pdfFailed": "PDF oluşturulamadı. Yazdırma penceresi açılıyor — “PDF olarak kaydet”i seçin.",
   "print": "Yazdır",
   "generating": "Oluşturuluyor…",
-  "downloadPdf": "↓ PDF indir"
+  "downloadPdf": "↓ PDF indir",
+  "cdt": {
+    "status": "Aktif · CDT müşterisi olarak ücretsiz erişim",
+    "title": "Erişim Creative Digital Tower tarafından sağlandı",
+    "body": "Platforma erişiminiz Creative Digital Tower müşterisi olarak sağlanmıştır. Tam {plan} planını ücretsiz kullanıyorsunuz — ödeme alınmaz ve proforma düzenlenmez.",
+    "until": "Erişim {date} tarihine kadar geçerlidir.",
+    "upgrade": "Daha yüksek bir plan mı istiyorsunuz veya sorunuz mu var? Bizimle iletişime geçin."
+  }
 }

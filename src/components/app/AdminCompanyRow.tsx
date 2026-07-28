@@ -29,7 +29,7 @@ type Props = {
     name: string | null; email: string; representativeRole: string | null; role: string;
     marketingConsent: boolean; termsAcceptedAt: string | null; createdAt: string;
   }[];
-  sub: { status: string; paymentStatus: string; periodStart: string | null; periodEnd: string | null; trialUsed: boolean };
+  sub: { status: string; paymentStatus: string; periodStart: string | null; periodEnd: string | null; trialUsed: boolean; billingMode: string; cdtEndsAt: string | null; cdtNote: string | null };
   events: { type: string; plan: string | null; status: string | null; period: string | null; amount: number | null; note: string | null; createdAt: string }[];
 };
 
@@ -80,6 +80,36 @@ export function AdminCompanyRow(props: Props) {
   const [mStatus, setMStatus] = useState(props.sub.status);
   const [pay, setPay] = useState(props.sub.paymentStatus);
   const [subMsg, setSubMsg] = useState("");
+  // Режим „Клиент на CDT" (billing mode)
+  const isCdt = props.sub.billingMode === "cdt_client";
+  const [cdtPlan, setCdtPlan] = useState(props.plan === "free" ? "start" : props.plan);
+  const [cdtEnd, setCdtEnd] = useState(props.sub.cdtEndsAt?.slice(0, 10) ?? "");
+  const [cdtNote, setCdtNote] = useState(props.sub.cdtNote ?? "");
+  const [cdtMsg, setCdtMsg] = useState("");
+  const [cdtBusy, setCdtBusy] = useState(false);
+
+  async function setCdt() {
+    setCdtBusy(true); setCdtMsg("");
+    const res = await fetch("/api/admin/cdt", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ companyId: props.id, action: "set", plan: cdtPlan, endsAt: cdtEnd || null, note: cdtNote || null }),
+    });
+    setCdtBusy(false);
+    if (res.ok) { setCdtMsg("✓ Запазено"); router.refresh(); setTimeout(() => setCdtMsg(""), 2500); }
+    else setCdtMsg((await res.json()).error ?? "Грешка");
+  }
+
+  async function removeCdt() {
+    if (!confirm(`Премахване на CDT достъпа за „${props.name}"? Фирмата се връща към стандартно таксуване (планът остава ${props.plan}, изберете нов режим на плащане).`)) return;
+    setCdtBusy(true); setCdtMsg("");
+    const res = await fetch("/api/admin/cdt", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ companyId: props.id, action: "remove" }),
+    });
+    setCdtBusy(false);
+    if (res.ok) { router.refresh(); }
+    else setCdtMsg((await res.json()).error ?? "Грешка");
+  }
 
   async function saveSubscription() {
     setSubMsg("");
@@ -155,7 +185,8 @@ export function AdminCompanyRow(props: Props) {
             <span>
               <span style={{ fontWeight: 600, fontSize: 13.5, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                 {props.name}
-                {awaitingPayment && <span title="Фирмата има платен план, но плащането не е потвърдено — прегледайте и потвърдете." style={{ fontSize: 10, fontWeight: 700, color: "#fff", background: "var(--brass)", borderRadius: 10, padding: "1px 8px" }}>Очаква потвърждение</span>}
+                {isCdt && <span title="Безплатен достъп като клиент на Creative Digital Tower — не се отчита като приход." style={{ fontSize: 10, fontWeight: 700, color: "#fff", background: "var(--navy)", borderRadius: 10, padding: "1px 8px" }}>CDT клиент</span>}
+                {!isCdt && awaitingPayment && <span title="Фирмата има платен план, но плащането не е потвърдено — прегледайте и потвърдете." style={{ fontSize: 10, fontWeight: 700, color: "#fff", background: "var(--brass)", borderRadius: 10, padding: "1px 8px" }}>Очаква потвърждение</span>}
               </span>
               <span style={{ fontSize: 11.5, color: "var(--muted)" }}>{props.owners}</span>
             </span>
@@ -176,7 +207,7 @@ export function AdminCompanyRow(props: Props) {
               {PLANS.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
             </select>
             {saved && <span style={{ color: "var(--emerald)", fontSize: 12 }}>✓</span>}
-            {plan !== "free" && (
+            {!isCdt && plan !== "free" && (
               <select value={pay} onChange={(e) => changePayment(e.target.value)}
                 title="Статус на плащане — само Получено плащане се брои като продажба"
                 style={{ width: "auto", padding: "5px 8px", fontSize: 12, fontWeight: 600, borderRadius: 6,
@@ -196,6 +227,30 @@ export function AdminCompanyRow(props: Props) {
       {open && (
         <tr>
           <td colSpan={8} style={{ background: "rgba(0,0,0,.02)", padding: "16px 20px" }}>
+            {/* Режим „Клиент на CDT" — безплатен достъп, изключен от приходите */}
+            <div style={{ marginBottom: 16, padding: "12px 14px", background: isCdt ? "rgba(26,54,93,.06)" : "rgba(255,255,255,.6)", borderRadius: 8, border: `1px solid ${isCdt ? "var(--navy)" : "var(--border)"}` }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--navy)", letterSpacing: 1, marginBottom: 8, display: "flex", alignItems: "center", gap: 8 }}>
+                КЛИЕНТ НА CDT (БЕЗПЛАТЕН ДОСТЪП)
+                {isCdt && <span style={{ fontSize: 10, fontWeight: 700, color: "#fff", background: "var(--navy)", borderRadius: 10, padding: "1px 8px" }}>Активен</span>}
+              </div>
+              <div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 8 }}>
+                Пълен функционален план БЕЗ такса. Не се издава проформа, не се очаква плащане, не влиза в MRR/ARR/платени клиенти/партньорски комисионни.
+              </div>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
+                <div><label style={{ fontSize: 11 }}>Функционален план</label><select value={cdtPlan} onChange={(e) => setCdtPlan(e.target.value)} style={{ padding: "5px 8px", fontSize: 12.5 }}>{PLANS.filter((p) => p.id !== "free").map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}</select></div>
+                <div><label style={{ fontSize: 11 }}>Достъп до (по избор)</label><input type="date" value={cdtEnd} onChange={(e) => setCdtEnd(e.target.value)} style={{ padding: "5px 8px", fontSize: 12.5 }} /></div>
+                <div style={{ flex: "1 1 220px" }}><label style={{ fontSize: 11 }}>Бележка</label><input type="text" value={cdtNote} onChange={(e) => setCdtNote(e.target.value)} placeholder="напр. клиент по договор №…" style={{ padding: "5px 8px", fontSize: 12.5, width: "100%" }} /></div>
+                <button className="btn btn-primary btn-sm" onClick={setCdt} disabled={cdtBusy}>{isCdt ? "Обнови CDT достъп" : "Маркирай като CDT клиент"}</button>
+                {isCdt && <button className="btn btn-ghost btn-sm" onClick={removeCdt} disabled={cdtBusy} style={{ color: "var(--brick)", borderColor: "var(--brick)" }}>Премахни CDT достъпа</button>}
+                {cdtMsg && <span style={{ fontSize: 12, color: cdtMsg.startsWith("✓") ? "var(--emerald)" : "var(--brick)" }}>{cdtMsg}</span>}
+              </div>
+              {isCdt && (
+                <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 8 }}>
+                  {props.sub.cdtEndsAt ? <>Достъп до: <strong>{new Date(props.sub.cdtEndsAt).toLocaleDateString("bg-BG")}</strong></> : <>Достъп: <strong>безсрочен</strong></>}
+                  {props.sub.cdtNote && <> · Бележка: <strong>{props.sub.cdtNote}</strong></>}
+                </div>
+              )}
+            </div>
             {/* Управление на абонамент */}
             <div style={{ marginBottom: 16, padding: "12px 14px", background: "rgba(255,255,255,.6)", borderRadius: 8, border: "1px solid var(--border)" }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: "var(--brass)", letterSpacing: 1, marginBottom: 8 }}>УПРАВЛЕНИЕ НА АБОНАМЕНТ</div>

@@ -19,6 +19,19 @@ export async function POST(req: Request) {
   try {
     const { companyId } = await requireCompany();
     const { plan, period, amount } = schema.parse(await req.json());
+
+    // Преход CDT → платен: ако фирмата е била „Клиент на CDT" и заявява платен план,
+    // връщаме я към стандартно таксуване (billingMode standard, плащане изчаква),
+    // след което важи обичайният поток с проформа и потвърждение на плащане.
+    const existing = await prisma.subscription.findUnique({ where: { companyId }, select: { billingMode: true } });
+    if (existing?.billingMode === "cdt_client") {
+      await prisma.subscription.update({
+        where: { companyId },
+        data: { billingMode: "standard", paymentStatus: "pending", cdtActivatedAt: null, cdtActivatedById: null, cdtEndsAt: null, cdtNote: null },
+      });
+      await logSubscriptionEvent(companyId, "plan_change", { plan, status: "active", note: "Преход от CDT клиент към платен абонамент" });
+    }
+
     await logSubscriptionEvent(companyId, "request", { plan, period: period ?? null, amount: amount ?? null, note: "Клиентът избра план за плащане по банков път" });
 
     // ─── Автоматично генериране на проформа фактура от платформената фирма ───

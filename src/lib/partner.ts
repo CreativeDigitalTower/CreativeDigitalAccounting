@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { planPrice, commissionRate, isPaidClientPlan, COMMISSION_PAYOUT_THRESHOLD, type PlanId } from "@/lib/constants";
 import { APP_URL } from "@/lib/email/templates";
+import { isRevenueExcluded } from "@/lib/billing";
 
 export type PartnerStats = {
   partnerCode: string | null;
@@ -28,7 +29,7 @@ export type PartnerStats = {
 export async function computeFirmPartnerStats(firm: { id: string; partnerCode: string | null; partnerPercentOverride: number | null; commissionPaidTotal: number }): Promise<PartnerStats> {
   const clients = await prisma.company.findMany({
     where: { managedByFirmId: firm.id, archivedAt: null },
-    select: { id: true, subscription: { select: { plan: true, paymentStatus: true } } },
+    select: { id: true, subscription: { select: { plan: true, paymentStatus: true, billingMode: true } } },
   });
 
   let paidClients = 0;
@@ -36,7 +37,8 @@ export async function computeFirmPartnerStats(firm: { id: string; partnerCode: s
   const paidList: { plan: PlanId }[] = [];
   for (const c of clients) {
     const plan = (c.subscription?.plan ?? "free") as PlanId;
-    const paid = isPaidClientPlan(plan) && c.subscription?.paymentStatus === "received";
+    // CDT/вътрешни клиенти НЕ носят комисионна (не са реален приход), дори да са с Про/Бизнес план.
+    const paid = isPaidClientPlan(plan) && c.subscription?.paymentStatus === "received" && !isRevenueExcluded(c.subscription);
     if (paid) { paidClients++; paidList.push({ plan }); }
   }
   const rate = commissionRate(paidClients, firm.partnerPercentOverride);
