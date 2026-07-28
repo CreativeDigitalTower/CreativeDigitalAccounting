@@ -298,6 +298,8 @@
     "colReason": "Λόγος",
     "colStatus": "Κατάσταση",
     "autoIn": "αυτόματη διαγραφή σε {days} ημέρες",
-    "confirmDelete": "Μετακίνηση στον Κάδο;"
+    "confirmDelete": "Μετακίνηση στον Κάδο;",
+    "colCompany": "Εταιρεία",
+    "allCompanies": "Όλες οι εταιρείες"
   }
 }

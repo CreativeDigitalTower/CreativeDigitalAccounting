@@ -5,7 +5,8 @@
   "nav": {
     "emails": "E-postalar ve bildirimler",
     "blog": "Blog",
-    "businesses": "İşletmeler (sektör/plan filtreleri)"
+    "businesses": "İşletmeler (sektör/plan filtreleri)",
+    "deletedDocs": "Silinen belgeler"
   },
   "companiesWord": "şirket",
   "ranges": {
@@ -312,5 +313,11 @@
     "bankReason": "Açıklama",
     "bankReasonValue": "Muhasebe firması aboneliği — {name}",
     "bankNote": "Ödeme alındıktan sonra seçilen planı etkinleştirir ve fatura düzenleriz. Tüm fiyatlar KDV hariçtir. 1 EUR = {rate} BGN."
+  },
+  "deletedDocs": {
+    "back": "← Yönetici",
+    "title": "Silinen belgeler",
+    "subtitle": "Tüm firmalarda {n} silinen belge — geri yükleme ve kalıcı silme.",
+    "nav": "Silinen belgeler"
   }
 }

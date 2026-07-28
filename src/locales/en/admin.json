@@ -5,7 +5,8 @@
   "nav": {
     "emails": "Emails & notifications",
     "blog": "Blog",
-    "businesses": "Businesses (filter by sector/plan)"
+    "businesses": "Businesses (filter by sector/plan)",
+    "deletedDocs": "Deleted documents"
   },
   "companiesWord": "companies",
   "ranges": {
@@ -312,5 +313,11 @@
     "bankReason": "Reference",
     "bankReasonValue": "Accounting firm subscription — {name}",
     "bankNote": "Once payment is received we activate the selected plan and issue an invoice. All prices are excl. VAT. 1 EUR = {rate} BGN."
+  },
+  "deletedDocs": {
+    "back": "← Admin",
+    "title": "Deleted documents",
+    "subtitle": "{n} deleted documents across all companies — restore and permanent delete.",
+    "nav": "Deleted documents"
   }
 }

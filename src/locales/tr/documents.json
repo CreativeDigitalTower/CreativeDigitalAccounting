@@ -298,6 +298,8 @@
     "colReason": "Neden",
     "colStatus": "Durum",
     "autoIn": "{days} gün içinde otomatik silme",
-    "confirmDelete": "Çöp Kutusuna taşınsın mı?"
+    "confirmDelete": "Çöp Kutusuna taşınsın mı?",
+    "colCompany": "Firma",
+    "allCompanies": "Tüm firmalar"
   }
 }

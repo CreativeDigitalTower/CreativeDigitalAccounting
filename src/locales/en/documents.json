@@ -298,6 +298,8 @@
     "colReason": "Reason",
     "colStatus": "Status",
     "autoIn": "auto-delete in {days} days",
-    "confirmDelete": "Move to Trash?"
+    "confirmDelete": "Move to Trash?",
+    "colCompany": "Company",
+    "allCompanies": "All companies"
   }
 }
