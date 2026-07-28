@@ -50,7 +50,8 @@
       "status": "Status"
     },
     "view": "View",
-    "edit": "Edit"
+    "edit": "Edit",
+    "duplicate": "Duplicate"
   },
   "invoices": {
     "title": "Invoices",
@@ -193,7 +194,9 @@
       "save": "Error while saving."
     },
     "fromProforma": "New invoice from proforma №{number} — review and adjust before creating.",
-    "copyAttachments": "Copy attachments from the proforma"
+    "copyAttachments": "Copy attachments from the proforma",
+    "duplicateBanner": "Based on {type} № {number} — review and adjust before saving.",
+    "copyAttachmentsAsk": "Copy the attachments too?"
   },
   "detail": {
     "back": "← Documents",
@@ -201,7 +204,8 @@
     "toInvoice": "→ Invoice",
     "internalTitle": "Internal comment (not visible to the client)",
     "openInvoice": "Open invoice №{number}",
-    "fromProforma": "← Created from proforma №{number}"
+    "fromProforma": "← Created from proforma №{number}",
+    "basedOn": "← Based on {type} № {number}"
   },
   "send": {
     "btn": "Send to client",
@@ -263,5 +267,6 @@
     "filters": "Filters",
     "count": "{n} documents",
     "empty": "No documents match the selected criteria."
-  }
+  },
+  "duplicate": "Duplicate"
 }

@@ -50,7 +50,8 @@
       "status": "Durum"
     },
     "view": "Görüntüle",
-    "edit": "Düzenle"
+    "edit": "Düzenle",
+    "duplicate": "Çoğalt"
   },
   "invoices": {
     "title": "Faturalar",
@@ -193,7 +194,9 @@
       "save": "Kaydetme hatası."
     },
     "fromProforma": "Proforma №{number} belgesinden yeni fatura — oluşturmadan önce inceleyip düzenleyin.",
-    "copyAttachments": "Ekleri proformadan kopyala"
+    "copyAttachments": "Ekleri proformadan kopyala",
+    "duplicateBanner": "{type} № {number} temel alınarak — kaydetmeden önce inceleyip düzenleyin.",
+    "copyAttachmentsAsk": "Ekler de kopyalansın mı?"
   },
   "detail": {
     "back": "← Belgeler",
@@ -201,7 +204,8 @@
     "toInvoice": "→ Fatura",
     "internalTitle": "Dahili yorum (müşteriye görünmez)",
     "openInvoice": "Faturayı aç №{number}",
-    "fromProforma": "← Proforma №{number} belgesinden oluşturuldu"
+    "fromProforma": "← Proforma №{number} belgesinden oluşturuldu",
+    "basedOn": "← {type} № {number} temel alınarak"
   },
   "send": {
     "btn": "Müşteriye gönder",
@@ -263,5 +267,6 @@
     "filters": "Filtreler",
     "count": "{n} belge",
     "empty": "Seçilen kriterlere uygun belge yok."
-  }
+  },
+  "duplicate": "Çoğalt"
 }

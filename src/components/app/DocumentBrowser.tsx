@@ -143,6 +143,9 @@ export function DocumentBrowser({ docs }: { docs: DocRow[] }) {
                       <td style={{ display: "flex", gap: 6 }}>
                         <Link href={`/dashboard/documents/${doc.id}`} className="btn btn-ghost btn-sm">{t("documents.page.view")}</Link>
                         <Link href={`/dashboard/documents/${doc.id}/edit`} className="btn btn-ghost btn-sm" title={t("documents.page.edit")} style={{ display: "inline-flex", alignItems: "center" }}><UiIcon.edit /></Link>
+                        <Link href={`/dashboard/documents/new?duplicate=${doc.id}`} className="btn btn-ghost btn-sm" title={t("documents.duplicate")} style={{ display: "inline-flex", alignItems: "center" }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                        </Link>
                       </td>
                     </tr>
                   ))}

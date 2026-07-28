@@ -50,7 +50,8 @@
       "status": "Status"
     },
     "view": "Vizualizează",
-    "edit": "Editează"
+    "edit": "Editează",
+    "duplicate": "Duplică"
   },
   "invoices": {
     "title": "Facturi",
@@ -193,7 +194,9 @@
       "save": "Eroare la salvare."
     },
     "fromProforma": "Factură nouă din proforma №{number} — verificați și ajustați înainte de creare.",
-    "copyAttachments": "Copiază atașamentele din proformă"
+    "copyAttachments": "Copiază atașamentele din proformă",
+    "duplicateBanner": "Pe baza {type} № {number} — verificați și ajustați înainte de salvare.",
+    "copyAttachmentsAsk": "Copiați și atașamentele?"
   },
   "detail": {
     "back": "← Documente",
@@ -201,7 +204,8 @@
     "toInvoice": "→ Factură",
     "internalTitle": "Comentariu intern (nevizibil clientului)",
     "openInvoice": "Deschide factura №{number}",
-    "fromProforma": "← Creată din proforma №{number}"
+    "fromProforma": "← Creată din proforma №{number}",
+    "basedOn": "← Pe baza {type} № {number}"
   },
   "send": {
     "btn": "Trimite clientului",
@@ -263,5 +267,6 @@
     "filters": "Filtre",
     "count": "{n} documente",
     "empty": "Niciun document nu corespunde criteriilor selectate."
-  }
+  },
+  "duplicate": "Duplică"
 }
