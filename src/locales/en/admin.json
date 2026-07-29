@@ -327,5 +327,15 @@
       "cdt": "CDT client (free)",
       "internal": "Internal company"
     }
+  },
+  "reactivation": {
+    "kpiTitle": "ACTIVATING REGISTERED COMPANIES",
+    "kpiCandidates": "Eligible inactive",
+    "kpiReminded": "Reminded (companies)",
+    "kpiSent": "Sent",
+    "kpiOpened": "Opened",
+    "kpiClicked": "Clicked",
+    "kpiReactivated": "Reactivated",
+    "kpiNote": "Opens/clicks are tracked via pixel and a secure redirect. Only real events are shown."
   }
 }

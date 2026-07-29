@@ -209,5 +209,17 @@
     "introAccepted": "Müşteri <strong>{clientName}</strong>, {docLabelLower} No. {number} belgesini kabul etti.",
     "introRejected": "Müşteri <strong>{clientName}</strong>, {docLabelLower} No. {number} belgesini reddetti.",
     "button": "Belgeyi aç"
+  },
+  "reactivation": {
+    "subject": "İlk faturanızı kesmeye hazır mısınız?",
+    "eyebrow": "Başlangıç",
+    "p_greeting": "Merhaba {name},",
+    "p_intro": "Creative Digital Accounting'de bir şirket profili oluşturduğunuzu, ancak ilk belgenizi düzenlemek için platformu henüz kullanmadığınızı fark ettik.",
+    "p_list_intro": "Hızlı ve kolay bir şekilde başlayabilirsiniz:",
+    "p_list": "• bir müşteri ekleyin;\n• fatura, proforma veya teklif düzenleyin;\n• ödemelerinizi ve belgelerinizi takip edin;\n• hesabınızdaki iş araçlarını kullanın.",
+    "p_easy": "Platform, karmaşık bir ilk kurulum olmadan çalışmaya başlayabilmeniz için tasarlanmıştır.",
+    "p_support": "Bir sorunuz varsa veya yardıma ihtiyacınız olursa, bu e-postayı doğrudan yanıtlayın. Ekibimiz yardımcı olmaktan memnuniyet duyar.",
+    "p_signoff": "Saygılarımızla,\nCreative Digital Accounting Ekibi",
+    "button": "İlk faturanızı kesin"
   }
 }

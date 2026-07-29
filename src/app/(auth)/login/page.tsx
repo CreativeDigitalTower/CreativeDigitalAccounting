@@ -28,8 +28,17 @@ export default function LoginPage() {
     if (res?.error) {
       setError(t("auth.login.invalid"));
     } else {
-      router.push("/dashboard");
+      router.push(safeNext());
     }
+  }
+
+  // Безопасен returnTo: само вътрешен относителен път (напр. от CTA в имейл за
+  // активиране). Предпазва от open redirect към външни адреси.
+  function safeNext(): string {
+    if (typeof window === "undefined") return "/dashboard";
+    const next = new URLSearchParams(window.location.search).get("next");
+    if (next && next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\")) return next;
+    return "/dashboard";
   }
 
   return (

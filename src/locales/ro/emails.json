@@ -209,5 +209,17 @@
     "introAccepted": "Clientul <strong>{clientName}</strong> a acceptat {docLabelLower} nr. {number}.",
     "introRejected": "Clientul <strong>{clientName}</strong> a respins {docLabelLower} nr. {number}.",
     "button": "Deschide documentul"
+  },
+  "reactivation": {
+    "subject": "Sunteți gata să emiteți prima factură?",
+    "eyebrow": "Primii pași",
+    "p_greeting": "Bună ziua {name},",
+    "p_intro": "Am observat că ați creat deja un profil de firmă în Creative Digital Accounting, dar încă nu ați folosit platforma pentru a emite primul document.",
+    "p_list_intro": "Puteți începe rapid și ușor prin:",
+    "p_list": "• adăugarea unui client;\n• emiterea unei facturi, proforme sau oferte;\n• urmărirea plăților și documentelor;\n• folosirea instrumentelor de business din contul dvs.",
+    "p_easy": "Platforma este concepută astfel încât să puteți începe fără o configurare inițială complicată.",
+    "p_support": "Dacă aveți o întrebare sau aveți nevoie de ajutor, răspundeți direct la acest e-mail. Echipa noastră este bucuroasă să vă ajute.",
+    "p_signoff": "Cu stimă,\nEchipa Creative Digital Accounting",
+    "button": "Emiteți prima factură"
   }
 }

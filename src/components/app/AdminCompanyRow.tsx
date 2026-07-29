@@ -2,6 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ReactivationModal } from "@/components/app/AdminReactivationModal";
+
+const REACT_STATUS: Record<string, string> = {
+  new: "Нова регистрация", inactive: "Неактивна", partial: "Частично активна", active: "Активна", reactivated: "Реактивирана",
+};
+const REACT_MAIL_STATUS: Record<string, string> = {
+  queued: "в опашка", sent: "изпратен", failed: "неуспешен", skipped: "пропуснат",
+};
 
 const PLANS = [
   { id: "free", label: "Безплатен" },
@@ -9,6 +17,19 @@ const PLANS = [
   { id: "business", label: "Бизнес" },
   { id: "pro", label: "Про" },
 ];
+
+// Данни за активиране на фирма (ръчни напомняния до неактивни фирми).
+export type ReactivationInfo = {
+  status: "new" | "inactive" | "partial" | "active" | "reactivated";
+  isCandidate: boolean;
+  defaultSubject: string; defaultParagraphs: string[]; defaultButtonLabel: string;
+  invoiceCount: number; documentCount: number; clientCount: number;
+  reminderCount: number; lastReminderAt: string | null;
+  cooldownDaysUntil: number; canSend: boolean;
+  recipients: string[]; ownerName: string | null;
+  createdAt: string; lastActivity: string | null;
+  timeline: { createdAt: string; status: string; opens: number; clicks: number; openedAt: string | null; clickedAt: string | null; bounced: boolean; toEmail: string; subject: string }[];
+};
 
 type Props = {
   id: string;
@@ -31,6 +52,7 @@ type Props = {
   }[];
   sub: { status: string; paymentStatus: string; periodStart: string | null; periodEnd: string | null; trialUsed: boolean; billingMode: string; cdtEndsAt: string | null; cdtNote: string | null };
   events: { type: string; plan: string | null; status: string | null; period: string | null; amount: number | null; note: string | null; createdAt: string }[];
+  reactivation?: ReactivationInfo;
 };
 
 const EVENT_LABEL: Record<string, string> = {
@@ -87,6 +109,10 @@ export function AdminCompanyRow(props: Props) {
   const [cdtNote, setCdtNote] = useState(props.sub.cdtNote ?? "");
   const [cdtMsg, setCdtMsg] = useState("");
   const [cdtBusy, setCdtBusy] = useState(false);
+  // Модал за напомняне за активиране
+  const [reactOpen, setReactOpen] = useState(false);
+  const react = props.reactivation;
+  const reminderDays = react?.lastReminderAt ? Math.floor((Date.now() - new Date(react.lastReminderAt).getTime()) / 86400000) : null;
 
   async function setCdt() {
     setCdtBusy(true); setCdtMsg("");
@@ -187,6 +213,8 @@ export function AdminCompanyRow(props: Props) {
                 {props.name}
                 {isCdt && <span title="Безплатен достъп като клиент на Creative Digital Tower — не се отчита като приход." style={{ fontSize: 10, fontWeight: 700, color: "#fff", background: "var(--navy)", borderRadius: 10, padding: "1px 8px" }}>CDT клиент</span>}
                 {!isCdt && awaitingPayment && <span title="Фирмата има платен план, но плащането не е потвърдено — прегледайте и потвърдете." style={{ fontSize: 10, fontWeight: 700, color: "#fff", background: "var(--brass)", borderRadius: 10, padding: "1px 8px" }}>Очаква потвърждение</span>}
+                {react && reminderDays != null && <span title={`Последно напомняне за активиране преди ${reminderDays} дни`} style={{ fontSize: 10, fontWeight: 700, color: "var(--navy)", background: "rgba(26,54,93,.1)", borderRadius: 10, padding: "1px 8px" }}>Напомнено преди {reminderDays} дни</span>}
+                {react?.isCandidate && reminderDays == null && <span title="Регистрирана, но без реална дейност — подходяща за напомняне за активиране." style={{ fontSize: 10, fontWeight: 700, color: "#fff", background: "var(--brass)", borderRadius: 10, padding: "1px 8px" }}>Нуждае се от активиране</span>}
               </span>
               <span style={{ fontSize: 11.5, color: "var(--muted)" }}>{props.owners}</span>
             </span>
@@ -227,6 +255,56 @@ export function AdminCompanyRow(props: Props) {
       {open && (
         <tr>
           <td colSpan={8} style={{ background: "rgba(0,0,0,.02)", padding: "16px 20px" }}>
+            {/* Активиране — ръчно напомняне до неактивна фирма */}
+            {react && (
+              <div style={{ marginBottom: 16, padding: "12px 14px", background: "rgba(255,255,255,.6)", borderRadius: 8, border: "1px solid var(--border)" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--brass)", letterSpacing: 1, marginBottom: 8 }}>КОМУНИКАЦИЯ ЗА АКТИВИРАНЕ</div>
+                <div style={{ fontSize: 12.5, color: "var(--ink-soft)", display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 8 }}>
+                  <span>Статус: <strong>{REACT_STATUS[react.status]}</strong></span>
+                  <span>Фактури: <strong>{react.invoiceCount}</strong></span>
+                  <span>Документи: <strong>{react.documentCount}</strong></span>
+                  <span>Клиенти: <strong>{react.clientCount}</strong></span>
+                  <span>Напомняния: <strong>{react.reminderCount}</strong></span>
+                  {react.lastReminderAt && <span>Последно: <strong>{new Date(react.lastReminderAt).toLocaleDateString("bg-BG")}</strong></span>}
+                </div>
+                <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                  {react.recipients.length === 0
+                    ? <span style={{ fontSize: 12, color: "var(--brick)" }}>Няма валиден имейл — напомняне не може да се изпрати.</span>
+                    : react.canSend
+                      ? <button className="btn btn-primary btn-sm" onClick={() => setReactOpen(true)}>Изпрати напомняне</button>
+                      : <>
+                          <span style={{ fontSize: 12, color: "var(--muted)" }}>{react.reminderCount >= 3 ? "Достигнат максимум напомняния." : `Изпратено скоро — изчакайте още ${react.cooldownDaysUntil} дни.`}</span>
+                          <button className="btn btn-ghost btn-sm" onClick={() => setReactOpen(true)}>Изпрати отново</button>
+                        </>}
+                </div>
+                {react.timeline.length > 0 && (
+                  <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 4 }}>
+                    {react.timeline.map((tm, i) => (
+                      <div key={i} style={{ fontSize: 11.5, color: "var(--ink-soft)", display: "flex", gap: 8, flexWrap: "wrap" }}>
+                        <span style={{ color: "var(--muted)", minWidth: 130 }}>{new Date(tm.createdAt).toLocaleString("bg-BG")}</span>
+                        <span>{tm.toEmail}</span>
+                        <span style={{ fontWeight: 600 }}>{REACT_MAIL_STATUS[tm.status] ?? tm.status}</span>
+                        {tm.opens > 0 && <span style={{ color: "var(--emerald-dark)" }}>отворен{tm.openedAt ? ` · ${new Date(tm.openedAt).toLocaleString("bg-BG")}` : ""}</span>}
+                        {tm.clicks > 0 && <span style={{ color: "var(--emerald-dark)" }}>CTA посетен</span>}
+                        {tm.bounced && <span style={{ color: "var(--brick)" }}>bounce</span>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            {reactOpen && react && (
+              <ReactivationModal
+                companyId={props.id} companyName={props.name}
+                recipients={react.recipients} ownerName={react.ownerName}
+                createdAt={react.createdAt} lastActivity={react.lastActivity}
+                invoiceCount={react.invoiceCount} documentCount={react.documentCount}
+                lastReminderAt={react.lastReminderAt} needsOverride={!react.canSend}
+                defaultSubject={react.defaultSubject} defaultParagraphs={react.defaultParagraphs}
+                defaultButtonLabel={react.defaultButtonLabel}
+                onClose={() => setReactOpen(false)} onSent={() => { setReactOpen(false); router.refresh(); }}
+              />
+            )}
             {/* Режим „Клиент на CDT" — безплатен достъп, изключен от приходите */}
             <div style={{ marginBottom: 16, padding: "12px 14px", background: isCdt ? "rgba(26,54,93,.06)" : "rgba(255,255,255,.6)", borderRadius: 8, border: `1px solid ${isCdt ? "var(--navy)" : "var(--border)"}` }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: "var(--navy)", letterSpacing: 1, marginBottom: 8, display: "flex", alignItems: "center", gap: 8 }}>
