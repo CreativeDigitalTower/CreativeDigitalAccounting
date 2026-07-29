@@ -5,6 +5,7 @@ import { getSession, getMyFirm } from "@/lib/session";
 import { accountantMaxClients } from "@/lib/constants";
 import { sendClientInvite } from "@/lib/firmInvites";
 import { z } from "zod";
+import { firmHasFullAccess } from "@/lib/billing";
 
 const schema = z.object({ email: z.string().email(), name: z.string().optional().nullable() });
 
@@ -16,8 +17,8 @@ export async function POST(req: Request) {
     const firm = await getMyFirm(userId);
     if (!firm) return NextResponse.json({ error: "Само за счетоводни къщи." }, { status: 403 });
 
-    const firmSub = await prisma.subscription.findUnique({ where: { companyId: firm.id }, select: { paymentStatus: true } });
-    if (firmSub?.paymentStatus !== "received") {
+    const firmSub = await prisma.subscription.findUnique({ where: { companyId: firm.id }, select: { paymentStatus: true, billingMode: true } });
+    if (!firmHasFullAccess(firmSub)) {
       return NextResponse.json({ error: "Поканите се активират след потвърждение на плащане на плана." }, { status: 403 });
     }
 

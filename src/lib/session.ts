@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { planHasFeature, effectiveManagedPlan, type PlanId } from "@/lib/constants";
+import { firmHasFullAccess } from "@/lib/billing";
 
 export const IMPERSONATE_COOKIE = "cda_impersonate";
 // Активна фирма при счетоводна къща (превключване между клиентски фирми)
@@ -138,10 +139,11 @@ export async function getPlan(companyId: string): Promise<PlanId> {
   // Клиентска фирма, управлявана от счетоводна къща → пълен (ефективен) план.
   const comp = await prisma.company.findUnique({
     where: { id: companyId },
-    select: { managedByFirmId: true, isAccountingFirm: true, subscription: { select: { plan: true, paymentStatus: true } } },
+    select: { managedByFirmId: true, isAccountingFirm: true, subscription: { select: { plan: true, paymentStatus: true, billingMode: true } } },
   });
-  // Счетоводна къща (собствена фирма): пълен достъп (Про) само след потвърдено плащане.
-  if (comp?.isAccountingFirm) return comp.subscription?.paymentStatus === "received" ? "pro" : "free";
+  // Счетоводна къща (собствена фирма): пълен достъп (Про) след потвърдено плащане ИЛИ
+  // при CDT/вътрешен billing (предоставен безплатен достъп без такса).
+  if (comp?.isAccountingFirm) return firmHasFullAccess(comp.subscription) ? "pro" : "free";
   // Клиентска фирма на счетоводна къща: базово СТАРТ, а при надграждане — реалния план.
   if (comp?.managedByFirmId) return effectiveManagedPlan(comp.subscription?.plan);
   return (comp?.subscription?.plan ?? "free") as PlanId;

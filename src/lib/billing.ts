@@ -57,6 +57,16 @@ export function isAwaitingPayment(sub: SubLike, opts: { isOwnAccount?: boolean }
   return plan !== "free" && sub?.status === "active" && sub?.paymentStatus !== "received";
 }
 
+/**
+ * Пълен достъп за СЧЕТОВОДНА КЪЩА без потвърдено плащане.
+ * Обичайно счетоводната къща получава пълен достъп само след потвърдено плащане,
+ * но при CDT/вътрешен billing (billingMode != standard) достъпът е предоставен без такса.
+ */
+export function firmHasFullAccess(sub: SubLike): boolean {
+  if (billingMode(sub) !== "standard") return true; // CDT/вътрешни → без такса
+  return sub?.paymentStatus === "received";
+}
+
 /** Дали CDT достъпът е изтекъл (има крайна дата в миналото) → „Изисква преглед". */
 export function isCdtExpired(sub: { billingMode?: string | null; cdtEndsAt?: Date | string | null } | null | undefined, now = new Date()): boolean {
   return billingMode(sub) === "cdt_client" && !!sub?.cdtEndsAt && new Date(sub.cdtEndsAt).getTime() < now.getTime();
