@@ -327,5 +327,15 @@
       "cdt": "Client CDT (gratuit)",
       "internal": "Companie internă"
     }
+  },
+  "reactivation": {
+    "kpiTitle": "ACTIVAREA FIRMELOR ÎNREGISTRATE",
+    "kpiCandidates": "Inactive eligibile",
+    "kpiReminded": "Reamintite (firme)",
+    "kpiSent": "Trimise",
+    "kpiOpened": "Deschise",
+    "kpiClicked": "Clicuri",
+    "kpiReactivated": "Reactivate",
+    "kpiNote": "Deschiderile/clicurile sunt urmărite prin pixel și redirect securizat. Se afișează doar evenimente reale."
   }
 }

@@ -12,6 +12,10 @@ import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 import { getT } from "@/lib/i18n/server";
 import { getMessages } from "@/lib/i18n/messages";
 import { isPayingSubscriber, isAwaitingPayment, isRevenueExcluded, isCdtClient } from "@/lib/billing";
+import { getCompanyEngagementStatus, isReactivationCandidate, reminderCooldown, type ActivationSignals } from "@/lib/engagement";
+import { reactivationReminderDefaults } from "@/lib/email/messages";
+import { normalizeLocale } from "@/lib/i18n/config";
+import type { ReactivationInfo } from "@/components/app/AdminCompanyRow";
 
 const RANGES = [
   { id: "7d", days: 7, bucket: "day" as const },
@@ -227,6 +231,88 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const daysSince = (d?: Date | null) => d ? Math.floor((nowD.getTime() - new Date(d).getTime()) / 86400000) : Infinity;
   const inactive = companies.map((c) => ({ id: c.id, name: c.name, plan: c.subscription?.plan ?? "free", days: daysSince(lastActivity.get(c.id)) }))
     .filter((c) => c.days >= 7).sort((a, b) => b.days - a.days).slice(0, 8);
+
+  // ─── Сигнали за активиране (ръчни напомняния до неактивни фирми) ───
+  const [invoiceAgg, reminderLogs] = await Promise.all([
+    prisma.document.groupBy({ by: ["companyId"], where: { type: "invoice", deletedAt: null }, _count: { _all: true }, _min: { createdAt: true } }),
+    prisma.emailLog.findMany({
+      where: { type: "reactivation_reminder" },
+      select: { companyId: true, createdAt: true, status: true, opensCount: true, clicksCount: true, openedAt: true, clickedAt: true, bounced: true, toEmail: true, subject: true },
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
+  const invoiceCountByCompany = new Map(invoiceAgg.map((r) => [r.companyId, r._count._all]));
+  const firstInvoiceByCompany = new Map(invoiceAgg.map((r) => [r.companyId, r._min.createdAt]));
+  const remindersByCompany = new Map<string, typeof reminderLogs>();
+  for (const r of reminderLogs) {
+    if (!r.companyId) continue;
+    const arr = remindersByCompany.get(r.companyId) ?? [];
+    arr.push(r); remindersByCompany.set(r.companyId, arr);
+  }
+  // Строим engagement сигналите за всяка (стандартна) фирма.
+  const reactivationByCompany = new Map<string, ReactivationInfo>();
+  for (const c of companies) {
+    if (c.isAccountingFirm) continue;
+    const invCount = invoiceCountByCompany.get(c.id) ?? 0;
+    const firstInvoiceAt = firstInvoiceByCompany.get(c.id) ?? null;
+    const rem = remindersByCompany.get(c.id) ?? [];
+    const signals: ActivationSignals = {
+      createdAt: c.createdAt,
+      invoiceCount: invCount,
+      documentCount: c._count.documents,
+      clientCount: c._count.clients,
+      lastActivityAt: lastActivityAt(c.id),
+      reminderCount: rem.length,
+      lastReminderAt: rem[0]?.createdAt ?? null,
+      firstInvoiceAt,
+    };
+    const allowedRecipients = [...new Set([
+      ...(c.email ? [c.email.toLowerCase()] : []),
+      ...c.companyUsers.map((cu) => cu.user?.email?.toLowerCase()).filter(Boolean) as string[],
+    ])];
+    const cd = reminderCooldown(rem.length, rem[0]?.createdAt ?? null);
+    const owner = c.companyUsers.find((cu) => cu.role === "owner")?.user ?? c.companyUsers[0]?.user;
+    const daysSinceReg = Math.floor((nowD.getTime() - new Date(c.createdAt).getTime()) / 86400000);
+    const defaults = reactivationReminderDefaults(
+      { companyName: c.name, userName: owner?.name, daysSinceRegistration: daysSinceReg },
+      normalizeLocale(owner?.preferredLanguage)
+    );
+    reactivationByCompany.set(c.id, {
+      defaultSubject: defaults.subject,
+      defaultParagraphs: defaults.paragraphs,
+      defaultButtonLabel: defaults.buttonLabel,
+      status: getCompanyEngagementStatus(signals),
+      isCandidate: isReactivationCandidate(signals) && allowedRecipients.length > 0,
+      invoiceCount: invCount,
+      documentCount: c._count.documents,
+      clientCount: c._count.clients,
+      reminderCount: rem.length,
+      lastReminderAt: rem[0]?.createdAt?.toISOString() ?? null,
+      cooldownDaysUntil: cd.daysUntilAllowed,
+      canSend: cd.canSend,
+      recipients: allowedRecipients,
+      ownerName: owner?.name ?? null,
+      createdAt: c.createdAt.toISOString(),
+      lastActivity: lastActivityAt(c.id)?.toISOString() ?? null,
+      timeline: rem.slice(0, 6).map((r) => ({
+        createdAt: r.createdAt.toISOString(), status: r.status, opens: r.opensCount, clicks: r.clicksCount,
+        openedAt: r.openedAt?.toISOString() ?? null, clickedAt: r.clickedAt?.toISOString() ?? null,
+        bounced: r.bounced, toEmail: r.toEmail, subject: r.subject,
+      })),
+    });
+  }
+  // KPI за активиране (реални данни от EmailLog + документи).
+  const reactStats = (() => {
+    const vals = [...reactivationByCompany.values()];
+    const candidates = vals.filter((v) => v.isCandidate).length;
+    const withReminder = reminderLogs.filter((r) => r.companyId);
+    const companiesReminded = new Set(withReminder.map((r) => r.companyId)).size;
+    const sent = withReminder.filter((r) => r.status === "sent").length;
+    const opened = withReminder.filter((r) => r.opensCount > 0).length;
+    const clicked = withReminder.filter((r) => r.clicksCount > 0).length;
+    const reactivated = vals.filter((v) => v.status === "reactivated").length;
+    return { candidates, companiesReminded, sent, opened, clicked, reactivated };
+  })();
 
   // ─── Допълнителни показатели за растеж и активност ───
   const growthMonthStart = new Date(nowD.getFullYear(), nowD.getMonth(), 1);
@@ -707,6 +793,27 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         </div>
       </div>
 
+      {/* ─── Активиране на регистрирани фирми (реални данни) ─── */}
+      <div className="glass panel" style={{ padding: "12px 16px", marginBottom: 14 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--brass)", letterSpacing: 1, marginBottom: 8 }}>{t("admin.reactivation.kpiTitle")}</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 10 }}>
+          {[
+            { label: t("admin.reactivation.kpiCandidates"), value: reactStats.candidates, color: "var(--brass)" },
+            { label: t("admin.reactivation.kpiReminded"), value: reactStats.companiesReminded, color: "var(--navy)" },
+            { label: t("admin.reactivation.kpiSent"), value: reactStats.sent, color: "var(--ink)" },
+            { label: t("admin.reactivation.kpiOpened"), value: reactStats.opened, color: "var(--emerald-dark)" },
+            { label: t("admin.reactivation.kpiClicked"), value: reactStats.clicked, color: "var(--emerald-dark)" },
+            { label: t("admin.reactivation.kpiReactivated"), value: reactStats.reactivated, color: "var(--emerald)" },
+          ].map((k) => (
+            <div key={k.label}>
+              <div style={{ fontSize: 11, color: "var(--muted)", marginBottom: 2 }}>{k.label}</div>
+              <div className="num" style={{ fontSize: 18, fontWeight: 700, color: k.color }}>{k.value}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 8 }}>{t("admin.reactivation.kpiNote")}</div>
+      </div>
+
       <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, fontWeight: 600, margin: "0 0 4px" }}>{t("admin.companies.title")}</h2>
       <div style={{ color: "var(--muted)", fontSize: 12.5, marginBottom: 10 }}>{t("admin.companies.subtitle")}</div>
       <div className="glass panel bi-table" style={{ padding: "8px 0", overflowX: "auto" }}>
@@ -757,6 +864,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                   cdtNote: c.subscription?.cdtNote ?? null,
                 }}
                 events={c.subscriptionEvents.map((e) => ({ type: e.type, plan: e.plan, status: e.status, period: e.period, amount: e.amount, note: e.note, createdAt: e.createdAt.toISOString() }))}
+                reactivation={reactivationByCompany.get(c.id)}
               />
             ))}
           </tbody>

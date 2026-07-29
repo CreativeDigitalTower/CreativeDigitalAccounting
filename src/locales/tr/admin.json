@@ -327,5 +327,15 @@
       "cdt": "CDT müşterisi (ücretsiz)",
       "internal": "Dahili şirket"
     }
+  },
+  "reactivation": {
+    "kpiTitle": "KAYITLI ŞİRKETLERİ ETKİNLEŞTİRME",
+    "kpiCandidates": "Uygun pasif",
+    "kpiReminded": "Hatırlatılan (şirket)",
+    "kpiSent": "Gönderildi",
+    "kpiOpened": "Açıldı",
+    "kpiClicked": "Tıklandı",
+    "kpiReactivated": "Yeniden etkin",
+    "kpiNote": "Açılma/tıklama pixel ve güvenli yönlendirme ile izlenir. Yalnızca gerçek olaylar gösterilir."
   }
 }

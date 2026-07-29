@@ -209,5 +209,17 @@
     "introAccepted": "Client <strong>{clientName}</strong> accepted {docLabelLower} No. {number}.",
     "introRejected": "Client <strong>{clientName}</strong> rejected {docLabelLower} No. {number}.",
     "button": "Open document"
+  },
+  "reactivation": {
+    "subject": "Ready to issue your first invoice?",
+    "eyebrow": "Getting started",
+    "p_greeting": "Hello {name},",
+    "p_intro": "We noticed that you have already created a company profile in Creative Digital Accounting, but you have not yet used the platform to issue your first document.",
+    "p_list_intro": "You can get started quickly and easily by:",
+    "p_list": "• adding a client;\n• issuing an invoice, proforma or quote;\n• tracking your payments and documents;\n• using the business tools available in your account.",
+    "p_easy": "The platform is designed so you can start working without any complex initial setup.",
+    "p_support": "If you have a question or need assistance, simply reply to this email. Our team is here and happy to help.",
+    "p_signoff": "Best regards,\nThe Creative Digital Accounting Team",
+    "button": "Issue your first invoice"
   }
 }

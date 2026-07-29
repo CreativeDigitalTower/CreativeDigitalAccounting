@@ -1,4 +1,4 @@
-import { baseTemplate, APP_URL, type EmailButton } from "./templates";
+import { baseTemplate, escapeHtml, APP_URL, type EmailButton } from "./templates";
 import { formatCurrency, BANK_DETAILS } from "@/lib/constants";
 import { getMessages, makeT } from "@/lib/i18n/messages";
 import { normalizeLocale, intlLocale, type Locale } from "@/lib/i18n/config";
@@ -450,4 +450,59 @@ export function contactFormEmail(d: { name: string; email: string; message: stri
       ],
     }),
   };
+}
+
+// ─────────────────────────── АКТИВИРАНЕ (реактивация) ───────────────────────────
+
+/** Абсолютен CTA линк „Издай първа фактура" през login с безопасен returnTo. */
+export function createInvoiceUrl(): string {
+  const dest = "/dashboard/documents/new?type=invoice&from=reactivation";
+  return `${APP_URL}/login?next=${encodeURIComponent(dest)}`;
+}
+
+export type ReactivationVars = { companyName: string; userName?: string | null; daysSinceRegistration: number };
+
+/**
+ * Стойности по подразбиране за напомнящия имейл за активиране — subject + текст
+ * (обикновени параграфи, с вече заместени placeholders). Super Admin ги вижда и
+ * може да ги редактира в modal-а преди изпращане.
+ */
+export function reactivationReminderDefaults(vars: ReactivationVars, locale: Locale = "bg"): { subject: string; paragraphs: string[]; buttonLabel: string; supportEmail: string } {
+  const { loc, E } = emT(locale);
+  void loc;
+  const name = vars.userName?.trim() || vars.companyName;
+  const R = (k: string, v?: Record<string, string | number>) => E(`reactivation.${k}`, v);
+  return {
+    subject: R("subject"),
+    paragraphs: [
+      R("p_greeting", { name }),
+      R("p_intro", { company: vars.companyName }),
+      R("p_list_intro"),
+      R("p_list"),
+      R("p_easy"),
+      R("p_support"),
+      R("p_signoff"),
+    ],
+    buttonLabel: R("button"),
+    supportEmail: "office@creativedigitalaccounting.com",
+  };
+}
+
+/**
+ * Изгражда финалния HTML на напомнящия имейл. Параграфите се ЕКРАНИРАТ (защита от
+ * HTML/email injection при редакция от админ). CTA бутонът се проследява автоматично
+ * от send слоя (open pixel + click redirect).
+ */
+export function buildReactivationHtml(o: { subject: string; paragraphs: string[]; buttonLabel: string; ctaUrl: string; locale?: Locale }): string {
+  const loc = normalizeLocale(o.locale ?? "bg");
+  return baseTemplate({
+    locale: loc,
+    eyebrow: emT(loc).E("reactivation.eyebrow"),
+    title: o.subject,
+    preheader: o.subject,
+    // Всеки параграф се екранира и преобразува новите редове в <br> (без суров HTML).
+    intro: o.paragraphs.map((p) => escapeHtml(p).replace(/\n/g, "<br>")),
+    button: { label: o.buttonLabel, url: o.ctaUrl },
+    footnote: "{{UNSUB}}",
+  });
 }
