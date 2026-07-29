@@ -10,10 +10,18 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   try {
     await requireSuperAdmin();
     const { id } = await params;
-    const permanent = new URL(req.url).searchParams.get("permanent") === "1";
+    const sp = new URL(req.url).searchParams;
+    const permanent = sp.get("permanent") === "1";
+    const detachClients = sp.get("detachClients") === "1";
     const { comment } = z.object({ comment: z.string().optional() }).parse(await req.json().catch(() => ({})));
     const company = await prisma.company.findUnique({ where: { id }, select: { name: true, eik: true } });
     if (!company) return NextResponse.json({ error: "Не е намерена" }, { status: 404 });
+
+    // Счетоводна къща с управлявани клиенти: по избор ги откачаме (managedByFirmId=null),
+    // за да не останат вързани към архивирана къща. Клиентските фирми НЕ се трият.
+    if (detachClients) {
+      await prisma.company.updateMany({ where: { managedByFirmId: id }, data: { managedByFirmId: null } });
+    }
 
     try {
       const a = adminSimpleEmail(permanent ? "Фирма изтрита ЗАВИНАГИ от Супер Админ" : "Фирма архивирана от Супер Админ", [

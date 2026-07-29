@@ -97,6 +97,7 @@
     "pThFirm": "Muhasebe firması",
     "pThAmount": "Tutar",
     "pThRequested": "Talep edildi",
-    "markPaid": "Ödendi olarak işaretle"
+    "markPaid": "Ödendi olarak işaretle",
+    "kpiCdt": "CDT firmaları"
   }
 }

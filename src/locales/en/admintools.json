@@ -97,6 +97,7 @@
     "pThFirm": "Accounting firm",
     "pThAmount": "Amount",
     "pThRequested": "Requested",
-    "markPaid": "Mark as paid"
+    "markPaid": "Mark as paid",
+    "kpiCdt": "CDT firms"
   }
 }

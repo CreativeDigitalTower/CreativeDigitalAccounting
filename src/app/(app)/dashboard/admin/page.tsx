@@ -293,17 +293,62 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
   // ─── Счетоводни къщи · партньорска статистика ───
   const firmsList = companies.filter((c) => c.isAccountingFirm);
+  // Всички клиентски фирми, управлявани от тези къщи — за обобщение и списък.
+  const managedClients = firmsList.length
+    ? await prisma.company.findMany({
+        where: { managedByFirmId: { in: firmsList.map((f) => f.id) }, archivedAt: null },
+        select: { id: true, name: true, managedByFirmId: true, clientStatus: true, createdAt: true, subscription: { select: { plan: true, paymentStatus: true, billingMode: true } } },
+        orderBy: { createdAt: "desc" },
+      })
+    : [];
+  const clientsByFirm = new Map<string, typeof managedClients>();
+  for (const c of managedClients) {
+    const arr = clientsByFirm.get(c.managedByFirmId!) ?? [];
+    arr.push(c); clientsByFirm.set(c.managedByFirmId!, arr);
+  }
+  // Цели за прехвърляне на клиенти (всички други къщи).
+  const firmTargets = firmsList.map((f) => ({ id: f.id, name: f.name }));
   const firmStats = await Promise.all(firmsList.map(async (f) => {
     const stats = await computeFirmPartnerStats({ id: f.id, partnerCode: f.partnerCode, partnerPercentOverride: f.partnerPercentOverride, commissionPaidTotal: f.commissionPaidTotal });
     const max = accountantMaxClients(f.firmPlan);
+    const mine = clientsByFirm.get(f.id) ?? [];
+    const owner = f.companyUsers.find((cu) => cu.role === "owner")?.user ?? f.companyUsers[0]?.user;
+    const sub = f.subscription;
     return {
       id: f.id, name: f.name, planLabel: accountantPlanLabel(f.firmPlan),
       firmPlan: f.firmPlan ?? "acc_start",
-      paymentStatus: f.subscription?.paymentStatus ?? "pending",
+      paymentStatus: sub?.paymentStatus ?? "pending",
       maxClients: max === Infinity ? "∞" : String(max),
+      maxClientsNum: max === Infinity ? null : max,
       totalClients: stats.totalClients, startClients: stats.startClients, paidClients: stats.paidClients,
       ratePercent: stats.ratePercent, overridePercent: f.partnerPercentOverride, monthlyCommission: stats.monthlyCommission,
       paidTotal: stats.paidTotal, pendingRequests: stats.pendingRequests,
+      // Разгъваем панел — административни данни
+      eik: f.eik, email: f.email, phone: f.phone,
+      createdAt: f.createdAt.toISOString(),
+      lastActivity: lastActivityAt(f.id)?.toISOString() ?? null,
+      ownerName: owner?.name ?? null, ownerEmail: owner?.email ?? null,
+      usersCount: f._count.companyUsers,
+      archived: false,
+      billingMode: sub?.billingMode ?? "standard",
+      cdtEndsAt: sub?.cdtEndsAt?.toISOString() ?? null,
+      cdtNote: sub?.cdtNote ?? null,
+      cdtActivatedAt: sub?.cdtActivatedAt?.toISOString() ?? null,
+      clientsSummary: {
+        total: mine.length,
+        active: mine.filter((c) => c.clientStatus === "active").length,
+        start: mine.filter((c) => (c.subscription?.plan ?? "free") === "free" && (c.subscription?.billingMode ?? "standard") === "standard").length,
+        paid: mine.filter((c) => (c.subscription?.plan ?? "free") !== "free" && (c.subscription?.billingMode ?? "standard") === "standard" && c.subscription?.paymentStatus === "received").length,
+        cdt: mine.filter((c) => (c.subscription?.billingMode ?? "standard") !== "standard").length,
+        freeSlots: max === Infinity ? null : Math.max(0, max - mine.length),
+      },
+      recentClients: mine.slice(0, 5).map((c) => ({
+        id: c.id, name: c.name,
+        plan: c.subscription?.plan ?? "free",
+        billingMode: c.subscription?.billingMode ?? "standard",
+        paymentStatus: c.subscription?.paymentStatus ?? "pending",
+      })),
+      events: f.subscriptionEvents.map((e) => ({ type: e.type, plan: e.plan, status: e.status, period: e.period, amount: e.amount, note: e.note, createdAt: e.createdAt.toISOString() })),
     };
   }));
   const firmRows = firmStats;
@@ -350,7 +395,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
       {/* ─── Счетоводни къщи · Партньорска програма ─── */}
       <div id="firms">
-        <AdminFirmsPanel firms={firmRows} payouts={payoutRows} />
+        <AdminFirmsPanel firms={firmRows} payouts={payoutRows} targets={firmTargets} />
       </div>
 
       {/* Чакащи потвърждение на плащане */}

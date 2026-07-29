@@ -6,6 +6,7 @@ import {
   isPayingSubscriber,
   isAwaitingPayment,
   isCdtExpired,
+  firmHasFullAccess,
 } from "@/lib/billing";
 
 // Помощни фабрики за абонаменти в трите независими измерения:
@@ -83,6 +84,22 @@ describe("isAwaitingPayment() — блок Очаква потвърждение
   it("потвърденият платен НЕ чака; собственият акаунт НЕ чака", () => {
     expect(isAwaitingPayment(paidActive())).toBe(false);
     expect(isAwaitingPayment(paidPending(), { isOwnAccount: true })).toBe(false);
+  });
+});
+
+describe("firmHasFullAccess() — достъп на счетоводна къща", () => {
+  it("стандартен режим изисква потвърдено плащане", () => {
+    expect(firmHasFullAccess({ billingMode: "standard", paymentStatus: "received" })).toBe(true);
+    expect(firmHasFullAccess({ billingMode: "standard", paymentStatus: "pending" })).toBe(false);
+    expect(firmHasFullAccess({ billingMode: "standard", paymentStatus: "not_received" })).toBe(false);
+  });
+  it("CDT/вътрешен режим дава пълен достъп БЕЗ плащане", () => {
+    expect(firmHasFullAccess({ billingMode: "cdt_client", paymentStatus: "pending" })).toBe(true);
+    expect(firmHasFullAccess({ billingMode: "internal", paymentStatus: "not_received" })).toBe(true);
+  });
+  it("липсващ абонамент = без достъп", () => {
+    expect(firmHasFullAccess(null)).toBe(false);
+    expect(firmHasFullAccess(undefined)).toBe(false);
   });
 });
 

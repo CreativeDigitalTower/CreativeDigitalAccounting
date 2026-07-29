@@ -5,6 +5,7 @@ import { accountantMaxClients } from "@/lib/constants";
 import { validateEik } from "@/lib/validation/eik";
 import { notifyAdmin } from "@/lib/email/send";
 import { z } from "zod";
+import { firmHasFullAccess } from "@/lib/billing";
 
 const schema = z.object({
   name: z.string().min(2),
@@ -27,9 +28,10 @@ export async function POST(req: Request) {
     const firm = await getMyFirm(userId);
     if (!firm) return NextResponse.json({ error: "Само за счетоводни къщи." }, { status: 403 });
 
-    // Функцията се активира след потвърдено плащане на счетоводния план.
-    const firmSub = await prisma.subscription.findUnique({ where: { companyId: firm.id }, select: { paymentStatus: true } });
-    if (firmSub?.paymentStatus !== "received") {
+    // Функцията се активира след потвърдено плащане на счетоводния план —
+    // или безплатно при CDT/вътрешен billing (firmHasFullAccess).
+    const firmSub = await prisma.subscription.findUnique({ where: { companyId: firm.id }, select: { paymentStatus: true, billingMode: true } });
+    if (!firmHasFullAccess(firmSub)) {
       return NextResponse.json({ error: "Добавянето на клиенти се активира след потвърждение на плащане на плана." }, { status: 403 });
     }
 

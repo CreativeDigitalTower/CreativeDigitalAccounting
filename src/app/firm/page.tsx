@@ -2,6 +2,7 @@ import { requireAccountingFirm } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { accountantMaxClients, effectiveManagedPlan, isPaidClientPlan, planLabel } from "@/lib/constants";
 import { computeFirmPartnerStats, generatePartnerCode } from "@/lib/partner";
+import { firmHasFullAccess } from "@/lib/billing";
 import { buildFirmOverview, clientHealth, type EnrichedClient } from "@/lib/bi/firm";
 import { upcomingStandard } from "@/lib/taxCalendar";
 import { FirmDashboard, type FirmInvite } from "@/components/app/FirmDashboard";
@@ -90,10 +91,10 @@ export default async function FirmPage() {
 
   const [stats, firmSub, pendingPayoutCount] = await Promise.all([
     computeFirmPartnerStats(firmData),
-    prisma.subscription.findUnique({ where: { companyId: firm.id }, select: { paymentStatus: true } }),
+    prisma.subscription.findUnique({ where: { companyId: firm.id }, select: { paymentStatus: true, billingMode: true } }),
     prisma.commissionPayout.count({ where: { firmId: firm.id, status: "requested" } }),
   ]);
-  const firmPaid = firmSub?.paymentStatus === "received";
+  const firmPaid = firmHasFullAccess(firmSub);
 
   const dayOfMonth = now.getDate();
   const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
