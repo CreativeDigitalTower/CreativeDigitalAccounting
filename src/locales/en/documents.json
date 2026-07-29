@@ -65,7 +65,9 @@
     "filterAll": "All",
     "empty": "No invoices",
     "issueFirst": "Issue the first invoice",
-    "galleryTitle": "Invoice templates — preview the designs"
+    "galleryTitle": "Invoice templates — preview the designs",
+    "emptyFiltered": "No invoices with status “{status}”.",
+    "showAll": "Show all"
   },
   "table": {
     "overdueAlert": "{n} overdue invoices — follow up with clients for payment.",

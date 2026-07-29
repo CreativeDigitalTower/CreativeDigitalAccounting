@@ -65,7 +65,9 @@
     "filterAll": "Toate",
     "empty": "Nicio factură",
     "issueFirst": "Emite prima factură",
-    "galleryTitle": "Șabloane de factură — previzualizează designurile"
+    "galleryTitle": "Șabloane de factură — previzualizează designurile",
+    "emptyFiltered": "Nu există facturi cu statusul „{status}”.",
+    "showAll": "Arată toate"
   },
   "table": {
     "overdueAlert": "{n} facturi restante — solicitați plata de la clienți.",

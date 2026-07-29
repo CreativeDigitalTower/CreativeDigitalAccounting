@@ -65,7 +65,9 @@
     "filterAll": "Tümü",
     "empty": "Fatura yok",
     "issueFirst": "İlk faturayı düzenle",
-    "galleryTitle": "Fatura şablonları — tasarımları önizle"
+    "galleryTitle": "Fatura şablonları — tasarımları önizle",
+    "emptyFiltered": "„{status}“ durumunda fatura yok.",
+    "showAll": "Tümünü göster"
   },
   "table": {
     "overdueAlert": "{n} gecikmiş fatura — müşterilerden ödeme talep edin.",
