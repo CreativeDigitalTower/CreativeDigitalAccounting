@@ -6,6 +6,7 @@ import Link from "next/link";
 import { InvoicesTable } from "@/components/app/InvoicesTable";
 import { TemplateGallery } from "@/components/app/TemplateGallery";
 import { formatCurrency, toBGN, isDualCurrencyActive, DOC_STATUSES, type PlanId } from "@/lib/constants";
+import { getInvoiceDisplayStatus, matchesInvoiceStatusFilter, isInvoicePaid, type InvoiceStatusFilter } from "@/lib/invoiceStatus";
 import { getT } from "@/lib/i18n/server";
 
 export default async function InvoicesPage({
@@ -20,22 +21,44 @@ export default async function InvoicesPage({
   const dual = isDualCurrencyActive();
   const { t } = await getT();
 
-  const invoices = await prisma.document.findMany({
-    where: { companyId, deletedAt: null, type: "invoice", ...(params.status ? { status: params.status as never } : {}) },
+  // Всички фактури на фирмата (без Кошчето). Филтрирането по статус става чрез
+  // централизираната логика getInvoiceDisplayStatus — за да съвпада с показаното.
+  const allInvoices = await prisma.document.findMany({
+    where: { companyId, deletedAt: null, type: "invoice" },
     include: { client: true, lines: true },
     orderBy: DOC_ORDER,
   });
+  const now = new Date();
 
-  const totals = invoices.reduce(
-    (acc, d) => {
-      const t = d.lines.reduce((s, l) => s + l.lineTotal, 0);
-      acc.all += t;
-      if (d.status === "paid") acc.paid += t;
-      else if (d.status !== "cancelled") acc.outstanding += t;
+  // Обогатяваме всяка фактура с обща сума + ефективен (display) статус.
+  const enriched = allInvoices.map((d) => {
+    const total = d.lines.reduce((s, l) => s + l.lineTotal, 0);
+    const input = { status: d.status, paidAmount: d.paidAmount, total, dueDate: d.dueDate, sentToClientAt: d.sentToClientAt };
+    return { doc: d, total, displayStatus: getInvoiceDisplayStatus(input, now), input };
+  });
+
+  // Брояч за всеки филтър (от същата логика като списъка → без разминаване).
+  const statusCounts = DOC_STATUSES.reduce((acc, s) => {
+    acc[s.value] = enriched.filter((e) => e.displayStatus === s.value).length;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const activeFilter = (params.status as InvoiceStatusFilter | undefined) ?? null;
+  const filtered = enriched.filter((e) => matchesInvoiceStatusFilter(e.input, activeFilter, now));
+
+  // KPI сумите използват същия helper (платена vs. дължима), не суровия статус.
+  const totals = enriched.reduce(
+    (acc, e) => {
+      acc.all += e.total;
+      if (isInvoicePaid(e.input)) acc.paid += e.total;
+      else if (e.doc.status !== "cancelled") acc.outstanding += e.total;
       return acc;
     },
     { all: 0, paid: 0, outstanding: 0 }
   );
+
+  const hasAnyInvoice = allInvoices.length > 0;
+  const invoices = filtered; // визуализираният (филтриран) набор
 
   return (
     <>
@@ -62,10 +85,10 @@ export default async function InvoicesPage({
       </div>
 
       <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
-        <Link href="/dashboard/invoices" className={`filter-tab${!params.status ? " active" : ""}`}>{t("documents.invoices.filterAll")}</Link>
+        <Link href="/dashboard/invoices" className={`filter-tab${!params.status ? " active" : ""}`}>{t("documents.invoices.filterAll")} ({enriched.length})</Link>
         {DOC_STATUSES.map((s) => (
           <Link key={s.value} href={`/dashboard/invoices?status=${s.value}`} className={`filter-tab${params.status === s.value ? " active" : ""}`}>
-            {t(`documents.status.${s.value}`)}
+            {t(`documents.status.${s.value}`)} ({statusCounts[s.value] ?? 0})
           </Link>
         ))}
       </div>
@@ -73,16 +96,27 @@ export default async function InvoicesPage({
       {invoices.length === 0 ? (
         <div className="glass panel" style={{ textAlign: "center", padding: "48px 0", color: "var(--muted)" }}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, color: "var(--muted)" }}><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2.5h9l3 3V21l-2-1.2-2 1.2-2-1.2-2 1.2-2-1.2L6 21V2.5Z"/><path d="M8.5 7.5h7M8.5 11h7M8.5 14.5h4"/></svg></div>
-          <div style={{ fontSize: 14, marginBottom: 16 }}>{t("documents.invoices.empty")}</div>
-          <Link href="/dashboard/documents/new?type=invoice" className="btn btn-primary btn-sm">{t("documents.invoices.issueFirst")}</Link>
+          {hasAnyInvoice && activeFilter ? (
+            <>
+              {/* Има фактури, но не и в текущия филтър — конкретно съобщение + „Покажи всички". */}
+              <div style={{ fontSize: 14, marginBottom: 16 }}>{t("documents.invoices.emptyFiltered", { status: t(`documents.status.${activeFilter}`) })}</div>
+              <Link href="/dashboard/invoices" className="btn btn-primary btn-sm">{t("documents.invoices.showAll")}</Link>
+            </>
+          ) : (
+            <>
+              {/* Фирмата няма нито една фактура — покана за първата. */}
+              <div style={{ fontSize: 14, marginBottom: 16 }}>{t("documents.invoices.empty")}</div>
+              <Link href="/dashboard/documents/new?type=invoice" className="btn btn-primary btn-sm">{t("documents.invoices.issueFirst")}</Link>
+            </>
+          )}
         </div>
       ) : (
         <InvoicesTable
           canDelete={canDeleteDocs}
-          invoices={invoices.map((doc) => ({
-            id: doc.id, number: doc.number, clientName: doc.client?.name ?? "—",
-            issueDate: doc.issueDate.toISOString(), dueDate: doc.dueDate ? doc.dueDate.toISOString() : null,
-            total: doc.lines.reduce((s, l) => s + l.lineTotal, 0), currency: doc.currency, status: doc.status,
+          invoices={invoices.map((e) => ({
+            id: e.doc.id, number: e.doc.number, clientName: e.doc.client?.name ?? "—",
+            issueDate: e.doc.issueDate.toISOString(), dueDate: e.doc.dueDate ? e.doc.dueDate.toISOString() : null,
+            total: e.total, currency: e.doc.currency, status: e.displayStatus,
           }))}
         />
       )}
