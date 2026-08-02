@@ -198,7 +198,10 @@
     "fromProforma": "New invoice from proforma №{number} — review and adjust before creating.",
     "copyAttachments": "Copy attachments from the proforma",
     "duplicateBanner": "Based on {type} № {number} — review and adjust before saving.",
-    "copyAttachmentsAsk": "Copy the attachments too?"
+    "copyAttachmentsAsk": "Copy the attachments too?",
+    "vatInvalid": "Invalid VAT number format.",
+    "vatInconsistent": "A VAT number is entered, but the client is marked as not VAT-registered. Please check the data.",
+    "duplicateInvoice": "Duplicate invoice"
   },
   "detail": {
     "back": "← Documents",

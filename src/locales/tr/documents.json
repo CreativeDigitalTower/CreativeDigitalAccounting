@@ -198,7 +198,10 @@
     "fromProforma": "Proforma №{number} belgesinden yeni fatura — oluşturmadan önce inceleyip düzenleyin.",
     "copyAttachments": "Ekleri proformadan kopyala",
     "duplicateBanner": "{type} № {number} temel alınarak — kaydetmeden önce inceleyip düzenleyin.",
-    "copyAttachmentsAsk": "Ekler de kopyalansın mı?"
+    "copyAttachmentsAsk": "Ekler de kopyalansın mı?",
+    "vatInvalid": "Geçersiz KDV numarası biçimi.",
+    "vatInconsistent": "Bir KDV numarası girildi, ancak müşteri KDV mükellefi değil olarak işaretlendi. Verileri kontrol edin.",
+    "duplicateInvoice": "Faturayı çoğalt"
   },
   "detail": {
     "back": "← Belgeler",

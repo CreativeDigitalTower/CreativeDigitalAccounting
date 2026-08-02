@@ -11,8 +11,14 @@ import {
 import { TemplateGallery } from "@/components/app/TemplateGallery";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { isLocale } from "@/lib/i18n/config";
+import { isValidVat, deriveVatRegistered, normalizeVat } from "@/lib/validation/vat";
 
-type ClientFull = { id: string; name: string; eik: string | null; vatNumber: string | null; city: string | null; address: string | null; contactEmail: string | null };
+// Пълните данни на клиент от CRM, които формата за фактура попълва при избор.
+type ClientFull = {
+  id: string; name: string; eik: string | null; vatNumber: string | null;
+  city: string | null; address: string | null; contactEmail: string | null;
+  mol: string | null; contactPerson: string | null; phone: string | null;
+};
 type Line = { description: string; quantity: number; unitPrice: number; vatRate: number };
 
 const DOC_TYPE_VALUES = ["invoice", "proforma", "quote", "credit_note", "debit_note"];
@@ -34,6 +40,7 @@ function NewDocumentForm() {
   // ръчни данни на клиента
   const [mClient, setMClient] = useState({
     name: "", eik: "", vatNumber: "", vatRegistered: false, mol: "", city: "", address: "", contactEmail: "",
+    contactPerson: "", phone: "",
   });
   const [currency, setCurrency] = useState("EUR");
   const [language, setLanguage] = useState<string>(defaultDocLang);
@@ -74,14 +81,44 @@ function NewDocumentForm() {
       ).slice(0, 6)
     : [];
 
+  // Попълва ВСИЧКИ данни на клиента от CRM (МОЛ, email, ДДС статус и т.н.).
+  // Статусът „регистриран по ЗДДС" се извежда от валиден ДДС номер (deriveVatRegistered).
   function pickClient(c: ClientFull) {
     setMClient({
-      name: c.name, eik: c.eik ?? "", vatNumber: c.vatNumber ?? "", vatRegistered: false,
-      mol: "", city: c.city ?? "", address: c.address ?? "", contactEmail: c.contactEmail ?? "",
+      name: c.name, eik: c.eik ?? "", vatNumber: c.vatNumber ?? "",
+      vatRegistered: deriveVatRegistered(c),
+      mol: c.mol ?? "", city: c.city ?? "", address: c.address ?? "",
+      contactEmail: c.contactEmail ?? "", contactPerson: c.contactPerson ?? "", phone: c.phone ?? "",
     });
     setClientId(c.id);
     setSuggestOpen(false);
   }
+
+  // Избор от падащото меню („От списък") → пълно попълване на данните.
+  function selectClientById(id: string) {
+    setClientId(id);
+    const c = clients.find((x) => x.id === id);
+    if (c) pickClient(c);
+  }
+
+  // Изрична смяна на режима на получателя от таба → изчистваме остатъчните данни,
+  // за да не остане МОЛ/email/ДДС от предишен клиент. (Дублиране/проформа задават
+  // режима програмно и НЕ минават оттук, така че тяхното предварително попълване се пази.)
+  function switchClientMode(mode: "select" | "manual") {
+    setClientMode(mode);
+    setClientId("");
+    setSuggestOpen(false);
+    setMClient({ name: "", eik: "", vatNumber: "", vatRegistered: false, mol: "", city: "", address: "", contactEmail: "", contactPerson: "", phone: "" });
+  }
+
+  // Ръчна корекция на ДДС номер: ако стане валиден, предлагаме „регистриран по ЗДДС".
+  function onVatNumberChange(value: string) {
+    setMClient((m) => ({ ...m, vatNumber: value, vatRegistered: isValidVat(value) ? true : m.vatRegistered }));
+    setClientId("");
+  }
+  // Противоречие: въведен ДДС номер, но маркиран като нерегистриран.
+  const vatInconsistent = normalizeVat(mClient.vatNumber).length > 0 && !mClient.vatRegistered;
+  const vatInvalidFormat = normalizeVat(mClient.vatNumber).length > 0 && !isValidVat(mClient.vatNumber);
 
   useEffect(() => {
     const preselect = searchParams.get("clientId");
@@ -347,8 +384,8 @@ function NewDocumentForm() {
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, flexWrap: "wrap" }}>
             <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 14, margin: 0 }}>{t("documents.form.recipient")}</h3>
             <div style={{ display: "flex", gap: 6, marginLeft: "auto" }}>
-              <button type="button" className={`filter-tab${clientMode === "select" ? " active" : ""}`} style={{ fontSize: 11.5 }} onClick={() => setClientMode("select")}>{t("documents.form.fromList")}</button>
-              <button type="button" className={`filter-tab${clientMode === "manual" ? " active" : ""}`} style={{ fontSize: 11.5 }} onClick={() => setClientMode("manual")}>{t("documents.form.manual")}</button>
+              <button type="button" className={`filter-tab${clientMode === "select" ? " active" : ""}`} style={{ fontSize: 11.5 }} onClick={() => switchClientMode("select")}>{t("documents.form.fromList")}</button>
+              <button type="button" className={`filter-tab${clientMode === "manual" ? " active" : ""}`} style={{ fontSize: 11.5 }} onClick={() => switchClientMode("manual")}>{t("documents.form.manual")}</button>
             </div>
           </div>
           <div style={{ display: "flex", gap: 6, marginBottom: 12 }}>
@@ -356,13 +393,17 @@ function NewDocumentForm() {
             <button type="button" className={`filter-tab${clientIsIndividual ? " active" : ""}`} style={{ fontSize: 11.5 }} onClick={() => setClientIsIndividual(true)}>{t("documents.form.individual")}</button>
           </div>
 
-          {clientMode === "select" ? (
-            <select value={clientId} onChange={(e) => setClientId(e.target.value)}>
+          {/* „От списък": избор от CRM → пълно попълване на данните по-долу. */}
+          {clientMode === "select" && (
+            <select value={clientId} onChange={(e) => selectClientById(e.target.value)} style={{ marginBottom: 12 }}>
               <option value="">{t("documents.form.selectClient")}</option>
               {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
-          ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+          )}
+          {/* Данните на получателя — попълват се автоматично при избор и остават
+              редактируеми (важи и за двата режима). При „Въведи ръчно" се редактират
+              свободно; смяната на клиент презарежда всички полета (без остатъчни данни). */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
               <div style={{ gridColumn: "1 / -1", position: "relative" }}>
                 <label>{t("documents.form.clientName")}</label>
                 <input
@@ -370,8 +411,9 @@ function NewDocumentForm() {
                   onChange={(e) => { setMClient({ ...mClient, name: e.target.value }); setClientId(""); setSuggestOpen(true); }}
                   onFocus={() => setSuggestOpen(true)}
                   placeholder={t("documents.form.clientNamePh")} autoComplete="off"
+                  readOnly={clientMode === "select"}
                 />
-                {suggestOpen && suggestions.length > 0 && (
+                {clientMode === "manual" && suggestOpen && suggestions.length > 0 && (
                   <div className="glass" style={{ position: "absolute", top: "100%", left: 0, right: 0, zIndex: 20, borderRadius: 8, marginTop: 4, maxHeight: 220, overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,.15)" }}>
                     {suggestions.map((c) => (
                       <button key={c.id} type="button" onClick={() => pickClient(c)}
@@ -393,7 +435,8 @@ function NewDocumentForm() {
               {!clientIsIndividual && (
                 <div>
                   <label>{t("documents.form.vat")}</label>
-                  <input type="text" value={mClient.vatNumber} onChange={(e) => setMClient({ ...mClient, vatNumber: e.target.value })} placeholder="BG..." />
+                  <input type="text" value={mClient.vatNumber} onChange={(e) => onVatNumberChange(e.target.value)} placeholder="BG..." />
+                  {vatInvalidFormat && <div style={{ fontSize: 11, color: "var(--brick)", marginTop: 3 }}>{t("documents.form.vatInvalid")}</div>}
                 </div>
               )}
               {!clientIsIndividual && (
@@ -403,6 +446,7 @@ function NewDocumentForm() {
                     <option value="0">{t("documents.form.vatRegNo")}</option>
                     <option value="1">{t("documents.form.vatRegYes")}</option>
                   </select>
+                  {vatInconsistent && <div style={{ fontSize: 11, color: "var(--brass)", marginTop: 3 }}>{t("documents.form.vatInconsistent")}</div>}
                 </div>
               )}
               <div>
@@ -421,11 +465,12 @@ function NewDocumentForm() {
                 <label>{t("documents.form.email")}</label>
                 <input type="email" value={mClient.contactEmail} onChange={(e) => setMClient({ ...mClient, contactEmail: e.target.value })} />
               </div>
-              <div style={{ gridColumn: "1 / -1", fontSize: 11.5, color: "var(--muted)" }}>
-                {t("documents.form.autoSaveHint")}
-              </div>
-            </div>
-          )}
+              {clientMode === "manual" && (
+                <div style={{ gridColumn: "1 / -1", fontSize: 11.5, color: "var(--muted)" }}>
+                  {t("documents.form.autoSaveHint")}
+                </div>
+              )}
+          </div>
         </div>
 
         {/* Редове */}

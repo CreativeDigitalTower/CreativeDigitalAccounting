@@ -198,7 +198,10 @@
     "fromProforma": "Factură nouă din proforma №{number} — verificați și ajustați înainte de creare.",
     "copyAttachments": "Copiază atașamentele din proformă",
     "duplicateBanner": "Pe baza {type} № {number} — verificați și ajustați înainte de salvare.",
-    "copyAttachmentsAsk": "Copiați și atașamentele?"
+    "copyAttachmentsAsk": "Copiați și atașamentele?",
+    "vatInvalid": "Format invalid al numărului de TVA.",
+    "vatInconsistent": "Este introdus un număr de TVA, dar clientul este marcat ca neînregistrat în scopuri de TVA. Verificați datele.",
+    "duplicateInvoice": "Duplică factura"
   },
   "detail": {
     "back": "← Documente",
