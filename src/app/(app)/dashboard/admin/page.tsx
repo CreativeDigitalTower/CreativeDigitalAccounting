@@ -473,6 +473,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           <Link href="/dashboard/admin/blog" className="btn btn-ghost btn-sm">{t("admin.nav.blog")}</Link>
           <Link href="/dashboard/admin/businesses" className="btn btn-ghost btn-sm">{t("admin.nav.businesses")}</Link>
           <Link href="/dashboard/admin/deleted-documents" className="btn btn-ghost btn-sm">{t("admin.nav.deletedDocs")}</Link>
+          <Link href="/dashboard/admin/company-groups" className="btn btn-ghost btn-sm">{t("admin.nav.companyGroups")}</Link>
         </div>
       </div>
 

@@ -1,0 +1,23 @@
+{
+  "title": "Genel bakış",
+  "subtitle": "{n} şirket için yönetim özeti.",
+  "revenueByCompany": "Şirkete göre ciro",
+  "empty": "Veri yok.",
+  "open": "➡ Aç",
+  "kpi": {
+    "revenue": "Toplam ciro",
+    "receivables": "Toplam alacak",
+    "overdue": "Gecikmiş faturalar",
+    "documents": "Düzenlenen belge",
+    "clients": "Müşteriler",
+    "companies": "Şirketler"
+  },
+  "th": {
+    "company": "Şirket",
+    "revenue": "Gelir",
+    "receivables": "Alacak",
+    "overdue": "Gecikmiş",
+    "documents": "Belgeler",
+    "clients": "Müşteriler"
+  }
+}

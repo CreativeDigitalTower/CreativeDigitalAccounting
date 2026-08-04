@@ -1184,6 +1184,12 @@ model Subscription {
   currentPeriodStart   DateTime?
   currentPeriodEnd     DateTime?
   trialUsed            Boolean            @default(false)
+  // Гъвкава отстъпка върху абонамента (0–100 %), независима от плана/billing.
+  // Източникът се пази в discountReason (напр. multi_company_additional, promo_*,
+  // individual_*), за да могат в бъдеще да се добавят кампании/индивидуални отстъпки
+  // без промяна на архитектурата. null = без отстъпка.
+  discountPercent      Int?
+  discountReason       String?
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }

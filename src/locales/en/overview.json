@@ -1,0 +1,23 @@
+{
+  "title": "Overview",
+  "subtitle": "Management overview across {n} companies.",
+  "revenueByCompany": "Revenue by company",
+  "empty": "No data.",
+  "open": "➡ Open",
+  "kpi": {
+    "revenue": "Total revenue",
+    "receivables": "Total receivables",
+    "overdue": "Overdue invoices",
+    "documents": "Documents issued",
+    "clients": "Clients",
+    "companies": "Companies"
+  },
+  "th": {
+    "company": "Company",
+    "revenue": "Revenue",
+    "receivables": "Receivables",
+    "overdue": "Overdue",
+    "documents": "Documents",
+    "clients": "Clients"
+  }
+}

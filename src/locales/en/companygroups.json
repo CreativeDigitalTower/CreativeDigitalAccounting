@@ -1,0 +1,10 @@
+{
+  "title": "Company groups",
+  "subtitle": "{n} owners with multiple companies.",
+  "backAdmin": "Back to Super Admin",
+  "grandMrr": "Total MRR",
+  "grandArr": "Total ARR",
+  "empty": "No owners with multiple companies.",
+  "companies": "{n} companies",
+  "note": "Read-only. Transferring/adding/removing a company to a user is coming soon."
+}

@@ -6,7 +6,8 @@
     "emails": "Email & ειδοποιήσεις",
     "blog": "Blog",
     "businesses": "Επιχειρήσεις (φίλτρα ανά τομέα/πλάνο)",
-    "deletedDocs": "Διαγραμμένα έγγραφα"
+    "deletedDocs": "Διαγραμμένα έγγραφα",
+    "companyGroups": "Ομάδες εταιρειών"
   },
   "companiesWord": "εταιρείες",
   "ranges": {
