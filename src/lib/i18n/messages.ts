@@ -48,6 +48,9 @@ import bgChrome from "@/locales/bg/chrome.json";
 import bgPublicdoc from "@/locales/bg/publicdoc.json";
 import bgPlatformbi from "@/locales/bg/platformbi.json";
 import bgTracking from "@/locales/bg/tracking.json";
+import bgMyCompanies from "@/locales/bg/mycompanies.json";
+import bgOverview from "@/locales/bg/overview.json";
+import bgCompanyGroups from "@/locales/bg/companygroups.json";
 import enCommon from "@/locales/en/common.json";
 import enNav from "@/locales/en/navigation.json";
 import enAuth from "@/locales/en/auth.json";
@@ -93,6 +96,9 @@ import enChrome from "@/locales/en/chrome.json";
 import enPublicdoc from "@/locales/en/publicdoc.json";
 import enPlatformbi from "@/locales/en/platformbi.json";
 import enTracking from "@/locales/en/tracking.json";
+import enMyCompanies from "@/locales/en/mycompanies.json";
+import enOverview from "@/locales/en/overview.json";
+import enCompanyGroups from "@/locales/en/companygroups.json";
 import ruCommon from "@/locales/ru/common.json";
 import ruNav from "@/locales/ru/navigation.json";
 import ruAuth from "@/locales/ru/auth.json";
@@ -138,6 +144,9 @@ import ruChrome from "@/locales/ru/chrome.json";
 import ruPublicdoc from "@/locales/ru/publicdoc.json";
 import ruPlatformbi from "@/locales/ru/platformbi.json";
 import ruTracking from "@/locales/ru/tracking.json";
+import ruMyCompanies from "@/locales/ru/mycompanies.json";
+import ruOverview from "@/locales/ru/overview.json";
+import ruCompanyGroups from "@/locales/ru/companygroups.json";
 import roCommon from "@/locales/ro/common.json";
 import roNav from "@/locales/ro/navigation.json";
 import roAuth from "@/locales/ro/auth.json";
@@ -183,6 +192,9 @@ import roChrome from "@/locales/ro/chrome.json";
 import roPublicdoc from "@/locales/ro/publicdoc.json";
 import roPlatformbi from "@/locales/ro/platformbi.json";
 import roTracking from "@/locales/ro/tracking.json";
+import roMyCompanies from "@/locales/ro/mycompanies.json";
+import roOverview from "@/locales/ro/overview.json";
+import roCompanyGroups from "@/locales/ro/companygroups.json";
 import trCommon from "@/locales/tr/common.json";
 import trNav from "@/locales/tr/navigation.json";
 import trAuth from "@/locales/tr/auth.json";
@@ -228,6 +240,9 @@ import trChrome from "@/locales/tr/chrome.json";
 import trPublicdoc from "@/locales/tr/publicdoc.json";
 import trPlatformbi from "@/locales/tr/platformbi.json";
 import trTracking from "@/locales/tr/tracking.json";
+import trMyCompanies from "@/locales/tr/mycompanies.json";
+import trOverview from "@/locales/tr/overview.json";
+import trCompanyGroups from "@/locales/tr/companygroups.json";
 import elCommon from "@/locales/el/common.json";
 import elNav from "@/locales/el/navigation.json";
 import elAuth from "@/locales/el/auth.json";
@@ -273,17 +288,20 @@ import elChrome from "@/locales/el/chrome.json";
 import elPublicdoc from "@/locales/el/publicdoc.json";
 import elPlatformbi from "@/locales/el/platformbi.json";
 import elTracking from "@/locales/el/tracking.json";
+import elMyCompanies from "@/locales/el/mycompanies.json";
+import elOverview from "@/locales/el/overview.json";
+import elCompanyGroups from "@/locales/el/companygroups.json";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Messages = Record<string, any>;
 
 const DICTS: Record<Locale, Messages> = {
-  bg: { common: bgCommon, navigation: bgNav, auth: bgAuth, bi: bgBi, pdf: bgPdf, emails: bgEmails, notifications: bgNotif, clients: bgClients, suppliers: bgSuppliers, expenses: bgExpenses, contracts: bgContracts, projects: bgProjects, warehouse: bgWarehouse, employees: bgEmployees, documents: bgDocuments, assets: bgAssets, modules: bgModules, account: bgAccount, subdocs: bgSubdocs, haccp: bgHaccp, pm: bgPm, portal: bgPortal, admin: bgAdmin, mailattach: bgMailattach, marketing: bgMarketing, pricing: bgPricing, register: bgRegister, enums: bgEnums, admintools: bgAdmintools, production: bgProduction, misc: bgMisc, firmbi: bgFirmbi, sectors: bgSectors, finance: bgFinance, widgets: bgWidgets, simulators: bgSimulators, blog: bgBlog, bizdocs: bgBizdocs, tools: bgTools, billing: bgBilling, blogpublic: bgBlogpublic, chrome: bgChrome, publicdoc: bgPublicdoc, platformbi: bgPlatformbi, tracking: bgTracking },
-  en: { common: enCommon, navigation: enNav, auth: enAuth, bi: enBi, pdf: enPdf, emails: enEmails, notifications: enNotif, clients: enClients, suppliers: enSuppliers, expenses: enExpenses, contracts: enContracts, projects: enProjects, warehouse: enWarehouse, employees: enEmployees, documents: enDocuments, assets: enAssets, modules: enModules, account: enAccount, subdocs: enSubdocs, haccp: enHaccp, pm: enPm, portal: enPortal, admin: enAdmin, mailattach: enMailattach, marketing: enMarketing, pricing: enPricing, register: enRegister, enums: enEnums, admintools: enAdmintools, production: enProduction, misc: enMisc, firmbi: enFirmbi, sectors: enSectors, finance: enFinance, widgets: enWidgets, simulators: enSimulators, blog: enBlog, bizdocs: enBizdocs, tools: enTools, billing: enBilling, blogpublic: enBlogpublic, chrome: enChrome, publicdoc: enPublicdoc, platformbi: enPlatformbi, tracking: enTracking },
-  ru: { common: ruCommon, navigation: ruNav, auth: ruAuth, bi: ruBi, pdf: ruPdf, emails: ruEmails, notifications: ruNotif, clients: ruClients, suppliers: ruSuppliers, expenses: ruExpenses, contracts: ruContracts, projects: ruProjects, warehouse: ruWarehouse, employees: ruEmployees, documents: ruDocuments, assets: ruAssets, modules: ruModules, account: ruAccount, subdocs: ruSubdocs, haccp: ruHaccp, pm: ruPm, portal: ruPortal, admin: ruAdmin, mailattach: ruMailattach, marketing: ruMarketing, pricing: ruPricing, register: ruRegister, enums: ruEnums, admintools: ruAdmintools, production: ruProduction, misc: ruMisc, firmbi: ruFirmbi, sectors: ruSectors, finance: ruFinance, widgets: ruWidgets, simulators: ruSimulators, blog: ruBlog, bizdocs: ruBizdocs, tools: ruTools, billing: ruBilling, blogpublic: ruBlogpublic, chrome: ruChrome, publicdoc: ruPublicdoc, platformbi: ruPlatformbi, tracking: ruTracking },
-  ro: { common: roCommon, navigation: roNav, auth: roAuth, bi: roBi, pdf: roPdf, emails: roEmails, notifications: roNotif, clients: roClients, suppliers: roSuppliers, expenses: roExpenses, contracts: roContracts, projects: roProjects, warehouse: roWarehouse, employees: roEmployees, documents: roDocuments, assets: roAssets, modules: roModules, account: roAccount, subdocs: roSubdocs, haccp: roHaccp, pm: roPm, portal: roPortal, admin: roAdmin, mailattach: roMailattach, marketing: roMarketing, pricing: roPricing, register: roRegister, enums: roEnums, admintools: roAdmintools, production: roProduction, misc: roMisc, firmbi: roFirmbi, sectors: roSectors, finance: roFinance, widgets: roWidgets, simulators: roSimulators, blog: roBlog, bizdocs: roBizdocs, tools: roTools, billing: roBilling, blogpublic: roBlogpublic, chrome: roChrome, publicdoc: roPublicdoc, platformbi: roPlatformbi, tracking: roTracking },
-  tr: { common: trCommon, navigation: trNav, auth: trAuth, bi: trBi, pdf: trPdf, emails: trEmails, notifications: trNotif, clients: trClients, suppliers: trSuppliers, expenses: trExpenses, contracts: trContracts, projects: trProjects, warehouse: trWarehouse, employees: trEmployees, documents: trDocuments, assets: trAssets, modules: trModules, account: trAccount, subdocs: trSubdocs, haccp: trHaccp, pm: trPm, portal: trPortal, admin: trAdmin, mailattach: trMailattach, marketing: trMarketing, pricing: trPricing, register: trRegister, enums: trEnums, admintools: trAdmintools, production: trProduction, misc: trMisc, firmbi: trFirmbi, sectors: trSectors, finance: trFinance, widgets: trWidgets, simulators: trSimulators, blog: trBlog, bizdocs: trBizdocs, tools: trTools, billing: trBilling, blogpublic: trBlogpublic, chrome: trChrome, publicdoc: trPublicdoc, platformbi: trPlatformbi, tracking: trTracking },
-  el: { common: elCommon, navigation: elNav, auth: elAuth, bi: elBi, pdf: elPdf, emails: elEmails, notifications: elNotif, clients: elClients, suppliers: elSuppliers, expenses: elExpenses, contracts: elContracts, projects: elProjects, warehouse: elWarehouse, employees: elEmployees, documents: elDocuments, assets: elAssets, modules: elModules, account: elAccount, subdocs: elSubdocs, haccp: elHaccp, pm: elPm, portal: elPortal, admin: elAdmin, mailattach: elMailattach, marketing: elMarketing, pricing: elPricing, register: elRegister, enums: elEnums, admintools: elAdmintools, production: elProduction, misc: elMisc, firmbi: elFirmbi, sectors: elSectors, finance: elFinance, widgets: elWidgets, simulators: elSimulators, blog: elBlog, bizdocs: elBizdocs, tools: elTools, billing: elBilling, blogpublic: elBlogpublic, chrome: elChrome, publicdoc: elPublicdoc, platformbi: elPlatformbi, tracking: elTracking },
+  bg: { common: bgCommon, navigation: bgNav, auth: bgAuth, bi: bgBi, pdf: bgPdf, emails: bgEmails, notifications: bgNotif, clients: bgClients, suppliers: bgSuppliers, expenses: bgExpenses, contracts: bgContracts, projects: bgProjects, warehouse: bgWarehouse, employees: bgEmployees, documents: bgDocuments, assets: bgAssets, modules: bgModules, account: bgAccount, subdocs: bgSubdocs, haccp: bgHaccp, pm: bgPm, portal: bgPortal, admin: bgAdmin, mailattach: bgMailattach, marketing: bgMarketing, pricing: bgPricing, register: bgRegister, enums: bgEnums, admintools: bgAdmintools, production: bgProduction, misc: bgMisc, firmbi: bgFirmbi, sectors: bgSectors, finance: bgFinance, widgets: bgWidgets, simulators: bgSimulators, blog: bgBlog, bizdocs: bgBizdocs, tools: bgTools, billing: bgBilling, blogpublic: bgBlogpublic, chrome: bgChrome, publicdoc: bgPublicdoc, platformbi: bgPlatformbi, tracking: bgTracking, myCompanies: bgMyCompanies, overview: bgOverview, companyGroups: bgCompanyGroups },
+  en: { common: enCommon, navigation: enNav, auth: enAuth, bi: enBi, pdf: enPdf, emails: enEmails, notifications: enNotif, clients: enClients, suppliers: enSuppliers, expenses: enExpenses, contracts: enContracts, projects: enProjects, warehouse: enWarehouse, employees: enEmployees, documents: enDocuments, assets: enAssets, modules: enModules, account: enAccount, subdocs: enSubdocs, haccp: enHaccp, pm: enPm, portal: enPortal, admin: enAdmin, mailattach: enMailattach, marketing: enMarketing, pricing: enPricing, register: enRegister, enums: enEnums, admintools: enAdmintools, production: enProduction, misc: enMisc, firmbi: enFirmbi, sectors: enSectors, finance: enFinance, widgets: enWidgets, simulators: enSimulators, blog: enBlog, bizdocs: enBizdocs, tools: enTools, billing: enBilling, blogpublic: enBlogpublic, chrome: enChrome, publicdoc: enPublicdoc, platformbi: enPlatformbi, tracking: enTracking, myCompanies: enMyCompanies, overview: enOverview, companyGroups: enCompanyGroups },
+  ru: { common: ruCommon, navigation: ruNav, auth: ruAuth, bi: ruBi, pdf: ruPdf, emails: ruEmails, notifications: ruNotif, clients: ruClients, suppliers: ruSuppliers, expenses: ruExpenses, contracts: ruContracts, projects: ruProjects, warehouse: ruWarehouse, employees: ruEmployees, documents: ruDocuments, assets: ruAssets, modules: ruModules, account: ruAccount, subdocs: ruSubdocs, haccp: ruHaccp, pm: ruPm, portal: ruPortal, admin: ruAdmin, mailattach: ruMailattach, marketing: ruMarketing, pricing: ruPricing, register: ruRegister, enums: ruEnums, admintools: ruAdmintools, production: ruProduction, misc: ruMisc, firmbi: ruFirmbi, sectors: ruSectors, finance: ruFinance, widgets: ruWidgets, simulators: ruSimulators, blog: ruBlog, bizdocs: ruBizdocs, tools: ruTools, billing: ruBilling, blogpublic: ruBlogpublic, chrome: ruChrome, publicdoc: ruPublicdoc, platformbi: ruPlatformbi, tracking: ruTracking, myCompanies: ruMyCompanies, overview: ruOverview, companyGroups: ruCompanyGroups },
+  ro: { common: roCommon, navigation: roNav, auth: roAuth, bi: roBi, pdf: roPdf, emails: roEmails, notifications: roNotif, clients: roClients, suppliers: roSuppliers, expenses: roExpenses, contracts: roContracts, projects: roProjects, warehouse: roWarehouse, employees: roEmployees, documents: roDocuments, assets: roAssets, modules: roModules, account: roAccount, subdocs: roSubdocs, haccp: roHaccp, pm: roPm, portal: roPortal, admin: roAdmin, mailattach: roMailattach, marketing: roMarketing, pricing: roPricing, register: roRegister, enums: roEnums, admintools: roAdmintools, production: roProduction, misc: roMisc, firmbi: roFirmbi, sectors: roSectors, finance: roFinance, widgets: roWidgets, simulators: roSimulators, blog: roBlog, bizdocs: roBizdocs, tools: roTools, billing: roBilling, blogpublic: roBlogpublic, chrome: roChrome, publicdoc: roPublicdoc, platformbi: roPlatformbi, tracking: roTracking, myCompanies: roMyCompanies, overview: roOverview, companyGroups: roCompanyGroups },
+  tr: { common: trCommon, navigation: trNav, auth: trAuth, bi: trBi, pdf: trPdf, emails: trEmails, notifications: trNotif, clients: trClients, suppliers: trSuppliers, expenses: trExpenses, contracts: trContracts, projects: trProjects, warehouse: trWarehouse, employees: trEmployees, documents: trDocuments, assets: trAssets, modules: trModules, account: trAccount, subdocs: trSubdocs, haccp: trHaccp, pm: trPm, portal: trPortal, admin: trAdmin, mailattach: trMailattach, marketing: trMarketing, pricing: trPricing, register: trRegister, enums: trEnums, admintools: trAdmintools, production: trProduction, misc: trMisc, firmbi: trFirmbi, sectors: trSectors, finance: trFinance, widgets: trWidgets, simulators: trSimulators, blog: trBlog, bizdocs: trBizdocs, tools: trTools, billing: trBilling, blogpublic: trBlogpublic, chrome: trChrome, publicdoc: trPublicdoc, platformbi: trPlatformbi, tracking: trTracking, myCompanies: trMyCompanies, overview: trOverview, companyGroups: trCompanyGroups },
+  el: { common: elCommon, navigation: elNav, auth: elAuth, bi: elBi, pdf: elPdf, emails: elEmails, notifications: elNotif, clients: elClients, suppliers: elSuppliers, expenses: elExpenses, contracts: elContracts, projects: elProjects, warehouse: elWarehouse, employees: elEmployees, documents: elDocuments, assets: elAssets, modules: elModules, account: elAccount, subdocs: elSubdocs, haccp: elHaccp, pm: elPm, portal: elPortal, admin: elAdmin, mailattach: elMailattach, marketing: elMarketing, pricing: elPricing, register: elRegister, enums: elEnums, admintools: elAdmintools, production: elProduction, misc: elMisc, firmbi: elFirmbi, sectors: elSectors, finance: elFinance, widgets: elWidgets, simulators: elSimulators, blog: elBlog, bizdocs: elBizdocs, tools: elTools, billing: elBilling, blogpublic: elBlogpublic, chrome: elChrome, publicdoc: elPublicdoc, platformbi: elPlatformbi, tracking: elTracking, myCompanies: elMyCompanies, overview: elOverview, companyGroups: elCompanyGroups },
 };
 
 // Дълбоко сливане: липсващ ключ пада обратно към българския (никога raw key на екрана).

@@ -1,0 +1,23 @@
+{
+  "title": "Vedere de ansamblu",
+  "subtitle": "Prezentare managerială pentru {n} firme.",
+  "revenueByCompany": "Venit pe firmă",
+  "empty": "Fără date.",
+  "open": "➡ Deschide",
+  "kpi": {
+    "revenue": "Venit total",
+    "receivables": "Creanțe totale",
+    "overdue": "Facturi restante",
+    "documents": "Documente emise",
+    "clients": "Clienți",
+    "companies": "Firme"
+  },
+  "th": {
+    "company": "Firmă",
+    "revenue": "Venituri",
+    "receivables": "Creanțe",
+    "overdue": "Restante",
+    "documents": "Documente",
+    "clients": "Clienți"
+  }
+}

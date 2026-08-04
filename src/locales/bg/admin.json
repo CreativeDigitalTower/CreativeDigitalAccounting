@@ -6,7 +6,8 @@
     "emails": "Имейли & известия",
     "blog": "Блог",
     "businesses": "Бизнеси (филтри по сектор/план)",
-    "deletedDocs": "Изтрити документи"
+    "deletedDocs": "Изтрити документи",
+    "companyGroups": "Групи фирми"
   },
   "companiesWord": "фирми",
   "ranges": {

@@ -1,0 +1,10 @@
+{
+  "title": "Şirket grupları",
+  "subtitle": "Birden fazla şirketi olan {n} sahip.",
+  "backAdmin": "Super Admin'e dön",
+  "grandMrr": "Toplam MRR",
+  "grandArr": "Toplam ARR",
+  "empty": "Birden fazla şirketi olan sahip yok.",
+  "companies": "{n} şirket",
+  "note": "Yalnızca görüntüleme. Şirketi bir kullanıcıya aktarma/ekleme/kaldırma yakında."
+}

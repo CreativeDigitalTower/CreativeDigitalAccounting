@@ -6,7 +6,8 @@
     "emails": "Emails & notifications",
     "blog": "Blog",
     "businesses": "Businesses (filter by sector/plan)",
-    "deletedDocs": "Deleted documents"
+    "deletedDocs": "Deleted documents",
+    "companyGroups": "Company groups"
   },
   "companiesWord": "companies",
   "ranges": {

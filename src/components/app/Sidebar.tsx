@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { planHasFeature, type PlanId } from "@/lib/constants";
 import { NavIcon } from "@/components/app/NavIcons";
+import { CompanySwitcher, type SwitcherCompany } from "@/components/app/CompanySwitcher";
 import { useT } from "@/components/i18n/I18nProvider";
 
 // Навигацията е групирана в логични сектори за по-ясен и структуриран изглед.
@@ -13,6 +14,7 @@ const navGroups: { title: string; titleKey: string; items: { href: string; label
     title: "Общ преглед", titleKey: "navigation.groups.overview",
     items: [
       { href: "/dashboard", label: "Табло", icon: "dashboard", feature: "dashboard", tKey: "navigation.dashboard" },
+      { href: "/dashboard/overview", label: "Обобщен изглед", icon: "analytics", feature: "dashboard", tKey: "navigation.overview" },
       { href: "/dashboard/pm", label: "Project Management", icon: "projects", feature: "project_management", tKey: "navigation.projectManagement" },
       { href: "/dashboard/analytics", label: "Анализи", icon: "analytics", feature: "analytics", tKey: "navigation.analytics" },
     ],
@@ -67,6 +69,7 @@ const navGroups: { title: string; titleKey: string; items: { href: string; label
   {
     title: "Профил", titleKey: "navigation.groups.profile",
     items: [
+      { href: "/dashboard/companies", label: "Моите фирми", icon: "clients", feature: "dashboard", tKey: "navigation.myCompanies" },
       { href: "/dashboard/settings", label: "Профил на фирмата", icon: "settings", feature: "dashboard", tKey: "navigation.settings" },
       { href: "/dashboard/subscription", label: "Абонамент", icon: "subscription", feature: "dashboard", tKey: "navigation.subscription" },
     ],
@@ -79,9 +82,12 @@ interface SidebarProps {
   isSuperAdmin?: boolean;
   logoUrl?: string | null;
   inboxUnread?: number;
+  companyEik?: string | null;
+  companies?: SwitcherCompany[];
+  activeCompanyId?: string;
 }
 
-export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread = 0 }: SidebarProps) {
+export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread = 0, companyEik = null, companies = [], activeCompanyId = "" }: SidebarProps) {
   const pathname = usePathname();
   const t = useT();
   const planId = plan as PlanId;
@@ -107,7 +113,10 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
         <Logo dark />
       </div>
 
-      {/* Company chip — links to company profile */}
+      {/* Превключвател на фирма (при няколко) или чип към профила (при една). */}
+      {companies.length > 1 ? (
+        <CompanySwitcher companies={companies} activeId={activeCompanyId} activeName={companyName} activeEik={companyEik} logoUrl={logoUrl ?? null} />
+      ) : (
       <Link
         href="/dashboard/settings"
         title="Профил на фирмата"
@@ -136,6 +145,7 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
         )}
         <div style={{ fontWeight: 600, color: "#E9E7DA", fontSize: 13 }}>{companyName}</div>
       </Link>
+      )}
 
       {/* Navigation — групирана по сектори */}
       <nav style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1 }}>

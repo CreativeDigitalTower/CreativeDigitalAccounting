@@ -1,0 +1,10 @@
+{
+  "title": "Grupuri de firme",
+  "subtitle": "{n} proprietari cu mai multe firme.",
+  "backAdmin": "Înapoi la Super Admin",
+  "grandMrr": "MRR total",
+  "grandArr": "ARR total",
+  "empty": "Niciun proprietar cu mai multe firme.",
+  "companies": "{n} firme",
+  "note": "Doar vizualizare. Transferul/adăugarea/eliminarea unei firme către un utilizator urmează."
+}

@@ -6,7 +6,8 @@
     "emails": "E-postalar ve bildirimler",
     "blog": "Blog",
     "businesses": "İşletmeler (sektör/plan filtreleri)",
-    "deletedDocs": "Silinen belgeler"
+    "deletedDocs": "Silinen belgeler",
+    "companyGroups": "Şirket grupları"
   },
   "companiesWord": "şirket",
   "ranges": {
