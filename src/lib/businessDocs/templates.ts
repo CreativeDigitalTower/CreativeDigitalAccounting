@@ -1,4 +1,5 @@
 import { applyVariables, resolveVariables, type VariableContext } from "./variables";
+import { HACCP_CATEGORY, HACCP_BUILDERS } from "./haccp";
 
 export type Complexity = "easy" | "medium" | "detailed";
 
@@ -231,6 +232,8 @@ const CUSTOM_BY_ID: Record<string, (v: Record<string, string>) => string> = {
 
 // ─── Специфични шаблони (професионална структура) ───
 const CUSTOM: Record<string, (v: Record<string, string>) => string> = {
+  // HACCP дневници/регистри/контролни листове (модулно, по title).
+  ...HACCP_BUILDERS,
   "Споразумение за конфиденциалност (NDA)": () => `
     <h1 style="${H}">Споразумение за конфиденциалност (NDA)</h1>
     ${meta()}
@@ -893,6 +896,8 @@ export const CATEGORIES: CategoryDef[] = [
     templates: ["Декларация по образец", "Декларация за съгласие", "Декларация за свързани лица", "Декларация за достоверност", "Декларация за липса на конфликт на интереси"].map((t) => ({ title: t })) },
   { id: "correspondence", title: "Кореспонденция", icon: "", description: "Имейл шаблони, покани и благодарствени писма.",
     templates: ["Имейл шаблон", "Покана", "Благодарствено писмо", "Напомнително писмо", "Извинително писмо", "Поздравително писмо"].map((t) => ({ title: t, complexity: "easy" as Complexity })) },
+  // HACCP / хранителна безопасност — професионален комплект дневници и регистри.
+  HACCP_CATEGORY,
 ];
 
 const DEFAULT_AUTO = ["Име на фирмата", "ЕИК", "Адрес", "Управител", "Дата", "Номер на документа"];
