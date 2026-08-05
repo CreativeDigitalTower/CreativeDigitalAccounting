@@ -2,6 +2,12 @@ import { applyVariables, resolveVariables, type VariableContext } from "./variab
 
 export type Complexity = "easy" | "medium" | "detailed";
 
+// Източник на данни за автоматичното попълване. Всеки шаблон „знае" откъде да
+// вземе данните: HR документи → Служител, документи към доставчици → Доставчик,
+// оферти/протоколи към клиенти → Клиент, а чисто фирмени/декларации → без
+// контрагент. (Бъдещи: vehicle/warehouse/production/project.)
+export type DataSource = "client" | "employee" | "supplier" | "none";
+
 export type TemplateDef = {
   title: string;
   description?: string;
@@ -9,6 +15,7 @@ export type TemplateDef = {
   complexity?: Complexity;
   estMinutes?: string;
   userFields?: string[];
+  dataSource?: DataSource;
   build?: (v: Record<string, string>) => string;
 };
 
@@ -24,6 +31,9 @@ export type CategoryDef = {
   // тези ЕИК. За да стане публична — премахни полето. За още фирми — добави ЕИК.
   // (архитектура за персонализирани → публични функционалности)
   restrictToEiks?: string[];
+  // Източник на данни по подразбиране за шаблоните в категорията (може да се
+  // предефинира per-шаблон чрез TemplateDef.dataSource).
+  dataSource?: DataSource;
   templates: TemplateDef[];
 };
 
@@ -40,6 +50,7 @@ export type Template = TemplateDef & {
   estMinutes: string;
   autoFields: string[];
   userFields: string[];
+  dataSource: DataSource;
 };
 
 // ─── Помощни функции за изграждане на тялото на документа ───
@@ -886,6 +897,23 @@ export const CATEGORIES: CategoryDef[] = [
 
 const DEFAULT_AUTO = ["Име на фирмата", "ЕИК", "Адрес", "Управител", "Дата", "Номер на документа"];
 
+// Източник на данни по категория (когато не е зададен per-шаблон). Определя кой
+// контрагент се избира в UI и кои {{…}} се попълват автоматично. Категории без
+// вписване тук ползват "none" (само фирмени данни / ръчно попълване).
+const CATEGORY_DATA_SOURCE: Record<string, DataSource> = {
+  hr: "employee",
+  suppliers: "supplier",
+  clients: "client",
+  acceptance: "client",
+  protocols: "client",
+  construction: "client",
+};
+
+/** Ефективният източник на данни за шаблон (per-шаблон → категория → "none"). */
+export function templateDataSource(tpl: { dataSource?: DataSource; categoryId: string }): DataSource {
+  return tpl.dataSource ?? CATEGORY_DATA_SOURCE[tpl.categoryId] ?? "none";
+}
+
 // Плоска, индексирана библиотека (id-та са стабилни докато редът не се променя — добавяй в края)
 export const TEMPLATES: Template[] = CATEGORIES.flatMap((cat) =>
   cat.templates.map((t, i): Template => ({
@@ -902,6 +930,7 @@ export const TEMPLATES: Template[] = CATEGORIES.flatMap((cat) =>
     estMinutes: t.estMinutes ?? "около 2–3 минути",
     autoFields: DEFAULT_AUTO,
     userFields: t.userFields ?? ["Конкретни данни според случая", "Страни / получател", "Предмет и условия"],
+    dataSource: t.dataSource ?? cat.dataSource ?? CATEGORY_DATA_SOURCE[cat.id] ?? "none",
   }))
 );
 
