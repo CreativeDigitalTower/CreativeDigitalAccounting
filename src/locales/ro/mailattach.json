@@ -48,10 +48,11 @@
     "replace": "Înlocuiește",
     "remove": "Elimină",
     "errNetwork": "Fără conexiune la server. Verificați internetul și reîncercați.",
-    "errServerTooLarge": "Fișierul este prea mare pentru server. Reduceți dimensiunea sau contactați un administrator (limită server).",
+    "errServerTooLarge": "Fișierul se încadrează în dimensiunea permisă, dar serverul/proxy l-a respins. Încercați din nou sau contactați-ne.",
     "errForbidden": "Nu aveți permisiune pentru această acțiune.",
     "errSave": "Eroare la salvarea pe server. Reîncercați.",
-    "pages": "{n} pag."
+    "pages": "{n} pag.",
+    "tooLargeExact": "Fișierul este {size}, dar dimensiunea maximă permisă este {max}."
   },
   "send": {
     "invalidManual": "Adresă de email invalidă.",

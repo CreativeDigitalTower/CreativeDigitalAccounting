@@ -3,19 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { validatePdfUpload, formatFileSize, MAX_ATTACHMENT_BYTES } from "@/lib/attachments";
+// formatFileSize/MAX_ATTACHMENT_BYTES — единен източник на лимита за UI + валидация.
 
 export type Attachment = {
   id: string; filename: string; originalFilename: string; mimeType: string; size: number; pages?: number | null; createdAt: string;
 };
-
-function fileToDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const r = new FileReader();
-    r.onload = () => resolve(r.result as string);
-    r.onerror = reject;
-    r.readAsDataURL(file);
-  });
-}
 
 /** Груб брой страници на PDF (по /Type /Page обектите). „ако може" — best-effort. */
 async function countPdfPages(file: File): Promise<number | undefined> {
@@ -52,34 +44,40 @@ export function InvoiceAttachments({ documentId, initial }: { documentId: string
 
   async function upload(file: File, replaceAttId?: string | null) {
     setError("");
-    // Клиентска валидация (сървърът валидира отново)
+    // Клиентска валидация (сървърът валидира отново по magic bytes).
     const v = validatePdfUpload({ filename: file.name, mimeType: file.type, size: file.size });
     if (!v.ok) { setError(v.error); return; }
-    if (file.size > MAX_ATTACHMENT_BYTES) { setError(t("mailattach.attach.tooLarge")); return; }
+    if (file.size > MAX_ATTACHMENT_BYTES) {
+      // Точно съобщение с реалния размер, вместо общо „твърде голям".
+      setError(t("mailattach.attach.tooLargeExact", { size: formatFileSize(file.size), max: formatFileSize(MAX_ATTACHMENT_BYTES) }));
+      return;
+    }
     setBusy(true);
     try {
-      const [dataUrl, pages] = await Promise.all([fileToDataUrl(file), countPdfPages(file)]);
-      const payload = { filename: file.name, mimeType: file.type || "application/pdf", size: file.size, pages, dataUrl };
+      // BINARY качване през multipart/form-data — без base64 инфлация по мрежата.
+      const pages = await countPdfPages(file);
+      const fd = new FormData();
+      fd.append("file", file, file.name);
+      fd.append("filename", file.name);
+      if (pages) fd.append("pages", String(pages));
       const url = replaceAttId ? `${base}/${replaceAttId}` : base;
       let res: Response;
       try {
-        res = await fetch(url, {
-          method: replaceAttId ? "PUT" : "POST",
-          headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
-        });
+        res = await fetch(url, { method: replaceAttId ? "PUT" : "POST", body: fd });
       } catch {
-        // Мрежова/сървърна грешка преди отговор (напр. прекъсната връзка)
         setError(t("mailattach.attach.errNetwork")); return;
       }
       if (!res.ok) {
-        // Показваме реалната причина, не общо „Неуспешно качване".
-        // 413 обикновено идва от лимит на реверс-прокси (client_max_body_size).
-        if (res.status === 413) { setError(t("mailattach.attach.errServerTooLarge")); return; }
+        let body: { error?: string; requestId?: string } = {};
+        try { body = await res.json(); } catch { /* не-JSON (HTML от прокси при 413) */ }
+        const ref = body.requestId ? ` (${body.requestId.slice(0, 8)})` : "";
+        if (res.status === 413) {
+          // Файлът е под лимита на приложението, но прокси/сървър го отхвърли.
+          setError((body.error || t("mailattach.attach.errServerTooLarge")) + ref); return;
+        }
         if (res.status === 401 || res.status === 403) { setError(t("mailattach.attach.errForbidden")); return; }
-        let msg = "";
-        try { msg = (await res.json())?.error ?? ""; } catch { /* не-JSON отговор (HTML от прокси/сървър) */ }
-        if (!msg) msg = res.status >= 500 ? t("mailattach.attach.errSave") : t("mailattach.attach.errUpload");
-        setError(msg); return;
+        if (body.error) { setError(body.error + ref); return; }
+        setError((res.status >= 500 ? t("mailattach.attach.errSave") : t("mailattach.attach.errUpload")) + ref); return;
       }
       const data = await res.json();
       setItems((prev) => replaceAttId ? prev.map((a) => (a.id === replaceAttId ? data : a)) : [...prev, data]);
