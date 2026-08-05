@@ -1,0 +1,18 @@
+{
+  "title": "Vehicles",
+  "subtitle": "Company vehicles for waybills and fuel reports.",
+  "add": "➕ Add vehicle",
+  "cancel": "Cancel",
+  "save": "Save",
+  "reg": "Reg. plate",
+  "brand": "Make",
+  "model": "Model",
+  "fuel": "Fuel",
+  "norm": "Consumption norm (l/100km)",
+  "tank": "Tank (l)",
+  "year": "Year",
+  "vin": "VIN",
+  "empty": "No vehicles added.",
+  "errReg": "Enter a registration plate.",
+  "errGeneric": "Save error."
+}

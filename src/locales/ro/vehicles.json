@@ -1,0 +1,18 @@
+{
+  "title": "Vehicule",
+  "subtitle": "Vehiculele firmei pentru foi de parcurs și rapoarte de combustibil.",
+  "add": "➕ Adaugă vehicul",
+  "cancel": "Anulează",
+  "save": "Salvează",
+  "reg": "Nr. înmatriculare",
+  "brand": "Marcă",
+  "model": "Model",
+  "fuel": "Combustibil",
+  "norm": "Normă consum (l/100km)",
+  "tank": "Rezervor (l)",
+  "year": "An",
+  "vin": "VIN",
+  "empty": "Niciun vehicul adăugat.",
+  "errReg": "Introduceți numărul de înmatriculare.",
+  "errGeneric": "Eroare la salvare."
+}

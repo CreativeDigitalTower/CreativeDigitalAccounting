@@ -204,6 +204,8 @@
     "pickEmployee": "Çalışan (otomatik doldurma için)",
     "noEmployee": "Çalışan yok",
     "pickSupplier": "Tedarikçi (otomatik doldurma için)",
-    "noSupplier": "Tedarikçi yok"
+    "noSupplier": "Tedarikçi yok",
+    "pickVehicle": "Araç (otomatik doldurma için)",
+    "noVehicle": "Araç yok"
   }
 }

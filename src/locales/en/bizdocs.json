@@ -204,6 +204,8 @@
     "pickEmployee": "Employee (for auto-fill)",
     "noEmployee": "No employee",
     "pickSupplier": "Supplier (for auto-fill)",
-    "noSupplier": "No supplier"
+    "noSupplier": "No supplier",
+    "pickVehicle": "Vehicle (for auto-fill)",
+    "noVehicle": "No vehicle"
   }
 }

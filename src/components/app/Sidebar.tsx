@@ -48,6 +48,7 @@ const navGroups: { title: string; titleKey: string; items: { href: string; label
       { href: "/dashboard/haccp", label: "HACCP", icon: "haccp", feature: "haccp", tKey: "navigation.haccp" },
       { href: "/dashboard/projects", label: "Проекти", icon: "projects", feature: "projects", tKey: "navigation.projects" },
       { href: "/dashboard/assets", label: "Активи", icon: "assets", feature: "assets", tKey: "navigation.assets" },
+      { href: "/dashboard/vehicles", label: "Автомобили", icon: "suppliers", feature: "dashboard", tKey: "navigation.vehicles" },
     ],
   },
   {
