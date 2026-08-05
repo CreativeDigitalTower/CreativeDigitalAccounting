@@ -1,6 +1,7 @@
 import { applyVariables, resolveVariables, type VariableContext } from "./variables";
 import { HACCP_CATEGORY, HACCP_BUILDERS } from "./haccp";
 import { VEHICLE_CATEGORY, VEHICLE_BUILDERS } from "./vehicles";
+import { normalizeBusinessDoc } from "./normalize";
 
 export type Complexity = "easy" | "medium" | "detailed";
 
@@ -993,7 +994,16 @@ export function categoriesForCountry(country = "BG"): CategoryDef[] {
 export function buildDocumentHtml(template: Template, ctx: VariableContext): string {
   const vars = resolveVariables(ctx);
   const raw = (CUSTOM_BY_ID[template.id] ?? CUSTOM[template.title] ?? (() => genericBody(template.title)))(vars);
-  return applyVariables(raw, vars);
+  const html = applyVariables(raw, vars);
+  // Нормативен нормализатор: гарантира издателски ЕИК (официални документи) и
+  // клауза по чл. 313 НК (декларации) за НОВите документи. Идемпотентен.
+  return normalizeBusinessDoc(html, {
+    companyName: ctx.company?.name ?? null,
+    companyEik: ctx.company?.eik ?? null,
+    companyVat: ctx.company?.vatNumber ?? null,
+    categoryId: template.categoryId,
+    title: template.title,
+  });
 }
 
 export const RECOMMENDED_IDS = ["contracts-1", "contracts-10", "hr-1", "company-6", "clients-1", "finance-1"];
