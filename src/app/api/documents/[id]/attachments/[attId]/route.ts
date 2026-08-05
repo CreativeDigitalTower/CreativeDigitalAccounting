@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { requireCompany } from "@/lib/session";
 import { fileResponse } from "@/lib/fileSecurity";
-import { validatePdfUpload, sanitizePdfFilename, MAX_ATTACHMENT_BYTES } from "@/lib/attachments";
-import { z } from "zod";
+import { sanitizePdfFilename, bytesToPdfDataUrl } from "@/lib/attachments";
+import { readPdfMultipart } from "@/lib/attachmentUpload";
 
 /** Приложение, което принадлежи на документ на текущата фирма (company scoping). */
 async function ownedAttachment(companyId: string, docId: string, attId: string) {
@@ -29,35 +30,36 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   }
 }
 
-const putSchema = z.object({
-  filename: z.string().min(1).max(255),
-  mimeType: z.string().min(1),
-  size: z.number().int().positive().max(MAX_ATTACHMENT_BYTES, "Файлът е твърде голям (макс. 8 MB)."),
-  pages: z.number().int().positive().max(100000).optional().nullable(),
-  dataUrl: z.string().min(1),
-});
-
-// PUT → замяна на файла (пази същия ред/id)
+// PUT → замяна на файла (пази същия ред/id). Multipart binary, като POST.
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string; attId: string }> }) {
+  const requestId = randomUUID();
+  let companyId = "", userId = "", id = "", attId = "";
   try {
-    const { companyId, userId } = await requireCompany();
-    const { id, attId } = await params;
-    if (!(await ownedAttachment(companyId, id, attId))) return NextResponse.json({ error: "Не е намерен." }, { status: 404 });
-    const data = putSchema.parse(await req.json());
-    const v = validatePdfUpload(data);
-    if (!v.ok) return NextResponse.json({ error: v.error }, { status: 400 });
-    const att = await prisma.documentAttachment.update({
-      where: { id: attId },
-      data: {
-        filename: sanitizePdfFilename(data.filename), originalFilename: data.filename.slice(0, 255),
-        mimeType: "application/pdf", size: data.size, pages: data.pages ?? null, dataUrl: data.dataUrl, uploadedById: userId,
-      },
-      select: { id: true, filename: true, originalFilename: true, mimeType: true, size: true, pages: true, createdAt: true },
-    });
-    return NextResponse.json(att);
-  } catch (err) {
-    if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues[0]?.message ?? "Невалидни данни." }, { status: 400 });
-    return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
+    ({ companyId, userId } = await requireCompany());
+    ({ id, attId } = await params);
+    if (!(await ownedAttachment(companyId, id, attId))) return NextResponse.json({ error: "Не е намерен.", requestId }, { status: 404 });
+
+    const up = await readPdfMultipart(req);
+    if (!up.ok) {
+      console.warn("[attachment-replace] rejected", { requestId, companyId, userId, documentId: id, attId, code: up.code, status: up.status });
+      return NextResponse.json({ error: up.error, code: up.code, requestId }, { status: up.status });
+    }
+    try {
+      const att = await prisma.documentAttachment.update({
+        where: { id: attId },
+        data: {
+          filename: sanitizePdfFilename(up.filename), originalFilename: up.filename.slice(0, 255),
+          mimeType: "application/pdf", size: up.size, pages: up.pages, dataUrl: bytesToPdfDataUrl(up.bytes), uploadedById: userId,
+        },
+        select: { id: true, filename: true, originalFilename: true, mimeType: true, size: true, pages: true, createdAt: true },
+      });
+      return NextResponse.json(att);
+    } catch (dbErr) {
+      console.error("[attachment-replace] storage error", { requestId, companyId, documentId: id, attId, err: String(dbErr).slice(0, 200) });
+      return NextResponse.json({ error: "Файлът е в разрешения размер, но не успяхме да го запишем. Опитайте отново.", code: "storage", requestId }, { status: 500 });
+    }
+  } catch {
+    return NextResponse.json({ error: "Сървърна грешка.", requestId }, { status: 500 });
   }
 }
 

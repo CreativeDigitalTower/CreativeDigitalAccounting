@@ -68,6 +68,46 @@ export function validatePdfUpload(input: PdfUploadInput): { ok: true } | { ok: f
   return { ok: true };
 }
 
+// ── Валидация на СУРОВИ (binary) байтове — за multipart upload (без base64) ──
+
+/** PDF магически байтове: %PDF (0x25 0x50 0x44 0x46) в началото на файла. */
+export function hasPdfMagic(bytes: Uint8Array): boolean {
+  return bytes.length >= 5 && bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46;
+}
+
+export type UploadErrorCode = "no_file" | "empty" | "too_large" | "not_pdf_mime" | "not_pdf_ext" | "not_pdf_magic";
+
+/**
+ * Валидира качен PDF по СУРОВИТЕ байтове. Разчита на magic bytes като меродавен
+ * критерий → приема валиден PDF дори когато Windows/браузър подаде празен или
+ * различен MIME (application/octet-stream). Отхвърля само явно не-PDF MIME.
+ */
+export function validatePdfBinary(input: { filename?: string | null; mimeType?: string | null; bytes: Uint8Array }):
+  { ok: true; size: number } | { ok: false; code: UploadErrorCode; error: string } {
+  const size = input.bytes.byteLength;
+  if (size <= 0) return { ok: false, code: "empty", error: "Файлът е празен." };
+  if (size > MAX_ATTACHMENT_BYTES) {
+    return { ok: false, code: "too_large", error: `Файлът е ${formatFileSize(size)}, а максимално разрешеният размер е ${formatFileSize(MAX_ATTACHMENT_BYTES)}.` };
+  }
+  if (!/\.pdf$/i.test(input.filename ?? "")) {
+    return { ok: false, code: "not_pdf_ext", error: "Файлът трябва да е с разширение .pdf." };
+  }
+  const mime = (input.mimeType ?? "").toLowerCase().split(";")[0].trim();
+  // Празен / octet-stream MIME е допустим (cross-browser) → решава magic bytes.
+  if (mime && mime !== "application/octet-stream" && !PDF_MIME.has(mime)) {
+    return { ok: false, code: "not_pdf_mime", error: "Избраният файл не е валиден PDF документ." };
+  }
+  if (!hasPdfMagic(input.bytes)) {
+    return { ok: false, code: "not_pdf_magic", error: "Избраният файл не е валиден PDF документ." };
+  }
+  return { ok: true, size };
+}
+
+/** Изгражда PDF data URL (за съхранение в БД) от сурови байтове. */
+export function bytesToPdfDataUrl(bytes: Uint8Array): string {
+  return "data:application/pdf;base64," + Buffer.from(bytes).toString("base64");
+}
+
 /** Човешки четлив размер (напр. „1.2 MB"). */
 export function formatFileSize(bytes: number): string {
   if (!bytes || bytes < 0) return "0 B";

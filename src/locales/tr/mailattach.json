@@ -48,10 +48,11 @@
     "replace": "Değiştir",
     "remove": "Kaldır",
     "errNetwork": "Sunucuya bağlantı yok. İnternetinizi kontrol edip tekrar deneyin.",
-    "errServerTooLarge": "Dosya sunucu için çok büyük. Boyutu küçültün veya yöneticiyle iletişime geçin (sunucu limiti).",
+    "errServerTooLarge": "Dosya izin verilen boyutta, ancak sunucu/proxy reddetti. Tekrar deneyin veya bize ulaşın.",
     "errForbidden": "Bu işlem için yetkiniz yok.",
     "errSave": "Sunucuya kaydetme hatası. Tekrar deneyin.",
-    "pages": "{n} sayfa"
+    "pages": "{n} sayfa",
+    "tooLargeExact": "Dosya {size}, ancak izin verilen maksimum boyut {max}."
   },
   "send": {
     "invalidManual": "Geçersiz e-posta adresi.",

@@ -48,10 +48,11 @@
     "replace": "Replace",
     "remove": "Remove",
     "errNetwork": "No connection to the server. Check your internet and try again.",
-    "errServerTooLarge": "The file is too large for the server. Reduce its size or contact an admin (server limit).",
+    "errServerTooLarge": "The file is within the allowed size, but the server/proxy rejected it. Try again or contact us.",
     "errForbidden": "You don't have permission for this action.",
     "errSave": "Server save error. Please try again.",
-    "pages": "{n} pages"
+    "pages": "{n} pages",
+    "tooLargeExact": "The file is {size}, but the maximum allowed size is {max}."
   },
   "send": {
     "invalidManual": "Invalid email address.",
