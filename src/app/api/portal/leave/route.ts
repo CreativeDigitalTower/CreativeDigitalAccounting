@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireEmployee } from "@/lib/session";
+import { calculateLeaveDays } from "@/lib/workingDays";
 import { z } from "zod";
-
-function daysBetween(a: Date, b: Date) {
-  return Math.max(1, Math.round((b.getTime() - a.getTime()) / 86400000) + 1);
-}
 
 export async function GET() {
   try {
@@ -35,11 +32,14 @@ export async function POST(req: Request) {
     const data = schema.parse(await req.json());
     const start = new Date(data.startDate);
     const end = new Date(data.endDate);
-    if (end < start) return NextResponse.json({ error: "Крайната дата е преди началната." }, { status: 400 });
+    // Централизирано изчисляване — само работни дни (без уикенди/празници).
+    const breakdown = calculateLeaveDays(data.type, data.startDate, data.endDate);
+    if (!breakdown.valid) return NextResponse.json({ error: breakdown.error === "end_before_start" ? "Крайната дата е преди началната." : "Невалидни дати." }, { status: 400 });
+    if (breakdown.workingDays === 0) return NextResponse.json({ error: "Избраният период не съдържа работни дни по графика на служителя." }, { status: 400 });
     const leave = await prisma.employeeLeave.create({
       data: {
         employeeId: employee.id, type: data.type, startDate: start, endDate: end,
-        days: daysBetween(start, end), note: data.note ?? null,
+        days: breakdown.workingDays, note: data.note ?? null,
         status: "pending", requestedByEmployee: true,
       },
       select: { id: true, type: true, startDate: true, endDate: true, days: true, note: true, status: true, requestedByEmployee: true, reviewNote: true },

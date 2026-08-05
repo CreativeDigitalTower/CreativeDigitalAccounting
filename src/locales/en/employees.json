@@ -123,7 +123,13 @@
     "docOptional": "Document (optional)",
     "attach": "Attach…",
     "add": "+ Add",
-    "fileTooLarge": "File is too large (max. 5 MB)."
+    "fileTooLarge": "File is too large (max. 5 MB).",
+    "calendarDays": "Period: {n} calendar days",
+    "workingDaysUsed": "Leave used: {n} working days",
+    "weekendDays": "weekends: {n}",
+    "holidayDays": "holidays: {n}",
+    "noWorkingDays": "The selected period contains no working days per the schedule.",
+    "tooltip": "Only working days per the employee's schedule are deducted from paid leave (excluding weekends and public holidays)."
   },
   "leaves": {
     "sectionTitle": "Leave / sick",

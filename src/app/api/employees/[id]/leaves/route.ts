@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireFeature } from "@/lib/session";
 import { validateUpload } from "@/lib/fileSecurity";
+import { audit } from "@/lib/documents";
+import { calculateLeaveDays } from "@/lib/workingDays";
 import { z } from "zod";
 
 const schema = z.object({
@@ -14,13 +16,9 @@ const schema = z.object({
   docDataUrl: z.string().optional().nullable(),
 });
 
-function daysBetween(a: Date, b: Date) {
-  return Math.max(1, Math.round((b.getTime() - a.getTime()) / 86400000) + 1);
-}
-
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { companyId } = await requireFeature("employees");
+    const { companyId, userId } = await requireFeature("employees");
     const { id } = await params;
     const emp = await prisma.employee.findUnique({ where: { id } });
     if (!emp || emp.companyId !== companyId) return NextResponse.json({ error: "Не е намерен." }, { status: 404 });
@@ -29,16 +27,32 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       const v = validateUpload({ mimeType: data.docMimeType, dataUrl: data.docDataUrl });
       if (!v.ok) return NextResponse.json({ error: v.error }, { status: 400 });
     }
+
+    // Централизирано изчисляване: приспадат се само РАБОТНИ дни (без уикенди и
+    // официални празници). НЕ използваме endDate − startDate.
+    const breakdown = calculateLeaveDays(data.type, data.startDate, data.endDate);
+    if (!breakdown.valid) {
+      return NextResponse.json({ error: breakdown.error === "end_before_start" ? "Крайната дата е преди началната." : "Невалидни дати." }, { status: 400 });
+    }
+    if (breakdown.workingDays === 0) {
+      return NextResponse.json({ error: "Избраният период не съдържа работни дни по графика на служителя." }, { status: 400 });
+    }
+
     const start = new Date(data.startDate);
     const end = new Date(data.endDate);
     const leave = await prisma.employeeLeave.create({
       data: {
-        employeeId: id, type: data.type, startDate: start, endDate: end, days: daysBetween(start, end), note: data.note ?? null,
+        employeeId: id, type: data.type, startDate: start, endDate: end,
+        days: breakdown.workingDays, note: data.note ?? null,
         docName: data.docName ?? null, docMimeType: data.docMimeType ?? null, docDataUrl: data.docDataUrl ?? null,
       },
       select: { id: true, type: true, startDate: true, endDate: true, days: true, note: true, docName: true },
     });
-    return NextResponse.json(leave);
+
+    await audit(companyId, userId, "create", "EmployeeLeave", leave.id,
+      `${emp.name}: ${data.type} ${data.startDate}–${data.endDate} · ${breakdown.workingDays} раб. дни (кал. ${breakdown.calendarDays}, уикенд ${breakdown.weekendDays}, празници ${breakdown.holidayDays})`);
+
+    return NextResponse.json({ ...leave, breakdown });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: "Невалидни данни." }, { status: 400 });
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
