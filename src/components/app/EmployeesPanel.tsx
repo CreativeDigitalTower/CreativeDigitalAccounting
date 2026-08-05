@@ -4,6 +4,7 @@ import { NumberField } from "@/components/i18n/NumberField";
 import { useEffect, useState, Fragment } from "react";
 import { formatCurrency } from "@/lib/constants";
 import { calcPayroll, sumPayroll, EMPLOYEE_SSC_RATE, EMPLOYER_SSC_RATE } from "@/lib/payroll";
+import { calculateWorkingDays } from "@/lib/workingDays";
 import { confirmDelete } from "@/lib/confirmDelete";
 import { UiIcon } from "@/components/app/NavIcons";
 import { EMPLOYEE_ACCESS_MODULES, type EmployeeAccess } from "@/lib/employeeAccess";
@@ -268,6 +269,11 @@ function LeavePanel({ employee }: { employee: Employee }) {
   const entitlement = employee.paidLeaveDays ?? 20;
   const remaining = entitlement - usedPaid;
 
+  // Жив breakdown за избрания период (същата централна логика като сървъра).
+  const leavePreview = form.startDate && form.endDate
+    ? (() => { const b = calculateWorkingDays(form.startDate, form.endDate); return b.valid ? b : null; })()
+    : null;
+
   const pay = calcPayroll(employee.salary ?? 0);
 
   return (
@@ -346,6 +352,16 @@ function LeavePanel({ employee }: { employee: Employee }) {
         </div>
         <button className="btn btn-primary btn-sm" onClick={add}>{t("employees.leaveForm.add")}</button>
       </div>
+      {leavePreview && (
+        <div style={{ fontSize: 12, color: "var(--ink-soft)", background: "var(--brass-soft)", borderRadius: 6, padding: "6px 10px", marginBottom: 8 }} title={t("employees.leaveForm.tooltip")}>
+          {leavePreview.workingDays === 0
+            ? <span style={{ color: "var(--brick)" }}>{t("employees.leaveForm.noWorkingDays")}</span>
+            : <>
+                {t("employees.leaveForm.calendarDays", { n: leavePreview.calendarDays })} · <strong>{t("employees.leaveForm.workingDaysUsed", { n: leavePreview.workingDays })}</strong>
+                <span style={{ color: "var(--muted)" }}> · {t("employees.leaveForm.weekendDays", { n: leavePreview.weekendDays })}{leavePreview.holidayDays > 0 ? ` · ${t("employees.leaveForm.holidayDays", { n: leavePreview.holidayDays })}` : ""}</span>
+              </>}
+        </div>
+      )}
       {err && <div style={{ background: "var(--brick-soft)", color: "var(--brick)", borderRadius: 6, padding: "6px 10px", fontSize: 12, marginBottom: 8 }}>{err}</div>}
       <div style={{ fontSize: 12, fontWeight: 600, color: "var(--ink)", margin: "4px 0 6px" }}>{t("employees.leaves.sectionTitle")}</div>
       {/* Чакащи заявки от служителя за одобрение */}

@@ -123,7 +123,13 @@
     "docOptional": "Document (opțional)",
     "attach": "Atașează…",
     "add": "+ Adaugă",
-    "fileTooLarge": "Fișierul este prea mare (max. 5 MB)."
+    "fileTooLarge": "Fișierul este prea mare (max. 5 MB).",
+    "calendarDays": "Perioadă: {n} zile calendaristice",
+    "workingDaysUsed": "Concediu folosit: {n} zile lucrătoare",
+    "weekendDays": "weekenduri: {n}",
+    "holidayDays": "sărbători: {n}",
+    "noWorkingDays": "Perioada selectată nu conține zile lucrătoare conform programului.",
+    "tooltip": "Din concediul plătit se scad doar zilele lucrătoare conform programului angajatului (fără weekenduri și sărbători)."
   },
   "leaves": {
     "sectionTitle": "Concedii / medicale",

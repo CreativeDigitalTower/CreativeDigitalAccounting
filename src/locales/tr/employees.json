@@ -123,7 +123,13 @@
     "docOptional": "Belge (isteğe bağlı)",
     "attach": "Ekle…",
     "add": "+ Ekle",
-    "fileTooLarge": "Dosya çok büyük (maks. 5 MB)."
+    "fileTooLarge": "Dosya çok büyük (maks. 5 MB).",
+    "calendarDays": "Dönem: {n} takvim günü",
+    "workingDaysUsed": "Kullanılan izin: {n} iş günü",
+    "weekendDays": "hafta sonu: {n}",
+    "holidayDays": "tatil: {n}",
+    "noWorkingDays": "Seçilen dönem, programa göre iş günü içermiyor.",
+    "tooltip": "Ücretli izinden yalnızca çalışanın programına göre iş günleri düşülür (hafta sonu ve resmi tatiller hariç)."
   },
   "leaves": {
     "sectionTitle": "İzin / hastalık",
