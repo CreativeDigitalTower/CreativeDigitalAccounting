@@ -25,7 +25,7 @@ export default async function TemplateInfoPage({ params }: { params: Promise<{ i
   if (!canAccessTemplate(t.id, comp?.eik ?? null)) notFound();
   const cx = COMPLEXITY[t.complexity];
   const source = templateDataSource(t);
-  const SOURCE_LABEL: Record<string, string> = { client: "Клиент", employee: "Служител", supplier: "Доставчик", none: "Само фирмени данни" };
+  const SOURCE_LABEL: Record<string, string> = { client: "Клиент", employee: "Служител", supplier: "Доставчик", vehicle: "Автомобил", none: "Само фирмени данни" };
 
   return (
     <>

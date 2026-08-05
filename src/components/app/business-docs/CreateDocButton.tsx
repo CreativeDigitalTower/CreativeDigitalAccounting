@@ -13,6 +13,7 @@ const SOURCE_CFG: Record<Exclude<DataSource, "none">, { endpoint: string; labelK
   client: { endpoint: "/api/clients", labelKey: "bizdocs.create.pickClient", noneKey: "bizdocs.create.noClient" },
   employee: { endpoint: "/api/employees", labelKey: "bizdocs.create.pickEmployee", noneKey: "bizdocs.create.noEmployee" },
   supplier: { endpoint: "/api/suppliers", labelKey: "bizdocs.create.pickSupplier", noneKey: "bizdocs.create.noSupplier" },
+  vehicle: { endpoint: "/api/vehicles", labelKey: "bizdocs.create.pickVehicle", noneKey: "bizdocs.create.noVehicle" },
 };
 
 export function CreateDocButton({ templateId, dataSource = "client" }: { templateId: string; dataSource?: DataSource }) {

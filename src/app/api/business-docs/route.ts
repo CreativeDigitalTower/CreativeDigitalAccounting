@@ -46,11 +46,12 @@ export async function POST(req: Request) {
     const client = source === "client" && selectedId ? await prisma.client.findFirst({ where: { id: selectedId, companyId } }) : null;
     const employee = source === "employee" && selectedId ? await prisma.employee.findFirst({ where: { id: selectedId, companyId } }) : null;
     const supplier = source === "supplier" && selectedId ? await prisma.supplier.findFirst({ where: { id: selectedId, companyId } }) : null;
+    const vehicle = source === "vehicle" && selectedId ? await prisma.vehicle.findFirst({ where: { id: selectedId, companyId } }) : null;
 
     // Индивидуална номерация ПО КАТЕГОРИЯ, започваща от 0001 за всяка категория
     const count = await prisma.businessDocument.count({ where: { companyId, category: template.categoryId } });
     const docNumber = `${template.categoryId.toUpperCase()}-${new Date().getFullYear()}-${String(count + 1).padStart(4, "0")}`;
-    const contentHtml = buildDocumentHtml(template, { company, client, employee, supplier, docNumber, docDate: new Date() });
+    const contentHtml = buildDocumentHtml(template, { company, client, employee, supplier, vehicle, docNumber, docDate: new Date() });
 
     const doc = await prisma.businessDocument.create({
       data: {

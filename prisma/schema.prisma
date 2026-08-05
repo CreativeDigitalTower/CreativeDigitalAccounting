@@ -166,6 +166,7 @@ model Company {
   stockCategories   StockCategory[]
   recipes           Recipe[]
   employees         Employee[]
+  vehicles          Vehicle[]
   technologicalDocs TechnologicalDoc[]
   conformityDeclarations ConformityDeclaration[]
   stocktakes        Stocktake[]
@@ -504,6 +505,28 @@ model Employee {
   leaves  EmployeeLeave[]
   files   EmployeeFile[]
   bonuses EmployeeBonus[]
+}
+
+// Автомобил на фирмата — за пътни листове, отчети за гориво и разходни норми.
+model Vehicle {
+  id            String   @id @default(cuid())
+  companyId     String
+  registration  String   // регистрационен номер
+  brand         String?  // марка
+  model         String?  // модел
+  vin           String?  // рама (VIN)
+  fuelType      String?  // бензин | дизел | газ | ел. | хибрид
+  fuelNorm      Float?   // разходна норма л/100 км
+  tankCapacity  Float?   // обем на резервоара (л)
+  year          Int?
+  odometer      Float?   // текущ пробег (км)
+  notes         String?  @db.Text
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
 }
 
 // Бонуси на служител — по месец, със сума, вид и бележка

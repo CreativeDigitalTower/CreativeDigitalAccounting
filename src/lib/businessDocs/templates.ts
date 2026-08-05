@@ -1,5 +1,6 @@
 import { applyVariables, resolveVariables, type VariableContext } from "./variables";
 import { HACCP_CATEGORY, HACCP_BUILDERS } from "./haccp";
+import { VEHICLE_CATEGORY, VEHICLE_BUILDERS } from "./vehicles";
 
 export type Complexity = "easy" | "medium" | "detailed";
 
@@ -7,7 +8,7 @@ export type Complexity = "easy" | "medium" | "detailed";
 // вземе данните: HR документи → Служител, документи към доставчици → Доставчик,
 // оферти/протоколи към клиенти → Клиент, а чисто фирмени/декларации → без
 // контрагент. (Бъдещи: vehicle/warehouse/production/project.)
-export type DataSource = "client" | "employee" | "supplier" | "none";
+export type DataSource = "client" | "employee" | "supplier" | "vehicle" | "none";
 
 export type TemplateDef = {
   title: string;
@@ -234,6 +235,8 @@ const CUSTOM_BY_ID: Record<string, (v: Record<string, string>) => string> = {
 const CUSTOM: Record<string, (v: Record<string, string>) => string> = {
   // HACCP дневници/регистри/контролни листове (модулно, по title).
   ...HACCP_BUILDERS,
+  // Автомобилни документи (пътни листове, отчет за гориво и т.н.).
+  ...VEHICLE_BUILDERS,
   "Споразумение за конфиденциалност (NDA)": () => `
     <h1 style="${H}">Споразумение за конфиденциалност (NDA)</h1>
     ${meta()}
@@ -866,8 +869,9 @@ export const CATEGORIES: CategoryDef[] = [
     templates: ["Съгласие за обработване на лични данни", "Информационно уведомление", "Искане за достъп до лични данни", "Искане за изтриване на лични данни", "Регистър за обработване"].map((t) => ({ title: t, complexity: "medium" as Complexity })) },
   { id: "inventory", title: "Инвентаризация", icon: "", description: "Описи и протоколи за инвентаризация.",
     templates: ["Инвентаризационен опис", "Опис на наличности", "Протокол за липси", "Протокол за излишъци", "Протокол за бракуване"].map((t) => ({ title: t })) },
-  { id: "vehicles", title: "Автомобили", icon: "", description: "Пътни листове, отчети за гориво и командировки.",
-    templates: ["Пътен лист", "Отчет за гориво", "Командировка", "Приемо-предаване на автомобил"].map((t) => ({ title: t })) },
+  // „Автомобили и гориво" — професионални образци (виж ./vehicles.ts). Заменя
+  // старите 4 generic шаблона; вече генерираните документи (snapshot) не се влияят.
+  VEHICLE_CATEGORY,
   { id: "construction", title: "Строителство", icon: "", description: "Протоколи за приемане и извършени дейности.",
     templates: ["Констативен протокол (строителство)", "Протокол за приемане", "Протокол за извършени дейности", "Протокол за завършен обект"].map((t) => ({ title: t })) },
   { id: "production", title: "Производство", icon: "", description: "Производствени поръчки и контролни листове.",
@@ -912,6 +916,7 @@ const CATEGORY_DATA_SOURCE: Record<string, DataSource> = {
   acceptance: "client",
   protocols: "client",
   construction: "client",
+  vehicles: "vehicle",
 };
 
 /** Ефективният източник на данни за шаблон (per-шаблон → категория → "none"). */

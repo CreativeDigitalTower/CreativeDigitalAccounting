@@ -1,0 +1,18 @@
+{
+  "title": "Araçlar",
+  "subtitle": "Sefer belgeleri ve yakıt raporları için şirket araçları.",
+  "add": "➕ Araç ekle",
+  "cancel": "İptal",
+  "save": "Kaydet",
+  "reg": "Plaka",
+  "brand": "Marka",
+  "model": "Model",
+  "fuel": "Yakıt",
+  "norm": "Tüketim normu (l/100km)",
+  "tank": "Depo (l)",
+  "year": "Yıl",
+  "vin": "Şasi (VIN)",
+  "empty": "Araç eklenmedi.",
+  "errReg": "Plaka girin.",
+  "errGeneric": "Kaydetme hatası."
+}

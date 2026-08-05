@@ -26,6 +26,12 @@ export type VariableContext = {
     address?: string | null; city?: string | null; phone?: string | null;
     contactEmail?: string | null; contactPerson?: string | null;
   } | null;
+  // Автомобил — за пътни листове, отчети за гориво и разходни норми.
+  vehicle?: {
+    registration?: string | null; brand?: string | null; model?: string | null;
+    vin?: string | null; fuelType?: string | null; fuelNorm?: number | null;
+    tankCapacity?: number | null; year?: number | null;
+  } | null;
   docNumber?: string;
   docDate?: Date;
 };
@@ -68,6 +74,14 @@ export const VARIABLE_LABELS: Record<string, string> = {
   "Доставчик.Телефон": "Телефон на доставчика",
   "Доставчик.Email": "Имейл на доставчика",
   "Доставчик.ЛицеЗаКонтакт": "Лице за контакт (доставчик)",
+  "Автомобил.Регистрация": "Регистрационен номер",
+  "Автомобил.Марка": "Марка",
+  "Автомобил.Модел": "Модел",
+  "Автомобил.VIN": "Рама (VIN)",
+  "Автомобил.Гориво": "Вид гориво",
+  "Автомобил.РазходнаНорма": "Разходна норма (л/100 км)",
+  "Автомобил.Резервоар": "Обем на резервоара (л)",
+  "Автомобил.Година": "Година на производство",
   "Проект.Име": "Име на проекта",
   "Документ.Номер": "Номер на документа",
   "Документ.Дата": "Дата на документа",
@@ -115,6 +129,15 @@ export function resolveVariables(ctx: VariableContext): Record<string, string> {
     "Служител.Възнаграждение": money(e.salary),
     "Служител.IBAN": e.iban ?? "",
     "Служител.Банка": e.bankName ?? "",
+    // Автомобил
+    "Автомобил.Регистрация": (ctx.vehicle?.registration) ?? "",
+    "Автомобил.Марка": (ctx.vehicle?.brand) ?? "",
+    "Автомобил.Модел": (ctx.vehicle?.model) ?? "",
+    "Автомобил.VIN": (ctx.vehicle?.vin) ?? "",
+    "Автомобил.Гориво": (ctx.vehicle?.fuelType) ?? "",
+    "Автомобил.РазходнаНорма": ctx.vehicle?.fuelNorm != null ? String(ctx.vehicle.fuelNorm) : "",
+    "Автомобил.Резервоар": ctx.vehicle?.tankCapacity != null ? String(ctx.vehicle.tankCapacity) : "",
+    "Автомобил.Година": ctx.vehicle?.year != null ? String(ctx.vehicle.year) : "",
     // Доставчик
     "Доставчик.Име": s.name ?? "",
     "Доставчик.ЕИК": s.eik ?? "",

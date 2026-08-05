@@ -204,6 +204,8 @@
     "pickEmployee": "Angajat (pentru completare automată)",
     "noEmployee": "Fără angajat",
     "pickSupplier": "Furnizor (pentru completare automată)",
-    "noSupplier": "Fără furnizor"
+    "noSupplier": "Fără furnizor",
+    "pickVehicle": "Vehicul (pentru completare automată)",
+    "noVehicle": "Fără vehicul"
   }
 }
