@@ -12,6 +12,20 @@ export type VariableContext = {
     address?: string | null; city?: string | null; phone?: string | null;
     contactEmail?: string | null; mol?: string | null; contactPerson?: string | null;
   } | null;
+  // Служител — за HR документи (трудов/граждански договор, длъжностна
+  // характеристика, заповеди, допълнителни споразумения и т.н.).
+  employee?: {
+    name?: string | null; position?: string | null; department?: string | null;
+    address?: string | null; phone?: string | null; email?: string | null;
+    hiredAt?: Date | string | null; salary?: number | null;
+    iban?: string | null; bankName?: string | null;
+  } | null;
+  // Доставчик — за документи към доставчици (заявки, поръчки, договори).
+  supplier?: {
+    name?: string | null; eik?: string | null; vatNumber?: string | null;
+    address?: string | null; city?: string | null; phone?: string | null;
+    contactEmail?: string | null; contactPerson?: string | null;
+  } | null;
   docNumber?: string;
   docDate?: Date;
 };
@@ -38,6 +52,22 @@ export const VARIABLE_LABELS: Record<string, string> = {
   "Служител.Име": "Име на служителя",
   "Служител.Длъжност": "Длъжност на служителя",
   "Служител.ЕГН": "ЕГН на служителя",
+  "Служител.Отдел": "Отдел / звено",
+  "Служител.Адрес": "Адрес на служителя",
+  "Служител.Телефон": "Телефон на служителя",
+  "Служител.Email": "Имейл на служителя",
+  "Служител.ДатаНазначаване": "Дата на назначаване",
+  "Служител.Възнаграждение": "Възнаграждение",
+  "Служител.ЛичнаКарта": "Лична карта",
+  "Служител.РаботноВреме": "Работно време",
+  "Служител.IBAN": "IBAN на служителя",
+  "Служител.Банка": "Банка на служителя",
+  "Доставчик.ДДС": "ДДС номер на доставчика",
+  "Доставчик.Адрес": "Адрес на доставчика",
+  "Доставчик.МОЛ": "МОЛ на доставчика",
+  "Доставчик.Телефон": "Телефон на доставчика",
+  "Доставчик.Email": "Имейл на доставчика",
+  "Доставчик.ЛицеЗаКонтакт": "Лице за контакт (доставчик)",
   "Проект.Име": "Име на проекта",
   "Документ.Номер": "Номер на документа",
   "Документ.Дата": "Дата на документа",
@@ -60,7 +90,11 @@ function fmtDate(d: Date) { return d.toLocaleDateString("bg-BG"); }
 export function resolveVariables(ctx: VariableContext): Record<string, string> {
   const c = ctx.company ?? {};
   const cl = ctx.client ?? {};
+  const e = ctx.employee ?? {};
+  const s = ctx.supplier ?? {};
   const now = ctx.docDate ?? new Date();
+  const money = (n?: number | null) => (n != null ? new Intl.NumberFormat("bg-BG", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n) : "");
+  const dt = (d?: Date | string | null) => (d ? fmtDate(new Date(d)) : "");
   return {
     "Клиент.Име": cl.name ?? "",
     "Клиент.ЕИК": cl.eik ?? "",
@@ -69,6 +103,27 @@ export function resolveVariables(ctx: VariableContext): Record<string, string> {
     "Клиент.Телефон": cl.phone ?? "",
     "Клиент.Email": cl.contactEmail ?? "",
     "Клиент.ЛицеЗаКонтакт": cl.contactPerson ?? "",
+    // Служител (HR) — ЕГН/лична карта/работно време не се пазят в профила и остават
+    // за ръчно попълване (визуален индикатор), останалото се попълва автоматично.
+    "Служител.Име": e.name ?? "",
+    "Служител.Длъжност": e.position ?? "",
+    "Служител.Отдел": e.department ?? "",
+    "Служител.Адрес": e.address ?? "",
+    "Служител.Телефон": e.phone ?? "",
+    "Служител.Email": e.email ?? "",
+    "Служител.ДатаНазначаване": dt(e.hiredAt),
+    "Служител.Възнаграждение": money(e.salary),
+    "Служител.IBAN": e.iban ?? "",
+    "Служител.Банка": e.bankName ?? "",
+    // Доставчик
+    "Доставчик.Име": s.name ?? "",
+    "Доставчик.ЕИК": s.eik ?? "",
+    "Доставчик.ДДС": s.vatNumber ?? "",
+    "Доставчик.Адрес": [s.address, s.city].filter(Boolean).join(", "),
+    "Доставчик.МОЛ": s.contactPerson ?? "",
+    "Доставчик.ЛицеЗаКонтакт": s.contactPerson ?? "",
+    "Доставчик.Телефон": s.phone ?? "",
+    "Доставчик.Email": s.contactEmail ?? "",
     "Фирма.Име": c.name ?? "",
     "Фирма.ЕИК": c.eik ?? "",
     "Фирма.ДДС": c.vatNumber ?? "",

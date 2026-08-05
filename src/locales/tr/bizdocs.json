@@ -200,6 +200,10 @@
     "noClient": "Müşteri yok",
     "creating": "Oluşturuluyor…",
     "create": "Belge oluştur →",
-    "err": "Oluşturma hatası."
+    "err": "Oluşturma hatası.",
+    "pickEmployee": "Çalışan (otomatik doldurma için)",
+    "noEmployee": "Çalışan yok",
+    "pickSupplier": "Tedarikçi (otomatik doldurma için)",
+    "noSupplier": "Tedarikçi yok"
   }
 }

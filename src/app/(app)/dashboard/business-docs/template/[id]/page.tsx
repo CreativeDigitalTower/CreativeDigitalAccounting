@@ -2,7 +2,7 @@ import { requireCompany, getPlan } from "@/lib/session";
 import { planHasFeature } from "@/lib/constants";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getTemplate, canAccessTemplate } from "@/lib/businessDocs/templates";
+import { getTemplate, canAccessTemplate, templateDataSource } from "@/lib/businessDocs/templates";
 import { prisma } from "@/lib/prisma";
 import { CreateDocButton } from "@/components/app/business-docs/CreateDocButton";
 import { LockedScreen } from "@/components/app/business-docs/LockedScreen";
@@ -24,6 +24,8 @@ export default async function TemplateInfoPage({ params }: { params: Promise<{ i
   const comp = await prisma.company.findUnique({ where: { id: companyId }, select: { eik: true } });
   if (!canAccessTemplate(t.id, comp?.eik ?? null)) notFound();
   const cx = COMPLEXITY[t.complexity];
+  const source = templateDataSource(t);
+  const SOURCE_LABEL: Record<string, string> = { client: "Клиент", employee: "Служител", supplier: "Доставчик", none: "Само фирмени данни" };
 
   return (
     <>
@@ -61,7 +63,10 @@ export default async function TemplateInfoPage({ params }: { params: Promise<{ i
         </div>
 
         <div style={{ borderTop: "1px solid var(--border)", paddingTop: 18 }}>
-          <CreateDocButton templateId={t.id} />
+          <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 10 }}>
+            Източник на данни: <strong style={{ color: "var(--ink-soft)" }}>{SOURCE_LABEL[source]}</strong>
+          </div>
+          <CreateDocButton templateId={t.id} dataSource={source} />
           <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 10 }}>
             След създаване документът се попълва автоматично с данните на вашата фирма и се отваря в редактора за преглед и свободна редакция.
           </p>
