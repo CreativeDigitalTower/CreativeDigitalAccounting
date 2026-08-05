@@ -25,6 +25,8 @@ export function DocEditor({ doc, logoUrl, companyName, invoices = [] }: { doc: D
   const [busy, setBusy] = useState(false);
 
   useEffect(() => { if (editorRef.current) editorRef.current.innerHTML = doc.contentHtml; }, [doc.contentHtml]);
+  // Цветовете/форматирането да се прилагат като inline CSS (по-надеждно за PDF/DOCX).
+  useEffect(() => { try { document.execCommand("styleWithCSS", false, "true"); } catch { /* ignore */ } }, []);
 
   function cmd(command: string, value?: string) {
     editorRef.current?.focus();
@@ -33,6 +35,93 @@ export function DocEditor({ doc, logoUrl, companyName, invoices = [] }: { doc: D
   function insertHtml(html: string) {
     editorRef.current?.focus();
     document.execCommand("insertHTML", false, html);
+  }
+
+  // ── Изображения: качване от файл (вгражда се като data URL, без външен хост) ──
+  function insertImageFromFile() {
+    const input = document.createElement("input");
+    input.type = "file"; input.accept = "image/*";
+    input.onchange = () => {
+      const file = input.files?.[0]; if (!file) return;
+      if (file.size > 3 * 1024 * 1024) { alert(t("bizdocs.ui.editor.imageTooBig")); return; }
+      const reader = new FileReader();
+      reader.onload = () => insertHtml(`<img src="${reader.result}" style="max-width:100%;" alt="" />`);
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }
+
+  // ── Подпис: блок с линия за подпис + име, или изображение на подпис ──
+  function insertSignatureBlock() {
+    insertHtml(`<table style="width:100%;margin-top:34px;border-collapse:collapse;"><tr>
+      <td style="width:48%;padding-top:6px;border-top:1px solid #16201C;font-size:12px;">Подпис: ....................</td>
+      <td style="width:4%;"></td>
+      <td style="width:48%;padding-top:6px;border-top:1px solid #16201C;font-size:12px;">Име и длъжност: ....................</td>
+    </tr></table>`);
+  }
+  function insertSignatureImage() {
+    const input = document.createElement("input");
+    input.type = "file"; input.accept = "image/*";
+    input.onchange = () => {
+      const file = input.files?.[0]; if (!file) return;
+      if (file.size > 2 * 1024 * 1024) { alert(t("bizdocs.ui.editor.imageTooBig")); return; }
+      const reader = new FileReader();
+      reader.onload = () => insertHtml(`<img src="${reader.result}" alt="подпис" style="max-height:64px;max-width:220px;object-fit:contain;" />`);
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }
+
+  // ── Таблици: вмъкване с избрани редове×колони + добавяне/триене на ред/колона ──
+  function insertTable() {
+    const spec = prompt(t("bizdocs.ui.editor.tableDims"), "3x3");
+    if (!spec) return;
+    const m = spec.match(/^\s*(\d+)\s*[xх×*]\s*(\d+)\s*$/i);
+    if (!m) return;
+    const rows = Math.min(40, Math.max(1, Number(m[1])));
+    const cols = Math.min(12, Math.max(1, Number(m[2])));
+    const cell = '<td style="border:1px solid #999;padding:6px;">&nbsp;</td>';
+    const row = `<tr>${cell.repeat(cols)}</tr>`;
+    insertHtml(`<table style="width:100%;border-collapse:collapse;margin:8px 0;">${row.repeat(rows)}</table>`);
+  }
+  function currentCell(): HTMLTableCellElement | null {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return null;
+    let node: Node | null = sel.getRangeAt(0).startContainer;
+    while (node && node !== editorRef.current) {
+      if (node instanceof HTMLTableCellElement) return node;
+      node = node.parentNode;
+    }
+    return null;
+  }
+  function tableAddRow() {
+    const c = currentCell(); const tr = c?.parentElement as HTMLTableRowElement | undefined;
+    if (!tr) { alert(t("bizdocs.ui.editor.tableFirst")); return; }
+    const nr = tr.cloneNode(true) as HTMLTableRowElement;
+    nr.querySelectorAll("td,th").forEach((td) => (td.innerHTML = "&nbsp;"));
+    tr.after(nr);
+  }
+  function tableAddCol() {
+    const c = currentCell(); if (!c) { alert(t("bizdocs.ui.editor.tableFirst")); return; }
+    const idx = c.cellIndex;
+    c.closest("table")?.querySelectorAll("tr").forEach((tr) => {
+      const ref = (tr as HTMLTableRowElement).cells[idx];
+      const nc = (ref?.cloneNode(false) as HTMLTableCellElement | undefined) ?? document.createElement("td");
+      nc.innerHTML = "&nbsp;";
+      if (!nc.getAttribute("style")) nc.setAttribute("style", "border:1px solid #999;padding:6px;");
+      if (ref) ref.after(nc); else tr.appendChild(nc);
+    });
+  }
+  function tableDelRow() { const c = currentCell(); (c?.parentElement as HTMLTableRowElement | undefined)?.remove(); }
+  function tableDelCol() {
+    const c = currentCell(); if (!c) return;
+    const idx = c.cellIndex;
+    c.closest("table")?.querySelectorAll("tr").forEach((tr) => (tr as HTMLTableRowElement).cells[idx]?.remove());
+  }
+
+  function insertLink() {
+    const url = prompt(t("bizdocs.ui.editor.linkUrl"), "https://");
+    if (url && /^https?:\/\//i.test(url)) cmd("createLink", url);
   }
 
   // Отразява текущото състояние на чекбоксовете в HTML атрибута `checked`,
@@ -161,8 +250,43 @@ export function DocEditor({ doc, logoUrl, companyName, invoices = [] }: { doc: D
         <Btn onClick={() => cmd("justifyCenter")} title={t("bizdocs.ui.editor.center")}>≡</Btn>
         <Btn onClick={() => cmd("justifyRight")} title={t("bizdocs.ui.editor.right")}>⯈</Btn>
         <Sep />
-        <Btn onClick={() => insertHtml('<table style="width:100%;border-collapse:collapse;margin:8px 0;"><tr><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td></tr><tr><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td><td style="border:1px solid #999;padding:6px;">&nbsp;</td></tr></table>')} title={t("bizdocs.ui.editor.table")}>▦</Btn>
-        <Btn onClick={() => { const url = prompt(t("bizdocs.ui.editor.imageUrl")); if (url) insertHtml(`<img src="${url}" style="max-width:100%;" />`); }} title={t("bizdocs.ui.editor.image")}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8.5" cy="9.5" r="1.5" /><path d="m4 17 5-5 4 4 3-3 4 4" /></svg></Btn>
+        {/* Стил на блок (заглавия/нормален текст) + шрифт */}
+        <select onMouseDown={(e) => e.preventDefault()} onChange={(e) => { if (e.target.value) cmd("formatBlock", e.target.value); e.target.selectedIndex = 0; }} style={{ width: "auto", padding: "0 6px", height: 30, fontSize: 12.5 }} defaultValue="">
+          <option value="" disabled>{t("bizdocs.ui.editor.heading")}</option>
+          <option value="h1">{t("bizdocs.ui.editor.h1")}</option>
+          <option value="h2">{t("bizdocs.ui.editor.h2")}</option>
+          <option value="p">{t("bizdocs.ui.editor.normal")}</option>
+        </select>
+        <select onMouseDown={(e) => e.preventDefault()} onChange={(e) => { if (e.target.value) cmd("fontName", e.target.value); e.target.selectedIndex = 0; }} style={{ width: "auto", padding: "0 6px", height: 30, fontSize: 12.5 }} defaultValue="">
+          <option value="" disabled>{t("bizdocs.ui.editor.font")}</option>
+          <option value="Georgia, serif">{t("bizdocs.ui.editor.fontSerif")}</option>
+          <option value="Arial, sans-serif">{t("bizdocs.ui.editor.fontSans")}</option>
+          <option value="'Courier New', monospace">{t("bizdocs.ui.editor.fontMono")}</option>
+        </select>
+        {/* Цвят на текст + маркер (пресети — без загуба на селекция) */}
+        <select onMouseDown={(e) => e.preventDefault()} onChange={(e) => { if (e.target.value) cmd("foreColor", e.target.value); e.target.selectedIndex = 0; }} style={{ width: "auto", padding: "0 6px", height: 30, fontSize: 12.5 }} defaultValue="" title={t("bizdocs.ui.editor.textColor")}>
+          <option value="" disabled>A🎨</option>
+          {["#16201C", "#1A365D", "#0F8A6A", "#A5812E", "#B4462F", "#555555"].map((c) => <option key={c} value={c}>{c}</option>)}
+        </select>
+        <select onMouseDown={(e) => e.preventDefault()} onChange={(e) => { if (e.target.value) cmd("hiliteColor", e.target.value); e.target.selectedIndex = 0; }} style={{ width: "auto", padding: "0 6px", height: 30, fontSize: 12.5 }} defaultValue="" title={t("bizdocs.ui.editor.highlight")}>
+          <option value="" disabled>▮</option>
+          {["#FCEFC7", "#FFF3B0", "#D6F5E3", "#FADBD8", "#E6E6E6"].map((c) => <option key={c} value={c}>{c}</option>)}
+        </select>
+        <Sep />
+        {/* Таблици */}
+        <Btn onClick={insertTable} title={t("bizdocs.ui.editor.table")}>▦</Btn>
+        <Btn onClick={tableAddRow} title={t("bizdocs.ui.editor.addRow")}>+⤒</Btn>
+        <Btn onClick={tableAddCol} title={t("bizdocs.ui.editor.addCol")}>+⤙</Btn>
+        <Btn onClick={tableDelRow} title={t("bizdocs.ui.editor.delRow")}>−⤒</Btn>
+        <Btn onClick={tableDelCol} title={t("bizdocs.ui.editor.delCol")}>−⤙</Btn>
+        <Sep />
+        {/* Изображения + подписи + връзка + страница */}
+        <Btn onClick={insertImageFromFile} title={t("bizdocs.ui.editor.imageUpload")}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8.5" cy="9.5" r="1.5" /><path d="m4 17 5-5 4 4 3-3 4 4" /></svg></Btn>
+        <Btn onClick={() => { const url = prompt(t("bizdocs.ui.editor.imageUrl")); if (url) insertHtml(`<img src="${url}" style="max-width:100%;" alt="" />`); }} title={t("bizdocs.ui.editor.image")}>🔗🖼</Btn>
+        <Btn onClick={insertSignatureBlock} title={t("bizdocs.ui.editor.signature")}>✒</Btn>
+        <Btn onClick={insertSignatureImage} title={t("bizdocs.ui.editor.signatureImg")}>✍</Btn>
+        <Btn onClick={insertLink} title={t("bizdocs.ui.editor.link")}>🔗</Btn>
+        <Btn onClick={() => cmd("removeFormat")} title={t("bizdocs.ui.editor.clearFormat")}>⌫</Btn>
         <Btn onClick={() => insertHtml('<div style="page-break-after:always;border-top:1px dashed #bbb;margin:18px 0;"></div>')} title={t("bizdocs.ui.editor.pageBreak")}>⤓</Btn>
       </div>
 
