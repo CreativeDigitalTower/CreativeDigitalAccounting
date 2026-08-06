@@ -70,5 +70,34 @@
     "notePre": "Hesaplama yalnızca hammaddeleri içerir. Sarf malzemeleri ve ek maliyetleri ",
     "noteBold": "içermez",
     "notePost": " — su, elektrik, ısıtma, kira, personel maaşları, ambalaj, amortisman vb. Tam maliyet için bunları ayrıca ekleyin."
+  },
+  "history": {
+    "title": "Üretim geçmişi",
+    "search": "Ara (numara, ürün, parti, operatör)",
+    "empty": "Üretim emri yok.",
+    "number": "Numara",
+    "date": "Tarih",
+    "product": "Ürün",
+    "batch": "Parti",
+    "qty": "Miktar",
+    "materials": "Malzeme",
+    "unitCost": "Birim maliyet",
+    "operator": "Operatör",
+    "status": "Durum",
+    "consumedTitle": "Kullanılan hammadde",
+    "material": "Hammadde",
+    "recipe": "Reçete"
+  },
+  "kpi": {
+    "count": "Üretim (ay)",
+    "producedValue": "Üretilen değer",
+    "materialsCost": "Hammadde gideri",
+    "avgUnitCost": "Ort. birim maliyet"
+  },
+  "status": {
+    "planned": "Planlandı",
+    "in_progress": "Devam ediyor",
+    "completed": "Tamamlandı",
+    "cancelled": "İptal"
   }
 }

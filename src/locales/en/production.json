@@ -70,5 +70,34 @@
     "notePre": "The calculation includes only the raw materials. It does ",
     "noteBold": "not include",
     "notePost": " consumables and additional costs — water, electricity, heating, rent, staff wages, packaging, depreciation, etc. For the full cost, add these separately."
+  },
+  "history": {
+    "title": "Production history",
+    "search": "Search (number, product, batch, operator)",
+    "empty": "No production orders.",
+    "number": "Number",
+    "date": "Date",
+    "product": "Product",
+    "batch": "Batch",
+    "qty": "Quantity",
+    "materials": "Materials",
+    "unitCost": "Unit cost",
+    "operator": "Operator",
+    "status": "Status",
+    "consumedTitle": "Consumed materials",
+    "material": "Material",
+    "recipe": "Recipe"
+  },
+  "kpi": {
+    "count": "Production runs (month)",
+    "producedValue": "Produced value",
+    "materialsCost": "Materials cost",
+    "avgUnitCost": "Avg unit cost"
+  },
+  "status": {
+    "planned": "Planned",
+    "in_progress": "In progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
   }
 }

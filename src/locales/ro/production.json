@@ -70,5 +70,34 @@
     "notePre": "Calculul include doar materiile prime. El ",
     "noteBold": "nu include",
     "notePost": " consumabile și costuri suplimentare — apă, curent, încălzire, chirie, salarii, ambalaje, amortizare etc. Pentru costul complet, adăugați-le separat."
+  },
+  "history": {
+    "title": "Istoric producție",
+    "search": "Căutare (număr, produs, lot, operator)",
+    "empty": "Nicio comandă de producție.",
+    "number": "Număr",
+    "date": "Dată",
+    "product": "Produs",
+    "batch": "Lot",
+    "qty": "Cantitate",
+    "materials": "Materiale",
+    "unitCost": "Cost unitar",
+    "operator": "Operator",
+    "status": "Status",
+    "consumedTitle": "Materii prime consumate",
+    "material": "Materie primă",
+    "recipe": "Rețetă"
+  },
+  "kpi": {
+    "count": "Producții (lună)",
+    "producedValue": "Valoare produsă",
+    "materialsCost": "Cost materii prime",
+    "avgUnitCost": "Cost unitar mediu"
+  },
+  "status": {
+    "planned": "Planificat",
+    "in_progress": "În curs",
+    "completed": "Finalizat",
+    "cancelled": "Anulat"
   }
 }
