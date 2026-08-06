@@ -165,6 +165,7 @@ model Company {
   archiveFiles      ArchiveFile[]
   stockCategories   StockCategory[]
   recipes           Recipe[]
+  productionOrders  ProductionOrder[]
   employees         Employee[]
   vehicles          Vehicle[]
   technologicalDocs TechnologicalDoc[]
@@ -456,6 +457,52 @@ model StockBatch {
 }
 
 // Рецепти за производство
+// Производствена поръчка/партида — траен запис за всяко производство (надгражда
+// текущия production run, без да променя ефекта му върху склада). Съхранява
+// производствен номер, продукт, количество, себестойност, оператор, статус,
+// изходна партида и вложените суровини (проследимост суровина → продукт).
+model ProductionOrder {
+  id            String   @id @default(cuid())
+  companyId     String
+  number        String
+  recipeId      String?
+  recipeName    String?
+  outputItemId  String?
+  outputName    String
+  outputBatch   String?  // производствена партида на готовия продукт
+  quantity      Float
+  unit          String   @default("бр")
+  materialsCost Float?   // сумарна себестойност на вложените суровини
+  unitCost      Float?   // себестойност за единица готова продукция
+  status        String   @default("completed") // planned | in_progress | completed | cancelled
+  operatorId    String?
+  operatorName  String?
+  note          String?  @db.Text
+  producedAt    DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  company      Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  consumptions ProductionConsumption[]
+
+  @@index([companyId, producedAt])
+}
+
+// Вложена суровина в производствена поръчка (за проследимост и себестойност).
+model ProductionConsumption {
+  id          String  @id @default(cuid())
+  orderId     String
+  stockItemId String?
+  itemName    String
+  quantity    Float
+  unit        String  @default("бр")
+  unitCost    Float?
+  batchNumber String?
+
+  order ProductionOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
 model Recipe {
   id             String       @id @default(cuid())
   companyId      String

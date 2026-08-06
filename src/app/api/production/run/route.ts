@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireFeature } from "@/lib/session";
 import { audit } from "@/lib/documents";
+import { productionNumber, materialsCost as calcMaterialsCost, unitCost as calcUnitCost } from "@/lib/production";
 import { z } from "zod";
 
 const schema = z.object({
@@ -41,25 +42,31 @@ export async function POST(req: Request) {
     }
 
     const now = new Date();
-    // Изписване на съставките
+    // Изписване на съставките + събиране на вложените суровини (за проследимост/себестойност)
+    const consumed: { stockItemId: string; itemName: string; quantity: number; unit: string; unitCost: number | null }[] = [];
     for (const ing of recipe.ingredients) {
       const need = ing.quantity * data.multiplier;
+      const it = byId.get(ing.stockItemId);
       await prisma.stockMovement.create({ data: { stockItemId: ing.stockItemId, type: "production", quantity: -need, date: now, note: `Вложено в производство: ${recipe.name}` } });
       await prisma.stockItem.update({ where: { id: ing.stockItemId }, data: { quantity: { decrement: need } } });
+      consumed.push({ stockItemId: ing.stockItemId, itemName: it?.name ?? "—", quantity: need, unit: it?.unit ?? "бр", unitCost: it?.unitCost ?? null });
     }
 
     // Заприходяване на готовата продукция (само ако фирмата го е избрала)
     let producedQty = 0;
     let outputItemId: string | null = null;
+    let outputName = recipe.name;
+    let outputUnit = "бр";
     if (data.addToWarehouse) {
       if (recipe.outputItemId) {
         // Готовият продукт е зададен в рецептата
         producedQty = recipe.outputQuantity * data.multiplier;
         const out = await prisma.stockItem.findFirst({ where: { id: recipe.outputItemId, companyId } });
-        if (out) outputItemId = out.id;
+        if (out) { outputItemId = out.id; outputName = out.name; outputUnit = out.unit; }
       } else if (data.output) {
         // Създаване/намиране на артикул в избрания склад по подадените данни
         producedQty = data.output.quantity;
+        outputName = data.output.name; outputUnit = data.output.unit;
         const existing = await prisma.stockItem.findFirst({ where: { companyId, warehouseId: data.output.warehouseId, name: data.output.name } });
         if (existing) {
           outputItemId = existing.id;
@@ -85,8 +92,32 @@ export async function POST(req: Request) {
       }
     }
 
-    await audit(companyId, userId, "create", "Production", recipe.id, `Производство ${recipe.name} ×${data.multiplier}`);
-    return NextResponse.json({ success: true, producedQty });
+    // ─── Траен запис на производствената поръчка + вложени суровини (проследимост) ───
+    // Допълнение към съществуващата логика — не променя ефекта върху склада.
+    let orderNumber: string | null = null;
+    try {
+      const year = now.getFullYear();
+      const seq = await prisma.productionOrder.count({ where: { companyId, producedAt: { gte: new Date(year, 0, 1), lt: new Date(year + 1, 0, 1) } } });
+      orderNumber = productionNumber(seq + 1, year);
+      const mCost = calcMaterialsCost(consumed);
+      const operator = await prisma.user.findUnique({ where: { id: userId }, select: { name: true, email: true } });
+      await prisma.productionOrder.create({
+        data: {
+          companyId, number: orderNumber, recipeId: recipe.id, recipeName: recipe.name,
+          outputItemId, outputName, outputBatch: data.batchNumber ?? null,
+          quantity: producedQty, unit: outputUnit,
+          materialsCost: mCost, unitCost: calcUnitCost(mCost, producedQty),
+          status: "completed", operatorId: userId, operatorName: operator?.name ?? operator?.email ?? null,
+          producedAt: now,
+          consumptions: {
+            create: consumed.map((c) => ({ stockItemId: c.stockItemId, itemName: c.itemName, quantity: c.quantity, unit: c.unit, unitCost: c.unitCost })),
+          },
+        },
+      });
+    } catch (e) { console.error("production order persist", e); }
+
+    await audit(companyId, userId, "create", "Production", recipe.id, `Производство ${recipe.name} ×${data.multiplier}${orderNumber ? ` (${orderNumber})` : ""}`);
+    return NextResponse.json({ success: true, producedQty, orderNumber });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: "Невалидни данни." }, { status: 400 });
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
