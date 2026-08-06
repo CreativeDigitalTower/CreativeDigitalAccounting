@@ -36,6 +36,8 @@ export default function ReceiveStockPage() {
         unitPrice: fd.get("unitPrice") ? parseLocalizedNumber(fd.get("unitPrice") as string) : null,
         supplierId: fd.get("supplierId") || null,
         batchNumber: fd.get("batchNumber") || null,
+        expiryDate: fd.get("expiryDate") || null,
+        documentRef: fd.get("documentRef") || null,
         date: fd.get("date"),
         note: fd.get("note") || null,
       }),
@@ -63,6 +65,8 @@ export default function ReceiveStockPage() {
             <div><label>{t("warehouse.receive.f.price")}</label><input type="text" inputMode="decimal" name="unitPrice" /></div>
             <div><label>{t("warehouse.receive.f.supplier")}</label><select name="supplierId"><option value="">—</option>{suppliers.map((s)=><option key={s.id} value={s.id}>{s.name}</option>)}</select></div>
             <div><label>{t("warehouse.receive.f.batch")}</label><input type="text" name="batchNumber" placeholder={t("warehouse.receive.f.batchPh")} /></div>
+            <div><label>{t("warehouse.receive.f.expiry")}</label><input type="date" name="expiryDate" /></div>
+            <div><label>{t("warehouse.receive.f.docRef")}</label><input type="text" name="documentRef" placeholder={t("warehouse.receive.f.docRefPh")} /></div>
             <div><label>{t("warehouse.receive.f.date")}</label><input type="date" name="date" required defaultValue={new Date().toISOString().slice(0,10)} /></div>
             <div style={{ gridColumn: "1 / -1" }}><label>{t("warehouse.receive.f.note")}</label><input type="text" name="note" /></div>
           </div>

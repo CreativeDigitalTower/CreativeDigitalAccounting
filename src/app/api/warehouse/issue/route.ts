@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireFeature } from "@/lib/session";
 import { audit } from "@/lib/documents";
+import { consumeBatchesFifo } from "@/lib/stockServer";
+import { freeQuantity } from "@/lib/stock";
 import { z } from "zod";
 
 const schema = z.object({
@@ -18,8 +20,10 @@ export async function POST(req: Request) {
 
     const item = await prisma.stockItem.findFirst({ where: { id: data.stockItemId, companyId } });
     if (!item) return NextResponse.json({ error: "Невалиден артикул." }, { status: 400 });
-    if (item.quantity < data.quantity) {
-      return NextResponse.json({ error: `Недостатъчна наличност. Налично: ${item.quantity} ${item.unit}.` }, { status: 400 });
+    // Изписва се от СВОБОДНОТО количество (наличност − резервирано).
+    const free = freeQuantity(item.quantity, item.reservedQuantity);
+    if (free < data.quantity) {
+      return NextResponse.json({ error: `Недостатъчно свободно количество. Свободни: ${free} ${item.unit} (резервирани ${item.reservedQuantity}).` }, { status: 400 });
     }
 
     await prisma.$transaction([
@@ -33,6 +37,8 @@ export async function POST(req: Request) {
         where: { id: data.stockItemId },
         data: { quantity: { decrement: data.quantity } },
       }),
+      // FIFO изписване по партиди (само ако артикулът има партиди — без regression).
+      ...(await consumeBatchesFifo(data.stockItemId, data.quantity)),
     ]);
     await audit(companyId, userId, "update", "StockItem", item.id, `Изписване −${data.quantity}`);
     return NextResponse.json({ success: true });

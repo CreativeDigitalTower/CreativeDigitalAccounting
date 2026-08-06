@@ -63,7 +63,10 @@
       "batch": "Număr lot",
       "batchPh": "ex. L2026-0617",
       "date": "Dată *",
-      "note": "Notă"
+      "note": "Notă",
+      "expiry": "Data expirării",
+      "docRef": "Document intrare",
+      "docRefPh": "Nr. factură / aviz"
     },
     "save": "Recepționează",
     "saving": "Se salvează…"
@@ -225,5 +228,28 @@
     "newPh": "Categorie nouă (ex. Materii prime)",
     "add": "Adaugă",
     "confirmDelete": "această categorie"
+  },
+  "batches": {
+    "title": "Loturi, expirare și rezervări",
+    "expiringTitle": "Loturi care expiră / expirate",
+    "noExpiring": "Niciun lot aproape de expirare.",
+    "reservedTitle": "Cantități rezervate",
+    "noReserved": "Nicio cantitate rezervată.",
+    "item": "Articol",
+    "batch": "Lot",
+    "qty": "Cantitate",
+    "supplier": "Furnizor",
+    "expiry": "Expirare",
+    "available": "Stoc",
+    "reserved": "Rezervat",
+    "free": "Liber",
+    "release": "Eliberează",
+    "reserveItem": "Articol",
+    "reserveQty": "Cantitate",
+    "reserve": "Rezervă",
+    "freeShort": "liber {n} {unit}",
+    "expiresIn": "în {d} zile",
+    "expired": "expirat acum {d} zile",
+    "err": "Eroare la rezervare."
   }
 }

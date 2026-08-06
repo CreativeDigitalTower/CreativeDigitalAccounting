@@ -5,6 +5,8 @@ import { CategoriesManager } from "@/components/app/CategoriesManager";
 import { FeatureLink } from "@/components/app/FeatureLink";
 import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 import { WarehousePriceSimulator } from "@/components/app/WarehousePriceSimulator";
+import { WarehouseBatches, type ExpiringBatch, type ReservedItem, type ReserveOption } from "@/components/app/WarehouseBatches";
+import { batchExpiryStatus, freeQuantity } from "@/lib/stock";
 import Link from "next/link";
 import { getT } from "@/lib/i18n/server";
 
@@ -28,6 +30,32 @@ export default async function WarehousePage() {
   ]);
 
   const lowStock = stockItems.filter((i) => i.minQuantity !== null && i.quantity <= (i.minQuantity ?? 0));
+
+  // ─── Партиди/FIFO/резервиране: изтичащи партиди + резервирани количества ───
+  const itemById = new Map(stockItems.map((i) => [i.id, i]));
+  const batchRows = await prisma.stockBatch.findMany({
+    where: { stockItem: { companyId }, quantity: { gt: 0 }, expiryDate: { not: null } },
+    orderBy: { expiryDate: "asc" },
+    select: { id: true, stockItemId: true, batchNumber: true, quantity: true, expiryDate: true, supplierName: true },
+  });
+  const nowD = new Date();
+  const expiringBatches: ExpiringBatch[] = batchRows
+    .map((b) => {
+      const st = batchExpiryStatus(b.expiryDate, nowD, 30);
+      const it = itemById.get(b.stockItemId);
+      return st.status === "soon" || st.status === "expired"
+        ? { id: b.id, itemName: it?.name ?? "—", batchNumber: b.batchNumber, quantity: b.quantity, unit: it?.unit ?? "бр",
+            expiryDate: b.expiryDate!.toISOString(), supplierName: b.supplierName, status: st.status as "soon" | "expired", days: st.days ?? 0 }
+        : null;
+    })
+    .filter(Boolean) as ExpiringBatch[];
+
+  const reservedItems: ReservedItem[] = stockItems
+    .filter((i) => (i.reservedQuantity ?? 0) > 0)
+    .map((i) => ({ id: i.id, name: i.name, unit: i.unit, quantity: i.quantity, reserved: i.reservedQuantity, free: freeQuantity(i.quantity, i.reservedQuantity) }));
+  const reserveOptions: ReserveOption[] = stockItems
+    .filter((i) => freeQuantity(i.quantity, i.reservedQuantity) > 0)
+    .map((i) => ({ id: i.id, name: i.name, unit: i.unit, free: freeQuantity(i.quantity, i.reservedQuantity) }));
 
   // Срок на годност — статус (жълто ≤7 дни, червено изтекъл)
   const now = new Date(); now.setHours(0, 0, 0, 0);
@@ -64,6 +92,8 @@ export default async function WarehousePage() {
       </div>
 
       {extended && <CategoriesManager initial={categories.map((c) => ({ id: c.id, name: c.name }))} />}
+
+      <WarehouseBatches expiring={expiringBatches} reserved={reservedItems} options={reserveOptions} />
 
       {/* Обща стойност на склада */}
       <div className="glass panel" style={{ padding: "16px 20px", marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, background: "linear-gradient(135deg, rgba(15,138,106,.08), rgba(11,94,74,.04))" }}>

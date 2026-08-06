@@ -63,7 +63,10 @@
       "batch": "Parti numarası",
       "batchPh": "örn. L2026-0617",
       "date": "Tarih *",
-      "note": "Not"
+      "note": "Not",
+      "expiry": "Son kullanma tarihi",
+      "docRef": "Giriş belgesi",
+      "docRefPh": "Fatura / irsaliye No"
     },
     "save": "Kabul et",
     "saving": "Kaydediliyor…"
@@ -225,5 +228,28 @@
     "newPh": "Yeni kategori (örn. Hammadde)",
     "add": "Ekle",
     "confirmDelete": "bu kategori"
+  },
+  "batches": {
+    "title": "Partiler, son kullanma ve rezervasyon",
+    "expiringTitle": "Süresi dolan / dolmuş partiler",
+    "noExpiring": "Süresi yaklaşan parti yok.",
+    "reservedTitle": "Rezerve miktarlar",
+    "noReserved": "Rezerve miktar yok.",
+    "item": "Ürün",
+    "batch": "Parti",
+    "qty": "Miktar",
+    "supplier": "Tedarikçi",
+    "expiry": "Son kullanma",
+    "available": "Mevcut",
+    "reserved": "Rezerve",
+    "free": "Serbest",
+    "release": "Serbest bırak",
+    "reserveItem": "Ürün",
+    "reserveQty": "Miktar",
+    "reserve": "Rezerve et",
+    "freeShort": "serbest {n} {unit}",
+    "expiresIn": "{d} gün içinde",
+    "expired": "{d} gün önce doldu",
+    "err": "Rezervasyon hatası."
   }
 }

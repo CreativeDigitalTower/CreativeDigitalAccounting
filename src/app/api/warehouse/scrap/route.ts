@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireFeature } from "@/lib/session";
 import { audit } from "@/lib/documents";
+import { consumeBatchesFifo } from "@/lib/stockServer";
 import { z } from "zod";
 
 const schema = z.object({
@@ -25,6 +26,7 @@ export async function POST(req: Request) {
         data: { stockItemId: data.stockItemId, type: "scrap", quantity: data.quantity, unitPrice: item.unitCost ?? null, date: new Date(data.date), note: data.note ?? "Брак" },
       }),
       prisma.stockItem.update({ where: { id: data.stockItemId }, data: { quantity: { decrement: data.quantity } } }),
+      ...(await consumeBatchesFifo(data.stockItemId, data.quantity)),
     ]);
     await audit(companyId, userId, "update", "StockItem", item.id, `Брак −${data.quantity}`);
     return NextResponse.json({ success: true });

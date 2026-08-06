@@ -418,6 +418,7 @@ model StockItem {
   name        String
   sku         String?
   quantity    Float   @default(0)
+  reservedQuantity Float @default(0) // заделено (свободно = quantity − reservedQuantity)
   minQuantity Float?
   unit        String  @default("бр")
   unitCost    Float?
@@ -428,6 +429,7 @@ model StockItem {
   category  StockCategory?  @relation(fields: [categoryId], references: [id])
   movements StockMovement[]
   batches   StockBatch[]
+  reservations StockReservation[]
 }
 
 model StockCategory {
@@ -446,14 +448,37 @@ model StockBatch {
   id          String   @id @default(cuid())
   stockItemId String
   batchNumber String
-  quantity    Float    @default(0)
+  quantity    Float    @default(0)  // ОСТАВАЩО количество (намалява при FIFO изписване)
+  initialQuantity Float?            // първоначално заприходено (за проследимост)
   unitCost    Float?
+  // Партидни данни за проследимост и срокове на годност (additive, nullable).
+  supplierId    String?
+  supplierName  String?             // snapshot (без relation, за да не пипаме Supplier)
+  deliveryDate  DateTime?           // дата на доставка
+  expiryDate    DateTime?           // срок на годност (null = безсрочно)
+  documentRef   String?             // входящ документ (фактура/приемо-предаване)
   note        String?
   createdAt   DateTime @default(now())
 
   stockItem StockItem @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
 
   @@index([stockItemId, createdAt])
+  @@index([expiryDate])
+}
+
+// Резервирано количество от артикул (напр. заделено за поръчка/производство).
+// Свободното = StockItem.quantity − StockItem.reservedQuantity.
+model StockReservation {
+  id          String   @id @default(cuid())
+  stockItemId String
+  quantity    Float
+  note        String?
+  releasedAt  DateTime?
+  createdAt   DateTime @default(now())
+
+  stockItem StockItem @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
+
+  @@index([stockItemId])
 }
 
 // Рецепти за производство
