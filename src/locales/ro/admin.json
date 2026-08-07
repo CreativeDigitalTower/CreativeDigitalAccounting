@@ -338,5 +338,13 @@
     "kpiClicked": "Clicuri",
     "kpiReactivated": "Reactivate",
     "kpiNote": "Deschiderile/clicurile sunt urmărite prin pixel și redirect securizat. Se afișează doar evenimente reale."
+  },
+  "personalization": {
+    "kpiTitle": "OFERTE DE PERSONALIZARE",
+    "kpiSent": "Trimise",
+    "kpiCompanies": "Firme",
+    "kpiOpened": "Deschise",
+    "kpiClicked": "Clicuri",
+    "kpiNote": "Urmărit prin trimis/deschis (pixel). Clicul pe un buton mailto nu este raportat fiabil de clienții de e-mail."
   }
 }

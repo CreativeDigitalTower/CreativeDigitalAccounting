@@ -338,5 +338,13 @@
     "kpiClicked": "Clicked",
     "kpiReactivated": "Reactivated",
     "kpiNote": "Opens/clicks are tracked via pixel and a secure redirect. Only real events are shown."
+  },
+  "personalization": {
+    "kpiTitle": "PERSONALIZATION OFFERS",
+    "kpiSent": "Sent",
+    "kpiCompanies": "Companies",
+    "kpiOpened": "Opened",
+    "kpiClicked": "Clicked",
+    "kpiNote": "Tracked via sent/opened (pixel). Clicks on a mailto button are not reliably reported by email clients."
   }
 }

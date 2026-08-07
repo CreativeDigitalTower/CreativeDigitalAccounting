@@ -221,5 +221,22 @@
     "p_support": "If you have a question or need assistance, simply reply to this email. Our team is here and happy to help.",
     "p_signoff": "Best regards,\nThe Creative Digital Accounting Team",
     "button": "Issue your first invoice"
+  },
+  "personalization": {
+    "subject": "We can tailor Creative Digital Accounting to your business – completely free",
+    "eyebrow": "Partnership",
+    "p_greeting": "Hello,",
+    "p_thanks": "Thank you for using Creative Digital Accounting.",
+    "p_goal": "Our goal is not just to provide accounting software, but to build a platform that genuinely makes every company's daily work easier.",
+    "p_dev": "That is why we continuously develop new features, templates, documents and entire modules based on our clients' needs.",
+    "p_if": "If your business needs:",
+    "p_list": "• a specific document;\n• a company template;\n• a new module;\n• a report;\n• an automation;\n• an integration;\n• a process you'd like automated;",
+    "p_or": "or any functionality that would make your work easier, we'll be glad to build it especially for you – completely free.",
+    "p_many": "Many of the platform's modules were created from our clients' suggestions and are now used successfully by many companies.",
+    "p_reply": "Just reply to this email and briefly describe what you'd like added. Our team will review your suggestion and, if we can build it, we'll develop and deploy it as fast as possible.",
+    "p_signoff": "Thank you for helping us grow Creative Digital Accounting together.\n\nBest regards,\nThe Creative Digital Accounting Team",
+    "button": "Send us your idea",
+    "mailtoSubject": "Idea for a new feature",
+    "partnership": "For us there is no requirement that is “too specific”. If a feature will help your business work more efficiently, send us your idea – we'll review it with the highest priority."
   }
 }

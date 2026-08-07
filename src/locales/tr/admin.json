@@ -338,5 +338,13 @@
     "kpiClicked": "Tıklandı",
     "kpiReactivated": "Yeniden etkin",
     "kpiNote": "Açılma/tıklama pixel ve güvenli yönlendirme ile izlenir. Yalnızca gerçek olaylar gösterilir."
+  },
+  "personalization": {
+    "kpiTitle": "KİŞİSELLEŞTİRME TEKLİFLERİ",
+    "kpiSent": "Gönderildi",
+    "kpiCompanies": "Şirketler",
+    "kpiOpened": "Açıldı",
+    "kpiClicked": "Tıklandı",
+    "kpiNote": "Gönderildi/açıldı ile izlenir (piksel). Mailto düğmesine tıklama e-posta istemcileri tarafından güvenilir şekilde raporlanmaz."
   }
 }

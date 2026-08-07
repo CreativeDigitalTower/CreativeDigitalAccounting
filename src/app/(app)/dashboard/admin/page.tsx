@@ -233,13 +233,11 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     .filter((c) => c.days >= 7).sort((a, b) => b.days - a.days).slice(0, 8);
 
   // ─── Сигнали за активиране (ръчни напомняния до неактивни фирми) ───
-  const [invoiceAgg, reminderLogs] = await Promise.all([
+  const emailLogSelect = { companyId: true, createdAt: true, status: true, opensCount: true, clicksCount: true, openedAt: true, clickedAt: true, bounced: true, toEmail: true, subject: true } as const;
+  const [invoiceAgg, reminderLogs, personalizationLogs] = await Promise.all([
     prisma.document.groupBy({ by: ["companyId"], where: { type: "invoice", deletedAt: null }, _count: { _all: true }, _min: { createdAt: true } }),
-    prisma.emailLog.findMany({
-      where: { type: "reactivation_reminder" },
-      select: { companyId: true, createdAt: true, status: true, opensCount: true, clicksCount: true, openedAt: true, clickedAt: true, bounced: true, toEmail: true, subject: true },
-      orderBy: { createdAt: "desc" },
-    }),
+    prisma.emailLog.findMany({ where: { type: "reactivation_reminder" }, select: emailLogSelect, orderBy: { createdAt: "desc" } }),
+    prisma.emailLog.findMany({ where: { type: "personalization_offer" }, select: emailLogSelect, orderBy: { createdAt: "desc" } }),
   ]);
   const invoiceCountByCompany = new Map(invoiceAgg.map((r) => [r.companyId, r._count._all]));
   const firstInvoiceByCompany = new Map(invoiceAgg.map((r) => [r.companyId, r._min.createdAt]));
@@ -248,6 +246,12 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     if (!r.companyId) continue;
     const arr = remindersByCompany.get(r.companyId) ?? [];
     arr.push(r); remindersByCompany.set(r.companyId, arr);
+  }
+  const personalizationByCompany = new Map<string, typeof personalizationLogs>();
+  for (const r of personalizationLogs) {
+    if (!r.companyId) continue;
+    const arr = personalizationByCompany.get(r.companyId) ?? [];
+    arr.push(r); personalizationByCompany.set(r.companyId, arr);
   }
   // Строим engagement сигналите за всяка (стандартна) фирма.
   const reactivationByCompany = new Map<string, ReactivationInfo>();
@@ -299,6 +303,18 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         openedAt: r.openedAt?.toISOString() ?? null, clickedAt: r.clickedAt?.toISOString() ?? null,
         bounced: r.bounced, toEmail: r.toEmail, subject: r.subject,
       })),
+      personalization: (() => {
+        const pl = personalizationByCompany.get(c.id) ?? [];
+        return {
+          count: pl.length,
+          lastSentAt: pl[0]?.createdAt?.toISOString() ?? null,
+          timeline: pl.slice(0, 6).map((r) => ({
+            createdAt: r.createdAt.toISOString(), status: r.status, opens: r.opensCount, clicks: r.clicksCount,
+            openedAt: r.openedAt?.toISOString() ?? null, clickedAt: r.clickedAt?.toISOString() ?? null,
+            bounced: r.bounced, toEmail: r.toEmail, subject: r.subject,
+          })),
+        };
+      })(),
     });
   }
   // KPI за активиране (реални данни от EmailLog + документи).
@@ -312,6 +328,16 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     const clicked = withReminder.filter((r) => r.clicksCount > 0).length;
     const reactivated = vals.filter((v) => v.status === "reactivated").length;
     return { candidates, companiesReminded, sent, opened, clicked, reactivated };
+  })();
+  // KPI за предложенията за персонализация (реални данни от EmailLog tracking).
+  const persStats = (() => {
+    const logs = personalizationLogs.filter((r) => r.companyId);
+    return {
+      sent: logs.filter((r) => r.status === "sent").length,
+      opened: logs.filter((r) => r.opensCount > 0).length,
+      clicked: logs.filter((r) => r.clicksCount > 0).length,
+      companies: new Set(logs.map((r) => r.companyId)).size,
+    };
   })();
 
   // ─── Допълнителни показатели за растеж и активност ───
@@ -813,6 +839,25 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           ))}
         </div>
         <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 8 }}>{t("admin.reactivation.kpiNote")}</div>
+      </div>
+
+      {/* ─── Предложения за персонализация (реални данни от tracking) ─── */}
+      <div className="glass panel" style={{ padding: "12px 16px", marginBottom: 14 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--brass)", letterSpacing: 1, marginBottom: 8 }}>{t("admin.personalization.kpiTitle")}</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 10 }}>
+          {[
+            { label: t("admin.personalization.kpiSent"), value: persStats.sent, color: "var(--ink)" },
+            { label: t("admin.personalization.kpiCompanies"), value: persStats.companies, color: "var(--navy)" },
+            { label: t("admin.personalization.kpiOpened"), value: persStats.opened, color: "var(--emerald-dark)" },
+            { label: t("admin.personalization.kpiClicked"), value: persStats.clicked, color: "var(--emerald-dark)" },
+          ].map((k) => (
+            <div key={k.label}>
+              <div style={{ fontSize: 11, color: "var(--muted)", marginBottom: 2 }}>{k.label}</div>
+              <div className="num" style={{ fontSize: 18, fontWeight: 700, color: k.color }}>{k.value}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 8 }}>{t("admin.personalization.kpiNote")}</div>
       </div>
 
       <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, fontWeight: 600, margin: "0 0 4px" }}>{t("admin.companies.title")}</h2>
