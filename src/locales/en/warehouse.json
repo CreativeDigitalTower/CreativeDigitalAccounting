@@ -63,7 +63,10 @@
       "batch": "Batch number",
       "batchPh": "e.g. L2026-0617",
       "date": "Date *",
-      "note": "Note"
+      "note": "Note",
+      "expiry": "Expiry date",
+      "docRef": "Incoming document",
+      "docRefPh": "Invoice / delivery note №"
     },
     "save": "Receive",
     "saving": "Saving…"
@@ -225,5 +228,28 @@
     "newPh": "New category (e.g. Raw materials)",
     "add": "Add",
     "confirmDelete": "this category"
+  },
+  "batches": {
+    "title": "Batches, expiry and reservations",
+    "expiringTitle": "Expiring / expired batches",
+    "noExpiring": "No batches nearing expiry.",
+    "reservedTitle": "Reserved quantities",
+    "noReserved": "No reserved quantities.",
+    "item": "Item",
+    "batch": "Batch",
+    "qty": "Quantity",
+    "supplier": "Supplier",
+    "expiry": "Expiry",
+    "available": "On hand",
+    "reserved": "Reserved",
+    "free": "Free",
+    "release": "Release",
+    "reserveItem": "Item",
+    "reserveQty": "Quantity",
+    "reserve": "Reserve",
+    "freeShort": "free {n} {unit}",
+    "expiresIn": "in {d} days",
+    "expired": "expired {d} days ago",
+    "err": "Reservation error."
   }
 }

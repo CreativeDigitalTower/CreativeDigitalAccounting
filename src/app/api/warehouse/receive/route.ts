@@ -11,6 +11,8 @@ const schema = z.object({
   unitPrice: z.number().min(0).optional().nullable(),
   supplierId: z.string().optional().nullable(),
   batchNumber: z.string().optional().nullable(),
+  expiryDate: z.string().optional().nullable(),
+  documentRef: z.string().max(120).optional().nullable(),
   date: z.string(),
   note: z.string().optional().nullable(),
 });
@@ -40,8 +42,20 @@ export async function POST(req: Request) {
       }),
     ];
     if (data.batchNumber) {
+      // Доставчик (snapshot на името, без relation) за проследимост.
+      let supplierName: string | null = null;
+      if (data.supplierId) {
+        const sup = await prisma.supplier.findFirst({ where: { id: data.supplierId, companyId }, select: { name: true } });
+        supplierName = sup?.name ?? null;
+      }
       ops.push(prisma.stockBatch.create({
-        data: { stockItemId: data.stockItemId, batchNumber: data.batchNumber, quantity: data.quantity, unitCost: data.unitPrice ?? null },
+        data: {
+          stockItemId: data.stockItemId, batchNumber: data.batchNumber,
+          quantity: data.quantity, initialQuantity: data.quantity, unitCost: data.unitPrice ?? null,
+          supplierId: data.supplierId ?? null, supplierName,
+          deliveryDate: new Date(data.date), expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
+          documentRef: data.documentRef ?? null, note: data.note ?? null,
+        },
       }));
     }
     await prisma.$transaction(ops);
