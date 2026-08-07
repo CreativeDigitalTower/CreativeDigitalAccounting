@@ -221,5 +221,22 @@
     "p_support": "Dacă aveți o întrebare sau aveți nevoie de ajutor, răspundeți direct la acest e-mail. Echipa noastră este bucuroasă să vă ajute.",
     "p_signoff": "Cu stimă,\nEchipa Creative Digital Accounting",
     "button": "Emiteți prima factură"
+  },
+  "personalization": {
+    "subject": "Putem adapta Creative Digital Accounting pentru afacerea dvs. – complet gratuit",
+    "eyebrow": "Parteneriat",
+    "p_greeting": "Bună ziua,",
+    "p_thanks": "Vă mulțumim că folosiți Creative Digital Accounting.",
+    "p_goal": "Scopul nostru nu este doar să oferim software de contabilitate, ci să construim o platformă care ușurează cu adevărat munca zilnică a fiecărei firme.",
+    "p_dev": "De aceea dezvoltăm continuu funcții, șabloane, documente și module întregi în funcție de nevoile clienților.",
+    "p_if": "Dacă în activitatea dvs. aveți nevoie de:",
+    "p_list": "• un document specific;\n• un șablon de firmă;\n• un modul nou;\n• un raport;\n• o automatizare;\n• o integrare;\n• un proces pe care ați dori să-l automatizați;",
+    "p_or": "sau orice funcționalitate care v-ar ușura munca, o vom dezvolta cu plăcere special pentru dvs. – complet gratuit.",
+    "p_many": "Multe module ale platformei au fost create din sugestiile clienților și sunt folosite azi cu succes de multe firme.",
+    "p_reply": "Este suficient să răspundeți la acest e-mail și să descrieți pe scurt ce ați dori adăugat. Echipa noastră va analiza sugestia și, dacă o putem realiza, o vom dezvolta cât mai rapid.",
+    "p_signoff": "Vă mulțumim că ne ajutați să dezvoltăm împreună Creative Digital Accounting.\n\nCu stimă,\nEchipa Creative Digital Accounting",
+    "button": "Trimiteți-ne ideea dvs.",
+    "mailtoSubject": "Idee pentru o funcție nouă",
+    "partnership": "Pentru noi nu există cerințe „prea specifice”. Dacă o funcție vă va ajuta afacerea să lucreze mai eficient, trimiteți-ne ideea – o vom analiza cu cea mai mare prioritate."
   }
 }

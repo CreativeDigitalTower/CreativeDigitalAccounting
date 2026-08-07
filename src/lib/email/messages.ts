@@ -493,6 +493,55 @@ export function reactivationReminderDefaults(vars: ReactivationVars, locale: Loc
  * HTML/email injection при редакция от админ). CTA бутонът се проследява автоматично
  * от send слоя (open pixel + click redirect).
  */
+// ─────────────────────── ПЕРСОНАЛИЗАЦИЯ (маркетинг кампания) ───────────────────────
+
+const PERSONALIZATION_MAILTO = "support@creativedigitalaccounting.com";
+
+/** Готово съдържание на имейла „Предложи персонализация" (по език на получателя). */
+export function personalizationOfferEmail(locale: Locale = "bg"): {
+  subject: string; eyebrow: string; paragraphs: string[]; buttonLabel: string; mailtoUrl: string; partnership: string;
+} {
+  const { E } = emT(locale);
+  const P = (k: string) => E(`personalization.${k}`);
+  return {
+    subject: P("subject"),
+    eyebrow: P("eyebrow"),
+    paragraphs: [
+      P("p_greeting"), P("p_thanks"), P("p_goal"), P("p_dev"),
+      P("p_if"), P("p_list"), P("p_or"), P("p_many"), P("p_reply"), P("p_signoff"),
+    ],
+    buttonLabel: P("button"),
+    mailtoUrl: `mailto:${PERSONALIZATION_MAILTO}?subject=${encodeURIComponent(P("mailtoSubject"))}`,
+    partnership: P("partnership"),
+  };
+}
+
+/**
+ * Изгражда HTML на имейла за персонализация. CTA е mailto бутон, който НЕ се
+ * обвива за click-tracking (без target="_blank" и различен padding), за да отвори
+ * коректно пощенския клиент. Отваряния се проследяват чрез open pixel.
+ */
+export function buildPersonalizationHtml(locale: Locale = "bg"): { subject: string; html: string } {
+  const loc = normalizeLocale(locale);
+  const o = personalizationOfferEmail(loc);
+  // Зелен mailto бутон (padding:14px + без target="_blank" → не се wрап-ва от send слоя).
+  const ctaButton = `<a href="${o.mailtoUrl}" style="display:inline-block;padding:14px 34px;background:#0F8A6A;color:#ffffff;font-weight:700;text-decoration:none;border-radius:10px;font-size:15px;">${escapeHtml(o.buttonLabel)}</a>`;
+  const partnership = `<strong>${escapeHtml(o.partnership)}</strong>`;
+  const html = baseTemplate({
+    locale: loc,
+    eyebrow: o.eyebrow,
+    title: o.subject,
+    preheader: o.subject,
+    intro: [
+      ...o.paragraphs.map((p) => escapeHtml(p).replace(/\n/g, "<br>")),
+      ctaButton,
+      partnership,
+    ],
+    footnote: "{{UNSUB}}",
+  });
+  return { subject: o.subject, html };
+}
+
 export function buildReactivationHtml(o: { subject: string; paragraphs: string[]; buttonLabel: string; ctaUrl: string; locale?: Locale }): string {
   const loc = normalizeLocale(o.locale ?? "bg");
   return baseTemplate({

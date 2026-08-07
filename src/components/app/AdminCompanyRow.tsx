@@ -29,6 +29,10 @@ export type ReactivationInfo = {
   recipients: string[]; ownerName: string | null;
   createdAt: string; lastActivity: string | null;
   timeline: { createdAt: string; status: string; opens: number; clicks: number; openedAt: string | null; clickedAt: string | null; bounced: boolean; toEmail: string; subject: string }[];
+  personalization: {
+    count: number; lastSentAt: string | null;
+    timeline: { createdAt: string; status: string; opens: number; clicks: number; openedAt: string | null; clickedAt: string | null; bounced: boolean; toEmail: string; subject: string }[];
+  };
 };
 
 type Props = {
@@ -113,6 +117,21 @@ export function AdminCompanyRow(props: Props) {
   const [reactOpen, setReactOpen] = useState(false);
   const react = props.reactivation;
   const reminderDays = react?.lastReminderAt ? Math.floor((Date.now() - new Date(react.lastReminderAt).getTime()) / 86400000) : null;
+  // Предложение за персонализация (отделна кампания, до бутона за напомняне).
+  const [persBusy, setPersBusy] = useState(false);
+  const [persErr, setPersErr] = useState("");
+  const persSent = (react?.personalization?.count ?? 0) > 0;
+  async function sendPersonalization() {
+    if (persSent && !confirm("Изпрати отново предложението за персонализация?")) return;
+    setPersBusy(true); setPersErr("");
+    const res = await fetch("/api/admin/personalization", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ companyId: props.id, campaign: "personalization" }),
+    });
+    setPersBusy(false);
+    if (res.ok) router.refresh();
+    else setPersErr((await res.json().catch(() => ({}))).error ?? "Грешка при изпращане.");
+  }
 
   async function setCdt() {
     setCdtBusy(true); setCdtMsg("");
@@ -276,12 +295,28 @@ export function AdminCompanyRow(props: Props) {
                           <span style={{ fontSize: 12, color: "var(--muted)" }}>{react.reminderCount >= 3 ? "Достигнат максимум напомняния." : `Изпратено скоро — изчакайте още ${react.cooldownDaysUntil} дни.`}</span>
                           <button className="btn btn-ghost btn-sm" onClick={() => setReactOpen(true)}>Изпрати отново</button>
                         </>}
+
+                  {/* Втори бутон — предложение за персонализация (отделна кампания) */}
+                  <span style={{ width: 1, alignSelf: "stretch", background: "var(--border)", margin: "0 2px" }} />
+                  {react.recipients.length === 0 ? null : persSent ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12 }}>
+                      <span style={{ color: "var(--emerald-dark)", fontWeight: 600 }}>✅ Персонализация · изпратено{react.personalization.lastSentAt ? ` на ${new Date(react.personalization.lastSentAt).toLocaleDateString("bg-BG")}` : ""}</span>
+                      <button className="btn btn-ghost btn-sm" onClick={sendPersonalization} disabled={persBusy}>{persBusy ? "…" : "Изпрати отново"}</button>
+                    </span>
+                  ) : (
+                    <button className="btn btn-ghost btn-sm" onClick={sendPersonalization} disabled={persBusy} style={{ borderColor: "var(--emerald)", color: "var(--emerald-dark)" }}>{persBusy ? "…" : "Предложи персонализация"}</button>
+                  )}
                 </div>
-                {react.timeline.length > 0 && (
+                {persErr && <div style={{ fontSize: 12, color: "var(--brick)", marginTop: 4 }}>{persErr}</div>}
+                {(react.timeline.length > 0 || react.personalization.timeline.length > 0) && (
                   <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 4 }}>
-                    {react.timeline.map((tm, i) => (
+                    {[
+                      ...react.timeline.map((tm) => ({ ...tm, kind: "Напомняне" })),
+                      ...react.personalization.timeline.map((tm) => ({ ...tm, kind: "Персонализация" })),
+                    ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 10).map((tm, i) => (
                       <div key={i} style={{ fontSize: 11.5, color: "var(--ink-soft)", display: "flex", gap: 8, flexWrap: "wrap" }}>
                         <span style={{ color: "var(--muted)", minWidth: 130 }}>{new Date(tm.createdAt).toLocaleString("bg-BG")}</span>
+                        <span style={{ fontWeight: 700, color: tm.kind === "Персонализация" ? "var(--emerald-dark)" : "var(--navy)", minWidth: 96 }}>{tm.kind}</span>
                         <span>{tm.toEmail}</span>
                         <span style={{ fontWeight: 600 }}>{REACT_MAIL_STATUS[tm.status] ?? tm.status}</span>
                         {tm.opens > 0 && <span style={{ color: "var(--emerald-dark)" }}>отворен{tm.openedAt ? ` · ${new Date(tm.openedAt).toLocaleString("bg-BG")}` : ""}</span>}

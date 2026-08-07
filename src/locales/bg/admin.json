@@ -338,5 +338,13 @@
     "kpiClicked": "Кликнати",
     "kpiReactivated": "Реактивирани",
     "kpiNote": "Отваряния/кликвания се отчитат чрез tracking pixel и защитен redirect. Показват се само реални събития."
+  },
+  "personalization": {
+    "kpiTitle": "ПРЕДЛОЖЕНИЯ ЗА ПЕРСОНАЛИЗАЦИЯ",
+    "kpiSent": "Изпратени",
+    "kpiCompanies": "Фирми",
+    "kpiOpened": "Отворени",
+    "kpiClicked": "Кликнати",
+    "kpiNote": "Проследяване чрез изпратен/отворен (tracking pixel). Кликването върху mailto бутон не се отчита надеждно от имейл клиентите."
   }
 }

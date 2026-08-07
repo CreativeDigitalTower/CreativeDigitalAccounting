@@ -221,5 +221,22 @@
     "p_support": "Bir sorunuz varsa veya yardıma ihtiyacınız olursa, bu e-postayı doğrudan yanıtlayın. Ekibimiz yardımcı olmaktan memnuniyet duyar.",
     "p_signoff": "Saygılarımızla,\nCreative Digital Accounting Ekibi",
     "button": "İlk faturanızı kesin"
+  },
+  "personalization": {
+    "subject": "Creative Digital Accounting'i işinize göre uyarlayabiliriz – tamamen ücretsiz",
+    "eyebrow": "Ortaklık",
+    "p_greeting": "Merhaba,",
+    "p_thanks": "Creative Digital Accounting'i kullandığınız için teşekkür ederiz.",
+    "p_goal": "Amacımız yalnızca muhasebe yazılımı sunmak değil, her şirketin günlük işini gerçekten kolaylaştıran bir platform kurmak.",
+    "p_dev": "Bu nedenle müşterilerimizin ihtiyaçlarına göre sürekli yeni özellikler, şablonlar, belgeler ve modüller geliştiriyoruz.",
+    "p_if": "İşinizde şunlara ihtiyacınız varsa:",
+    "p_list": "• özel bir belge;\n• firma şablonu;\n• yeni bir modül;\n• bir rapor;\n• bir otomasyon;\n• bir entegrasyon;\n• otomatikleştirmek istediğiniz bir süreç;",
+    "p_or": "veya işinizi kolaylaştıracak herhangi bir özellik varsa, size özel olarak geliştirmekten memnuniyet duyarız – tamamen ücretsiz.",
+    "p_many": "Platformdaki birçok modül müşterilerimizin önerileriyle oluşturuldu ve bugün birçok şirket tarafından başarıyla kullanılıyor.",
+    "p_reply": "Bu e-postayı yanıtlayıp ne eklenmesini istediğinizi kısaca yazmanız yeterli. Ekibimiz önerinizi inceleyecek ve gerçekleştirebilirsek en kısa sürede geliştirip devreye alacaktır.",
+    "p_signoff": "Creative Digital Accounting'i birlikte büyütmemize yardımcı olduğunuz için teşekkürler.\n\nSaygılarımızla,\nCreative Digital Accounting Ekibi",
+    "button": "Fikrinizi bize gönderin",
+    "mailtoSubject": "Yeni özellik fikri",
+    "partnership": "Bizim için „çok özel“ bir talep yoktur. Bir özellik işinizin daha verimli çalışmasına yardımcı olacaksa, fikrinizi gönderin – en yüksek öncelikle değerlendireceğiz."
   }
 }
