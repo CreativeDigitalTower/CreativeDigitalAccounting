@@ -7,6 +7,7 @@ import {
 import { formatCurrency } from "@/lib/constants";
 import { APP_URL } from "@/lib/email/templates";
 import { normalizeLocale, intlLocale } from "@/lib/i18n/config";
+import { isReminderDue, daysUntil } from "@/lib/assetDocuments";
 
 const DAY = 24 * 60 * 60 * 1000;
 const fmt = (d: Date, loc: string) => d.toLocaleDateString(intlLocale(normalizeLocale(loc)));
@@ -114,6 +115,49 @@ export async function GET(req: Request) {
       if (await alreadySent("project_expiring", o.email, p.name)) continue;
       const m = expiringEntityEmail("project", p.name, fmt(p.deadline!, o.loc), `${APP_URL}/dashboard/projects`, o.loc);
       await sendEmail({ to: o.email, toName: o.userName, subject: m.subject, html: m.html, category: m.category, type: "project_expiring", companyId: p.companyId });
+      sent++;
+    }
+  }
+
+  // ─── 6) Изтичащи документи към активи (гаранция/застраховка/валидност) ───
+  // Само за документи с ИЗРИЧНО избрано напомняне (reminderDays != null). Създава
+  // in-app известие през съществуващата Notification система (i18n key + payload).
+  // Idempotent: reminderSentAt пази срещу повторно пращане.
+  {
+    const maxWindow = new Date(today.getTime() + 90 * DAY);
+    const candidates = await prisma.assetDocument.findMany({
+      where: {
+        deletedAt: null,
+        reminderDays: { not: null },
+        reminderSentAt: null,
+        validTo: { gte: today, lte: maxWindow },
+      },
+      select: {
+        id: true, name: true, originalFilename: true, docType: true, validTo: true, reminderDays: true,
+        asset: { select: { name: true, companyId: true } },
+      },
+    });
+    for (const d of candidates) {
+      if (!isReminderDue({ ...d, reminderSentAt: null })) continue;
+      const days = daysUntil(d.validTo) ?? 0;
+      const o = await ownerOf(d.asset.companyId);
+      const loc = o?.loc ?? "bg";
+      await prisma.notification.create({
+        data: {
+          companyId: d.asset.companyId, type: "asset_doc_expiring",
+          titleKey: "notifications.assetDocExpiry.title",
+          bodyKey: "notifications.assetDocExpiry.body",
+          data: {
+            name: d.name ?? d.originalFilename ?? "",
+            docType: d.docType ?? "other",
+            asset: d.asset.name,
+            date: fmt(d.validTo!, loc),
+            n: days,
+          },
+          link: "/dashboard/assets",
+        },
+      });
+      await prisma.assetDocument.update({ where: { id: d.id }, data: { reminderSentAt: new Date() } });
       sent++;
     }
   }

@@ -33,5 +33,9 @@
     "bell": "Notifications",
     "title": "Notifications",
     "empty": "No new notifications"
+  },
+  "assetDocExpiry": {
+    "title": "Asset document is expiring",
+    "body": "“{name}” ({docType}) for asset “{asset}” expires on {date} (in {n} days)."
   }
 }

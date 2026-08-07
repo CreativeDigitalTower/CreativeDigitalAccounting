@@ -83,5 +83,82 @@
       "title": "Servis kaydı ({n})",
       "empty": "Kayıt yok."
     }
+  },
+  "docs": {
+    "title": "Ekler ve belgeler",
+    "addBtn": "+ Belge ekle",
+    "closeForm": "Kapat",
+    "tabUpload": "Dosya yükle",
+    "tabLink": "Mevcut olanı bağla",
+    "empty": "Ekli belge yok.",
+    "saving": "Kaydediliyor…",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "editTitle": "Belgeyi düzenle",
+    "linkedTag": "Bağlı",
+    "errNoFile": "Bir dosya seçin.",
+    "errNoLink": "Bir belge seçin.",
+    "errSave": "Kaydetme hatası.",
+    "errDelete": "Silme hatası.",
+    "confirmReplace": "\"{name}\" dosyasını değiştirmek istediğinizden emin misiniz? Eski dosyanın üzerine yazılacak.",
+    "confirmDeleteName": "\"{name}\" belgesini",
+    "types": {
+      "invoice": "Alım faturası",
+      "receipt": "Fiş",
+      "warranty": "Garanti belgesi",
+      "insurance": "Sigorta poliçesi",
+      "contract": "Sözleşme",
+      "handover": "Teslim tutanağı",
+      "certificate": "Sertifika",
+      "service": "Servis belgesi",
+      "technical": "Teknik dokümantasyon",
+      "photo": "Fotoğraf",
+      "other": "Diğer belge"
+    },
+    "status": {
+      "active": "Aktif",
+      "expiring": "{n} gün içinde bitiyor",
+      "expired": "Süresi doldu"
+    },
+    "th": {
+      "type": "Tür",
+      "name": "Ad",
+      "date": "Tarih",
+      "validity": "Geçerlilik",
+      "status": "Durum",
+      "actions": "İşlemler"
+    },
+    "act": {
+      "preview": "Önizleme",
+      "download": "İndir",
+      "edit": "Düzenle",
+      "replace": "Dosyayı değiştir",
+      "delete": "Sil"
+    },
+    "f": {
+      "type": "Belge türü",
+      "file": "Dosya",
+      "linkDoc": "Mevcut belge",
+      "selectDoc": "Belge seçin",
+      "name": "Ad",
+      "number": "Numara",
+      "issuer": "Düzenleyen",
+      "docDate": "Belge tarihi",
+      "validFrom": "Geçerlilik başlangıcı",
+      "validTo": "Geçerlilik bitişi",
+      "provider": "Sağlayıcı/servis",
+      "insurer": "Sigortacı",
+      "contact": "İletişim",
+      "policyNo": "Poliçe numarası",
+      "insuredValue": "Sigorta bedeli",
+      "supplier": "Tedarikçi",
+      "amount": "Tutar",
+      "vat": "KDV",
+      "merchant": "Satıcı",
+      "reminder": "Bitiminden önce hatırlat",
+      "noReminder": "Hatırlatma yok",
+      "reminderDays": "{n} gün önce",
+      "note": "Not"
+    }
   }
 }

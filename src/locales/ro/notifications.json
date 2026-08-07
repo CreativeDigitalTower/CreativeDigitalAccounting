@@ -33,5 +33,9 @@
     "bell": "Notificări",
     "title": "Notificări",
     "empty": "Nu există notificări noi"
+  },
+  "assetDocExpiry": {
+    "title": "Un document al activului expiră",
+    "body": "„{name}” ({docType}) pentru activul „{asset}” expiră la {date} (în {n} zile)."
   }
 }

@@ -83,5 +83,82 @@
       "title": "Jurnal service ({n})",
       "empty": "Nicio înregistrare."
     }
+  },
+  "docs": {
+    "title": "Atașamente și documente",
+    "addBtn": "+ Adaugă document",
+    "closeForm": "Închide",
+    "tabUpload": "Încarcă fișier",
+    "tabLink": "Leagă existent",
+    "empty": "Niciun document atașat.",
+    "saving": "Se salvează…",
+    "save": "Salvează",
+    "cancel": "Anulează",
+    "editTitle": "Editare document",
+    "linkedTag": "Legat",
+    "errNoFile": "Selectați un fișier.",
+    "errNoLink": "Selectați un document.",
+    "errSave": "Eroare la salvare.",
+    "errDelete": "Eroare la ștergere.",
+    "confirmReplace": "Sigur doriți să înlocuiți fișierul „{name}”? Fișierul vechi va fi suprascris.",
+    "confirmDeleteName": "documentul „{name}”",
+    "types": {
+      "invoice": "Factură de achiziție",
+      "receipt": "Bon fiscal",
+      "warranty": "Certificat de garanție",
+      "insurance": "Poliță de asigurare",
+      "contract": "Contract",
+      "handover": "Proces-verbal de predare",
+      "certificate": "Certificat",
+      "service": "Document de service",
+      "technical": "Documentație tehnică",
+      "photo": "Fotografie",
+      "other": "Alt document"
+    },
+    "status": {
+      "active": "Activă",
+      "expiring": "Expiră în {n} zile",
+      "expired": "Expirată"
+    },
+    "th": {
+      "type": "Tip",
+      "name": "Nume",
+      "date": "Data",
+      "validity": "Valabilitate",
+      "status": "Status",
+      "actions": "Acțiuni"
+    },
+    "act": {
+      "preview": "Previzualizare",
+      "download": "Descarcă",
+      "edit": "Editează",
+      "replace": "Înlocuiește fișierul",
+      "delete": "Șterge"
+    },
+    "f": {
+      "type": "Tip document",
+      "file": "Fișier",
+      "linkDoc": "Document existent",
+      "selectDoc": "Selectați document",
+      "name": "Denumire",
+      "number": "Număr",
+      "issuer": "Emitent",
+      "docDate": "Data documentului",
+      "validFrom": "Valabil de la",
+      "validTo": "Valabil până la",
+      "provider": "Furnizor/service",
+      "insurer": "Asigurător",
+      "contact": "Contact",
+      "policyNo": "Număr poliță",
+      "insuredValue": "Valoare asigurată",
+      "supplier": "Furnizor",
+      "amount": "Sumă",
+      "vat": "TVA",
+      "merchant": "Comerciant",
+      "reminder": "Amintește înainte de expirare",
+      "noReminder": "Fără memento",
+      "reminderDays": "{n} zile înainte",
+      "note": "Notă"
+    }
   }
 }
