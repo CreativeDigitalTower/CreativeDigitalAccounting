@@ -1,0 +1,63 @@
+{
+  "title": "Jurnal de plăți",
+  "subtitle": "Plăți primite și efectuate — cu filtre și totaluri.",
+  "add": "➕ Plată nouă",
+  "cancel": "Anulează",
+  "save": "Salvează",
+  "delete": "Șterge",
+  "confirmDelete": "Ștergeți înregistrarea din jurnal?",
+  "errAmount": "Introduceți o sumă peste 0.",
+  "errSave": "Eroare la salvare.",
+  "empty": "Nicio plată pentru filtrele selectate.",
+  "kpi": {
+    "received": "Primite",
+    "made": "Efectuate",
+    "net": "Net",
+    "pending": "În așteptare",
+    "overdue": "Restante"
+  },
+  "dir": {
+    "in": "Primită",
+    "out": "Efectuată"
+  },
+  "st": {
+    "completed": "Efectuată",
+    "pending": "În așteptare"
+  },
+  "disp": {
+    "received": "Primită",
+    "made": "Efectuată",
+    "pending": "În așteptare",
+    "overdue": "Restantă"
+  },
+  "f": {
+    "direction": "Direcție",
+    "status": "Status",
+    "amount": "Sumă",
+    "date": "Dată",
+    "dueDate": "Scadență",
+    "method": "Metodă de plată",
+    "client": "Client",
+    "supplier": "Furnizor",
+    "reason": "Motiv",
+    "bankAccount": "Cont / casă",
+    "note": "Notă"
+  },
+  "filter": {
+    "all": "Toate",
+    "from": "De la",
+    "to": "Până la",
+    "search": "Căutare",
+    "searchPh": "partener, document, motiv"
+  },
+  "th": {
+    "date": "Dată",
+    "direction": "Direcție",
+    "amount": "Sumă",
+    "counterparty": "Partener",
+    "document": "Document",
+    "method": "Metodă",
+    "reason": "Motiv",
+    "status": "Status"
+  }
+}

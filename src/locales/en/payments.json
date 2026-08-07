@@ -1,0 +1,63 @@
+{
+  "title": "Payments journal",
+  "subtitle": "Received and made payments — with filters and totals.",
+  "add": "➕ New payment",
+  "cancel": "Cancel",
+  "save": "Save",
+  "delete": "Delete",
+  "confirmDelete": "Delete this journal entry?",
+  "errAmount": "Enter an amount above 0.",
+  "errSave": "Save error.",
+  "empty": "No payments for the selected filters.",
+  "kpi": {
+    "received": "Received",
+    "made": "Made",
+    "net": "Net",
+    "pending": "Pending",
+    "overdue": "Overdue"
+  },
+  "dir": {
+    "in": "Received",
+    "out": "Made"
+  },
+  "st": {
+    "completed": "Completed",
+    "pending": "Pending"
+  },
+  "disp": {
+    "received": "Received",
+    "made": "Made",
+    "pending": "Pending",
+    "overdue": "Overdue"
+  },
+  "f": {
+    "direction": "Direction",
+    "status": "Status",
+    "amount": "Amount",
+    "date": "Date",
+    "dueDate": "Due date",
+    "method": "Payment method",
+    "client": "Client",
+    "supplier": "Supplier",
+    "reason": "Reason",
+    "bankAccount": "Account / cash",
+    "note": "Note"
+  },
+  "filter": {
+    "all": "All",
+    "from": "From",
+    "to": "To",
+    "search": "Search",
+    "searchPh": "counterparty, document, reason"
+  },
+  "th": {
+    "date": "Date",
+    "direction": "Direction",
+    "amount": "Amount",
+    "counterparty": "Counterparty",
+    "document": "Document",
+    "method": "Method",
+    "reason": "Reason",
+    "status": "Status"
+  }
+}

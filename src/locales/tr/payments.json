@@ -1,0 +1,63 @@
+{
+  "title": "Ödeme günlüğü",
+  "subtitle": "Alınan ve yapılan ödemeler — filtreler ve toplamlarla.",
+  "add": "➕ Yeni ödeme",
+  "cancel": "İptal",
+  "save": "Kaydet",
+  "delete": "Sil",
+  "confirmDelete": "Bu günlük kaydı silinsin mi?",
+  "errAmount": "0'dan büyük tutar girin.",
+  "errSave": "Kaydetme hatası.",
+  "empty": "Seçilen filtrelere göre ödeme yok.",
+  "kpi": {
+    "received": "Alınan",
+    "made": "Yapılan",
+    "net": "Net",
+    "pending": "Bekleyen",
+    "overdue": "Geciken"
+  },
+  "dir": {
+    "in": "Alınan",
+    "out": "Yapılan"
+  },
+  "st": {
+    "completed": "Tamamlandı",
+    "pending": "Bekliyor"
+  },
+  "disp": {
+    "received": "Alındı",
+    "made": "Yapıldı",
+    "pending": "Bekliyor",
+    "overdue": "Gecikti"
+  },
+  "f": {
+    "direction": "Yön",
+    "status": "Durum",
+    "amount": "Tutar",
+    "date": "Tarih",
+    "dueDate": "Vade",
+    "method": "Ödeme yöntemi",
+    "client": "Müşteri",
+    "supplier": "Tedarikçi",
+    "reason": "Açıklama",
+    "bankAccount": "Hesap / kasa",
+    "note": "Not"
+  },
+  "filter": {
+    "all": "Tümü",
+    "from": "Başlangıç",
+    "to": "Bitiş",
+    "search": "Ara",
+    "searchPh": "taraf, belge, açıklama"
+  },
+  "th": {
+    "date": "Tarih",
+    "direction": "Yön",
+    "amount": "Tutar",
+    "counterparty": "Taraf",
+    "document": "Belge",
+    "method": "Yöntem",
+    "reason": "Açıklama",
+    "status": "Durum"
+  }
+}
