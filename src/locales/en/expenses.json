@@ -76,7 +76,19 @@
       "attach": "Attach expense invoice (PDF/photo)",
       "attached": "✓ Attached:",
       "recurring": "Recurring monthly expense (rent, salaries, maintenance…)",
-      "recurringHint": "Used to calculate fixed monthly expenses in Analytics."
+      "recurringHint": "Used to calculate fixed monthly expenses in Analytics.",
+      "project": "Project",
+      "noProject": "No project",
+      "addPresets": "+ standard categories"
     }
+  },
+  "analysis": {
+    "title": "Expense analysis",
+    "thisMonth": "This month",
+    "allTime": "All time",
+    "byCategory": "By category",
+    "bySupplier": "By supplier",
+    "byProject": "By project",
+    "monthly": "Monthly · {year}"
   }
 }
