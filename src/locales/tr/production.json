@@ -99,5 +99,35 @@
     "in_progress": "Devam ediyor",
     "completed": "Tamamlandı",
     "cancelled": "İptal"
+  },
+  "prodReports": {
+    "link": "Üretim raporları →",
+    "back": "Üretim",
+    "title": "Üretim raporları",
+    "byProduct": "Ürüne göre",
+    "byOperator": "Operatöre göre",
+    "byBatch": "Partiye göre",
+    "materials": "Hammadde tüketimi",
+    "material": "Hammadde",
+    "qty": "Miktar",
+    "cost": "Değer",
+    "note": "Dönem: {from} – {to}.",
+    "kpi": {
+      "count": "Üretim",
+      "qty": "Üretilen",
+      "value": "Üretilen değer",
+      "materials": "Hammadde gideri",
+      "avgUnit": "Ort. birim maliyet"
+    },
+    "tools": {
+      "from": "Başlangıç",
+      "to": "Bitiş",
+      "search": "Ara",
+      "searchPh": "numara, ürün, parti, operatör",
+      "apply": "Uygula",
+      "export": "CSV dışa aktar",
+      "save": "Filtreyi kaydet",
+      "saveName": "Filtre adı:"
+    }
   }
 }

@@ -99,5 +99,35 @@
     "in_progress": "In progress",
     "completed": "Completed",
     "cancelled": "Cancelled"
+  },
+  "prodReports": {
+    "link": "Production reports →",
+    "back": "Production",
+    "title": "Production reports",
+    "byProduct": "By product",
+    "byOperator": "By operator",
+    "byBatch": "By batch",
+    "materials": "Materials consumption",
+    "material": "Material",
+    "qty": "Quantity",
+    "cost": "Value",
+    "note": "Period: {from} – {to}.",
+    "kpi": {
+      "count": "Runs",
+      "qty": "Produced",
+      "value": "Produced value",
+      "materials": "Materials cost",
+      "avgUnit": "Avg unit cost"
+    },
+    "tools": {
+      "from": "From",
+      "to": "To",
+      "search": "Search",
+      "searchPh": "number, product, batch, operator",
+      "apply": "Apply",
+      "export": "Export CSV",
+      "save": "Save filter",
+      "saveName": "Saved filter name:"
+    }
   }
 }

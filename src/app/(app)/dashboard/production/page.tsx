@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { ProductionPanel } from "@/components/app/ProductionPanel";
 import { CostCalculator } from "@/components/app/CostCalculator";
 import { ProductionHistory, type ProdOrder } from "@/components/app/ProductionHistory";
+import Link from "next/link";
+import { getT } from "@/lib/i18n/server";
 
 export default async function ProductionPage() {
   const { companyId } = await requireFeature("production");
@@ -38,8 +40,12 @@ export default async function ProductionPage() {
     avgUnitCost: producedQtySum > 0 ? +(materialsCostSum / producedQtySum).toFixed(2) : 0,
   };
 
+  const { t } = await getT();
   return (
     <>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
+        <Link href="/dashboard/production/reports" className="btn btn-ghost btn-sm">{t("prodReports.link")}</Link>
+      </div>
       <ProductionPanel initialRecipes={recipes} items={items} warehouses={warehouseRows} />
       <ProductionHistory orders={orders} kpi={kpi} />
       <CostCalculator />

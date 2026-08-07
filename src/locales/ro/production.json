@@ -99,5 +99,35 @@
     "in_progress": "În curs",
     "completed": "Finalizat",
     "cancelled": "Anulat"
+  },
+  "prodReports": {
+    "link": "Rapoarte de producție →",
+    "back": "Producție",
+    "title": "Rapoarte de producție",
+    "byProduct": "Pe produs",
+    "byOperator": "Pe operator",
+    "byBatch": "Pe lot",
+    "materials": "Consum materii prime",
+    "material": "Materie primă",
+    "qty": "Cantitate",
+    "cost": "Valoare",
+    "note": "Perioadă: {from} – {to}.",
+    "kpi": {
+      "count": "Producții",
+      "qty": "Produs",
+      "value": "Valoare produsă",
+      "materials": "Cost materii prime",
+      "avgUnit": "Cost unitar mediu"
+    },
+    "tools": {
+      "from": "De la",
+      "to": "Până la",
+      "search": "Căutare",
+      "searchPh": "număr, produs, lot, operator",
+      "apply": "Aplică",
+      "export": "Export CSV",
+      "save": "Salvează filtru",
+      "saveName": "Nume filtru:"
+    }
   }
 }
