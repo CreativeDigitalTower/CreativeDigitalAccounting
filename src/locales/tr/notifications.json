@@ -33,5 +33,9 @@
     "bell": "Bildirimler",
     "title": "Bildirimler",
     "empty": "Yeni bildirim yok"
+  },
+  "assetDocExpiry": {
+    "title": "Varlık belgesinin süresi doluyor",
+    "body": "“{asset}” varlığı için “{name}” ({docType}) {date} tarihinde ({n} gün içinde) sona eriyor."
   }
 }

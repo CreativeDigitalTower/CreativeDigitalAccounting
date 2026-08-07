@@ -83,5 +83,82 @@
       "title": "Service log ({n})",
       "empty": "No records."
     }
+  },
+  "docs": {
+    "title": "Attachments & documents",
+    "addBtn": "+ Add document",
+    "closeForm": "Close",
+    "tabUpload": "Upload file",
+    "tabLink": "Link existing",
+    "empty": "No attached documents.",
+    "saving": "Saving…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "editTitle": "Edit document",
+    "linkedTag": "Linked",
+    "errNoFile": "Select a file.",
+    "errNoLink": "Select a document.",
+    "errSave": "Error saving.",
+    "errDelete": "Error deleting.",
+    "confirmReplace": "Are you sure you want to replace the file \"{name}\"? The old file will be overwritten.",
+    "confirmDeleteName": "the document \"{name}\"",
+    "types": {
+      "invoice": "Purchase invoice",
+      "receipt": "Receipt",
+      "warranty": "Warranty card",
+      "insurance": "Insurance policy",
+      "contract": "Contract",
+      "handover": "Handover protocol",
+      "certificate": "Certificate",
+      "service": "Service document",
+      "technical": "Technical documentation",
+      "photo": "Photo",
+      "other": "Other document"
+    },
+    "status": {
+      "active": "Active",
+      "expiring": "Expires in {n} days",
+      "expired": "Expired"
+    },
+    "th": {
+      "type": "Type",
+      "name": "Name",
+      "date": "Date",
+      "validity": "Validity",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "act": {
+      "preview": "Preview",
+      "download": "Download",
+      "edit": "Edit",
+      "replace": "Replace file",
+      "delete": "Delete"
+    },
+    "f": {
+      "type": "Document type",
+      "file": "File",
+      "linkDoc": "Existing document",
+      "selectDoc": "Select document",
+      "name": "Name",
+      "number": "Number",
+      "issuer": "Issuer",
+      "docDate": "Document date",
+      "validFrom": "Valid from",
+      "validTo": "Valid to",
+      "provider": "Provider/service",
+      "insurer": "Insurer",
+      "contact": "Contact",
+      "policyNo": "Policy number",
+      "insuredValue": "Insured value",
+      "supplier": "Supplier",
+      "amount": "Amount",
+      "vat": "VAT",
+      "merchant": "Merchant",
+      "reminder": "Remind before expiry",
+      "noReminder": "No reminder",
+      "reminderDays": "{n} days before",
+      "note": "Note"
+    }
   }
 }

@@ -872,6 +872,7 @@ model Document {
   lines          DocumentLine[]
   attachments    DocumentAttachment[]
   events         DocumentEvent[]
+  assetLinks     AssetDocument[]      @relation("AssetDocLink")
 
   @@index([recipientCompanyId])
   @@index([companyId, deletedAt])
@@ -1112,6 +1113,7 @@ model Asset {
 
   company     Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
   serviceLogs AssetServiceLog[]
+  documents   AssetDocument[]
 }
 
 model AssetServiceLog {
@@ -1121,6 +1123,49 @@ model AssetServiceLog {
   description String
 
   asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+}
+
+// Прикачени документи към актив (по желание). Съхранението следва общия механизъм
+// (base64 dataUrl в БД) ИЛИ връзка към вече съществуващ Document (без дублиране).
+// Всички полета извън assetId са nullable → съществуващите активи остават непроменени.
+model AssetDocument {
+  id               String    @id @default(cuid())
+  assetId          String
+  docType          String? // invoice|receipt|warranty|insurance|contract|handover|certificate|service|technical|photo|other
+  // Съхранение: собствен файл ...
+  filename         String?
+  originalFilename String?
+  mimeType         String?
+  size             Int?
+  dataUrl          String?   @db.Text
+  // ... ИЛИ връзка към съществуващ документ (избягва дублиране на storage)
+  linkedDocumentId String?
+  // Незадължителни метаданни
+  name             String?
+  description      String?   @db.Text
+  docDate          DateTime?
+  number           String?
+  issuer           String?
+  validFrom        DateTime?
+  validTo          DateTime?
+  note             String?   @db.Text
+  // Тип-специфични данни (гаранция/застраховка/фактура/касова бележка) — разширяемо
+  data             Json?
+  // Напомняне преди изтичане (дни). null = без напомняне.
+  reminderDays     Int?
+  reminderSentAt   DateTime?
+  // Одит
+  uploadedById     String?
+  updatedById      String?
+  deletedAt        DateTime? // soft delete (Кошче)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  asset          Asset     @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  linkedDocument Document? @relation("AssetDocLink", fields: [linkedDocumentId], references: [id], onDelete: SetNull)
+
+  @@index([assetId])
+  @@index([validTo])
 }
 
 // ─── Handover Protocols ──────────────────────────────────────────────────
