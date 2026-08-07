@@ -7,6 +7,7 @@ import { z } from "zod";
 const schema = z.object({
   categoryId: z.string(),
   supplierId: z.string().nullable().optional(),
+  projectId: z.string().nullable().optional(),
   description: z.string().min(1),
   invoiceNumber: z.string().optional().nullable(),
   amount: z.number().positive(),
@@ -32,6 +33,10 @@ export async function POST(req: Request) {
         companyId,
         categoryId: data.categoryId,
         supplierId: data.supplierId ?? null,
+        // Проектът се валидира company-scoped, за да не се закачи чужд.
+        projectId: data.projectId
+          ? (await prisma.project.findFirst({ where: { id: data.projectId, companyId }, select: { id: true } }))?.id ?? null
+          : null,
         description: data.description,
         invoiceNumber: data.invoiceNumber ?? null,
         amount: data.amount,

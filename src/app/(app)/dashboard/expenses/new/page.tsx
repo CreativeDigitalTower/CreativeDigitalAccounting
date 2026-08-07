@@ -14,6 +14,8 @@ export default function NewExpensePage() {
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [projects, setProjects] = useState<{ id: string; name: string }[]>([]);
+  const [addingPresets, setAddingPresets] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [attachment, setAttachment] = useState<string | null>(null);
@@ -22,7 +24,15 @@ export default function NewExpensePage() {
   useEffect(() => {
     fetch("/api/expense-categories").then((r) => r.json()).then(setCategories);
     fetch("/api/suppliers").then((r) => r.json()).then(setSuppliers);
+    fetch("/api/projects").then((r) => (r.ok ? r.json() : [])).then((d) => setProjects(Array.isArray(d) ? d.map((p: { id: string; name: string }) => ({ id: p.id, name: p.name })) : [])).catch(() => {});
   }, []);
+
+  async function addPresets() {
+    setAddingPresets(true);
+    const res = await fetch("/api/expense-categories/presets", { method: "POST" });
+    if (res.ok) { const list = await fetch("/api/expense-categories").then((r) => r.json()); setCategories(list); }
+    setAddingPresets(false);
+  }
 
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -52,6 +62,7 @@ export default function NewExpensePage() {
       body: JSON.stringify({
         categoryId: fd.get("categoryId"),
         supplierId: fd.get("supplierId") || null,
+        projectId: fd.get("projectId") || null,
         description: fd.get("description"),
         invoiceNumber: (fd.get("invoiceNumber") as string) || null,
         amount,
@@ -97,7 +108,12 @@ export default function NewExpensePage() {
               <input type="text" name="invoiceNumber" placeholder={t("expenses.new.f.invoiceNumberPh")} />
             </div>
             <div>
-              <label>{t("expenses.new.f.category")}</label>
+              <label style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                {t("expenses.new.f.category")}
+                <button type="button" onClick={addPresets} disabled={addingPresets} style={{ background: "none", border: "none", color: "var(--brass)", cursor: "pointer", fontSize: 11 }}>
+                  {addingPresets ? "…" : t("expenses.new.f.addPresets")}
+                </button>
+              </label>
               <select name="categoryId" required>
                 <option value="">{t("expenses.new.f.selectCat")}</option>
                 {categories.map((c) => (
@@ -114,6 +130,17 @@ export default function NewExpensePage() {
                 ))}
               </select>
             </div>
+            {projects.length > 0 && (
+              <div>
+                <label>{t("expenses.new.f.project")}</label>
+                <select name="projectId">
+                  <option value="">{t("expenses.new.f.noProject")}</option>
+                  {projects.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div>
               <label>{t("expenses.new.f.gross")}</label>
               <input type="text" inputMode="decimal" name="amount" required placeholder="100.00" />

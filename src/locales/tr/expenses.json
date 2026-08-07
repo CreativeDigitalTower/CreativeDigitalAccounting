@@ -76,7 +76,19 @@
       "attach": "Gider faturası ekle (PDF/foto)",
       "attached": "✓ Eklendi:",
       "recurring": "Yinelenen aylık gider (kira, maaşlar, bakım…)",
-      "recurringHint": "Analizlerde sabit aylık giderleri hesaplamak için kullanılır."
+      "recurringHint": "Analizlerde sabit aylık giderleri hesaplamak için kullanılır.",
+      "project": "Proje",
+      "noProject": "Proje yok",
+      "addPresets": "+ standart kategoriler"
     }
+  },
+  "analysis": {
+    "title": "Gider analizi",
+    "thisMonth": "Bu ay",
+    "allTime": "Tümü",
+    "byCategory": "Kategoriye göre",
+    "bySupplier": "Tedarikçiye göre",
+    "byProject": "Projeye göre",
+    "monthly": "Aylık · {year}"
   }
 }

@@ -76,7 +76,19 @@
       "attach": "Atașează factura de cheltuială (PDF/foto)",
       "attached": "✓ Atașat:",
       "recurring": "Cheltuială lunară recurentă (chirie, salarii, întreținere…)",
-      "recurringHint": "Folosită pentru calcularea cheltuielilor lunare fixe în Analize."
+      "recurringHint": "Folosită pentru calcularea cheltuielilor lunare fixe în Analize.",
+      "project": "Proiect",
+      "noProject": "Fără proiect",
+      "addPresets": "+ categorii standard"
     }
+  },
+  "analysis": {
+    "title": "Analiza cheltuielilor",
+    "thisMonth": "Luna aceasta",
+    "allTime": "Total",
+    "byCategory": "Pe categorie",
+    "bySupplier": "Pe furnizor",
+    "byProject": "Pe proiect",
+    "monthly": "Lunar · {year}"
   }
 }
