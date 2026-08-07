@@ -144,6 +144,7 @@ model Company {
 
   auditLogs         AuditLog[]
   cashRegisters     CashRegister[]
+  payments          Payment[]
   bankStatements    BankStatement[]
 
   companyUsers      CompanyUser[]
@@ -1196,6 +1197,39 @@ model ArchiveFile {
 }
 
 // ─── Каса (cash registers) ───────────────────────────────────────────────
+// Дневник на плащанията — единен регистър на получените и извършените плащания.
+// Надгражда финансовата част, без да променя фактурите/касата/разходите (тези
+// потоци остават непроменени; тук се води отделен, филтруем ledger). Връзките
+// към клиент/доставчик/документ се пазят като id + snapshot на името/номера, за
+// да не се въвеждат back-relations в съществуващите модели.
+model Payment {
+  id             String   @id @default(cuid())
+  companyId      String
+  direction      String   // in = получено · out = извършено
+  status         String   @default("completed") // completed | pending
+  amount         Float
+  currency       String   @default("EUR")
+  date           DateTime
+  dueDate        DateTime?
+  method         String   @default("bank_transfer") // PAYMENT_METHODS id
+  reason         String?   // основание
+  clientId       String?
+  supplierId     String?
+  counterpartyName String? // snapshot (клиент или доставчик)
+  documentId     String?   // фактура/разход/друг документ
+  documentRef    String?   // номер (snapshot)
+  cashRegisterId String?
+  bankAccount    String?   // IBAN / сметка (свободен текст)
+  note           String?   @db.Text
+  createdById    String?
+  createdAt      DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, date])
+  @@index([companyId, direction, status])
+}
+
 model CashRegister {
   id        String   @id @default(cuid())
   companyId String

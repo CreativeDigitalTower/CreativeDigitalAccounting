@@ -33,6 +33,7 @@ const navGroups: { title: string; titleKey: string; items: { href: string; label
     title: "Финанси", titleKey: "navigation.groups.finance",
     items: [
       { href: "/dashboard/cash", label: "Каса", icon: "cash", feature: "cash", tKey: "navigation.cash" },
+      { href: "/dashboard/payments", label: "Плащания", icon: "cash", feature: "cash", tKey: "navigation.payments" },
       { href: "/dashboard/expenses", label: "Разходи", icon: "expenses", feature: "expenses", tKey: "navigation.expenses" },
       { href: "/dashboard/contracts", label: "Договори", icon: "contracts", feature: "contracts", tKey: "navigation.contracts" },
       { href: "/dashboard/tax-calendar", label: "Данъчен календар", icon: "calendar", feature: "tax_calendar", tKey: "navigation.taxCalendar" },
