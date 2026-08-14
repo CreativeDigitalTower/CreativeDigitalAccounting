@@ -66,5 +66,6 @@
   "logisticsProducts": "Ürünler",
   "logisticsCarriers": "Taşıyıcılar",
   "logisticsRoutes": "Rotalar",
-  "logisticsSettings": "Ayarlar"
+  "logisticsSettings": "Ayarlar",
+  "logisticsShipments": "Seferler"
 }

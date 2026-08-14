@@ -66,5 +66,6 @@
   "logisticsProducts": "Products",
   "logisticsCarriers": "Carriers",
   "logisticsRoutes": "Routes",
-  "logisticsSettings": "Settings"
+  "logisticsSettings": "Settings",
+  "logisticsShipments": "Shipments"
 }

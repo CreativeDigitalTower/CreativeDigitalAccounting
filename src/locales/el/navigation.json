@@ -66,5 +66,6 @@
   "logisticsProducts": "Προϊόντα",
   "logisticsCarriers": "Μεταφορείς",
   "logisticsRoutes": "Διαδρομές",
-  "logisticsSettings": "Ρυθμίσεις"
+  "logisticsSettings": "Ρυθμίσεις",
+  "logisticsShipments": "Δρομολόγια"
 }

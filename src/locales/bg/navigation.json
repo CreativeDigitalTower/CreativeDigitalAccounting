@@ -66,5 +66,6 @@
   "logisticsProducts": "Продукти",
   "logisticsCarriers": "Превозвачи",
   "logisticsRoutes": "Маршрути",
-  "logisticsSettings": "Настройки"
+  "logisticsSettings": "Настройки",
+  "logisticsShipments": "Курсове / Доставки"
 }

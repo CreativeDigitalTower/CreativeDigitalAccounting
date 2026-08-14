@@ -35,3 +35,17 @@ export type SeqScope = (typeof SEQ_SCOPE)[keyof typeof SEQ_SCOPE];
 export function formatShipmentId(year: number, value: number): string {
   return `TR-${year}-${String(value).padStart(6, "0")}`;
 }
+
+// Статуси на курса (workflow, раздел 21). Подредени; разширяеми чрез добавяне тук
+// + преводен ключ logistics.shipmentStatus.<id>. „loaded" = натоварен / очаква
+// фактура от Holcim (статус по подразбиране след създаване от експедиционна бележка).
+export const SHIPMENT_STATUSES = [
+  "planned", "at_factory", "loading", "loaded", "left_factory", "in_transit",
+  "at_border", "customs", "released", "in_mk", "arrived", "unloaded", "completed",
+] as const;
+export type ShipmentStatus = (typeof SHIPMENT_STATUSES)[number];
+export const DEFAULT_SHIPMENT_STATUS: ShipmentStatus = "loaded";
+
+export function isValidShipmentStatus(s: string): s is ShipmentStatus {
+  return (SHIPMENT_STATUSES as readonly string[]).includes(s);
+}
