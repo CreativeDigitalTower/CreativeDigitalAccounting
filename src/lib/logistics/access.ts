@@ -8,9 +8,9 @@
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
-import { requireCompany, getMyRole } from "@/lib/session";
+import { requireCompany, getMyRole, isSuperAdmin } from "@/lib/session";
 import { LOGISTICS_MODULE_KEY } from "@/lib/logistics/config";
-import { canLogistics, logisticsCaps, type LogisticsCaps } from "@/lib/logistics/perms";
+import { canLogistics, logisticsCaps, effectiveRole, type LogisticsCaps } from "@/lib/logistics/perms";
 
 export { canLogistics, logisticsCaps };
 export type { LogisticsPermission, LogisticsCaps } from "@/lib/logistics/perms";
@@ -33,9 +33,18 @@ export type LogisticsContext = { userId: string; companyId: string; role: string
 export async function requireLogistics(): Promise<LogisticsContext> {
   const { userId, companyId } = await requireCompany();
   if (!(await hasLogisticsAccess(companyId))) redirect("/dashboard");
-  const role = await getMyRole(userId, companyId);
+  // Super Admin (вкл. technical access/импърсонация) не е член на фирмата → getMyRole
+  // връща null. Дава му се пълен достъп (по спец. „Super Admin има пълен достъп"),
+  // но ЕДВА след като модулът е активиран за фирмата (без пробив в сигурността).
+  const role = await getEffectiveRole(userId, companyId);
   if (!canLogistics(role, "view_logistics")) redirect("/dashboard");
   return { userId, companyId, role, caps: logisticsCaps(role) };
+}
+
+/** Ролята за проверка на права: Super Admin → „owner" (пълен достъп); иначе реалната. */
+async function getEffectiveRole(userId: string, companyId: string): Promise<string | null> {
+  const [admin, role] = await Promise.all([isSuperAdmin(userId), getMyRole(userId, companyId)]);
+  return effectiveRole(admin, role);
 }
 
 // ── API guard: връща JSON 403 вместо redirect. Проверява модул + конкретно право. ──
@@ -47,7 +56,7 @@ export async function logisticsApiGuard(perm: import("@/lib/logistics/perms").Lo
   if (!(await hasLogisticsAccess(companyId))) {
     return { ok: false, res: NextResponse.json({ error: "Няма достъп до модула." }, { status: 403 }) };
   }
-  const role = await getMyRole(userId, companyId);
+  const role = await getEffectiveRole(userId, companyId);
   if (!canLogistics(role, perm)) {
     return { ok: false, res: NextResponse.json({ error: "Недостатъчни права." }, { status: 403 }) };
   }

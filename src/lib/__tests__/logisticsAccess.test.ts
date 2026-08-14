@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { canLogistics, logisticsCaps } from "@/lib/logistics/perms";
+import { canLogistics, logisticsCaps, effectiveRole } from "@/lib/logistics/perms";
 import { formatShipmentId, LOGISTICS_DEFAULTS, SEQ_SCOPE, LOGISTICS_MODULE_KEY } from "@/lib/logistics/config";
 
 describe("logistics config", () => {
@@ -46,5 +46,22 @@ describe("права по роля (logistics)", () => {
     expect(canLogistics("employee", "view_logistics")).toBe(false);
     expect(canLogistics(null, "view_logistics")).toBe(false);
     expect(canLogistics("ghost", "view_logistics")).toBe(false);
+  });
+});
+
+describe("effectiveRole (Super Admin technical access / импърсонация)", () => {
+  it("Super Admin (не е член → role=null) получава owner → пълен достъп", () => {
+    // Регресия: преди корекцията null роля блокираше Super Admin и redirect-ваше.
+    expect(effectiveRole(true, null)).toBe("owner");
+    expect(canLogistics(effectiveRole(true, null), "view_logistics")).toBe(true);
+    expect(canLogistics(effectiveRole(true, null), "manage_invoices")).toBe(true);
+  });
+  it("НЕ Super Admin запазва реалната роля", () => {
+    expect(effectiveRole(false, "viewer")).toBe("viewer");
+    expect(effectiveRole(false, null)).toBe(null);
+    expect(canLogistics(effectiveRole(false, null), "view_logistics")).toBe(false);
+  });
+  it("Super Admin с реална роля също получава owner (пълен достъп)", () => {
+    expect(effectiveRole(true, "viewer")).toBe("owner");
   });
 });
