@@ -21,6 +21,16 @@ const ROLE_LOGISTICS_PERMS: Record<string, LogisticsPermission[]> = {
   employee: [],
 };
 
+/**
+ * Ефективна роля за проверка на права: Super Admin (вкл. technical access /
+ * импърсонация, при която не е член на фирмата) получава „owner" → пълен достъп.
+ * Иначе — реалната роля във фирмата.
+ */
+export function effectiveRole(isSuperAdmin: boolean, role: string | null | undefined): string | null {
+  if (isSuperAdmin) return "owner";
+  return role ?? null;
+}
+
 export function canLogistics(role: string | null | undefined, perm: LogisticsPermission): boolean {
   if (!role) return false;
   if (role === "owner") return true;
