@@ -67,5 +67,7 @@
   "logisticsCarriers": "Taşıyıcılar",
   "logisticsRoutes": "Rotalar",
   "logisticsSettings": "Ayarlar",
-  "logisticsShipments": "Seferler"
+  "logisticsShipments": "Seferler",
+  "logisticsProformas": "Proformalar",
+  "logisticsHolcim": "Holcim faturaları"
 }

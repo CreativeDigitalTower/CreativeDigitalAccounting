@@ -67,5 +67,7 @@
   "logisticsCarriers": "Превозвачи",
   "logisticsRoutes": "Маршрути",
   "logisticsSettings": "Настройки",
-  "logisticsShipments": "Курсове / Доставки"
+  "logisticsShipments": "Курсове / Доставки",
+  "logisticsProformas": "Проформи",
+  "logisticsHolcim": "Holcim фактури"
 }

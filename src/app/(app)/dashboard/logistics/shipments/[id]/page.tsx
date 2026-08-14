@@ -16,10 +16,13 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       contract: true, clientNumber: true, factory: true, loadingPlace: true, entryAt: true, exitAt: true,
       incoterm: true, destination: true, recipient: true, note: true, createdAt: true,
       statusHistory: { select: { id: true, fromStatus: true, toStatus: true, note: true, createdAt: true }, orderBy: { createdAt: "desc" } },
+      proformaAllocation: { select: { quantity: true, proforma: { select: { id: true, number: true, currency: true } } } },
+      invoiceLinks: { select: { quantity: true, unitPrice: true, lineTotal: true, invoice: { select: { id: true, number: true, currency: true } } } },
     },
   });
   if (!s) notFound();
 
+  const link = s.invoiceLinks[0];
   const dto: ShipmentDto = {
     ...s,
     dispatchDate: s.dispatchDate?.toISOString() ?? null,
@@ -27,6 +30,8 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     exitAt: s.exitAt?.toISOString() ?? null,
     createdAt: s.createdAt.toISOString(),
     statusHistory: s.statusHistory.map((h) => ({ ...h, createdAt: h.createdAt.toISOString() })),
+    proforma: s.proformaAllocation?.proforma ? { number: s.proformaAllocation.proforma.number, quantity: s.proformaAllocation.quantity } : null,
+    purchase: link ? { invoiceNumber: link.invoice.number, unitPrice: link.unitPrice, lineTotal: link.lineTotal, currency: link.invoice.currency } : null,
   };
   return <ShipmentDetail shipment={dto} canManage={caps.manage_shipments} />;
 }

@@ -67,5 +67,7 @@
   "logisticsCarriers": "Carriers",
   "logisticsRoutes": "Routes",
   "logisticsSettings": "Settings",
-  "logisticsShipments": "Shipments"
+  "logisticsShipments": "Shipments",
+  "logisticsProformas": "Proformas",
+  "logisticsHolcim": "Holcim invoices"
 }
