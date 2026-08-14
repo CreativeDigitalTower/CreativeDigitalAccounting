@@ -1,26 +1,33 @@
 /**
  * Чисти изчисления за покупната страна (Holcim фактури + проформи). Тествани.
  * Нищо не е hardcode: ДДС ставката идва отвън (от фактурата), не е фиксирана.
+ * Паричните изчисления минават през decimal-safe helpers (money.ts), не през float.
  */
+import { netAmount, lineFinancials, sumMoney } from "@/lib/logistics/money";
 
 export function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
-/** Ред от фактура: количество × единична цена (реален пример 26.140 × 70 = 1829.80). */
+/** Ред от фактура: нето без ДДС = количество × единична цена (26.140 × 70 = 1829.80). */
 export function lineTotal(quantity: number, unitPrice: number): number {
   if (!(quantity >= 0) || !(unitPrice >= 0)) return 0;
-  return round2(quantity * unitPrice);
+  return netAmount(quantity, unitPrice);
 }
 
-export type InvoiceLineInput = { quantity: number; unitPrice: number };
+export type InvoiceLineInput = { quantity: number; unitPrice: number; vatRate?: number | null };
 
-/** Тотали на фактурата: данъчна основа, ДДС (по подадена ставка) и обща сума. */
+/**
+ * Тотали на фактурата от редовете: per-line закръгляне на нето/ДДС/бруто (както
+ * реалната фактура), после точна Decimal сума. `vatRate` е default за редове без
+ * собствена ставка. Данъчна основа = Σ нето, ДДС = Σ line-VAT, общо = Σ бруто.
+ */
 export function invoiceTotals(lines: InvoiceLineInput[], vatRate: number | null | undefined) {
-  const base = round2(lines.reduce((s, l) => s + lineTotal(l.quantity, l.unitPrice), 0));
   const rate = vatRate != null && vatRate >= 0 ? vatRate : 0;
-  const vat = round2(base * rate / 100);
-  const total = round2(base + vat);
+  const per = lines.map((l) => lineFinancials(l.quantity, l.unitPrice, l.vatRate ?? rate));
+  const base = sumMoney(per.map((p) => p.net));
+  const vat = sumMoney(per.map((p) => p.vat));
+  const total = sumMoney(per.map((p) => p.gross));
   return { base, vat, total, vatRate: rate };
 }
 

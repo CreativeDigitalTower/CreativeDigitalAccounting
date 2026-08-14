@@ -218,6 +218,25 @@
     "empty": "Fatura yok.",
     "shipments": "Seferler",
     "noUnfactured": "Faturasız sefer yok.",
-    "selectAtLeastOne": "En az bir sefer seçin."
+    "selectAtLeastOne": "En az bir sefer seçin.",
+    "line": "Satır",
+    "lineNumber": "Satır no",
+    "issueDate": "Düzenleme tarihi",
+    "paymentMethod": "Ödeme yöntemi",
+    "notes": "Notlar",
+    "pdf": "Orijinal PDF",
+    "quantity": "Miktar",
+    "material": "Malzeme",
+    "match": "Eşleşme",
+    "matchOk": "✓ Eşleşme",
+    "warnTruck": "⚠ Farklı araç",
+    "warnQuantity": "⚠ Farklı miktar",
+    "warnMaterial": "⚠ Farklı malzeme",
+    "headerMismatch": "⚠ Başlık toplamları farklı",
+    "computedTotals": "Satırlardan hesaplanan",
+    "headerTotals": "Girilen (PDF)",
+    "detailTitle": "Holcim faturası",
+    "openShipment": "Seferi aç",
+    "downloadPdf": "PDF indir"
   }
 }

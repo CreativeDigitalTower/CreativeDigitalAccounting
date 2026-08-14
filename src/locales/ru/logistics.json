@@ -218,6 +218,25 @@
     "empty": "Нет счетов.",
     "shipments": "Рейсы",
     "noUnfactured": "Нет нефактурированных рейсов.",
-    "selectAtLeastOne": "Выберите хотя бы один рейс."
+    "selectAtLeastOne": "Выберите хотя бы один рейс.",
+    "line": "Строка",
+    "lineNumber": "№ строки",
+    "issueDate": "Дата выписки",
+    "paymentMethod": "Способ оплаты",
+    "notes": "Заметки",
+    "pdf": "Оригинал PDF",
+    "quantity": "Количество",
+    "material": "Материал",
+    "match": "Совпадение",
+    "matchOk": "✓ Совпадение",
+    "warnTruck": "⚠ Другой автомобиль",
+    "warnQuantity": "⚠ Другое количество",
+    "warnMaterial": "⚠ Другой материал",
+    "headerMismatch": "⚠ Итоги шапки не совпадают",
+    "computedTotals": "Рассчитано по строкам",
+    "headerTotals": "Введено (из PDF)",
+    "detailTitle": "Счёт Holcim",
+    "openShipment": "Открыть рейс",
+    "downloadPdf": "Скачать PDF"
   }
 }

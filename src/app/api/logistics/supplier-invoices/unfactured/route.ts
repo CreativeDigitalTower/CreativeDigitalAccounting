@@ -9,7 +9,7 @@ export async function GET() {
   if (!g.ok) return g.res;
   const shipments = await prisma.shipment.findMany({
     where: { companyId: g.companyId, deletedAt: null, netQuantity: { gt: 0 }, invoiceLinks: { none: {} } },
-    select: { id: true, code: true, dispatchNoteNumber: true, dispatchDate: true, vehicleRegSnapshot: true, productNameSnapshot: true, netQuantity: true, unit: true },
+    select: { id: true, code: true, dispatchNoteNumber: true, dispatchDate: true, vehicleRegSnapshot: true, productNameSnapshot: true, materialCodeSnapshot: true, netQuantity: true, unit: true },
     orderBy: { dispatchDate: "asc" },
   });
   return NextResponse.json(shipments);
