@@ -66,5 +66,6 @@
   "logisticsProducts": "Produse",
   "logisticsCarriers": "Transportatori",
   "logisticsRoutes": "Rute",
-  "logisticsSettings": "Setări"
+  "logisticsSettings": "Setări",
+  "logisticsShipments": "Curse"
 }

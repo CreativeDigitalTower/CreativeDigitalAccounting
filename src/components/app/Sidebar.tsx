@@ -101,6 +101,7 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
     title: "Търговия и логистика", titleKey: "navigation.groups.logistics",
     items: [
       { href: "/dashboard/logistics", label: "Табло (логистика)", icon: "suppliers", feature: "dashboard", tKey: "navigation.logisticsDashboard" },
+      { href: "/dashboard/logistics/shipments", label: "Курсове / Доставки", icon: "invoice", feature: "dashboard", tKey: "navigation.logisticsShipments" },
       { href: "/dashboard/logistics/vehicles", label: "Автомобили", icon: "suppliers", feature: "dashboard", tKey: "navigation.logisticsVehicles" },
       { href: "/dashboard/logistics/products", label: "Продукти", icon: "warehouse", feature: "dashboard", tKey: "navigation.logisticsProducts" },
       { href: "/dashboard/logistics/carriers", label: "Превозвачи", icon: "suppliers", feature: "dashboard", tKey: "navigation.logisticsCarriers" },

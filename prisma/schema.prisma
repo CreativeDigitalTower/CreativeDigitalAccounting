@@ -197,6 +197,7 @@ model Company {
   carriers          Carrier[]
   logisticsRoutes   LogisticsRoute[]
   logisticsSettings LogisticsSettings?
+  shipments         Shipment[]
 
   @@index([managedByFirmId])
   @@index([isAccountingFirm])
@@ -452,6 +453,7 @@ model Supplier {
   expenses          Expense[]
   supplierDocuments SupplierDocument[]
   contracts         Contract[]
+  shipments         Shipment[]
 }
 
 model SupplierDocument {
@@ -666,6 +668,7 @@ model Vehicle {
   logisticsProfile VehicleLogisticsProfile?
   aliases          VehicleAlias[]
   logisticsDocuments VehicleDocument[]
+  shipments        Shipment[]
 
   @@unique([companyId, normalizedRegistration])
   @@index([companyId])
@@ -747,8 +750,9 @@ model LogisticsProduct {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  aliases LogisticsProductAlias[]
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  aliases   LogisticsProductAlias[]
+  shipments Shipment[]
 
   @@unique([companyId, normalizedName])
   @@index([companyId, active])
@@ -819,6 +823,88 @@ model LogisticsSettings {
   updatedAt   DateTime @updatedAt
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+// ─── Курс / Доставка (Shipment) — централен оперативен обект на логистиката ──
+// Започва от Holcim експедиционна бележка. Получава concurrency-safe вътрешен номер
+// (TR-YYYY-000001) чрез NumberSequence. Пази snapshots (продукт/автомобил/превозвач)
+// за историческа коректност — бъдещи промени по master data не пренаписват курса.
+model Shipment {
+  id        String @id @default(cuid())
+  companyId String
+  code      String // TR-2026-000001
+  seqYear   Int
+  seqValue  Int
+
+  // Holcim експедиционна бележка (начало на процеса)
+  dispatchNoteNumber String?
+  dispatchDate       DateTime?
+  supplierId         String? // Holcim (Supplier record); nullable
+
+  // Автомобил (reference + snapshot)
+  vehicleId          String?
+  vehicleRegSnapshot String?
+  trailerReg         String?
+  carrierId          String?
+  carrierSnapshot    String?
+  driver             String?
+
+  // Продукт (reference + snapshot)
+  productId            String?
+  productNameSnapshot  String?
+  materialCodeSnapshot String?
+  unit                 String  @default("t")
+
+  // Количества
+  grossWeight Float?
+  tara        Float?
+  netQuantity Float?
+
+  // Товарене / логистични метаданни (по образец на експедиционната бележка)
+  contract     String?
+  clientNumber String?
+  factory      String?
+  loadingPlace String?
+  entryAt      DateTime?
+  exitAt       DateTime?
+  incoterm     String?
+  destination  String?
+  recipient    String?
+
+  status      String    @default("loaded") // виж SHIPMENT_STATUSES (config)
+  note        String?   @db.Text
+  createdById String?
+  deletedAt   DateTime? // soft delete / отмяна (не hard delete на записи във веригата)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  company       Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  vehicle       Vehicle?                @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  supplier      Supplier?               @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  product       LogisticsProduct?       @relation(fields: [productId], references: [id], onDelete: SetNull)
+  statusHistory ShipmentStatusHistory[]
+
+  @@unique([companyId, code])
+  // Една експедиционна бележка не може да бъде въведена два пъти в една фирма.
+  @@unique([companyId, dispatchNoteNumber])
+  @@index([companyId, status])
+  @@index([vehicleId])
+  @@index([productId])
+}
+
+// История на статусите (одит: кой, кога, от→към). Двама души работят паралелно.
+model ShipmentStatusHistory {
+  id          String   @id @default(cuid())
+  shipmentId  String
+  fromStatus  String?
+  toStatus    String
+  changedById String?
+  note        String?
+  createdAt   DateTime @default(now())
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([shipmentId])
 }
 
 // Бонуси на служител — по месец, със сума, вид и бележка
