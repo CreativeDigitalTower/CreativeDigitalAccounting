@@ -218,6 +218,25 @@
     "empty": "No invoices.",
     "shipments": "Shipments",
     "noUnfactured": "No unfactured shipments.",
-    "selectAtLeastOne": "Select at least one shipment."
+    "selectAtLeastOne": "Select at least one shipment.",
+    "line": "Line",
+    "lineNumber": "Line no.",
+    "issueDate": "Issue date",
+    "paymentMethod": "Payment method",
+    "notes": "Notes",
+    "pdf": "Original PDF",
+    "quantity": "Quantity",
+    "material": "Material",
+    "match": "Match",
+    "matchOk": "✓ Match",
+    "warnTruck": "⚠ Truck differs",
+    "warnQuantity": "⚠ Quantity differs",
+    "warnMaterial": "⚠ Material differs",
+    "headerMismatch": "⚠ Header totals differ from line totals",
+    "computedTotals": "Computed from lines",
+    "headerTotals": "Entered (from PDF)",
+    "detailTitle": "Holcim invoice",
+    "openShipment": "Open shipment",
+    "downloadPdf": "Download PDF"
   }
 }

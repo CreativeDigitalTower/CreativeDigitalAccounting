@@ -218,6 +218,25 @@
     "empty": "Няма фактури.",
     "shipments": "Курсове",
     "noUnfactured": "Няма нефактурирани експедиции.",
-    "selectAtLeastOne": "Изберете поне един курс."
+    "selectAtLeastOne": "Изберете поне един курс.",
+    "line": "Ред",
+    "lineNumber": "№ ред",
+    "issueDate": "Дата на издаване",
+    "paymentMethod": "Начин на плащане",
+    "notes": "Бележки",
+    "pdf": "Оригинален PDF",
+    "quantity": "Количество",
+    "material": "Материал",
+    "match": "Съвпадение",
+    "matchOk": "✓ Съвпадение",
+    "warnTruck": "⚠ Различен автомобил",
+    "warnQuantity": "⚠ Различно количество",
+    "warnMaterial": "⚠ Различен материал",
+    "headerMismatch": "⚠ Header тоталите не съвпадат със сумата от редовете",
+    "computedTotals": "Изчислено от редовете",
+    "headerTotals": "Въведени (от PDF)",
+    "detailTitle": "Holcim фактура",
+    "openShipment": "Отвори курса",
+    "downloadPdf": "Изтегли PDF"
   }
 }

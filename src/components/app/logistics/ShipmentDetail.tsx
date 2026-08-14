@@ -15,7 +15,10 @@ export type ShipmentDto = {
   entryAt: string | null; exitAt: string | null; incoterm: string | null; destination: string | null; recipient: string | null;
   note: string | null; createdAt: string; statusHistory: History[];
   proforma?: { number: string | null; quantity: number } | null;
-  purchase?: { invoiceNumber: string; unitPrice: number; lineTotal: number; currency: string } | null;
+  purchase?: {
+    invoiceId: string; invoiceNumber: string; lineNumber: number | null;
+    quantity: number; unitPrice: number; net: number; vat: number | null; gross: number | null; currency: string;
+  } | null;
 };
 
 export function ShipmentDetail({ shipment, canManage }: { shipment: ShipmentDto; canManage: boolean }) {
@@ -80,10 +83,15 @@ export function ShipmentDetail({ shipment, canManage }: { shipment: ShipmentDto;
             <Row l={t("logistics.shipNew.clientNumber")} v={s.clientNumber} />
             <Row l={t("logistics.shipNew.factory")} v={s.factory} />
             <Row l={t("logistics.proformas.title")} v={s.proforma ? `${s.proforma.number ?? "—"} · ${s.proforma.quantity} ${s.unit}` : "—"} />
-            <Row l={t("logistics.holcimInv.title")} v={s.purchase ? s.purchase.invoiceNumber : "—"} />
-            <Row l={t("logistics.holcimInv.unitPrice")} v={s.purchase ? `${s.purchase.unitPrice} ${s.purchase.currency}/${s.unit}` : "—"} />
-            <Row l={t("logistics.holcimInv.lineTotal")} v={s.purchase ? `${s.purchase.lineTotal} ${s.purchase.currency}` : "—"} />
-            {!s.purchase && <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 6 }}>{t("logistics.shipDetail.phaseHolcim")}</div>}
+            {s.purchase ? (
+              <>
+                <Row l={t("logistics.holcimInv.title")} v={<Link href={`/dashboard/logistics/holcim-invoices/${s.purchase.invoiceId}`}>{s.purchase.invoiceNumber}{s.purchase.lineNumber != null ? ` · ${t("logistics.holcimInv.line")} ${s.purchase.lineNumber}` : ""}</Link>} />
+                <Row l={t("logistics.holcimInv.unitPrice")} v={`${s.purchase.unitPrice} ${s.purchase.currency}/${s.unit}`} />
+                <Row l={t("logistics.holcimInv.base")} v={`${s.purchase.net} ${s.purchase.currency}`} />
+                <Row l={t("logistics.holcimInv.vat")} v={s.purchase.vat != null ? `${s.purchase.vat} ${s.purchase.currency}` : "—"} />
+                <Row l={t("logistics.holcimInv.total")} v={s.purchase.gross != null ? `${s.purchase.gross} ${s.purchase.currency}` : "—"} />
+              </>
+            ) : <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 6 }}>{t("logistics.shipDetail.phaseHolcim")}</div>}
           </Panel>
           <Panel title={t("logistics.shipDetail.transport")}>
             <Row l={t("logistics.shipNew.vehicle")} v={s.vehicleRegSnapshot} />

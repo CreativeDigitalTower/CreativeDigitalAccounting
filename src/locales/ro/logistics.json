@@ -218,6 +218,25 @@
     "empty": "Nicio factură.",
     "shipments": "Curse",
     "noUnfactured": "Nicio cursă nefacturată.",
-    "selectAtLeastOne": "Selectați cel puțin o cursă."
+    "selectAtLeastOne": "Selectați cel puțin o cursă.",
+    "line": "Linie",
+    "lineNumber": "Nr. linie",
+    "issueDate": "Data emiterii",
+    "paymentMethod": "Metodă de plată",
+    "notes": "Note",
+    "pdf": "PDF original",
+    "quantity": "Cantitate",
+    "material": "Material",
+    "match": "Potrivire",
+    "matchOk": "✓ Potrivire",
+    "warnTruck": "⚠ Vehicul diferit",
+    "warnQuantity": "⚠ Cantitate diferită",
+    "warnMaterial": "⚠ Material diferit",
+    "headerMismatch": "⚠ Totalurile din antet diferă",
+    "computedTotals": "Calculat din linii",
+    "headerTotals": "Introdus (din PDF)",
+    "detailTitle": "Factură Holcim",
+    "openShipment": "Deschide cursa",
+    "downloadPdf": "Descarcă PDF"
   }
 }

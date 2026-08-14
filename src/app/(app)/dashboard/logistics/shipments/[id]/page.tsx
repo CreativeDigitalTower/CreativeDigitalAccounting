@@ -17,7 +17,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       incoterm: true, destination: true, recipient: true, note: true, createdAt: true,
       statusHistory: { select: { id: true, fromStatus: true, toStatus: true, note: true, createdAt: true }, orderBy: { createdAt: "desc" } },
       proformaAllocation: { select: { quantity: true, proforma: { select: { id: true, number: true, currency: true } } } },
-      invoiceLinks: { select: { quantity: true, unitPrice: true, lineTotal: true, invoice: { select: { id: true, number: true, currency: true } } } },
+      invoiceLinks: { select: { lineNumber: true, quantity: true, unitPrice: true, lineTotal: true, vatAmount: true, grossAmount: true, invoice: { select: { id: true, number: true, currency: true } } } },
     },
   });
   if (!s) notFound();
@@ -31,7 +31,10 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     createdAt: s.createdAt.toISOString(),
     statusHistory: s.statusHistory.map((h) => ({ ...h, createdAt: h.createdAt.toISOString() })),
     proforma: s.proformaAllocation?.proforma ? { number: s.proformaAllocation.proforma.number, quantity: s.proformaAllocation.quantity } : null,
-    purchase: link ? { invoiceNumber: link.invoice.number, unitPrice: link.unitPrice, lineTotal: link.lineTotal, currency: link.invoice.currency } : null,
+    purchase: link ? {
+      invoiceId: link.invoice.id, invoiceNumber: link.invoice.number, lineNumber: link.lineNumber,
+      quantity: link.quantity, unitPrice: link.unitPrice, net: link.lineTotal, vat: link.vatAmount, gross: link.grossAmount, currency: link.invoice.currency,
+    } : null,
   };
   return <ShipmentDetail shipment={dto} canManage={caps.manage_shipments} />;
 }

@@ -970,8 +970,16 @@ model SupplierInvoice {
   date         DateTime?
   taxEventDate DateTime?
   currency     String    @default("EUR")
-  vatRate      Float?    // от фактурата — НЕ hardcode-ната стойност
-  // Прикачен файл (по желание)
+  vatRate      Float?    // ставка по подразбиране от фактурата — НЕ hardcode
+  paymentMethod String?
+  // Snapshot на страните (историческа коректност при бъдеща промяна на име/адрес)
+  supplierSnapshot  String?
+  recipientSnapshot String?
+  // Header тотали, въведени от потребителя (от PDF) — за валидация срещу line totals.
+  headerTaxBase    Float?
+  headerVatTotal   Float?
+  headerGrandTotal Float?
+  // Прикачен оригинален PDF (по желание)
   fileName         String?
   originalFilename String?
   mimeType         String?
@@ -991,13 +999,27 @@ model SupplierInvoice {
 
 // Ред от Holcim фактура ↔ курс. shipmentId е UNIQUE → една експедиционна бележка/курс
 // НЕ може да бъде добавена към две фактури (Test 2). lineTotal = quantity × unitPrice.
+// Ред от Holcim фактура ↔ курс (line-level). shipmentId е UNIQUE → 1 dispatch note →
+// 1 supplier invoice line (Test 4). Immutable финансов snapshot: net/VAT/gross се пазят
+// на реда (не се разчита само на текущата цена в Product).
 model SupplierInvoiceShipmentLink {
-  id        String @id @default(cuid())
-  invoiceId String
+  id         String @id @default(cuid())
+  invoiceId  String
   shipmentId String @unique
-  quantity  Float  // snapshot на нето количеството към момента
+  lineNumber Int?   // № на реда във фактурата (напр. 10, 11, 21…)
+  // Snapshot от избрания курс — потребителят не преписва тези данни
+  dispatchNoteSnapshot String?
+  truckSnapshot        String?
+  materialCodeSnapshot String?
+  productSnapshot      String?
+  // Финансови стойности (immutable snapshot; изчислени с decimal аритметика)
+  quantity  Float  // фактурираното количество (собствен snapshot; НЕ пренаписва курса)
   unitPrice Float  // покупна цена/тон
-  lineTotal Float  // quantity × unitPrice (изчислено при запис)
+  vatRate   Float? // ставка на реда (по подразбиране = header vatRate)
+  lineTotal Float  // нето без ДДС = quantity × unitPrice
+  vatAmount Float? // ДДС на реда
+  grossAmount Float? // с ДДС = нето + ДДС
+  currency  String @default("EUR")
   createdAt DateTime @default(now())
 
   invoice  SupplierInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)

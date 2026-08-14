@@ -218,6 +218,25 @@
     "empty": "Χωρίς τιμολόγια.",
     "shipments": "Δρομολόγια",
     "noUnfactured": "Δεν υπάρχουν.",
-    "selectAtLeastOne": "Επιλέξτε τουλάχιστον ένα."
+    "selectAtLeastOne": "Επιλέξτε τουλάχιστον ένα.",
+    "line": "Γραμμή",
+    "lineNumber": "Αρ. γραμμής",
+    "issueDate": "Ημ/νία έκδοσης",
+    "paymentMethod": "Τρόπος πληρωμής",
+    "notes": "Σημειώσεις",
+    "pdf": "Πρωτότυπο PDF",
+    "quantity": "Ποσότητα",
+    "material": "Υλικό",
+    "match": "Αντιστοιχία",
+    "matchOk": "✓ Αντιστοιχία",
+    "warnTruck": "⚠ Διαφορετικό όχημα",
+    "warnQuantity": "⚠ Διαφορετική ποσότητα",
+    "warnMaterial": "⚠ Διαφορετικό υλικό",
+    "headerMismatch": "⚠ Τα σύνολα κεφαλίδας διαφέρουν",
+    "computedTotals": "Υπολογισμένο",
+    "headerTotals": "Καταχωρημένο (PDF)",
+    "detailTitle": "Τιμολόγιο Holcim",
+    "openShipment": "Άνοιγμα δρομολογίου",
+    "downloadPdf": "Λήψη PDF"
   }
 }
