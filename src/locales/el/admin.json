@@ -7,7 +7,8 @@
     "blog": "Blog",
     "businesses": "Επιχειρήσεις (φίλτρα ανά τομέα/πλάνο)",
     "deletedDocs": "Διαγραμμένα έγγραφα",
-    "companyGroups": "Ομάδες εταιρειών"
+    "companyGroups": "Ομάδες εταιρειών",
+    "modules": "Ενότητες"
   },
   "companiesWord": "εταιρείες",
   "ranges": {

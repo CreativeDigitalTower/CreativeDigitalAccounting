@@ -186,8 +186,66 @@ model Company {
   clientInvites     ClientInvite[]
   payoutRequests    CommissionPayout[]
 
+  // ─── Бизнес група (свързани фирми, напр. BG ↔ MK) ───
+  // Двете фирми остават отделни ЮЛ (отделна номерация, валута, клиенти). Групата
+  // само позволява споделяне на определени оперативни документи в workflow-а.
+  companyGroupId    String?
+  companyGroup      CompanyGroup? @relation(fields: [companyGroupId], references: [id], onDelete: SetNull)
+  moduleAccess      CompanyModuleAccess[]
+  numberSequences   NumberSequence[]
+
   @@index([managedByFirmId])
   @@index([isAccountingFirm])
+  @@index([companyGroupId])
+}
+
+// ─── Бизнес група: свързва няколко отделни фирми (напр. BG + MK) ─────────────
+// Фирмите се присъединяват по-късно без нова migration (nullable Company.companyGroupId).
+model CompanyGroup {
+  id        String   @id @default(cuid())
+  name      String
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  companies Company[]
+}
+
+// ─── Индивидуален достъп до модул (per-company, database-driven) ─────────────
+// Generic — позволява активиране на всеки модул за конкретна фирма без промяна на
+// source code и без hardcode на ЕИК. Логистичният модул ползва moduleKey="logistics".
+model CompanyModuleAccess {
+  id        String   @id @default(cuid())
+  companyId String
+  moduleKey String   // напр. "logistics"
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, moduleKey])
+  @@index([moduleKey, enabled])
+}
+
+// ─── Атомарен брояч за последователна номерация (concurrency-safe) ───────────
+// Използва се вътре в транзакция с атомарен increment под unique constraint →
+// двама едновременни потребители НИКОГА не получават един и същ номер.
+// Scope примери: "shipment", "supplier_invoice", "bg_mk_invoice", "mk_invoice".
+// series/year позволяват отделни редици (напр. по година). Празен string = без.
+model NumberSequence {
+  id        String   @id @default(cuid())
+  companyId String
+  scope     String
+  series    String   @default("")
+  year      Int      @default(0)
+  nextValue Int      @default(1)
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, scope, series, year])
+  @@index([companyId, scope])
 }
 
 // Покана към клиентска фирма от счетоводна къща

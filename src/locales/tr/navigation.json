@@ -6,7 +6,8 @@
     "operations": "Operasyonlar",
     "team": "Ekip",
     "more": "Daha fazla",
-    "profile": "Profil"
+    "profile": "Profil",
+    "logistics": "Ticaret ve lojistik"
   },
   "dashboard": "Panel",
   "projectManagement": "Proje Yönetimi",
@@ -59,5 +60,6 @@
   "myCompanies": "Şirketlerim",
   "companyGroups": "Şirket grupları",
   "vehicles": "Araçlar",
-  "payments": "Ödemeler"
+  "payments": "Ödemeler",
+  "logisticsDashboard": "Panel (lojistik)"
 }
