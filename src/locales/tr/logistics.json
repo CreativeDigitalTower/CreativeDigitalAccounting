@@ -1,0 +1,109 @@
+{
+  "common": {
+    "add": "Ekle",
+    "save": "Kaydet",
+    "saving": "Kaydediliyor…",
+    "cancel": "İptal",
+    "edit": "Düzenle",
+    "close": "Kapat",
+    "archive": "Arşivle",
+    "activate": "Etkinleştir",
+    "active": "Aktif",
+    "inactive": "Pasif",
+    "delete": "Sil",
+    "back": "Geri",
+    "search": "Ara…",
+    "none": "—",
+    "err": "Bir hata oluştu.",
+    "actions": "İşlemler",
+    "status": "Durum",
+    "notes": "Notlar"
+  },
+  "products": {
+    "title": "Ürünler (çimentolar)",
+    "add": "+ Ürün ekle",
+    "name": "Ad",
+    "materialCode": "Malzeme kodu",
+    "unit": "Birim",
+    "packaging": "Ambalaj",
+    "aliases": "Takma adlar",
+    "addAlias": "Yeni takma ad",
+    "empty": "Henüz ürün yok."
+  },
+  "vehicles": {
+    "title": "Araçlar",
+    "add": "+ Araç ekle",
+    "registration": "Plaka",
+    "trailer": "Römork",
+    "carrier": "Taşıyıcı",
+    "driver": "Sürücü",
+    "ownership": "Sahiplik",
+    "dossier": "Dosya",
+    "empty": "Araç yok.",
+    "own_own": "Kendi",
+    "own_carrier": "Taşıyıcının",
+    "own_subcontractor": "Taşeron",
+    "own_unspecified": "Belirtilmemiş"
+  },
+  "dossier": {
+    "basic": "Temel bilgiler",
+    "documents": "Belgeler",
+    "history": "Sefer geçmişi",
+    "historyPlaceholder": "Sefer geçmişi, Sevkiyat modülü etkinleştirildiğinde otomatik olarak dolacaktır.",
+    "addDoc": "+ Belge ekle",
+    "docType": "Tür",
+    "docName": "Ad",
+    "docNumber": "Numara",
+    "validTo": "Geçerlilik",
+    "file": "Dosya",
+    "download": "İndir",
+    "noDocs": "Belge yok."
+  },
+  "docTypes": {
+    "registration": "Ruhsat",
+    "insurance": "Sigorta",
+    "inspection": "Muayene",
+    "license": "Lisans",
+    "permit": "İzin",
+    "contract": "Sözleşme",
+    "certificate": "Sertifika",
+    "other": "Diğer"
+  },
+  "carriers": {
+    "title": "Taşıyıcılar",
+    "add": "+ Taşıyıcı ekle",
+    "name": "Ad",
+    "eik": "Vergi no",
+    "contact": "İletişim",
+    "phone": "Telefon",
+    "email": "E-posta",
+    "empty": "Taşıyıcı yok."
+  },
+  "routes": {
+    "title": "Rotalar",
+    "add": "+ Rota ekle",
+    "from": "Nereden",
+    "to": "Nereye",
+    "distance": "Mesafe (km)",
+    "time": "Süre (dk)",
+    "border": "Sınır kapısı",
+    "empty": "Rota yok."
+  },
+  "settings": {
+    "title": "Modül ayarları",
+    "bgCurrency": "BG şirket para birimi",
+    "mkCurrency": "MK şirket para birimi",
+    "mkVat": "Varsayılan MK KDV (%)",
+    "note": "Bunlar varsayılanlardır; her belge kendi anlık görüntüsünü tutar.",
+    "saved": "Kaydedildi."
+  },
+  "dashboard": {
+    "title": "Ticaret, tedarik ve lojistik",
+    "intro": "Modül aktif. Ana verileri yönetin. Seferler sonraki aşamalarda gelecek.",
+    "vehicles": "Araçlar",
+    "products": "Ürünler",
+    "carriers": "Taşıyıcılar",
+    "routes": "Rotalar",
+    "group": "İş grubu"
+  }
+}

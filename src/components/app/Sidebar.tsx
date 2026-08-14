@@ -99,7 +99,14 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
   // Само входна точка (Phase 1); подстраниците идват в следващите фази.
   const logisticsGroup = logisticsEnabled ? {
     title: "Търговия и логистика", titleKey: "navigation.groups.logistics",
-    items: [{ href: "/dashboard/logistics", label: "Табло (логистика)", icon: "suppliers", feature: "dashboard", tKey: "navigation.logisticsDashboard" }],
+    items: [
+      { href: "/dashboard/logistics", label: "Табло (логистика)", icon: "suppliers", feature: "dashboard", tKey: "navigation.logisticsDashboard" },
+      { href: "/dashboard/logistics/vehicles", label: "Автомобили", icon: "suppliers", feature: "dashboard", tKey: "navigation.logisticsVehicles" },
+      { href: "/dashboard/logistics/products", label: "Продукти", icon: "warehouse", feature: "dashboard", tKey: "navigation.logisticsProducts" },
+      { href: "/dashboard/logistics/carriers", label: "Превозвачи", icon: "suppliers", feature: "dashboard", tKey: "navigation.logisticsCarriers" },
+      { href: "/dashboard/logistics/routes", label: "Маршрути", icon: "suppliers", feature: "dashboard", tKey: "navigation.logisticsRoutes" },
+      { href: "/dashboard/logistics/settings", label: "Настройки", icon: "settings", feature: "dashboard", tKey: "navigation.logisticsSettings" },
+    ],
   } : null;
   const groups = logisticsGroup ? [...navGroups, logisticsGroup] : navGroups;
 

@@ -1,0 +1,109 @@
+{
+  "common": {
+    "add": "Add",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "close": "Close",
+    "archive": "Archive",
+    "activate": "Activate",
+    "active": "Active",
+    "inactive": "Inactive",
+    "delete": "Delete",
+    "back": "Back",
+    "search": "Search…",
+    "none": "—",
+    "err": "An error occurred.",
+    "actions": "Actions",
+    "status": "Status",
+    "notes": "Notes"
+  },
+  "products": {
+    "title": "Products (cements)",
+    "add": "+ Add product",
+    "name": "Name",
+    "materialCode": "Material code",
+    "unit": "Unit",
+    "packaging": "Packaging",
+    "aliases": "Aliases",
+    "addAlias": "New alias",
+    "empty": "No products yet. Add the first."
+  },
+  "vehicles": {
+    "title": "Vehicles",
+    "add": "+ Add vehicle",
+    "registration": "Registration",
+    "trailer": "Trailer",
+    "carrier": "Carrier",
+    "driver": "Driver",
+    "ownership": "Ownership",
+    "dossier": "Dossier",
+    "empty": "No vehicles.",
+    "own_own": "Own",
+    "own_carrier": "Carrier",
+    "own_subcontractor": "Subcontractor",
+    "own_unspecified": "Unspecified"
+  },
+  "dossier": {
+    "basic": "Basic data",
+    "documents": "Documents",
+    "history": "Trip history",
+    "historyPlaceholder": "Trip history will populate automatically once the Shipments module is enabled.",
+    "addDoc": "+ Add document",
+    "docType": "Type",
+    "docName": "Name",
+    "docNumber": "Number",
+    "validTo": "Valid to",
+    "file": "File",
+    "download": "Download",
+    "noDocs": "No documents."
+  },
+  "docTypes": {
+    "registration": "Registration",
+    "insurance": "Insurance",
+    "inspection": "Inspection",
+    "license": "License",
+    "permit": "Permit",
+    "contract": "Contract",
+    "certificate": "Certificate",
+    "other": "Other"
+  },
+  "carriers": {
+    "title": "Carriers",
+    "add": "+ Add carrier",
+    "name": "Name",
+    "eik": "Reg. no",
+    "contact": "Contact",
+    "phone": "Phone",
+    "email": "Email",
+    "empty": "No carriers."
+  },
+  "routes": {
+    "title": "Routes",
+    "add": "+ Add route",
+    "from": "From",
+    "to": "To",
+    "distance": "Distance (km)",
+    "time": "Time (min)",
+    "border": "Border point",
+    "empty": "No routes."
+  },
+  "settings": {
+    "title": "Module settings",
+    "bgCurrency": "BG company currency",
+    "mkCurrency": "MK company currency",
+    "mkVat": "Default MK VAT (%)",
+    "note": "These are defaults; each document keeps its own snapshot of the rate/currency.",
+    "saved": "Saved."
+  },
+  "dashboard": {
+    "title": "Trade, supply & logistics",
+    "intro": "The module is active. Manage master data (vehicles, products, carriers, routes). Operational trips come in later phases.",
+    "vehicles": "Vehicles",
+    "products": "Products",
+    "carriers": "Carriers",
+    "routes": "Routes",
+    "group": "Business group"
+  }
+}

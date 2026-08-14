@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireSuperAdmin } from "@/lib/session";
 import { audit } from "@/lib/documents";
 import { LOGISTICS_MODULE_KEY, LOGISTICS_SETUP_EIK } from "@/lib/logistics/config";
+import { seedLogisticsMasterData } from "@/lib/logistics/seed";
 import { z } from "zod";
 
 // Super Admin активиране на модула (корекции 1, 2, 19). ЕИК се ползва САМО за
@@ -14,6 +15,7 @@ const schema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("createGroup"), name: z.string().min(1), note: z.string().optional() }),
   z.object({ action: z.literal("attachGroup"), companyId: z.string(), groupId: z.string().nullable() }),
   z.object({ action: z.literal("setupClient"), eik: z.string().optional() }),
+  z.object({ action: z.literal("seedMasterData"), companyId: z.string() }),
 ]);
 
 export async function GET() {
@@ -79,6 +81,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true });
     }
 
+    if (body.action === "seedMasterData") {
+      const company = await prisma.company.findUnique({ where: { id: body.companyId }, select: { id: true } });
+      if (!company) return NextResponse.json({ error: "Фирмата не е намерена." }, { status: 404 });
+      const res = await seedLogisticsMasterData(body.companyId);
+      await audit(body.companyId, userId, "seed_master_data", "Company", body.companyId,
+        `Master data: ${res.vehicles} автомобила, ${res.products} продукта`);
+      return NextResponse.json({ success: true, seeded: res });
+    }
+
     // setupClient: еднократна безопасна начална настройка за клиента по ЕИК.
     const eik = body.eik?.trim() || LOGISTICS_SETUP_EIK;
     const company = await prisma.company.findFirst({ where: { eik, archivedAt: null }, select: { id: true, name: true, companyGroupId: true } });
@@ -98,9 +109,11 @@ export async function POST(req: Request) {
       });
       return { groupId };
     });
+    // Начална master data (idempotent) — автомобили + продукти на клиента.
+    const seeded = await seedLogisticsMasterData(company.id);
     await audit(company.id, userId, "module_setup", "Company", company.id,
-      `Логистичен модул активиран (setup по ЕИК ${eik}), група ${result.groupId}`);
-    return NextResponse.json({ success: true, companyId: company.id, groupId: result.groupId });
+      `Логистичен модул активиран (setup по ЕИК ${eik}), група ${result.groupId}, ${seeded.vehicles} авт./${seeded.products} прод.`);
+    return NextResponse.json({ success: true, companyId: company.id, groupId: result.groupId, seeded });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: "Невалидни данни." }, { status: 400 });
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });

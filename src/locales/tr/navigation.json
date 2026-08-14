@@ -61,5 +61,10 @@
   "companyGroups": "Şirket grupları",
   "vehicles": "Araçlar",
   "payments": "Ödemeler",
-  "logisticsDashboard": "Panel (lojistik)"
+  "logisticsDashboard": "Panel (lojistik)",
+  "logisticsVehicles": "Araçlar",
+  "logisticsProducts": "Ürünler",
+  "logisticsCarriers": "Taşıyıcılar",
+  "logisticsRoutes": "Rotalar",
+  "logisticsSettings": "Ayarlar"
 }
