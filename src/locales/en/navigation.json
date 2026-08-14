@@ -6,7 +6,8 @@
     "operations": "Operations",
     "team": "Team",
     "more": "More",
-    "profile": "Profile"
+    "profile": "Profile",
+    "logistics": "Trade & logistics"
   },
   "dashboard": "Dashboard",
   "projectManagement": "Project Management",
@@ -59,5 +60,6 @@
   "myCompanies": "My companies",
   "companyGroups": "Company groups",
   "vehicles": "Vehicles",
-  "payments": "Payments"
+  "payments": "Payments",
+  "logisticsDashboard": "Dashboard (logistics)"
 }

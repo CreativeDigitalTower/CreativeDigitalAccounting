@@ -7,7 +7,8 @@
     "blog": "Blog",
     "businesses": "Businesses (filter by sector/plan)",
     "deletedDocs": "Deleted documents",
-    "companyGroups": "Company groups"
+    "companyGroups": "Company groups",
+    "modules": "Modules"
   },
   "companiesWord": "companies",
   "ranges": {

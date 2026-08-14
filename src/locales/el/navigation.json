@@ -6,7 +6,8 @@
     "operations": "Λειτουργίες",
     "team": "Ομάδα",
     "more": "Περισσότερα",
-    "profile": "Προφίλ"
+    "profile": "Προφίλ",
+    "logistics": "Εμπόριο & εφοδιαστική"
   },
   "dashboard": "Πίνακας",
   "projectManagement": "Διαχείριση έργων",
@@ -59,5 +60,6 @@
   "myCompanies": "Οι εταιρείες μου",
   "companyGroups": "Ομάδες εταιρειών",
   "vehicles": "Οχήματα",
-  "payments": "Πληρωμές"
+  "payments": "Πληρωμές",
+  "logisticsDashboard": "Πίνακας (εφοδιαστική)"
 }

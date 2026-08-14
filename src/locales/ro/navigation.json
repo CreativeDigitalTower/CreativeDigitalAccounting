@@ -6,7 +6,8 @@
     "operations": "Operațiuni",
     "team": "Echipă",
     "more": "Mai mult",
-    "profile": "Profil"
+    "profile": "Profil",
+    "logistics": "Comerț și logistică"
   },
   "dashboard": "Tablou de bord",
   "projectManagement": "Management de proiecte",
@@ -59,5 +60,6 @@
   "myCompanies": "Firmele mele",
   "companyGroups": "Grupuri de firme",
   "vehicles": "Vehicule",
-  "payments": "Plăți"
+  "payments": "Plăți",
+  "logisticsDashboard": "Tablou (logistică)"
 }

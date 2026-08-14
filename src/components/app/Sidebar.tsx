@@ -87,12 +87,21 @@ interface SidebarProps {
   companyEik?: string | null;
   companies?: SwitcherCompany[];
   activeCompanyId?: string;
+  logisticsEnabled?: boolean;
 }
 
-export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread = 0, companyEik = null, companies = [], activeCompanyId = "" }: SidebarProps) {
+export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread = 0, companyEik = null, companies = [], activeCompanyId = "", logisticsEnabled = false }: SidebarProps) {
   const pathname = usePathname();
   const t = useT();
   const planId = plan as PlanId;
+
+  // Индивидуален модул — показва се само при database-driven достъп (не по план).
+  // Само входна точка (Phase 1); подстраниците идват в следващите фази.
+  const logisticsGroup = logisticsEnabled ? {
+    title: "Търговия и логистика", titleKey: "navigation.groups.logistics",
+    items: [{ href: "/dashboard/logistics", label: "Табло (логистика)", icon: "suppliers", feature: "dashboard", tKey: "navigation.logisticsDashboard" }],
+  } : null;
+  const groups = logisticsGroup ? [...navGroups, logisticsGroup] : navGroups;
 
   return (
     <aside
@@ -151,7 +160,7 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
 
       {/* Navigation — групирана по сектори */}
       <nav style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1 }}>
-        {navGroups.map((group) => (
+        {groups.map((group) => (
           <div key={group.title} className="sb-group">
             <div className="sb-group-title">{t(group.titleKey)}</div>
             {group.items.map((item) => {

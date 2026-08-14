@@ -6,7 +6,8 @@
     "operations": "Операции",
     "team": "Команда",
     "more": "Ещё",
-    "profile": "Профиль"
+    "profile": "Профиль",
+    "logistics": "Торговля и логистика"
   },
   "dashboard": "Панель",
   "projectManagement": "Управление проектами",
@@ -59,5 +60,6 @@
   "myCompanies": "Мои компании",
   "companyGroups": "Группы компаний",
   "vehicles": "Автомобили",
-  "payments": "Платежи"
+  "payments": "Платежи",
+  "logisticsDashboard": "Панель (логистика)"
 }
