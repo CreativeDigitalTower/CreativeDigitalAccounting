@@ -61,5 +61,10 @@
   "companyGroups": "Company groups",
   "vehicles": "Vehicles",
   "payments": "Payments",
-  "logisticsDashboard": "Dashboard (logistics)"
+  "logisticsDashboard": "Dashboard (logistics)",
+  "logisticsVehicles": "Vehicles",
+  "logisticsProducts": "Products",
+  "logisticsCarriers": "Carriers",
+  "logisticsRoutes": "Routes",
+  "logisticsSettings": "Settings"
 }

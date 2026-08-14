@@ -99,6 +99,12 @@ export function AdminModuleAccess() {
                     onClick={() => post({ action: "setModule", companyId: c.id, enabled: !c.logisticsEnabled }, c.logisticsEnabled ? "Модулът е деактивиран." : "Модулът е активиран.")}>
                     {c.logisticsEnabled ? "Деактивирай" : "Активирай"}
                   </button>
+                  {c.logisticsEnabled && (
+                    <button className="btn btn-ghost btn-sm" disabled={busy} style={{ marginLeft: 6 }}
+                      onClick={() => post({ action: "seedMasterData", companyId: c.id }, "Master data е зареден (idempotent).")}>
+                      Зареди master data
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

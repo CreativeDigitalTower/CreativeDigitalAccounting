@@ -1,26 +1,44 @@
+import Link from "next/link";
 import { requireLogistics } from "@/lib/logistics/access";
 import { prisma } from "@/lib/prisma";
+import { getT } from "@/lib/i18n/server";
 
-// Phase 1: входна точка на модула. Guard-ът пренасочва фирми без достъп към /dashboard,
-// така модулът НЕ се вижда от други клиенти. Бизнес екраните идват в следващите фази.
+// Phase 2: входно табло на модула — master data (автомобили/продукти/превозвачи/маршрути).
+// Оперативните курсове идват в следващите фази.
 export default async function LogisticsDashboardPage() {
   const { companyId } = await requireLogistics();
-  const company = await prisma.company.findUnique({
-    where: { id: companyId },
-    select: { name: true, companyGroup: { select: { name: true, companies: { select: { id: true, name: true, eik: true, defaultCurrency: true } } } } },
-  });
+  const { t } = await getT();
+  const [vehicles, products, carriers, routes, company] = await Promise.all([
+    prisma.vehicle.count({ where: { companyId, normalizedRegistration: { not: null } } }),
+    prisma.logisticsProduct.count({ where: { companyId } }),
+    prisma.carrier.count({ where: { companyId } }),
+    prisma.logisticsRoute.count({ where: { companyId } }),
+    prisma.company.findUnique({ where: { id: companyId }, select: { companyGroup: { select: { name: true, companies: { select: { id: true, name: true, eik: true, defaultCurrency: true } } } } } }),
+  ]);
+
+  const cards = [
+    { label: t("logistics.dashboard.vehicles"), n: vehicles, href: "/dashboard/logistics/vehicles" },
+    { label: t("logistics.dashboard.products"), n: products, href: "/dashboard/logistics/products" },
+    { label: t("logistics.dashboard.carriers"), n: carriers, href: "/dashboard/logistics/carriers" },
+    { label: t("logistics.dashboard.routes"), n: routes, href: "/dashboard/logistics/routes" },
+  ];
 
   return (
-    <div style={{ maxWidth: 900 }}>
-      <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, marginBottom: 8 }}>Търговия, доставки и логистика</h1>
-      <p style={{ fontSize: 13.5, color: "var(--muted)", marginBottom: 20 }}>
-        Модулът е активиран за тази фирма. Основата (бизнес група, достъп, номерация) е готова.
-        Оперативните екрани — курсове, експедиции, Holcim фактури, внос, BG→MK продажби — предстоят
-        в следващите фази.
-      </p>
+    <div style={{ maxWidth: 960 }}>
+      <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, marginBottom: 8 }}>{t("logistics.dashboard.title")}</h1>
+      <p style={{ fontSize: 13.5, color: "var(--muted)", marginBottom: 20 }}>{t("logistics.dashboard.intro")}</p>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 14, marginBottom: 20 }}>
+        {cards.map((c) => (
+          <Link key={c.href} href={c.href} className="glass kpi-card" style={{ textDecoration: "none", color: "inherit" }}>
+            <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 6 }}>{c.label}</div>
+            <div className="num" style={{ fontSize: 24, fontWeight: 600 }}>{c.n}</div>
+          </Link>
+        ))}
+      </div>
 
       <div className="glass panel">
-        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 10px" }}>Бизнес група</h3>
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 10px" }}>{t("logistics.dashboard.group")}</h3>
         {company?.companyGroup ? (
           <>
             <div style={{ fontSize: 13, marginBottom: 8 }}><strong>{company.companyGroup.name}</strong></div>
@@ -30,9 +48,7 @@ export default async function LogisticsDashboardPage() {
               </div>
             ))}
           </>
-        ) : (
-          <div style={{ fontSize: 13, color: "var(--muted)" }}>Фирмата все още не е присъединена към бизнес група.</div>
-        )}
+        ) : <div style={{ fontSize: 13, color: "var(--muted)" }}>—</div>}
       </div>
     </div>
   );

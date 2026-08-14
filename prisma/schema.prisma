@@ -193,6 +193,10 @@ model Company {
   companyGroup      CompanyGroup? @relation(fields: [companyGroupId], references: [id], onDelete: SetNull)
   moduleAccess      CompanyModuleAccess[]
   numberSequences   NumberSequence[]
+  logisticsProducts LogisticsProduct[]
+  carriers          Carrier[]
+  logisticsRoutes   LogisticsRoute[]
+  logisticsSettings LogisticsSettings?
 
   @@index([managedByFirmId])
   @@index([isAccountingFirm])
@@ -643,6 +647,9 @@ model Vehicle {
   id            String   @id @default(cuid())
   companyId     String
   registration  String   // регистрационен номер
+  // Нормализиран рег. номер (главни, без интервали/тирета) — за dedup срещу
+  // формат разлики. Nullable: старите записи (горивен модул) остават непроменени.
+  normalizedRegistration String?
   brand         String?  // марка
   model         String?  // модел
   vin           String?  // рама (VIN)
@@ -656,8 +663,162 @@ model Vehicle {
   createdAt     DateTime @default(now())
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  logisticsProfile VehicleLogisticsProfile?
+  aliases          VehicleAlias[]
+  logisticsDocuments VehicleDocument[]
 
+  @@unique([companyId, normalizedRegistration])
   @@index([companyId])
+}
+
+// ─── Логистичен модул: master data (companion към Vehicle, без isLogistics) ──
+// Специфични за логистиката данни за автомобил. Основният registration НЕ се дублира.
+model VehicleLogisticsProfile {
+  id            String   @id @default(cuid())
+  vehicleId     String   @unique
+  trailerReg    String?  // ремарке
+  carrierId     String?  // превозвач
+  defaultDriver String?  // шофьор по подразбиране
+  ownershipType String?  // own | carrier | subcontractor | unspecified (по подразбиране неопределено)
+  notes         String?  @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  vehicle Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  carrier Carrier? @relation(fields: [carrierId], references: [id], onDelete: SetNull)
+
+  @@index([carrierId])
+}
+
+// Alias/import идентификатор на автомобил (потвърдени съкратени номера от Excel).
+// vehicleId е nullable → непотвърден historical alias може да съществува и да бъде
+// свързан ръчно към правилния автомобил по-късно, когато получим пълния номер.
+model VehicleAlias {
+  id             String  @id @default(cuid())
+  companyId      String
+  alias          String
+  normalizedAlias String
+  vehicleId      String?
+  createdAt      DateTime @default(now())
+
+  vehicle Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+
+  @@unique([companyId, normalizedAlias])
+  @@index([vehicleId])
+}
+
+// Документи към автомобил (досие): рег. документ, застраховка, тех. преглед и др.
+model VehicleDocument {
+  id               String    @id @default(cuid())
+  vehicleId        String
+  docType          String? // registration|insurance|inspection|license|permit|contract|certificate|other
+  name             String?
+  number           String?
+  issueDate        DateTime?
+  validTo          DateTime?
+  filename         String?
+  originalFilename String?
+  mimeType         String?
+  size             Int?
+  dataUrl          String?   @db.Text
+  notes            String?   @db.Text
+  uploadedById     String?
+  deletedAt        DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId])
+  @@index([validTo])
+}
+
+// Продуктова номенклатура за логистичния модул (цименти + Holcim material code).
+model LogisticsProduct {
+  id             String   @id @default(cuid())
+  companyId      String
+  canonicalName  String
+  normalizedName String   // за dedup/съпоставяне
+  materialCode   String?  // Holcim material code (nullable — само потвърдените)
+  unit           String   @default("t")
+  packaging      String?  // напр. „25 kg bags"
+  active         Boolean  @default(true)
+  notes          String?  @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  aliases LogisticsProductAlias[]
+
+  @@unique([companyId, normalizedName])
+  @@index([companyId, active])
+}
+
+// Историческ alias на продукт (формат разлики: 42,5 ↔ 42.5, с/без „/").
+model LogisticsProductAlias {
+  id             String @id @default(cuid())
+  productId      String
+  companyId      String
+  alias          String
+  normalizedAlias String
+  createdAt      DateTime @default(now())
+
+  product LogisticsProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, normalizedAlias])
+  @@index([productId])
+}
+
+// Превозвачи (номенклатура).
+model Carrier {
+  id        String   @id @default(cuid())
+  companyId String
+  name      String
+  eik       String?
+  contact   String?
+  phone     String?
+  email     String?
+  note      String?  @db.Text
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company  Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  profiles VehicleLogisticsProfile[]
+
+  @@index([companyId, active])
+}
+
+// Маршрути (номенклатура).
+model LogisticsRoute {
+  id          String   @id @default(cuid())
+  companyId   String
+  fromPlace   String
+  toPlace     String
+  distanceKm  Float?
+  estTimeMin  Int?
+  borderPoint String?
+  note        String?  @db.Text
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, active])
+}
+
+// Настройки на модула по фирма (configurable defaults — snapshot към документа по-късно).
+model LogisticsSettings {
+  id          String   @id @default(cuid())
+  companyId   String   @unique
+  bgCurrency  String   @default("EUR")
+  mkCurrency  String   @default("MKD")
+  mkVatRate   Float    @default(18)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 // Бонуси на служител — по месец, със сума, вид и бележка
