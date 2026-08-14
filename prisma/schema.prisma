@@ -198,6 +198,8 @@ model Company {
   logisticsRoutes   LogisticsRoute[]
   logisticsSettings LogisticsSettings?
   shipments         Shipment[]
+  logisticsProformas LogisticsProforma[]
+  supplierInvoices  SupplierInvoice[]
 
   @@index([managedByFirmId])
   @@index([isAccountingFirm])
@@ -883,6 +885,8 @@ model Shipment {
   supplier      Supplier?               @relation(fields: [supplierId], references: [id], onDelete: SetNull)
   product       LogisticsProduct?       @relation(fields: [productId], references: [id], onDelete: SetNull)
   statusHistory ShipmentStatusHistory[]
+  invoiceLinks  SupplierInvoiceShipmentLink[]
+  proformaAllocation ProformaAllocation?
 
   @@unique([companyId, code])
   // Една експедиционна бележка не може да бъде въведена два пъти в една фирма.
@@ -905,6 +909,101 @@ model ShipmentStatusHistory {
   shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
 
   @@index([shipmentId])
+}
+
+// ─── Проформи / договорени количества (Holcim) ──────────────────────────────
+// Клиентът следи количества по проформи от завода. „Изразходвано" НЕ се съхранява
+// (изчислява се от алокациите → без drift). Остатък = initialQuantity − Σ алокации.
+model LogisticsProforma {
+  id              String   @id @default(cuid())
+  companyId       String
+  number          String?
+  date            DateTime?
+  supplierId      String?
+  productId       String?
+  productSnapshot String?  // snapshot на името за историческа коректност
+  initialQuantity Float    // договорено количество
+  unit            String   @default("t")
+  currency        String   @default("EUR")
+  unitPrice       Float?   // ако е приложимо
+  status          String   @default("active") // active | closed | cancelled
+  // Прикачен файл (по желание) — общ attachment механизъм (base64 dataUrl)
+  fileName         String?
+  originalFilename String?
+  mimeType         String?
+  dataUrl          String?  @db.Text
+  note            String?  @db.Text
+  createdById     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  company     Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  allocations ProformaAllocation[]
+
+  @@index([companyId, status])
+  @@index([supplierId])
+}
+
+// Приспадане на курс от проформа. Един курс се приспада от НАЙ-МНОГО една проформа.
+model ProformaAllocation {
+  id         String   @id @default(cuid())
+  proformaId String
+  shipmentId String   @unique
+  quantity   Float    // приспаднато нето количество (snapshot)
+  createdById String?
+  createdAt  DateTime @default(now())
+
+  proforma LogisticsProforma @relation(fields: [proformaId], references: [id], onDelete: Cascade)
+  shipment Shipment          @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([proformaId])
+}
+
+// ─── Holcim фактура (входяща supplier invoice): 1 фактура → N курса ──────────
+// Отделен модел (не Document engine): входящ документ с връзки към курсове и покупна
+// цена/тон; не бива да ползва собствената номерация/DocumentType на фирмата.
+model SupplierInvoice {
+  id           String    @id @default(cuid())
+  companyId    String
+  supplierId   String?
+  number       String
+  date         DateTime?
+  taxEventDate DateTime?
+  currency     String    @default("EUR")
+  vatRate      Float?    // от фактурата — НЕ hardcode-ната стойност
+  // Прикачен файл (по желание)
+  fileName         String?
+  originalFilename String?
+  mimeType         String?
+  dataUrl          String?  @db.Text
+  note         String?   @db.Text
+  createdById  String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  company Company                       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  links   SupplierInvoiceShipmentLink[]
+
+  // Един и същ номер фактура от същия доставчик не се въвежда два пъти.
+  @@unique([companyId, supplierId, number])
+  @@index([companyId])
+}
+
+// Ред от Holcim фактура ↔ курс. shipmentId е UNIQUE → една експедиционна бележка/курс
+// НЕ може да бъде добавена към две фактури (Test 2). lineTotal = quantity × unitPrice.
+model SupplierInvoiceShipmentLink {
+  id        String @id @default(cuid())
+  invoiceId String
+  shipmentId String @unique
+  quantity  Float  // snapshot на нето количеството към момента
+  unitPrice Float  // покупна цена/тон
+  lineTotal Float  // quantity × unitPrice (изчислено при запис)
+  createdAt DateTime @default(now())
+
+  invoice  SupplierInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  shipment Shipment        @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
 }
 
 // Бонуси на служител — по месец, със сума, вид и бележка

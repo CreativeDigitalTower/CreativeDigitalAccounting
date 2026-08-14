@@ -14,6 +14,8 @@ export type ShipmentDto = {
   contract: string | null; clientNumber: string | null; factory: string | null; loadingPlace: string | null;
   entryAt: string | null; exitAt: string | null; incoterm: string | null; destination: string | null; recipient: string | null;
   note: string | null; createdAt: string; statusHistory: History[];
+  proforma?: { number: string | null; quantity: number } | null;
+  purchase?: { invoiceNumber: string; unitPrice: number; lineTotal: number; currency: string } | null;
 };
 
 export function ShipmentDetail({ shipment, canManage }: { shipment: ShipmentDto; canManage: boolean }) {
@@ -77,7 +79,11 @@ export function ShipmentDetail({ shipment, canManage }: { shipment: ShipmentDto;
             <Row l={t("logistics.shipNew.contract")} v={s.contract} />
             <Row l={t("logistics.shipNew.clientNumber")} v={s.clientNumber} />
             <Row l={t("logistics.shipNew.factory")} v={s.factory} />
-            <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 6 }}>{t("logistics.shipDetail.phaseHolcim")}</div>
+            <Row l={t("logistics.proformas.title")} v={s.proforma ? `${s.proforma.number ?? "—"} · ${s.proforma.quantity} ${s.unit}` : "—"} />
+            <Row l={t("logistics.holcimInv.title")} v={s.purchase ? s.purchase.invoiceNumber : "—"} />
+            <Row l={t("logistics.holcimInv.unitPrice")} v={s.purchase ? `${s.purchase.unitPrice} ${s.purchase.currency}/${s.unit}` : "—"} />
+            <Row l={t("logistics.holcimInv.lineTotal")} v={s.purchase ? `${s.purchase.lineTotal} ${s.purchase.currency}` : "—"} />
+            {!s.purchase && <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 6 }}>{t("logistics.shipDetail.phaseHolcim")}</div>}
           </Panel>
           <Panel title={t("logistics.shipDetail.transport")}>
             <Row l={t("logistics.shipNew.vehicle")} v={s.vehicleRegSnapshot} />

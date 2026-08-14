@@ -67,5 +67,7 @@
   "logisticsCarriers": "Μεταφορείς",
   "logisticsRoutes": "Διαδρομές",
   "logisticsSettings": "Ρυθμίσεις",
-  "logisticsShipments": "Δρομολόγια"
+  "logisticsShipments": "Δρομολόγια",
+  "logisticsProformas": "Προτιμολόγια",
+  "logisticsHolcim": "Τιμολόγια Holcim"
 }

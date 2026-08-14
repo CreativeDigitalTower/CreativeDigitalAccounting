@@ -67,5 +67,7 @@
   "logisticsCarriers": "Transportatori",
   "logisticsRoutes": "Rute",
   "logisticsSettings": "Setări",
-  "logisticsShipments": "Curse"
+  "logisticsShipments": "Curse",
+  "logisticsProformas": "Proforme",
+  "logisticsHolcim": "Facturi Holcim"
 }

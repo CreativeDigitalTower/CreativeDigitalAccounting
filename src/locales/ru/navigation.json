@@ -67,5 +67,7 @@
   "logisticsCarriers": "Перевозчики",
   "logisticsRoutes": "Маршруты",
   "logisticsSettings": "Настройки",
-  "logisticsShipments": "Рейсы"
+  "logisticsShipments": "Рейсы",
+  "logisticsProformas": "Проформы",
+  "logisticsHolcim": "Счета Holcim"
 }
