@@ -61,5 +61,10 @@
   "companyGroups": "Ομάδες εταιρειών",
   "vehicles": "Οχήματα",
   "payments": "Πληρωμές",
-  "logisticsDashboard": "Πίνακας (εφοδιαστική)"
+  "logisticsDashboard": "Πίνακας (εφοδιαστική)",
+  "logisticsVehicles": "Οχήματα",
+  "logisticsProducts": "Προϊόντα",
+  "logisticsCarriers": "Μεταφορείς",
+  "logisticsRoutes": "Διαδρομές",
+  "logisticsSettings": "Ρυθμίσεις"
 }

@@ -1,0 +1,109 @@
+{
+  "common": {
+    "add": "Adaugă",
+    "save": "Salvează",
+    "saving": "Se salvează…",
+    "cancel": "Anulează",
+    "edit": "Editează",
+    "close": "Închide",
+    "archive": "Arhivează",
+    "activate": "Activează",
+    "active": "Activ",
+    "inactive": "Inactiv",
+    "delete": "Șterge",
+    "back": "Înapoi",
+    "search": "Caută…",
+    "none": "—",
+    "err": "A apărut o eroare.",
+    "actions": "Acțiuni",
+    "status": "Status",
+    "notes": "Note"
+  },
+  "products": {
+    "title": "Produse (cimenturi)",
+    "add": "+ Adaugă produs",
+    "name": "Denumire",
+    "materialCode": "Material code",
+    "unit": "Unitate",
+    "packaging": "Ambalaj",
+    "aliases": "Aliasuri",
+    "addAlias": "Alias nou",
+    "empty": "Niciun produs încă."
+  },
+  "vehicles": {
+    "title": "Vehicule",
+    "add": "+ Adaugă vehicul",
+    "registration": "Nr. înmatriculare",
+    "trailer": "Remorcă",
+    "carrier": "Transportator",
+    "driver": "Șofer",
+    "ownership": "Proprietate",
+    "dossier": "Dosar",
+    "empty": "Niciun vehicul.",
+    "own_own": "Propriu",
+    "own_carrier": "Al transportatorului",
+    "own_subcontractor": "Subcontractant",
+    "own_unspecified": "Nespecificat"
+  },
+  "dossier": {
+    "basic": "Date de bază",
+    "documents": "Documente",
+    "history": "Istoric curse",
+    "historyPlaceholder": "Istoricul curselor se va completa automat după activarea modulului de livrări.",
+    "addDoc": "+ Adaugă document",
+    "docType": "Tip",
+    "docName": "Nume",
+    "docNumber": "Număr",
+    "validTo": "Valabil până la",
+    "file": "Fișier",
+    "download": "Descarcă",
+    "noDocs": "Niciun document."
+  },
+  "docTypes": {
+    "registration": "Înmatriculare",
+    "insurance": "Asigurare",
+    "inspection": "Inspecție tehnică",
+    "license": "Licență",
+    "permit": "Permis",
+    "contract": "Contract",
+    "certificate": "Certificat",
+    "other": "Altul"
+  },
+  "carriers": {
+    "title": "Transportatori",
+    "add": "+ Adaugă transportator",
+    "name": "Denumire",
+    "eik": "CUI",
+    "contact": "Contact",
+    "phone": "Telefon",
+    "email": "Email",
+    "empty": "Niciun transportator."
+  },
+  "routes": {
+    "title": "Rute",
+    "add": "+ Adaugă rută",
+    "from": "De la",
+    "to": "Până la",
+    "distance": "Distanță (km)",
+    "time": "Timp (min)",
+    "border": "Punct de frontieră",
+    "empty": "Nicio rută."
+  },
+  "settings": {
+    "title": "Setări modul",
+    "bgCurrency": "Monedă firmă BG",
+    "mkCurrency": "Monedă firmă MK",
+    "mkVat": "TVA implicit MK (%)",
+    "note": "Acestea sunt valori implicite; fiecare document păstrează propriul snapshot.",
+    "saved": "Salvat."
+  },
+  "dashboard": {
+    "title": "Comerț, aprovizionare și logistică",
+    "intro": "Modulul este activ. Gestionați datele master. Cursele vor apărea ulterior.",
+    "vehicles": "Vehicule",
+    "products": "Produse",
+    "carriers": "Transportatori",
+    "routes": "Rute",
+    "group": "Grup de firme"
+  }
+}

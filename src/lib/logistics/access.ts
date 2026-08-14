@@ -7,6 +7,7 @@
  */
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
 import { requireCompany, getMyRole } from "@/lib/session";
 import { LOGISTICS_MODULE_KEY } from "@/lib/logistics/config";
 import { canLogistics, logisticsCaps, type LogisticsCaps } from "@/lib/logistics/perms";
@@ -35,4 +36,20 @@ export async function requireLogistics(): Promise<LogisticsContext> {
   const role = await getMyRole(userId, companyId);
   if (!canLogistics(role, "view_logistics")) redirect("/dashboard");
   return { userId, companyId, role, caps: logisticsCaps(role) };
+}
+
+// ── API guard: връща JSON 403 вместо redirect. Проверява модул + конкретно право. ──
+export type ApiGuardOk = { ok: true; userId: string; companyId: string; role: string | null };
+export type ApiGuardFail = { ok: false; res: NextResponse };
+
+export async function logisticsApiGuard(perm: import("@/lib/logistics/perms").LogisticsPermission): Promise<ApiGuardOk | ApiGuardFail> {
+  const { userId, companyId } = await requireCompany();
+  if (!(await hasLogisticsAccess(companyId))) {
+    return { ok: false, res: NextResponse.json({ error: "Няма достъп до модула." }, { status: 403 }) };
+  }
+  const role = await getMyRole(userId, companyId);
+  if (!canLogistics(role, perm)) {
+    return { ok: false, res: NextResponse.json({ error: "Недостатъчни права." }, { status: 403 }) };
+  }
+  return { ok: true, userId, companyId, role };
 }

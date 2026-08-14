@@ -61,5 +61,10 @@
   "companyGroups": "Grupuri de firme",
   "vehicles": "Vehicule",
   "payments": "Plăți",
-  "logisticsDashboard": "Tablou (logistică)"
+  "logisticsDashboard": "Tablou (logistică)",
+  "logisticsVehicles": "Vehicule",
+  "logisticsProducts": "Produse",
+  "logisticsCarriers": "Transportatori",
+  "logisticsRoutes": "Rute",
+  "logisticsSettings": "Setări"
 }

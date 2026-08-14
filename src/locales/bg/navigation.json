@@ -61,5 +61,10 @@
   "companyGroups": "Групи фирми",
   "vehicles": "Автомобили",
   "payments": "Плащания",
-  "logisticsDashboard": "Табло (логистика)"
+  "logisticsDashboard": "Табло (логистика)",
+  "logisticsVehicles": "Автомобили",
+  "logisticsProducts": "Продукти",
+  "logisticsCarriers": "Превозвачи",
+  "logisticsRoutes": "Маршрути",
+  "logisticsSettings": "Настройки"
 }
