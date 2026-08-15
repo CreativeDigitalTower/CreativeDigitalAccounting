@@ -46,28 +46,28 @@
     "own_unspecified": "Nespecificat"
   },
   "dossier": {
-    "basic": "Date de bază",
-    "documents": "Documente",
-    "history": "Istoric curse",
-    "historyPlaceholder": "Istoricul curselor se va completa automat după activarea modulului de livrări.",
-    "addDoc": "+ Adaugă document",
-    "docType": "Tip",
-    "docName": "Nume",
-    "docNumber": "Număr",
-    "validTo": "Valabil până la",
-    "file": "Fișier",
-    "download": "Descarcă",
-    "noDocs": "Niciun document."
+    "title": "Dosar de import",
+    "complete": "✓ Complet",
+    "incomplete": "! Incomplet",
+    "present": "✓ disponibil",
+    "missing": "! lipsă"
   },
   "docTypes": {
-    "registration": "Înmatriculare",
-    "insurance": "Asigurare",
-    "inspection": "Inspecție tehnică",
-    "license": "Licență",
-    "permit": "Permis",
-    "contract": "Contract",
-    "certificate": "Certificat",
-    "other": "Altul"
+    "dispatch_note": "Aviz de expediție",
+    "holcim_invoice": "Factură Holcim",
+    "proforma": "Proformă",
+    "cmr": "CMR",
+    "waybill": "Scrisoare de trăsură",
+    "customs_declaration": "Declarație vamală",
+    "export_doc": "Document de export",
+    "import_doc": "Document de import",
+    "transport_invoice": "Factură transport",
+    "border_doc": "Document de frontieră",
+    "forwarder_doc": "Document expeditor",
+    "bg_mk_invoice": "Factură BG→MK",
+    "mk_invoice": "Factură MK",
+    "payment_doc": "Document de plată",
+    "other": "Alt document"
   },
   "carriers": {
     "title": "Transportatori",
@@ -253,5 +253,35 @@
     "vehicle": "Vehicul",
     "dispatchNote": "Aviz",
     "unresolved": "nelegate"
+  },
+  "milestones": {
+    "loading": "Încărcare",
+    "departure": "Plecare",
+    "border_arrival": "Sosire la frontieră",
+    "border_crossing": "Trecere",
+    "arrival": "Sosire"
+  },
+  "transport": {
+    "title": "Urmărire",
+    "expected": "Estimat (de la–până)",
+    "actual": "Real",
+    "confirm": "Confirmă acum",
+    "save": "Salvează",
+    "stDelayed": "Întârziere",
+    "stConfirmed": "Confirmat",
+    "stPending": "În așteptare",
+    "delayedBadge": "⚠ Întârziere"
+  },
+  "shipDocs": {
+    "title": "Documente",
+    "add": "+ Adaugă document",
+    "type": "Tip",
+    "name": "Nume",
+    "number": "Număr",
+    "date": "Data",
+    "file": "Fișier",
+    "download": "Descarcă",
+    "delete": "Șterge",
+    "empty": "Niciun document."
   }
 }

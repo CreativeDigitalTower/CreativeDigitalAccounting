@@ -6,12 +6,14 @@ import { audit } from "@/lib/documents";
 import { nextSequenceValue } from "@/lib/logistics/sequence";
 import { SEQ_SCOPE, formatShipmentId, DEFAULT_SHIPMENT_STATUS } from "@/lib/logistics/config";
 import { computeNet, validateShipmentCore } from "@/lib/logistics/shipmentCalc";
+import { shipmentDelayed } from "@/lib/logistics/transport";
 import { z } from "zod";
 
 const listSelect = {
   id: true, code: true, dispatchNoteNumber: true, dispatchDate: true, status: true,
   vehicleRegSnapshot: true, productNameSnapshot: true, netQuantity: true, unit: true,
   destination: true, createdAt: true,
+  milestones: { select: { expectedFrom: true, expectedTo: true, actualAt: true } },
 } as const;
 
 export async function GET(req: Request) {
@@ -22,7 +24,8 @@ export async function GET(req: Request) {
     where: { companyId: g.companyId, deletedAt: null, ...(status ? { status } : {}) },
     select: listSelect, orderBy: { createdAt: "desc" }, take: 500,
   });
-  return NextResponse.json(shipments);
+  const out = shipments.map(({ milestones, ...s }) => ({ ...s, delayed: shipmentDelayed(milestones) }));
+  return NextResponse.json(out);
 }
 
 const optDate = z.string().datetime().nullable().optional().or(z.literal("").transform(() => null));

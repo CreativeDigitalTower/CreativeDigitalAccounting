@@ -46,28 +46,28 @@
     "own_unspecified": "Belirtilmemiş"
   },
   "dossier": {
-    "basic": "Temel bilgiler",
-    "documents": "Belgeler",
-    "history": "Sefer geçmişi",
-    "historyPlaceholder": "Sefer geçmişi, Sevkiyat modülü etkinleştirildiğinde otomatik olarak dolacaktır.",
-    "addDoc": "+ Belge ekle",
-    "docType": "Tür",
-    "docName": "Ad",
-    "docNumber": "Numara",
-    "validTo": "Geçerlilik",
-    "file": "Dosya",
-    "download": "İndir",
-    "noDocs": "Belge yok."
+    "title": "İthalat dosyası",
+    "complete": "✓ Tamamlandı",
+    "incomplete": "! Eksik",
+    "present": "✓ mevcut",
+    "missing": "! eksik"
   },
   "docTypes": {
-    "registration": "Ruhsat",
-    "insurance": "Sigorta",
-    "inspection": "Muayene",
-    "license": "Lisans",
-    "permit": "İzin",
-    "contract": "Sözleşme",
-    "certificate": "Sertifika",
-    "other": "Diğer"
+    "dispatch_note": "Sevk irsaliyesi",
+    "holcim_invoice": "Holcim faturası",
+    "proforma": "Proforma",
+    "cmr": "CMR",
+    "waybill": "İrsaliye",
+    "customs_declaration": "Gümrük beyannamesi",
+    "export_doc": "İhracat belgesi",
+    "import_doc": "İthalat belgesi",
+    "transport_invoice": "Nakliye faturası",
+    "border_doc": "Sınır belgesi",
+    "forwarder_doc": "Nakliyeci belgesi",
+    "bg_mk_invoice": "BG→MK fatura",
+    "mk_invoice": "MK fatura",
+    "payment_doc": "Ödeme belgesi",
+    "other": "Diğer belge"
   },
   "carriers": {
     "title": "Taşıyıcılar",
@@ -253,5 +253,35 @@
     "vehicle": "Araç",
     "dispatchNote": "İrsaliye",
     "unresolved": "eşleşmeyen"
+  },
+  "milestones": {
+    "loading": "Yükleme",
+    "departure": "Kalkış",
+    "border_arrival": "Sınıra varış",
+    "border_crossing": "Geçiş",
+    "arrival": "Varış"
+  },
+  "transport": {
+    "title": "Takip",
+    "expected": "Beklenen (–)",
+    "actual": "Gerçek",
+    "confirm": "Şimdi onayla",
+    "save": "Kaydet",
+    "stDelayed": "Gecikme",
+    "stConfirmed": "Onaylandı",
+    "stPending": "Bekliyor",
+    "delayedBadge": "⚠ Gecikme"
+  },
+  "shipDocs": {
+    "title": "Belgeler",
+    "add": "+ Belge ekle",
+    "type": "Tür",
+    "name": "Ad",
+    "number": "Numara",
+    "date": "Tarih",
+    "file": "Dosya",
+    "download": "İndir",
+    "delete": "Sil",
+    "empty": "Belge yok."
   }
 }
