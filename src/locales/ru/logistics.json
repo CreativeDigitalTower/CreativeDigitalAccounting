@@ -237,6 +237,21 @@
     "headerTotals": "Введено (из PDF)",
     "detailTitle": "Счёт Holcim",
     "openShipment": "Открыть рейс",
-    "downloadPdf": "Скачать PDF"
+    "downloadPdf": "Скачать PDF",
+    "linesTitle": "Позиции счёта",
+    "addLine": "+ Добавить позицию",
+    "dupLine": "Дублировать",
+    "delLine": "Удалить",
+    "materialName": "Наименование",
+    "materialCode": "Шифр",
+    "unit": "ЕИ",
+    "statusMatched": "✓ Связана",
+    "statusReview": "⚠ Проверка",
+    "statusUnmatched": "○ Нет рейса",
+    "totalsMatch": "✓ Суммы совпадают",
+    "totalsDiff": "⚠ Разница",
+    "vehicle": "Автомобиль",
+    "dispatchNote": "Накладная",
+    "unresolved": "несвязанные"
   }
 }

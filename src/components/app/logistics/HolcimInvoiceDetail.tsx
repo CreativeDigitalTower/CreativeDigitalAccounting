@@ -5,7 +5,8 @@ import { useT } from "@/components/i18n/I18nProvider";
 
 type Line = {
   id: string; lineNumber: number | null; dispatchNoteSnapshot: string | null; truckSnapshot: string | null;
-  materialCodeSnapshot: string | null; productSnapshot: string | null; quantity: number; unitPrice: number;
+  materialCodeSnapshot: string | null; materialName: string | null; unit: string | null; productSnapshot: string | null;
+  matchStatus: string | null; quantity: number; unitPrice: number;
   vatRate: number | null; lineTotal: number; vatAmount: number | null; grossAmount: number | null;
   shipment: { id: string; code: string } | null;
 };
@@ -47,23 +48,31 @@ export function HolcimInvoiceDetail({ id }: { id: string }) {
       <div className="glass panel" style={{ overflowX: "auto", marginBottom: 12 }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead><tr>
-            <th style={th}>{t("logistics.holcimInv.line")}</th><th style={th}>{t("logistics.shipments.dispatchNote")}</th><th style={th}>{t("logistics.shipments.code")}</th>
-            <th style={th}>{t("logistics.shipments.vehicle")}</th><th style={th}>{t("logistics.holcimInv.material")}</th><th style={th}>{t("logistics.holcimInv.quantity")}</th>
-            <th style={th}>{t("logistics.holcimInv.unitPrice")}</th><th style={th}>{t("logistics.holcimInv.base")}</th><th style={th}>{t("logistics.holcimInv.vat")}</th><th style={th}>{t("logistics.holcimInv.total")}</th>
+            <th style={th}>{t("logistics.holcimInv.line")}</th><th style={th}>{t("logistics.holcimInv.materialCode")}</th><th style={th}>{t("logistics.holcimInv.materialName")}</th>
+            <th style={th}>{t("logistics.holcimInv.unit")}</th><th style={th}>{t("logistics.holcimInv.quantity")}</th><th style={th}>{t("logistics.holcimInv.unitPrice")}</th>
+            <th style={th}>{t("logistics.holcimInv.base")}</th><th style={th}>{t("logistics.holcimInv.vat")}</th><th style={th}>{t("logistics.holcimInv.total")}</th>
+            <th style={th}>{t("logistics.holcimInv.dispatchNote")}</th><th style={th}>{t("logistics.holcimInv.vehicle")}</th><th style={th}>{t("logistics.shipments.code")}</th><th style={th}>{t("logistics.holcimInv.match")}</th>
           </tr></thead>
           <tbody>
             {inv.links.map((l) => (
               <tr key={l.id}>
                 <td style={td}>{l.lineNumber ?? "—"}</td>
-                <td style={td}>{l.dispatchNoteSnapshot ?? "—"}</td>
-                <td style={td}>{l.shipment ? <Link href={`/dashboard/logistics/shipments/${l.shipment.id}`} style={{ fontWeight: 600 }}>{l.shipment.code}</Link> : "—"}</td>
-                <td style={td}>{l.truckSnapshot ?? "—"}</td>
                 <td style={td}>{l.materialCodeSnapshot ?? "—"}</td>
+                <td style={td}>{l.materialName ?? l.productSnapshot ?? "—"}</td>
+                <td style={td}>{l.unit ?? "—"}</td>
                 <td style={td} className="num">{l.quantity}</td>
                 <td style={td} className="num">{l.unitPrice}</td>
                 <td style={td} className="num">{l.lineTotal}</td>
                 <td style={td} className="num">{l.vatAmount ?? "—"}</td>
                 <td style={td} className="num">{l.grossAmount ?? "—"}</td>
+                <td style={td}>{l.dispatchNoteSnapshot ?? "—"}</td>
+                <td style={td}>{l.truckSnapshot ?? "—"}</td>
+                <td style={td}>{l.shipment ? <Link href={`/dashboard/logistics/shipments/${l.shipment.id}`} style={{ fontWeight: 600 }}>{l.shipment.code}</Link> : "—"}</td>
+                <td style={{ ...td, fontSize: 11, whiteSpace: "nowrap" }}>
+                  {l.matchStatus === "matched" ? <span style={{ color: "var(--emerald-dark,#0F8A6A)" }}>{t("logistics.holcimInv.statusMatched")}</span>
+                    : l.matchStatus === "review" ? <span style={{ color: "var(--brass)" }}>{t("logistics.holcimInv.statusReview")}</span>
+                    : <span style={{ color: "var(--muted)" }}>{t("logistics.holcimInv.statusUnmatched")}</span>}
+                </td>
               </tr>
             ))}
           </tbody>

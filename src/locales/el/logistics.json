@@ -237,6 +237,21 @@
     "headerTotals": "Καταχωρημένο (PDF)",
     "detailTitle": "Τιμολόγιο Holcim",
     "openShipment": "Άνοιγμα δρομολογίου",
-    "downloadPdf": "Λήψη PDF"
+    "downloadPdf": "Λήψη PDF",
+    "linesTitle": "Γραμμές τιμολογίου",
+    "addLine": "+ Προσθήκη γραμμής",
+    "dupLine": "Διπλασιασμός",
+    "delLine": "Διαγραφή",
+    "materialName": "Ονομασία",
+    "materialCode": "Κωδικός",
+    "unit": "ΜΜ",
+    "statusMatched": "✓ Συνδεδεμένη",
+    "statusReview": "⚠ Έλεγχος",
+    "statusUnmatched": "○ Χωρίς δρομολόγιο",
+    "totalsMatch": "✓ Τα σύνολα ταιριάζουν",
+    "totalsDiff": "⚠ Διαφορά",
+    "vehicle": "Όχημα",
+    "dispatchNote": "Δελτίο",
+    "unresolved": "ασύνδετα"
   }
 }

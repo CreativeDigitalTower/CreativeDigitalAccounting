@@ -16,7 +16,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       links: {
         select: {
           id: true, lineNumber: true, dispatchNoteSnapshot: true, truckSnapshot: true, materialCodeSnapshot: true,
-          productSnapshot: true, quantity: true, unitPrice: true, vatRate: true, lineTotal: true, vatAmount: true, grossAmount: true,
+          materialName: true, unit: true, productSnapshot: true, matchStatus: true,
+          quantity: true, unitPrice: true, vatRate: true, lineTotal: true, vatAmount: true, grossAmount: true,
           shipment: { select: { id: true, code: true } },
         },
         orderBy: { lineNumber: "asc" },

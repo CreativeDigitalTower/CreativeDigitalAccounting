@@ -1005,25 +1005,35 @@ model SupplierInvoice {
 model SupplierInvoiceShipmentLink {
   id         String @id @default(cuid())
   invoiceId  String
-  shipmentId String @unique
+  // Свързаният курс. NULLABLE: фактурата е самостоятелен source документ — редът може
+  // да бъде въведен ръчно и БЕЗ намерен Shipment (свързването става после). @unique
+  // (nulls distinct) → един курс НЕ може да бъде фактуриран два пъти.
+  shipmentId String? @unique
   lineNumber Int?   // № на реда във фактурата (напр. 10, 11, 21…)
-  // Snapshot от избрания курс — потребителят не преписва тези данни
-  dispatchNoteSnapshot String?
-  truckSnapshot        String?
-  materialCodeSnapshot String?
-  productSnapshot      String?
-  // Финансови стойности (immutable snapshot; изчислени с decimal аритметика)
-  quantity  Float  // фактурираното количество (собствен snapshot; НЕ пренаписва курса)
-  unitPrice Float  // покупна цена/тон
-  vatRate   Float? // ставка на реда (по подразбиране = header vatRate)
-  lineTotal Float  // нето без ДДС = quantity × unitPrice
+  // Въведени от фактурата данни (immutable snapshot на реалния документ).
+  // materialCode и materialName са ОТДЕЛНИ полета, макар Holcim да ги показва в 1 колона.
+  dispatchNoteSnapshot String? // № експедиционна бележка (както е на фактурата)
+  truckSnapshot        String? // автомобил (както е на фактурата)
+  materialCodeSnapshot String? // шифър на материала
+  materialName         String? // наименование на материала (снапшот от документа)
+  productSnapshot      String? // име на разпознатия продукт (ако е mat-нат)
+  unit                 String? // мерна единица (МЕ)
+  // Финансови стойности (immutable snapshot; изчислени с decimal аритметика, с
+  // възможност за ръчна корекция при rounding в оригинала).
+  quantity  Float  // фактурирано количество (собствен snapshot; НЕ пренаписва курса)
+  unitPrice Float  // единична цена
+  vatRate   Float? // ставка на ДДС на реда (по подразбиране = header vatRate)
+  lineTotal Float  // сума без ДДС = количество × единична цена
   vatAmount Float? // ДДС на реда
-  grossAmount Float? // с ДДС = нето + ДДС
+  grossAmount Float? // общо с ДДС = нето + ДДС
   currency  String @default("EUR")
+  // Резултат от автоматичния matching към Shipment (не блокира записа):
+  // matched | review | unmatched
+  matchStatus String?
   createdAt DateTime @default(now())
 
   invoice  SupplierInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  shipment Shipment        @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  shipment Shipment?       @relation(fields: [shipmentId], references: [id], onDelete: SetNull)
 
   @@index([invoiceId])
 }

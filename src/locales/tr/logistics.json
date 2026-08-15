@@ -237,6 +237,21 @@
     "headerTotals": "Girilen (PDF)",
     "detailTitle": "Holcim faturası",
     "openShipment": "Seferi aç",
-    "downloadPdf": "PDF indir"
+    "downloadPdf": "PDF indir",
+    "linesTitle": "Fatura kalemleri",
+    "addLine": "+ Kalem ekle",
+    "dupLine": "Çoğalt",
+    "delLine": "Sil",
+    "materialName": "Malzeme adı",
+    "materialCode": "Kod",
+    "unit": "Birim",
+    "statusMatched": "✓ Eşleşti",
+    "statusReview": "⚠ İncele",
+    "statusUnmatched": "○ Sefer yok",
+    "totalsMatch": "✓ Toplamlar uyuyor",
+    "totalsDiff": "⚠ Fark",
+    "vehicle": "Araç",
+    "dispatchNote": "İrsaliye",
+    "unresolved": "eşleşmeyen"
   }
 }
