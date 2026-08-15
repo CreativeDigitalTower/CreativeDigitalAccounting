@@ -12,29 +12,6 @@ export function AdminModuleAccess() {
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
-  // Инструмент за поправка: свързване/прехвърляне на фирма към клиент.
-  const [tr, setTr] = useState({ companyId: "", addOwnerFromCompanyId: "", setGroupId: "", removeUserId: "" });
-  const [preview, setPreview] = useState<{ name: string; members: { userId: string; name: string | null; email: string; role: string }[]; companyGroupId: string | null } | null>(null);
-
-  async function loadPreview() {
-    if (!tr.companyId) return;
-    const r = await fetch(`/api/admin/company-transfer?companyId=${encodeURIComponent(tr.companyId)}`);
-    const j = await r.json().catch(() => ({}));
-    setPreview(r.ok ? j : null);
-    if (!r.ok) setMsg(`⚠️ ${j.error ?? "Грешка."}`);
-  }
-  async function applyTransfer() {
-    setBusy(true); setMsg("");
-    const body: Record<string, unknown> = { companyId: tr.companyId };
-    if (tr.addOwnerFromCompanyId) body.addOwnerFromCompanyId = tr.addOwnerFromCompanyId;
-    if (tr.setGroupId) body.setGroupId = tr.setGroupId;
-    if (tr.removeUserId) body.removeUserId = tr.removeUserId;
-    const r = await fetch("/api/admin/company-transfer", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-    const j = await r.json().catch(() => ({}));
-    setBusy(false);
-    setMsg(r.ok ? `✅ Приложено: ${(j.changes ?? []).join(", ")}` : `⚠️ ${j.error ?? "Грешка."}`);
-    if (r.ok) { loadPreview(); load(); }
-  }
 
   async function load() {
     const r = await fetch("/api/admin/logistics-access");
@@ -135,35 +112,13 @@ export function AdminModuleAccess() {
         </table>
       </div>
 
-      {/* Поправка: свързване/прехвърляне на фирма към клиент (напр. грешно добавена MK). */}
+      {/* Поправка: пълен flow за прехвърляне/свързване на фирма към клиент. */}
       <div className="glass panel" style={{ marginTop: 16 }}>
         <div style={{ fontWeight: 600, marginBottom: 6, fontSize: 14 }}>Прехвърляне / свързване на фирма</div>
-        <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 10 }}>
-          Добавя собственик (наследен от друга фирма), задава бизнес група и премахва грешно членство (напр. на Super Admin). Не трие фирма/данни; последният собственик е защитен.
+        <div style={{ fontSize: 12.5, color: "var(--muted)", marginBottom: 10 }}>
+          Свързва фирма, попаднала в грешен профил, към правилния клиент — без изтриване на данни, с избор на собственик, група и preview.
         </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "end" }}>
-          <div><label style={{ fontSize: 11.5, color: "var(--muted)" }}>ID на фирмата</label><br /><input style={{ padding: "5px 7px", fontSize: 12.5, width: 220 }} value={tr.companyId} onChange={(e) => setTr({ ...tr, companyId: e.target.value })} onBlur={loadPreview} /></div>
-          <div><label style={{ fontSize: 11.5, color: "var(--muted)" }}>Собственик от фирма (ID)</label><br /><input style={{ padding: "5px 7px", fontSize: 12.5, width: 220 }} value={tr.addOwnerFromCompanyId} onChange={(e) => setTr({ ...tr, addOwnerFromCompanyId: e.target.value })} placeholder="напр. BG фирмата" /></div>
-          <div><label style={{ fontSize: 11.5, color: "var(--muted)" }}>Група</label><br />
-            <select style={{ padding: "5px 7px", fontSize: 12.5 }} value={tr.setGroupId} onChange={(e) => setTr({ ...tr, setGroupId: e.target.value })}>
-              <option value="">— не пипай —</option>
-              {groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
-            </select></div>
-          <div><label style={{ fontSize: 11.5, color: "var(--muted)" }}>Премахни user (ID)</label><br /><input style={{ padding: "5px 7px", fontSize: 12.5, width: 200 }} value={tr.removeUserId} onChange={(e) => setTr({ ...tr, removeUserId: e.target.value })} placeholder="напр. Super Admin" /></div>
-          <button className="btn btn-primary btn-sm" disabled={busy || !tr.companyId} onClick={applyTransfer}>Приложи</button>
-        </div>
-        {preview && (
-          <div style={{ marginTop: 10, fontSize: 12.5 }}>
-            <div><strong>{preview.name}</strong> · група: {groupName(preview.companyGroupId)}</div>
-            <div style={{ color: "var(--muted)", marginTop: 4 }}>Членове:</div>
-            {preview.members.map((m) => (
-              <div key={m.userId} style={{ display: "flex", gap: 8, alignItems: "center", padding: "2px 0" }}>
-                <span>{m.name ?? "—"} · {m.email} · {m.role}</span>
-                <button className="btn btn-ghost btn-sm" style={{ padding: "1px 6px" }} onClick={() => setTr({ ...tr, removeUserId: m.userId })}>избери за премахване</button>
-              </div>
-            ))}
-          </div>
-        )}
+        <a className="btn btn-primary btn-sm" href="/dashboard/admin/company-transfer">Отвори „Прехвърляне на фирма"</a>
       </div>
     </div>
   );

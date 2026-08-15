@@ -8,7 +8,8 @@
     "businesses": "Επιχειρήσεις (φίλτρα ανά τομέα/πλάνο)",
     "deletedDocs": "Διαγραμμένα έγγραφα",
     "companyGroups": "Ομάδες εταιρειών",
-    "modules": "Ενότητες"
+    "modules": "Ενότητες",
+    "companyTransfer": "Μεταφορά εταιρείας"
   },
   "companiesWord": "εταιρείες",
   "ranges": {

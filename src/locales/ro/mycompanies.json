@@ -57,5 +57,6 @@
   },
   "unlink": "Elimină legătura",
   "unlinkConfirm": "Aceasta elimină „{name}” din profil, dar nu șterge firma.",
-  "taBanner": "Gestionați firmele: {name}"
+  "taBanner": "Gestionați firmele: {name}",
+  "openTransfer": "Deschideți transferul firmei?"
 }

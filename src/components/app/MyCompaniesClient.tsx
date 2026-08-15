@@ -10,7 +10,7 @@ import type { MyCompanyKpi } from "@/lib/myCompanies";
 
 const PLAN_KEYS = ["free", "start", "business", "pro"] as const;
 
-export function MyCompaniesClient({ companies, activeId, paidCount, impersonating = false, targetCompanyName = null }: { companies: MyCompanyKpi[]; activeId: string; paidCount: number; impersonating?: boolean; targetCompanyName?: string | null }) {
+export function MyCompaniesClient({ companies, activeId, paidCount, impersonating = false, targetCompanyName = null, isSuperAdmin = false }: { companies: MyCompanyKpi[]; activeId: string; paidCount: number; impersonating?: boolean; targetCompanyName?: string | null; isSuperAdmin?: boolean }) {
   const { t, locale } = useI18n();
   const router = useRouter();
   const sp = useSearchParams();
@@ -23,8 +23,13 @@ export function MyCompaniesClient({ companies, activeId, paidCount, impersonatin
     const res = await fetch("/api/company/unlink", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ companyId: id }) });
     const j = await res.json().catch(() => ({}));
     setBusyId(null);
-    if (res.ok) router.refresh();
-    else alert(j.error ?? t("myCompanies.wizard.err"));
+    if (res.ok) { router.refresh(); return; }
+    // Orphan защита блокира — за Super Admin предложи директно прехвърляне.
+    if (j.orphan && isSuperAdmin && window.confirm(`${j.error}\n\n${t("myCompanies.openTransfer")}`)) {
+      router.push(`/dashboard/admin/company-transfer?source=${id}`);
+      return;
+    }
+    alert(j.error ?? t("myCompanies.wizard.err"));
   }
 
   async function enterCompany(id: string) {

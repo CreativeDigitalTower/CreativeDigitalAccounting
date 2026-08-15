@@ -501,6 +501,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           <Link href="/dashboard/admin/deleted-documents" className="btn btn-ghost btn-sm">{t("admin.nav.deletedDocs")}</Link>
           <Link href="/dashboard/admin/company-groups" className="btn btn-ghost btn-sm">{t("admin.nav.companyGroups")}</Link>
           <Link href="/dashboard/admin/modules" className="btn btn-ghost btn-sm">{t("admin.nav.modules")}</Link>
+          <Link href="/dashboard/admin/company-transfer" className="btn btn-ghost btn-sm">{t("admin.nav.companyTransfer")}</Link>
         </div>
       </div>
 

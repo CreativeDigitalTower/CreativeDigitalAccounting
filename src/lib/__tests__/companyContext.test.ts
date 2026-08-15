@@ -39,3 +39,35 @@ describe("wouldOrphanCompany (Test 12: orphan защита)", () => {
     expect(wouldOrphanCompany(["client"], "sa")).toBe(false);
   });
 });
+
+describe("transfer flow — инварианти (ред: първо owner, после remove)", () => {
+  // Моделира логиката на company-transfer: адд-овете стават ПРЕДИ проверката за orphan.
+  function applyTransfer(ownersNow: string[], addOwners: string[], removeUserId: string | null): { ok: boolean; ownersAfter: string[]; error?: string } {
+    const ownersAfterAdd = [...new Set([...ownersNow, ...addOwners])];
+    if (removeUserId && ownersAfterAdd.includes(removeUserId) && wouldOrphanCompany(ownersAfterAdd, removeUserId)) {
+      return { ok: false, ownersAfter: ownersAfterAdd, error: "ORPHAN" };
+    }
+    const ownersAfter = removeUserId ? ownersAfterAdd.filter((o) => o !== removeUserId) : ownersAfterAdd;
+    return { ok: ownersAfter.length > 0, ownersAfter };
+  }
+
+  it("SEM случай: SA собственик → добавяме клиента, махаме SA → остава клиентът", () => {
+    const r = applyTransfer(["sa"], ["client"], "sa");
+    expect(r.ok).toBe(true);
+    expect(r.ownersAfter).toEqual(["client"]); // Test: target owner създаден, SA махнат
+  });
+  it("не може remove без нов owner (само SA, махаме SA) → блок", () => {
+    const r = applyTransfer(["sa"], [], "sa");
+    expect(r.ok).toBe(false);
+    expect(r.error).toBe("ORPHAN");
+  });
+  it("upsert не създава дубликат membership (клиентът вече е owner)", () => {
+    const r = applyTransfer(["client"], ["client"], "sa");
+    expect(r.ownersAfter).toEqual(["client"]); // без дубликат
+    expect(r.ok).toBe(true);
+  });
+  it("няколко нови собственика се добавят", () => {
+    const r = applyTransfer(["sa"], ["c1", "c2"], "sa");
+    expect(new Set(r.ownersAfter)).toEqual(new Set(["c1", "c2"]));
+  });
+});
