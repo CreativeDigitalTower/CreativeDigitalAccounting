@@ -46,28 +46,28 @@
     "own_unspecified": "Unspecified"
   },
   "dossier": {
-    "basic": "Basic data",
-    "documents": "Documents",
-    "history": "Trip history",
-    "historyPlaceholder": "Trip history will populate automatically once the Shipments module is enabled.",
-    "addDoc": "+ Add document",
-    "docType": "Type",
-    "docName": "Name",
-    "docNumber": "Number",
-    "validTo": "Valid to",
-    "file": "File",
-    "download": "Download",
-    "noDocs": "No documents."
+    "title": "Import dossier",
+    "complete": "✓ Complete",
+    "incomplete": "! Incomplete",
+    "present": "✓ available",
+    "missing": "! missing"
   },
   "docTypes": {
-    "registration": "Registration",
-    "insurance": "Insurance",
-    "inspection": "Inspection",
-    "license": "License",
-    "permit": "Permit",
-    "contract": "Contract",
-    "certificate": "Certificate",
-    "other": "Other"
+    "dispatch_note": "Dispatch note",
+    "holcim_invoice": "Holcim invoice",
+    "proforma": "Proforma",
+    "cmr": "CMR",
+    "waybill": "Waybill",
+    "customs_declaration": "Customs declaration",
+    "export_doc": "Export document",
+    "import_doc": "Import document",
+    "transport_invoice": "Transport invoice",
+    "border_doc": "Border document",
+    "forwarder_doc": "Forwarder document",
+    "bg_mk_invoice": "BG→MK invoice",
+    "mk_invoice": "MK invoice",
+    "payment_doc": "Payment document",
+    "other": "Other document"
   },
   "carriers": {
     "title": "Carriers",
@@ -253,5 +253,35 @@
     "vehicle": "Vehicle",
     "dispatchNote": "Dispatch note",
     "unresolved": "unresolved"
+  },
+  "milestones": {
+    "loading": "Loading",
+    "departure": "Departure",
+    "border_arrival": "Border arrival",
+    "border_crossing": "Crossing",
+    "arrival": "Arrival"
+  },
+  "transport": {
+    "title": "Tracking",
+    "expected": "Expected (from–to)",
+    "actual": "Actual",
+    "confirm": "Confirm now",
+    "save": "Save",
+    "stDelayed": "Delayed",
+    "stConfirmed": "Confirmed",
+    "stPending": "Pending",
+    "delayedBadge": "⚠ Delayed"
+  },
+  "shipDocs": {
+    "title": "Documents",
+    "add": "+ Add document",
+    "type": "Type",
+    "name": "Name",
+    "number": "Number",
+    "date": "Date",
+    "file": "File",
+    "download": "Download",
+    "delete": "Delete",
+    "empty": "No documents."
   }
 }

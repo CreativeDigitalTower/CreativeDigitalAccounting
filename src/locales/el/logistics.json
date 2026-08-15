@@ -46,28 +46,28 @@
     "own_unspecified": "Απροσδιόριστο"
   },
   "dossier": {
-    "basic": "Βασικά στοιχεία",
-    "documents": "Έγγραφα",
-    "history": "Ιστορικό δρομολογίων",
-    "historyPlaceholder": "Το ιστορικό θα συμπληρώνεται αυτόματα μετά την ενεργοποίηση της ενότητας Αποστολών.",
-    "addDoc": "+ Προσθήκη εγγράφου",
-    "docType": "Τύπος",
-    "docName": "Όνομα",
-    "docNumber": "Αριθμός",
-    "validTo": "Ισχύει έως",
-    "file": "Αρχείο",
-    "download": "Λήψη",
-    "noDocs": "Χωρίς έγγραφα."
+    "title": "Φάκελος εισαγωγής",
+    "complete": "✓ Πλήρες",
+    "incomplete": "! Ελλιπές",
+    "present": "✓ διαθέσιμο",
+    "missing": "! λείπει"
   },
   "docTypes": {
-    "registration": "Άδεια κυκλοφορίας",
-    "insurance": "Ασφάλεια",
-    "inspection": "Τεχνικός έλεγχος",
-    "license": "Άδεια",
-    "permit": "Άδεια",
-    "contract": "Σύμβαση",
-    "certificate": "Πιστοποιητικό",
-    "other": "Άλλο"
+    "dispatch_note": "Δελτίο αποστολής",
+    "holcim_invoice": "Τιμολόγιο Holcim",
+    "proforma": "Προτιμολόγιο",
+    "cmr": "CMR",
+    "waybill": "Φορτωτική",
+    "customs_declaration": "Τελωνειακή διασάφηση",
+    "export_doc": "Έγγραφο εξαγωγής",
+    "import_doc": "Έγγραφο εισαγωγής",
+    "transport_invoice": "Τιμολόγιο μεταφοράς",
+    "border_doc": "Συνοριακό έγγραφο",
+    "forwarder_doc": "Έγγραφο μεταφορέα",
+    "bg_mk_invoice": "Τιμολόγιο BG→MK",
+    "mk_invoice": "Τιμολόγιο MK",
+    "payment_doc": "Έγγραφο πληρωμής",
+    "other": "Άλλο έγγραφο"
   },
   "carriers": {
     "title": "Μεταφορείς",
@@ -253,5 +253,35 @@
     "vehicle": "Όχημα",
     "dispatchNote": "Δελτίο",
     "unresolved": "ασύνδετα"
+  },
+  "milestones": {
+    "loading": "Φόρτωση",
+    "departure": "Αναχώρηση",
+    "border_arrival": "Άφιξη στα σύνορα",
+    "border_crossing": "Διέλευση",
+    "arrival": "Άφιξη"
+  },
+  "transport": {
+    "title": "Παρακολούθηση",
+    "expected": "Αναμενόμενο (–)",
+    "actual": "Πραγματικό",
+    "confirm": "Επιβεβαίωση",
+    "save": "Αποθήκευση",
+    "stDelayed": "Καθυστέρηση",
+    "stConfirmed": "Επιβεβαιώθηκε",
+    "stPending": "Εκκρεμεί",
+    "delayedBadge": "⚠ Καθυστέρηση"
+  },
+  "shipDocs": {
+    "title": "Έγγραφα",
+    "add": "+ Προσθήκη",
+    "type": "Τύπος",
+    "name": "Όνομα",
+    "number": "Αριθμός",
+    "date": "Ημ/νία",
+    "file": "Αρχείο",
+    "download": "Λήψη",
+    "delete": "Διαγραφή",
+    "empty": "Χωρίς έγγραφα."
   }
 }

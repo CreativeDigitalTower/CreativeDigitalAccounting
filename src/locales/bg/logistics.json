@@ -46,28 +46,28 @@
     "own_unspecified": "Неопределено"
   },
   "dossier": {
-    "basic": "Основни данни",
-    "documents": "Документи",
-    "history": "История на курсовете",
-    "historyPlaceholder": "Историята на курсовете ще се попълва автоматично след активиране на модул Доставки/Курсове.",
-    "addDoc": "+ Добави документ",
-    "docType": "Тип",
-    "docName": "Име",
-    "docNumber": "Номер",
-    "validTo": "Валиден до",
-    "file": "Файл",
-    "download": "Изтегли",
-    "noDocs": "Няма документи."
+    "title": "Досие на вноса",
+    "complete": "✓ Пълно",
+    "incomplete": "! Непълно",
+    "present": "✓ наличен",
+    "missing": "! липсва"
   },
   "docTypes": {
-    "registration": "Регистрационен документ",
-    "insurance": "Застраховка",
-    "inspection": "Технически преглед",
-    "license": "Лиценз",
-    "permit": "Разрешително",
-    "contract": "Договор",
-    "certificate": "Сертификат",
-    "other": "Друг"
+    "dispatch_note": "Експедиционна бележка",
+    "holcim_invoice": "Holcim фактура",
+    "proforma": "Проформа",
+    "cmr": "CMR",
+    "waybill": "Изпратница",
+    "customs_declaration": "Митническа декларация",
+    "export_doc": "Документ за износ",
+    "import_doc": "Документ за внос",
+    "transport_invoice": "Транспортна фактура",
+    "border_doc": "Граничен документ",
+    "forwarder_doc": "Спедиторски документ",
+    "bg_mk_invoice": "BG→MK фактура",
+    "mk_invoice": "MK фактура",
+    "payment_doc": "Платежен документ",
+    "other": "Друг документ"
   },
   "carriers": {
     "title": "Превозвачи",
@@ -253,5 +253,35 @@
     "vehicle": "Автомобил",
     "dispatchNote": "Експ. бележка",
     "unresolved": "несвързани"
+  },
+  "milestones": {
+    "loading": "Товарене",
+    "departure": "Тръгване",
+    "border_arrival": "Пристигане на граница",
+    "border_crossing": "Преминаване",
+    "arrival": "Пристигане"
+  },
+  "transport": {
+    "title": "Проследяване",
+    "expected": "Очаквано (от–до)",
+    "actual": "Реално",
+    "confirm": "Потвърди сега",
+    "save": "Запази",
+    "stDelayed": "Закъснение",
+    "stConfirmed": "Потвърдено",
+    "stPending": "Очаква",
+    "delayedBadge": "⚠ Закъснение"
+  },
+  "shipDocs": {
+    "title": "Документи",
+    "add": "+ Добави документ",
+    "type": "Тип",
+    "name": "Име",
+    "number": "Номер",
+    "date": "Дата",
+    "file": "Файл",
+    "download": "Изтегли",
+    "delete": "Изтрий",
+    "empty": "Няма документи."
   }
 }

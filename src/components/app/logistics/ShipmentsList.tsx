@@ -6,7 +6,7 @@ import { SHIPMENT_STATUSES } from "@/lib/logistics/config";
 
 type Shipment = {
   id: string; code: string; dispatchNoteNumber: string | null; dispatchDate: string | null; status: string;
-  vehicleRegSnapshot: string | null; productNameSnapshot: string | null; netQuantity: number | null; unit: string; destination: string | null;
+  vehicleRegSnapshot: string | null; productNameSnapshot: string | null; netQuantity: number | null; unit: string; destination: string | null; delayed?: boolean;
 };
 
 export function ShipmentsList({ canManage }: { canManage: boolean }) {
@@ -65,7 +65,7 @@ export function ShipmentsList({ canManage }: { canManage: boolean }) {
                   <td style={td}>{s.productNameSnapshot ?? "—"}</td>
                   <td style={td} className="num">{s.netQuantity != null ? `${s.netQuantity} ${s.unit}` : "—"}</td>
                   <td style={td}>{s.destination ?? "—"}</td>
-                  <td style={td}><span style={{ fontSize: 11, fontWeight: 700, background: "rgba(15,138,106,.12)", color: "var(--emerald-dark,#0F8A6A)", borderRadius: 10, padding: "2px 8px" }}>{t(`logistics.shipmentStatus.${s.status}`)}</span></td>
+                  <td style={td}><span style={{ fontSize: 11, fontWeight: 700, background: "rgba(15,138,106,.12)", color: "var(--emerald-dark,#0F8A6A)", borderRadius: 10, padding: "2px 8px" }}>{t(`logistics.shipmentStatus.${s.status}`)}</span>{s.delayed && <span style={{ fontSize: 11, fontWeight: 700, color: "var(--brick)", marginLeft: 6 }}>{t("logistics.transport.delayedBadge")}</span>}</td>
                 </tr>
               ))}
             </tbody>

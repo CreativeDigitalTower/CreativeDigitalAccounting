@@ -49,3 +49,31 @@ export const DEFAULT_SHIPMENT_STATUS: ShipmentStatus = "loaded";
 export function isValidShipmentStatus(s: string): s is ShipmentStatus {
   return (SHIPMENT_STATUSES as readonly string[]).includes(s);
 }
+
+// Видове документи към курса (типизирани). Ключовете имат преводи logistics.docTypes.*
+export const SHIPMENT_DOC_TYPES = [
+  "dispatch_note", "holcim_invoice", "proforma", "cmr", "waybill", "customs_declaration",
+  "export_doc", "import_doc", "transport_invoice", "border_doc", "forwarder_doc",
+  "bg_mk_invoice", "mk_invoice", "payment_doc", "other",
+] as const;
+export type ShipmentDocType = (typeof SHIPMENT_DOC_TYPES)[number];
+export function isValidShipmentDocType(s: string): s is ShipmentDocType {
+  return (SHIPMENT_DOC_TYPES as readonly string[]).includes(s);
+}
+
+// Документи, необходими за досието на вноса (✓ наличен / ! липсва). Configurable.
+export const REQUIRED_IMPORT_DOCS: ShipmentDocType[] = [
+  "cmr", "customs_declaration", "export_doc", "import_doc",
+];
+
+// Транспортни етапи с очаквани времеви диапазони (workflow на движението).
+export const TRANSPORT_MILESTONES = [
+  "loading", "departure", "border_arrival", "border_crossing", "arrival",
+] as const;
+export type TransportMilestone = (typeof TRANSPORT_MILESTONES)[number];
+export function isValidMilestone(s: string): s is TransportMilestone {
+  return (TRANSPORT_MILESTONES as readonly string[]).includes(s);
+}
+
+// Толеранс (минути) след горната граница на очаквания диапазон, преди „Закъснение".
+export const DELAY_GRACE_MINUTES = 90;

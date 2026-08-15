@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useT } from "@/components/i18n/I18nProvider";
 import { SHIPMENT_STATUSES } from "@/lib/logistics/config";
+import { ShipmentTransport } from "@/components/app/logistics/ShipmentTransport";
+import { ShipmentDocuments } from "@/components/app/logistics/ShipmentDocuments";
 
 type History = { id: string; fromStatus: string | null; toStatus: string; note: string | null; createdAt: string };
 export type ShipmentDto = {
@@ -102,6 +104,7 @@ export function ShipmentDetail({ shipment, canManage }: { shipment: ShipmentDto;
             <Row l={t("logistics.shipNew.loadingPlace")} v={s.loadingPlace} />
             <Row l={t("logistics.shipNew.entryAt")} v={dtt(s.entryAt)} />
             <Row l={t("logistics.shipNew.exitAt")} v={dtt(s.exitAt)} />
+            <ShipmentTransport shipmentId={s.id} canManage={canManage} />
           </Panel>
         </div>
         <div>
@@ -114,7 +117,7 @@ export function ShipmentDetail({ shipment, canManage }: { shipment: ShipmentDto;
             <div style={{ fontSize: 12.5, color: "var(--muted)" }}>{t("logistics.shipDetail.phaseSale")}</div>
           </Panel>
           <Panel title={t("logistics.shipDetail.documents")}>
-            <div style={{ fontSize: 12.5, color: "var(--muted)" }}>{t("logistics.shipDetail.phaseDocs")}</div>
+            <ShipmentDocuments shipmentId={s.id} canManage={canManage} />
           </Panel>
           <Panel title={t("logistics.shipDetail.history")}>
             {s.statusHistory.length === 0 ? <div style={{ fontSize: 12.5, color: "var(--muted)" }}>—</div> :

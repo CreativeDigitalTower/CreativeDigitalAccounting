@@ -887,6 +887,8 @@ model Shipment {
   statusHistory ShipmentStatusHistory[]
   invoiceLinks  SupplierInvoiceShipmentLink[]
   proformaAllocation ProformaAllocation?
+  documents     ShipmentDocument[]
+  milestones    ShipmentMilestone[]
 
   @@unique([companyId, code])
   // Една експедиционна бележка не може да бъде въведена два пъти в една фирма.
@@ -1036,6 +1038,54 @@ model SupplierInvoiceShipmentLink {
   shipment Shipment?       @relation(fields: [shipmentId], references: [id], onDelete: SetNull)
 
   @@index([invoiceId])
+}
+
+// ─── Структурирани документи към курса (типизирани, не generic списък) ───────
+// Видове: dispatch_note | holcim_invoice | proforma | cmr | waybill |
+// customs_declaration | export_doc | import_doc | transport_invoice | border_doc |
+// forwarder_doc | bg_mk_invoice | mk_invoice | payment_doc | other.
+model ShipmentDocument {
+  id               String    @id @default(cuid())
+  shipmentId       String
+  docType          String
+  name             String?
+  number           String?
+  docDate          DateTime?
+  note             String?   @db.Text
+  filename         String?
+  originalFilename String?
+  mimeType         String?
+  size             Int?
+  dataUrl          String?   @db.Text
+  uploadedById     String?
+  deletedAt        DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([shipmentId])
+}
+
+// ─── Транспортни етапи (очаквани времеви диапазони + реални часове) ──────────
+// GPS НЕ се ползва (Phase 5): статуси + очаквани времена + ръчно потвърждение.
+// milestone: loading | departure | border_arrival | border_crossing | arrival.
+// Закъснението се ИЗЧИСЛЯВА (няма авто-промяна на реалния статус — раздел 22).
+model ShipmentMilestone {
+  id           String    @id @default(cuid())
+  shipmentId   String
+  milestone    String
+  expectedFrom DateTime?
+  expectedTo   DateTime?
+  actualAt     DateTime?
+  note         String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@unique([shipmentId, milestone])
+  @@index([shipmentId])
 }
 
 // Бонуси на служител — по месец, със сума, вид и бележка

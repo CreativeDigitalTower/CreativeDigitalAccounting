@@ -46,28 +46,28 @@
     "own_unspecified": "Не указано"
   },
   "dossier": {
-    "basic": "Основные данные",
-    "documents": "Документы",
-    "history": "История рейсов",
-    "historyPlaceholder": "История рейсов будет заполняться автоматически после активации модуля доставок.",
-    "addDoc": "+ Добавить документ",
-    "docType": "Тип",
-    "docName": "Имя",
-    "docNumber": "Номер",
-    "validTo": "Действует до",
-    "file": "Файл",
-    "download": "Скачать",
-    "noDocs": "Нет документов."
+    "title": "Досье импорта",
+    "complete": "✓ Полное",
+    "incomplete": "! Неполное",
+    "present": "✓ есть",
+    "missing": "! отсутствует"
   },
   "docTypes": {
-    "registration": "Регистрация",
-    "insurance": "Страховка",
-    "inspection": "Техосмотр",
-    "license": "Лицензия",
-    "permit": "Разрешение",
-    "contract": "Договор",
-    "certificate": "Сертификат",
-    "other": "Другой"
+    "dispatch_note": "Накладная",
+    "holcim_invoice": "Счёт Holcim",
+    "proforma": "Проформа",
+    "cmr": "CMR",
+    "waybill": "Товарная накладная",
+    "customs_declaration": "Таможенная декларация",
+    "export_doc": "Экспортный документ",
+    "import_doc": "Импортный документ",
+    "transport_invoice": "Транспортный счёт",
+    "border_doc": "Пограничный документ",
+    "forwarder_doc": "Экспедиторский документ",
+    "bg_mk_invoice": "Счёт BG→MK",
+    "mk_invoice": "Счёт MK",
+    "payment_doc": "Платёжный документ",
+    "other": "Другой документ"
   },
   "carriers": {
     "title": "Перевозчики",
@@ -253,5 +253,35 @@
     "vehicle": "Автомобиль",
     "dispatchNote": "Накладная",
     "unresolved": "несвязанные"
+  },
+  "milestones": {
+    "loading": "Погрузка",
+    "departure": "Отправление",
+    "border_arrival": "Прибытие на границу",
+    "border_crossing": "Пересечение",
+    "arrival": "Прибытие"
+  },
+  "transport": {
+    "title": "Отслеживание",
+    "expected": "Ожидается (с–по)",
+    "actual": "Фактически",
+    "confirm": "Подтвердить",
+    "save": "Сохранить",
+    "stDelayed": "Задержка",
+    "stConfirmed": "Подтверждено",
+    "stPending": "Ожидается",
+    "delayedBadge": "⚠ Задержка"
+  },
+  "shipDocs": {
+    "title": "Документы",
+    "add": "+ Добавить документ",
+    "type": "Тип",
+    "name": "Имя",
+    "number": "Номер",
+    "date": "Дата",
+    "file": "Файл",
+    "download": "Скачать",
+    "delete": "Удалить",
+    "empty": "Нет документов."
   }
 }
