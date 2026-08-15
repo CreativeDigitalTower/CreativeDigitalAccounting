@@ -237,6 +237,21 @@
     "headerTotals": "Entered (from PDF)",
     "detailTitle": "Holcim invoice",
     "openShipment": "Open shipment",
-    "downloadPdf": "Download PDF"
+    "downloadPdf": "Download PDF",
+    "linesTitle": "Invoice lines",
+    "addLine": "+ Add line",
+    "dupLine": "Duplicate",
+    "delLine": "Delete",
+    "materialName": "Material name",
+    "materialCode": "Code",
+    "unit": "Unit",
+    "statusMatched": "✓ Matched",
+    "statusReview": "⚠ Review",
+    "statusUnmatched": "○ No shipment",
+    "totalsMatch": "✓ Totals match",
+    "totalsDiff": "⚠ Difference",
+    "vehicle": "Vehicle",
+    "dispatchNote": "Dispatch note",
+    "unresolved": "unresolved"
   }
 }

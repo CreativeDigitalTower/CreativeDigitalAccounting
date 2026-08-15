@@ -237,6 +237,21 @@
     "headerTotals": "Introdus (din PDF)",
     "detailTitle": "Factură Holcim",
     "openShipment": "Deschide cursa",
-    "downloadPdf": "Descarcă PDF"
+    "downloadPdf": "Descarcă PDF",
+    "linesTitle": "Poziții factură",
+    "addLine": "+ Adaugă linie",
+    "dupLine": "Duplică",
+    "delLine": "Șterge",
+    "materialName": "Denumire",
+    "materialCode": "Cod",
+    "unit": "UM",
+    "statusMatched": "✓ Legată",
+    "statusReview": "⚠ Verifică",
+    "statusUnmatched": "○ Fără cursă",
+    "totalsMatch": "✓ Totaluri corecte",
+    "totalsDiff": "⚠ Diferență",
+    "vehicle": "Vehicul",
+    "dispatchNote": "Aviz",
+    "unresolved": "nelegate"
   }
 }

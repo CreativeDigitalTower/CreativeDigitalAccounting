@@ -237,6 +237,21 @@
     "headerTotals": "Въведени (от PDF)",
     "detailTitle": "Holcim фактура",
     "openShipment": "Отвори курса",
-    "downloadPdf": "Изтегли PDF"
+    "downloadPdf": "Изтегли PDF",
+    "linesTitle": "Позиции във фактурата",
+    "addLine": "+ Добави позиция",
+    "dupLine": "Дублирай",
+    "delLine": "Изтрий",
+    "materialName": "Наименование",
+    "materialCode": "Шифър",
+    "unit": "МЕ",
+    "statusMatched": "✓ Свързана",
+    "statusReview": "⚠ Преглед",
+    "statusUnmatched": "○ Няма експедиция",
+    "totalsMatch": "✓ Сумите съвпадат",
+    "totalsDiff": "⚠ Разлика",
+    "vehicle": "Автомобил",
+    "dispatchNote": "Експ. бележка",
+    "unresolved": "несвързани"
   }
 }

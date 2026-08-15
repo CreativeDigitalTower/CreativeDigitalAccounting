@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { lineFinancials, sumMoney } from "@/lib/logistics/money";
 import { invoiceTotals } from "@/lib/logistics/purchaseCalc";
-import { matchInvoiceLine, resolveProductByMaterialCode } from "@/lib/logistics/invoiceMatch";
+import { matchInvoiceLine, resolveProductByMaterialCode, matchStatusFor } from "@/lib/logistics/invoiceMatch";
 import { HOLCIM_INVOICE_FIXTURE as FIX } from "@/lib/logistics/__fixtures__/holcimInvoice";
 
 describe("decimal-safe line financials", () => {
@@ -60,6 +60,23 @@ describe("Shipment matching (primary = dispatch note)", () => {
   it("нормализиран автомобил (интервали/малки букви) не дава фалшив warning", () => {
     const r = matchInvoiceLine(shipment, { truck: "st 8669 ae" });
     expect(r.warnings.truck).toBe(false);
+  });
+});
+
+describe("matchStatusFor (ръчен ред — matching не блокира записа)", () => {
+  const shipment = { dispatchNoteNumber: "B0000313802", registration: "ST8669AE", materialCode: "14012840", netQuantity: 26.14 };
+
+  it("няма намерен курс → unmatched (не блокира)", () => {
+    expect(matchStatusFor(null, { dispatchNoteNumber: "B0000313802", quantity: 26.14 })).toBe("unmatched");
+  });
+  it("намерен курс, всичко съвпада → matched", () => {
+    expect(matchStatusFor(shipment, { dispatchNoteNumber: "B0000313802", truck: "ST8669AE", materialCode: "14012840", quantity: 26.14 })).toBe("matched");
+  });
+  it("намерен курс, но различно количество → review", () => {
+    expect(matchStatusFor(shipment, { dispatchNoteNumber: "B0000313802", quantity: 30 })).toBe("review");
+  });
+  it("намерен курс, но различен автомобил → review", () => {
+    expect(matchStatusFor(shipment, { dispatchNoteNumber: "B0000313802", truck: "CB1234AB" })).toBe("review");
   });
 });
 

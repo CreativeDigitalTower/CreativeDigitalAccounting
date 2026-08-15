@@ -44,6 +44,21 @@ export function matchInvoiceLine(shipment: ShipmentForMatch, line: InvoiceLineFo
   return { primaryMatch, warnings, hasWarning };
 }
 
+export type MatchStatus = "matched" | "review" | "unmatched";
+
+/**
+ * Статус на реда спрямо намерен курс (без да блокира записа):
+ *  - няма курс           → "unmatched" (○ Няма намерена експедиция)
+ *  - курс + без разлики   → "matched"   (✓ Свързана експедиция)
+ *  - курс + разлика       → "review"    (⚠ Необходимо е преглеждане)
+ */
+export function matchStatusFor(shipment: ShipmentForMatch | null, line: InvoiceLineForMatch): MatchStatus {
+  if (!shipment) return "unmatched";
+  const r = matchInvoiceLine(shipment, line);
+  if (!r.primaryMatch) return "unmatched";
+  return r.hasWarning ? "review" : "matched";
+}
+
 /**
  * Разпознаване на продукт по material code (раздел 17). Връща id на съществуващ
  * продукт или null → изисква ревю (не създава автоматично продукт).
