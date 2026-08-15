@@ -411,5 +411,39 @@
     "addProduct": "+ Product/year",
     "delete": "Delete",
     "aggregatedNote": "Current data is aggregated automatically; enter only pre-system data here."
+  },
+  "dash": {
+    "today": "Today",
+    "documents": "Documents",
+    "quantities": "Quantities",
+    "finances": "Finances",
+    "awaitingInvoice": "Awaiting Holcim invoice",
+    "missingCmr": "Missing CMR",
+    "loadedMonth": "Loaded (month)",
+    "soldMonth": "Sold (month)",
+    "purchases": "Purchases",
+    "sales": "Sales",
+    "margin": "Margin"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "finances": "Finances & margin",
+    "purchase": "Purchase",
+    "costs": "Costs",
+    "revenue": "Revenue",
+    "gross": "Gross result",
+    "marginPct": "Margin %",
+    "topRevenue": "Top clients by revenue",
+    "topTons": "Top clients by tons",
+    "client": "Client",
+    "products": "Product analysis",
+    "product": "Product",
+    "soldQty": "Sold",
+    "avgSale": "Avg sale",
+    "avgPurchase": "Avg purchase",
+    "marginUnit": "Margin/t",
+    "comparison": "Period comparison",
+    "quantity": "Quantity",
+    "empty": "Not enough data yet."
   }
 }

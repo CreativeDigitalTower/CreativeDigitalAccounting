@@ -411,5 +411,39 @@
     "addProduct": "+ Ürün/yıl",
     "delete": "Sil",
     "aggregatedNote": "Güncel veriler otomatik toplanır."
+  },
+  "dash": {
+    "today": "Bugün",
+    "documents": "Belgeler",
+    "quantities": "Miktarlar",
+    "finances": "Finans",
+    "awaitingInvoice": "Holcim faturası bekliyor",
+    "missingCmr": "CMR eksik",
+    "loadedMonth": "Yüklenen (ay)",
+    "soldMonth": "Satılan (ay)",
+    "purchases": "Alımlar",
+    "sales": "Satışlar",
+    "margin": "Marj"
+  },
+  "analytics": {
+    "title": "Analizler",
+    "finances": "Finans ve marj",
+    "purchase": "Alım",
+    "costs": "Masraflar",
+    "revenue": "Gelir",
+    "gross": "Brüt sonuç",
+    "marginPct": "Marj %",
+    "topRevenue": "Ciroya göre top müşteriler",
+    "topTons": "Tona göre top müşteriler",
+    "client": "Müşteri",
+    "products": "Ürün analizi",
+    "product": "Ürün",
+    "soldQty": "Satılan",
+    "avgSale": "Ort. satış",
+    "avgPurchase": "Ort. alım",
+    "marginUnit": "Marj/t",
+    "comparison": "Dönem karşılaştırması",
+    "quantity": "Miktar",
+    "empty": "Henüz yeterli veri yok."
   }
 }

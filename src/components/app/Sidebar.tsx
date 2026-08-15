@@ -111,6 +111,7 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
       { href: "/dashboard/logistics/products", label: "Продукти", icon: "warehouse", feature: "dashboard", tKey: "navigation.logisticsProducts" },
       { href: "/dashboard/logistics/carriers", label: "Превозвачи", icon: "suppliers", feature: "dashboard", tKey: "navigation.logisticsCarriers" },
       { href: "/dashboard/logistics/routes", label: "Маршрути", icon: "suppliers", feature: "dashboard", tKey: "navigation.logisticsRoutes" },
+      { href: "/dashboard/logistics/analytics", label: "Анализи (лог.)", icon: "analytics", feature: "dashboard", tKey: "navigation.logisticsAnalytics" },
       { href: "/dashboard/logistics/settings", label: "Настройки", icon: "settings", feature: "dashboard", tKey: "navigation.logisticsSettings" },
     ],
   } : null;

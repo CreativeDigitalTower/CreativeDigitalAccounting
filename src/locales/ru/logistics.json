@@ -411,5 +411,39 @@
     "addProduct": "+ Продукт/год",
     "delete": "Удалить",
     "aggregatedNote": "Текущие данные агрегируются автоматически."
+  },
+  "dash": {
+    "today": "Сегодня",
+    "documents": "Документы",
+    "quantities": "Количества",
+    "finances": "Финансы",
+    "awaitingInvoice": "Ожидают счёт Holcim",
+    "missingCmr": "Нет CMR",
+    "loadedMonth": "Загружено (месяц)",
+    "soldMonth": "Продано (месяц)",
+    "purchases": "Закупки",
+    "sales": "Продажи",
+    "margin": "Маржа"
+  },
+  "analytics": {
+    "title": "Аналитика",
+    "finances": "Финансы и маржа",
+    "purchase": "Закупка",
+    "costs": "Расходы",
+    "revenue": "Доход",
+    "gross": "Валовый результат",
+    "marginPct": "Маржа %",
+    "topRevenue": "Топ клиентов по обороту",
+    "topTons": "Топ клиентов по тоннам",
+    "client": "Клиент",
+    "products": "Анализ по продукту",
+    "product": "Продукт",
+    "soldQty": "Продано",
+    "avgSale": "Ср. продажа",
+    "avgPurchase": "Ср. закупка",
+    "marginUnit": "Маржа/т",
+    "comparison": "Сравнение периодов",
+    "quantity": "Количество",
+    "empty": "Пока недостаточно данных."
   }
 }
