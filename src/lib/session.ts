@@ -15,6 +15,50 @@ export async function getSession() {
   return session;
 }
 
+/** Импърсониран (target) companyId при валиден Super Admin technical access; иначе null. */
+export async function getImpersonatedCompanyId(userId: string): Promise<string | null> {
+  const jar = await cookies();
+  const imp = jar.get(IMPERSONATE_COOKIE)?.value;
+  if (!imp) return null;
+  const admin = await prisma.user.findUnique({ where: { id: userId }, select: { isSuperAdmin: true } });
+  if (!admin?.isSuperAdmin) return null;
+  const exists = await prisma.company.findUnique({ where: { id: imp }, select: { id: true } });
+  return exists ? imp : null;
+}
+
+export type EffectiveContext = {
+  actorUserId: string;          // реалният логнат потребител (за audit)
+  contextUserId: string | null; // чии фирми управляваме (target owner при technical access)
+  companyId: string;            // активна/target фирма
+  impersonating: boolean;
+  targetCompanyName: string | null;
+};
+
+/**
+ * Ефективен контекст за company-scoped операции. При Super Admin technical access
+ * контекстът е ЦЕЛЕВАТА фирма и нейният собственик — не личните фирми на Super Admin.
+ */
+export async function getEffectiveContext(): Promise<EffectiveContext> {
+  const session = await getSession();
+  const actorUserId = session.user!.id as string;
+  const impCompanyId = await getImpersonatedCompanyId(actorUserId);
+  if (impCompanyId) {
+    const company = await prisma.company.findUnique({
+      where: { id: impCompanyId },
+      select: { name: true, companyUsers: { where: { role: "owner" }, select: { userId: true }, take: 1 } },
+    });
+    return {
+      actorUserId,
+      contextUserId: company?.companyUsers[0]?.userId ?? null,
+      companyId: impCompanyId,
+      impersonating: true,
+      targetCompanyName: company?.name ?? null,
+    };
+  }
+  const companyId = await getCompanyId(actorUserId);
+  return { actorUserId, contextUserId: actorUserId, companyId, impersonating: false, targetCompanyName: null };
+}
+
 export async function getCompanyId(userId: string): Promise<string> {
   // Импърсонация: ако супер админ е "влязъл" в чужда фирма
   const jar = await cookies();

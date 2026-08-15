@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/session";
+import { getEffectiveContext } from "@/lib/session";
 import { validateCompanyIdentity } from "@/lib/validation/companyIdentity";
 import { planPrice, type PlanId } from "@/lib/constants";
 import { multiCompanyDiscount, applyDiscount } from "@/lib/discount";
@@ -32,8 +32,14 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   try {
-    const session = await getSession();
-    const userId = session.user!.id as string;
+    // Ефективен контекст: при technical access собственик става ЦЕЛЕВИЯТ клиент,
+    // не Super Admin-ът. Audit пази реалния actor.
+    const ctx = await getEffectiveContext();
+    const actorUserId = ctx.actorUserId;
+    const ownerUserId = ctx.contextUserId;
+    if (!ownerUserId) {
+      return NextResponse.json({ error: "Целевата фирма няма собственик — задайте собственик преди добавяне на свързана фирма." }, { status: 400 });
+    }
     const data = schema.parse(await req.json());
 
     // Валидация според държава: BG → ЕИК checksum; международна → рег. номер (без checksum).
@@ -54,10 +60,18 @@ export async function POST(req: Request) {
     const vatReg = !!data.vatRegistered && !!(data.vatNumber && data.vatNumber.trim());
     const plan = data.plan as PlanId;
 
-    // Мултифирмена отстъпка: според броя ВЕЧЕ платени фирми на собственика.
-    const paidCount = plan !== "free" ? await countPaidOwnedCompanies(userId) : 0;
+    // Мултифирмена отстъпка: според броя ВЕЧЕ платени фирми на СОБСТВЕНИКА (контекста).
+    const paidCount = plan !== "free" ? await countPaidOwnedCompanies(ownerUserId) : 0;
     const rule = plan !== "free" ? multiCompanyDiscount(paidCount) : { percent: 0, reason: "" };
     const breakdown = applyDiscount(planPrice(plan), rule.percent);
+
+    // При technical access новата фирма се присъединява към бизнес групата на target
+    // фирмата (ако има) — така свързаните фирми са в общата група.
+    let groupId: string | null = null;
+    if (ctx.impersonating) {
+      const target = await prisma.company.findUnique({ where: { id: ctx.companyId }, select: { companyGroupId: true } });
+      groupId = target?.companyGroupId ?? null;
+    }
 
     const company = await prisma.$transaction(async (tx) => {
       const c = await tx.company.create({
@@ -70,10 +84,12 @@ export async function POST(req: Request) {
           defaultVatExempt: !vatReg, defaultVatExemptReason: vatReg ? null : "art113_9",
           address: data.address || null, city: data.city || null, mol: data.mol || null,
           isAccountingFirm: false, managedByFirmId: null,
+          companyGroupId: groupId,
           referralSource: "multi_company",
         },
       });
-      await tx.companyUser.create({ data: { userId, companyId: c.id, role: "owner" } });
+      // Собственик е КЛИЕНТЪТ (контекста), не Super Admin actor-ът.
+      await tx.companyUser.create({ data: { userId: ownerUserId, companyId: c.id, role: "owner" } });
       await tx.subscription.create({
         data: {
           companyId: c.id, plan,
@@ -84,8 +100,14 @@ export async function POST(req: Request) {
       return c;
     });
 
-    await audit(company.id, userId, "create", "Company", company.id,
-      `Нова фирма през „Моите фирми" (план ${plan}${rule.percent ? `, отстъпка ${rule.percent}%` : ""})`);
+    const auditNote = `Нова фирма през „Моите фирми"${ctx.impersonating ? ` (technical access → ${ctx.targetCompanyName ?? ctx.companyId})` : ""} (план ${plan}${rule.percent ? `, отстъпка ${rule.percent}%` : ""})`;
+    if (ctx.impersonating) {
+      // Technical access: пазим следа с реалния actor (Super Admin) + target — audit()
+      // нарочно се пропуска при импърсонация, затова записваме директно.
+      await prisma.auditLog.create({ data: { companyId: company.id, userId: actorUserId, action: "create_ta", entity: "Company", entityId: company.id, summary: auditNote } }).catch((e) => console.error("ta audit", e));
+    } else {
+      await audit(company.id, actorUserId, "create", "Company", company.id, auditNote);
+    }
 
     // Проформа само за платен план с крайна сума > 0 (100% отстъпка → без проформа).
     let proforma: { token: string; number: string } | null = null;

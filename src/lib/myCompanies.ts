@@ -50,11 +50,32 @@ export async function countPaidOwnedCompanies(userId: string): Promise<number> {
 
 /** Пълен управленски обзор на фирмите на собственика (KPI per фирма). */
 export async function getMyCompanies(userId: string): Promise<MyCompanyKpi[]> {
+  return kpisForWhere(ownedWhere(userId));
+}
+
+/**
+ * Фирми в ефективния контекст (за „Моите фирми" при Super Admin technical access):
+ * фирмите на target собственика + фирмите в същата бизнес група + самата target фирма.
+ * Никога не връща личните фирми на Super Admin.
+ */
+export async function getContextCompanies(opts: { contextUserId: string | null; targetCompanyId: string }): Promise<MyCompanyKpi[]> {
+  const target = await prisma.company.findUnique({ where: { id: opts.targetCompanyId }, select: { companyGroupId: true } });
+  const groupIds = target?.companyGroupId
+    ? (await prisma.company.findMany({ where: { companyGroupId: target.companyGroupId, archivedAt: null }, select: { id: true } })).map((c) => c.id)
+    : [];
+  const explicitIds = [...new Set([opts.targetCompanyId, ...groupIds])];
+  const or: object[] = [{ id: { in: explicitIds }, archivedAt: null }];
+  if (opts.contextUserId) or.push(ownedWhere(opts.contextUserId));
+  return kpisForWhere({ OR: or });
+}
+
+/** Общата заявка + KPI мапинг за произволен where филтър. */
+async function kpisForWhere(where: object): Promise<MyCompanyKpi[]> {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
   const companies = await prisma.company.findMany({
-    where: ownedWhere(userId),
+    where,
     select: {
       id: true, name: true, eik: true, logoUrl: true,
       subscription: { select: { plan: true, status: true, paymentStatus: true, billingMode: true, discountPercent: true } },

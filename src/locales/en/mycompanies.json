@@ -54,5 +54,8 @@
     "regNumber": "Registration number",
     "regHelp": "Enter the company's official registration number in its country.",
     "vatIntl": "VAT number"
-  }
+  },
+  "unlink": "Unlink",
+  "unlinkConfirm": "This removes \"{name}\" from the current multi-company profile but will NOT delete the company or its documents. Continue?",
+  "taBanner": "You are managing the companies of: {name} (technical access)"
 }
