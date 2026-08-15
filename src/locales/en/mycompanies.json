@@ -57,5 +57,6 @@
   },
   "unlink": "Unlink",
   "unlinkConfirm": "This removes \"{name}\" from the current multi-company profile but will NOT delete the company or its documents. Continue?",
-  "taBanner": "You are managing the companies of: {name} (technical access)"
+  "taBanner": "You are managing the companies of: {name} (technical access)",
+  "openTransfer": "Open the company transfer flow?"
 }

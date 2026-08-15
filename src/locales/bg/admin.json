@@ -8,7 +8,8 @@
     "businesses": "Бизнеси (филтри по сектор/план)",
     "deletedDocs": "Изтрити документи",
     "companyGroups": "Групи фирми",
-    "modules": "Модули"
+    "modules": "Модули",
+    "companyTransfer": "Прехвърляне на фирма"
   },
   "companiesWord": "фирми",
   "ranges": {

@@ -1,4 +1,4 @@
-import { requireCompany, getEffectiveContext } from "@/lib/session";
+import { requireCompany, getEffectiveContext, isSuperAdmin } from "@/lib/session";
 import { getMyCompanies, getContextCompanies, countPaidOwnedCompanies } from "@/lib/myCompanies";
 import { MyCompaniesClient } from "@/components/app/MyCompaniesClient";
 
@@ -13,6 +13,7 @@ export default async function MyCompaniesPage() {
     ? await getContextCompanies({ contextUserId: ctx.contextUserId, targetCompanyId: ctx.companyId })
     : await getMyCompanies(ctx.actorUserId);
   const paidCount = ctx.impersonating ? 0 : await countPaidOwnedCompanies(ctx.actorUserId);
+  const superAdmin = await isSuperAdmin(ctx.actorUserId);
 
   return (
     <MyCompaniesClient
@@ -21,6 +22,7 @@ export default async function MyCompaniesPage() {
       paidCount={paidCount}
       impersonating={ctx.impersonating}
       targetCompanyName={ctx.targetCompanyName}
+      isSuperAdmin={superAdmin}
     />
   );
 }

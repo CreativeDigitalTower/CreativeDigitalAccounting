@@ -57,5 +57,6 @@
   },
   "unlink": "Bağlantıyı kaldır",
   "unlinkConfirm": "Bu, \"{name}\" şirketini profilden kaldırır ama silmez.",
-  "taBanner": "Şu şirketin firmalarını yönetiyorsunuz: {name}"
+  "taBanner": "Şu şirketin firmalarını yönetiyorsunuz: {name}",
+  "openTransfer": "Şirket transferini aç?"
 }
