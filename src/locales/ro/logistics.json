@@ -283,5 +283,40 @@
     "download": "Descarcă",
     "delete": "Șterge",
     "empty": "Niciun document."
+  },
+  "costTypes": {
+    "transport": "Transport",
+    "border_fee": "Taxă de frontieră",
+    "customs_service": "Serviciu vamal",
+    "forwarding": "Expediere",
+    "tax": "Taxă",
+    "mk_vat": "TVA Macedonia",
+    "other": "Altul"
+  },
+  "costs": {
+    "title": "Costuri de import",
+    "add": "+ Adaugă cost",
+    "type": "Tip",
+    "amount": "Sumă",
+    "currency": "Monedă",
+    "fxRate": "Curs",
+    "base": "În monedă de bază",
+    "vatRate": "Cotă %",
+    "includeInCost": "În cost",
+    "note": "Notă",
+    "delete": "Șterge",
+    "empty": "Niciun cost.",
+    "purchase": "Valoare achiziție",
+    "included": "Costuri (în cost)",
+    "totalCost": "Cost total",
+    "mkVatHint": "TVA nu intră implicit în cost."
+  },
+  "fx": {
+    "title": "Cursuri valutare",
+    "add": "+ Adaugă curs",
+    "rate": "Curs (1 bază = X)",
+    "date": "Data",
+    "source": "Sursă",
+    "empty": "Niciun curs."
   }
 }

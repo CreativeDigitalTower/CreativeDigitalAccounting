@@ -283,5 +283,40 @@
     "download": "Download",
     "delete": "Delete",
     "empty": "No documents."
+  },
+  "costTypes": {
+    "transport": "Transport",
+    "border_fee": "Border fee",
+    "customs_service": "Customs service",
+    "forwarding": "Forwarding",
+    "tax": "Tax",
+    "mk_vat": "Macedonian VAT",
+    "other": "Other"
+  },
+  "costs": {
+    "title": "Import costs",
+    "add": "+ Add cost",
+    "type": "Type",
+    "amount": "Amount",
+    "currency": "Currency",
+    "fxRate": "FX rate",
+    "base": "In base currency",
+    "vatRate": "Rate %",
+    "includeInCost": "In cost",
+    "note": "Note",
+    "delete": "Delete",
+    "empty": "No costs.",
+    "purchase": "Purchase value",
+    "included": "Costs (in cost)",
+    "totalCost": "Total cost",
+    "mkVatHint": "VAT is excluded from cost by default (recoverable)."
+  },
+  "fx": {
+    "title": "Exchange rates",
+    "add": "+ Add rate",
+    "rate": "Rate (1 base = X)",
+    "date": "Date",
+    "source": "Source",
+    "empty": "No rates yet."
   }
 }
