@@ -283,5 +283,40 @@
     "download": "İndir",
     "delete": "Sil",
     "empty": "Belge yok."
+  },
+  "costTypes": {
+    "transport": "Nakliye",
+    "border_fee": "Sınır ücreti",
+    "customs_service": "Gümrük hizmeti",
+    "forwarding": "Nakliye komisyonu",
+    "tax": "Vergi",
+    "mk_vat": "Makedonya KDV",
+    "other": "Diğer"
+  },
+  "costs": {
+    "title": "İthalat masrafları",
+    "add": "+ Masraf ekle",
+    "type": "Tür",
+    "amount": "Tutar",
+    "currency": "Para",
+    "fxRate": "Kur",
+    "base": "Baz para",
+    "vatRate": "Oran %",
+    "includeInCost": "Maliyette",
+    "note": "Not",
+    "delete": "Sil",
+    "empty": "Masraf yok.",
+    "purchase": "Alım değeri",
+    "included": "Masraflar",
+    "totalCost": "Toplam maliyet",
+    "mkVatHint": "KDV varsayılan olarak maliyette değil."
+  },
+  "fx": {
+    "title": "Döviz kurları",
+    "add": "+ Kur ekle",
+    "rate": "Kur (1 baz = X)",
+    "date": "Tarih",
+    "source": "Kaynak",
+    "empty": "Kur yok."
   }
 }

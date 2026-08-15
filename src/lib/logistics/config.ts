@@ -77,3 +77,16 @@ export function isValidMilestone(s: string): s is TransportMilestone {
 
 // Толеранс (минути) след горната граница на очаквания диапазон, преди „Закъснение".
 export const DELAY_GRACE_MINUTES = 90;
+
+// Видове разходи при внос (Македония). Преводи: logistics.costTypes.*
+export const IMPORT_COST_TYPES = [
+  "transport", "border_fee", "customs_service", "forwarding", "tax", "mk_vat", "other",
+] as const;
+export type ImportCostType = (typeof IMPORT_COST_TYPES)[number];
+export function isValidCostType(s: string): s is ImportCostType {
+  return (IMPORT_COST_TYPES as readonly string[]).includes(s);
+}
+// По подразбиране ДДВ НЕ влиза в икономическата себестойност (възстановим данък).
+export function costIncludedByDefault(costType: string): boolean {
+  return costType !== "mk_vat";
+}

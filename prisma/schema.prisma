@@ -200,6 +200,7 @@ model Company {
   shipments         Shipment[]
   logisticsProformas LogisticsProforma[]
   supplierInvoices  SupplierInvoice[]
+  logisticsExchangeRates LogisticsExchangeRate[]
 
   @@index([managedByFirmId])
   @@index([isAccountingFirm])
@@ -889,6 +890,7 @@ model Shipment {
   proformaAllocation ProformaAllocation?
   documents     ShipmentDocument[]
   milestones    ShipmentMilestone[]
+  importCosts   ImportCost[]
 
   @@unique([companyId, code])
   // Една експедиционна бележка не може да бъде въведена два пъти в една фирма.
@@ -1086,6 +1088,51 @@ model ShipmentMilestone {
 
   @@unique([shipmentId, milestone])
   @@index([shipmentId])
+}
+
+// ─── Разходи при внос (Македония) ────────────────────────────────────────────
+// Компоненти: transport | border_fee | customs_service | forwarding | tax |
+// mk_vat | other. Всеки пази валута + курс snapshot към базовата валута.
+// ДДВ обикновено НЕ влиза в икономическата себестойност (includeInCost=false) —
+// раздел 49: данъците не се приемат автоматично за себестойност без настройка.
+model ImportCost {
+  id            String   @id @default(cuid())
+  shipmentId    String
+  costType      String
+  amount        Float    // стойност във валутата на разхода
+  currency      String   @default("EUR")
+  fxRate        Float    @default(1) // множител към базовата валута (snapshot)
+  baseAmount    Float    // amount × fxRate, в базовата валута (изчислено при запис)
+  vatRate       Float?   // ставка (напр. 18 за mk_vat) — за информация
+  includeInCost Boolean  @default(true) // дали влиза в себестойността
+  auto          Boolean  @default(false) // автоматично изчислен или ръчен
+  note          String?
+  createdById   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([shipmentId])
+}
+
+// ─── Валутни курсове (EUR↔MKD и др.) ─────────────────────────────────────────
+// Регистър за справка/предложение; конкретната операция пази собствен snapshot
+// на използвания курс (ImportCost.fxRate). rate = единици quote за 1 base.
+model LogisticsExchangeRate {
+  id            String    @id @default(cuid())
+  companyId     String
+  baseCurrency  String    @default("EUR")
+  quoteCurrency String    @default("MKD")
+  rate          Float     // 1 base = rate quote (напр. 1 EUR = 61.5 MKD)
+  date          DateTime?
+  source        String?
+  note          String?
+  createdAt     DateTime  @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, baseCurrency, quoteCurrency])
 }
 
 // Бонуси на служител — по месец, със сума, вид и бележка

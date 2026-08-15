@@ -6,6 +6,7 @@ import { useT } from "@/components/i18n/I18nProvider";
 import { SHIPMENT_STATUSES } from "@/lib/logistics/config";
 import { ShipmentTransport } from "@/components/app/logistics/ShipmentTransport";
 import { ShipmentDocuments } from "@/components/app/logistics/ShipmentDocuments";
+import { ShipmentCosts } from "@/components/app/logistics/ShipmentCosts";
 
 type History = { id: string; fromStatus: string | null; toStatus: string; note: string | null; createdAt: string };
 export type ShipmentDto = {
@@ -111,7 +112,7 @@ export function ShipmentDetail({ shipment, canManage }: { shipment: ShipmentDto;
           <Panel title={t("logistics.shipDetail.border")}>
             <Row l={t("logistics.shipNew.destination")} v={s.destination} />
             <Row l={t("logistics.shipNew.recipient")} v={s.recipient} />
-            <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 6 }}>{t("logistics.shipDetail.phaseBorder")}</div>
+            <div style={{ marginTop: 10 }}><ShipmentCosts shipmentId={s.id} canManage={canManage} /></div>
           </Panel>
           <Panel title={t("logistics.shipDetail.sale")}>
             <div style={{ fontSize: 12.5, color: "var(--muted)" }}>{t("logistics.shipDetail.phaseSale")}</div>
