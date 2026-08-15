@@ -201,6 +201,8 @@ model Company {
   logisticsProformas LogisticsProforma[]
   supplierInvoices  SupplierInvoice[]
   logisticsExchangeRates LogisticsExchangeRate[]
+  bgMkInvoicesIssued   BgMkInvoice[] @relation("BgMkIssuer")
+  bgMkInvoicesReceived BgMkInvoice[] @relation("BgMkRecipient")
 
   @@index([managedByFirmId])
   @@index([isAccountingFirm])
@@ -891,6 +893,7 @@ model Shipment {
   documents     ShipmentDocument[]
   milestones    ShipmentMilestone[]
   importCosts   ImportCost[]
+  bgMkLine      BgMkInvoiceLine?
 
   @@unique([companyId, code])
   // Една експедиционна бележка не може да бъде въведена два пъти в една фирма.
@@ -1133,6 +1136,55 @@ model LogisticsExchangeRate {
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId, baseCurrency, quoteCurrency])
+}
+
+// ─── BG → MK intercompany фактура (един споделен документ) ───────────────────
+// BG фирмата (companyId) продава на свързаната MK фирма (counterpartyCompanyId).
+// ЕДИН запис, видим и от двете фирми: BG страна = издаден, MK страна = получен —
+// без повторно въвеждане/качване. Позициите носят source shipment за traceability.
+model BgMkInvoice {
+  id                   String   @id @default(cuid())
+  companyId            String   // издател (BG)
+  counterpartyCompanyId String  // получател (MK) — член на същата CompanyGroup
+  number               String
+  date                 DateTime?
+  currency             String   @default("EUR")
+  vatRate              Float?
+  note                 String?  @db.Text
+  createdById          String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  company      Company           @relation("BgMkIssuer", fields: [companyId], references: [id], onDelete: Cascade)
+  counterparty Company           @relation("BgMkRecipient", fields: [counterpartyCompanyId], references: [id], onDelete: Cascade)
+  lines        BgMkInvoiceLine[]
+
+  @@unique([companyId, number])
+  @@index([companyId])
+  @@index([counterpartyCompanyId])
+}
+
+// Позиция от BG→MK фактура. shipmentId е UNIQUE → една стока не се продава на MK два
+// пъти. Позициите после захранват MK продажбите (Phase 8) — enter once, use everywhere.
+model BgMkInvoiceLine {
+  id              String  @id @default(cuid())
+  invoiceId       String
+  shipmentId      String? @unique
+  productId       String?
+  productSnapshot String?
+  unit            String  @default("t")
+  quantity        Float
+  unitPrice       Float
+  lineTotal       Float   // нето
+  vatAmount       Float?
+  grossAmount     Float?
+  currency        String  @default("EUR")
+  createdAt       DateTime @default(now())
+
+  invoice  BgMkInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  shipment Shipment?   @relation(fields: [shipmentId], references: [id], onDelete: SetNull)
+
+  @@index([invoiceId])
 }
 
 // Бонуси на служител — по месец, със сума, вид и бележка

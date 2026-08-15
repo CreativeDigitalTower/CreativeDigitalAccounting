@@ -36,6 +36,11 @@ export function formatShipmentId(year: number, value: number): string {
   return `TR-${year}-${String(value).padStart(6, "0")}`;
 }
 
+/** Форматира номер на BG→MK фактура: BM-2026-000001. */
+export function formatBgMkNumber(year: number, value: number): string {
+  return `BM-${year}-${String(value).padStart(6, "0")}`;
+}
+
 // Статуси на курса (workflow, раздел 21). Подредени; разширяеми чрез добавяне тук
 // + преводен ключ logistics.shipmentStatus.<id>. „loaded" = натоварен / очаква
 // фактура от Holcim (статус по подразбиране след създаване от експедиционна бележка).
