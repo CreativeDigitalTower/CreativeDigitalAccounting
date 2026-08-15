@@ -376,5 +376,40 @@
     "traceTitle": "Documente legate",
     "bgMkInvoice": "Factură BG→MK",
     "createSaleFrom": "Creează vânzare MK"
+  },
+  "vhist": {
+    "trips": "Curse",
+    "tons": "Transportat",
+    "lastTrip": "Ultima cursă",
+    "firstTrip": "Prima cursă",
+    "products": "Produse",
+    "destinations": "Destinații"
+  },
+  "clients": {
+    "title": "Clienți (logistică)",
+    "empty": "Niciun client.",
+    "name": "Client",
+    "invoices": "Facturi",
+    "revenue": "Venit",
+    "quantity": "Cantitate",
+    "lastPurchase": "Ultima achiziție",
+    "avgPrice": "Preț mediu/t",
+    "dossier": "Dosar",
+    "salesTitle": "Vânzări (agregat)",
+    "byProduct": "Pe produs",
+    "product": "Produs",
+    "invoicesTitle": "Facturi",
+    "number": "Număr",
+    "date": "Data",
+    "gross": "Total",
+    "noSales": "Nicio vânzare.",
+    "historicalTitle": "Date istorice",
+    "year": "An",
+    "note": "Notă",
+    "unit": "UM",
+    "addYear": "+ Adaugă an",
+    "addProduct": "+ Produs/an",
+    "delete": "Șterge",
+    "aggregatedNote": "Datele curente se agregă automat."
   }
 }

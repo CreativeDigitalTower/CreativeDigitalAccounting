@@ -376,5 +376,40 @@
     "traceTitle": "İlgili belgeler",
     "bgMkInvoice": "BG→MK fatura",
     "createSaleFrom": "MK satışı oluştur"
+  },
+  "vhist": {
+    "trips": "Seferler",
+    "tons": "Taşınan",
+    "lastTrip": "Son sefer",
+    "firstTrip": "İlk sefer",
+    "products": "Ürünler",
+    "destinations": "Varışlar"
+  },
+  "clients": {
+    "title": "Müşteriler (lojistik)",
+    "empty": "Müşteri yok.",
+    "name": "Müşteri",
+    "invoices": "Faturalar",
+    "revenue": "Ciro",
+    "quantity": "Miktar",
+    "lastPurchase": "Son alım",
+    "avgPrice": "Ort. fiyat/t",
+    "dossier": "Dosya",
+    "salesTitle": "Satışlar (toplu)",
+    "byProduct": "Ürüne göre",
+    "product": "Ürün",
+    "invoicesTitle": "Faturalar",
+    "number": "Numara",
+    "date": "Tarih",
+    "gross": "Toplam",
+    "noSales": "Satış yok.",
+    "historicalTitle": "Geçmiş veriler",
+    "year": "Yıl",
+    "note": "Not",
+    "unit": "Birim",
+    "addYear": "+ Yıl ekle",
+    "addProduct": "+ Ürün/yıl",
+    "delete": "Sil",
+    "aggregatedNote": "Güncel veriler otomatik toplanır."
   }
 }

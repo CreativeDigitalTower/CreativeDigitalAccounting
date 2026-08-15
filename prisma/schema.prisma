@@ -366,6 +366,43 @@ model Client {
   files     ClientFile[]
   emails    ClientEmail[]
   mkInvoices MkInvoice[]
+  historicalMetrics        ClientHistoricalMetric[]
+  historicalProductMetrics ClientHistoricalProductMetric[]
+}
+
+// ─── Исторически данни за клиент (преди старта на платформата) ───────────────
+// Раздел 42: ръчно въведени годишни стойности. Текущите/бъдещите данни се
+// АГРЕГИРАТ автоматично от фактурите — тук са само историческите (миграция).
+model ClientHistoricalMetric {
+  id        String   @id @default(cuid())
+  clientId  String
+  year      Int
+  revenue   Float?
+  quantity  Float?
+  unit      String   @default("t")
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@unique([clientId, year])
+  @@index([clientId])
+}
+
+// Исторически данни по продукт за клиент (раздел 43): година → продукт → количество/оборот.
+model ClientHistoricalProductMetric {
+  id        String   @id @default(cuid())
+  clientId  String
+  year      Int
+  product   String
+  quantity  Float?
+  revenue   Float?
+  createdAt DateTime @default(now())
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, year])
 }
 
 // Структурирани имейл адреси на клиента + предпочитания за получаване.

@@ -376,5 +376,40 @@
     "traceTitle": "Связанные документы",
     "bgMkInvoice": "Счёт BG→MK",
     "createSaleFrom": "Создать MK продажу"
+  },
+  "vhist": {
+    "trips": "Рейсы",
+    "tons": "Перевезено",
+    "lastTrip": "Последний рейс",
+    "firstTrip": "Первый рейс",
+    "products": "Продукты",
+    "destinations": "Назначения"
+  },
+  "clients": {
+    "title": "Клиенты (логистика)",
+    "empty": "Нет клиентов.",
+    "name": "Клиент",
+    "invoices": "Счета",
+    "revenue": "Оборот",
+    "quantity": "Количество",
+    "lastPurchase": "Последняя покупка",
+    "avgPrice": "Ср. цена/т",
+    "dossier": "Досье",
+    "salesTitle": "Продажи (агрегировано)",
+    "byProduct": "По продукту",
+    "product": "Продукт",
+    "invoicesTitle": "Счета",
+    "number": "Номер",
+    "date": "Дата",
+    "gross": "Итого",
+    "noSales": "Нет продаж.",
+    "historicalTitle": "Исторические данные",
+    "year": "Год",
+    "note": "Заметка",
+    "unit": "ЕИ",
+    "addYear": "+ Добавить год",
+    "addProduct": "+ Продукт/год",
+    "delete": "Удалить",
+    "aggregatedNote": "Текущие данные агрегируются автоматически."
   }
 }
