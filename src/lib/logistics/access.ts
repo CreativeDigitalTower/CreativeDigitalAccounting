@@ -24,6 +24,27 @@ export async function hasLogisticsAccess(companyId: string): Promise<boolean> {
   return !!rec?.enabled;
 }
 
+/** Другите фирми в същата бизнес група (за BG↔MK intercompany). Празно, ако няма група. */
+export async function groupCounterparties(companyId: string): Promise<{ id: string; name: string }[]> {
+  const me = await prisma.company.findUnique({ where: { id: companyId }, select: { companyGroupId: true } });
+  if (!me?.companyGroupId) return [];
+  const others = await prisma.company.findMany({
+    where: { companyGroupId: me.companyGroupId, id: { not: companyId }, archivedAt: null },
+    select: { id: true, name: true }, orderBy: { name: "asc" },
+  });
+  return others;
+}
+
+/** Дали двете фирми са в една и съща бизнес група (за достъп до споделени документи). */
+export async function inSameGroup(a: string, b: string): Promise<boolean> {
+  if (a === b) return true;
+  const [ca, cb] = await Promise.all([
+    prisma.company.findUnique({ where: { id: a }, select: { companyGroupId: true } }),
+    prisma.company.findUnique({ where: { id: b }, select: { companyGroupId: true } }),
+  ]);
+  return !!ca?.companyGroupId && ca.companyGroupId === cb?.companyGroupId;
+}
+
 export type LogisticsContext = { userId: string; companyId: string; role: string | null; caps: LogisticsCaps };
 
 /**

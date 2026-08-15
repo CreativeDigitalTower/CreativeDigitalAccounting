@@ -69,5 +69,6 @@
   "logisticsSettings": "Ayarlar",
   "logisticsShipments": "Seferler",
   "logisticsProformas": "Proformalar",
-  "logisticsHolcim": "Holcim faturaları"
+  "logisticsHolcim": "Holcim faturaları",
+  "logisticsBgMk": "BG → MK satışları"
 }

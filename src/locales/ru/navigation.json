@@ -69,5 +69,6 @@
   "logisticsSettings": "Настройки",
   "logisticsShipments": "Рейсы",
   "logisticsProformas": "Проформы",
-  "logisticsHolcim": "Счета Holcim"
+  "logisticsHolcim": "Счета Holcim",
+  "logisticsBgMk": "Продажи BG → MK"
 }
