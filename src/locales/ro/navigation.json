@@ -71,5 +71,6 @@
   "logisticsProformas": "Proforme",
   "logisticsHolcim": "Facturi Holcim",
   "logisticsBgMk": "Vânzări BG → MK",
-  "logisticsMkSales": "Vânzări MK"
+  "logisticsMkSales": "Vânzări MK",
+  "logisticsClients": "Clienți (log.)"
 }

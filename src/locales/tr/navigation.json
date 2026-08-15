@@ -71,5 +71,6 @@
   "logisticsProformas": "Proformalar",
   "logisticsHolcim": "Holcim faturaları",
   "logisticsBgMk": "BG → MK satışları",
-  "logisticsMkSales": "MK satışları"
+  "logisticsMkSales": "MK satışları",
+  "logisticsClients": "Müşteriler"
 }

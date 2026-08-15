@@ -71,5 +71,6 @@
   "logisticsProformas": "Проформи",
   "logisticsHolcim": "Holcim фактури",
   "logisticsBgMk": "Продажби BG → MK",
-  "logisticsMkSales": "MK продажби"
+  "logisticsMkSales": "MK продажби",
+  "logisticsClients": "Клиенти (лог.)"
 }

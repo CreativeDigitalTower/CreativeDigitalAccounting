@@ -376,5 +376,40 @@
     "traceTitle": "Σχετικά έγγραφα",
     "bgMkInvoice": "Τιμολόγιο BG→MK",
     "createSaleFrom": "Δημιουργία πώλησης MK"
+  },
+  "vhist": {
+    "trips": "Δρομολόγια",
+    "tons": "Μεταφέρθηκε",
+    "lastTrip": "Τελευταίο",
+    "firstTrip": "Πρώτο",
+    "products": "Προϊόντα",
+    "destinations": "Προορισμοί"
+  },
+  "clients": {
+    "title": "Πελάτες (εφοδιαστική)",
+    "empty": "Χωρίς πελάτες",
+    "name": "Πελάτης",
+    "invoices": "Τιμολόγια",
+    "revenue": "Έσοδα",
+    "quantity": "Ποσότητα",
+    "lastPurchase": "Τελευταία αγορά",
+    "avgPrice": "Μέση τιμή/t",
+    "dossier": "Φάκελος",
+    "salesTitle": "Πωλήσεις (συγκεντρωτικά)",
+    "byProduct": "Ανά προϊόν",
+    "product": "Προϊόν",
+    "invoicesTitle": "Τιμολόγια",
+    "number": "Αριθμός",
+    "date": "Ημ/νία",
+    "gross": "Σύνολο",
+    "noSales": "Χωρίς πωλήσεις",
+    "historicalTitle": "Ιστορικά δεδομένα",
+    "year": "Έτος",
+    "note": "Σημείωση",
+    "unit": "ΜΜ",
+    "addYear": "+ Προσθήκη έτους",
+    "addProduct": "+ Προϊόν/έτος",
+    "delete": "Διαγραφή",
+    "aggregatedNote": "Τα τρέχοντα δεδομένα συγκεντρώνονται αυτόματα."
   }
 }

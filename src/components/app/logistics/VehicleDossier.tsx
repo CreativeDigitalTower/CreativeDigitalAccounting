@@ -9,12 +9,13 @@ type Profile = { trailerReg: string | null; carrierId: string | null; defaultDri
 type Vehicle = { id: string; registration: string; active: boolean; notes: string | null; logisticsProfile: Profile | null; aliases: { id: string; alias: string }[] };
 type Carrier = { id: string; name: string };
 type Doc = { id: string; docType: string | null; name: string | null; number: string | null; issueDate: string | null; validTo: string | null; originalFilename: string | null; mimeType: string | null };
+type History = { trips: number; totalTons: number; firstTrip: string | null; lastTrip: string | null; products: string[]; destinations: string[] };
 
 const DOC_TYPES = ["registration", "insurance", "inspection", "license", "permit", "contract", "certificate", "other"];
 const OWNERSHIP = ["own", "carrier", "subcontractor", "unspecified"];
 const fileToDataUrl = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = rej; r.readAsDataURL(f); });
 
-export function VehicleDossier({ vehicle, carriers, canManage, canDocs }: { vehicle: Vehicle; carriers: Carrier[]; canManage: boolean; canDocs: boolean }) {
+export function VehicleDossier({ vehicle, carriers, canManage, canDocs, history }: { vehicle: Vehicle; carriers: Carrier[]; canManage: boolean; canDocs: boolean; history?: History }) {
   const t = useT();
   const [v, setV] = useState(vehicle);
   const [docs, setDocs] = useState<Doc[]>([]);
@@ -136,7 +137,20 @@ export function VehicleDossier({ vehicle, carriers, canManage, canDocs }: { vehi
       {/* История */}
       <div className="glass panel">
         <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 8px" }}>{t("logistics.dossier.history")}</h3>
-        <div style={{ fontSize: 13, color: "var(--muted)" }}>{t("logistics.dossier.historyPlaceholder")}</div>
+        {!history || history.trips === 0 ? (
+          <div style={{ fontSize: 13, color: "var(--muted)" }}>{t("logistics.dossier.historyPlaceholder")}</div>
+        ) : (
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(130px,1fr))", gap: 10, marginBottom: 8 }}>
+              <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.vhist.trips")}</div><div className="num" style={{ fontSize: 18, fontWeight: 600 }}>{history.trips}</div></div>
+              <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.vhist.tons")}</div><div className="num" style={{ fontSize: 18, fontWeight: 600 }}>{history.totalTons} t</div></div>
+              <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.vhist.lastTrip")}</div><div className="num" style={{ fontSize: 14, fontWeight: 600 }}>{history.lastTrip ? new Date(history.lastTrip).toLocaleDateString() : "—"}</div></div>
+              <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.vhist.firstTrip")}</div><div className="num" style={{ fontSize: 14, fontWeight: 600 }}>{history.firstTrip ? new Date(history.firstTrip).toLocaleDateString() : "—"}</div></div>
+            </div>
+            {history.products.length > 0 && <div style={{ fontSize: 12, color: "var(--muted)" }}>{t("logistics.vhist.products")}: {history.products.join(", ")}</div>}
+            {history.destinations.length > 0 && <div style={{ fontSize: 12, color: "var(--muted)" }}>{t("logistics.vhist.destinations")}: {history.destinations.join(", ")}</div>}
+          </>
+        )}
       </div>
     </div>
   );

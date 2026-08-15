@@ -376,5 +376,40 @@
     "traceTitle": "Related documents",
     "bgMkInvoice": "BG→MK invoice",
     "createSaleFrom": "Create MK sale"
+  },
+  "vhist": {
+    "trips": "Trips",
+    "tons": "Tons hauled",
+    "lastTrip": "Last trip",
+    "firstTrip": "First trip",
+    "products": "Products",
+    "destinations": "Destinations"
+  },
+  "clients": {
+    "title": "Clients (logistics)",
+    "empty": "No clients.",
+    "name": "Client",
+    "invoices": "Invoices",
+    "revenue": "Revenue",
+    "quantity": "Quantity",
+    "lastPurchase": "Last purchase",
+    "avgPrice": "Avg price/t",
+    "dossier": "Dossier",
+    "salesTitle": "Sales (aggregated)",
+    "byProduct": "By product",
+    "product": "Product",
+    "invoicesTitle": "Invoices",
+    "number": "Number",
+    "date": "Date",
+    "gross": "Total",
+    "noSales": "No sales.",
+    "historicalTitle": "Historical data (pre-system)",
+    "year": "Year",
+    "note": "Note",
+    "unit": "Unit",
+    "addYear": "+ Add year",
+    "addProduct": "+ Product/year",
+    "delete": "Delete",
+    "aggregatedNote": "Current data is aggregated automatically; enter only pre-system data here."
   }
 }
