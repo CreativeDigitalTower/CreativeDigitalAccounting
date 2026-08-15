@@ -49,6 +49,10 @@
     "created": "Company created successfully.",
     "proforma": "Proforma",
     "viewProforma": "View proforma",
-    "err": "Failed to create the company."
+    "err": "Failed to create the company.",
+    "country": "Country",
+    "regNumber": "Registration number",
+    "regHelp": "Enter the company's official registration number in its country.",
+    "vatIntl": "VAT number"
   }
 }

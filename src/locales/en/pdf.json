@@ -55,5 +55,6 @@
     "fixedRate": "Fixed rate: 1 EUR = {rate} BGN.",
     "closing": "We remain at your disposal for any further questions.",
     "regards": "Kind regards,"
-  }
+  },
+  "regNo": "Reg. No."
 }

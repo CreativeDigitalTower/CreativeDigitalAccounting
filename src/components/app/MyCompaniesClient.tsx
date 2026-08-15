@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { formatCurrency, planPrice } from "@/lib/constants";
 import { multiCompanyDiscount, applyDiscount } from "@/lib/discount";
+import { COMPANY_COUNTRIES, suggestedCurrency, countryByCode } from "@/lib/constants/countries";
 import type { MyCompanyKpi } from "@/lib/myCompanies";
 
 const PLAN_KEYS = ["free", "start", "business", "pro"] as const;
@@ -85,7 +86,8 @@ export function MyCompaniesClient({ companies, activeId, paidCount }: { companie
 function AddCompanyWizard({ paidCount, onClose, onCreated }: { paidCount: number; onClose: () => void; onCreated: (id: string) => void }) {
   const { t } = useI18n();
   const [step, setStep] = useState(1);
-  const [f, setF] = useState({ eik: "", name: "", vatNumber: "", vatRegistered: false, address: "", city: "", mol: "", email: "", phone: "" });
+  const [f, setF] = useState({ countryCode: "BG", country: "България", registrationNumber: "", eik: "", name: "", vatNumber: "", vatRegistered: false, defaultCurrency: "", address: "", city: "", mol: "", email: "", phone: "" });
+  const isBg = f.countryCode === "BG";
   const [plan, setPlan] = useState<(typeof PLAN_KEYS)[number]>("free");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
@@ -135,9 +137,22 @@ function AddCompanyWizard({ paidCount, onClose, onCreated }: { paidCount: number
 
         {step === 1 && (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            <div style={{ gridColumn: "1 / -1" }}><label>{t("myCompanies.wizard.eik")}</label><input value={f.eik} onChange={(e) => set("eik", e.target.value)} onBlur={lookup} placeholder="123456789" /></div>
+            <div style={{ gridColumn: "1 / -1" }}><label>{t("myCompanies.wizard.country")}</label>
+              <select value={f.countryCode} onChange={(e) => {
+                const code = e.target.value; const opt = countryByCode(code);
+                setF((p) => ({ ...p, countryCode: code, country: opt?.name ?? "", defaultCurrency: code === "BG" ? "" : suggestedCurrency(code) }));
+              }}>
+                {COMPANY_COUNTRIES.map((c) => <option key={c.code} value={c.code}>{c.name}</option>)}
+              </select>
+            </div>
+            {isBg ? (
+              <div style={{ gridColumn: "1 / -1" }}><label>{t("myCompanies.wizard.eik")}</label><input value={f.eik} onChange={(e) => set("eik", e.target.value)} onBlur={lookup} placeholder="123456789" /></div>
+            ) : (
+              <div style={{ gridColumn: "1 / -1" }}><label>{t("myCompanies.wizard.regNumber")}</label><input value={f.registrationNumber} onChange={(e) => set("registrationNumber", e.target.value)} placeholder="—" />
+                <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 3 }}>{t("myCompanies.wizard.regHelp")}</div></div>
+            )}
             <div style={{ gridColumn: "1 / -1" }}><label>{t("myCompanies.wizard.name")}</label><input value={f.name} onChange={(e) => set("name", e.target.value)} /></div>
-            <div><label>{t("myCompanies.wizard.vat")}</label><input value={f.vatNumber} onChange={(e) => set("vatNumber", e.target.value)} placeholder="BG..." /></div>
+            <div><label>{isBg ? t("myCompanies.wizard.vat") : t("myCompanies.wizard.vatIntl")}</label><input value={f.vatNumber} onChange={(e) => set("vatNumber", e.target.value)} placeholder={isBg ? "BG..." : ""} /></div>
             <div><label>{t("myCompanies.wizard.vatReg")}</label><select value={f.vatRegistered ? "1" : "0"} onChange={(e) => set("vatRegistered", e.target.value === "1")}><option value="0">{t("myCompanies.wizard.vatRegNo")}</option><option value="1">{t("myCompanies.wizard.vatRegYes")}</option></select></div>
             <div><label>{t("myCompanies.wizard.city")}</label><input value={f.city} onChange={(e) => set("city", e.target.value)} /></div>
             <div><label>{t("myCompanies.wizard.mol")}</label><input value={f.mol} onChange={(e) => set("mol", e.target.value)} /></div>
@@ -193,7 +208,7 @@ function AddCompanyWizard({ paidCount, onClose, onCreated }: { paidCount: number
         {step < 4 && (
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20 }}>
             <button className="btn btn-ghost btn-sm" onClick={() => step === 1 ? onClose() : setStep(step - 1)}>{step === 1 ? t("myCompanies.wizard.cancel") : t("myCompanies.wizard.back")}</button>
-            {step < 3 && <button className="btn btn-primary btn-sm" disabled={step === 1 && (!f.eik.trim() || !f.name.trim())} onClick={() => setStep(step + 1)}>{t("myCompanies.wizard.next")}</button>}
+            {step < 3 && <button className="btn btn-primary btn-sm" disabled={step === 1 && ((isBg ? !f.eik.trim() : !f.registrationNumber.trim()) || !f.name.trim())} onClick={() => setStep(step + 1)}>{t("myCompanies.wizard.next")}</button>}
             {step === 3 && <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => submit()}>{busy ? "…" : (plan === "free" ? t("myCompanies.wizard.finish") : t("myCompanies.wizard.toPayment"))}</button>}
           </div>
         )}

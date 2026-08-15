@@ -1,10 +1,11 @@
 import { formatCurrency, toBGN, isDualCurrencyActive, EUR_TO_BGN, getTemplate, paymentMethodLabel, PLATFORM_NAME, PLATFORM_URL_DISPLAY } from "@/lib/constants";
 import { getMessages, makeT } from "@/lib/i18n/messages";
 import { normalizeLocale, intlLocale } from "@/lib/i18n/config";
+import { companyIdentifier } from "@/lib/company/identifier";
 
 export type InvoiceParty = {
   name: string; mol?: string | null; address?: string | null; city?: string | null;
-  eik?: string | null; vatNumber?: string | null;
+  eik?: string | null; vatNumber?: string | null; countryCode?: string | null; registrationNumber?: string | null;
   bankIban?: string | null; bankName?: string | null; bankBic?: string | null;
   phone?: string | null; email?: string | null; website?: string | null;
 };
@@ -34,13 +35,17 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
   const serif = "'Fraunces', serif";
 
   const company = data.company;
+  // Идентификатор: BG → ЕИК, международна → рег. номер. Никога фиктивни стойности.
+  const idOf = (p: InvoiceParty) => companyIdentifier(p);
+  const idText = (p: InvoiceParty) => { const id = idOf(p); return id ? `${L(id.kind === "eik" ? "eik" : "regNo")} ${id.value}` : ""; };
+  const idLine = (p: InvoiceParty | null | undefined) => { if (!p) return null; const id = idOf(p); return id ? <div>{L(id.kind === "eik" ? "eik" : "regNo")}: {id.value}</div> : null; };
   const senderLines = (
     <div style={{ fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.7 }}>
       <div style={{ fontWeight: 600 }}>{company.name}</div>
       {company.mol && <div>{L("mol")}: {company.mol}</div>}
       {company.address && <div>{company.address}</div>}
       {company.city && <div>{company.city}</div>}
-      {company.eik && <div>{L("eik")}: {company.eik}</div>}
+      {idLine(company)}
       {company.vatNumber && <div>{L("vatNo")}: {company.vatNumber}</div>}
       {company.phone && <div>{L("phone")}: {company.phone}</div>}
       {company.email && <div>{L("email")}: {company.email}</div>}
@@ -74,7 +79,7 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
         {data.client.mol && <div>{L("mol")}: {data.client.mol}</div>}
         {data.client.address && <div>{data.client.address}</div>}
         {data.client.city && <div>{data.client.city}</div>}
-        {data.client.eik && <div>{L("eik")}: {data.client.eik}</div>}
+        {idLine(data.client)}
         {data.client.vatNumber && <div>{L("vatNo")}: {data.client.vatNumber}</div>}
       </div>
     </div>
@@ -122,7 +127,7 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
             <div style={{ fontSize: 12.5, lineHeight: 1.7, opacity: .92 }}>
               {company.mol && <div>{L("mol")}: {company.mol}</div>}
               {company.address && <div>{company.address}{company.city ? `, ${company.city}` : ""}</div>}
-              {company.eik && <div>{L("eik")}: {company.eik}</div>}
+              {idLine(company)}
               {company.vatNumber && <div>{L("vatNo")}: {company.vatNumber}</div>}
             </div>
           </div>
@@ -162,7 +167,7 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
           <div>
             <div style={{ fontFamily: serif, fontWeight: 700, fontSize: 22 }}>{company.name}</div>
             <div style={{ fontSize: 12.5, lineHeight: 1.7, opacity: .92, marginTop: 6 }}>
-              {company.eik && <div>{L("eik")}: {company.eik}{company.vatNumber ? ` · ${L("vat")} ${company.vatNumber}` : ""}</div>}
+              {(idOf(company) || company.vatNumber) && <div>{idText(company)}{company.vatNumber ? `${idOf(company) ? " · " : ""}${L("vat")} ${company.vatNumber}` : ""}</div>}
               {company.address && <div>{company.address}{company.city ? `, ${company.city}` : ""}</div>}
             </div>
           </div>
@@ -184,7 +189,7 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
         <div style={{ margin: "-40px -48px 24px", padding: "26px 48px", background: accent, color: "#fff", textAlign: "center" }}>
           <div style={{ fontFamily: serif, fontWeight: 700, fontSize: 22, letterSpacing: .5 }}>{company.name}</div>
           <div style={{ fontSize: 12, opacity: .9, marginTop: 4 }}>
-            {[company.address, company.city].filter(Boolean).join(", ")}{company.eik ? ` · ${L("eik")} ${company.eik}` : ""}{company.vatNumber ? ` · ${L("vat")} ${company.vatNumber}` : ""}
+            {[company.address, company.city].filter(Boolean).join(", ")}{idOf(company) ? ` · ${idText(company)}` : ""}{company.vatNumber ? ` · ${L("vat")} ${company.vatNumber}` : ""}
           </div>
         </div>
         <div style={{ textAlign: "center" }}>
@@ -208,7 +213,7 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12, flexWrap: "wrap", gap: 16, fontSize: 12, lineHeight: 1.7 }}>
           <div style={{ color: "var(--ink-soft)" }}>
-            {company.eik && <div>{L("eik")}: {company.eik}</div>}
+            {idLine(company)}
             {company.vatNumber && <div>{L("vatNo")}: {company.vatNumber}</div>}
             {company.address && <div>{company.address}{company.city ? `, ${company.city}` : ""}</div>}
           </div>

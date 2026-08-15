@@ -88,7 +88,11 @@ model VerificationToken {
 model Company {
   id              String   @id @default(cuid())
   name            String
-  eik             String?
+  eik             String?  // български ЕИК/БУЛСТАТ (само за BG фирми)
+  // Държава (ISO2, напр. BG/MK/RS). Определя validation логиката. null/BG = българска.
+  countryCode     String?
+  // Официален национален регистрационен номер за чуждестранни фирми (без BG checksum).
+  registrationNumber String?
   vatNumber       String?
   vatRegistered   Boolean  @default(false)
   address         String?
@@ -205,6 +209,9 @@ model Company {
   bgMkInvoicesReceived BgMkInvoice[] @relation("BgMkRecipient")
   mkInvoices           MkInvoice[]
 
+  // Уникалност на чуждестранна фирма по държава + рег. номер (nulls distinct →
+  // съществуващите BG записи без countryCode/registrationNumber не са засегнати).
+  @@unique([countryCode, registrationNumber])
   @@index([managedByFirmId])
   @@index([isAccountingFirm])
   @@index([companyGroupId])
