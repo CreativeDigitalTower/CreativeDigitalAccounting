@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
-import { validateEik } from "@/lib/validation/eik";
+import { validateCompanyIdentity } from "@/lib/validation/companyIdentity";
 import { planPrice, type PlanId } from "@/lib/constants";
 import { multiCompanyDiscount, applyDiscount } from "@/lib/discount";
 import { countPaidOwnedCompanies } from "@/lib/myCompanies";
@@ -15,9 +15,13 @@ import { z } from "zod";
 // всички съществуващи функции и per-company изолация важат директно.
 const schema = z.object({
   name: z.string().min(2),
-  eik: z.string().min(1),
+  countryCode: z.string().optional().nullable(),
+  eik: z.string().optional().nullable(),
+  registrationNumber: z.string().optional().nullable(),
+  country: z.string().optional().nullable(), // показвано име на държавата
   vatNumber: z.string().optional().nullable(),
   vatRegistered: z.boolean().optional(),
+  defaultCurrency: z.string().max(8).optional().nullable(),
   address: z.string().optional().nullable(),
   city: z.string().optional().nullable(),
   mol: z.string().optional().nullable(),
@@ -32,13 +36,14 @@ export async function POST(req: Request) {
     const userId = session.user!.id as string;
     const data = schema.parse(await req.json());
 
-    // ЕИК валидация (същият helper като навсякъде).
-    const eikCheck = validateEik(data.eik);
-    if (!eikCheck.isValid) return NextResponse.json({ error: eikCheck.error ?? "Невалиден ЕИК." }, { status: 400 });
-    const eik = eikCheck.normalized;
+    // Валидация според държава: BG → ЕИК checksum; международна → рег. номер (без checksum).
+    const idCheck = validateCompanyIdentity({ countryCode: data.countryCode, eik: data.eik, registrationNumber: data.registrationNumber });
+    if (!idCheck.ok) return NextResponse.json({ error: idCheck.error }, { status: 400 });
+    const { countryCode, eik, registrationNumber } = idCheck;
 
-    // Дедупликация: ако вече има фирма с този ЕИК — не създаваме нова.
-    const existing = await prisma.company.findFirst({ where: { eik }, select: { id: true } });
+    // Дедупликация: BG → по ЕИК; международна → по (countryCode + регистрационен номер).
+    const dupWhere = idCheck.isBg ? { eik: eik! } : { countryCode, registrationNumber: registrationNumber! };
+    const existing = await prisma.company.findFirst({ where: dupWhere, select: { id: true } });
     if (existing) {
       return NextResponse.json({
         error: "Тази фирма вече съществува. Ако сте неин собственик, можете да заявите достъп.",
@@ -57,8 +62,11 @@ export async function POST(req: Request) {
     const company = await prisma.$transaction(async (tx) => {
       const c = await tx.company.create({
         data: {
-          name: data.name, eik, phone: data.phone || null, email: data.email || null,
+          name: data.name, eik: eik ?? null, countryCode, registrationNumber: registrationNumber ?? null,
+          country: data.country || (idCheck.isBg ? "България" : null),
+          phone: data.phone || null, email: data.email || null,
           vatNumber: data.vatNumber || null, vatRegistered: vatReg,
+          defaultCurrency: data.defaultCurrency?.trim() || undefined,
           defaultVatExempt: !vatReg, defaultVatExemptReason: vatReg ? null : "art113_9",
           address: data.address || null, city: data.city || null, mol: data.mol || null,
           isAccountingFirm: false, managedByFirmId: null,

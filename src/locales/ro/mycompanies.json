@@ -49,6 +49,10 @@
     "created": "Firma a fost creată cu succes.",
     "proforma": "Proformă",
     "viewProforma": "Vezi proforma",
-    "err": "Crearea firmei a eșuat."
+    "err": "Crearea firmei a eșuat.",
+    "country": "Țară",
+    "regNumber": "Număr de înregistrare",
+    "regHelp": "Introduceți numărul oficial de înregistrare al firmei.",
+    "vatIntl": "Număr TVA"
   }
 }

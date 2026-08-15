@@ -49,6 +49,10 @@
     "created": "Şirket başarıyla oluşturuldu.",
     "proforma": "Proforma",
     "viewProforma": "Proformayı gör",
-    "err": "Şirket oluşturulamadı."
+    "err": "Şirket oluşturulamadı.",
+    "country": "Ülke",
+    "regNumber": "Kayıt numarası",
+    "regHelp": "Şirketin resmi kayıt numarasını girin.",
+    "vatIntl": "VAT numarası"
   }
 }

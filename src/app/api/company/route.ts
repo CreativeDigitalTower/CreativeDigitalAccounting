@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCompany } from "@/lib/session";
 import { audit } from "@/lib/documents";
-import { validateEik } from "@/lib/validation/eik";
+import { validateCompanyIdentity, normalizeCountryCode } from "@/lib/validation/companyIdentity";
 import { z } from "zod";
 
 const schema = z.object({
   name: z.string().min(2),
+  countryCode: z.string().optional().nullable(),
+  registrationNumber: z.string().optional().nullable(),
+  country: z.string().optional().nullable(),
   eik: z.string().optional().nullable(),
   vatNumber: z.string().optional().nullable(),
   vatRegistered: z.boolean().optional(),
@@ -54,19 +57,26 @@ export async function PUT(req: Request) {
 
     const data = schema.parse(await req.json());
 
-    // ── Валидация на ЕИК/БУЛСТАT + уникалност (ако е попълнен) ──
-    if (data.eik != null && String(data.eik).trim() !== "") {
-      const eikCheck = validateEik(data.eik);
-      if (!eikCheck.isValid) {
-        return NextResponse.json({ error: eikCheck.error ?? "Невалиден ЕИК/БУЛСТАТ." }, { status: 400 });
-      }
-      data.eik = eikCheck.normalized;
-      const dup = await prisma.company.findFirst({
-        where: { eik: eikCheck.normalized, id: { not: companyId } },
-        select: { id: true },
-      });
-      if (dup) {
-        return NextResponse.json({ error: "Фирма с този ЕИК/БУЛСТАТ вече е регистрирана." }, { status: 400 });
+    // Държавата определя каква валидация се прилага. Ако не е подадена изрично,
+    // ползваме текущата на фирмата (обратна съвместимост за BG).
+    const current = await prisma.company.findUnique({ where: { id: companyId }, select: { countryCode: true } });
+    const countryCode = normalizeCountryCode(data.countryCode ?? current?.countryCode);
+
+    // ── Валидация според държава + уникалност (само ако идентификаторът е попълнен) ──
+    const hasEik = data.eik != null && String(data.eik).trim() !== "";
+    const hasReg = data.registrationNumber != null && String(data.registrationNumber).trim() !== "";
+    if (hasEik || hasReg || data.countryCode != null) {
+      const idCheck = validateCompanyIdentity({ countryCode, eik: data.eik, registrationNumber: data.registrationNumber }, { requireIdentifier: false });
+      if (!idCheck.ok) return NextResponse.json({ error: idCheck.error }, { status: 400 });
+      data.countryCode = idCheck.countryCode;
+      data.eik = idCheck.eik;
+      data.registrationNumber = idCheck.registrationNumber;
+      if (idCheck.isBg && idCheck.eik) {
+        const dup = await prisma.company.findFirst({ where: { eik: idCheck.eik, id: { not: companyId } }, select: { id: true } });
+        if (dup) return NextResponse.json({ error: "Фирма с този ЕИК/БУЛСТАТ вече е регистрирана." }, { status: 400 });
+      } else if (!idCheck.isBg && idCheck.registrationNumber) {
+        const dup = await prisma.company.findFirst({ where: { countryCode: idCheck.countryCode, registrationNumber: idCheck.registrationNumber, id: { not: companyId } }, select: { id: true } });
+        if (dup) return NextResponse.json({ error: "Фирма с този регистрационен номер вече е регистрирана." }, { status: 400 });
       }
     }
 
