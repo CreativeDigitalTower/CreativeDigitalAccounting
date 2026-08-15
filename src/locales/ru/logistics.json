@@ -348,5 +348,33 @@
     "proforma": "Проформа",
     "directionIssued": "Изданная",
     "directionReceived": "Полученная"
+  },
+  "mksale": {
+    "title": "MK продажи",
+    "add": "+ Новая MK продажа",
+    "number": "Номер",
+    "date": "Дата",
+    "client": "Клиент",
+    "selectClient": "Выберите клиента",
+    "net": "Нетто",
+    "gross": "Итого",
+    "vatRate": "НДС %",
+    "currency": "Валюта",
+    "empty": "Нет продаж.",
+    "create": "Создать продажу",
+    "inventory": "Наличие",
+    "received": "Получено",
+    "sold": "Продано",
+    "remaining": "Остаток",
+    "product": "Продукт",
+    "quantity": "Количество",
+    "unitPrice": "Цена продажи",
+    "lineTotal": "Сумма",
+    "noInventory": "Нет наличия для продажи.",
+    "selectAtLeastOne": "Выберите хотя бы одну позицию.",
+    "overCap": "Количество превышает остаток.",
+    "traceTitle": "Связанные документы",
+    "bgMkInvoice": "Счёт BG→MK",
+    "createSaleFrom": "Создать MK продажу"
   }
 }

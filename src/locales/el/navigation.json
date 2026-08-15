@@ -70,5 +70,6 @@
   "logisticsShipments": "Δρομολόγια",
   "logisticsProformas": "Προτιμολόγια",
   "logisticsHolcim": "Τιμολόγια Holcim",
-  "logisticsBgMk": "Πωλήσεις BG → MK"
+  "logisticsBgMk": "Πωλήσεις BG → MK",
+  "logisticsMkSales": "Πωλήσεις MK"
 }

@@ -348,5 +348,33 @@
     "proforma": "Proforma",
     "directionIssued": "Düzenlenen",
     "directionReceived": "Alınan"
+  },
+  "mksale": {
+    "title": "MK satışları",
+    "add": "+ Yeni MK satışı",
+    "number": "Numara",
+    "date": "Tarih",
+    "client": "Müşteri",
+    "selectClient": "Müşteri seçin",
+    "net": "Net",
+    "gross": "Toplam",
+    "vatRate": "KDV %",
+    "currency": "Para",
+    "empty": "Satış yok.",
+    "create": "Satış oluştur",
+    "inventory": "Mevcut stok",
+    "received": "Alınan",
+    "sold": "Satılan",
+    "remaining": "Kalan",
+    "product": "Ürün",
+    "quantity": "Miktar",
+    "unitPrice": "Satış fiyatı",
+    "lineTotal": "Tutar",
+    "noInventory": "Satılacak stok yok.",
+    "selectAtLeastOne": "En az bir kalem seçin.",
+    "overCap": "Miktar kalanı aşıyor.",
+    "traceTitle": "İlgili belgeler",
+    "bgMkInvoice": "BG→MK fatura",
+    "createSaleFrom": "MK satışı oluştur"
   }
 }

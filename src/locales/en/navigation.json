@@ -70,5 +70,6 @@
   "logisticsShipments": "Shipments",
   "logisticsProformas": "Proformas",
   "logisticsHolcim": "Holcim invoices",
-  "logisticsBgMk": "BG → MK sales"
+  "logisticsBgMk": "BG → MK sales",
+  "logisticsMkSales": "MK sales"
 }

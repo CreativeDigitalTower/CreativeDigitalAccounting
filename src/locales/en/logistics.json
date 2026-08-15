@@ -348,5 +348,33 @@
     "proforma": "Proforma",
     "directionIssued": "Issued",
     "directionReceived": "Received"
+  },
+  "mksale": {
+    "title": "MK sales",
+    "add": "+ New MK sale",
+    "number": "Number",
+    "date": "Date",
+    "client": "Client",
+    "selectClient": "Select client",
+    "net": "Net",
+    "gross": "Total",
+    "vatRate": "VAT %",
+    "currency": "Currency",
+    "empty": "No sales.",
+    "create": "Create sale",
+    "inventory": "Available inventory",
+    "received": "Received",
+    "sold": "Sold",
+    "remaining": "Remaining",
+    "product": "Product",
+    "quantity": "Quantity",
+    "unitPrice": "Sale price",
+    "lineTotal": "Line total",
+    "noInventory": "No inventory available to sell.",
+    "selectAtLeastOne": "Select at least one item.",
+    "overCap": "Quantity exceeds remaining.",
+    "traceTitle": "Related documents",
+    "bgMkInvoice": "BG→MK invoice",
+    "createSaleFrom": "Create MK sale"
   }
 }
