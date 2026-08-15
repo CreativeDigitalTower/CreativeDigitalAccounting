@@ -411,5 +411,39 @@
     "addProduct": "+ Προϊόν/έτος",
     "delete": "Διαγραφή",
     "aggregatedNote": "Τα τρέχοντα δεδομένα συγκεντρώνονται αυτόματα."
+  },
+  "dash": {
+    "today": "Σήμερα",
+    "documents": "Έγγραφα",
+    "quantities": "Ποσότητες",
+    "finances": "Οικονομικά",
+    "awaitingInvoice": "Αναμονή τιμολογίου",
+    "missingCmr": "Λείπει CMR",
+    "loadedMonth": "Φορτώθηκε (μήνας)",
+    "soldMonth": "Πωλήθηκε (μήνας)",
+    "purchases": "Αγορές",
+    "sales": "Πωλήσεις",
+    "margin": "Περιθώριο"
+  },
+  "analytics": {
+    "title": "Αναλύσεις",
+    "finances": "Οικονομικά & περιθώριο",
+    "purchase": "Αγορά",
+    "costs": "Κόστη",
+    "revenue": "Έσοδα",
+    "gross": "Μικτό αποτέλεσμα",
+    "marginPct": "Περιθώριο %",
+    "topRevenue": "Top πελάτες ανά έσοδα",
+    "topTons": "Top πελάτες ανά τόνους",
+    "client": "Πελάτης",
+    "products": "Ανάλυση προϊόντος",
+    "product": "Προϊόν",
+    "soldQty": "Πωλημένο",
+    "avgSale": "Μέση πώληση",
+    "avgPurchase": "Μέση αγορά",
+    "marginUnit": "Περιθώριο/t",
+    "comparison": "Σύγκριση περιόδων",
+    "quantity": "Ποσότητα",
+    "empty": "Δεν υπάρχουν αρκετά δεδομένα ακόμη."
   }
 }

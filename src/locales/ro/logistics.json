@@ -411,5 +411,39 @@
     "addProduct": "+ Produs/an",
     "delete": "Șterge",
     "aggregatedNote": "Datele curente se agregă automat."
+  },
+  "dash": {
+    "today": "Astăzi",
+    "documents": "Documente",
+    "quantities": "Cantități",
+    "finances": "Finanțe",
+    "awaitingInvoice": "Așteaptă factura Holcim",
+    "missingCmr": "Lipsă CMR",
+    "loadedMonth": "Încărcat (lună)",
+    "soldMonth": "Vândut (lună)",
+    "purchases": "Achiziții",
+    "sales": "Vânzări",
+    "margin": "Marjă"
+  },
+  "analytics": {
+    "title": "Analize",
+    "finances": "Finanțe și marjă",
+    "purchase": "Achiziție",
+    "costs": "Costuri",
+    "revenue": "Venit",
+    "gross": "Rezultat brut",
+    "marginPct": "Marjă %",
+    "topRevenue": "Top clienți după venit",
+    "topTons": "Top clienți după tone",
+    "client": "Client",
+    "products": "Analiză pe produs",
+    "product": "Produs",
+    "soldQty": "Vândut",
+    "avgSale": "Preț mediu vânzare",
+    "avgPurchase": "Preț mediu achiziție",
+    "marginUnit": "Marjă/t",
+    "comparison": "Comparație perioade",
+    "quantity": "Cantitate",
+    "empty": "Încă nu sunt suficiente date."
   }
 }
