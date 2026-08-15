@@ -348,5 +348,33 @@
     "proforma": "Proformă",
     "directionIssued": "Emisă",
     "directionReceived": "Primită"
+  },
+  "mksale": {
+    "title": "Vânzări MK",
+    "add": "+ Vânzare MK nouă",
+    "number": "Număr",
+    "date": "Data",
+    "client": "Client",
+    "selectClient": "Selectați client",
+    "net": "Net",
+    "gross": "Total",
+    "vatRate": "TVA %",
+    "currency": "Monedă",
+    "empty": "Nicio vânzare.",
+    "create": "Creează vânzare",
+    "inventory": "Stoc disponibil",
+    "received": "Primit",
+    "sold": "Vândut",
+    "remaining": "Rămas",
+    "product": "Produs",
+    "quantity": "Cantitate",
+    "unitPrice": "Preț vânzare",
+    "lineTotal": "Total",
+    "noInventory": "Niciun stoc disponibil.",
+    "selectAtLeastOne": "Selectați cel puțin un articol.",
+    "overCap": "Cantitatea depășește restul.",
+    "traceTitle": "Documente legate",
+    "bgMkInvoice": "Factură BG→MK",
+    "createSaleFrom": "Creează vânzare MK"
   }
 }

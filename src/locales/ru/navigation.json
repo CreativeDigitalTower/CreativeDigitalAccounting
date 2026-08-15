@@ -70,5 +70,6 @@
   "logisticsShipments": "Рейсы",
   "logisticsProformas": "Проформы",
   "logisticsHolcim": "Счета Holcim",
-  "logisticsBgMk": "Продажи BG → MK"
+  "logisticsBgMk": "Продажи BG → MK",
+  "logisticsMkSales": "MK продажи"
 }

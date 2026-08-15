@@ -203,6 +203,7 @@ model Company {
   logisticsExchangeRates LogisticsExchangeRate[]
   bgMkInvoicesIssued   BgMkInvoice[] @relation("BgMkIssuer")
   bgMkInvoicesReceived BgMkInvoice[] @relation("BgMkRecipient")
+  mkInvoices           MkInvoice[]
 
   @@index([managedByFirmId])
   @@index([isAccountingFirm])
@@ -364,6 +365,7 @@ model Client {
   tasks     ClientTask[]
   files     ClientFile[]
   emails    ClientEmail[]
+  mkInvoices MkInvoice[]
 }
 
 // Структурирани имейл адреси на клиента + предпочитания за получаване.
@@ -1183,8 +1185,58 @@ model BgMkInvoiceLine {
 
   invoice  BgMkInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   shipment Shipment?   @relation(fields: [shipmentId], references: [id], onDelete: SetNull)
+  mkAllocations MkInvoiceLine[]
 
   @@index([invoiceId])
+}
+
+// ─── MK продажба към краен клиент (MK фактура) ───────────────────────────────
+// MK фирмата (companyId) продава на MK клиент (Client). Позициите приспадат
+// количество от полученото BG→MK inventory (BgMkInvoiceLine) — allocation ledger.
+model MkInvoice {
+  id          String   @id @default(cuid())
+  companyId   String   // MK фирма (продавач)
+  clientId    String?  // MK клиент
+  number      String
+  date        DateTime?
+  currency    String   @default("MKD")
+  vatRate     Float?   // default 18 (конфигурируем)
+  note        String?  @db.Text
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  client  Client?         @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  lines   MkInvoiceLine[]
+
+  @@unique([companyId, number])
+  @@index([companyId])
+  @@index([clientId])
+}
+
+// Позиция от MK фактура = един ред от allocation ledger-а. Приспада quantity от
+// конкретен източник (BgMkInvoiceLine). Остатък(източник) = получено − Σ приспаднати.
+// Double-selling се пази чрез Serializable транзакция при създаване.
+model MkInvoiceLine {
+  id               String  @id @default(cuid())
+  invoiceId        String
+  sourceBgMkLineId String? // източник от полученото inventory (traceability + остатък)
+  productSnapshot  String?
+  unit             String  @default("t")
+  quantity         Float
+  unitPrice        Float
+  lineTotal        Float   // нето
+  vatAmount        Float?
+  grossAmount      Float?
+  currency         String  @default("MKD")
+  createdAt        DateTime @default(now())
+
+  invoice MkInvoice        @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  source  BgMkInvoiceLine? @relation(fields: [sourceBgMkLineId], references: [id], onDelete: SetNull)
+
+  @@index([invoiceId])
+  @@index([sourceBgMkLineId])
 }
 
 // Бонуси на служител — по месец, със сума, вид и бележка

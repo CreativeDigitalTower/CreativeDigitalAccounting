@@ -348,5 +348,33 @@
     "proforma": "Проформа",
     "directionIssued": "Издадена",
     "directionReceived": "Получена"
+  },
+  "mksale": {
+    "title": "MK продажби",
+    "add": "+ Нова MK продажба",
+    "number": "Номер",
+    "date": "Дата",
+    "client": "Клиент",
+    "selectClient": "Изберете клиент",
+    "net": "Нето",
+    "gross": "Общо",
+    "vatRate": "ДДВ %",
+    "currency": "Валута",
+    "empty": "Няма продажби.",
+    "create": "Създай продажба",
+    "inventory": "Налично (получено от BG)",
+    "received": "Получено",
+    "sold": "Продадено",
+    "remaining": "Остатък",
+    "product": "Продукт",
+    "quantity": "Количество",
+    "unitPrice": "Продажна цена",
+    "lineTotal": "Стойност",
+    "noInventory": "Няма налично количество за продажба.",
+    "selectAtLeastOne": "Изберете поне една позиция.",
+    "overCap": "Количеството надвишава остатъка.",
+    "traceTitle": "Свързани документи",
+    "bgMkInvoice": "BG→MK фактура",
+    "createSaleFrom": "Създай MK продажба"
   }
 }

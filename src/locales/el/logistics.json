@@ -348,5 +348,33 @@
     "proforma": "Προτιμολόγιο",
     "directionIssued": "Εκδοθέν",
     "directionReceived": "Ληφθέν"
+  },
+  "mksale": {
+    "title": "Πωλήσεις MK",
+    "add": "+ Νέα πώληση MK",
+    "number": "Αριθμός",
+    "date": "Ημ/νία",
+    "client": "Πελάτης",
+    "selectClient": "Επιλέξτε πελάτη",
+    "net": "Καθαρό",
+    "gross": "Σύνολο",
+    "vatRate": "ΦΠΑ %",
+    "currency": "Νόμισμα",
+    "empty": "Χωρίς πωλήσεις",
+    "create": "Δημιουργία πώλησης",
+    "inventory": "Διαθέσιμο απόθεμα",
+    "received": "Ληφθέν",
+    "sold": "Πωλημένο",
+    "remaining": "Υπόλοιπο",
+    "product": "Προϊόν",
+    "quantity": "Ποσότητα",
+    "unitPrice": "Τιμή πώλησης",
+    "lineTotal": "Σύνολο",
+    "noInventory": "Δεν υπάρχει διαθέσιμο απόθεμα",
+    "selectAtLeastOne": "Επιλέξτε τουλάχιστον ένα",
+    "overCap": "Η ποσότητα υπερβαίνει το υπόλοιπο",
+    "traceTitle": "Σχετικά έγγραφα",
+    "bgMkInvoice": "Τιμολόγιο BG→MK",
+    "createSaleFrom": "Δημιουργία πώλησης MK"
   }
 }
