@@ -54,5 +54,8 @@
     "regNumber": "Kayıt numarası",
     "regHelp": "Şirketin resmi kayıt numarasını girin.",
     "vatIntl": "VAT numarası"
-  }
+  },
+  "unlink": "Bağlantıyı kaldır",
+  "unlinkConfirm": "Bu, \"{name}\" şirketini profilden kaldırır ama silmez.",
+  "taBanner": "Şu şirketin firmalarını yönetiyorsunuz: {name}"
 }

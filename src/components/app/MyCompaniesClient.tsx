@@ -10,12 +10,22 @@ import type { MyCompanyKpi } from "@/lib/myCompanies";
 
 const PLAN_KEYS = ["free", "start", "business", "pro"] as const;
 
-export function MyCompaniesClient({ companies, activeId, paidCount }: { companies: MyCompanyKpi[]; activeId: string; paidCount: number }) {
+export function MyCompaniesClient({ companies, activeId, paidCount, impersonating = false, targetCompanyName = null }: { companies: MyCompanyKpi[]; activeId: string; paidCount: number; impersonating?: boolean; targetCompanyName?: string | null }) {
   const { t, locale } = useI18n();
   const router = useRouter();
   const sp = useSearchParams();
   const [wizard, setWizard] = useState(sp.get("add") === "1");
   const [busyId, setBusyId] = useState<string | null>(null);
+
+  async function unlink(id: string, name: string) {
+    if (!window.confirm(t("myCompanies.unlinkConfirm", { name }))) return;
+    setBusyId(id);
+    const res = await fetch("/api/company/unlink", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ companyId: id }) });
+    const j = await res.json().catch(() => ({}));
+    setBusyId(null);
+    if (res.ok) router.refresh();
+    else alert(j.error ?? t("myCompanies.wizard.err"));
+  }
 
   async function enterCompany(id: string) {
     if (id === activeId) { router.push("/dashboard"); return; }
@@ -30,6 +40,11 @@ export function MyCompaniesClient({ companies, activeId, paidCount }: { companie
 
   return (
     <>
+      {impersonating && (
+        <div style={{ background: "var(--brass-soft)", border: "1px solid var(--brass)", borderRadius: 10, padding: "10px 14px", fontSize: 13, marginBottom: 16 }}>
+          {t("myCompanies.taBanner", { name: targetCompanyName ?? "—" })}
+        </div>
+      )}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>{t("myCompanies.title")}</h1>
@@ -70,9 +85,16 @@ export function MyCompaniesClient({ companies, activeId, paidCount }: { companie
               <span style={{ color: "var(--muted)" }}>{t("myCompanies.kpi.lastActivity")}</span><strong className="num" style={{ textAlign: "right" }}>{c.lastActivity ? new Date(c.lastActivity).toLocaleDateString(locale) : "—"}</strong>
             </div>
 
-            <button className="btn btn-ghost btn-sm" style={{ width: "100%" }} disabled={busyId === c.id} onClick={() => enterCompany(c.id)}>
-              {busyId === c.id ? "…" : t("myCompanies.enter")}
-            </button>
+            <div style={{ display: "flex", gap: 6 }}>
+              <button className="btn btn-ghost btn-sm" style={{ flex: 1 }} disabled={busyId === c.id} onClick={() => enterCompany(c.id)}>
+                {busyId === c.id ? "…" : t("myCompanies.enter")}
+              </button>
+              {c.id !== activeId && (
+                <button className="btn btn-ghost btn-sm" style={{ color: "var(--brick)" }} disabled={busyId === c.id} title={t("myCompanies.unlink")} onClick={() => unlink(c.id, c.name)}>
+                  {t("myCompanies.unlink")}
+                </button>
+              )}
+            </div>
           </div>
         ))}
       </div>
