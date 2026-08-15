@@ -22,6 +22,9 @@ export const LOGISTICS_DEFAULTS = {
   mkVatRate: 18, // стандартна ставка за MK workflow (snapshot се пази към документа)
 } as const;
 
+// Стандартно MK ДДВ по подразбиране за MK продажбите (конфигурируемо чрез настройки).
+export const MK_DEFAULT_VAT_RATE = LOGISTICS_DEFAULTS.mkVatRate;
+
 // Scope-ове за атомарната номерация (NumberSequence.scope).
 export const SEQ_SCOPE = {
   shipment: "shipment",

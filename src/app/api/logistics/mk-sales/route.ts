@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { logisticsApiGuard } from "@/lib/logistics/access";
 import { audit } from "@/lib/documents";
 import { nextSequenceValue } from "@/lib/logistics/sequence";
-import { SEQ_SCOPE, formatMkNumber } from "@/lib/logistics/config";
+import { SEQ_SCOPE, formatMkNumber, MK_DEFAULT_VAT_RATE } from "@/lib/logistics/config";
 import { lineFinancials, sumMoney } from "@/lib/logistics/money";
 import { canSellQuantity } from "@/lib/logistics/inventory";
 import { z } from "zod";
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
       if (!client) return NextResponse.json({ error: "Клиентът не е намерен." }, { status: 404 });
     }
     const currency = d.currency || "MKD";
-    const vatRate = d.vatRate ?? 18; // default MK ДДВ 18% (конфигурируемо)
+    const vatRate = d.vatRate ?? MK_DEFAULT_VAT_RATE; // default MK ДДВ (конфигурируемо)
     const year = (d.date ? new Date(d.date) : new Date()).getFullYear();
 
     // Кумулативно търсене на количество по източник в рамките на заявката.
