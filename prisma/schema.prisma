@@ -215,6 +215,7 @@ model Company {
   bgMkInvoicesReceived BgMkInvoice[] @relation("BgMkRecipient")
   mkInvoices           MkInvoice[]
   exportSets           ExportDocumentSet[]
+  fashionSettings      FashionSettings?
 
   // Уникалност на чуждестранна фирма по държава + рег. номер (nulls distinct →
   // съществуващите BG записи без countryCode/registrationNumber не са засегнати).
@@ -2310,4 +2311,30 @@ model ProjectTask {
   @@index([companyId, boardId])
   @@index([boardId, monthly])
   @@index([boardId, archived])
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// МОДУЛ „МОДНО ПРОИЗВОДСТВО" (Fashion Production) — Phase 1: настройки на модула.
+// Активирането е database-driven през CompanyModuleAccess (moduleKey =
+// "fashion_production"). Всички данни са изолирани по companyId, аналогично на
+// логистичния модул. Следващите фази добавят материали/ledger/стилове/BOM/… .
+// ═══════════════════════════════════════════════════════════════════════════
+model FashionSettings {
+  id        String @id @default(cuid())
+  companyId String @unique
+
+  // General
+  defaultCurrency  String @default("EUR")
+  laborHourlyRate  Float  @default(0) // €/час за Direct Labor
+  costingMethod    String @default("weighted_average") // weighted_average (v1)
+  overheadMethod   String @default("per_unit")         // per_unit | percent_labor
+  overheadValue    Float  @default(0)                  // сума/бр. или % върху labor
+
+  // Inventory
+  allowNegativeStock Boolean @default(false) // по подразбиране не се допуска
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }

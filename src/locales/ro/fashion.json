@@ -1,0 +1,41 @@
+{
+  "title": "Fashion Production",
+  "intro": "Manage garment production — materials, styles, cutting, production, quality control, finished goods and costing.",
+  "open": "Open",
+  "comingSoon": "Coming soon",
+  "limitedRole": "Some sections are restricted based on your role.",
+  "nav": {
+    "group": "Fashion Production",
+    "dashboard": "Dashboard",
+    "materials": "Materials",
+    "deliveries": "Deliveries",
+    "styles": "Styles",
+    "patterns": "Patterns",
+    "bom": "BOM",
+    "operations": "Operations",
+    "cutting": "Cutting",
+    "production": "Production",
+    "qc": "Quality Control",
+    "finishedGoods": "Finished Goods",
+    "sales": "Sales",
+    "costing": "Costing",
+    "analytics": "Analytics",
+    "settings": "Settings"
+  },
+  "settings": {
+    "general": "General",
+    "inventory": "Inventory",
+    "currency": "Default currency",
+    "laborRate": "Labor hourly rate (€/h)",
+    "costingMethod": "Costing method",
+    "weightedAverage": "Weighted average cost",
+    "overheadMethod": "Overhead method",
+    "perUnit": "Fixed amount per unit",
+    "percentLabor": "Percentage of labor",
+    "overheadValue": "Overhead value",
+    "allowNegative": "Allow negative stock (not recommended)",
+    "save": "Save",
+    "saved": "Settings saved.",
+    "errSave": "Eroare la salvare."
+  }
+}

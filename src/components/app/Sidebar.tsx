@@ -88,9 +88,10 @@ interface SidebarProps {
   companies?: SwitcherCompany[];
   activeCompanyId?: string;
   logisticsEnabled?: boolean;
+  fashionEnabled?: boolean;
 }
 
-export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread = 0, companyEik = null, companies = [], activeCompanyId = "", logisticsEnabled = false }: SidebarProps) {
+export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread = 0, companyEik = null, companies = [], activeCompanyId = "", logisticsEnabled = false, fashionEnabled = false }: SidebarProps) {
   const pathname = usePathname();
   const t = useT();
   const planId = plan as PlanId;
@@ -117,7 +118,29 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
       { href: "/dashboard/logistics/settings", label: "Настройки", icon: "settings", feature: "dashboard", tKey: "navigation.logisticsSettings" },
     ],
   } : null;
-  const groups = logisticsGroup ? [...navGroups, logisticsGroup] : navGroups;
+  // Модул „Модно производство" — database-driven достъп (не по план). Само входните
+  // точки; подстраниците се разгръщат в следващите фази.
+  const fashionGroup = fashionEnabled ? {
+    title: "Модно производство", titleKey: "fashion.nav.group",
+    items: [
+      { href: "/dashboard/fashion", label: "Табло", icon: "production", feature: "dashboard", tKey: "fashion.nav.dashboard" },
+      { href: "/dashboard/fashion/materials", label: "Материали", icon: "warehouse", feature: "dashboard", tKey: "fashion.nav.materials" },
+      { href: "/dashboard/fashion/deliveries", label: "Доставки", icon: "invoice", feature: "dashboard", tKey: "fashion.nav.deliveries" },
+      { href: "/dashboard/fashion/styles", label: "Модели", icon: "document", feature: "dashboard", tKey: "fashion.nav.styles" },
+      { href: "/dashboard/fashion/patterns", label: "Кройки", icon: "document", feature: "dashboard", tKey: "fashion.nav.patterns" },
+      { href: "/dashboard/fashion/bom", label: "Рецепти (BOM)", icon: "document", feature: "dashboard", tKey: "fashion.nav.bom" },
+      { href: "/dashboard/fashion/operations", label: "Технологични карти", icon: "document", feature: "dashboard", tKey: "fashion.nav.operations" },
+      { href: "/dashboard/fashion/cutting", label: "Кроене", icon: "production", feature: "dashboard", tKey: "fashion.nav.cutting" },
+      { href: "/dashboard/fashion/production", label: "Производство", icon: "production", feature: "dashboard", tKey: "fashion.nav.production" },
+      { href: "/dashboard/fashion/qc", label: "Контрол на качеството", icon: "analytics", feature: "dashboard", tKey: "fashion.nav.qc" },
+      { href: "/dashboard/fashion/finished-goods", label: "Готова продукция", icon: "warehouse", feature: "dashboard", tKey: "fashion.nav.finishedGoods" },
+      { href: "/dashboard/fashion/sales", label: "Продажби", icon: "invoice", feature: "dashboard", tKey: "fashion.nav.sales" },
+      { href: "/dashboard/fashion/costing", label: "Себестойност", icon: "analytics", feature: "dashboard", tKey: "fashion.nav.costing" },
+      { href: "/dashboard/fashion/analytics", label: "Анализи", icon: "analytics", feature: "dashboard", tKey: "fashion.nav.analytics" },
+      { href: "/dashboard/fashion/settings", label: "Настройки", icon: "settings", feature: "dashboard", tKey: "fashion.nav.settings" },
+    ],
+  } : null;
+  const groups = [...navGroups, ...(logisticsGroup ? [logisticsGroup] : []), ...(fashionGroup ? [fashionGroup] : [])];
 
   return (
     <aside

@@ -6,19 +6,38 @@ type Group = { id: string; name: string };
 
 // Super Admin контрол: активиране на логистичния модул по фирма + управление на
 // бизнес групи (BG ↔ MK). Всичко минава през /api/admin/logistics-access.
+type FashionCompany = { id: string; name: string; eik: string | null; fashionEnabled: boolean };
+
 export function AdminModuleAccess() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
+  const [fashion, setFashion] = useState<FashionCompany[]>([]);
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
 
   async function load() {
-    const r = await fetch("/api/admin/logistics-access");
+    const [r, rf] = await Promise.all([
+      fetch("/api/admin/logistics-access"),
+      fetch("/api/admin/fashion-access"),
+    ]);
     const j = await r.json().catch(() => ({}));
     if (r.ok) { setCompanies(j.companies ?? []); setGroups(j.groups ?? []); }
+    const jf = await rf.json().catch(() => ({}));
+    if (rf.ok) setFashion(jf.companies ?? []);
   }
   useEffect(() => { load(); }, []);
+
+  async function postFashion(companyId: string, enabled: boolean) {
+    setBusy(true); setMsg("");
+    const r = await fetch("/api/admin/fashion-access", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ companyId, enabled }),
+    });
+    const jf = await r.json().catch(() => ({}));
+    setBusy(false);
+    setMsg(r.ok ? `✅ ${enabled ? "Модно производство активиран." : "Модно производство деактивиран."}` : `⚠️ ${jf.error ?? "Грешка."}`);
+    if (r.ok) await load();
+  }
 
   async function post(body: unknown, note: string) {
     setBusy(true); setMsg("");
@@ -105,6 +124,35 @@ export function AdminModuleAccess() {
                       Зареди master data
                     </button>
                   )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Модул „Модно производство" (Fashion Production) — независимо активиране. */}
+      <div className="glass panel" style={{ marginTop: 16, overflowX: "auto" }}>
+        <div style={{ fontWeight: 600, marginBottom: 6, fontSize: 14 }}>Модул „Модно производство"</div>
+        <div style={{ fontSize: 12.5, color: "var(--muted)", marginBottom: 10 }}>
+          Индивидуално активиране на модула за шивашко/модно производство. Database-driven, изолиран по фирма.
+        </div>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead><tr><th style={th}>Фирма</th><th style={th}>ЕИК</th><th style={th}>Статус</th><th style={th}>Действие</th></tr></thead>
+          <tbody>
+            {fashion.filter((c) => !q || c.name.toLowerCase().includes(q.toLowerCase()) || (c.eik ?? "").includes(q)).map((c) => (
+              <tr key={c.id}>
+                <td style={td}>{c.name}</td>
+                <td style={td}>{c.eik ?? "—"}</td>
+                <td style={td}>
+                  <span style={{ fontSize: 11.5, fontWeight: 700, color: "#fff", borderRadius: 12, padding: "2px 9px", background: c.fashionEnabled ? "var(--emerald)" : "var(--muted)" }}>
+                    {c.fashionEnabled ? "Активен" : "Неактивен"}
+                  </span>
+                </td>
+                <td style={td}>
+                  <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => postFashion(c.id, !c.fashionEnabled)}>
+                    {c.fashionEnabled ? "Деактивирай" : "Активирай"}
+                  </button>
                 </td>
               </tr>
             ))}

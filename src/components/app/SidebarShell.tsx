@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/app/Sidebar";
 import type { SwitcherCompany } from "@/components/app/CompanySwitcher";
 
-type Props = { companyName: string; plan: string; isSuperAdmin?: boolean; logoUrl?: string | null; inboxUnread?: number; companyEik?: string | null; companies?: SwitcherCompany[]; activeCompanyId?: string; logisticsEnabled?: boolean };
+type Props = { companyName: string; plan: string; isSuperAdmin?: boolean; logoUrl?: string | null; inboxUnread?: number; companyEik?: string | null; companies?: SwitcherCompany[]; activeCompanyId?: string; logisticsEnabled?: boolean; fashionEnabled?: boolean };
 
 export function SidebarShell(props: Props) {
   const [open, setOpen] = useState(false);
