@@ -31,8 +31,32 @@ export const SEQ_SCOPE = {
   supplierInvoice: "supplier_invoice",
   bgMkInvoice: "bg_mk_invoice",
   mkInvoice: "mk_invoice",
+  exportInvoice: "export_invoice",
+  dispatch: "dispatch",
 } as const;
 export type SeqScope = (typeof SEQ_SCOPE)[keyof typeof SEQ_SCOPE];
+
+// Конфигурируем формат на export invoice номера (Excel: 0000009617). Промяна на
+// формата НЕ изисква промяна по source code — само тук.
+export type NumberFormat = { prefix: string; length: number; pad: string };
+export const EXPORT_INVOICE_FORMAT: NumberFormat = { prefix: "", length: 10, pad: "0" };
+export const DISPATCH_FORMAT: NumberFormat = { prefix: "", length: 0, pad: "0" };
+
+/** Форматира пореден номер по конфигурация (prefix + zero-pad до length). */
+export function formatSequenceNumber(value: number, fmt: NumberFormat): string {
+  const body = fmt.length > 0 ? String(value).padStart(fmt.length, fmt.pad || "0") : String(value);
+  return `${fmt.prefix}${body}`;
+}
+
+/** Предложение за dispatch номер на база invoice номера (последните до 4 цифри). Не е hard dependency. */
+export function suggestDispatchFromInvoice(invoiceNumber: string | null | undefined): string {
+  const digits = (invoiceNumber ?? "").replace(/\D/g, "");
+  return digits ? String(Number(digits.slice(-4))) : "";
+}
+
+// Видове документи в експортния комплект (Excel sheets).
+export const EXPORT_DOC_TYPES = ["invoice", "dispatch", "blank", "declaration", "cmr_epson", "cmr_hp"] as const;
+export type ExportDocType = (typeof EXPORT_DOC_TYPES)[number];
 
 /** Форматира вътрешния ID на курс: TR-2026-000001. */
 export function formatShipmentId(year: number, value: number): string {

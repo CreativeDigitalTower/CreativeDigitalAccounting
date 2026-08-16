@@ -22,9 +22,18 @@ export function normalizeRegistration(input: string | null | undefined): string 
  * ЗАПАЗВА буквите (вкл. тиретата чрез премахване, така A-LL→ALL, B-LL→BLL остават
  * различни) → НЕ смесва различни класове цимент.
  */
+// Кирилски букви-двойници → латински (клиентът пише „CEM II / А-LL" с кирилско А).
+// Безопасно за домейна (циментовите класове ползват латиница), позволява
+// „А-LL" (кирилско) да съвпадне с „A-LL" (латинско) — без да смесва B/V класове.
+const CYRILLIC_LOOKALIKE: Record<string, string> = {
+  "А": "A", "В": "B", "Е": "E", "С": "C", "О": "O", "Р": "P", "Н": "H", "К": "K", "М": "M", "Т": "T", "Х": "X",
+};
+function foldCyrillic(s: string): string {
+  return s.replace(/[АВЕСОРНКМТХ]/g, (ch) => CYRILLIC_LOOKALIKE[ch] ?? ch);
+}
+
 export function normalizeProductKey(input: string | null | undefined): string {
-  return (input ?? "")
-    .toUpperCase()
+  return foldCyrillic((input ?? "").toUpperCase())
     .replace(/,/g, ".")      // десетична запетая → точка
     .replace(/\s+/g, "")     // маха всички интервали
     .replace(/\//g, "")      // маха „/" (CEM II / A-LL → CEM IIA-LL)

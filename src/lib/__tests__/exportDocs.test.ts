@@ -1,0 +1,89 @@
+import { describe, it, expect } from "vitest";
+import { buildDocumentData, kgFromTonnes, invoiceLineValue, truckTrailerLabel, type Parties } from "@/lib/logistics/exportDocs";
+import { formatSequenceNumber, suggestDispatchFromInvoice, EXPORT_INVOICE_FORMAT, EXPORT_DOC_TYPES } from "@/lib/logistics/config";
+import { normalizeProductKey } from "@/lib/logistics/normalize";
+
+// Fixture по SK501.xlsx (само за тестове — НЕ seed).
+const SRC = {
+  invoiceNumber: "0000009617", invoiceDate: "2026-08-12T00:00:00.000Z",
+  destination: "SKOPIE", truckRegSnapshot: "SK501TO", trailerReg: "SK5022AE",
+  productSnapshot: "CEM II A-LL 42.5 R", customsCode: "25232900",
+  quantity: 26.04, unit: "t", declarationCmrDate: "2026-08-12T00:00:00.000Z", dispatchNumber: "9617",
+  holcimProforma: null,
+};
+const PARTIES: Parties = {
+  seller: { name: "METAL TRADE KUSTENDIL 2005 Ltd.", city: "Kyustendil", country: "Bulgaria", eik: "109581515" },
+  buyer: { name: "SEM INTERNATIONAL DOOEL", city: "Tetovo", country: "North Macedonia", registrationNumber: "MK123" },
+  client: { name: "ARADIKO KOP DOOEL", city: "Skopje" },
+};
+
+describe("numbering (конфигурируем 10-цифрен формат)", () => {
+  it("0000009617", () => {
+    expect(formatSequenceNumber(9617, EXPORT_INVOICE_FORMAT)).toBe("0000009617");
+    expect(formatSequenceNumber(1, EXPORT_INVOICE_FORMAT)).toBe("0000000001");
+  });
+  it("dispatch предложение = последните 4 цифри на invoice", () => {
+    expect(suggestDispatchFromInvoice("0000009617")).toBe("9617");
+    expect(suggestDispatchFromInvoice("")).toBe("");
+  });
+});
+
+describe("truck/trailer + kg + invoice value", () => {
+  it("комбиниран етикет", () => { expect(truckTrailerLabel("SK501TO", "SK5022AE")).toBe("SK501TO / SK5022AE"); });
+  it("CMR kg = количество × 1000 (26.04 → 26040)", () => { expect(kgFromTonnes(26.04)).toBe(26040); });
+  it("invoice стойност = количество × цена (26.04 × 100 = 2604)", () => { expect(invoiceLineValue(26.04, 100)).toBe(2604); });
+});
+
+describe("buildDocumentData — едно въвеждане → всички документи", () => {
+  it("генерира и 6-те типа", () => {
+    for (const dt of EXPORT_DOC_TYPES) expect(buildDocumentData(SRC, PARTIES, dt)).toBeTruthy();
+  });
+  it("Invoice: номер/камион/дестинация/продукт от source", () => {
+    const inv = buildDocumentData(SRC, PARTIES, "invoice") as Record<string, unknown>;
+    expect(inv.invoiceNumber).toBe("0000009617");
+    expect(inv.truck).toBe("SK501TO / SK5022AE");
+    expect(inv.destination).toBe("SKOPIE");
+    expect((inv.seller as { name: string }).name).toBe("METAL TRADE KUSTENDIL 2005 Ltd.");
+    expect((inv.buyer as { name: string }).name).toBe("SEM INTERNATIONAL DOOEL");
+    const goods = (inv.goods as { description: string; quantity: number }[])[0];
+    expect(goods.description).toContain("CEM II A-LL 42.5 R");
+    expect(goods.quantity).toBe(26.04);
+    expect(inv.vatRate).toBe(0); // Export Art.28
+  });
+  it("CMR: kg = 26040, invoice номер, камион, customsCode", () => {
+    const cmr = buildDocumentData(SRC, PARTIES, "cmr_epson") as Record<string, unknown>;
+    expect(cmr.weightKg).toBe(26040);
+    expect(cmr.invoiceNumber).toBe("0000009617");
+    expect(cmr.truck).toBe("SK501TO / SK5022AE");
+    expect((cmr.goods as { customsCode: string }).customsCode).toBe("25232900");
+    expect(cmr.layout).toBe("epson");
+    expect((buildDocumentData(SRC, PARTIES, "cmr_hp") as Record<string, unknown>).layout).toBe("hp");
+  });
+  it("Испратница: номер, камион, продукт, количество; издател = MK фирмата", () => {
+    const disp = buildDocumentData(SRC, PARTIES, "dispatch") as Record<string, unknown>;
+    expect(disp.dispatchNumber).toBe("9617");
+    expect((disp.issuer as { name: string }).name).toBe("SEM INTERNATIONAL DOOEL");
+    expect((disp.recipient as { name: string })?.name).toBe("ARADIKO KOP DOOEL");
+    const row = (disp.rows as { truck: string; quantity: number }[])[0];
+    expect(row.truck).toBe("SK501TO / SK5022AE");
+    expect(row.quantity).toBe(26.04);
+  });
+  it("Празна: без получател", () => {
+    const blank = buildDocumentData(SRC, PARTIES, "blank") as Record<string, unknown>;
+    expect(blank.recipient).toBe(null);
+  });
+  it("Декларация: invoice номер + компания auto-fill", () => {
+    const decl = buildDocumentData(SRC, PARTIES, "declaration") as Record<string, unknown>;
+    expect(decl.invoiceNumber).toBe("0000009617");
+    expect((decl.bgCompany as { name: string }).name).toBe("METAL TRADE KUSTENDIL 2005 Ltd.");
+  });
+});
+
+describe("product alias нормализация (кирилско А, запетая, /)", () => {
+  it("кирилско А-LL 52,5 N дава същия ключ като латинско A-LL 52.5 N", () => {
+    expect(normalizeProductKey("CEM II / А-LL 52,5 N")).toBe(normalizeProductKey("CEM II A-LL 52.5 N"));
+  });
+  it("не смесва A-LL / B-LL", () => {
+    expect(normalizeProductKey("CEM II А-LL 42,5 R")).not.toBe(normalizeProductKey("CEM II B-LL 42.5 R"));
+  });
+});

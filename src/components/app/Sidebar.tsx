@@ -102,6 +102,7 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
     items: [
       { href: "/dashboard/logistics", label: "Табло (логистика)", icon: "suppliers", feature: "dashboard", tKey: "navigation.logisticsDashboard" },
       { href: "/dashboard/logistics/shipments", label: "Курсове / Доставки", icon: "invoice", feature: "dashboard", tKey: "navigation.logisticsShipments" },
+      { href: "/dashboard/logistics/export", label: "Експортни доставки", icon: "document", feature: "dashboard", tKey: "navigation.logisticsExport" },
       { href: "/dashboard/logistics/proformas", label: "Проформи", icon: "document", feature: "dashboard", tKey: "navigation.logisticsProformas" },
       { href: "/dashboard/logistics/holcim-invoices", label: "Holcim фактури", icon: "invoice", feature: "dashboard", tKey: "navigation.logisticsHolcim" },
       { href: "/dashboard/logistics/bg-mk", label: "Продажби BG → MK", icon: "invoice", feature: "dashboard", tKey: "navigation.logisticsBgMk" },

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { normalizeRegistration, normalizeProductKey, normalizeMaterialCode } from "@/lib/logistics/normalize";
 import {
-  SEED_VEHICLE_REGISTRATIONS, SEED_VEHICLE_ALIASES, SEED_PRODUCTS, UNRESOLVED_VEHICLE_SHORTCODES,
+  SEED_VEHICLE_REGISTRATIONS, SEED_VEHICLE_ALIASES, SEED_PRODUCTS, UNRESOLVED_VEHICLE_SHORTCODES, SEED_TRUCK_TRAILERS,
 } from "@/lib/logistics/masterData";
 
 describe("normalizeRegistration (dedup срещу формат)", () => {
@@ -27,8 +27,9 @@ describe("alias резолюция (съкратени → пълни)", () => {
     expect(normalizeRegistration("ST8669")).not.toBe(normalizeRegistration("ST8669AE"));
   });
   it("всички seed alias-и сочат към seed-нат пълен номер", () => {
+    const allTrucks = new Set([...SEED_VEHICLE_REGISTRATIONS, ...SEED_TRUCK_TRAILERS.map((x) => x.truck)]);
     for (const full of Object.values(SEED_VEHICLE_ALIASES)) {
-      expect(SEED_VEHICLE_REGISTRATIONS).toContain(full);
+      expect(allTrucks.has(full)).toBe(true);
     }
   });
   it("непотвърдените съкратени номера НЕ са сред каноничните автомобили", () => {
@@ -46,8 +47,12 @@ describe("seed master data — цялост", () => {
     const norm = SEED_VEHICLE_REGISTRATIONS.map(normalizeRegistration);
     expect(new Set(norm).size).toBe(21);
   });
-  it("точно 4 продукта", () => {
-    expect(SEED_PRODUCTS.length).toBe(4);
+  it("основните 4 + новите от SK501.xlsx (8 общо)", () => {
+    expect(SEED_PRODUCTS.length).toBe(8);
+    const names = SEED_PRODUCTS.map((p) => p.canonicalName);
+    expect(names).toContain("CEM I 52.5 R");
+    expect(names).toContain("DEGASET");
+    expect(names).toContain("CEM IV B(V) 42.5 N");
   });
   it("material codes само за потвърдените (42.5 R и 52.5 N)", () => {
     const byName = Object.fromEntries(SEED_PRODUCTS.map((p) => [p.canonicalName, p.materialCode]));

@@ -73,5 +73,6 @@
   "logisticsBgMk": "Продажби BG → MK",
   "logisticsMkSales": "MK продажби",
   "logisticsClients": "Клиенти (лог.)",
-  "logisticsAnalytics": "Анализи (лог.)"
+  "logisticsAnalytics": "Анализи (лог.)",
+  "logisticsExport": "Експортни доставки"
 }

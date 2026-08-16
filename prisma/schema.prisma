@@ -208,6 +208,7 @@ model Company {
   bgMkInvoicesIssued   BgMkInvoice[] @relation("BgMkIssuer")
   bgMkInvoicesReceived BgMkInvoice[] @relation("BgMkRecipient")
   mkInvoices           MkInvoice[]
+  exportSets           ExportDocumentSet[]
 
   // Уникалност на чуждестранна фирма по държава + рег. номер (nulls distinct →
   // съществуващите BG записи без countryCode/registrationNumber не са засегнати).
@@ -794,6 +795,7 @@ model LogisticsProduct {
   canonicalName  String
   normalizedName String   // за dedup/съпоставяне
   materialCode   String?  // Holcim material code (nullable — само потвърдените)
+  customsCode    String?  // митнически/CN код за CMR (напр. 25232900) — nullable
   unit           String   @default("t")
   packaging      String?  // напр. „25 kg bags"
   active         Boolean  @default(true)
@@ -940,6 +942,7 @@ model Shipment {
   milestones    ShipmentMilestone[]
   importCosts   ImportCost[]
   bgMkLine      BgMkInvoiceLine?
+  exportSets    ExportDocumentSet[]
 
   @@unique([companyId, code])
   // Една експедиционна бележка не може да бъде въведена два пъти в една фирма.
@@ -1281,6 +1284,63 @@ model MkInvoiceLine {
 
   @@index([invoiceId])
   @@index([sourceBgMkLineId])
+}
+
+// ─── Експортна доставка (еквивалент на Excel „ALL") — централен вход ─────────
+// Едно въвеждане → генерира 6 документа (Invoice/Испратница/Празна/Декларация/
+// CMR Epson/CMR HP) като snapshot-и. Всичко auto-fill + editable (AUTO-FILL, NOT LOCK).
+model ExportDocumentSet {
+  id                 String    @id @default(cuid())
+  companyId          String    // продавач (BG, активната фирма)
+  shipmentId         String?   // reuse на съществуващ курс (по желание)
+  buyerCompanyId     String?   // свързаната MK фирма
+  clientId           String?   // краен MK клиент (за Испратница)
+  invoiceNumber      String
+  invoiceDate        DateTime?
+  destination        String?
+  routeId            String?
+  truckVehicleId     String?
+  truckRegSnapshot   String?
+  trailerReg         String?
+  logisticsProductId String?
+  productSnapshot    String?
+  quantity           Float?
+  unit               String    @default("t")
+  declarationCmrDate DateTime?
+  dispatchNumber     String?
+  status             String    @default("draft") // draft | ready | finalized | cancelled
+  note               String?   @db.Text
+  createdById        String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  company   Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  shipment  Shipment?        @relation(fields: [shipmentId], references: [id], onDelete: SetNull)
+  documents ExportDocument[]
+
+  @@unique([companyId, invoiceNumber])
+  @@index([companyId, status])
+}
+
+// Документ-snapshot от export set-а. `data` пази попълнените полета (auto-fill), после
+// editable; `overridden` пази ръчните промени срещу тихо презаписване при regenerate.
+model ExportDocument {
+  id            String    @id @default(cuid())
+  setId         String
+  docType       String    // invoice | dispatch | blank | declaration | cmr_epson | cmr_hp
+  data          Json
+  overridden    Boolean   @default(false)
+  status        String    @default("draft") // draft | ready | finalized | cancelled
+  finalizedAt   DateTime?
+  finalizedById String?
+  createdById   String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  set ExportDocumentSet @relation(fields: [setId], references: [id], onDelete: Cascade)
+
+  @@unique([setId, docType])
+  @@index([setId])
 }
 
 // Бонуси на служител — по месец, със сума, вид и бележка

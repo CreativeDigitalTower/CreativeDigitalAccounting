@@ -73,5 +73,6 @@
   "logisticsBgMk": "Πωλήσεις BG → MK",
   "logisticsMkSales": "Πωλήσεις MK",
   "logisticsClients": "Πελάτες",
-  "logisticsAnalytics": "Αναλύσεις"
+  "logisticsAnalytics": "Αναλύσεις",
+  "logisticsExport": "Εξαγωγές"
 }
