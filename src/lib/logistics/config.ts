@@ -54,9 +54,19 @@ export function suggestDispatchFromInvoice(invoiceNumber: string | null | undefi
   return digits ? String(Number(digits.slice(-4))) : "";
 }
 
-// Видове документи в експортния комплект (Excel sheets).
+// Всички исторически видове документи (вкл. „blank" — за backward compatibility със
+// стари ExportDocument записи; НЕ се създава повече). buildDocumentData ги покрива всичките.
 export const EXPORT_DOC_TYPES = ["invoice", "dispatch", "blank", "declaration", "cmr_epson", "cmr_hp"] as const;
 export type ExportDocType = (typeof EXPORT_DOC_TYPES)[number];
+
+// Активни документи в текущия workflow (Sheet „Празна" отпадна — беше празен вариант
+// на Испратницата, не отделен бизнес документ). Точно 5 документа на комплект.
+export const ACTIVE_EXPORT_DOC_TYPES = ["invoice", "dispatch", "declaration", "cmr_epson", "cmr_hp"] as const satisfies readonly ExportDocType[];
+export type ActiveExportDocType = (typeof ACTIVE_EXPORT_DOC_TYPES)[number];
+/** Активен ли е този docType в текущия workflow (blank = само за преглед на стари записи). */
+export function isActiveExportDocType(docType: string): boolean {
+  return (ACTIVE_EXPORT_DOC_TYPES as readonly string[]).includes(docType);
+}
 
 /** Форматира вътрешния ID на курс: TR-2026-000001. */
 export function formatShipmentId(year: number, value: number): string {

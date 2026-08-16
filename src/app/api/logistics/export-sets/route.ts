@@ -11,14 +11,30 @@ import { z } from "zod";
 const listSelect = {
   id: true, invoiceNumber: true, invoiceDate: true, destination: true, truckRegSnapshot: true, trailerReg: true,
   productSnapshot: true, quantity: true, unit: true, dispatchNumber: true, status: true, createdAt: true,
-  documents: { select: { docType: true, status: true } },
+  buyerCompanyId: true, clientId: true,
+  documents: { select: { docType: true, status: true, overridden: true } },
 } as const;
 
 export async function GET() {
   const g = await logisticsApiGuard("view_logistics");
   if (!g.ok) return g.res;
   const sets = await prisma.exportDocumentSet.findMany({ where: { companyId: g.companyId }, select: listSelect, orderBy: { createdAt: "desc" }, take: 500 });
-  return NextResponse.json(sets);
+
+  // Имена на купувача/клиента (няма пряка релация — резолваме наведнъж без N+1).
+  const buyerIds = [...new Set(sets.map((s) => s.buyerCompanyId).filter(Boolean) as string[])];
+  const clientIds = [...new Set(sets.map((s) => s.clientId).filter(Boolean) as string[])];
+  const [buyers, clients] = await Promise.all([
+    buyerIds.length ? prisma.company.findMany({ where: { id: { in: buyerIds } }, select: { id: true, name: true } }) : Promise.resolve([]),
+    clientIds.length ? prisma.client.findMany({ where: { id: { in: clientIds }, companyId: g.companyId }, select: { id: true, name: true } }) : Promise.resolve([]),
+  ]);
+  const buyerName = new Map(buyers.map((b) => [b.id, b.name]));
+  const clientName = new Map(clients.map((c) => [c.id, c.name]));
+
+  const rows = sets.map(({ buyerCompanyId, clientId, ...s }) => ({
+    ...s,
+    buyer: (buyerCompanyId && buyerName.get(buyerCompanyId)) || (clientId && clientName.get(clientId)) || null,
+  }));
+  return NextResponse.json(rows);
 }
 
 const optDate = z.string().datetime().nullable().optional().or(z.literal("").transform(() => null));

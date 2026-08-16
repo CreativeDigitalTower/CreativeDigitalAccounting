@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logisticsApiGuard } from "@/lib/logistics/access";
 import { audit } from "@/lib/documents";
-import { EXPORT_DOC_TYPES } from "@/lib/logistics/config";
-import { buildDocumentData, type Party } from "@/lib/logistics/exportDocs";
+import { EXPORT_DOC_TYPES, ACTIVE_EXPORT_DOC_TYPES } from "@/lib/logistics/config";
+import { buildDocumentData, shouldRegenerate, type Party } from "@/lib/logistics/exportDocs";
 import { z } from "zod";
 
 const schema = z.object({ force: z.boolean().optional(), docTypes: z.array(z.string()).optional() });
@@ -24,7 +24,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         invoiceNumber: true, invoiceDate: true, destination: true, truckRegSnapshot: true, trailerReg: true,
         productSnapshot: true, quantity: true, unit: true, declarationCmrDate: true, dispatchNumber: true,
         logisticsProductId: true, buyerCompanyId: true, clientId: true,
-        documents: { select: { docType: true, overridden: true } },
+        documents: { select: { docType: true, overridden: true, status: true } },
       },
     });
     if (!set) return NextResponse.json({ error: "Не е намерена." }, { status: 404 });
@@ -50,12 +50,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       dispatchNumber: set.dispatchNumber, holcimProforma: proforma,
     };
 
-    const overridden = new Set(set.documents.filter((x) => x.overridden).map((x) => x.docType));
-    const targets = (d.docTypes?.length ? d.docTypes : [...EXPORT_DOC_TYPES]).filter((t) => (EXPORT_DOC_TYPES as readonly string[]).includes(t));
+    const byType = new Map(set.documents.map((x) => [x.docType, x]));
+    // По подразбиране се създават само активните 5 документа (без „blank"); подаден
+    // docTypes се филтрира до валидните исторически типове (BC).
+    const targets = (d.docTypes?.length ? d.docTypes : [...ACTIVE_EXPORT_DOC_TYPES]).filter((t) => (EXPORT_DOC_TYPES as readonly string[]).includes(t));
     const created: string[] = []; const skipped: string[] = [];
 
     for (const docType of targets) {
-      if (overridden.has(docType) && !d.force) { skipped.push(docType); continue; }
+      // Финализиран → никога тихо; overridden → само при force (виж shouldRegenerate).
+      if (!shouldRegenerate(byType.get(docType), !!d.force)) { skipped.push(docType); continue; }
       const data = buildDocumentData(src, parties, docType as (typeof EXPORT_DOC_TYPES)[number]);
       await prisma.exportDocument.upsert({
         where: { setId_docType: { setId: id, docType } },

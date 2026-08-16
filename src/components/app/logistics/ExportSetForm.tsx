@@ -5,6 +5,13 @@ import Link from "next/link";
 import { useT } from "@/components/i18n/I18nProvider";
 import { SearchableSelect } from "@/components/app/logistics/SearchableSelect";
 
+// Дефиниран на модулно ниво, за да НЕ се пресъздава при всеки render — иначе полетата
+// вътре remount-ват и губят focus / дата не може да се въвежда с клавиатура. (bug #1/#2)
+const LBL: React.CSSProperties = { fontSize: 11.5, color: "var(--muted)", display: "block", marginBottom: 3 };
+function F({ label, children }: { label: string; children: React.ReactNode }) {
+  return (<div><label style={LBL}>{label}</label>{children}</div>);
+}
+
 type Vehicle = { id: string; registration: string; trailerReg: string | null };
 type Product = { id: string; canonicalName: string };
 type Route = { id: string; label: string };
@@ -54,8 +61,6 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients }: {
   }
 
   const inp = { padding: "6px 9px", fontSize: 13, width: "100%" } as const;
-  const lbl = { fontSize: 11.5, color: "var(--muted)", display: "block", marginBottom: 3 } as const;
-  const F = ({ label, children }: { label: string; children: React.ReactNode }) => (<div><label style={lbl}>{label}</label>{children}</div>);
 
   return (
     <div style={{ maxWidth: 820 }}>
