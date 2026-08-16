@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildDocumentData, kgFromTonnes, invoiceLineValue, truckTrailerLabel, goodsRowValue, invoiceTotals, dispatchTotalQuantity, type Parties } from "@/lib/logistics/exportDocs";
+import { buildDocumentData, kgFromTonnes, invoiceLineValue, truckTrailerLabel, goodsRowValue, invoiceTotals, dispatchTotalQuantity, cmrPrintOffset, type Parties } from "@/lib/logistics/exportDocs";
 import { formatSequenceNumber, suggestDispatchFromInvoice, EXPORT_INVOICE_FORMAT, EXPORT_DOC_TYPES } from "@/lib/logistics/config";
 import { normalizeProductKey } from "@/lib/logistics/normalize";
 
@@ -96,6 +96,30 @@ describe("сумиране на invoice/dispatch таблици (PR2)", () => {
   });
   it("dispatchTotalQuantity събира количествата decimal-safe", () => {
     expect(dispatchTotalQuantity([{ quantity: 0.1 }, { quantity: 0.2 }])).toBe(0.3);
+  });
+});
+
+describe("Декларация + CMR (PR3)", () => {
+  it("декларацията носи фактурата, продукта и произход BG и EU", () => {
+    const dec = buildDocumentData(SRC, PARTIES, "declaration");
+    expect(dec.invoiceNumber).toBe("0000009617");
+    expect(dec.product).toBe("CEM II A-LL 42.5 R");
+    expect(dec.origin).toBe("BG и EU");
+    expect(String(dec.bodyText)).toContain("0000009617");
+  });
+  it("CMR Epson и HP носят различен layout, но еднакво бруто тегло (kg)", () => {
+    const ep = buildDocumentData(SRC, PARTIES, "cmr_epson");
+    const hp = buildDocumentData(SRC, PARTIES, "cmr_hp");
+    expect(ep.layout).toBe("epson");
+    expect(hp.layout).toBe("hp");
+    expect(ep.weightKg).toBe(26040);
+    expect(hp.weightKg).toBe(26040);
+    expect((ep.goods as { customsCode?: string }).customsCode).toBe("25232900");
+  });
+  it("cmrPrintOffset разделя калибрирането на двата принтера", () => {
+    expect(cmrPrintOffset("epson")).toEqual({ top: 0, left: 0 });
+    expect(cmrPrintOffset("hp")).toEqual({ top: 6, left: 4 });
+    expect(cmrPrintOffset(null)).toEqual({ top: 0, left: 0 });
   });
 });
 
