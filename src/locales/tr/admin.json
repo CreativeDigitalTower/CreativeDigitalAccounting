@@ -315,7 +315,7 @@
     "bankBank": "Banka",
     "bankReason": "Açıklama",
     "bankReasonValue": "Muhasebe firması aboneliği — {name}",
-    "bankNote": "Ödeme alındıktan sonra seçilen planı etkinleştirir ve fatura düzenleriz. Tüm fiyatlar KDV hariçtir. 1 EUR = {rate} BGN."
+    "bankNote": "Ödeme alındıktan sonra seçilen planı etkinleştirir ve fatura düzenleriz. Tüm fiyatlar KDV hariçtir."
   },
   "deletedDocs": {
     "back": "← Yönetici",

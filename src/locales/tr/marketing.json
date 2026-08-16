@@ -38,7 +38,7 @@
     "createdBy": "Hazırlayan"
   },
   "home": {
-    "heroBadge": "✦ Yeni — 08.08.2026'ya kadar çift EUR/BGN gösterimi",
+    "heroBadge": "✦ Yeni — baştan itibaren euro (EUR) ile faturalama",
     "heroTitle1": "Tüm işiniz,",
     "heroTitle2": "tek bir yerde düzenli.",
     "heroSubtitle": "Faturalar, stok, üretim, giderler, CRM, sözleşmeler ve finansal analiz — işletmeler için tek bir modern platformda birleşti.",
@@ -90,9 +90,9 @@
         "label": "kayıt için"
       },
       {
-        "num": "1,95583",
-        "unit": "BGN/EUR",
-        "label": "sabit kur"
+        "num": "EUR",
+        "unit": "",
+        "label": "ana para birimi"
       },
       {
         "num": "20 / 9 / 0",
@@ -243,7 +243,7 @@
       },
       {
         "title": "Uyumluluk",
-        "text": "Çift EUR/BGN gösterimi, KDV oranları %20/%9/%0, SAF-T hazırlığı ve VIES doğrulaması — tüm yerel gereklilikleri karşılıyoruz."
+        "text": "KDV oranları %20/%9/%0, SAF-T hazırlığı ve VIES doğrulaması — tüm yerel gereklilikleri karşılıyoruz."
       },
       {
         "title": "Güvenlik",
@@ -458,7 +458,7 @@
           "Tür ve yıla göre otomatik numaralandırma (CDA-2026-####)",
           "Belge zinciri: Teklif → Proforma → Fatura",
           "Farklı stillerde 15 profesyonel fatura şablonu",
-          "Çift EUR/BGN gösterimi (08.08.2026'ya kadar zorunlu)",
+          "Ana para birimi olarak euro (EUR) ile faturalama",
           "Tekrarlayan (abonelik) faturalar",
           "Durumlar: taslak, gönderildi, ödendi, gecikmiş, iptal"
         ]
@@ -584,7 +584,7 @@
       }
     ],
     "freeStartTitle": "Her müşteriniz ücretsiz START erişimi alır",
-    "freeStartText": "START; faturalama, müşteriler ve tedarikçiler, temel depo, giderler, vergi takvimi ve çift EUR/BGN gösterimini içerir — müşteri için tamamen ücretsiz. Müşteri daha fazla özellik isterse istediği zaman daha yüksek bir plana geçebilir.",
+    "freeStartText": "START; faturalama, müşteriler ve tedarikçiler, temel depo, giderler, vergi takvimi içerir — müşteri için tamamen ücretsiz. Müşteri daha fazla özellik isterse istediği zaman daha yüksek bir plana geçebilir.",
     "firmTitle": "Muhasebe firması için",
     "firmBenefits": [
       {
@@ -612,7 +612,7 @@
       },
       {
         "title": "Euro'ya hazır",
-        "desc": "Çift EUR/BGN gösterimi ve yeni gerekliliklerle tam uyum."
+        "desc": "Euro (EUR) ile faturalama ve yeni gerekliliklerle tam uyum."
       },
       {
         "title": "Muhasebeciyle ortak çalışma",
@@ -641,7 +641,7 @@
       },
       {
         "q": "Müşteri için ücretsiz START erişimi neleri içerir?",
-        "a": "Faturalama, müşteriler ve tedarikçiler, temel depo, giderler, vergi takvimi ve çift EUR/BGN gösterimi — tamamen ücretsiz."
+        "a": "Faturalama, müşteriler ve tedarikçiler, temel depo, giderler, vergi takvimi — tamamen ücretsiz."
       }
     ],
     "finalTitle": "Başlamaya hazır mısınız?",

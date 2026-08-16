@@ -4,7 +4,7 @@ import { DOC_ORDER } from "@/lib/documentSort";
 import Link from "next/link";
 import { Stamp } from "@/components/Stamp";
 import { WelcomeWizard } from "@/components/app/WelcomeWizard";
-import { formatCurrency, toBGN, isDualCurrencyActive, getYearMonth, planHasFeature, SUBSCRIPTION_PLANS, type PlanId } from "@/lib/constants";
+import { formatCurrency, getYearMonth, planHasFeature, SUBSCRIPTION_PLANS, type PlanId } from "@/lib/constants";
 import { TopClientsChart } from "@/components/app/TopClientsChart";
 import { aggregateClientRevenue } from "@/lib/clientRevenue";
 import { upcomingStandard } from "@/lib/taxCalendar";
@@ -142,7 +142,6 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const docsRemaining = docsLimit === Infinity ? Infinity : Math.max(0, docsLimit - docsUsed);
 
   const lowStockItems = lowStock.filter((i) => i.minQuantity !== null && i.quantity <= (i.minQuantity ?? 0));
-  const dual = isDualCurrencyActive();
 
   // Приходи по клиент (за топ 5 диаграмата)
   const clientRevenueInvoices = await prisma.document.findMany({
@@ -337,21 +336,21 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           {
             label: `Приходи (${periodLabel.toLowerCase()})`,
             value: formatCurrency(monthRevenue),
-            bgn: dual ? `≈ ${formatCurrency(toBGN(monthRevenue), "BGN")}` : null,
+            bgn: null,
             delta: null,
             color: "var(--emerald)",
           },
           {
             label: `Разходи (${periodLabel.toLowerCase()})`,
             value: formatCurrency(monthExpenses),
-            bgn: dual ? `≈ ${formatCurrency(toBGN(monthExpenses), "BGN")}` : null,
+            bgn: null,
             delta: null,
             color: "var(--brick)",
           },
           {
             label: "Нетна печалба",
             value: formatCurrency(profit),
-            bgn: dual ? `≈ ${formatCurrency(toBGN(profit), "BGN")}` : null,
+            bgn: null,
             delta: profit >= 0 ? "▲ положителна" : "▼ отрицателна",
             deltaType: profit >= 0 ? "up" : "warn",
             color: "var(--navy)",
@@ -456,9 +455,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                     <div style={{ fontWeight: 600, fontSize: 13.5 }}>{doc.client?.name ?? "—"}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div className="num" style={{ fontWeight: 600, fontSize: 13.5 }}>{formatCurrency(total)}</div>
-                    {dual && <div className="num" style={{ fontSize: 10.5, color: "var(--muted)" }}>≈ {formatCurrency(toBGN(total), "BGN")}</div>}
-                  </div>
+                    <div className="num" style={{ fontWeight: 600, fontSize: 13.5 }}>{formatCurrency(total)}</div>                  </div>
                   <Stamp status={doc.status} />
                 </Link>
               );

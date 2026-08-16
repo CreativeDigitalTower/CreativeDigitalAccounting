@@ -5,7 +5,7 @@ import Link from "next/link";
 import { StatusSelect } from "@/components/app/StatusSelect";
 import { UiIcon } from "@/components/app/NavIcons";
 import { useI18n } from "@/components/i18n/I18nProvider";
-import { formatCurrency, toBGN, isDualCurrencyActive, groupByMonth } from "@/lib/constants";
+import { formatCurrency, groupByMonth } from "@/lib/constants";
 import { SORT_OPTIONS, sortDocs, DEFAULT_SORT, type SortKey } from "@/lib/documentSort";
 import { TrackIcon } from "@/components/app/TrackIcon";
 import { TrashDeleteButton } from "@/components/app/TrashDeleteButton";
@@ -34,7 +34,6 @@ function isOverdue(d: DocRow): boolean {
 
 export function DocumentBrowser({ docs, canDelete = true }: { docs: DocRow[]; canDelete?: boolean }) {
   const { t, locale } = useI18n();
-  const dual = isDualCurrencyActive();
   const [sort, setSort] = useState<SortKey>(DEFAULT_SORT);
   const [filters, setFilters] = useState<Filters>(EMPTY);
   const [ready, setReady] = useState(false);
@@ -124,7 +123,7 @@ export function DocumentBrowser({ docs, canDelete = true }: { docs: DocRow[]; ca
                 <thead>
                   <tr>
                     <th>{t("documents.page.th.number")}</th><th>{t("documents.page.th.type")}</th><th>{t("documents.page.th.client")}</th><th>{t("documents.page.th.date")}</th><th>{t("documents.page.th.due")}</th>
-                    <th className="num">{t("documents.page.th.amount")}</th>{dual && <th className="num">BGN</th>}<th>{t("documents.page.th.status")}</th><th></th><th></th>
+                    <th className="num">{t("documents.page.th.amount")}</th><th>{t("documents.page.th.status")}</th><th></th><th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -135,9 +134,7 @@ export function DocumentBrowser({ docs, canDelete = true }: { docs: DocRow[]; ca
                       <td style={{ fontWeight: 600 }}>{doc.clientName ?? "—"}</td>
                       <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>{new Date(doc.issueDate).toLocaleDateString(locale)}</td>
                       <td style={{ color: "var(--ink-soft)", fontSize: 13 }}>{doc.dueDate ? new Date(doc.dueDate).toLocaleDateString(locale) : "—"}</td>
-                      <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(doc.total, doc.currency)}</td>
-                      {dual && <td className="num" style={{ fontSize: 11.5, color: "var(--muted)" }}>{formatCurrency(toBGN(doc.total), "BGN")}</td>}
-                      <td><StatusSelect id={doc.id} status={doc.status} /></td>
+                      <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(doc.total, doc.currency)}</td>                      <td><StatusSelect id={doc.id} status={doc.status} /></td>
                       <td style={{ whiteSpace: "nowrap", color: "var(--muted)" }}>
                         {(doc.chips ?? []).map((c, i) => <span key={i} title={t(c.key)} style={{ marginRight: 5, cursor: "default", display: "inline-flex" }}><TrackIcon name={c.icon} /></span>)}
                       </td>

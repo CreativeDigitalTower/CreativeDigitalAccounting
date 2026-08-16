@@ -1,4 +1,4 @@
-import { formatCurrency, toBGN, isDualCurrencyActive, EUR_TO_BGN, getTemplate, paymentMethodLabel, PLATFORM_NAME, PLATFORM_URL_DISPLAY } from "@/lib/constants";
+import { formatCurrency, toBGN, shouldShowDualCurrency, EUR_TO_BGN, getTemplate, paymentMethodLabel, PLATFORM_NAME, PLATFORM_URL_DISPLAY } from "@/lib/constants";
 import { getMessages, makeT } from "@/lib/i18n/messages";
 import { normalizeLocale, intlLocale } from "@/lib/i18n/config";
 import { companyIdentifier } from "@/lib/company/identifier";
@@ -25,7 +25,9 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
   const fmtDate = (d: string | Date) => new Date(d).toLocaleDateString(intlLocale(lang));
   const accent = tpl.accent;
   const layout = tpl.layout as string;
-  const dual = isDualCurrencyActive() && data.currency === "EUR";
+  // Двойно EUR/BGN обозначаване САМО за документи, издадени преди края на периода
+  // (по дата на издаване). Новите документи и другите валути → без BGN.
+  const dual = shouldShowDualCurrency(data.issueDate, data.currency);
   const subtotal = data.lines.reduce((s, l) => s + l.quantity * l.unitPrice, 0);
   const vat = data.lines.reduce((s, l) => s + l.quantity * l.unitPrice * (l.vatRate / 100), 0);
   const total = subtotal + vat;

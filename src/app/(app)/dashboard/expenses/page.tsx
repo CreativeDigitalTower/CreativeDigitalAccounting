@@ -1,7 +1,7 @@
 import { requireFeature } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { formatCurrency, toBGN, isDualCurrencyActive, EUR_TO_BGN } from "@/lib/constants";
+import { formatCurrency } from "@/lib/constants";
 import { ExpensesList } from "@/components/app/ExpensesList";
 import { groupExpenses, monthlyTotals, totalExpenses, type ExpenseForAnalysis } from "@/lib/expenseAnalysis";
 import { getT } from "@/lib/i18n/server";
@@ -9,7 +9,6 @@ import { getT } from "@/lib/i18n/server";
 export default async function ExpensesPage({ searchParams }: { searchParams: Promise<{ period?: string }> }) {
   const { companyId } = await requireFeature("expenses");
   const { t, locale } = await getT();
-  const dual = isDualCurrencyActive();
   const period = (await searchParams)?.period === "all" ? "all" : "month";
 
   const [expenses, totalResult, categories, suppliers] = await Promise.all([
@@ -50,9 +49,7 @@ export default async function ExpensesPage({ searchParams }: { searchParams: Pro
         <div>
           <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 25, fontWeight: 600, margin: "0 0 3px" }}>{t("expenses.title")}</h1>
           <div style={{ color: "var(--muted)", fontSize: 13 }}>
-            {t("expenses.totalLabel")} <strong className="num">{formatCurrency(total)}</strong>
-            {dual && <span className="num" style={{ color: "var(--muted)", marginLeft: 8, fontSize: 12 }}>≈ {formatCurrency(toBGN(total), "BGN")}</span>}
-          </div>
+            {t("expenses.totalLabel")} <strong className="num">{formatCurrency(total)}</strong>          </div>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
           <Link href="/dashboard/expenses/new" className="btn btn-primary">{t("expenses.newExpense")}</Link>
@@ -129,8 +126,6 @@ export default async function ExpensesPage({ searchParams }: { searchParams: Pro
         </div>
       ) : (
         <ExpensesList
-          dual={dual}
-          toBGNRate={EUR_TO_BGN}
           categories={categories}
           suppliers={suppliers}
           expenses={expenses.map((e) => ({

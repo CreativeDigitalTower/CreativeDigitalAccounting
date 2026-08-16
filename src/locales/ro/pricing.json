@@ -1,6 +1,6 @@
 {
   "title": "Planuri de abonament",
-  "pricesNote": "Toate prețurile fără TVA · 1 EUR = {rate} BGN",
+  "pricesNote": "Toate prețurile fără TVA",
   "recommended": "Recomandat",
   "specialPrice": "Preț special",
   "active": "Activ",
@@ -74,7 +74,6 @@
         "Depozit de bază",
         "Tablou financiar",
         "Calendar fiscal",
-        "Afișare dublă EUR/BGN",
         "2 șabloane PDF profesionale"
       ]
     },
@@ -162,7 +161,7 @@
     "bankReason": "Detalii plată",
     "bankReasonValue": "Abonament CDA — {name} ({period})",
     "bankAmount": "Sumă de transferat",
-    "pricesVatNote": "Toate prețurile fără TVA. 1 EUR = {rate} BGN.",
+    "pricesVatNote": "Toate prețurile fără TVA.",
     "modalTitle": "Plata abonamentului",
     "modalIntroPrefix": "Ați ales planul ",
     "modalIntroSuffix": " · {period}.",

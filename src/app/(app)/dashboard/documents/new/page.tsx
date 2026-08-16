@@ -5,7 +5,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
-  isDualCurrencyActive, toBGN, formatCurrency, EUR_TO_BGN,
+  formatCurrency,
   CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, PAYMENT_METHODS, allowedTemplateCount, VAT_EXEMPT_REASONS, type PlanId,
 } from "@/lib/constants";
 import { TemplateGallery } from "@/components/app/TemplateGallery";
@@ -26,7 +26,6 @@ const DOC_TYPE_VALUES = ["invoice", "proforma", "quote", "credit_note", "debit_n
 function NewDocumentForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const dual = isDualCurrencyActive();
   const { locale, t } = useI18n();
   // Език на документа по подразбиране: езикът на текущия потребител (иначе български).
   const defaultDocLang = isLocale(locale) ? locale : "bg";
@@ -212,7 +211,6 @@ function NewDocumentForm() {
   const subtotal = lines.reduce((s, l) => s + l.quantity * l.unitPrice, 0);
   const vat = lines.reduce((s, l) => s + l.quantity * l.unitPrice * (l.vatRate / 100), 0);
   const total = subtotal + vat;
-  const showBgn = dual && currency === "EUR";
 
   async function handleSave(status: "draft" | "issued" | "sent") {
     setError("");
@@ -523,18 +521,7 @@ function NewDocumentForm() {
           <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid var(--border)", marginTop: 6, paddingTop: 10, fontSize: 17, fontWeight: 700, fontFamily: "'IBM Plex Mono', monospace" }}>
             <span>{t("documents.form.total")}</span><span>{formatCurrency(total, currency)}</span>
           </div>
-          {showBgn && (
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "var(--muted)", fontFamily: "'IBM Plex Mono', monospace", paddingTop: 4 }}>
-              <span>{t("documents.form.bgnApprox")}</span><span>{formatCurrency(toBGN(total), "BGN")}</span>
-            </div>
-          )}
         </div>
-
-        {showBgn && (
-          <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 12 }}>
-            {t("documents.form.dualNote", { rate: EUR_TO_BGN })}
-          </p>
-        )}
 
         {/* ДДС — неначисляване */}
         {type !== "quote" && (

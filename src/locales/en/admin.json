@@ -315,7 +315,7 @@
     "bankBank": "Bank",
     "bankReason": "Reference",
     "bankReasonValue": "Accounting firm subscription — {name}",
-    "bankNote": "Once payment is received we activate the selected plan and issue an invoice. All prices are excl. VAT. 1 EUR = {rate} BGN."
+    "bankNote": "Once payment is received we activate the selected plan and issue an invoice. All prices are excl. VAT."
   },
   "deletedDocs": {
     "back": "← Admin",

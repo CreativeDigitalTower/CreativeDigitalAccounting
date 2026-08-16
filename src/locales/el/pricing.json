@@ -1,6 +1,6 @@
 {
   "title": "Πλάνα συνδρομής",
-  "pricesNote": "Όλες οι τιμές χωρίς ΦΠΑ · 1 EUR = {rate} BGN",
+  "pricesNote": "Όλες οι τιμές χωρίς ΦΠΑ",
   "recommended": "Προτεινόμενο",
   "specialPrice": "Ειδική τιμή",
   "active": "Ενεργό",
@@ -74,7 +74,6 @@
         "Βασική αποθήκη",
         "Οικονομικός πίνακας",
         "Φορολογικό ημερολόγιο",
-        "Διπλή εμφάνιση EUR/BGN",
         "2 επαγγελματικά πρότυπα PDF"
       ]
     },
@@ -162,7 +161,7 @@
     "bankReason": "Αιτιολογία",
     "bankReasonValue": "Συνδρομή CDA — {name} ({period})",
     "bankAmount": "Ποσό προς μεταφορά",
-    "pricesVatNote": "Όλες οι τιμές χωρίς ΦΠΑ. 1 EUR = {rate} BGN.",
+    "pricesVatNote": "Όλες οι τιμές χωρίς ΦΠΑ.",
     "modalTitle": "Πληρωμή συνδρομής",
     "modalIntroPrefix": "Επιλέξατε το πλάνο ",
     "modalIntroSuffix": " · {period}.",

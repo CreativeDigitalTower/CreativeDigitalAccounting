@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { InvoicesTable } from "@/components/app/InvoicesTable";
 import { TemplateGallery } from "@/components/app/TemplateGallery";
-import { formatCurrency, toBGN, isDualCurrencyActive, DOC_STATUSES, type PlanId } from "@/lib/constants";
+import { formatCurrency, DOC_STATUSES, type PlanId } from "@/lib/constants";
 import { getInvoiceDisplayStatus, matchesInvoiceStatusFilter, isInvoicePaid, type InvoiceStatusFilter } from "@/lib/invoiceStatus";
 import { getT } from "@/lib/i18n/server";
 
@@ -18,7 +18,6 @@ export default async function InvoicesPage({
   const canDeleteDocs = canTrash(await getMyRole(userId, companyId), "delete");
   const plan = await getPlan(companyId);
   const params = await searchParams;
-  const dual = isDualCurrencyActive();
   const { t } = await getT();
 
   // Всички фактури на фирмата (без Кошчето). Филтрирането по статус става чрез
@@ -78,9 +77,7 @@ export default async function InvoicesPage({
         ].map((k) => (
           <div key={k.label} className="glass kpi-card">
             <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 8 }}>{k.label}</div>
-            <div className="num" style={{ fontSize: 20, fontWeight: 600, color: k.color }}>{formatCurrency(k.value)}</div>
-            {dual && <div className="num" style={{ fontSize: 10.5, color: "var(--muted)" }}>≈ {formatCurrency(toBGN(k.value), "BGN")}</div>}
-          </div>
+            <div className="num" style={{ fontSize: 20, fontWeight: 600, color: k.color }}>{formatCurrency(k.value)}</div>          </div>
         ))}
       </div>
 

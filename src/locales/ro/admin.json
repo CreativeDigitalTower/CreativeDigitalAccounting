@@ -315,7 +315,7 @@
     "bankBank": "Bancă",
     "bankReason": "Detalii plată",
     "bankReasonValue": "Abonament firmă de contabilitate — {name}",
-    "bankNote": "După primirea plății activăm planul selectat și emitem o factură. Toate prețurile sunt fără TVA. 1 EUR = {rate} BGN."
+    "bankNote": "După primirea plății activăm planul selectat și emitem o factură. Toate prețurile sunt fără TVA."
   },
   "deletedDocs": {
     "back": "← Admin",
