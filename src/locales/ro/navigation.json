@@ -73,5 +73,6 @@
   "logisticsBgMk": "Vânzări BG → MK",
   "logisticsMkSales": "Vânzări MK",
   "logisticsClients": "Clienți (log.)",
-  "logisticsAnalytics": "Analize"
+  "logisticsAnalytics": "Analize",
+  "logisticsExport": "Export"
 }
