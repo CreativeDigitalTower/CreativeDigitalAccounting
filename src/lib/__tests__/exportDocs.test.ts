@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { buildDocumentData, kgFromTonnes, invoiceLineValue, truckTrailerLabel, goodsRowValue, invoiceTotals, dispatchTotalQuantity, cmrPrintOffset, type Parties } from "@/lib/logistics/exportDocs";
-import { formatSequenceNumber, suggestDispatchFromInvoice, EXPORT_INVOICE_FORMAT, EXPORT_DOC_TYPES } from "@/lib/logistics/config";
+import { buildDocumentData, kgFromTonnes, invoiceLineValue, truckTrailerLabel, goodsRowValue, invoiceTotals, dispatchTotalQuantity, cmrPrintOffset, shouldRegenerate, DECLARATION_STATEMENT, type Parties } from "@/lib/logistics/exportDocs";
+import { formatSequenceNumber, suggestDispatchFromInvoice, EXPORT_INVOICE_FORMAT, EXPORT_DOC_TYPES, ACTIVE_EXPORT_DOC_TYPES, isActiveExportDocType } from "@/lib/logistics/config";
 import { normalizeProductKey } from "@/lib/logistics/normalize";
 
 // Fixture по SK501.xlsx (само за тестове — НЕ seed).
@@ -120,6 +120,47 @@ describe("Декларация + CMR (PR3)", () => {
     expect(cmrPrintOffset("epson")).toEqual({ top: 0, left: 0 });
     expect(cmrPrintOffset("hp")).toEqual({ top: 6, left: 4 });
     expect(cmrPrintOffset(null)).toEqual({ top: 0, left: 0 });
+  });
+});
+
+describe("BUGFIX/UX — активни документи, декларация, регенерация, persistence", () => {
+  it("активният workflow е точно 5 документа, без blank", () => {
+    expect(ACTIVE_EXPORT_DOC_TYPES.length).toBe(5);
+    expect((ACTIVE_EXPORT_DOC_TYPES as readonly string[]).includes("blank")).toBe(false);
+    expect(isActiveExportDocType("blank")).toBe(false);
+    expect(isActiveExportDocType("invoice")).toBe(true);
+    // blank остава в историческия набор за backward compatibility
+    expect((EXPORT_DOC_TYPES as readonly string[]).includes("blank")).toBe(true);
+  });
+
+  it("декларацията съдържа задължителния нормативен текст", () => {
+    const dec = buildDocumentData(SRC, PARTIES, "declaration");
+    expect(dec.statementText).toBe(DECLARATION_STATEMENT);
+    for (const frag of ["Кумулация не е приложена", "при поискване от митническите власти", "допълнителни документи"]) {
+      expect(String(dec.statementText)).toContain(frag);
+    }
+  });
+
+  it("shouldRegenerate: нов→true, draft→true, overridden→само при force, finalized→никога", () => {
+    expect(shouldRegenerate(null, false)).toBe(true);
+    expect(shouldRegenerate({ status: "draft", overridden: false }, false)).toBe(true);
+    expect(shouldRegenerate({ status: "draft", overridden: true }, false)).toBe(false);
+    expect(shouldRegenerate({ status: "draft", overridden: true }, true)).toBe(true);
+    expect(shouldRegenerate({ status: "finalized", overridden: false }, false)).toBe(false);
+    expect(shouldRegenerate({ status: "finalized", overridden: true }, true)).toBe(false); // дори с force
+  });
+
+  it("persistence: ръчна корекция преживява опит за „Генерирай всички“", () => {
+    // 1) generate → авто-данни
+    const auto = buildDocumentData(SRC, PARTIES, "invoice") as { goods: { quantity: number; unitPrice: number | null }[] };
+    expect(auto.goods[0].quantity).toBe(26.04);
+    // 2) потребителят коригира количество/цена → overridden snapshot
+    const overriddenDoc = { status: "draft", overridden: true, data: { ...auto, goods: [{ ...auto.goods[0], quantity: 25.5, unitPrice: 100 }] } };
+    // 3) „Генерирай всички" без force → трябва да се пропусне (не презаписва)
+    expect(shouldRegenerate(overriddenDoc, false)).toBe(false);
+    // 4) повторно отваряне връща запазените ръчни стойности (snapshot, не regenerate)
+    expect(overriddenDoc.data.goods[0].quantity).toBe(25.5);
+    expect(invoiceTotals(overriddenDoc.data.goods).value).toBe(2550);
   });
 });
 

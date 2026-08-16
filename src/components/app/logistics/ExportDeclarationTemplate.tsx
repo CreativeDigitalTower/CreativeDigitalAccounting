@@ -1,5 +1,6 @@
 "use client";
 import { companyIdentifier } from "@/lib/company/identifier";
+import { DECLARATION_STATEMENT } from "@/lib/logistics/exportDocs";
 
 type Party = { name?: string | null; address?: string | null; city?: string | null; country?: string | null; eik?: string | null; registrationNumber?: string | null; vatNumber?: string | null };
 export type DeclarationDocData = {
@@ -8,6 +9,7 @@ export type DeclarationDocData = {
   proformaNumber?: string | null; proformaDate?: string | null; holcim?: string | null;
   invoiceNumber?: string | null; invoiceDate?: string | null; product?: string | null;
   origin?: string | null; place?: string | null; date?: string | null; bodyText?: string | null;
+  statementText?: string | null;
 };
 
 const d = (s?: string | null) => s ? new Date(s).toLocaleDateString("bg-BG") : "";
@@ -25,7 +27,9 @@ export function ExportDeclarationTemplate({ data }: { data: DeclarationDocData }
         <div>{idText(data.bgCompany)}{data.bgCompany?.vatNumber ? ` · ДДС ${data.bgCompany.vatNumber}` : ""}</div>
       </div>
 
-      <p style={{ textAlign: "justify", marginBottom: 16 }}>{data.bodyText ?? ""}</p>
+      <p style={{ textAlign: "justify", marginBottom: 12 }}>{data.bodyText ?? ""}</p>
+      {/* Задължителен нормативен текст (fallback към константата за стари snapshots). */}
+      <p style={{ textAlign: "justify", marginBottom: 16, whiteSpace: "pre-line" }}>{data.statementText ?? DECLARATION_STATEMENT}</p>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 16px", marginBottom: 24 }}>
         <div>Фактура №: <b>{data.invoiceNumber ?? ""}</b></div>

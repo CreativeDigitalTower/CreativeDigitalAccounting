@@ -51,6 +51,25 @@ export function invoiceTotals(goods: GoodsLike[]): { quantity: number; value: nu
   return { quantity: quantity.toDecimalPlaces(3).toNumber(), value: value.toDecimalPlaces(2).toNumber() };
 }
 /**
+ * Задължителен нормативен текст в декларацията (по реалния клиентски шаблон от
+ * SK501.xlsx, sheet „Декларация"). Auto-fill, но остава editable.
+ */
+export const DECLARATION_STATEMENT =
+  "Декларирам, че: Кумулация не е приложена. Задължавам се, при поискване от митническите власти, да предоставя всички допълнителни документи.";
+
+/**
+ * Решава дали „Генерирай всички" да презапише вече съществуващ документ.
+ * Финализиран документ НЕ се презаписва (изисква изрично отваряне за редакция);
+ * документ с ръчни промени (overridden) се презаписва само при force.
+ */
+export function shouldRegenerate(doc: { status?: string | null; overridden?: boolean | null } | null | undefined, force: boolean): boolean {
+  if (!doc) return true;                        // нов документ — създава се
+  if (doc.status === "finalized") return false; // финализиран — никога тихо
+  if (doc.overridden) return force;             // ръчна промяна — само при force
+  return true;                                  // непроменен draft — обновява се
+}
+
+/**
  * Печатен отстъп на CMR мрежата спрямо предпечатаната бланка. Epson и HP са
  * калибрирани различно → държим ги разделно (спец. изискване). Стойности в px.
  */
@@ -104,6 +123,7 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
         origin: "BG и EU", place: parties.seller.city ?? null, date: src.declarationCmrDate,
         declarant: null,
         bodyText: `Долуподписаният, представител на „${parties.seller.name ?? ""}", декларирам, че изнасяните стоки (цимент), описани във ф-ра № ${src.invoiceNumber ?? ""}, са с произход BG и EU и отговарят на правилата за произход в преференциалната търговия.`,
+        statementText: DECLARATION_STATEMENT,
       };
     case "cmr_epson":
     case "cmr_hp":

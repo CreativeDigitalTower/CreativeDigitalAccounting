@@ -19,7 +19,11 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const { id } = await params;
   const set = await prisma.exportDocumentSet.findFirst({ where: { id, companyId: g.companyId }, select: detailSelect });
   if (!set) return NextResponse.json({ error: "Не е намерена." }, { status: 404 });
-  return NextResponse.json(set);
+  const [buyer, client] = await Promise.all([
+    set.buyerCompanyId ? prisma.company.findUnique({ where: { id: set.buyerCompanyId }, select: { name: true } }) : Promise.resolve(null),
+    set.clientId ? prisma.client.findFirst({ where: { id: set.clientId, companyId: g.companyId }, select: { name: true } }) : Promise.resolve(null),
+  ]);
+  return NextResponse.json({ ...set, buyerName: buyer?.name ?? null, clientName: client?.name ?? null });
 }
 
 const optDate = z.string().datetime().nullable().optional().or(z.literal("").transform(() => null));
@@ -28,6 +32,7 @@ const patchSchema = z.object({
   invoiceDate: optDate,
   destination: z.string().max(200).nullable().optional(),
   truckVehicleId: z.string().nullable().optional(),
+  truckRegSnapshot: z.string().max(40).nullable().optional(), // директна корекция на камиона (source-of-truth)
   trailerReg: z.string().max(40).nullable().optional(),
   logisticsProductId: z.string().nullable().optional(),
   quantity: z.number().positive().nullable().optional(),
@@ -52,6 +57,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (d.invoiceDate !== undefined) data.invoiceDate = d.invoiceDate ? new Date(d.invoiceDate) : null;
     if (d.destination !== undefined) data.destination = d.destination;
     if (d.trailerReg !== undefined) data.trailerReg = d.trailerReg;
+    if (d.truckRegSnapshot !== undefined) data.truckRegSnapshot = d.truckRegSnapshot;
     if (d.quantity !== undefined) data.quantity = d.quantity;
     if (d.unit !== undefined) data.unit = d.unit;
     if (d.declarationCmrDate !== undefined) data.declarationCmrDate = d.declarationCmrDate ? new Date(d.declarationCmrDate) : null;
