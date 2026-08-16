@@ -74,5 +74,6 @@
   "logisticsMkSales": "Vânzări MK",
   "logisticsClients": "Clienți (log.)",
   "logisticsAnalytics": "Analize",
-  "logisticsExport": "Export"
+  "logisticsExport": "Export",
+  "logisticsExportReceived": "Documente de export primite"
 }

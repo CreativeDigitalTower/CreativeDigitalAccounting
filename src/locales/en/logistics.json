@@ -513,6 +513,20 @@
     "sourceHint": "Changes here are the source of truth: newly generated documents (not manually overridden/finalized) will use them.",
     "sourceSaved": "Data saved. Use Generate all to propagate to the documents.",
     "view": "View",
-    "edit": "Edit"
+    "edit": "Edit",
+    "terms": "Terms of delivery",
+    "destinationCountry": "Destination country",
+    "city": "City",
+    "manager": "Manager",
+    "representedCompany": "Represented company",
+    "proformaDate": "Proforma date",
+    "proformaSupplier": "Proforma supplier",
+    "promoteToSource": "Apply the change to the delivery's source data too",
+    "promoted": "promoted to source",
+    "receivedBadge": "Received document",
+    "receivedTitle": "Received export documents",
+    "receivedIntro": "Export deliveries issued to your company by a linked seller in the group (view and print only).",
+    "receivedEmpty": "No received export documents.",
+    "seller": "Seller"
   }
 }

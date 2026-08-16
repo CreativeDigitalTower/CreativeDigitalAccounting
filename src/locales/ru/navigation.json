@@ -74,5 +74,6 @@
   "logisticsMkSales": "MK продажи",
   "logisticsClients": "Клиенты (лог.)",
   "logisticsAnalytics": "Аналитика",
-  "logisticsExport": "Экспорт"
+  "logisticsExport": "Экспорт",
+  "logisticsExportReceived": "Полученные экспортные документы"
 }

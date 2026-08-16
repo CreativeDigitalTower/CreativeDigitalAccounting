@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { logisticsApiGuard } from "@/lib/logistics/access";
+import { logisticsApiGuard, exportSetReadRole } from "@/lib/logistics/access";
 import { audit } from "@/lib/documents";
 import { z } from "zod";
 
@@ -17,13 +17,17 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const g = await logisticsApiGuard("view_logistics");
   if (!g.ok) return g.res;
   const { id } = await params;
-  const set = await prisma.exportDocumentSet.findFirst({ where: { id, companyId: g.companyId }, select: detailSelect });
+  // Зареждаме по id, после авторизираме (продавач или купувач от групата).
+  const set = await prisma.exportDocumentSet.findUnique({ where: { id }, select: detailSelect });
   if (!set) return NextResponse.json({ error: "Не е намерена." }, { status: 404 });
-  const [buyer, client] = await Promise.all([
+  const role = await exportSetReadRole(g.companyId, set);
+  if (!role) return NextResponse.json({ error: "Няма достъп." }, { status: 403 });
+  const [seller, buyer, client] = await Promise.all([
+    prisma.company.findUnique({ where: { id: set.companyId }, select: { name: true } }),
     set.buyerCompanyId ? prisma.company.findUnique({ where: { id: set.buyerCompanyId }, select: { name: true } }) : Promise.resolve(null),
-    set.clientId ? prisma.client.findFirst({ where: { id: set.clientId, companyId: g.companyId }, select: { name: true } }) : Promise.resolve(null),
+    set.clientId ? prisma.client.findFirst({ where: { id: set.clientId, companyId: set.companyId }, select: { name: true } }) : Promise.resolve(null),
   ]);
-  return NextResponse.json({ ...set, buyerName: buyer?.name ?? null, clientName: client?.name ?? null });
+  return NextResponse.json({ ...set, sellerName: seller?.name ?? null, buyerName: buyer?.name ?? null, clientName: client?.name ?? null, viewerRole: role });
 }
 
 const optDate = z.string().datetime().nullable().optional().or(z.literal("").transform(() => null));

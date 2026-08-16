@@ -1,4 +1,4 @@
-import { requireLogistics } from "@/lib/logistics/access";
+import { requireLogistics, exportSetReadRole } from "@/lib/logistics/access";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { AutoPrint } from "@/components/app/AutoPrint";
@@ -13,10 +13,13 @@ export default async function Page({ params }: { params: Promise<{ id: string; d
   const { companyId } = await requireLogistics();
   const { id, docType } = await params;
   const doc = await prisma.exportDocument.findFirst({
-    where: { docType, set: { id, companyId } },
-    select: { data: true, docType: true },
+    where: { docType, set: { id } },
+    select: { data: true, docType: true, set: { select: { companyId: true, buyerCompanyId: true } } },
   });
   if (!doc) notFound();
+  // Печатът е достъпен за продавача и за купувача от групата (intercompany).
+  const role = await exportSetReadRole(companyId, doc.set);
+  if (!role) notFound();
   const data = (doc.data ?? {}) as Record<string, unknown>;
 
   return (

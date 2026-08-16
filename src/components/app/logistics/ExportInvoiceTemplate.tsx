@@ -11,6 +11,7 @@ export type InvoiceDocData = {
   destination?: string | null; destinationCountry?: string | null; goods?: Goods[];
   vatText?: string | null; vatRate?: number | null; originText?: string | null; originPlace?: string | null;
   paymentConditions?: string | null; certificatesText?: string | null; notes?: string | null;
+  date?: string | null; city?: string | null; manager?: string | null;
 };
 
 const d = (s?: string | null) => s ? new Date(s).toLocaleDateString("bg-BG") : "";
@@ -78,7 +79,13 @@ export function ExportInvoiceTemplate({ data }: { data: InvoiceDocData }) {
       <div style={{ marginBottom: 6 }}>{data.vatText ?? ""} · VAT {n2(data.vatRate ?? 0)} %</div>
       <div style={{ marginBottom: 6 }}>Payment conditions: {data.paymentConditions ?? ""}</div>
       {data.notes && <div style={{ fontSize: 11, marginBottom: 6 }}>{data.notes}</div>}
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 24 }}>
+      {/* Date / City / Manager блок */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginTop: 14, marginBottom: 4 }}>
+        <div>Date: <b>{d(data.date ?? data.invoiceDate)}</b></div>
+        <div>City: <b>{data.city ?? ""}</b></div>
+        <div>Manager: <b>{data.manager ?? ""}</b></div>
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 18 }}>
         <div>{data.originPlace ?? ""}</div>
         <div style={{ textAlign: "center" }}>Seller: ______________<br /><span style={{ fontSize: 10.5 }}>/ Sign. &amp; Stamp /</span></div>
       </div>

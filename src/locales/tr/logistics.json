@@ -513,6 +513,20 @@
     "sourceHint": "Buradaki değişiklikler kaynak referanstır: yeni oluşturulan belgeler (elle değiştirilmemiş/tamamlanmamış) bunları kullanır.",
     "sourceSaved": "Veriler kaydedildi. Belgelere yansıtmak için Tümünü oluştur kullanın.",
     "view": "Görüntüle",
-    "edit": "Düzenle"
+    "edit": "Düzenle",
+    "terms": "Teslim şartları",
+    "destinationCountry": "Varış ülkesi",
+    "city": "Şehir",
+    "manager": "Yönetici",
+    "representedCompany": "Temsil edilen şirket",
+    "proformaDate": "Proforma tarihi",
+    "proformaSupplier": "Proforma tedarikçi",
+    "promoteToSource": "Değişikliği teslimatın ana verilerine de uygula",
+    "promoted": "kaynağa aktarıldı",
+    "receivedBadge": "Alınan belge",
+    "receivedTitle": "Alınan ihracat belgeleri",
+    "receivedIntro": "Gruptaki bağlı bir satıcı tarafından şirketinize düzenlenen ihracat teslimatları (yalnızca görüntüleme ve yazdırma).",
+    "receivedEmpty": "Alınan ihracat belgesi yok.",
+    "seller": "Satıcı"
   }
 }

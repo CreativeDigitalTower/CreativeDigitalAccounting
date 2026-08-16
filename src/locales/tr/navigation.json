@@ -74,5 +74,6 @@
   "logisticsMkSales": "MK satışları",
   "logisticsClients": "Müşteriler",
   "logisticsAnalytics": "Analizler",
-  "logisticsExport": "İhracat"
+  "logisticsExport": "İhracat",
+  "logisticsExportReceived": "Alınan ihracat belgeleri"
 }

@@ -44,7 +44,11 @@
     "logoPaidHint": "Το λογότυπο στο τιμολόγιο διατίθεται μόνο στα επί πληρωμή πλάνα (Start, Business, Pro).",
     "back": "Πίσω",
     "save": "Αποθήκευση αλλαγών",
-    "saving": "Αποθήκευση…"
+    "saving": "Αποθήκευση…",
+    "nameEn": "Επωνυμία στα αγγλικά (export)",
+    "addressEn": "Διεύθυνση στα αγγλικά (export)",
+    "cityEn": "Πόλη στα αγγλικά (export)",
+    "countryEn": "Χώρα στα αγγλικά (export)"
   },
   "businessProfile": {
     "title": "Επιχειρηματικό προφίλ (Smart Workspace)",

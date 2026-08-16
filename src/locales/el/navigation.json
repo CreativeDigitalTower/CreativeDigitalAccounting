@@ -74,5 +74,6 @@
   "logisticsMkSales": "Πωλήσεις MK",
   "logisticsClients": "Πελάτες",
   "logisticsAnalytics": "Αναλύσεις",
-  "logisticsExport": "Εξαγωγές"
+  "logisticsExport": "Εξαγωγές",
+  "logisticsExportReceived": "Ληφθέντα έγγραφα εξαγωγής"
 }

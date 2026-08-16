@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { buildDocumentData, kgFromTonnes, invoiceLineValue, truckTrailerLabel, goodsRowValue, invoiceTotals, dispatchTotalQuantity, cmrPrintOffset, shouldRegenerate, DECLARATION_STATEMENT, type Parties } from "@/lib/logistics/exportDocs";
+import { buildDocumentData, kgFromTonnes, invoiceLineValue, truckTrailerLabel, goodsRowValue, invoiceTotals, dispatchTotalQuantity, cmrPrintOffset, shouldRegenerate, DECLARATION_STATEMENT, translateCountry, partyEn, splitTruckTrailer, buildDeclarationText, resolveExportSetRole, type Parties } from "@/lib/logistics/exportDocs";
+import { promotePatchToSet } from "@/lib/logistics/promoteFields";
+import { toExportParty } from "@/lib/logistics/exportParty";
 import { formatSequenceNumber, suggestDispatchFromInvoice, EXPORT_INVOICE_FORMAT, EXPORT_DOC_TYPES, ACTIVE_EXPORT_DOC_TYPES, isActiveExportDocType } from "@/lib/logistics/config";
 import { normalizeProductKey } from "@/lib/logistics/normalize";
 
@@ -161,6 +163,116 @@ describe("BUGFIX/UX — активни документи, декларация,
     // 4) повторно отваряне връща запазените ръчни стойности (snapshot, не regenerate)
     expect(overriddenDoc.data.goods[0].quantity).toBe(25.5);
     expect(invoiceTotals(overriddenDoc.data.goods).value).toBe(2550);
+  });
+});
+
+describe("DOCUMENT SYNC — English snapshot, promote-to-source, декларация, MK visibility", () => {
+  const SELLER_EN = {
+    name: "Метал Трейд Кюстендил 2005 ООД", address: "ул. Калоян 23", city: "Кюстендил", country: "България",
+    eik: "109581515", registrationNumber: null, vatNumber: "BG109581515",
+    nameEn: "METAL TRADE KUSTENDIL 2005 Ltd.", addressEn: "23 Kaloyan Str.", cityEn: "Kyustendil", countryEn: "Bulgaria",
+    manager: "ПЕЙО ЧУНЧЕВ",
+  };
+  const BUYER_EN = {
+    name: "SEM INTERNATIONAL DOOEL", address: null, city: "Тетово", country: "Северна Македония",
+    eik: null, registrationNumber: "MK123", vatNumber: null, countryEn: "North Macedonia",
+  };
+  const P: Parties = { seller: SELLER_EN, buyer: BUYER_EN, client: { name: "ARADIKO KOP DOOEL", city: "Skopje" } };
+
+  it("#3 Invoice seller показва English legal name", () => {
+    const inv = buildDocumentData(SRC, P, "invoice") as { seller: { name: string; address: string; city: string; country: string } };
+    expect(inv.seller.name).toBe("METAL TRADE KUSTENDIL 2005 Ltd.");
+    expect(inv.seller.address).toBe("23 Kaloyan Str.");
+    expect(inv.seller.city).toBe("Kyustendil");
+    expect(inv.seller.country).toBe("Bulgaria");
+  });
+  it("#4 Buyer = SEM INTERNATIONAL DOOEL", () => {
+    const inv = buildDocumentData(SRC, P, "invoice") as { buyer: { name: string } };
+    expect(inv.buyer.name).toBe("SEM INTERNATIONAL DOOEL");
+  });
+  it("#5 Terms по подразбиране = FCA KYUSTENDIL (един интервал)", () => {
+    const inv = buildDocumentData(SRC, P, "invoice") as { termsOfDelivery: string };
+    expect(inv.termsOfDelivery).toBe("FCA KYUSTENDIL");
+  });
+  it("#6 Country display = North Macedonia (translateCountry)", () => {
+    expect(translateCountry("Северна Македония")).toBe("North Macedonia");
+    const inv = buildDocumentData(SRC, P, "invoice") as { destinationCountry: string };
+    expect(inv.destinationCountry).toBe("North Macedonia");
+  });
+  it("#7 Invoice има date/city/manager блок", () => {
+    const inv = buildDocumentData(SRC, P, "invoice") as { date: string; city: string; manager: string };
+    expect(inv.date).toBe(SRC.invoiceDate);
+    expect(inv.city).toBe("KYUSTENDIL");
+    expect(inv.manager).toBe("ПЕЙО ЧУНЧЕВ");
+  });
+  it("partyEn прави fallback към BG стойности, ако липсва English", () => {
+    expect(partyEn({ name: "Фирма", city: "София" }).city).toBe("София");
+    expect(partyEn({ name: "Фирма", nameEn: "Firm Ltd." }).name).toBe("Firm Ltd.");
+  });
+  it("toExportParty мапва Company → Party (mol → manager, En полета)", () => {
+    const p = toExportParty({ name: "X", address: null, city: "Кюстендил", country: "България", eik: "1", registrationNumber: null, vatNumber: null, mol: "Иван", nameEn: "X Ltd." });
+    expect(p.manager).toBe("Иван"); expect(p.nameEn).toBe("X Ltd.");
+  });
+
+  it("#1 splitTruckTrailer разделя комбинирания етикет (промяна на камиона)", () => {
+    expect(splitTruckTrailer("SK6539 / SK6539AO")).toEqual({ truck: "SK6539", trailer: "SK6539AO" });
+    expect(splitTruckTrailer("SK501TO")).toEqual({ truck: "SK501TO", trailer: null });
+    expect(splitTruckTrailer("")).toEqual({ truck: null, trailer: null });
+  });
+  it("#8 promotePatchToSet мапва truck → truckRegSnapshot/trailerReg и invoiceNumber", () => {
+    const upd = promotePatchToSet({ truck: "SK6539 / SK6539AO", invoiceNumber: " 0000009617 " });
+    expect(upd.truckRegSnapshot).toBe("SK6539"); expect(upd.trailerReg).toBe("SK6539AO");
+    expect(upd.invoiceNumber).toBe("0000009617");
+  });
+  it("#9 downstream Dispatch ползва новия камион след като set-ът е обновен", () => {
+    const src2 = { ...SRC, truckRegSnapshot: "SK6539", trailerReg: "SK6539AO" };
+    const disp = buildDocumentData(src2, P, "dispatch") as { rows: { truck: string }[] };
+    expect(disp.rows[0].truck).toBe("SK6539 / SK6539AO");
+  });
+  it("#10/#11 shouldRegenerate: overridden не се пипа без force, finalized никога", () => {
+    expect(shouldRegenerate({ status: "draft", overridden: true }, false)).toBe(false);
+    expect(shouldRegenerate({ status: "finalized", overridden: false }, true)).toBe(false);
+  });
+
+  it("#12 декларацията се съставя от proforma/invoice променливи и се обновява при промяна", () => {
+    const base = buildDeclarationText({ declarantName: "Пейо Димитров Чунчев", representedCompany: "Метал Трейд – Кюстендил 2005 ООД", proformaSupplier: "ХОЛСИМ (БЪЛГАРИЯ) АД", invoiceNumber: "0000009617", invoiceDate: "2026-08-12" });
+    expect(base).toContain("Пейо Димитров Чунчев");
+    expect(base).toContain("ХОЛСИМ (БЪЛГАРИЯ) АД");
+    expect(base).toContain("0000009617");
+    // промяна на proforma → нов текст
+    const withProf = buildDeclarationText({ invoiceNumber: "0000009617", proformaNumber: "3285959", proformaDate: "2026-08-11" });
+    expect(withProf).toContain("Проформа Фактура 3285959");
+    expect(withProf).toContain("11.08.2026");
+    // промяна на invoice номер → нов текст
+    expect(buildDeclarationText({ invoiceNumber: "0000009999" })).toContain("0000009999");
+  });
+  it("#13 CMR invoice number идва от source; sync през promote", () => {
+    const cmr = buildDocumentData({ ...SRC, invoiceNumber: "0000009999" }, P, "cmr_epson") as { invoiceNumber: string };
+    expect(cmr.invoiceNumber).toBe("0000009999");
+  });
+  it("#14 Declaration city = КЮСТЕНДИЛ (от град на продавача, не София)", () => {
+    const dec = buildDocumentData(SRC, P, "declaration") as { city: string; place: string };
+    expect(dec.city).toBe("КЮСТЕНДИЛ");
+    expect(dec.place).toBe("КЮСТЕНДИЛ");
+  });
+
+  it("#16/#17 resolveExportSetRole: продавач/купувач виждат, чужда фирма — не", () => {
+    const set = { companyId: "BG", buyerCompanyId: "MK" };
+    expect(resolveExportSetRole("BG", set, false)).toBe("seller");
+    expect(resolveExportSetRole("MK", set, true)).toBe("buyer");   // MK в същата група
+    expect(resolveExportSetRole("MK", set, false)).toBe(null);     // MK не в групата
+    expect(resolveExportSetRole("OTHER", set, true)).toBe(null);   // чужда фирма
+  });
+
+  it("#19 CMR Epson/HP: идентично съдържание, различен само layout offset (RETAINED)", () => {
+    const ep = buildDocumentData(SRC, P, "cmr_epson") as Record<string, unknown>;
+    const hp = buildDocumentData(SRC, P, "cmr_hp") as Record<string, unknown>;
+    expect(ep.layout).toBe("epson"); expect(hp.layout).toBe("hp");
+    // съдържанието (без layout) е еднакво
+    const { layout: _a, ...epRest } = ep; const { layout: _b, ...hpRest } = hp;
+    expect(JSON.stringify(epRest)).toBe(JSON.stringify(hpRest));
+    // разликата е само в печатния offset
+    expect(cmrPrintOffset("epson")).not.toEqual(cmrPrintOffset("hp"));
   });
 });
 

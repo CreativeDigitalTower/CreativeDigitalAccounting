@@ -74,5 +74,6 @@
   "logisticsMkSales": "MK sales",
   "logisticsClients": "Clients (log.)",
   "logisticsAnalytics": "Analytics (log.)",
-  "logisticsExport": "Export deliveries"
+  "logisticsExport": "Export deliveries",
+  "logisticsExportReceived": "Received export documents"
 }

@@ -16,6 +16,11 @@ const schema = z.object({
   address: z.string().optional().nullable(),
   city: z.string().optional().nullable(),
   mol: z.string().optional().nullable(),
+  // Английски legal snapshot за експортни документи (nullable, additive).
+  nameEn: z.string().optional().nullable(),
+  addressEn: z.string().optional().nullable(),
+  cityEn: z.string().optional().nullable(),
+  countryEn: z.string().optional().nullable(),
   phone: z.string().optional().nullable(),
   email: z.string().optional().nullable(),
   website: z.string().optional().nullable(),
