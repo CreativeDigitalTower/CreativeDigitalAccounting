@@ -12,6 +12,7 @@ type SetDto = {
   status: string; documents: Doc[];
 };
 const DOC_LABEL: Record<string, string> = { invoice: "docInvoice", dispatch: "docDispatch", blank: "docBlank", declaration: "docDeclaration", cmr_epson: "docCmrEpson", cmr_hp: "docCmrHp" };
+const EDITABLE = new Set(["invoice", "dispatch", "blank"]); // PR2 документи с редактор/печат
 
 export function ExportSetDetail({ id, canManage }: { id: string; canManage: boolean }) {
   const t = useT();
@@ -75,6 +76,9 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
                   <span style={{ fontSize: 11, fontWeight: 700, color: "var(--emerald-dark,#0F8A6A)" }}>✓ {t("logistics.export.stGenerated")}{doc.overridden && <span style={{ color: "var(--brass)" }}> · {t("logistics.export.overridden")}</span>}</span>
                 ) : (
                   <span style={{ fontSize: 11, color: "var(--muted)" }}>○ {t("logistics.export.stNot")}</span>
+                )}
+                {doc && EDITABLE.has(dtp) && (
+                  <Link href={`/dashboard/logistics/export/${id}/${dtp}`} className="btn btn-ghost btn-sm" style={{ fontSize: 11, padding: "2px 8px" }}>{t("logistics.export.open")}</Link>
                 )}
               </div>
             );

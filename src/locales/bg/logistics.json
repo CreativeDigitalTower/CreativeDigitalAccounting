@@ -481,6 +481,11 @@
     "docBlank": "Празна испратница",
     "docDeclaration": "Декларация",
     "docCmrEpson": "CMR Epson",
-    "docCmrHp": "CMR HP"
+    "docCmrHp": "CMR HP",
+    "open": "Отвори",
+    "save": "Запази",
+    "finalize": "Финализирай",
+    "reopen": "Отвори за редакция",
+    "printPdf": "Печат / PDF"
   }
 }

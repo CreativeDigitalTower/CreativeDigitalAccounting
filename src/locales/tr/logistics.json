@@ -481,6 +481,11 @@
     "docBlank": "Boş irsaliye",
     "docDeclaration": "Beyan",
     "docCmrEpson": "CMR Epson",
-    "docCmrHp": "CMR HP"
+    "docCmrHp": "CMR HP",
+    "open": "Aç",
+    "save": "Kaydet",
+    "finalize": "Tamamla",
+    "reopen": "Düzenleme için yeniden aç",
+    "printPdf": "Yazdır / PDF"
   }
 }

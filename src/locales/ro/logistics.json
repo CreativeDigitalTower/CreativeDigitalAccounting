@@ -481,6 +481,11 @@
     "docBlank": "Aviz gol",
     "docDeclaration": "Declarație",
     "docCmrEpson": "CMR Epson",
-    "docCmrHp": "CMR HP"
+    "docCmrHp": "CMR HP",
+    "open": "Deschide",
+    "save": "Salvează",
+    "finalize": "Finalizează",
+    "reopen": "Redeschide pentru editare",
+    "printPdf": "Printează / PDF"
   }
 }
