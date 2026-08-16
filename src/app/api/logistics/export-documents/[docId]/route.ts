@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { logisticsApiGuard } from "@/lib/logistics/access";
+import { logisticsApiGuard, exportSetReadRole } from "@/lib/logistics/access";
 import { audit } from "@/lib/documents";
 import { z } from "zod";
 
+// Редакция е само за продавача (set.companyId). За четене се авторизира отделно.
 async function loadDoc(companyId: string, docId: string) {
   return prisma.exportDocument.findFirst({
     where: { id: docId, set: { companyId } },
@@ -15,9 +16,15 @@ export async function GET(_req: Request, { params }: { params: Promise<{ docId: 
   const g = await logisticsApiGuard("view_logistics");
   if (!g.ok) return g.res;
   const { docId } = await params;
-  const doc = await loadDoc(g.companyId, docId);
+  const doc = await prisma.exportDocument.findUnique({
+    where: { id: docId },
+    select: { id: true, setId: true, docType: true, data: true, overridden: true, status: true, finalizedAt: true, set: { select: { companyId: true, buyerCompanyId: true } } },
+  });
   if (!doc) return NextResponse.json({ error: "Не е намерен." }, { status: 404 });
-  return NextResponse.json(doc);
+  const role = await exportSetReadRole(g.companyId, doc.set);
+  if (!role) return NextResponse.json({ error: "Няма достъп." }, { status: 403 });
+  const { set: _set, ...rest } = doc;
+  return NextResponse.json({ ...rest, viewerRole: role });
 }
 
 const schema = z.object({

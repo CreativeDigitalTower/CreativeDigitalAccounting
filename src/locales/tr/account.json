@@ -44,7 +44,11 @@
     "logoPaidHint": "Fatura logosu yalnızca ücretli planlarda (Başlangıç, İşletme, Pro) mevcuttur.",
     "back": "Geri",
     "save": "Değişiklikleri kaydet",
-    "saving": "Kaydediliyor…"
+    "saving": "Kaydediliyor…",
+    "nameEn": "İngilizce ad (export)",
+    "addressEn": "İngilizce adres (export)",
+    "cityEn": "İngilizce şehir (export)",
+    "countryEn": "İngilizce ülke (export)"
   },
   "businessProfile": {
     "title": "İş profili (Smart Workspace)",

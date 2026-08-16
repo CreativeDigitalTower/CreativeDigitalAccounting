@@ -44,7 +44,11 @@
     "logoPaidHint": "Logoul pe factură este disponibil doar în planurile plătite (Start, Business, Pro).",
     "back": "Înapoi",
     "save": "Salvează modificările",
-    "saving": "Se salvează…"
+    "saving": "Se salvează…",
+    "nameEn": "Denumire în engleză (export)",
+    "addressEn": "Adresă în engleză (export)",
+    "cityEn": "Oraș în engleză (export)",
+    "countryEn": "Țară în engleză (export)"
   },
   "businessProfile": {
     "title": "Profil de afaceri (Smart Workspace)",

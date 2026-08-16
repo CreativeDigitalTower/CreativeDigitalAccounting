@@ -14,6 +14,7 @@ import { useT } from "@/components/i18n/I18nProvider";
 type Company = {
   name: string; eik: string | null; vatNumber: string | null; vatRegistered: boolean;
   address: string | null; city: string | null; mol: string | null;
+  nameEn: string | null; addressEn: string | null; cityEn: string | null; countryEn: string | null;
   phone: string | null; email: string | null; website: string | null;
   bankIban: string | null; bankName: string | null; bankBic: string | null;
   logoUrl: string | null; brandColor: string | null;
@@ -142,6 +143,23 @@ export default function SettingsPage() {
           <div style={{ gridColumn: "1 / -1" }}>
             <label>{t("account.settings.address")}</label>
             <input type="text" value={c.address ?? ""} onChange={(e) => set("address", e.target.value)} />
+          </div>
+          {/* Английски legal snapshot за експортни документи (invoice/CMR). */}
+          <div>
+            <label>{t("account.settings.nameEn")}</label>
+            <input type="text" value={c.nameEn ?? ""} onChange={(e) => set("nameEn", e.target.value)} placeholder="METAL TRADE KUSTENDIL 2005 Ltd." />
+          </div>
+          <div>
+            <label>{t("account.settings.cityEn")}</label>
+            <input type="text" value={c.cityEn ?? ""} onChange={(e) => set("cityEn", e.target.value)} placeholder="Kyustendil" />
+          </div>
+          <div>
+            <label>{t("account.settings.countryEn")}</label>
+            <input type="text" value={c.countryEn ?? ""} onChange={(e) => set("countryEn", e.target.value)} placeholder="Bulgaria" />
+          </div>
+          <div style={{ gridColumn: "1 / -1" }}>
+            <label>{t("account.settings.addressEn")}</label>
+            <input type="text" value={c.addressEn ?? ""} onChange={(e) => set("addressEn", e.target.value)} placeholder="23 Kaloyan Str." />
           </div>
           <div>
             <label>{t("account.settings.phone")}</label>

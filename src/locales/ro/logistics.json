@@ -513,6 +513,20 @@
     "sourceHint": "Modificările aici sunt sursa de adevăr: documentele nou generate (fără modificări manuale/finalizate) le vor folosi.",
     "sourceSaved": "Date salvate. Folosiți Generează toate pentru a le propaga la documente.",
     "view": "Vizualizare",
-    "edit": "Editează"
+    "edit": "Editează",
+    "terms": "Condiții de livrare",
+    "destinationCountry": "Țara de destinație",
+    "city": "Oraș",
+    "manager": "Administrator",
+    "representedCompany": "Compania reprezentată",
+    "proformaDate": "Data proformei",
+    "proformaSupplier": "Furnizor (proformă)",
+    "promoteToSource": "Aplică modificarea și la datele de bază ale livrării",
+    "promoted": "propagat la sursă",
+    "receivedBadge": "Document primit",
+    "receivedTitle": "Documente de export primite",
+    "receivedIntro": "Livrări de export emise către compania dvs. de un vânzător asociat din grup (doar vizualizare și tipărire).",
+    "receivedEmpty": "Niciun document de export primit.",
+    "seller": "Vânzător"
   }
 }

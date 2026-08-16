@@ -44,7 +44,11 @@
     "logoPaidHint": "The invoice logo is available only on paid plans (Start, Business, Pro).",
     "back": "Back",
     "save": "Save changes",
-    "saving": "Saving…"
+    "saving": "Saving…",
+    "nameEn": "Legal name (EN, export)",
+    "addressEn": "Address (EN, export)",
+    "cityEn": "City (EN, export)",
+    "countryEn": "Country (EN, export)"
   },
   "businessProfile": {
     "title": "Business profile (Smart Workspace)",

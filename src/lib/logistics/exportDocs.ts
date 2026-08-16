@@ -10,7 +10,58 @@ import type { ExportDocType } from "@/lib/logistics/config";
 export type Party = {
   name: string | null; address?: string | null; city?: string | null; country?: string | null;
   eik?: string | null; registrationNumber?: string | null; vatNumber?: string | null;
+  // Английски legal snapshot (за invoice/CMR). Ако липсва → fallback към BG стойностите.
+  nameEn?: string | null; addressEn?: string | null; cityEn?: string | null; countryEn?: string | null;
+  manager?: string | null; // управител/МОЛ (за invoice manager блок, декларатор)
 };
+
+// Превод на често срещани държави BG→EN (за export документи). Passthrough при непознати.
+const COUNTRY_EN: Record<string, string> = {
+  "българия": "Bulgaria", "bulgaria": "Bulgaria",
+  "северна македония": "North Macedonia", "македония": "North Macedonia",
+  "north macedonia": "North Macedonia", "republic of north macedonia": "North Macedonia",
+  "гърция": "Greece", "румъния": "Romania", "турция": "Türkiye", "сърбия": "Serbia",
+};
+/** Английско име на държава (за export документи); връща оригинала при непознати. */
+export function translateCountry(country: string | null | undefined): string | null {
+  if (!country) return country ?? null;
+  return COUNTRY_EN[country.trim().toLowerCase()] ?? country;
+}
+
+/** Английски display на фирма за export документ: En полета с fallback към BG. */
+export function partyEn(p: Party | null | undefined): Party {
+  if (!p) return { name: null };
+  return {
+    ...p,
+    name: p.nameEn || p.name,
+    address: p.addressEn || p.address,
+    city: p.cityEn || p.city,
+    country: translateCountry(p.countryEn || p.country),
+  };
+}
+
+/**
+ * Чисто решение за роля при ЧЕТЕНЕ на export set: продавачът винаги; купувачът само
+ * ако е в същата бизнес група (intercompany shared visibility). Инжектира се `sameGroup`,
+ * за да е тестваемо без DB.
+ */
+export function resolveExportSetRole(
+  activeCompanyId: string,
+  set: { companyId: string; buyerCompanyId: string | null },
+  sameGroup: boolean,
+): "seller" | "buyer" | null {
+  if (set.companyId === activeCompanyId) return "seller";
+  if (set.buyerCompanyId && set.buyerCompanyId === activeCompanyId && sameGroup) return "buyer";
+  return null;
+}
+
+/** Обратното на truckTrailerLabel: „SK501TO / SK5022AE" → { truck, trailer }. */
+export function splitTruckTrailer(label: string | null | undefined): { truck: string | null; trailer: string | null } {
+  const s = (label ?? "").trim();
+  if (!s) return { truck: null, trailer: null };
+  const parts = s.split("/").map((x) => x.trim()).filter(Boolean);
+  return { truck: parts[0] ?? null, trailer: parts.length > 1 ? parts.slice(1).join(" / ") : null };
+}
 export type ExportSetSource = {
   invoiceNumber: string | null; invoiceDate: string | null;
   destination: string | null; truckRegSnapshot: string | null; trailerReg: string | null;
@@ -57,6 +108,36 @@ export function invoiceTotals(goods: GoodsLike[]): { quantity: number; value: nu
 export const DECLARATION_STATEMENT =
   "Декларирам, че: Кумулация не е приложена. Задължавам се, при поискване от митническите власти, да предоставя всички допълнителни документи.";
 
+// Default доставчик на проформата (Холсим) — по клиентския шаблон.
+export const PROFORMA_SUPPLIER = "ХОЛСИМ (БЪЛГАРИЯ) АД";
+
+/** Структурирани променливи за декларацията (всички editable snapshot). */
+export type DeclarationVars = {
+  declarantName?: string | null; representedCompany?: string | null;
+  proformaNumber?: string | null; proformaDate?: string | null; proformaSupplier?: string | null;
+  invoiceNumber?: string | null; invoiceDate?: string | null; origin?: string | null;
+};
+const dmy = (s?: string | null) => {
+  if (!s) return "";
+  const d = new Date(s); if (isNaN(d.getTime())) return String(s);
+  return `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}.${d.getFullYear()}`;
+};
+/**
+ * Съставя точния текст на декларацията от структурираните променливи (по SK501.xlsx).
+ * Промяна на proforma/invoice номер/дата веднага променя изхода.
+ */
+export function buildDeclarationText(v: DeclarationVars): string {
+  const origin = v.origin || "BG и EU";
+  const proformaLine = (v.proformaNumber || v.proformaDate)
+    ? `Проформа Фактура ${v.proformaNumber ?? ""} /${dmy(v.proformaDate)}год. на фирма ${v.proformaSupplier || PROFORMA_SUPPLIER},`
+    : `на фирма ${v.proformaSupplier || PROFORMA_SUPPLIER},`;
+  return [
+    `Долуподписаният ${v.declarantName ?? ""}, представител на „${v.representedCompany ?? ""}", на основание:`,
+    proformaLine,
+    `декларирам, че изнасяните стоки (цимент), описани във ф-ра № ${v.invoiceNumber ?? ""}/${dmy(v.invoiceDate)} са с произход ${origin} и отговарят на правилата за произход в преференциалната търговия.`,
+  ].join("\n");
+}
+
 /**
  * Решава дали „Генерирай всички" да презапише вече съществуващ документ.
  * Финализиран документ НЕ се презаписва (изисква изрично отваряне за редакция);
@@ -88,19 +169,25 @@ export function dispatchTotalQuantity(rows: { quantity?: number | null }[]): num
  */
 export function buildDocumentData(src: ExportSetSource, parties: Parties, docType: ExportDocType): Record<string, unknown> {
   const truck = truckTrailerLabel(src.truckRegSnapshot, src.trailerReg);
+  const sellerEn = partyEn(parties.seller);
+  const buyerEn = partyEn(parties.buyer);
+  const sellerCityEn = (sellerEn.city ?? "").toUpperCase().trim();
   switch (docType) {
     case "invoice":
       return {
         invoiceNumber: src.invoiceNumber, invoiceDate: src.invoiceDate,
-        seller: parties.seller, buyer: parties.buyer,
+        seller: sellerEn, buyer: buyerEn,
         contract: null, annex: null, order: null,
-        termsOfDelivery: src.destination ? `FCA ${(parties.seller.city ?? "").toUpperCase()}` : "FCA",
-        truck, placeOfShipment: parties.seller.city ?? null, dateOfShipment: src.invoiceDate,
-        destination: src.destination, destinationCountry: parties.buyer.country ?? null,
+        // Default „FCA {град}" (нормализиран един интервал), editable, само при initial generation.
+        termsOfDelivery: `FCA ${sellerCityEn}`.replace(/\s+/g, " ").trim(),
+        truck, placeOfShipment: sellerEn.city ?? null, dateOfShipment: src.invoiceDate,
+        destination: src.destination, destinationCountry: buyerEn.country ?? null,
+        // Date/City/Manager блок (auto-fill, editable snapshot).
+        date: src.invoiceDate, city: sellerCityEn || null, manager: parties.seller.manager ?? null,
         goods: [{ description: src.productSnapshot ? `CEMENT ${src.productSnapshot} - IN BULK` : null, quantity: src.quantity, unit: src.unit || "TNE", unitPrice: null, value: null, currency: "EUR", certificate: null }],
         vatText: "Export, Art.28 Bulgarian VAT Legislation", vatRate: 0, vatAmount: 0,
         originText: "ИЗНОСИТЕЛЯТ НА ПРОДУКТИТЕ, ОБХВАНАТИ ОТ ТОЗИ ДОКУМЕНТ, ДЕКЛАРИРА, ЧЕ ОСВЕН КЪДЕТО ЯСНО Е ОТБЕЛЯЗАНО ДРУГО, ТЕЗИ ПРОДУКТИ СА С EU ПРЕФЕРЕНЦИАЛЕН ПРОИЗХОД",
-        originPlace: (parties.seller.city ?? "").toUpperCase() || null, originSigner: parties.seller.name ? null : null,
+        originPlace: sellerCityEn || null,
         paymentConditions: "Bank transfer", totalQuantity: src.quantity, totalValue: null, notes: null,
       };
     case "dispatch":
@@ -114,23 +201,33 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
         totalQuantity: src.quantity,
       };
     }
-    case "declaration":
+    case "declaration": {
+      // Структурирани променливи (editable) → от тях се съставя текстът (rebuild при промяна).
+      const vars: DeclarationVars = {
+        declarantName: parties.seller.manager ?? null,
+        representedCompany: parties.seller.name,
+        proformaNumber: src.holcimProforma?.number ?? null,
+        proformaDate: src.holcimProforma?.date ?? null,
+        proformaSupplier: PROFORMA_SUPPLIER,
+        invoiceNumber: src.invoiceNumber, invoiceDate: src.invoiceDate,
+        origin: "BG и EU",
+      };
       return {
         regulation: "Регламент – EC №2447/2015, Приложение 22-10", title: "ДЕКЛАРАЦИЯ",
-        declarantName: parties.seller.name, bgCompany: parties.seller,
-        proformaNumber: src.holcimProforma?.number ?? null, proformaDate: src.holcimProforma?.date ?? null, holcim: "ХОЛСИМ (БЪЛГАРИЯ) АД",
-        invoiceNumber: src.invoiceNumber, invoiceDate: src.invoiceDate, product: src.productSnapshot,
-        origin: "BG и EU", place: parties.seller.city ?? null, date: src.declarationCmrDate,
-        declarant: null,
-        bodyText: `Долуподписаният, представител на „${parties.seller.name ?? ""}", декларирам, че изнасяните стоки (цимент), описани във ф-ра № ${src.invoiceNumber ?? ""}, са с произход BG и EU и отговарят на правилата за произход в преференциалната търговия.`,
+        ...vars, holcim: PROFORMA_SUPPLIER, bgCompany: parties.seller, product: src.productSnapshot,
+        // Град по подразбиране = град на продавача (напр. КЮСТЕНДИЛ), editable.
+        place: (parties.seller.city ?? "").toUpperCase() || null, city: (parties.seller.city ?? "").toUpperCase() || null,
+        date: src.declarationCmrDate,
+        bodyText: buildDeclarationText(vars),
         statementText: DECLARATION_STATEMENT,
       };
+    }
     case "cmr_epson":
     case "cmr_hp":
       return {
         layout: docType === "cmr_epson" ? "epson" : "hp",
-        sender: parties.seller, consignee: parties.buyer,
-        destination: src.destination, placeOfShipment: `${(parties.seller.city ?? "").toUpperCase()}, ${(parties.seller.country ?? "").toUpperCase()}`,
+        sender: sellerEn, consignee: buyerEn,
+        destination: src.destination, placeOfShipment: [sellerCityEn, (sellerEn.country ?? "").toUpperCase()].filter(Boolean).join(", "),
         date: src.declarationCmrDate, truck, invoiceNumber: src.invoiceNumber,
         goods: { description: src.productSnapshot ? `CEMENT ${src.productSnapshot}` : "CEMENT", customsCode: src.customsCode ?? null },
         weightKg: kgFromTonnes(src.quantity), speditor: null,

@@ -74,5 +74,6 @@
   "logisticsMkSales": "MK продажби",
   "logisticsClients": "Клиенти (лог.)",
   "logisticsAnalytics": "Анализи (лог.)",
-  "logisticsExport": "Експортни доставки"
+  "logisticsExport": "Експортни доставки",
+  "logisticsExportReceived": "Получени експортни документи"
 }

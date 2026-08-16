@@ -9,7 +9,8 @@ type SetDto = {
   id: string; invoiceNumber: string; invoiceDate: string | null; destination: string | null;
   truckRegSnapshot: string | null; trailerReg: string | null; productSnapshot: string | null;
   quantity: number | null; unit: string; declarationCmrDate: string | null; dispatchNumber: string | null;
-  status: string; buyerName: string | null; clientName: string | null; documents: Doc[];
+  status: string; sellerName: string | null; buyerName: string | null; clientName: string | null; documents: Doc[];
+  viewerRole?: string;
 };
 const DOC_LABEL: Record<string, string> = { invoice: "docInvoice", dispatch: "docDispatch", declaration: "docDeclaration", cmr_epson: "docCmrEpson", cmr_hp: "docCmrHp" };
 
@@ -24,6 +25,8 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
   async function load() { const r = await fetch(`/api/logistics/export-sets/${id}`); if (r.ok) setS(await r.json()); }
   useEffect(() => { load(); }, [id]);
   if (!s) return null;
+  const isSeller = (s.viewerRole ?? "seller") === "seller";
+  const manage = canManage && isSeller; // купувачът (MK) вижда read-only
 
   async function generate(force = false) {
     setBusy(true); setMsg("");
@@ -61,6 +64,7 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
         <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 10, background: s.status === "finalized" ? "var(--emerald-dark,#0F8A6A)" : "rgba(0,0,0,.08)", color: s.status === "finalized" ? "#fff" : "var(--muted)" }}>
           {s.status === "finalized" ? t("logistics.export.stReady") : t("logistics.export.stDraft")}
         </span>
+        {!isSeller && <span style={{ fontSize: 11, fontWeight: 700, color: "var(--muted)" }}>{t("logistics.export.receivedBadge")}</span>}
       </div>
       {msg && <div style={{ background: "var(--brass-soft)", border: "1px solid var(--brass)", borderRadius: 8, padding: "8px 12px", fontSize: 12.5, marginBottom: 12 }}>{msg}</div>}
 
@@ -68,7 +72,7 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
         <div className="glass panel">
           <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
             <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>{t("logistics.export.basic")}</h3>
-            {canManage && !editSrc && <button className="btn btn-ghost btn-sm" style={{ marginLeft: "auto", fontSize: 11 }} onClick={openEdit}>{t("logistics.export.editSource")}</button>}
+            {manage && !editSrc && <button className="btn btn-ghost btn-sm" style={{ marginLeft: "auto", fontSize: 11 }} onClick={openEdit}>{t("logistics.export.editSource")}</button>}
           </div>
 
           {editSrc ? (
@@ -89,6 +93,7 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
             <>
               {[
                 [t("logistics.export.invoiceNumber"), s.invoiceNumber],
+                [t("logistics.export.seller"), s.sellerName],
                 [t("logistics.export.date"), dt(s.invoiceDate)],
                 [t("logistics.export.destination"), s.destination],
                 [t("logistics.export.truck"), [s.truckRegSnapshot, s.trailerReg].filter(Boolean).join(" / ") || "—"],
@@ -110,7 +115,7 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
         <div className="glass panel">
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>{t("logistics.export.documents")}</h3>
-            {canManage && <button className="btn btn-primary btn-sm" style={{ marginLeft: "auto" }} disabled={busy} onClick={() => generate(false)}>{t("logistics.export.generateAll")}</button>}
+            {manage && <button className="btn btn-primary btn-sm" style={{ marginLeft: "auto" }} disabled={busy} onClick={() => generate(false)}>{t("logistics.export.generateAll")}</button>}
           </div>
           {ACTIVE_EXPORT_DOC_TYPES.map((dtp) => {
             const doc = docFor(dtp);
@@ -139,7 +144,7 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
               </div>
             );
           })}
-          {canManage && s.documents.some((d) => d.overridden) && (
+          {manage && s.documents.some((d) => d.overridden) && (
             <button className="btn btn-ghost btn-sm" style={{ marginTop: 10 }} disabled={busy} onClick={() => generate(true)}>{t("logistics.export.regenerate")}</button>
           )}
         </div>

@@ -44,7 +44,11 @@
     "logoPaidHint": "Логото във фактурата е достъпно само за платените планове (Старт, Бизнес, Про).",
     "back": "Назад",
     "save": "Запази промените",
-    "saving": "Записване…"
+    "saving": "Записване…",
+    "nameEn": "Име на английски (export)",
+    "addressEn": "Адрес на английски (export)",
+    "cityEn": "Град на английски (export)",
+    "countryEn": "Държава на английски (export)"
   },
   "businessProfile": {
     "title": "Бизнес профил (Smart Workspace)",

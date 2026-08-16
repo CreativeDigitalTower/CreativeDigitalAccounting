@@ -11,6 +11,7 @@ import { NextResponse } from "next/server";
 import { requireCompany, getMyRole, isSuperAdmin } from "@/lib/session";
 import { LOGISTICS_MODULE_KEY } from "@/lib/logistics/config";
 import { canLogistics, logisticsCaps, effectiveRole, type LogisticsCaps } from "@/lib/logistics/perms";
+import { resolveExportSetRole } from "@/lib/logistics/exportDocs";
 
 export { canLogistics, logisticsCaps };
 export type { LogisticsPermission, LogisticsCaps } from "@/lib/logistics/perms";
@@ -43,6 +44,19 @@ export async function inSameGroup(a: string, b: string): Promise<boolean> {
     prisma.company.findUnique({ where: { id: b }, select: { companyGroupId: true } }),
   ]);
   return !!ca?.companyGroupId && ca.companyGroupId === cb?.companyGroupId;
+}
+
+/**
+ * Достъп за ЧЕТЕНЕ на export set: продавачът (companyId) винаги; купувачът (MK фирма)
+ * само ако е в същата бизнес група (intercompany shared visibility, без дублиране).
+ * Връща ролята за UI ("seller" = издател, "buyer" = получател) или null при отказ.
+ */
+export async function exportSetReadRole(activeCompanyId: string, set: { companyId: string; buyerCompanyId: string | null }): Promise<"seller" | "buyer" | null> {
+  // Продавачът не изисква group проверка; за купувача питаме дали е в същата група.
+  const sameGroup = set.companyId !== activeCompanyId && set.buyerCompanyId === activeCompanyId
+    ? await inSameGroup(activeCompanyId, set.companyId)
+    : false;
+  return resolveExportSetRole(activeCompanyId, set, sameGroup);
 }
 
 export type LogisticsContext = { userId: string; companyId: string; role: string | null; caps: LogisticsCaps };
