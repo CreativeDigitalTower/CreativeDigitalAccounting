@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useT } from "@/components/i18n/I18nProvider";
 import { ExportInvoiceTemplate, type InvoiceDocData } from "@/components/app/logistics/ExportInvoiceTemplate";
 import { ExportDispatchTemplate, type DispatchDocData } from "@/components/app/logistics/ExportDispatchTemplate";
+import { ExportDeclarationTemplate, type DeclarationDocData } from "@/components/app/logistics/ExportDeclarationTemplate";
+import { ExportCmrTemplate, type CmrDocData } from "@/components/app/logistics/ExportCmrTemplate";
 
 type Doc = { id: string; docType: string; data: Record<string, unknown>; overridden: boolean; status: string };
 
@@ -61,8 +63,20 @@ export function ExportDocEditor({ setId, docId, canManage }: { setId: string; do
     </div>
   );
 
-  const isInvoice = doc.docType === "invoice";
-  const isBlank = doc.docType === "blank";
+  const Area = ({ label, path }: { label: string; path: string }) => (
+    <div><label style={lbl}>{label}</label>
+      <textarea disabled={finalized} style={{ ...inp, minHeight: 96, resize: "vertical", fontFamily: "inherit" }}
+        value={String(getPath(data, path) ?? "")}
+        onChange={(e) => set(path, e.target.value)} />
+    </div>
+  );
+
+  const dt = doc.docType;
+  const isInvoice = dt === "invoice";
+  const isBlank = dt === "blank";
+  const isDispatchLike = dt === "dispatch" || dt === "blank";
+  const isDeclaration = dt === "declaration";
+  const isCmr = dt === "cmr_epson" || dt === "cmr_hp";
   const printUrl = `/dashboard/logistics/export/${setId}/${doc.docType}/print`;
 
   return (
@@ -99,7 +113,7 @@ export function ExportDocEditor({ setId, docId, canManage }: { setId: string; do
               <Field label="VAT %" path="vatRate" type="number" />
               <Field label="Payment conditions" path="paymentConditions" />
             </>
-          ) : (
+          ) : isDispatchLike ? (
             <>
               <Field label={t("logistics.export.dispatch")} path="dispatchNumber" />
               <Field label={t("logistics.export.date")} path="date" type="date" />
@@ -109,14 +123,41 @@ export function ExportDocEditor({ setId, docId, canManage }: { setId: string; do
               <Field label="Материал" path="rows.0.material" />
               <Field label={t("logistics.export.quantity")} path="rows.0.quantity" type="number" />
             </>
+          ) : isDeclaration ? (
+            <>
+              <Field label="Декларатор" path="declarantName" />
+              <Field label={t("logistics.export.invoiceNumber")} path="invoiceNumber" />
+              <Field label={t("logistics.export.date")} path="invoiceDate" type="date" />
+              <Field label={t("logistics.export.product")} path="product" />
+              <Field label="Произход" path="origin" />
+              <Field label="Проформа №" path="proformaNumber" />
+              <Field label="Място" path="place" />
+              <Field label={t("logistics.export.date")} path="date" type="date" />
+              <Area label="Текст на декларацията" path="bodyText" />
+            </>
+          ) : (
+            <>
+              <Field label="Изпращач (sender)" path="sender.name" />
+              <Field label="Получател (consignee)" path="consignee.name" />
+              <Field label={t("logistics.export.destination")} path="destination" />
+              <Field label="Място на натоварване" path="placeOfShipment" />
+              <Field label={t("logistics.export.date")} path="date" type="date" />
+              <Field label={t("logistics.export.truck")} path="truck" />
+              <Field label={t("logistics.export.invoiceNumber")} path="invoiceNumber" />
+              <Field label="Описание на стоката" path="goods.description" />
+              <Field label="Митнически код" path="goods.customsCode" />
+              <Field label="Бруто тегло (kg)" path="weightKg" type="number" />
+              <Field label="Превозвач" path="carrier" />
+            </>
           )}
         </div>
 
         {/* Live preview */}
         <div style={{ overflowX: "auto", background: "#f4f2ea", padding: 12, borderRadius: 10 }}>
-          {isInvoice
-            ? <ExportInvoiceTemplate data={data as InvoiceDocData} />
-            : <ExportDispatchTemplate data={data as DispatchDocData} blank={isBlank} />}
+          {isInvoice ? <ExportInvoiceTemplate data={data as InvoiceDocData} />
+            : isDispatchLike ? <ExportDispatchTemplate data={data as DispatchDocData} blank={isBlank} />
+            : isDeclaration ? <ExportDeclarationTemplate data={data as DeclarationDocData} />
+            : <ExportCmrTemplate data={data as CmrDocData} />}
         </div>
       </div>
     </div>

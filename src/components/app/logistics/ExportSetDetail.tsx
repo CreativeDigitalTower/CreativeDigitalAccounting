@@ -12,7 +12,8 @@ type SetDto = {
   status: string; documents: Doc[];
 };
 const DOC_LABEL: Record<string, string> = { invoice: "docInvoice", dispatch: "docDispatch", blank: "docBlank", declaration: "docDeclaration", cmr_epson: "docCmrEpson", cmr_hp: "docCmrHp" };
-const EDITABLE = new Set(["invoice", "dispatch", "blank"]); // PR2 документи с редактор/печат
+// Всички шест документа имат редактор/печат (PR2: invoice/dispatch/blank; PR3: declaration/cmr).
+const EDITABLE = new Set(["invoice", "dispatch", "blank", "declaration", "cmr_epson", "cmr_hp"]);
 
 export function ExportSetDetail({ id, canManage }: { id: string; canManage: boolean }) {
   const t = useT();

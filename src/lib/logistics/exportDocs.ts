@@ -50,6 +50,14 @@ export function invoiceTotals(goods: GoodsLike[]): { quantity: number; value: nu
   const value = goods.reduce<Prisma.Decimal>((s, g) => s.plus(goodsRowValue(g) ?? 0), new Prisma.Decimal(0));
   return { quantity: quantity.toDecimalPlaces(3).toNumber(), value: value.toDecimalPlaces(2).toNumber() };
 }
+/**
+ * Печатен отстъп на CMR мрежата спрямо предпечатаната бланка. Epson и HP са
+ * калибрирани различно → държим ги разделно (спец. изискване). Стойности в px.
+ */
+export function cmrPrintOffset(layout: string | null | undefined): { top: number; left: number } {
+  return layout === "hp" ? { top: 6, left: 4 } : { top: 0, left: 0 };
+}
+
 /** Общо количество за испратница/празна (3 знака). */
 export function dispatchTotalQuantity(rows: { quantity?: number | null }[]): number {
   return rows.reduce<Prisma.Decimal>((s, r) => s.plus(r.quantity ?? 0), new Prisma.Decimal(0)).toDecimalPlaces(3).toNumber();
