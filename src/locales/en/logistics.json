@@ -481,6 +481,11 @@
     "docBlank": "Blank dispatch",
     "docDeclaration": "Declaration",
     "docCmrEpson": "CMR Epson",
-    "docCmrHp": "CMR HP"
+    "docCmrHp": "CMR HP",
+    "open": "Open",
+    "save": "Save",
+    "finalize": "Finalize",
+    "reopen": "Reopen for editing",
+    "printPdf": "Print / PDF"
   }
 }

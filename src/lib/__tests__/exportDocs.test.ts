@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildDocumentData, kgFromTonnes, invoiceLineValue, truckTrailerLabel, type Parties } from "@/lib/logistics/exportDocs";
+import { buildDocumentData, kgFromTonnes, invoiceLineValue, truckTrailerLabel, goodsRowValue, invoiceTotals, dispatchTotalQuantity, type Parties } from "@/lib/logistics/exportDocs";
 import { formatSequenceNumber, suggestDispatchFromInvoice, EXPORT_INVOICE_FORMAT, EXPORT_DOC_TYPES } from "@/lib/logistics/config";
 import { normalizeProductKey } from "@/lib/logistics/normalize";
 
@@ -76,6 +76,26 @@ describe("buildDocumentData — едно въвеждане → всички д�
     const decl = buildDocumentData(SRC, PARTIES, "declaration") as Record<string, unknown>;
     expect(decl.invoiceNumber).toBe("0000009617");
     expect((decl.bgCompany as { name: string }).name).toBe("METAL TRADE KUSTENDIL 2005 Ltd.");
+  });
+});
+
+describe("сумиране на invoice/dispatch таблици (PR2)", () => {
+  it("goodsRowValue ползва явната стойност, ако е зададена", () => {
+    expect(goodsRowValue({ quantity: 26.04, unitPrice: 100, value: 2600 })).toBe(2600);
+  });
+  it("goodsRowValue смята количество × цена, ако няма явна стойност", () => {
+    expect(goodsRowValue({ quantity: 26.04, unitPrice: 100 })).toBe(2604);
+  });
+  it("invoiceTotals събира количество (3 знака) и стойност (2 знака) без плаваща грешка", () => {
+    const r = invoiceTotals([
+      { quantity: 26.04, unitPrice: 100 },
+      { quantity: 10.1, unitPrice: 99.9 },
+    ]);
+    expect(r.quantity).toBe(36.14);
+    expect(r.value).toBe(3612.99);
+  });
+  it("dispatchTotalQuantity събира количествата decimal-safe", () => {
+    expect(dispatchTotalQuantity([{ quantity: 0.1 }, { quantity: 0.2 }])).toBe(0.3);
   });
 });
 

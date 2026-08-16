@@ -37,6 +37,24 @@ export function invoiceLineValue(quantity: number | null | undefined, unitPrice:
   return netAmount(quantity, unitPrice);
 }
 
+/** Ред стока за сумиране (label→value е editable snapshot). */
+type GoodsLike = { quantity?: number | null; unitPrice?: number | null; value?: number | null };
+/** Стойност на ред: явно зададена стойност, иначе количество × цена. */
+export function goodsRowValue(g: GoodsLike): number | null {
+  if (g.value != null) return g.value;
+  return invoiceLineValue(g.quantity, g.unitPrice);
+}
+/** Обобщения за invoice таблица: общо количество (3 знака) и обща стойност (2 знака). */
+export function invoiceTotals(goods: GoodsLike[]): { quantity: number; value: number } {
+  const quantity = goods.reduce<Prisma.Decimal>((s, g) => s.plus(g.quantity ?? 0), new Prisma.Decimal(0));
+  const value = goods.reduce<Prisma.Decimal>((s, g) => s.plus(goodsRowValue(g) ?? 0), new Prisma.Decimal(0));
+  return { quantity: quantity.toDecimalPlaces(3).toNumber(), value: value.toDecimalPlaces(2).toNumber() };
+}
+/** Общо количество за испратница/празна (3 знака). */
+export function dispatchTotalQuantity(rows: { quantity?: number | null }[]): number {
+  return rows.reduce<Prisma.Decimal>((s, r) => s.plus(r.quantity ?? 0), new Prisma.Decimal(0)).toDecimalPlaces(3).toNumber();
+}
+
 /**
  * Изгражда данните за конкретен документ от source-а (auto-fill). Връща plain обект,
  * който се пази в ExportDocument.data и после е editable.

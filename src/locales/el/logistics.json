@@ -481,6 +481,11 @@
     "docBlank": "Κενό δελτίο",
     "docDeclaration": "Δήλωση",
     "docCmrEpson": "CMR Epson",
-    "docCmrHp": "CMR HP"
+    "docCmrHp": "CMR HP",
+    "open": "Άνοιγμα",
+    "save": "Αποθήκευση",
+    "finalize": "Οριστικοποίηση",
+    "reopen": "Άνοιγμα για επεξεργασία",
+    "printPdf": "Εκτύπωση / PDF"
   }
 }
