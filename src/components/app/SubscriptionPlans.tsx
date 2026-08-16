@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { PLAN_DETAILS, BILLING_PERIODS } from "@/components/marketing/Pricing";
-import { EUR_TO_BGN, isPromoActive } from "@/lib/constants";
+import { isPromoActive } from "@/lib/constants";
 import { metaTrack } from "@/lib/metaClient";
 import { useI18n } from "@/components/i18n/I18nProvider";
 
@@ -112,10 +112,6 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
                   {t("pricing.totalFor", { total: total.toFixed(2), months: period.months })} <span style={{ color: "var(--brass)" }}>{t("pricing.saved", { amount: (fullTotal - total).toFixed(2) })}</span>
                 </div>
               )}
-              {plan.price > 0 && period.months === 1 && (
-                <div className="num" style={{ fontSize: 11, color: "var(--muted)", marginBottom: 4, textAlign: "center" }}>{t("pricing.approxBgn", { amount: (plan.price * EUR_TO_BGN).toFixed(2) })}</div>
-              )}
-
               <p style={{ fontSize: 12, color: "var(--ink-soft)", margin: "10px 0 12px", lineHeight: 1.5, textAlign: "center" }}>{pt.blurb}</p>
 
               <ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px", display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
@@ -171,7 +167,7 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
             { label: "IBAN", value: bank.iban },
             { label: t("pricing.sub.bankBank"), value: bank.bank },
             { label: t("pricing.sub.bankReason"), value: payPlan ? t("pricing.sub.bankReasonValue", { name: P.plans[payPlan.id].name, period: t(`pricing.periods.${period.id}`) }) : bank.reason },
-            ...(payPlan ? [{ label: t("pricing.sub.bankAmount"), value: `${payAmount.toFixed(2)} € (≈ ${(payAmount * EUR_TO_BGN).toFixed(2)} лв)`, highlight: true }] : []),
+            ...(payPlan ? [{ label: t("pricing.sub.bankAmount"), value: `${payAmount.toFixed(2)} €`, highlight: true }] : []),
           ].map((b) => (
             <div key={b.label} style={{ background: (b as { highlight?: boolean }).highlight ? "var(--emerald-soft)" : "rgba(255,255,255,.5)", borderRadius: 8, padding: "12px 14px", border: `1px solid ${(b as { highlight?: boolean }).highlight ? "var(--emerald)" : "var(--border)"}` }}>
               <div style={{ fontSize: 11, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>{b.label}</div>
@@ -179,7 +175,7 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
             </div>
           ))}
         </div>
-        <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 10 }}>{t("pricing.sub.pricesVatNote", { rate: EUR_TO_BGN })}</p>
+        <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 10 }}>{t("pricing.sub.pricesVatNote")}</p>
       </div>
 
       {/* Поп-ъп с ясни инструкции за плащане */}
@@ -203,7 +199,7 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
                 { label: "IBAN", value: bank.iban },
                 { label: t("pricing.sub.bankBank"), value: bank.bank },
                 { label: t("pricing.sub.modalReasonLabel"), value: t("pricing.sub.bankReasonValue", { name: P.plans[payPlan.id].name, period: t(`pricing.periods.${period.id}`) }) },
-                { label: t("pricing.sub.bankAmount"), value: `${payAmount.toFixed(2)} € (≈ ${(payAmount * EUR_TO_BGN).toFixed(2)} лв)`, highlight: true },
+                { label: t("pricing.sub.bankAmount"), value: `${payAmount.toFixed(2)} €`, highlight: true },
               ].map((b) => (
                 <div key={b.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, background: b.highlight ? "var(--emerald-soft)" : "rgba(255,255,255,.55)", borderRadius: 10, padding: "12px 16px", border: `1px solid ${b.highlight ? "var(--emerald)" : "var(--border)"}` }}>
                   <span style={{ fontSize: 11.5, color: "var(--muted)", textTransform: "uppercase", letterSpacing: .8, flexShrink: 0 }}>{b.label}</span>
@@ -216,7 +212,7 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
               {t("pricing.sub.modalNote")}
             </div>
 
-            <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 12, textAlign: "center" }}>{t("pricing.sub.pricesVatNote", { rate: EUR_TO_BGN })}</p>
+            <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 12, textAlign: "center" }}>{t("pricing.sub.pricesVatNote")}</p>
 
             <div style={{ display: "flex", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
               {proformaLoading ? (

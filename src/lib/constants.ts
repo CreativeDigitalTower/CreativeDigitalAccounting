@@ -2,7 +2,11 @@ export const EUR_TO_BGN = 1.95583;
 // Кошче: колко дни се пазят изтритите документи преди автоматично изтриване.
 // (В бъдеще — конфигурируемо от Супер Админ: 30/60/90/180/365/никога.)
 export const TRASH_RETENTION_DAYS = 90;
-export const DUAL_CURRENCY_UNTIL = new Date("2026-08-08");
+// Край на периода на ЗАДЪЛЖИТЕЛНО двойно обозначаване EUR/BGN (чл. 32 ЗВЕ). След тази
+// дата текущият интерфейс/цени се показват само в EUR. Централизирана — не се дублира.
+export const DUAL_DISPLAY_END_DATE = new Date("2026-08-08");
+/** @deprecated Използвайте DUAL_DISPLAY_END_DATE. Оставено за backward compatibility. */
+export const DUAL_CURRENCY_UNTIL = DUAL_DISPLAY_END_DATE;
 export const FREE_PLAN_LIMIT = 5; // документа/месец
 
 export const COMPANY_NAME = "Криейтив Диджитъл Тауър ЕООД";
@@ -323,8 +327,34 @@ export function isTemplateAllowed(plan: PlanId, index: number): boolean {
   return n === Infinity || index < n;
 }
 
+/**
+ * Дали ТЕКУЩИЯТ интерфейс/цени трябва да показват двойно EUR/BGN обозначаване.
+ * Периодът на задължително двойно обозначаване приключи на DUAL_DISPLAY_END_DATE,
+ * затова за текущите екрани, публичния сайт и абонаментите винаги е EUR-only.
+ * (Историческите ДОКУМЕНТИ ползват isDualDisplayForDate по дата на издаване.)
+ */
 export function isDualCurrencyActive(): boolean {
-  return new Date() < DUAL_CURRENCY_UNTIL;
+  return false;
+}
+
+/**
+ * Дали документ, ИЗДАДЕН на дадена дата, е с двойно EUR/BGN обозначаване. Ключът е
+ * датата на издаване, а НЕ текущата дата — така вече издадените документи остават
+ * точно както са били (historical snapshot), а новите са EUR-only.
+ */
+export function isDualDisplayForDate(date: Date | string | null | undefined): boolean {
+  if (!date) return false;
+  const d = new Date(date);
+  return !isNaN(d.getTime()) && d < DUAL_DISPLAY_END_DATE;
+}
+
+/**
+ * Дали документ да покаже двойно EUR/BGN обозначаване: само за EUR документи, издадени
+ * преди края на периода. Другите валути (USD/GBP/…) и новите документи → без BGN.
+ * Единствен източник на истината — ползва се от invoice/offer рендерерите и тестовете.
+ */
+export function shouldShowDualCurrency(date: Date | string | null | undefined, currency: string | null | undefined): boolean {
+  return currency === "EUR" && isDualDisplayForDate(date);
 }
 
 export function toBGN(eur: number): number {

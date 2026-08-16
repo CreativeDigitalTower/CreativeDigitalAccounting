@@ -15,8 +15,8 @@ export type ExpenseRow = {
 type Cat = { id: string; name: string };
 type Sup = { id: string; name: string };
 
-export function ExpensesList({ expenses, categories, suppliers, dual, toBGNRate }: {
-  expenses: ExpenseRow[]; categories: Cat[]; suppliers: Sup[]; dual: boolean; toBGNRate: number;
+export function ExpensesList({ expenses, categories, suppliers }: {
+  expenses: ExpenseRow[]; categories: Cat[]; suppliers: Sup[];
 }) {
   const { t, locale } = useI18n();
   const router = useRouter();
@@ -90,7 +90,7 @@ export function ExpensesList({ expenses, categories, suppliers, dual, toBGNRate 
                         : <span style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("expenses.type.single")}</span>}</td>
                       <td style={{ fontSize: 13, color: "var(--ink-soft)" }}>{e.supplier ?? "—"}</td>
                       <td style={{ fontSize: 13, color: "var(--ink-soft)" }}>{new Date(e.date).toLocaleDateString(locale)}</td>
-                      <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(e.amount)}{dual && <div style={{ fontSize: 10.5, color: "var(--muted)" }}>≈ {formatCurrency(e.amount * toBGNRate, "BGN")}</div>}</td>
+                      <td className="num" style={{ fontWeight: 600 }}>{formatCurrency(e.amount)}</td>
                       <td><AttachmentCell endpoint={`/api/expenses/${e.id}`} hasFile={e.hasFile} maxMB={3} /></td>
                       <td style={{ display: "flex", gap: 6 }}>
                         <button className="btn btn-ghost btn-sm" title={t("expenses.row.edit")} onClick={() => setEdit(e)} style={{ display: "inline-flex", alignItems: "center" }}><UiIcon.edit /></button>

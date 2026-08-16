@@ -1,6 +1,6 @@
 {
   "title": "Тарифные планы",
-  "pricesNote": "Все цены без НДС · 1 EUR = {rate} лв",
+  "pricesNote": "Все цены без НДС",
   "recommended": "Рекомендуемый",
   "specialPrice": "Специальная цена",
   "active": "Активен",
@@ -74,7 +74,6 @@
         "Базовый склад",
         "Финансовая панель",
         "Налоговый календарь",
-        "Двойное обозначение EUR/BGN",
         "2 профессиональных PDF-шаблона"
       ]
     },
@@ -162,7 +161,7 @@
     "bankReason": "Основание",
     "bankReasonValue": "Подписка CDA — {name} ({period})",
     "bankAmount": "Сумма к переводу",
-    "pricesVatNote": "Все цены без НДС. 1 EUR = {rate} лв.",
+    "pricesVatNote": "Все цены без НДС.",
     "modalTitle": "Оплата подписки",
     "modalIntroPrefix": "Вы выбрали план ",
     "modalIntroSuffix": " · {period}.",

@@ -1,6 +1,6 @@
 {
   "title": "Abonelik planları",
-  "pricesNote": "Tüm fiyatlar KDV hariç · 1 EUR = {rate} BGN",
+  "pricesNote": "Tüm fiyatlar KDV hariç",
   "recommended": "Önerilen",
   "specialPrice": "Özel fiyat",
   "active": "Aktif",
@@ -74,7 +74,6 @@
         "Temel depo",
         "Finansal pano",
         "Vergi takvimi",
-        "Çift EUR/BGN gösterimi",
         "2 profesyonel PDF şablonu"
       ]
     },
@@ -162,7 +161,7 @@
     "bankReason": "Açıklama",
     "bankReasonValue": "CDA aboneliği — {name} ({period})",
     "bankAmount": "Gönderilecek tutar",
-    "pricesVatNote": "Tüm fiyatlar KDV hariçtir. 1 EUR = {rate} BGN.",
+    "pricesVatNote": "Tüm fiyatlar KDV hariçtir.",
     "modalTitle": "Abonelik ödemesi",
     "modalIntroPrefix": "",
     "modalIntroSuffix": " planını seçtiniz · {period}.",

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { FinancialHistorySection } from "@/components/app/FinancialHistorySection";
 import { MonthlyBackfill } from "@/components/app/MonthlyBackfill";
 import { PriceIncreaseSimulator } from "@/components/app/PriceIncreaseSimulator";
-import { formatCurrency, isDualCurrencyActive } from "@/lib/constants";
+import { formatCurrency } from "@/lib/constants";
 import { sumPayroll } from "@/lib/payroll";
 import { VatRegistrationForecast } from "@/components/app/VatRegistrationForecast";
 import { resolvePeriod, computeAnalytics } from "@/lib/bi/analytics";
@@ -74,7 +74,6 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   const monthsElapsed = curMonth + 1;
   const vatMonthlyRunRate = Math.max(expectedRetainer, vatTurnover / monthsElapsed);
 
-  const dual = isDualCurrencyActive();
 
   return (
     <>
@@ -152,9 +151,6 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
           currentExpenses={yearExpenses}
           currentProfit={yearProfit}
         />
-      </div>
-
-      {dual && <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 8 }}>Сумите се визуализират в EUR; двойно EUR/BGN обозначаване е активно за официалните документи.</div>}
-    </>
+      </div>    </>
   );
 }

@@ -38,7 +38,7 @@
     "createdBy": "Creat de"
   },
   "home": {
-    "heroBadge": "✦ Nou — afișare dublă EUR/BGN până la 08.08.2026",
+    "heroBadge": "✦ Nou — facturare în euro (EUR) de la început",
     "heroTitle1": "Întreaga ta afacere,",
     "heroTitle2": "organizată într-un singur loc.",
     "heroSubtitle": "Facturi, stocuri, producție, cheltuieli, CRM, contracte și analize financiare — unite într-o platformă modernă pentru afaceri.",
@@ -90,9 +90,9 @@
         "label": "pentru înregistrare"
       },
       {
-        "num": "1,95583",
-        "unit": "BGN/EUR",
-        "label": "curs fix"
+        "num": "EUR",
+        "unit": "",
+        "label": "monedă principală"
       },
       {
         "num": "20 / 9 / 0",
@@ -243,7 +243,7 @@
       },
       {
         "title": "Conformitate",
-        "text": "Afișare dublă EUR/BGN, cote TVA 20%/9%/0%, pregătire SAF-T și validare VIES — acoperim toate cerințele locale."
+        "text": "Cote TVA 20%/9%/0%, pregătire SAF-T și validare VIES — acoperim toate cerințele locale."
       },
       {
         "title": "Securitate",
@@ -458,7 +458,7 @@
           "Numerotare automată pe tip și an (CDA-2026-####)",
           "Lanț de documente: Ofertă → Proformă → Factură",
           "15 șabloane profesionale de facturi cu stiluri diferite",
-          "Afișare dublă EUR/BGN (obligatorie până la 08.08.2026)",
+          "Facturare în euro (EUR) ca monedă principală",
           "Facturi recurente (de abonament)",
           "Stări: ciornă, trimisă, plătită, restantă, anulată"
         ]
@@ -584,7 +584,7 @@
       }
     ],
     "freeStartTitle": "Fiecare client al dvs. primește acces START gratuit",
-    "freeStartText": "START include facturare, clienți și furnizori, depozit de bază, cheltuieli, calendar fiscal și afișare dublă EUR/BGN — complet gratuit pentru client. Dacă clientul dorește mai multe funcții, poate face upgrade oricând.",
+    "freeStartText": "START include facturare, clienți și furnizori, depozit de bază, cheltuieli, calendar fiscal — complet gratuit pentru client. Dacă clientul dorește mai multe funcții, poate face upgrade oricând.",
     "firmTitle": "Pentru firma de contabilitate",
     "firmBenefits": [
       {
@@ -612,7 +612,7 @@
       },
       {
         "title": "Pregătit pentru euro",
-        "desc": "Afișare dublă EUR/BGN și compatibilitate deplină cu noile cerințe."
+        "desc": "Facturare în euro (EUR) și compatibilitate deplină cu noile cerințe."
       },
       {
         "title": "Lucru în comun cu contabilul",
@@ -641,7 +641,7 @@
       },
       {
         "q": "Ce include accesul START gratuit pentru client?",
-        "a": "Facturare, clienți și furnizori, depozit de bază, cheltuieli, calendar fiscal și afișare dublă EUR/BGN — complet gratuit."
+        "a": "Facturare, clienți și furnizori, depozit de bază, cheltuieli, calendar fiscal — complet gratuit."
       }
     ],
     "finalTitle": "Sunteți gata să începeți?",

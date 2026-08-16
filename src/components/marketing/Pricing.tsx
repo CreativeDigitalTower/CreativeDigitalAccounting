@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { EUR_TO_BGN, isPromoActive, BILLING_PERIODS } from "@/lib/constants";
+import { isPromoActive, BILLING_PERIODS } from "@/lib/constants";
 import { IconSeed, IconRocket, IconTrophy, IconCrown, IconBuilding } from "@/components/Icons";
 import { useI18n } from "@/components/i18n/I18nProvider";
 
@@ -45,7 +45,7 @@ export function Pricing() {
         {t("pricing.title")}
       </h2>
       <p style={{ textAlign: "center", color: "var(--muted)", marginBottom: 20, fontSize: 14 }}>
-        {t("pricing.pricesNote", { rate: EUR_TO_BGN.toFixed(5) })}
+        {t("pricing.pricesNote")}
       </p>
 
       {/* Период на плащане */}
@@ -105,10 +105,6 @@ export function Pricing() {
                   {t("pricing.totalFor", { total: total.toFixed(2), months: period.months })} <span style={{ color: "var(--brass)" }}>{t("pricing.saved", { amount: (fullTotal - total).toFixed(2) })}</span>
                 </div>
               )}
-              {plan.price > 0 && period.months === 1 && (
-                <div className="num" style={{ fontSize: 11, color: "var(--muted)", marginBottom: 6, textAlign: "center" }}>{t("pricing.approxBgn", { amount: (plan.price * EUR_TO_BGN).toFixed(2) })}</div>
-              )}
-
               <p style={{ fontSize: 12.5, color: "var(--ink-soft)", margin: "10px 0 14px", lineHeight: 1.5, textAlign: "center" }}>{pt.blurb}</p>
 
               <ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px", display: "flex", flexDirection: "column", gap: 7, flex: 1 }}>

@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { metaTrack } from "@/lib/metaClient";
 import { PLAN_DETAILS, BILLING_PERIODS } from "@/components/marketing/Pricing";
-import { EUR_TO_BGN, isPromoActive, ACCOUNTANT_PLANS } from "@/lib/constants";
+import { isPromoActive, ACCOUNTANT_PLANS } from "@/lib/constants";
 import { validateEik } from "@/lib/validation/eik";
 import { useT, useI18n } from "@/components/i18n/I18nProvider";
 
@@ -261,11 +261,7 @@ function RegisterForm() {
                       </div>
                       {p.price > 0 && period.months > 1 && (
                         <div style={{ fontSize: 10.5, color: "var(--muted)", marginTop: 1 }}>{t("register.totalForShort", { total: total.toFixed(2), months: period.months })}</div>
-                      )}
-                      {p.price > 0 && period.months === 1 && (
-                        <div className="num" style={{ fontSize: 10.5, color: "var(--muted)" }}>{t("register.approxBgn", { amount: (p.price * EUR_TO_BGN).toFixed(2) })}</div>
-                      )}
-                      <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 6, lineHeight: 1.4 }}>{RP.plans[p.id].tagline}</div>
+                      )}                      <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 6, lineHeight: 1.4 }}>{RP.plans[p.id].tagline}</div>
                       <ul style={{ listStyle: "none", padding: 0, margin: "8px 0 0", display: "flex", flexDirection: "column", gap: 3 }}>
                         {RP.plans[p.id].features.slice(0, 4).map((f: string) => (
                           <li key={f} style={{ fontSize: 10.5, color: "var(--ink-soft)", paddingLeft: 14, position: "relative" }}>

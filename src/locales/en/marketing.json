@@ -38,7 +38,7 @@
     "createdBy": "Created by"
   },
   "home": {
-    "heroBadge": "✦ New — dual EUR/BGN display until 08.08.2026",
+    "heroBadge": "✦ New — invoice in euro (EUR) from the start",
     "heroTitle1": "Your entire business,",
     "heroTitle2": "organized in one place.",
     "heroSubtitle": "Invoices, inventory, production, expenses, CRM, contracts and financial analytics — unified in one modern platform for business.",
@@ -90,9 +90,9 @@
         "label": "to sign up"
       },
       {
-        "num": "1.95583",
-        "unit": "BGN/EUR",
-        "label": "fixed rate"
+        "num": "EUR",
+        "unit": "",
+        "label": "main currency"
       },
       {
         "num": "20 / 9 / 0",
@@ -243,7 +243,7 @@
       },
       {
         "title": "Compliance",
-        "text": "Dual EUR/BGN display, VAT rates 20%/9%/0%, SAF-T readiness and Bulgarian VIES validation — we cover all local requirements."
+        "text": "VAT rates 20%/9%/0%, SAF-T readiness and Bulgarian VIES validation — we cover all local requirements."
       },
       {
         "title": "Security",
@@ -458,7 +458,7 @@
           "Automatic numbering by type and year (CDA-2026-####)",
           "Document chain: Quote → Proforma → Invoice",
           "15 professional invoice templates with different styles",
-          "Dual EUR/BGN display (mandatory until 08.08.2026)",
+          "Invoicing in euro (EUR) as the main currency",
           "Recurring (subscription) invoices",
           "Statuses: draft, sent, paid, overdue, cancelled"
         ]
@@ -584,7 +584,7 @@
       }
     ],
     "freeStartTitle": "Every client of yours gets free START access",
-    "freeStartText": "START includes invoicing, clients and suppliers, basic inventory, expenses, tax calendar and dual EUR/BGN display — completely free for the client. If the client needs more features, they can upgrade to a higher plan at any time.",
+    "freeStartText": "START includes invoicing, clients and suppliers, basic inventory, expenses, tax calendar — completely free for the client. If the client needs more features, they can upgrade to a higher plan at any time.",
     "firmTitle": "For the accounting firm",
     "firmBenefits": [
       {
@@ -612,7 +612,7 @@
       },
       {
         "title": "Euro-ready",
-        "desc": "Dual EUR/BGN display and full compatibility with the new requirements."
+        "desc": "Invoicing in euro (EUR) and full compatibility with the new requirements."
       },
       {
         "title": "Working together with the accountant",
@@ -641,7 +641,7 @@
       },
       {
         "q": "What does the free START access include for the client?",
-        "a": "Invoicing, clients and suppliers, basic inventory, expenses, tax calendar and dual EUR/BGN display — completely free."
+        "a": "Invoicing, clients and suppliers, basic inventory, expenses, tax calendar — completely free."
       }
     ],
     "finalTitle": "Ready to get started?",

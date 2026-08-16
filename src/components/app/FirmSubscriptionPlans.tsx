@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ACCOUNTANT_PLANS, BILLING_PERIODS, EUR_TO_BGN, isPromoActive } from "@/lib/constants";
+import { ACCOUNTANT_PLANS, BILLING_PERIODS, isPromoActive } from "@/lib/constants";
 import { useI18n } from "@/components/i18n/I18nProvider";
 
 export function FirmSubscriptionPlans({ currentPlan }: { currentPlan: string | null }) {
@@ -49,9 +49,7 @@ export function FirmSubscriptionPlans({ currentPlan }: { currentPlan: string | n
                   </>
                 )}
               </div>
-              {!p.custom && period.months > 1 && <div style={{ fontSize: 11, color: "var(--muted)", textAlign: "center", marginTop: 2 }}>{t("pricing.totalForShort", { total: total.toFixed(2), months: period.months })}</div>}
-              {!p.custom && period.months === 1 && <div className="num" style={{ fontSize: 11, color: "var(--muted)", textAlign: "center" }}>{t("pricing.approxBgnShort", { amount: (monthly * EUR_TO_BGN).toFixed(2) })}</div>}
-              <div style={{ textAlign: "center", fontSize: 13, fontWeight: 700, color: "var(--navy)", background: "var(--navy-soft)", borderRadius: 8, padding: "7px 0", margin: "10px 0 4px" }}>
+              {!p.custom && period.months > 1 && <div style={{ fontSize: 11, color: "var(--muted)", textAlign: "center", marginTop: 2 }}>{t("pricing.totalForShort", { total: total.toFixed(2), months: period.months })}</div>}              <div style={{ textAlign: "center", fontSize: 13, fontWeight: 700, color: "var(--navy)", background: "var(--navy-soft)", borderRadius: 8, padding: "7px 0", margin: "10px 0 4px" }}>
                 {p.maxClients === Infinity ? t("pricing.unlimitedClients") : t("pricing.upToClients", { n: p.maxClients })}
               </div>
               <div style={{ textAlign: "center", fontSize: 11.5, color: "var(--muted)", marginBottom: 12 }}>{p.maxUsers === Infinity ? t("pricing.unlimitedUsers") : t("pricing.upToUsers", { n: p.maxUsers })}</div>

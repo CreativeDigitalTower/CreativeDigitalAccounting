@@ -1,6 +1,6 @@
 {
   "title": "Subscription plans",
-  "pricesNote": "All prices excl. VAT · 1 EUR = {rate} BGN",
+  "pricesNote": "All prices excl. VAT",
   "recommended": "Recommended",
   "specialPrice": "Special price",
   "active": "Active",
@@ -74,7 +74,6 @@
         "Basic inventory",
         "Financial dashboard",
         "Tax calendar",
-        "Dual EUR/BGN display",
         "2 professional PDF templates"
       ]
     },
@@ -162,7 +161,7 @@
     "bankReason": "Reference",
     "bankReasonValue": "CDA subscription — {name} ({period})",
     "bankAmount": "Amount to transfer",
-    "pricesVatNote": "All prices excl. VAT. 1 EUR = {rate} BGN.",
+    "pricesVatNote": "All prices excl. VAT.",
     "modalTitle": "Subscription payment",
     "modalIntroPrefix": "You chose the ",
     "modalIntroSuffix": " plan · {period}.",

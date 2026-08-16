@@ -1,6 +1,6 @@
 {
   "title": "Абонаментни планове",
-  "pricesNote": "Всички цени са без ДДС · 1 EUR = {rate} лв",
+  "pricesNote": "Всички цени са без ДДС",
   "recommended": "Препоръчан",
   "specialPrice": "Специална цена",
   "active": "Активен",
@@ -74,7 +74,6 @@
         "Базов склад",
         "Финансово табло",
         "Данъчен календар",
-        "Двойно EUR/BGN обозначаване",
         "2 професионални PDF шаблона"
       ]
     },
@@ -162,7 +161,7 @@
     "bankReason": "Основание",
     "bankReasonValue": "Абонамент CDA — {name} ({period})",
     "bankAmount": "Сума за превод",
-    "pricesVatNote": "Всички цени са без ДДС. 1 EUR = {rate} лв.",
+    "pricesVatNote": "Всички цени са без ДДС.",
     "modalTitle": "Плащане на абонамент",
     "modalIntroPrefix": "Избрахте план ",
     "modalIntroSuffix": " · {period}.",

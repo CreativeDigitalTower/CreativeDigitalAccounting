@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireAccountingFirm } from "@/lib/session";
-import { BANK_DETAILS, EUR_TO_BGN, accountantPlanLabel } from "@/lib/constants";
+import { BANK_DETAILS, accountantPlanLabel } from "@/lib/constants";
 import { FirmSubscriptionPlans } from "@/components/app/FirmSubscriptionPlans";
 import { getT } from "@/lib/i18n/server";
 
@@ -39,7 +39,7 @@ export default async function FirmSubscriptionPage() {
             </div>
           ))}
         </div>
-        <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 12 }}>{t("admin.firm.bankNote", { rate: EUR_TO_BGN })}</p>
+        <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 12 }}>{t("admin.firm.bankNote")}</p>
       </div>
     </div>
   );
