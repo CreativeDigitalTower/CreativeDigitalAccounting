@@ -216,6 +216,10 @@ model Company {
   mkInvoices           MkInvoice[]
   exportSets           ExportDocumentSet[]
   fashionSettings      FashionSettings?
+  fashionMaterials     FashionMaterial[]
+  fashionCategories    FashionMaterialCategory[]
+  fashionDeliveries    FashionMaterialDelivery[]
+  fashionMovements     FashionInventoryMovement[]
 
   // Уникалност на чуждестранна фирма по държава + рег. номер (nulls distinct →
   // съществуващите BG записи без countryCode/registrationNumber не са засегнати).
@@ -2337,4 +2341,144 @@ model FashionSettings {
   updatedAt DateTime @updatedAt
 
   company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+// ─── Fashion Production · Phase 2: материали, категории, доставки, ledger ─────
+
+// Категории материали (редактируеми per company). Seed-ват се defaults при първа употреба.
+model FashionMaterialCategory {
+  id        String  @id @default(cuid())
+  companyId String
+  name      String
+  code      String?
+  sortOrder Int     @default(0)
+  active    Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company   Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  materials FashionMaterial[]
+
+  @@unique([companyId, name])
+  @@index([companyId, active])
+}
+
+// Универсален материал (плат/конец/аксесоар/…) — общ модел с категории и специализирани
+// nullable полета за плат/конец. Наличността НЕ се редактира директно — само през ledger.
+model FashionMaterial {
+  id          String  @id @default(cuid())
+  companyId   String
+  categoryId  String?
+  name        String
+  sku         String?
+  supplierId  String?
+  brand       String?
+  description String? @db.Text
+  colorName   String?
+  colorCode   String?
+  unit        String  @default("m") // m | pcs | g | kg | roll | spool | …
+  quantity    Float   @default(0)   // текуща наличност (управлява се от ledger)
+  minQuantity Float?                // минимална наличност (алармa)
+  avgCost     Float   @default(0)   // среднопретеглена покупна цена
+  currency    String  @default("EUR")
+  lastDeliveryAt DateTime?
+  active      Boolean @default(true)
+  photoUrl    String? @db.Text      // мостра/снимка (dataUrl)
+  note        String? @db.Text
+
+  // Плат
+  composition      String?
+  widthCm          Float?
+  weightGsm        Float?
+  elasticityPct    Float?
+  elasticityDir    String?
+  // Конец
+  threadType       String?
+  threadThickness  String?
+  metersPerSpool   Float?
+  spoolsCount      Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company   Company                    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category  FashionMaterialCategory?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  movements FashionInventoryMovement[]
+  deliveryLines FashionDeliveryLine[]
+
+  @@unique([companyId, sku])
+  @@index([companyId, categoryId])
+  @@index([companyId, active])
+}
+
+// Доставка на материали (header). При потвърждаване увеличава наличности + преизчислява
+// среднопретеглена цена + създава PURCHASE движения (транзакционно, idempotent).
+model FashionMaterialDelivery {
+  id             String  @id @default(cuid())
+  companyId      String
+  supplierId     String?
+  date           DateTime @default(now())
+  invoiceNumber  String?
+  deliveryNumber String?
+  transportCost  Float   @default(0)
+  extraCosts     Float   @default(0)
+  currency       String  @default("EUR")
+  note           String? @db.Text
+  // Прикачен документ (общ base64 механизъм)
+  fileName         String?
+  originalFilename String?
+  mimeType         String?
+  dataUrl          String? @db.Text
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company Company               @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  lines   FashionDeliveryLine[]
+
+  @@index([companyId, date])
+}
+
+// Ред от доставка. landedUnitCost = unitPrice + разпределени транспортни/доп. разходи.
+model FashionDeliveryLine {
+  id             String  @id @default(cuid())
+  deliveryId     String
+  materialId     String
+  quantity       Float
+  unit           String
+  unitPrice      Float
+  lineTotal      Float
+  allocatedExtra Float   @default(0)
+  landedUnitCost Float
+
+  delivery FashionMaterialDelivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+  material FashionMaterial         @relation(fields: [materialId], references: [id], onDelete: Restrict)
+
+  @@index([deliveryId])
+  @@index([materialId])
+}
+
+// Централен ledger на складовите движения. quantity винаги > 0; посоката е в direction.
+// Никога не се редактира текущо число директно — всяка промяна е ново движение.
+model FashionInventoryMovement {
+  id         String @id @default(cuid())
+  companyId  String
+  materialId String
+  type       String // PURCHASE | MANUAL_IN | MANUAL_OUT | CUTTING_CONSUMPTION | SAMPLE_CONSUMPTION | PRODUCTION_OUTPUT | SALE | DEFECT | SCRAP | REWORK | GIFT | MARKETING | STOCK_ADJUSTMENT | RETURN
+  direction  String // in | out
+  quantity   Float
+  unit       String
+  unitCost   Float?
+  sourceType String? // FashionMaterialDelivery | FashionCuttingBatch | manual | …
+  sourceId   String?
+  date       DateTime @default(now())
+  userId     String?
+  note       String? @db.Text
+  createdAt  DateTime @default(now())
+
+  company  Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  material FashionMaterial @relation(fields: [materialId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, materialId, createdAt])
+  @@index([companyId, type])
 }
