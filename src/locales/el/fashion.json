@@ -116,5 +116,63 @@
     "MARKETING": "Marketing",
     "STOCK_ADJUSTMENT": "Adjustment",
     "RETURN": "Return"
+  },
+  "styles": {
+    "add": "New style",
+    "search": "Search…",
+    "allStatuses": "All statuses",
+    "empty": "No styles.",
+    "code": "Code",
+    "name": "Name",
+    "collection": "Collection",
+    "category": "Category",
+    "season": "Season",
+    "year": "Year",
+    "colors": "Colors",
+    "sizes": "Sizes",
+    "patterns": "Patterns",
+    "status": "Status",
+    "skuPrefix": "SKU prefix",
+    "description": "Description",
+    "errRequired": "Enter code and name.",
+    "statusChanged": "Status updated.",
+    "photos": "Photos",
+    "addPhoto": "Add photo",
+    "noPhotos": "No photos.",
+    "main": "Main",
+    "photoTooLarge": "File too large."
+  },
+  "patterns": {
+    "versions": "Pattern versions",
+    "none": "No pattern.",
+    "version": "Version",
+    "size": "Size",
+    "paper": "Paper",
+    "digital": "Digital",
+    "marker": "Marker",
+    "file": "File",
+    "author": "Author",
+    "download": "Download",
+    "approve": "Approve",
+    "archive": "Archive",
+    "newVersion": "New version",
+    "addVersion": "Add version",
+    "overviewIntro": "Pattern readiness per style (latest version)."
+  },
+  "status": {
+    "idea": "Idea",
+    "development": "Development",
+    "first_sample": "First sample",
+    "fit_sample": "Fit sample",
+    "approved": "Approved",
+    "ready_for_production": "Ready for production",
+    "in_production": "In production",
+    "active": "Active",
+    "archived": "Archived"
+  },
+  "patternStatus": {
+    "draft": "Draft",
+    "approved": "Approved",
+    "archived": "Archived"
   }
 }
