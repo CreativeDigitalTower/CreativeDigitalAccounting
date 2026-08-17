@@ -226,6 +226,8 @@ model Company {
   fashionOperations    FashionOperation[]
   fashionOpCategories  FashionOperationCategory[]
   fashionMachines      FashionMachine[]
+  fashionCuttingBatches FashionCuttingBatch[]
+  fashionRemnants      FashionRemnant[]
 
   // Уникалност на чуждестранна фирма по държава + рег. номер (nulls distinct →
   // съществуващите BG записи без countryCode/registrationNumber не са засегнати).
@@ -2412,6 +2414,8 @@ model FashionMaterial {
   movements FashionInventoryMovement[]
   deliveryLines FashionDeliveryLine[]
   bomItems      FashionBomItem[]
+  cuttingBatches FashionCuttingBatch[]
+  remnants       FashionRemnant[]
 
   @@unique([companyId, sku])
   @@index([companyId, categoryId])
@@ -2519,6 +2523,7 @@ model FashionStyle {
   patterns FashionPattern[]
   bomItems FashionBomItem[]
   operations FashionOperation[]
+  cuttingBatches FashionCuttingBatch[]
 
   @@unique([companyId, code])
   @@index([companyId, status])
@@ -2669,4 +2674,76 @@ model FashionOperation {
   machine  FashionMachine?            @relation(fields: [machineId], references: [id], onDelete: SetNull)
 
   @@index([companyId, styleId])
+}
+
+// ─── Fashion Production · Phase 6: кроене (Cutting Batch) + остатъци ──────────
+
+// Кроене: приспада реалния разход плат от склада ТРАНЗАКЦИОННО при потвърждаване.
+// Idempotent — потвърждава се веднъж (status guard), няма двойно приспадане.
+model FashionCuttingBatch {
+  id          String  @id @default(cuid())
+  companyId   String
+  code        String  // CUT-2026-000042
+  seqYear     Int
+  seqValue    Int
+  styleId     String
+  color       String?
+  materialId  String  // платът, който се крои
+  roll        String?
+  batch       String?
+  date        DateTime @default(now())
+  status      String  @default("draft") // draft | confirmed | cancelled
+  expectedFabric Float @default(0) // теоретичен разход (от BOM)
+  actualFabric   Float @default(0) // реален разход
+  waste          Float @default(0) // отпадък
+  note        String? @db.Text
+  createdById String?
+  confirmedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company  Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  style    FashionStyle         @relation(fields: [styleId], references: [id], onDelete: Restrict)
+  material FashionMaterial      @relation(fields: [materialId], references: [id], onDelete: Restrict)
+  lines    FashionCuttingLine[]
+  remnants FashionRemnant[]
+
+  @@unique([companyId, code])
+  @@index([companyId, status])
+}
+
+// Скроени бройки по размер.
+model FashionCuttingLine {
+  id       String @id @default(cuid())
+  batchId  String
+  size     String
+  quantity Int
+
+  batch FashionCuttingBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+
+  @@unique([batchId, size])
+  @@index([batchId])
+}
+
+// Използваем остатък от плат (§13). Може по-късно да се ползва за мостри/детайли.
+model FashionRemnant {
+  id         String  @id @default(cuid())
+  companyId  String
+  batchId    String?
+  materialId String
+  colorName  String?
+  widthCm    Float?
+  lengthCm   Float?
+  quantity   Float   @default(1) // брой парчета
+  status     String  @default("available") // available | reserved | used | waste
+  note       String? @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  company  Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  batch    FashionCuttingBatch? @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  material FashionMaterial      @relation(fields: [materialId], references: [id], onDelete: Restrict)
+
+  @@index([companyId, status])
+  @@index([materialId, status])
 }
