@@ -116,5 +116,63 @@
     "MARKETING": "Маркетинг",
     "STOCK_ADJUSTMENT": "Корекция",
     "RETURN": "Връщане"
+  },
+  "styles": {
+    "add": "Нов модел",
+    "search": "Търсене…",
+    "allStatuses": "Всички статуси",
+    "empty": "Няма модели.",
+    "code": "Код",
+    "name": "Име",
+    "collection": "Колекция",
+    "category": "Категория",
+    "season": "Сезон",
+    "year": "Година",
+    "colors": "Цветове",
+    "sizes": "Размери",
+    "patterns": "Кройки",
+    "status": "Статус",
+    "skuPrefix": "SKU префикс",
+    "description": "Описание",
+    "errRequired": "Въведете код и име.",
+    "statusChanged": "Статусът е обновен.",
+    "photos": "Снимки",
+    "addPhoto": "Добави снимка",
+    "noPhotos": "Няма снимки.",
+    "main": "Основна",
+    "photoTooLarge": "Файлът е твърде голям."
+  },
+  "patterns": {
+    "versions": "Версии на кройката",
+    "none": "Няма кройка.",
+    "version": "Версия",
+    "size": "Размер",
+    "paper": "Хартиена",
+    "digital": "Дигитална",
+    "marker": "Маркер",
+    "file": "Файл",
+    "author": "Автор",
+    "download": "Изтегли",
+    "approve": "Одобри",
+    "archive": "Архивирай",
+    "newVersion": "Нова версия",
+    "addVersion": "Добави версия",
+    "overviewIntro": "Готовност на кройките по модел (последна версия)."
+  },
+  "status": {
+    "idea": "Идея",
+    "development": "Разработка",
+    "first_sample": "Първа мостра",
+    "fit_sample": "Fit мостра",
+    "approved": "Одобрен",
+    "ready_for_production": "Готов за производство",
+    "in_production": "В производство",
+    "active": "Активен",
+    "archived": "Архивиран"
+  },
+  "patternStatus": {
+    "draft": "Чернова",
+    "approved": "Одобрена",
+    "archived": "Архивирана"
   }
 }

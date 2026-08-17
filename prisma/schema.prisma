@@ -220,6 +220,8 @@ model Company {
   fashionCategories    FashionMaterialCategory[]
   fashionDeliveries    FashionMaterialDelivery[]
   fashionMovements     FashionInventoryMovement[]
+  fashionStyles        FashionStyle[]
+  fashionPatterns      FashionPattern[]
 
   // Уникалност на чуждестранна фирма по държава + рег. номер (nulls distinct →
   // съществуващите BG записи без countryCode/registrationNumber не са засегнати).
@@ -2481,4 +2483,79 @@ model FashionInventoryMovement {
 
   @@index([companyId, materialId, createdAt])
   @@index([companyId, type])
+}
+
+// ─── Fashion Production · Phase 3: модели (Style Master) + кройки (versioned) ─
+
+// Модел дреха с пълно производствено досие (§5). Кодът е ръчен и уникален per company.
+model FashionStyle {
+  id          String  @id @default(cuid())
+  companyId   String
+  code        String  // напр. EX-SPO-DR-001
+  name        String
+  collection  String?
+  category    String?
+  season      String?
+  year        Int?
+  description String? @db.Text
+  status      String  @default("idea") // виж STYLE_STATUSES
+  photoUrl    String? @db.Text          // основна снимка (dataUrl)
+  skuPrefix   String?                   // за SKU логиката на вариантите (EX-SD)
+  colors      String[]                  // налични цветове
+  sizes       String[]                  // налични размери
+  approvedAt  DateTime?
+  note        String? @db.Text
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company  Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  photos   FashionStylePhoto[]
+  patterns FashionPattern[]
+
+  @@unique([companyId, code])
+  @@index([companyId, status])
+}
+
+// Снимки на модел (продукт / върху модел / други). Много на брой.
+model FashionStylePhoto {
+  id        String  @id @default(cuid())
+  styleId   String
+  url       String  @db.Text // dataUrl
+  kind      String  @default("product") // product | on_model | other
+  caption   String?
+  sortOrder Int     @default(0)
+  createdAt DateTime @default(now())
+
+  style FashionStyle @relation(fields: [styleId], references: [id], onDelete: Cascade)
+
+  @@index([styleId])
+}
+
+// Кройка с версияция (§6). Всяка версия е нов запис — старите НЕ се презаписват.
+model FashionPattern {
+  id         String  @id @default(cuid())
+  companyId  String
+  styleId    String
+  version    Int
+  size       String?
+  hasPaper   Boolean @default(false)
+  hasDigital Boolean @default(false)
+  hasMarker  Boolean @default(false) // готов план/маркер за кроене
+  fileUrl    String? @db.Text        // прикачен файл (dataUrl)
+  fileName   String?
+  mimeType   String?
+  photoUrl   String? @db.Text
+  status     String  @default("draft") // draft | approved | archived
+  author     String?
+  note       String? @db.Text
+  createdById String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  company Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  style   FashionStyle @relation(fields: [styleId], references: [id], onDelete: Cascade)
+
+  @@unique([styleId, version])
+  @@index([companyId, styleId])
 }

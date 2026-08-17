@@ -6,7 +6,7 @@ import type { FashionCaps } from "@/lib/fashion/perms";
 
 // Началната страница (hub) на модула. Разделите се разгръщат в следващите фази —
 // засега води само към готовите (Табло/Настройки), останалите са „предстои".
-const READY = new Set(["dashboard", "settings"]);
+const READY = new Set(["dashboard", "settings", "materials", "deliveries", "styles", "patterns"]);
 
 export function FashionHub({ caps }: { caps: FashionCaps }) {
   const t = useT();
