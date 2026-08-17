@@ -223,6 +223,9 @@ model Company {
   fashionStyles        FashionStyle[]
   fashionPatterns      FashionPattern[]
   fashionBomItems      FashionBomItem[]
+  fashionOperations    FashionOperation[]
+  fashionOpCategories  FashionOperationCategory[]
+  fashionMachines      FashionMachine[]
 
   // Уникалност на чуждестранна фирма по държава + рег. номер (nulls distinct →
   // съществуващите BG записи без countryCode/registrationNumber не са засегнати).
@@ -2515,6 +2518,7 @@ model FashionStyle {
   photos   FashionStylePhoto[]
   patterns FashionPattern[]
   bomItems FashionBomItem[]
+  operations FashionOperation[]
 
   @@unique([companyId, code])
   @@index([companyId, status])
@@ -2599,4 +2603,70 @@ model FashionBomOverride {
 
   @@unique([bomItemId, size, color])
   @@index([bomItemId])
+}
+
+// ─── Fashion Production · Phase 5: технологични операции + производствено време ─
+
+// Категории операции (§9) — редактируеми/разширяеми per company (seed defaults).
+model FashionOperationCategory {
+  id        String  @id @default(cuid())
+  companyId String
+  code      String?
+  name      String
+  sortOrder Int     @default(0)
+  active    Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company    Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  operations FashionOperation[]
+
+  @@unique([companyId, name])
+  @@index([companyId, active])
+}
+
+// Машини (по желание) — за връзка към операция.
+model FashionMachine {
+  id        String  @id @default(cuid())
+  companyId String
+  name      String
+  type      String?
+  note      String?
+  active    Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company    Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  operations FashionOperation[]
+
+  @@index([companyId, active])
+}
+
+// Технологична операция за модел (§9). Подредба по seq. Времето храни себестойност/капацитет.
+model FashionOperation {
+  id           String  @id @default(cuid())
+  companyId    String
+  styleId      String
+  seq          Int     @default(0)
+  name         String
+  description  String? @db.Text
+  categoryId   String?
+  machineId    String?
+  machineLabel String? // свободен текст, ако няма въведени машини
+  expectedMinutes Float @default(0) // стандартно време (мин.)
+  workstation  String?
+  instructions String? @db.Text
+  photoUrl     String? @db.Text
+  fileUrl      String? @db.Text
+  note         String? @db.Text
+  createdById  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  company  Company                    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  style    FashionStyle               @relation(fields: [styleId], references: [id], onDelete: Cascade)
+  category FashionOperationCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  machine  FashionMachine?            @relation(fields: [machineId], references: [id], onDelete: SetNull)
+
+  @@index([companyId, styleId])
 }

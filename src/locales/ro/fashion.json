@@ -196,5 +196,26 @@
     "errLine": "Select material and quantity.",
     "pickVariant": "Select a size and/or color above.",
     "overridePrompt": "Quantity for {size} / {color}:"
+  },
+  "ops": {
+    "overviewIntro": "Operation cards and production time per style.",
+    "total": "Total time",
+    "min": "min",
+    "h": "h",
+    "empty": "No operations.",
+    "name": "Operation",
+    "category": "Type",
+    "machine": "Machine",
+    "minutes": "Minutes",
+    "workstation": "Workstation",
+    "add": "Add",
+    "byCategory": "Time by type",
+    "byMachine": "Time by machine",
+    "count": "Operations",
+    "machines": "Machines",
+    "noMachines": "No machines yet.",
+    "machineName": "Machine name",
+    "machineType": "Type",
+    "addMachine": "Add machine"
   }
 }
