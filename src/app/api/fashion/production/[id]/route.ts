@@ -11,7 +11,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const { id } = await params;
   const o = await prisma.fashionProductionOrder.findFirst({
     where: { id, companyId: g.companyId },
-    include: { style: { select: { code: true, name: true } }, batch: { select: { code: true } }, lines: { orderBy: { size: "asc" } } },
+    include: { style: { select: { code: true, name: true, colors: true } }, batch: { select: { code: true } }, lines: { orderBy: { size: "asc" } } },
   });
   if (!o) return NextResponse.json({ error: "Не е намерена." }, { status: 404 });
   return NextResponse.json({ ...o, cut: productionCut(o.lines), nextStatuses: nextStatuses(o.status) });

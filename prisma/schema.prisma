@@ -233,6 +233,8 @@ model Company {
   fashionDefects       FashionDefect[]
   fashionDefectCategories FashionDefectCategory[]
   fashionSamples       FashionSample[]
+  fashionFinishedGoods FashionFinishedGood[]
+  fashionFgMovements   FashionFinishedGoodMovement[]
 
   // Уникалност на чуждестранна фирма по държава + рег. номер (nulls distinct →
   // съществуващите BG записи без countryCode/registrationNumber не са засегнати).
@@ -2531,6 +2533,7 @@ model FashionStyle {
   cuttingBatches FashionCuttingBatch[]
   productionOrders FashionProductionOrder[]
   samples FashionSample[]
+  finishedGoods FashionFinishedGood[]
 
   @@unique([companyId, code])
   @@index([companyId, status])
@@ -2777,6 +2780,7 @@ model FashionProductionOrder {
   qtyDefective   Int     @default(0)
   qtyRepair      Int     @default(0)
   qtyReady       Int     @default(0)
+  qtyReceived    Int     @default(0) // прехвърлени в готова продукция
   note           String? @db.Text
   createdById    String?
   createdAt      DateTime @default(now())
@@ -2887,4 +2891,58 @@ model FashionSample {
   style    FashionStyle    @relation(fields: [styleId], references: [id], onDelete: Restrict)
 
   @@index([companyId, styleId])
+}
+
+// ─── Fashion Production · Phase 9: готова продукция (Finished Goods) ──────────
+
+// Наличност на готова продукция на ниво Style + Color + Size (§17). Броевете се
+// управляват през ledger движения; available е текущата наличност за продажба.
+model FashionFinishedGood {
+  id         String  @id @default(cuid())
+  companyId  String
+  styleId    String
+  color      String  @default("")
+  size       String  @default("")
+  sku        String
+  available  Int     @default(0)
+  produced   Int     @default(0)
+  sold       Int     @default(0)
+  reserved   Int     @default(0)
+  gifted     Int     @default(0)
+  marketing  Int     @default(0)
+  scrapped   Int     @default(0)
+  returned   Int     @default(0)
+  unitCost   Float   @default(0) // среднопретеглена себестойност/бр.
+  retailPrice Float?             // препоръчана продажна цена (Phase 10)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  company   Company                       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  style     FashionStyle                  @relation(fields: [styleId], references: [id], onDelete: Restrict)
+  movements FashionFinishedGoodMovement[]
+
+  @@unique([companyId, styleId, color, size])
+  @@index([companyId, styleId])
+}
+
+// Ledger на движенията на готовата продукция.
+model FashionFinishedGoodMovement {
+  id             String  @id @default(cuid())
+  companyId      String
+  finishedGoodId String
+  type           String  // виж FG_MOVEMENT_TYPES
+  direction      String  // in | out
+  quantity       Int
+  unitCost       Float?
+  sourceType     String?
+  sourceId       String?
+  date           DateTime @default(now())
+  userId         String?
+  note           String? @db.Text
+  createdAt      DateTime @default(now())
+
+  company      Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  finishedGood FashionFinishedGood @relation(fields: [finishedGoodId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, finishedGoodId, createdAt])
 }

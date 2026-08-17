@@ -5,15 +5,16 @@ import { useT } from "@/components/i18n/I18nProvider";
 import { FASHION_BASE_PATH } from "@/lib/fashion/config";
 import { ProductionStatusBadge } from "@/components/app/fashion/ProductionStatusBadge";
 import { ProductionQcPanel } from "@/components/app/fashion/ProductionQcPanel";
+import { ProductionReceivePanel } from "@/components/app/fashion/ProductionReceivePanel";
 
 type Line = { id: string; size: string; cutQuantity: number };
 type Order = {
   id: string; code: string; status: string; color: string | null; productionBatch: string | null; date: string;
-  qtyGood: number; qtyDefective: number; qtyRepair: number; qtyReady: number; cut: number; nextStatuses: string[];
-  style: { code: string; name: string }; batch: { code: string } | null; lines: Line[];
+  qtyGood: number; qtyDefective: number; qtyRepair: number; qtyReady: number; qtyReceived: number; cut: number; nextStatuses: string[];
+  style: { code: string; name: string; colors: string[] }; batch: { code: string } | null; lines: Line[];
 };
 
-export function ProductionDetail({ id, canManage, canManageQc }: { id: string; canManage: boolean; canManageQc: boolean }) {
+export function ProductionDetail({ id, canManage, canManageQc, canManageFg }: { id: string; canManage: boolean; canManageQc: boolean; canManageFg: boolean }) {
   const t = useT();
   const [o, setO] = useState<Order | null>(null);
   const [busy, setBusy] = useState(false);
@@ -98,6 +99,12 @@ export function ProductionDetail({ id, canManage, canManageQc }: { id: string; c
       </div>
 
       <ProductionQcPanel orderId={id} canManage={canManageQc} onChange={load} />
+
+      {canManageFg && o.qtyReady > 0 && (
+        <div style={{ marginTop: 14 }}>
+          <ProductionReceivePanel orderId={id} lines={o.lines} color={o.color} colors={o.style.colors ?? []} remaining={Math.max(0, o.qtyReady - o.qtyReceived)} onChange={load} />
+        </div>
+      )}
     </div>
   );
 }
