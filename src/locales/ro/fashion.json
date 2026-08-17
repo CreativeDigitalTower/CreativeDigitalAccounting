@@ -174,5 +174,27 @@
     "draft": "Draft",
     "approved": "Approved",
     "archived": "Archived"
+  },
+  "bom": {
+    "overviewIntro": "Material cost per unit by style (base quantity × weighted-average cost).",
+    "lines": "Lines",
+    "materialCost": "Material cost/unit",
+    "edit": "Edit",
+    "variant": "Variant",
+    "baseSize": "Base size",
+    "anyColor": "Any color",
+    "empty": "No recipe.",
+    "material": "Material",
+    "baseQty": "Base qty",
+    "resolvedQty": "Resolved qty",
+    "unitCost": "Unit cost",
+    "lineCost": "Cost",
+    "overrides": "Overrides",
+    "override": "Override",
+    "addLine": "Add line",
+    "add": "Add",
+    "errLine": "Select material and quantity.",
+    "pickVariant": "Select a size and/or color above.",
+    "overridePrompt": "Quantity for {size} / {color}:"
   }
 }
