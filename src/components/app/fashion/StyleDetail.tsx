@@ -70,6 +70,7 @@ export function StyleDetail({ id, canManageStyles, canManagePatterns }: { id: st
         <span style={{ fontSize: 14 }}>{s.name}</span>
         <StatusBadge status={s.status} />
         <Link href={`${FASHION_BASE_PATH}/styles/${id}/bom`} className="btn btn-ghost btn-sm" style={{ fontSize: 11 }}>{t("fashion.nav.bom")}</Link>
+        <Link href={`${FASHION_BASE_PATH}/styles/${id}/operations`} className="btn btn-ghost btn-sm" style={{ fontSize: 11 }}>{t("fashion.nav.operations")}</Link>
         {canManageStyles && (
           <select style={{ marginLeft: "auto", padding: "5px 8px", fontSize: 12.5 }} value={s.status} disabled={busy}
             onChange={(e) => patch({ status: e.target.value }, t("fashion.styles.statusChanged"))}>
