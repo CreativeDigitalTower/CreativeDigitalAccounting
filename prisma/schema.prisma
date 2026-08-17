@@ -229,6 +229,10 @@ model Company {
   fashionCuttingBatches FashionCuttingBatch[]
   fashionRemnants      FashionRemnant[]
   fashionProductionOrders FashionProductionOrder[]
+  fashionQcRecords     FashionQcRecord[]
+  fashionDefects       FashionDefect[]
+  fashionDefectCategories FashionDefectCategory[]
+  fashionSamples       FashionSample[]
 
   // Уникалност на чуждестранна фирма по държава + рег. номер (nulls distinct →
   // съществуващите BG записи без countryCode/registrationNumber не са засегнати).
@@ -2526,6 +2530,7 @@ model FashionStyle {
   operations FashionOperation[]
   cuttingBatches FashionCuttingBatch[]
   productionOrders FashionProductionOrder[]
+  samples FashionSample[]
 
   @@unique([companyId, code])
   @@index([companyId, status])
@@ -2781,6 +2786,8 @@ model FashionProductionOrder {
   style   FashionStyle                @relation(fields: [styleId], references: [id], onDelete: Restrict)
   batch   FashionCuttingBatch?        @relation(fields: [cuttingBatchId], references: [id], onDelete: SetNull)
   lines   FashionProductionOrderLine[]
+  qcRecords FashionQcRecord[]
+  defects   FashionDefect[]
 
   @@unique([companyId, code])
   @@index([companyId, status])
@@ -2797,4 +2804,87 @@ model FashionProductionOrderLine {
 
   @@unique([orderId, size])
   @@index([orderId])
+}
+
+// ─── Fashion Production · Phase 8: контрол на качеството + дефекти + мостри ────
+
+// Типове дефекти (§15) — редактируеми per company (seed defaults).
+model FashionDefectCategory {
+  id        String  @id @default(cuid())
+  companyId String
+  code      String?
+  name      String
+  sortOrder Int     @default(0)
+  active    Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, name])
+  @@index([companyId, active])
+}
+
+// QC минаване: колко бройки са преминали годни. Броевете на поръчката се преизчисляват
+// от източника (QC минавания + дефекти) → idempotent.
+model FashionQcRecord {
+  id               String  @id @default(cuid())
+  companyId        String
+  productionOrderId String
+  goodQty          Int     @default(0)
+  date             DateTime @default(now())
+  note             String? @db.Text
+  createdById      String?
+  createdAt        DateTime @default(now())
+
+  company Company                @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  order   FashionProductionOrder @relation(fields: [productionOrderId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, productionOrderId])
+}
+
+// Дефектна бройка + решение (disposition). „repaired" → готова; „scrap" → извън продажба.
+model FashionDefect {
+  id               String  @id @default(cuid())
+  companyId        String
+  productionOrderId String
+  quantity         Int
+  size             String?
+  color            String?
+  defectType       String  // снимка на името на категорията
+  description      String? @db.Text
+  photoUrl         String? @db.Text
+  disposition      String  @default("repair") // виж DEFECT_DISPOSITIONS
+  date             DateTime @default(now())
+  createdById      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  company Company                @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  order   FashionProductionOrder @relation(fields: [productionOrderId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, productionOrderId])
+}
+
+// Мостра (§16). Ползва реални материали (намалява наличността чрез SAMPLE_CONSUMPTION),
+// но НЕ влиза в готовата продукция за продажба.
+model FashionSample {
+  id           String  @id @default(cuid())
+  companyId    String
+  styleId      String
+  type         String  // виж SAMPLE_TYPES
+  color        String?
+  size         String?
+  quantity     Int     @default(1)
+  materialId   String? // ако е зададен материал → приспада се от склада
+  materialQty  Float?
+  date         DateTime @default(now())
+  note         String? @db.Text
+  createdById  String?
+  createdAt    DateTime @default(now())
+
+  company  Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  style    FashionStyle    @relation(fields: [styleId], references: [id], onDelete: Restrict)
+
+  @@index([companyId, styleId])
 }

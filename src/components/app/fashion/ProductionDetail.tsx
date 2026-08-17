@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useT } from "@/components/i18n/I18nProvider";
 import { FASHION_BASE_PATH } from "@/lib/fashion/config";
 import { ProductionStatusBadge } from "@/components/app/fashion/ProductionStatusBadge";
+import { ProductionQcPanel } from "@/components/app/fashion/ProductionQcPanel";
 
 type Line = { id: string; size: string; cutQuantity: number };
 type Order = {
@@ -12,7 +13,7 @@ type Order = {
   style: { code: string; name: string }; batch: { code: string } | null; lines: Line[];
 };
 
-export function ProductionDetail({ id, canManage }: { id: string; canManage: boolean }) {
+export function ProductionDetail({ id, canManage, canManageQc }: { id: string; canManage: boolean; canManageQc: boolean }) {
   const t = useT();
   const [o, setO] = useState<Order | null>(null);
   const [busy, setBusy] = useState(false);
@@ -95,6 +96,8 @@ export function ProductionDetail({ id, canManage }: { id: string; canManage: boo
           <p style={{ fontSize: 10.5, color: "var(--muted)", marginTop: 10 }}>{t("fashion.prod.countsHint")}</p>
         </div>
       </div>
+
+      <ProductionQcPanel orderId={id} canManage={canManageQc} onChange={load} />
     </div>
   );
 }
