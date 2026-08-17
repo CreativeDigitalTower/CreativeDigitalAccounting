@@ -228,6 +228,7 @@ model Company {
   fashionMachines      FashionMachine[]
   fashionCuttingBatches FashionCuttingBatch[]
   fashionRemnants      FashionRemnant[]
+  fashionProductionOrders FashionProductionOrder[]
 
   // Уникалност на чуждестранна фирма по държава + рег. номер (nulls distinct →
   // съществуващите BG записи без countryCode/registrationNumber не са засегнати).
@@ -2524,6 +2525,7 @@ model FashionStyle {
   bomItems FashionBomItem[]
   operations FashionOperation[]
   cuttingBatches FashionCuttingBatch[]
+  productionOrders FashionProductionOrder[]
 
   @@unique([companyId, code])
   @@index([companyId, status])
@@ -2707,6 +2709,7 @@ model FashionCuttingBatch {
   material FashionMaterial      @relation(fields: [materialId], references: [id], onDelete: Restrict)
   lines    FashionCuttingLine[]
   remnants FashionRemnant[]
+  productionOrders FashionProductionOrder[]
 
   @@unique([companyId, code])
   @@index([companyId, status])
@@ -2746,4 +2749,52 @@ model FashionRemnant {
 
   @@index([companyId, status])
   @@index([materialId, status])
+}
+
+// ─── Fashion Production · Phase 7: производствени поръчки + workflow ──────────
+
+// Производствена поръчка (§14). Свързва се с кроене; статусът върви по workflow
+// CUT→SEWING→FINISHING→QC→READY (+ ON_HOLD/REWORK/CANCELLED). Броевете good/defective/
+// repair/ready се управляват от следващите фази (QC/готова продукция).
+model FashionProductionOrder {
+  id             String  @id @default(cuid())
+  companyId      String
+  code           String  // PRD-2026-000026
+  seqYear        Int
+  seqValue       Int
+  styleId        String
+  color          String?
+  cuttingBatchId String?
+  productionBatch String?
+  date           DateTime @default(now())
+  status         String  @default("cut") // виж PRODUCTION_STATUSES
+  qtyGood        Int     @default(0)
+  qtyDefective   Int     @default(0)
+  qtyRepair      Int     @default(0)
+  qtyReady       Int     @default(0)
+  note           String? @db.Text
+  createdById    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  company Company                     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  style   FashionStyle                @relation(fields: [styleId], references: [id], onDelete: Restrict)
+  batch   FashionCuttingBatch?        @relation(fields: [cuttingBatchId], references: [id], onDelete: SetNull)
+  lines   FashionProductionOrderLine[]
+
+  @@unique([companyId, code])
+  @@index([companyId, status])
+}
+
+// Скроени бройки по размер в поръчката.
+model FashionProductionOrderLine {
+  id          String @id @default(cuid())
+  orderId     String
+  size        String
+  cutQuantity Int
+
+  order FashionProductionOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, size])
+  @@index([orderId])
 }
