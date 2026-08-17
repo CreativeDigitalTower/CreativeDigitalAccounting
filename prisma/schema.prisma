@@ -222,6 +222,7 @@ model Company {
   fashionMovements     FashionInventoryMovement[]
   fashionStyles        FashionStyle[]
   fashionPatterns      FashionPattern[]
+  fashionBomItems      FashionBomItem[]
 
   // Уникалност на чуждестранна фирма по държава + рег. номер (nulls distinct →
   // съществуващите BG записи без countryCode/registrationNumber не са засегнати).
@@ -2407,6 +2408,7 @@ model FashionMaterial {
   category  FashionMaterialCategory?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   movements FashionInventoryMovement[]
   deliveryLines FashionDeliveryLine[]
+  bomItems      FashionBomItem[]
 
   @@unique([companyId, sku])
   @@index([companyId, categoryId])
@@ -2512,6 +2514,7 @@ model FashionStyle {
   company  Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
   photos   FashionStylePhoto[]
   patterns FashionPattern[]
+  bomItems FashionBomItem[]
 
   @@unique([companyId, code])
   @@index([companyId, status])
@@ -2558,4 +2561,42 @@ model FashionPattern {
 
   @@unique([styleId, version])
   @@index([companyId, styleId])
+}
+
+// ─── Fashion Production · Phase 4: BOM (рецепта) + overrides по размер/цвят ───
+
+// Базов ред от рецептата на модел: материал + количество за 1 бройка (§7).
+model FashionBomItem {
+  id         String  @id @default(cuid())
+  companyId  String
+  styleId    String
+  materialId String
+  quantity   Float   // базово количество за 1 бройка
+  unit       String
+  note       String?
+  sortOrder  Int     @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  company   Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  style     FashionStyle         @relation(fields: [styleId], references: [id], onDelete: Cascade)
+  material  FashionMaterial      @relation(fields: [materialId], references: [id], onDelete: Restrict)
+  overrides FashionBomOverride[]
+
+  @@index([companyId, styleId])
+  @@index([materialId])
+}
+
+// Override на количеството по размер/цвят/вариант (§8). Липсва override → базовото.
+model FashionBomOverride {
+  id        String  @id @default(cuid())
+  bomItemId String
+  size      String  @default("")
+  color     String  @default("")
+  quantity  Float
+
+  bomItem FashionBomItem @relation(fields: [bomItemId], references: [id], onDelete: Cascade)
+
+  @@unique([bomItemId, size, color])
+  @@index([bomItemId])
 }

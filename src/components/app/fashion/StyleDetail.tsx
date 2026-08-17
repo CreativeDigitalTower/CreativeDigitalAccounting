@@ -69,6 +69,7 @@ export function StyleDetail({ id, canManageStyles, canManagePatterns }: { id: st
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }} className="num">{s.code}</h1>
         <span style={{ fontSize: 14 }}>{s.name}</span>
         <StatusBadge status={s.status} />
+        <Link href={`${FASHION_BASE_PATH}/styles/${id}/bom`} className="btn btn-ghost btn-sm" style={{ fontSize: 11 }}>{t("fashion.nav.bom")}</Link>
         {canManageStyles && (
           <select style={{ marginLeft: "auto", padding: "5px 8px", fontSize: 12.5 }} value={s.status} disabled={busy}
             onChange={(e) => patch({ status: e.target.value }, t("fashion.styles.statusChanged"))}>
