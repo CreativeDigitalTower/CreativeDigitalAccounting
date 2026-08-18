@@ -458,5 +458,30 @@
     "minStock": "Min stock",
     "suggested": "Suggested",
     "days": "days"
+  },
+  "serial": {
+    "title": "Serial numbers (LIMITED)",
+    "notEnabled": "This style is not serialized. Enable it to issue individual serial numbers.",
+    "editionSize": "Edition size",
+    "enable": "Enable serialization",
+    "disable": "Disable",
+    "edition": "Edition",
+    "issued": "Issued",
+    "remaining": "Remaining",
+    "saveEdition": "Save edition",
+    "generate": "Generate numbers",
+    "count": "Count",
+    "color": "Color",
+    "size": "Size",
+    "batch": "Batch",
+    "generateBtn": "Generate",
+    "generated": "Generated {n} numbers.",
+    "noUnits": "No numbers issued.",
+    "st_available": "Available",
+    "st_reserved": "Reserved",
+    "st_sold": "Sold",
+    "st_gift": "Gift",
+    "st_marketing": "Marketing",
+    "st_defective": "Defective"
   }
 }
