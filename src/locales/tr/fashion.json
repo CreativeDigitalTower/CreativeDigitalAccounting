@@ -420,5 +420,32 @@
     "confirmFinalize": "Finalizing will reduce finished-goods stock and lock the report. Continue?",
     "confirmUnlock": "Unlocking will reverse the stock movements. Continue?",
     "lockedHint": "Report is finalized and locked. Unlock it to make corrections."
+  },
+  "dash": {
+    "materialsValue": "Materials value",
+    "lowStock": "below min",
+    "inProduction": "In production",
+    "forQc": "For QC",
+    "defectRate": "Defect rate",
+    "readyForSale": "Ready for sale",
+    "monthRevenue": "Revenue (month)",
+    "topSelling": "Top selling",
+    "slowMoving": "Slow moving"
+  },
+  "an": {
+    "from": "From",
+    "to": "To",
+    "allCollections": "All collections",
+    "sellThrough": "Sell-through",
+    "defectRate": "Defect rate",
+    "waste": "Material waste",
+    "revenue": "Revenue",
+    "salesByStyle": "Sales by style",
+    "noData": "No data for the period.",
+    "bestSellers": "Best sellers",
+    "slowMovers": "Slow movers",
+    "marginByStyle": "Margin by style",
+    "salesBySize": "Sales by size",
+    "salesByColor": "Sales by color"
   }
 }
