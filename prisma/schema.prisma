@@ -236,6 +236,7 @@ model Company {
   fashionFinishedGoods FashionFinishedGood[]
   fashionStyleCostings FashionStyleCosting[]
   fashionSalesReports  FashionSalesReport[]
+  fashionSerialUnits   FashionSerializedUnit[]
   fashionFgMovements   FashionFinishedGoodMovement[]
 
   // Уникалност на чуждестранна фирма по държава + рег. номер (nulls distinct →
@@ -2519,6 +2520,8 @@ model FashionStyle {
   status      String  @default("idea") // виж STYLE_STATUSES
   photoUrl    String? @db.Text          // основна снимка (dataUrl)
   skuPrefix   String?                   // за SKU логиката на вариантите (EX-SD)
+  serialized  Boolean @default(false) // LIMITED / сериализиран модел (§27)
+  editionSize Int?                       // размер на тиража (напр. 100)
   colors      String[]                  // налични цветове
   sizes       String[]                  // налични размери
   approvedAt  DateTime?
@@ -2536,6 +2539,7 @@ model FashionStyle {
   productionOrders FashionProductionOrder[]
   samples FashionSample[]
   finishedGoods FashionFinishedGood[]
+  serialUnits FashionSerializedUnit[]
   costing FashionStyleCosting?
 
   @@unique([companyId, code])
@@ -3024,4 +3028,29 @@ model FashionSalesLine {
   finishedGood FashionFinishedGood @relation(fields: [finishedGoodId], references: [id], onDelete: Restrict)
 
   @@index([reportId])
+}
+
+// ─── Fashion Production · Phase 14: опционална сериализация (LIMITED) ──────────
+
+// Индивидуален сериен номер за LIMITED модел (§27). Само моделите с serialized=true.
+model FashionSerializedUnit {
+  id              String  @id @default(cuid())
+  companyId       String
+  styleId         String
+  serial          Int
+  color           String?
+  size            String?
+  productionBatch String?
+  status          String  @default("available") // виж SERIAL_STATUSES
+  note            String? @db.Text
+  soldAt          DateTime?
+  createdById     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  company Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  style   FashionStyle @relation(fields: [styleId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, styleId, serial])
+  @@index([companyId, styleId])
 }

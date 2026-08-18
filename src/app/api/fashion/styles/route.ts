@@ -37,6 +37,8 @@ const schema = z.object({
   description: z.string().max(4000).nullable().optional(),
   status: z.enum(STYLE_STATUSES).optional(),
   skuPrefix: z.string().max(40).nullable().optional(),
+  serialized: z.boolean().optional(),
+  editionSize: z.number().int().min(0).nullable().optional(),
   colors: z.string().nullable().optional(), // свободен списък → масив
   sizes: z.string().nullable().optional(),
   photoUrl: z.string().nullable().optional(),
@@ -53,7 +55,7 @@ export async function POST(req: Request) {
         companyId: g.companyId, code: d.code.trim(), name: d.name.trim(),
         collection: d.collection ?? null, category: d.category ?? null, season: d.season ?? null,
         year: d.year ?? null, description: d.description ?? null, status: d.status ?? "idea",
-        skuPrefix: d.skuPrefix?.trim() || null, colors: parseList(d.colors), sizes: parseList(d.sizes),
+        skuPrefix: d.skuPrefix?.trim() || null, colors: parseList(d.colors), sizes: parseList(d.sizes), serialized: d.serialized ?? false, editionSize: d.editionSize ?? null,
         photoUrl: d.photoUrl ?? null, note: d.note ?? null, createdById: g.userId,
       },
     });

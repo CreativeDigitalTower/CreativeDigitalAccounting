@@ -30,6 +30,8 @@ const schema = z.object({
   description: z.string().max(4000).nullable().optional(),
   status: z.enum(STYLE_STATUSES).optional(),
   skuPrefix: z.string().max(40).nullable().optional(),
+  serialized: z.boolean().optional(),
+  editionSize: z.number().int().min(0).nullable().optional(),
   colors: z.string().nullable().optional(),
   sizes: z.string().nullable().optional(),
   photoUrl: z.string().nullable().optional(),
