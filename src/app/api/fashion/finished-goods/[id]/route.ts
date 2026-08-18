@@ -43,3 +43,22 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
   }
 }
+
+// Задава минимална наличност (за препоръки за производство).
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const g = await fashionApiGuard("manage_finished_goods");
+  if (!g.ok) return g.res;
+  try {
+    const { id } = await params;
+    const fg = await prisma.fashionFinishedGood.findFirst({ where: { id, companyId: g.companyId }, select: { id: true } });
+    if (!fg) return NextResponse.json({ error: "Не е намерена." }, { status: 404 });
+    const body = await req.json();
+    const minStock = Number(body?.minStock);
+    if (!Number.isInteger(minStock) || minStock < 0) return NextResponse.json({ error: "Невалидна стойност." }, { status: 400 });
+    await prisma.fashionFinishedGood.update({ where: { id }, data: { minStock } });
+    await audit(g.companyId, g.userId, "update", "FashionFinishedGood", id, `Мин. наличност: ${minStock}`);
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
+  }
+}

@@ -2915,6 +2915,7 @@ model FashionFinishedGood {
   marketing  Int     @default(0)
   scrapped   Int     @default(0)
   returned   Int     @default(0)
+  minStock   Int     @default(0) // минимална наличност (за препоръки)
   unitCost   Float   @default(0) // среднопретеглена себестойност/бр.
   retailPrice Float?             // препоръчана продажна цена (Phase 10)
   createdAt  DateTime @default(now())

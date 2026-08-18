@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useT } from "@/components/i18n/I18nProvider";
 import { FASHION_BASE_PATH } from "@/lib/fashion/config";
+import { ForecastPanel } from "@/components/app/fashion/ForecastPanel";
 
 type Rank = { key: string; value: number };
 type StyleRow = { code: string; units: number; revenue: number; grossProfit: number; grossMarginPct: number };
@@ -12,7 +13,7 @@ type Data = {
   marginByStyle: Rank[]; bestSellers: Rank[]; slowMovers: Rank[];
 };
 
-export function AnalyticsClient({ collections }: { collections: string[] }) {
+export function AnalyticsClient({ collections, canManageFg }: { collections: string[]; canManageFg: boolean }) {
   const t = useT();
   const [d, setD] = useState<Data | null>(null);
   const [from, setFrom] = useState("");
@@ -87,6 +88,8 @@ export function AnalyticsClient({ collections }: { collections: string[] }) {
             <RankList title={t("fashion.an.salesBySize")} items={d.salesBySize} />
             <RankList title={t("fashion.an.salesByColor")} items={d.salesByColor} />
           </div>
+
+          <ForecastPanel canManage={canManageFg} />
         </>
       )}
     </div>

@@ -8,5 +8,5 @@ export default async function Page() {
   if (!caps.view_analytics) redirect("/dashboard/fashion");
   const styles = await prisma.fashionStyle.findMany({ where: { companyId }, select: { collection: true } });
   const collections = [...new Set(styles.map((s) => s.collection).filter(Boolean) as string[])].sort();
-  return <AnalyticsClient collections={collections} />;
+  return <AnalyticsClient collections={collections} canManageFg={caps.manage_finished_goods} />;
 }
