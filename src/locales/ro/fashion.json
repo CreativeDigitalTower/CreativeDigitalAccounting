@@ -447,5 +447,16 @@
     "marginByStyle": "Margin by style",
     "salesBySize": "Sales by size",
     "salesByColor": "Sales by color"
+  },
+  "fc": {
+    "title": "Stock cover / Suggested production",
+    "window": "Window (mo.)",
+    "target": "Target cover (mo.)",
+    "hint": "Average monthly sales are computed from finalized reports in the window. The suggestion is a simple formula (no AI).",
+    "avgMonthly": "Avg/mo.",
+    "coverDays": "Cover",
+    "minStock": "Min stock",
+    "suggested": "Suggested",
+    "days": "days"
   }
 }
