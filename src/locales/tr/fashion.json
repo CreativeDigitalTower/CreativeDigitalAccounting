@@ -394,5 +394,31 @@
     "marginHint": "Profit · Margin% / Markup% vs selling price.",
     "save": "Save",
     "saved": "Saved."
+  },
+  "sales": {
+    "add": "New report",
+    "empty": "No reports.",
+    "period": "Period",
+    "units": "Units",
+    "revenue": "Revenue",
+    "cogs": "COGS",
+    "grossProfit": "Gross profit",
+    "margin": "Margin",
+    "st_draft": "Draft",
+    "st_finalized": "Finalized",
+    "errLine": "Select SKU, quantity and price.",
+    "qty": "Qty",
+    "price": "Price",
+    "discount": "Discount",
+    "lineRevenue": "Revenue",
+    "addLine": "Add line",
+    "noLines": "No lines.",
+    "finalize": "Finalize report",
+    "unlock": "Unlock",
+    "finalized": "Report finalized; stock reduced.",
+    "insufficient": "Insufficient stock.",
+    "confirmFinalize": "Finalizing will reduce finished-goods stock and lock the report. Continue?",
+    "confirmUnlock": "Unlocking will reverse the stock movements. Continue?",
+    "lockedHint": "Report is finalized and locked. Unlock it to make corrections."
   }
 }
