@@ -367,5 +367,32 @@
     "receiveBtn": "Прехвърли",
     "errReceive": "Въведете бройки.",
     "received": "Прехвърлени {n} бройки."
+  },
+  "cost": {
+    "overviewIntro": "Себестойност, цени и марж по модел.",
+    "manufacturing": "Производствена себест.",
+    "fullyLoaded": "Пълна себестойност",
+    "retail": "Retail цена",
+    "selling": "Продажна цена",
+    "margin": "Марж",
+    "breakdown": "Разбивка/бр.",
+    "directMaterials": "Директни материали",
+    "packaging": "Опаковка",
+    "labor": "Труд",
+    "overhead": "Overhead",
+    "commercial": "Търговски алокации",
+    "prices": "Цени и алокации",
+    "allocations": "Алокации (fully loaded)",
+    "allocMarketing": "Маркетинг",
+    "allocFees": "Такси плащане",
+    "allocFulfillment": "Fulfillment",
+    "allocReturns": "Връщания (резерв)",
+    "allocLogistics": "Логистика",
+    "allocOther": "Друго",
+    "marginMfg": "Марж (производствена)",
+    "marginLoaded": "Марж (пълна)",
+    "marginHint": "Печалба · Margin% / Markup% спрямо продажната цена.",
+    "save": "Запази",
+    "saved": "Записано."
   }
 }

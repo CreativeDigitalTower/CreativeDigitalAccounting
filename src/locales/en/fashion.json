@@ -367,5 +367,32 @@
     "receiveBtn": "Receive",
     "errReceive": "Enter quantities.",
     "received": "Received {n} units."
+  },
+  "cost": {
+    "overviewIntro": "Cost, prices and margin by style.",
+    "manufacturing": "Manufacturing cost",
+    "fullyLoaded": "Fully loaded cost",
+    "retail": "Retail price",
+    "selling": "Selling price",
+    "margin": "Margin",
+    "breakdown": "Breakdown/unit",
+    "directMaterials": "Direct materials",
+    "packaging": "Packaging",
+    "labor": "Labor",
+    "overhead": "Overhead",
+    "commercial": "Commercial allocations",
+    "prices": "Prices & allocations",
+    "allocations": "Allocations (fully loaded)",
+    "allocMarketing": "Marketing",
+    "allocFees": "Payment fees",
+    "allocFulfillment": "Fulfillment",
+    "allocReturns": "Returns allowance",
+    "allocLogistics": "Logistics",
+    "allocOther": "Other",
+    "marginMfg": "Margin (manufacturing)",
+    "marginLoaded": "Margin (fully loaded)",
+    "marginHint": "Profit · Margin% / Markup% vs selling price.",
+    "save": "Save",
+    "saved": "Saved."
   }
 }

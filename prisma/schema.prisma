@@ -234,6 +234,7 @@ model Company {
   fashionDefectCategories FashionDefectCategory[]
   fashionSamples       FashionSample[]
   fashionFinishedGoods FashionFinishedGood[]
+  fashionStyleCostings FashionStyleCosting[]
   fashionFgMovements   FashionFinishedGoodMovement[]
 
   // Уникалност на чуждестранна фирма по държава + рег. номер (nulls distinct →
@@ -2534,6 +2535,7 @@ model FashionStyle {
   productionOrders FashionProductionOrder[]
   samples FashionSample[]
   finishedGoods FashionFinishedGood[]
+  costing FashionStyleCosting?
 
   @@unique([companyId, code])
   @@index([companyId, status])
@@ -2945,4 +2947,29 @@ model FashionFinishedGoodMovement {
   finishedGood FashionFinishedGood @relation(fields: [finishedGoodId], references: [id], onDelete: Cascade)
 
   @@index([companyId, finishedGoodId, createdAt])
+}
+
+// ─── Fashion Production · Phase 10: себестойност + цени + марж ─────────────────
+
+// Ценова/себестойностна конфигурация на модел (по желание): препоръчана retail цена,
+// реална продажна цена и търговски алокации за fully-loaded cost (§21, §22).
+model FashionStyleCosting {
+  id                 String  @id @default(cuid())
+  companyId          String
+  styleId            String  @unique
+  retailPrice        Float?  // препоръчана/стандартна retail цена
+  sellingPrice       Float?  // реална продажна цена
+  marketingAlloc     Float   @default(0)
+  paymentFees        Float   @default(0)
+  fulfillment        Float   @default(0)
+  returnsAllowance   Float   @default(0)
+  logistics          Float   @default(0)
+  otherAlloc         Float   @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  company Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  style   FashionStyle @relation(fields: [styleId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
 }
