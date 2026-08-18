@@ -235,6 +235,7 @@ model Company {
   fashionSamples       FashionSample[]
   fashionFinishedGoods FashionFinishedGood[]
   fashionStyleCostings FashionStyleCosting[]
+  fashionSalesReports  FashionSalesReport[]
   fashionFgMovements   FashionFinishedGoodMovement[]
 
   // Уникалност на чуждестранна фирма по държава + рег. номер (nulls distinct →
@@ -2922,6 +2923,7 @@ model FashionFinishedGood {
   company   Company                       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   style     FashionStyle                  @relation(fields: [styleId], references: [id], onDelete: Restrict)
   movements FashionFinishedGoodMovement[]
+  salesLines FashionSalesLine[]
 
   @@unique([companyId, styleId, color, size])
   @@index([companyId, styleId])
@@ -2972,4 +2974,53 @@ model FashionStyleCosting {
   style   FashionStyle @relation(fields: [styleId], references: [id], onDelete: Cascade)
 
   @@index([companyId])
+}
+
+// ─── Fashion Production · Phase 11: месечни отчети за продажби ─────────────────
+
+// Ръчен месечен отчет за продажби (§18). При приключване (finalized) намалява готовата
+// наличност, изчислява приход/COGS/печалба и се ЗАКЛЮЧВА. Отключване → връща движенията.
+model FashionSalesReport {
+  id            String  @id @default(cuid())
+  companyId     String
+  period        String  // YYYY-MM
+  status        String  @default("draft") // draft | finalized
+  currency      String  @default("EUR")
+  revenue       Float   @default(0)
+  cogs          Float   @default(0)
+  grossProfit   Float   @default(0)
+  units         Int     @default(0)
+  note          String? @db.Text
+  createdById   String?
+  finalizedAt   DateTime?
+  finalizedById String?
+  unlockedAt    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  company Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  lines   FashionSalesLine[]
+
+  @@unique([companyId, period])
+  @@index([companyId, status])
+}
+
+// Ред от отчета: SKU (готова продукция) + количество/цена/отстъпка. При приключване се
+// снапшотват себестойност/приход/COGS за историческа коректност.
+model FashionSalesLine {
+  id             String  @id @default(cuid())
+  reportId       String
+  finishedGoodId String
+  quantity       Int
+  price          Float
+  discount       Float   @default(0)
+  unitCostSnapshot Float @default(0)
+  revenue        Float   @default(0)
+  cogs           Float   @default(0)
+  note           String?
+
+  report       FashionSalesReport  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  finishedGood FashionFinishedGood @relation(fields: [finishedGoodId], references: [id], onDelete: Restrict)
+
+  @@index([reportId])
 }
