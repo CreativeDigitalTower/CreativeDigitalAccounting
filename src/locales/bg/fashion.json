@@ -420,5 +420,32 @@
     "confirmFinalize": "Приключване ще намали готовата наличност и заключи отчета. Продължавате ли?",
     "confirmUnlock": "Отключването ще върне складовите движения. Продължавате ли?",
     "lockedHint": "Отчетът е приключен и заключен. Отключете го за корекция."
+  },
+  "dash": {
+    "materialsValue": "Стойност суровини",
+    "lowStock": "под минимум",
+    "inProduction": "В производство",
+    "forQc": "За QC",
+    "defectRate": "Defect rate",
+    "readyForSale": "Готови за продажба",
+    "monthRevenue": "Оборот (месец)",
+    "topSelling": "Най-продавани",
+    "slowMoving": "Залежаващи"
+  },
+  "an": {
+    "from": "От",
+    "to": "До",
+    "allCollections": "Всички колекции",
+    "sellThrough": "Sell-through",
+    "defectRate": "Defect rate",
+    "waste": "Material waste",
+    "revenue": "Оборот",
+    "salesByStyle": "Продажби по модел",
+    "noData": "Няма данни за периода.",
+    "bestSellers": "Best sellers",
+    "slowMovers": "Slow movers",
+    "marginByStyle": "Марж по модел",
+    "salesBySize": "Продажби по размер",
+    "salesByColor": "Продажби по цвят"
   }
 }
