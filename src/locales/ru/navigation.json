@@ -75,5 +75,6 @@
   "logisticsClients": "Клиенты (лог.)",
   "logisticsAnalytics": "Аналитика",
   "logisticsExport": "Экспорт",
-  "logisticsExportReceived": "Полученные экспортные документы"
+  "logisticsExportReceived": "Полученные экспортные документы",
+  "featureRequest": "Индивидуальное решение"
 }

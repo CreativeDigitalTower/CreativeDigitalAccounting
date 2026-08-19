@@ -75,5 +75,6 @@
   "logisticsClients": "Πελάτες",
   "logisticsAnalytics": "Αναλύσεις",
   "logisticsExport": "Εξαγωγές",
-  "logisticsExportReceived": "Ληφθέντα έγγραφα εξαγωγής"
+  "logisticsExportReceived": "Ληφθέντα έγγραφα εξαγωγής",
+  "featureRequest": "Προσαρμοσμένη λύση"
 }

@@ -19,6 +19,8 @@ import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 import { reminderStatus, PRIORITY_META } from "@/lib/reminderColor";
 import { computeBusinessOverview } from "@/lib/bi/overview";
 import { BusinessOverviewSection } from "@/components/bi/BusinessOverviewSection";
+import { FeatureRequestCta } from "@/components/app/FeatureRequestCta";
+import { sectorHintKey } from "@/lib/featureRequest/config";
 
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ period?: string; from?: string; to?: string }> }) {
   const { companyId, userId } = await requireCompany();
@@ -277,6 +279,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
       {/* ═══ Business Intelligence — обзор на бизнеса ═══ */}
       <BusinessOverviewSection data={biOverview} />
+
+      <FeatureRequestCta sectorHint={sectorHintKey(profile?.businessSector)} />
 
       {/* Topbar + избор на период */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, marginBottom: 16, flexWrap: "wrap" }}>

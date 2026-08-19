@@ -238,5 +238,33 @@
     "button": "Fikrinizi bize gönderin",
     "mailtoSubject": "Yeni özellik fikri",
     "partnership": "Bizim için „çok özel“ bir talep yoktur. Bir özellik işinizin daha verimli çalışmasına yardımcı olacaksa, fikrinizi gönderin – en yüksek öncelikle değerlendireceğiz."
+  },
+  "featureRequest": {
+    "conf": {
+      "subject": "We received your idea for Creative Digital Accounting",
+      "eyebrow": "Custom request",
+      "title": "Thank you for your idea!",
+      "intro1": "Hello,",
+      "intro2": "We received your request: “{title}”",
+      "intro3": "Our team will review it and contact you if we need more information.",
+      "intro4": "Approved custom features that fit the platform and your business are developed at no extra charge.",
+      "button": "View my suggestions",
+      "footnote": "Thank you for helping us grow Creative Digital Accounting."
+    },
+    "reply": {
+      "subject": "Regarding your request: {title}",
+      "eyebrow": "Reply from the team",
+      "title": "Regarding your request",
+      "button": "View my suggestions",
+      "footnote": "Best regards, The Creative Digital Accounting team"
+    },
+    "delivered": {
+      "subject": "Your request has been delivered",
+      "eyebrow": "Done",
+      "title": "Your request is delivered",
+      "intro1": "Your request “{title}” is now delivered and available in the platform.",
+      "intro2": "Thank you for helping us grow Creative Digital Accounting.",
+      "button": "Open"
+    }
   }
 }

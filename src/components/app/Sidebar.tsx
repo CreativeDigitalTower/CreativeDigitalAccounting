@@ -74,6 +74,7 @@ const navGroups: { title: string; titleKey: string; items: { href: string; label
       { href: "/dashboard/companies", label: "Моите фирми", icon: "clients", feature: "dashboard", tKey: "navigation.myCompanies" },
       { href: "/dashboard/settings", label: "Профил на фирмата", icon: "settings", feature: "dashboard", tKey: "navigation.settings" },
       { href: "/dashboard/subscription", label: "Абонамент", icon: "subscription", feature: "dashboard", tKey: "navigation.subscription" },
+      { href: "/dashboard/feature-request", label: "Индивидуално решение", icon: "document", feature: "dashboard", tKey: "navigation.featureRequest" },
     ],
   },
 ];

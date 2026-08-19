@@ -648,5 +648,19 @@
     "finalText": "Зарегистрируйтесь как бухгалтерская фирма, пригласите клиентов и управляйте всеми компаниями из одного места.",
     "finalStart": "Начните как бухгалтер",
     "finalContact": "Связаться с нами"
+  },
+  "adapt": {
+    "eyebrow": "Adaptability",
+    "title": "Software that adapts to your business",
+    "subtitle": "Not every business works the same way. That's why Creative Digital Accounting is not a closed system.",
+    "text": "If you need a specific module, document, template, report, automation or other feature, send us your idea. We continuously develop the platform together with our clients and, when approved, can build the solution at no extra charge.",
+    "m1": "Custom modules",
+    "m2": "Specific documents and templates",
+    "m3": "Automations",
+    "m4": "Personalized reports",
+    "m5": "Integrations",
+    "m6": "No fee for approved development",
+    "ctaGuest": "Sign up and send an idea",
+    "ctaLoggedIn": "Request a custom solution"
   }
 }

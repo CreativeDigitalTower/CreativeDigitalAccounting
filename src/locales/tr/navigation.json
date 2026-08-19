@@ -75,5 +75,6 @@
   "logisticsClients": "Müşteriler",
   "logisticsAnalytics": "Analizler",
   "logisticsExport": "İhracat",
-  "logisticsExportReceived": "Alınan ihracat belgeleri"
+  "logisticsExportReceived": "Alınan ihracat belgeleri",
+  "featureRequest": "Özel çözüm"
 }
