@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Pricing } from "@/components/marketing/Pricing";
 import { getT, getLocale } from "@/lib/i18n/server";
+import { auth } from "@/lib/auth";
 import { getMessages } from "@/lib/i18n/messages";
 import {
   IconInvoice, IconWarehouse, IconExpense, IconChart, IconUsers, IconFactory,
@@ -22,6 +23,8 @@ type StatBar = { num: string; unit: string; label: string };
 
 export default async function HomePage() {
   const { t } = await getT();
+  const session = await auth();
+  const loggedIn = !!session?.user?.id;
   const H = getMessages(await getLocale()).marketing.home as unknown as {
     features: Copy[]; newFeatures: Copy[]; highlights: Copy[]; steps: Copy[]; stats: Stat[]; statsBar: StatBar[];
   };
@@ -208,6 +211,22 @@ export default async function HomePage() {
               <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginTop: 4 }}>{s.label}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Адаптивност — заяви индивидуален безплатен модул (§14) */}
+      <section style={{ maxWidth: 980, margin: "0 auto", padding: "20px 32px 8px" }}>
+        <div className="glass" style={{ borderRadius: 18, padding: "34px 36px", borderLeft: "4px solid var(--brass)", background: "linear-gradient(120deg, var(--brass-soft), transparent)" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 700, color: "var(--brass)", marginBottom: 10 }}>✦ {t("marketing.adapt.eyebrow")}</div>
+          <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 28, fontWeight: 700, margin: "0 0 8px" }}>{t("marketing.adapt.title")}</h2>
+          <p style={{ fontSize: 15, color: "var(--ink-soft)", margin: "0 0 6px", fontWeight: 600 }}>{t("marketing.adapt.subtitle")}</p>
+          <p style={{ fontSize: 14, color: "var(--ink-soft)", margin: "0 0 16px", lineHeight: 1.6, maxWidth: 720 }}>{t("marketing.adapt.text")}</p>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
+            {["m1", "m2", "m3", "m4", "m5", "m6"].map((k) => (
+              <span key={k} style={{ fontSize: 12.5, background: "rgba(255,255,255,.5)", border: "1px solid var(--border)", borderRadius: 20, padding: "5px 12px", fontWeight: 600 }}>{t(`marketing.adapt.${k}`)}</span>
+            ))}
+          </div>
+          <Link href={loggedIn ? "/dashboard/feature-request" : "/register"} className="btn btn-primary" style={{ fontSize: 15, padding: "12px 26px" }}>{loggedIn ? t("marketing.adapt.ctaLoggedIn") : t("marketing.adapt.ctaGuest")}</Link>
         </div>
       </section>
 

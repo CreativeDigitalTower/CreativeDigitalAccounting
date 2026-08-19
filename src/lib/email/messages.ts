@@ -555,3 +555,76 @@ export function buildReactivationHtml(o: { subject: string; paragraphs: string[]
     footnote: "{{UNSUB}}",
   });
 }
+
+// ─────────────────────── Индивидуални заявки (feature request) ───────────────────────
+
+/** Confirmation към клиента след подаване на заявка (§12). */
+export function featureRequestConfirmationEmail(requestTitle: string, locale: Locale = "bg"): Msg {
+  const { loc, E } = emT(locale);
+  return {
+    category: "system",
+    subject: E("featureRequest.conf.subject"),
+    html: baseTemplate({
+      locale: loc,
+      eyebrow: E("featureRequest.conf.eyebrow"),
+      title: E("featureRequest.conf.title"),
+      intro: [E("featureRequest.conf.intro1"), E("featureRequest.conf.intro2", { title: requestTitle }), E("featureRequest.conf.intro3"), E("featureRequest.conf.intro4")],
+      button: { label: E("featureRequest.conf.button"), url: `${APP_URL}/dashboard/feature-request` },
+      footnote: E("featureRequest.conf.footnote"),
+    }),
+  };
+}
+
+/** Отговор от екипа към клиента (редактируем текст) (§11). */
+export function featureRequestReplyEmail(requestTitle: string, bodyText: string, locale: Locale = "bg"): Msg {
+  const { loc, E } = emT(locale);
+  return {
+    category: "system",
+    subject: E("featureRequest.reply.subject", { title: requestTitle }),
+    html: baseTemplate({
+      locale: loc,
+      eyebrow: E("featureRequest.reply.eyebrow"),
+      title: E("featureRequest.reply.title"),
+      intro: bodyText.split(/\n{2,}/).map((s) => s.trim()).filter(Boolean),
+      button: { label: E("featureRequest.reply.button"), url: `${APP_URL}/dashboard/feature-request` },
+      footnote: E("featureRequest.reply.footnote"),
+    }),
+  };
+}
+
+/** Известие към клиента при „Реализирана" (§20). */
+export function featureRequestDeliveredEmail(requestTitle: string, locale: Locale = "bg"): Msg {
+  const { loc, E } = emT(locale);
+  return {
+    category: "system",
+    subject: E("featureRequest.delivered.subject"),
+    html: baseTemplate({
+      locale: loc,
+      eyebrow: E("featureRequest.delivered.eyebrow"),
+      title: E("featureRequest.delivered.title"),
+      intro: [E("featureRequest.delivered.intro1", { title: requestTitle }), E("featureRequest.delivered.intro2")],
+      button: { label: E("featureRequest.delivered.button"), url: `${APP_URL}/dashboard/feature-request` },
+    }),
+  };
+}
+
+/** Админ известие (office@) за нова заявка — винаги на bg (§6, §20). */
+export function adminFeatureRequestEmail(d: { company: string; eik?: string | null; type: string; title: string; contactEmail: string; plan?: string | null }): Msg {
+  return {
+    category: "admin",
+    subject: `Нова индивидуална заявка: ${d.company}`,
+    html: baseTemplate({
+      eyebrow: "Notification Center",
+      title: "Нова индивидуална заявка",
+      intro: [`Клиент изпрати заявка за персонализация: „${d.title}"`],
+      details: [
+        { label: "Фирма", value: d.company },
+        { label: "ЕИК", value: d.eik || "—" },
+        { label: "Вид", value: d.type },
+        { label: "Контакт", value: d.contactEmail },
+        { label: "План", value: planName(d.plan) },
+      ],
+      button: { label: "Виж заявките", url: `${APP_URL}/dashboard/admin/feature-requests` },
+    }),
+  };
+}

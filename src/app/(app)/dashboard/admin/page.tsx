@@ -8,6 +8,7 @@ import { computeFirmPartnerStats } from "@/lib/partner";
 import { AdminFirmsPanel } from "@/components/app/AdminFirmsPanel";
 import { buildPlatformOverview } from "@/lib/bi/platform";
 import { PlatformOverview } from "@/components/bi/PlatformOverview";
+import { AdminFeatureRequestKpi } from "@/components/app/AdminFeatureRequestKpi";
 import { NavIcon, UiIcon } from "@/components/app/NavIcons";
 import { getT } from "@/lib/i18n/server";
 import { getMessages } from "@/lib/i18n/messages";
@@ -507,6 +508,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
       {/* ═══ Обзор на платформата (BI Executive Overview) ═══ */}
       <PlatformOverview data={platformOverview} />
+
+      <AdminFeatureRequestKpi />
 
       {/* ─── Счетоводни къщи · Партньорска програма ─── */}
       <div id="firms">

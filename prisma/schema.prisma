@@ -202,6 +202,7 @@ model Company {
   companyGroupId    String?
   companyGroup      CompanyGroup? @relation(fields: [companyGroupId], references: [id], onDelete: SetNull)
   moduleAccess      CompanyModuleAccess[]
+  featureRequests   FeatureRequest[]
   numberSequences   NumberSequence[]
   logisticsProducts LogisticsProduct[]
   carriers          Carrier[]
@@ -3053,4 +3054,67 @@ model FashionSerializedUnit {
 
   @@unique([companyId, styleId, serial])
   @@index([companyId, styleId])
+}
+
+// ─── „Заяви индивидуален безплатен модул" (feature/custom request) ────────────
+// Клиент заявява индивидуален модул/функция/документ/справка/автоматизация и т.н.
+// Заявяването е безплатно; одобрените разработки — без допълнително заплащане.
+model FeatureRequest {
+  id             String   @id @default(cuid())
+  companyId      String
+  userId         String?
+  scope          String   @default("company") // company | firm
+  type           String   // module | feature | document | report | automation | integration | improvement | other
+  title          String
+  description    String   @db.Text
+  benefit        String?  @db.Text
+  contactEmail   String
+  contactPhone   String?
+  status         String   @default("new")
+  priority       String?
+  assignedTo     String?
+  dueDate        DateTime?
+  rating         Int?
+  planSnapshot   String?
+  modulesSnapshot String? @db.Text
+  locale         String   @default("bg")
+  lastActivityAt DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  company     Company                    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  attachments FeatureRequestAttachment[]
+  notes       FeatureRequestNote[]
+
+  @@index([companyId, status])
+  @@index([status, createdAt])
+}
+
+// Прикачен файл към заявка (base64 dataUrl — общият механизъм в платформата).
+model FeatureRequestAttachment {
+  id        String @id @default(cuid())
+  requestId String
+  fileName  String
+  mimeType  String
+  size      Int
+  dataUrl   String @db.Text
+  createdAt DateTime @default(now())
+
+  request FeatureRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+}
+
+// Вътрешна бележка / комуникация по заявка (не се вижда от клиента, освен client_email).
+model FeatureRequestNote {
+  id        String @id @default(cuid())
+  requestId String
+  authorId  String?
+  kind      String @default("note") // note | technical | estimate | status | client_email
+  body      String @db.Text
+  createdAt DateTime @default(now())
+
+  request FeatureRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
 }

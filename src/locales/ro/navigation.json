@@ -75,5 +75,6 @@
   "logisticsClients": "Clienți (log.)",
   "logisticsAnalytics": "Analize",
   "logisticsExport": "Export",
-  "logisticsExportReceived": "Documente de export primite"
+  "logisticsExportReceived": "Documente de export primite",
+  "featureRequest": "Soluție personalizată"
 }
