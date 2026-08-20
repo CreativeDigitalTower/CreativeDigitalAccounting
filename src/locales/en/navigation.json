@@ -76,5 +76,6 @@
   "logisticsAnalytics": "Analytics (log.)",
   "logisticsExport": "Export deliveries",
   "logisticsExportReceived": "Received export documents",
-  "featureRequest": "Custom solution"
+  "featureRequest": "Custom solution",
+  "logisticsFleet": "Fleet"
 }

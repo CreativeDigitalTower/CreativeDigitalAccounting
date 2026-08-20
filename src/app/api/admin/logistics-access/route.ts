@@ -4,6 +4,7 @@ import { requireSuperAdmin } from "@/lib/session";
 import { audit } from "@/lib/documents";
 import { LOGISTICS_MODULE_KEY, LOGISTICS_SETUP_EIK } from "@/lib/logistics/config";
 import { seedLogisticsMasterData } from "@/lib/logistics/seed";
+import { importCementFleet } from "@/lib/logistics/cementFleet";
 import { z } from "zod";
 
 // Super Admin активиране на модула (корекции 1, 2, 19). ЕИК се ползва САМО за
@@ -16,6 +17,7 @@ const schema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("attachGroup"), companyId: z.string(), groupId: z.string().nullable() }),
   z.object({ action: z.literal("setupClient"), eik: z.string().optional() }),
   z.object({ action: z.literal("seedMasterData"), companyId: z.string() }),
+  z.object({ action: z.literal("importCementFleet"), companyId: z.string() }),
 ]);
 
 export async function GET() {
@@ -88,6 +90,15 @@ export async function POST(req: Request) {
       await audit(body.companyId, userId, "seed_master_data", "Company", body.companyId,
         `Master data: ${res.vehicles} автомобила, ${res.products} продукта`);
       return NextResponse.json({ success: true, seeded: res });
+    }
+
+    if (body.action === "importCementFleet") {
+      const company = await prisma.company.findUnique({ where: { id: body.companyId }, select: { id: true } });
+      if (!company) return NextResponse.json({ error: "Фирмата не е намерена." }, { status: 404 });
+      const res = await importCementFleet(body.companyId);
+      await audit(body.companyId, userId, "import_fleet", "Company", body.companyId,
+        `Автопарк (цимент): ${res.carriers} превозвача, ${res.trucks} влекача, ${res.configurations} конфигурации`);
+      return NextResponse.json({ success: true, imported: res });
     }
 
     // setupClient: еднократна безопасна начална настройка за клиента по ЕИК.

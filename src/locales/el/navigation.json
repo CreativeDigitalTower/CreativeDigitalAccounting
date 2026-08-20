@@ -76,5 +76,6 @@
   "logisticsAnalytics": "Αναλύσεις",
   "logisticsExport": "Εξαγωγές",
   "logisticsExportReceived": "Ληφθέντα έγγραφα εξαγωγής",
-  "featureRequest": "Προσαρμοσμένη λύση"
+  "featureRequest": "Προσαρμοσμένη λύση",
+  "logisticsFleet": "Στόλος"
 }

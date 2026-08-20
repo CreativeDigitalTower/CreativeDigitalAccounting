@@ -528,5 +528,28 @@
     "receivedIntro": "Livrări de export emise către compania dvs. de un vânzător asociat din grup (doar vizualizare și tipărire).",
     "receivedEmpty": "Niciun document de export primit.",
     "seller": "Vânzător"
+  },
+  "fleet": {
+    "title": "Fleet",
+    "back": "Logistics",
+    "configs": "configurations",
+    "search": "Search by plate / driver…",
+    "allCarriers": "All carriers",
+    "allCargo": "Any cargo type",
+    "bulk": "Bulk cement",
+    "bags": "Bagged cement",
+    "driver": "Driver",
+    "allActive": "Active and inactive",
+    "activeOnly": "Active only",
+    "inactiveOnly": "Inactive only",
+    "empty": "No configurations.",
+    "truck": "Truck",
+    "trailer": "Trailer",
+    "carrier": "Carrier",
+    "driverCol": "Driver",
+    "cargo": "Cargo type",
+    "maxLoad": "Max load",
+    "readOnly": "Read-only.",
+    "capacityWarn": "Quantity exceeds the max load of the selected vehicle ({max} t)."
   }
 }
