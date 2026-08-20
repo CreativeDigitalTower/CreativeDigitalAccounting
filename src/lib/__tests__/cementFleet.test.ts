@@ -99,3 +99,35 @@ describe("cement fleet dataset (§8–§25)", () => {
     expect(withCombo.length).toBeGreaterThanOrEqual(1);
   });
 });
+
+import { fleetGaps, fleetReviewSummary } from "@/lib/logistics/fleet";
+
+describe("import review — fleetGaps / fleetReviewSummary (§34)", () => {
+  it("flags every empty field", () => {
+    expect(fleetGaps({ driver: "", trailer: "", cargoMode: "", maxPayloadTons: null }).sort())
+      .toEqual(["cargo", "driver", "payload", "trailer"]);
+  });
+  it("a fully populated config has no gaps", () => {
+    expect(fleetGaps({ defaultDriver: "Иван", trailerReg: "SK7430BI", cargoMode: "bulk", maxPayloadTons: 26 })).toEqual([]);
+  });
+  it("accepts both driver/defaultDriver and trailer/trailerReg shapes", () => {
+    expect(fleetGaps({ defaultDriver: "Иван", trailerReg: "X", cargoMode: "bags", maxPayloadTons: 23.8 })).toEqual([]);
+    expect(fleetGaps({ driver: "Иван", trailer: "X", cargoMode: "bags", maxPayloadTons: 23.8 })).toEqual([]);
+  });
+  it("whitespace-only counts as missing", () => {
+    expect(fleetGaps({ driver: "   ", trailer: "X", cargoMode: "bulk", maxPayloadTons: 1 })).toEqual(["driver"]);
+  });
+  it("summary counts incomplete vs complete", () => {
+    const s = fleetReviewSummary([
+      { driver: "A", trailer: "T", cargoMode: "bulk", maxPayloadTons: 26 },
+      { driver: "", trailer: "T", cargoMode: "bulk", maxPayloadTons: 26 },
+      { driver: "B", trailer: "T", cargoMode: "", maxPayloadTons: null },
+    ]);
+    expect(s.total).toBe(3);
+    expect(s.complete).toBe(1);
+    expect(s.incomplete).toBe(2);
+    expect(s.missingDriver).toBe(1);
+    expect(s.missingCargo).toBe(1);
+    expect(s.missingPayload).toBe(1);
+  });
+});

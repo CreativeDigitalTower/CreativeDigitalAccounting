@@ -38,7 +38,8 @@ export function FleetClient({ carriers, canManage }: { carriers: Carrier[]; canM
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
         <Link href="/dashboard/logistics" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← {t("logistics.fleet.back")}</Link>
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{t("logistics.fleet.title")}</h1>
-        <span style={{ marginLeft: "auto", fontSize: 12.5, color: "var(--muted)" }}>{total} {t("logistics.fleet.configs")}</span>
+        <Link href="/dashboard/logistics/fleet/review" style={{ marginLeft: "auto", fontSize: 12.5, color: "var(--brick)", textDecoration: "none" }}>{t("logistics.fleet.review.link")} →</Link>
+        <span style={{ fontSize: 12.5, color: "var(--muted)" }}>{total} {t("logistics.fleet.configs")}</span>
       </div>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>

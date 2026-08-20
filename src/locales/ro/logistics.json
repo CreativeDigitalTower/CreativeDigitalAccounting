@@ -550,6 +550,28 @@
     "cargo": "Cargo type",
     "maxLoad": "Max load",
     "readOnly": "Read-only.",
-    "capacityWarn": "Quantity exceeds the max load of the selected vehicle ({max} t)."
+    "capacityWarn": "Quantity exceeds the max load of the selected vehicle ({max} t).",
+    "review": {
+      "title": "Import review",
+      "link": "Missing data",
+      "intro": "Configurations left with empty fields at import (§34). Complete them manually — nothing was auto-invented.",
+      "showAll": "Show all (not only incomplete)",
+      "allComplete": "All configurations are complete. 🎉",
+      "missing": "Missing",
+      "complete": "Complete",
+      "save": "Save",
+      "cancel": "Cancel",
+      "gap": {
+        "driver": "Driver",
+        "trailer": "Trailer",
+        "cargo": "Cargo type",
+        "payload": "Max load"
+      },
+      "stat": {
+        "total": "Total",
+        "complete": "Complete",
+        "incomplete": "Incomplete"
+      }
+    }
   }
 }
