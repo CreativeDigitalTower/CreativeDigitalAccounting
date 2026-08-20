@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useT } from "@/components/i18n/I18nProvider";
 import { SearchableSelect } from "@/components/app/logistics/SearchableSelect";
+import { exceedsPayload, bagsCalc, BAGS_DEFAULTS } from "@/lib/logistics/fleet";
 
 // Дефиниран на модулно ниво, за да НЕ се пресъздава при всеки render — иначе полетата
 // вътре remount-ват и губят focus / дата не може да се въвежда с клавиатура. (bug #1/#2)
@@ -30,10 +31,28 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients }: {
     truckVehicleId: "", trailerReg: "", logisticsProductId: "", quantity: "", declarationCmrDate: new Date().toISOString().slice(0, 10),
     dispatchNumber: "", buyerCompanyId: buyers[0]?.id ?? "", clientId: "",
   });
+  // Автофил от конфигурацията на превозвача (§27): последен шофьор, макс. товар, вид товар.
+  // Шофьорът НЕ се заключва — потребителят може да го смени. Товарът се валидира (§28).
+  const [cfg, setCfg] = useState<{ maxPayloadTons: number | null; cargoMode: string; driver: string | null } | null>(null);
 
-  function pickTruck(id: string) {
+  async function pickTruck(id: string) {
     const v = vehicles.find((x) => x.id === id);
     setF((s) => ({ ...s, truckVehicleId: id, trailerReg: v?.trailerReg ?? s.trailerReg }));
+    setCfg(null);
+    if (!v) return;
+    try {
+      const r = await fetch(`/api/logistics/vehicle-configs?truck=${encodeURIComponent(v.registration)}&active=1`);
+      const j = await r.json().catch(() => []);
+      const row = Array.isArray(j) ? j[0] : null;
+      if (!row) return;
+      setCfg({ maxPayloadTons: row.maxPayloadTons ?? null, cargoMode: row.cargoMode ?? "", driver: row.driver ?? null });
+      setF((s) => ({
+        ...s,
+        trailerReg: s.trailerReg || row.trailer || "",
+        // BAGS: подразбиращо се количество 23.8 t (17 палета × 56 торби × 25 kg), ако е празно.
+        quantity: s.quantity || (row.cargoMode === "bags" ? String(bagsCalc(BAGS_DEFAULTS.pallets).totalTons) : s.quantity),
+      }));
+    } catch { /* автофилът е best-effort — не блокира формата */ }
   }
   function pickRoute(id: string) {
     const r = routes.find((x) => x.id === id);
@@ -85,7 +104,14 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients }: {
         <F label={t("logistics.export.product")}>
           <SearchableSelect options={products.map((p) => ({ value: p.id, label: p.canonicalName }))} value={f.logisticsProductId} onChange={(v) => setF({ ...f, logisticsProductId: v })} allowEmpty={false} />
         </F>
-        <F label={t("logistics.export.quantity")}><input type="number" step="0.001" style={inp} value={f.quantity} onChange={(e) => setF({ ...f, quantity: e.target.value })} placeholder="26.04" /></F>
+        <F label={t("logistics.export.quantity")}>
+          <input type="number" step="0.001" style={inp} value={f.quantity} onChange={(e) => setF({ ...f, quantity: e.target.value })} placeholder="26.04" />
+          {cfg && cfg.cargoMode !== "bags" && exceedsPayload(Number(f.quantity), cfg.maxPayloadTons) && (
+            <div style={{ color: "var(--brick)", fontSize: 11.5, marginTop: 4 }}>
+              ⚠ {t("logistics.fleet.capacityWarn").replace("{max}", (cfg.maxPayloadTons ?? 0).toFixed(1))}
+            </div>
+          )}
+        </F>
         <F label={t("logistics.export.cmrDate")}><input type="date" style={inp} value={f.declarationCmrDate} onChange={(e) => setF({ ...f, declarationCmrDate: e.target.value })} /></F>
         <F label={`${t("logistics.export.dispatch")} ${t("logistics.export.dispatchAuto")}`}><input style={inp} value={f.dispatchNumber} onChange={(e) => setF({ ...f, dispatchNumber: e.target.value })} placeholder="9617" /></F>
         <F label={t("logistics.export.buyer")}>

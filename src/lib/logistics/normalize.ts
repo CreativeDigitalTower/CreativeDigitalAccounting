@@ -10,18 +10,6 @@
  * Нормализира регистрационен номер: главни букви, само букви и цифри (маха
  * интервали, тирета, точки и др.). „CB 0638 AT" / „cb-0638-at" → „CB0638AT".
  */
-export function normalizeRegistration(input: string | null | undefined): string {
-  return (input ?? "")
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, "");
-}
-
-/**
- * Нормализира продуктово име/alias за точно съпоставяне: главни букви, десетична
- * запетая → точка (42,5 → 42.5), маха интервали и „/" (форматиращи разлики).
- * ЗАПАЗВА буквите (вкл. тиретата чрез премахване, така A-LL→ALL, B-LL→BLL остават
- * различни) → НЕ смесва различни класове цимент.
- */
 // Кирилски букви-двойници → латински (клиентът пише „CEM II / А-LL" с кирилско А).
 // Безопасно за домейна (циментовите класове ползват латиница), позволява
 // „А-LL" (кирилско) да съвпадне с „A-LL" (латинско) — без да смесва B/V класове.
@@ -31,6 +19,20 @@ const CYRILLIC_LOOKALIKE: Record<string, string> = {
 function foldCyrillic(s: string): string {
   return s.replace(/[АВЕСОРНКМТХ]/g, (ch) => CYRILLIC_LOOKALIKE[ch] ?? ch);
 }
+
+export function normalizeRegistration(input: string | null | undefined): string {
+  // foldCyrillic ПРЕДИ стрипването: кирилски рег. номера (напр. „СВ0024СА") се
+  // свеждат до латиница („CB0024CA") → един и същ автомобил, без дубликати.
+  return foldCyrillic((input ?? "").toUpperCase())
+    .replace(/[^A-Z0-9]/g, "");
+}
+
+/**
+ * Нормализира продуктово име/alias за точно съпоставяне: главни букви, десетична
+ * запетая → точка (42,5 → 42.5), маха интервали и „/" (форматиращи разлики).
+ * ЗАПАЗВА буквите (вкл. тиретата чрез премахване, така A-LL→ALL, B-LL→BLL остават
+ * различни) → НЕ смесва различни класове цимент.
+ */
 
 export function normalizeProductKey(input: string | null | undefined): string {
   return foldCyrillic((input ?? "").toUpperCase())

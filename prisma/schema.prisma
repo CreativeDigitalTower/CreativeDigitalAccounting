@@ -212,6 +212,7 @@ model Company {
   logisticsProformas LogisticsProforma[]
   supplierInvoices  SupplierInvoice[]
   logisticsExchangeRates LogisticsExchangeRate[]
+  vehicleConfigs         VehicleConfiguration[]
   bgMkInvoicesIssued   BgMkInvoice[] @relation("BgMkIssuer")
   bgMkInvoicesReceived BgMkInvoice[] @relation("BgMkRecipient")
   mkInvoices           MkInvoice[]
@@ -751,6 +752,7 @@ model Vehicle {
   aliases          VehicleAlias[]
   logisticsDocuments VehicleDocument[]
   shipments        Shipment[]
+  configurations   VehicleConfiguration[]
 
   @@unique([companyId, normalizedRegistration])
   @@index([companyId])
@@ -872,6 +874,7 @@ model Carrier {
 
   company  Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   profiles VehicleLogisticsProfile[]
+  configurations VehicleConfiguration[]
 
   @@index([companyId, active])
 }
@@ -3117,4 +3120,35 @@ model FeatureRequestNote {
   request FeatureRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
 
   @@index([requestId])
+}
+
+// ─── Логистика: транспортна конфигурация (влекач + ремарке + вид товар) ───────
+// Реалната работна единица на автопарка: ЕДИН влекач (Vehicle) може да има няколко
+// конфигурации (различни ремаркета / вид товар). Шофьорът НЕ се заключва към камиона
+// (defaultDriver е само по подразбиране/последен) — реалният шофьор се snapshot-ва в
+// Shipment. Company-scoped; dedup по normalized рег. номера (§33, §35).
+model VehicleConfiguration {
+  id             String  @id @default(cuid())
+  companyId      String
+  vehicleId      String  // влекач (truck)
+  trailerReg     String? // ремарке (raw)
+  trailerRegNorm String  @default("") // нормализиран ремарке — за dedup
+  carrierId      String?
+  defaultDriver  String? // основен/последен шофьор (не permanent lock)
+  driverPhone    String?
+  cargoMode      String  @default("") // bulk | bags | "" (неопределено)
+  maxPayloadTons Float?  // максимален товар (t) — null, ако не е известен (§34)
+  active         Boolean @default(true)
+  source         String? // напр. „import:cement"
+  notes          String? @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  company Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  vehicle Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  carrier Carrier? @relation(fields: [carrierId], references: [id], onDelete: SetNull)
+
+  @@unique([companyId, vehicleId, trailerRegNorm, cargoMode, carrierId])
+  @@index([companyId, carrierId])
+  @@index([companyId, cargoMode])
 }

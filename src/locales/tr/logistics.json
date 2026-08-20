@@ -528,5 +528,28 @@
     "receivedIntro": "Gruptaki bağlı bir satıcı tarafından şirketinize düzenlenen ihracat teslimatları (yalnızca görüntüleme ve yazdırma).",
     "receivedEmpty": "Alınan ihracat belgesi yok.",
     "seller": "Satıcı"
+  },
+  "fleet": {
+    "title": "Fleet",
+    "back": "Logistics",
+    "configs": "configurations",
+    "search": "Search by plate / driver…",
+    "allCarriers": "All carriers",
+    "allCargo": "Any cargo type",
+    "bulk": "Bulk cement",
+    "bags": "Bagged cement",
+    "driver": "Driver",
+    "allActive": "Active and inactive",
+    "activeOnly": "Active only",
+    "inactiveOnly": "Inactive only",
+    "empty": "No configurations.",
+    "truck": "Truck",
+    "trailer": "Trailer",
+    "carrier": "Carrier",
+    "driverCol": "Driver",
+    "cargo": "Cargo type",
+    "maxLoad": "Max load",
+    "readOnly": "Read-only.",
+    "capacityWarn": "Quantity exceeds the max load of the selected vehicle ({max} t)."
   }
 }

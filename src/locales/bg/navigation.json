@@ -76,5 +76,6 @@
   "logisticsAnalytics": "Анализи (лог.)",
   "logisticsExport": "Експортни доставки",
   "logisticsExportReceived": "Получени експортни документи",
-  "featureRequest": "Индивидуално решение"
+  "featureRequest": "Индивидуално решение",
+  "logisticsFleet": "Автопарк"
 }

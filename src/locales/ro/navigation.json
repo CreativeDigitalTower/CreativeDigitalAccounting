@@ -76,5 +76,6 @@
   "logisticsAnalytics": "Analize",
   "logisticsExport": "Export",
   "logisticsExportReceived": "Documente de export primite",
-  "featureRequest": "Soluție personalizată"
+  "featureRequest": "Soluție personalizată",
+  "logisticsFleet": "Parc auto"
 }

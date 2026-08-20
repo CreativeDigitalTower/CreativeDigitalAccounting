@@ -76,5 +76,6 @@
   "logisticsAnalytics": "Аналитика",
   "logisticsExport": "Экспорт",
   "logisticsExportReceived": "Полученные экспортные документы",
-  "featureRequest": "Индивидуальное решение"
+  "featureRequest": "Индивидуальное решение",
+  "logisticsFleet": "Автопарк"
 }

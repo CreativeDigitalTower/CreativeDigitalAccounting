@@ -76,5 +76,6 @@
   "logisticsAnalytics": "Analizler",
   "logisticsExport": "İhracat",
   "logisticsExportReceived": "Alınan ihracat belgeleri",
-  "featureRequest": "Özel çözüm"
+  "featureRequest": "Özel çözüm",
+  "logisticsFleet": "Filo"
 }
