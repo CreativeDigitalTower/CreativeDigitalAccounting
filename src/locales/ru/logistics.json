@@ -573,5 +573,29 @@
         "incomplete": "Incomplete"
       }
     }
+  },
+  "reports": {
+    "title": "Reports (carrier/cargo)",
+    "intro": "Bulk/bagged volume and load per truck and carrier for the selected period. By invoice date.",
+    "from": "From",
+    "to": "To",
+    "allStatus": "All statuses",
+    "totalDeliveries": "Total dispatches",
+    "deliveriesShort": "disp.",
+    "deliveries": "Dispatches",
+    "totalTons": "Total (t)",
+    "avgTons": "Avg/trip",
+    "utilization": "Utilization",
+    "byCarrier": "By carrier",
+    "byTruck": "By truck",
+    "byProduct": "By product",
+    "unknownCargo": "Unspecified cargo",
+    "empty": "No data for the period.",
+    "status": {
+      "draft": "Draft",
+      "ready": "Ready",
+      "finalized": "Finalized",
+      "cancelled": "Cancelled"
+    }
   }
 }
