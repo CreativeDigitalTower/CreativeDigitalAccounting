@@ -598,6 +598,8 @@
       "ready": "Ready",
       "finalized": "Finalized",
       "cancelled": "Cancelled"
-    }
+    },
+    "exportCsv": "CSV dışa aktar",
+    "print": "Yazdır / PDF"
   }
 }
