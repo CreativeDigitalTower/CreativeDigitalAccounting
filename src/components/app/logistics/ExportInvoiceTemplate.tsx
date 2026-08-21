@@ -15,8 +15,10 @@ export type InvoiceDocData = {
 };
 
 const d = (s?: string | null) => s ? new Date(s).toLocaleDateString("bg-BG") : "";
-const n2 = (v?: number | null) => v == null ? "" : v.toFixed(2);
-const n3 = (v?: number | null) => v == null ? "" : v.toFixed(3);
+const n2 = (v?: number | null) => v == null ? "" : v.toFixed(2); // парична стойност — по текущото правило (§4)
+// Количество — винаги 3 знака, BG десетичен разделител (само визуализация).
+const nf3 = new Intl.NumberFormat("bg-BG", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+const n3 = (v?: number | null) => v == null ? "" : nf3.format(v);
 const lineValue = (g: Goods) => goodsRowValue(g);
 
 function idText(p?: Party) { if (!p) return ""; const id = companyIdentifier(p); return id ? `${id.kind === "eik" ? "ЕИК" : "Reg.No"} ${id.value}` : ""; }

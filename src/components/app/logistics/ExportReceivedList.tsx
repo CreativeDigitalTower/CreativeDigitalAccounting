@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useT } from "@/components/i18n/I18nProvider";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 import { ACTIVE_EXPORT_DOC_TYPES, isActiveExportDocType } from "@/lib/logistics/config";
 
 type Row = {
@@ -13,6 +13,7 @@ const ACTIVE_TOTAL = ACTIVE_EXPORT_DOC_TYPES.length;
 
 export function ExportReceivedList() {
   const t = useT();
+  const { qty, qtyUnit } = useI18n();
   const [rows, setRows] = useState<Row[]>([]);
   useEffect(() => { fetch("/api/logistics/export-sets/received").then((r) => r.ok ? r.json() : []).then(setRows); }, []);
 
@@ -43,7 +44,7 @@ export function ExportReceivedList() {
                   <td style={td}><Link href={`/dashboard/logistics/export/${r.id}`} style={{ fontWeight: 600 }}>{r.invoiceNumber}</Link></td>
                   <td style={td}>{dt(r.invoiceDate)}</td><td style={td}>{r.seller ?? "—"}</td><td style={td}>{r.destination ?? "—"}</td>
                   <td style={td}>{[r.truckRegSnapshot, r.trailerReg].filter(Boolean).join(" / ") || "—"}</td>
-                  <td style={td} className="num">{r.quantity != null ? `${r.quantity} ${r.unit}` : "—"}</td>
+                  <td style={td} className="num">{r.quantity != null ? qtyUnit(r.quantity, r.unit) : "—"}</td>
                   <td style={td}>{r.status === "finalized" ? t("logistics.export.stReady") : t("logistics.export.stDraft")}</td>
                   <td style={td} className="num">{active(r.documents)}/{ACTIVE_TOTAL}</td>
                   <td style={td}><Link href={`/dashboard/logistics/export/${r.id}`} className="btn btn-ghost btn-sm" style={{ fontSize: 11, padding: "2px 10px" }}>{t("logistics.export.view")}</Link></td>

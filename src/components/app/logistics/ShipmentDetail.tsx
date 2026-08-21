@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useT } from "@/components/i18n/I18nProvider";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 import { SHIPMENT_STATUSES } from "@/lib/logistics/config";
 import { ShipmentTransport } from "@/components/app/logistics/ShipmentTransport";
 import { ShipmentDocuments } from "@/components/app/logistics/ShipmentDocuments";
@@ -26,6 +26,7 @@ export type ShipmentDto = {
 
 export function ShipmentDetail({ shipment, canManage }: { shipment: ShipmentDto; canManage: boolean }) {
   const t = useT();
+  const { qty, qtyUnit } = useI18n();
   const router = useRouter();
   const [s, setS] = useState(shipment);
   const [busy, setBusy] = useState(false);
@@ -75,9 +76,9 @@ export function ShipmentDetail({ shipment, canManage }: { shipment: ShipmentDto;
           <Panel title={t("logistics.shipDetail.basic")}>
             <Row l={t("logistics.shipments.date")} v={dt(s.dispatchDate)} />
             <Row l={t("logistics.shipNew.product")} v={s.productNameSnapshot} />
-            <Row l={t("logistics.shipNew.net")} v={s.netQuantity != null ? `${s.netQuantity} ${s.unit}` : "—"} />
-            <Row l={t("logistics.shipNew.gross")} v={s.grossWeight} />
-            <Row l={t("logistics.shipNew.tara")} v={s.tara} />
+            <Row l={t("logistics.shipNew.net")} v={s.netQuantity != null ? qtyUnit(s.netQuantity, s.unit) : "—"} />
+            <Row l={t("logistics.shipNew.gross")} v={s.grossWeight != null ? qtyUnit(s.grossWeight, s.unit) : "—"} />
+            <Row l={t("logistics.shipNew.tara")} v={s.tara != null ? qtyUnit(s.tara, s.unit) : "—"} />
           </Panel>
           <Panel title={t("logistics.shipDetail.holcim")}>
             <Row l={t("logistics.shipNew.dispatchNote")} v={s.dispatchNoteNumber} />
@@ -85,7 +86,7 @@ export function ShipmentDetail({ shipment, canManage }: { shipment: ShipmentDto;
             <Row l={t("logistics.shipNew.contract")} v={s.contract} />
             <Row l={t("logistics.shipNew.clientNumber")} v={s.clientNumber} />
             <Row l={t("logistics.shipNew.factory")} v={s.factory} />
-            <Row l={t("logistics.proformas.title")} v={s.proforma ? `${s.proforma.number ?? "—"} · ${s.proforma.quantity} ${s.unit}` : "—"} />
+            <Row l={t("logistics.proformas.title")} v={s.proforma ? `${s.proforma.number ?? "—"} · ${qtyUnit(s.proforma.quantity, s.unit)}` : "—"} />
             {s.purchase ? (
               <>
                 <Row l={t("logistics.holcimInv.title")} v={<Link href={`/dashboard/logistics/holcim-invoices/${s.purchase.invoiceId}`}>{s.purchase.invoiceNumber}{s.purchase.lineNumber != null ? ` · ${t("logistics.holcimInv.line")} ${s.purchase.lineNumber}` : ""}</Link>} />

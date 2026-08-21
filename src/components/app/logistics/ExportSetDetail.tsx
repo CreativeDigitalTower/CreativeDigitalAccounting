@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useT } from "@/components/i18n/I18nProvider";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 import { ACTIVE_EXPORT_DOC_TYPES } from "@/lib/logistics/config";
 
 type Doc = { id: string; docType: string; status: string; overridden: boolean; updatedAt: string };
@@ -16,6 +16,7 @@ const DOC_LABEL: Record<string, string> = { invoice: "docInvoice", dispatch: "do
 
 export function ExportSetDetail({ id, canManage }: { id: string; canManage: boolean }) {
   const t = useT();
+  const { qty, qtyUnit } = useI18n();
   const [s, setS] = useState<SetDto | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
@@ -98,7 +99,7 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
                 [t("logistics.export.destination"), s.destination],
                 [t("logistics.export.truck"), [s.truckRegSnapshot, s.trailerReg].filter(Boolean).join(" / ") || "—"],
                 [t("logistics.export.product"), s.productSnapshot],
-                [t("logistics.export.quantity"), s.quantity != null ? `${s.quantity} ${s.unit}` : "—"],
+                [t("logistics.export.quantity"), s.quantity != null ? qtyUnit(s.quantity, s.unit) : "—"],
                 [t("logistics.export.buyer"), s.buyerName],
                 [t("logistics.export.client"), s.clientName],
                 [t("logistics.export.cmrDate"), dt(s.declarationCmrDate)],

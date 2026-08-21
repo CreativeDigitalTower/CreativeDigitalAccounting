@@ -601,5 +601,23 @@
     },
     "exportCsv": "Export CSV",
     "print": "Printare / PDF"
+  },
+  "validation": {
+    "client": "Vă rugăm selectați un client.",
+    "product": "Vă rugăm selectați un produs.",
+    "quantity": "Vă rugăm introduceți cantitatea.",
+    "quantityPositive": "Cantitatea trebuie să fie mai mare de 0.",
+    "quantityInvalid": "Introduceți o cantitate validă.",
+    "date": "Vă rugăm introduceți o dată.",
+    "vehicle": "Vă rugăm selectați un vehicul.",
+    "trailer": "Vă rugăm selectați o remorcă.",
+    "carrier": "Vă rugăm selectați un transportator.",
+    "supplier": "Vă rugăm selectați un furnizor.",
+    "docNumber": "Vă rugăm introduceți un număr de document.",
+    "required": "Câmp obligatoriu.",
+    "name": "Vă rugăm introduceți o denumire.",
+    "amount": "Vă rugăm introduceți o valoare.",
+    "payload": "Cantitatea depășește sarcina maximă a vehiculului – {max} t.",
+    "banner": "Nu toate câmpurile obligatorii sunt completate. Verificați câmpurile evidențiate."
   }
 }

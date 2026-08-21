@@ -8,6 +8,41 @@ export function fmtMoney(value: number, locale: Locale, currency = "EUR"): strin
 export function fmtNumber(value: number, locale: Locale, opts?: Intl.NumberFormatOptions): string {
   return new Intl.NumberFormat(intlLocale(locale), opts).format(value || 0);
 }
+
+// Мерни КОЛИЧЕСТВА винаги с точно 3 знака след десетичния разделител (изискване на
+// клиента за счетоводството). Разделителят следва locale (BG „,“ / EN „.“), но
+// precision е винаги 3. НЕ променя реалната стойност — само визуализацията.
+export const QUANTITY_FRACTION_DIGITS = 3;
+export function fmtQuantity(value: number | null | undefined, locale: Locale): string {
+  return new Intl.NumberFormat(intlLocale(locale), {
+    minimumFractionDigits: QUANTITY_FRACTION_DIGITS,
+    maximumFractionDigits: QUANTITY_FRACTION_DIGITS,
+  }).format(Number(value) || 0);
+}
+/** Количество + мерна единица: „26,500 t“. */
+export function fmtQuantityUnit(value: number | null | undefined, unit: string | null | undefined, locale: Locale): string {
+  return `${fmtQuantity(value, locale)}${unit ? ` ${unit}` : ""}`;
+}
+
+/**
+ * Разбира въведено количество с точка ИЛИ запетая като десетичен разделител
+ * („28“, „28,5“, „28.500“, „28,250“). Ако има и двете, запетаята се третира като
+ * разделител на хиляди. Връща null при невалиден вход (не 0 — за да се различи).
+ */
+export function parseQuantity(input: string | number | null | undefined): number | null {
+  if (input == null) return null;
+  if (typeof input === "number") return Number.isFinite(input) ? input : null;
+  const s = input.trim().replace(/\s/g, "");
+  if (!s) return null;
+  const hasComma = s.includes(","), hasDot = s.includes(".");
+  let norm: string;
+  if (hasComma && hasDot) norm = s.replace(/,/g, "");           // 1,234.5 → 1234.5
+  else if (hasComma) norm = s.replace(/,/g, ".");               // 28,5 → 28.5
+  else norm = s;
+  if (!/^-?\d+(\.\d+)?$/.test(norm)) return null;
+  const n = Number(norm);
+  return Number.isFinite(n) ? n : null;
+}
 export function fmtPercent(value: number, locale: Locale, fractionDigits = 1): string {
   return new Intl.NumberFormat(intlLocale(locale), { style: "percent", maximumFractionDigits: fractionDigits }).format((value || 0) / 100);
 }

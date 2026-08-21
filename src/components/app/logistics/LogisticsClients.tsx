@@ -1,12 +1,13 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useT } from "@/components/i18n/I18nProvider";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 
 type Row = { id: string; name: string; eik: string | null; invoices: number; revenue: number; quantity: number; lastPurchase: string | null };
 
 export function LogisticsClients() {
   const t = useT();
+  const { qty, qtyUnit } = useI18n();
   const [rows, setRows] = useState<Row[]>([]);
   const [q, setQ] = useState("");
 
@@ -37,7 +38,7 @@ export function LogisticsClients() {
                 <tr key={r.id}>
                   <td style={td}><Link href={`/dashboard/logistics/clients/${r.id}`} style={{ fontWeight: 600 }}>{r.name}</Link>{r.eik && <span style={{ color: "var(--muted)", fontSize: 11 }}> · {r.eik}</span>}</td>
                   <td style={td} className="num">{r.invoices}</td>
-                  <td style={td} className="num">{r.quantity}</td>
+                  <td style={td} className="num">{qty(r.quantity)}</td>
                   <td style={td} className="num">{r.revenue}</td>
                   <td style={td}>{dt(r.lastPurchase)}</td>
                 </tr>

@@ -15,7 +15,7 @@ type Data = {
 
 export function LogisticsReportsClient() {
   const t = useT();
-  const { num } = useI18n();
+  const { qty } = useI18n();
   const today = new Date().toISOString().slice(0, 10);
   const firstOfYear = `${new Date().getFullYear()}-01-01`;
   const [from, setFrom] = useState(firstOfYear);
@@ -60,7 +60,7 @@ export function LogisticsReportsClient() {
     download(`logistics-report_${from}_${to}.csv`, blocks.join("\r\n"));
   }
 
-  const tons = (v: number) => `${num(v)} t`;
+  const tons = (v: number) => `${qty(v)} t`;
   const th = { textAlign: "left" as const, padding: "7px 8px", color: "var(--muted)", fontSize: 12, whiteSpace: "nowrap" as const };
   const tdr = { padding: "7px 8px", fontSize: 12.5, borderTop: "1px solid rgba(217,215,200,.5)" };
   const sel = { padding: "6px 9px", fontSize: 12.5 } as const;

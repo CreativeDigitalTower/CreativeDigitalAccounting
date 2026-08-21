@@ -1,13 +1,14 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useT } from "@/components/i18n/I18nProvider";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 
 type Carrier = { id: string; name: string };
 type Row = { id: string; truck: string; trailer: string | null; carrierName: string | null; driver: string | null; driverPhone: string | null; cargoMode: string; maxPayloadTons: number | null; active: boolean };
 
 export function FleetClient({ carriers, canManage }: { carriers: Carrier[]; canManage: boolean }) {
   const t = useT();
+  const { qty, qtyUnit } = useI18n();
   const [rows, setRows] = useState<Row[]>([]);
   const [q, setQ] = useState("");
   const [carrierId, setCarrierId] = useState("");
@@ -76,7 +77,7 @@ export function FleetClient({ carriers, canManage }: { carriers: Carrier[]; canM
                   <td style={td}>{r.carrierName ?? "—"}</td>
                   <td style={td}>{r.driver ?? "—"}{r.driverPhone ? <div style={{ fontSize: 11, color: "var(--muted)" }} className="num">{r.driverPhone}</div> : null}</td>
                   <td style={td}>{cargoLabel(r.cargoMode)}</td>
-                  <td style={td} className="num">{r.maxPayloadTons != null ? `${r.maxPayloadTons} t` : "—"}</td>
+                  <td style={td} className="num">{r.maxPayloadTons != null ? qtyUnit(r.maxPayloadTons, "t") : "—"}</td>
                 </tr>
               ))}
             </tbody>

@@ -601,5 +601,23 @@
     },
     "exportCsv": "Export CSV",
     "print": "Print / PDF"
+  },
+  "validation": {
+    "client": "Please select a client.",
+    "product": "Please select a product.",
+    "quantity": "Please enter a quantity.",
+    "quantityPositive": "Quantity must be greater than 0.",
+    "quantityInvalid": "Enter a valid quantity.",
+    "date": "Please enter a date.",
+    "vehicle": "Please select a vehicle.",
+    "trailer": "Please select a trailer.",
+    "carrier": "Please select a carrier.",
+    "supplier": "Please select a supplier.",
+    "docNumber": "Please enter a document number.",
+    "required": "This field is required.",
+    "name": "Please enter a name.",
+    "amount": "Please enter a value.",
+    "payload": "Quantity exceeds the vehicle's max load – {max} t.",
+    "banner": "Not all required fields are filled in. Please check the highlighted fields."
   }
 }

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useT } from "@/components/i18n/I18nProvider";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 
 type Trace = { bgMkInvoiceId: string; bgMkInvoice: string; shipmentId: string | null; shipmentCode: string | null; dispatchNote: string | null; holcimInvoiceId: string | null; holcimInvoice: string | null; proforma: string | null };
 type Line = { id: string; productSnapshot: string | null; unit: string; quantity: number; unitPrice: number; lineTotal: number; vatAmount: number | null; grossAmount: number | null; trace: Trace | null };
@@ -9,6 +9,7 @@ type Invoice = { id: string; number: string; date: string | null; currency: stri
 
 export function MkSaleDetail({ id }: { id: string }) {
   const t = useT();
+  const { qty, qtyUnit } = useI18n();
   const [inv, setInv] = useState<Invoice | null>(null);
   useEffect(() => { fetch(`/api/logistics/mk-sales/${id}`).then((r) => r.ok ? r.json() : null).then(setInv); }, [id]);
   if (!inv) return null;
@@ -43,7 +44,7 @@ export function MkSaleDetail({ id }: { id: string }) {
             {inv.lines.map((l) => (
               <tr key={l.id}>
                 <td style={td}>{l.productSnapshot ?? "—"}</td>
-                <td style={td} className="num">{l.quantity} {l.unit}</td>
+                <td style={td} className="num">{qtyUnit(l.quantity, l.unit)}</td>
                 <td style={td} className="num">{l.unitPrice}</td>
                 <td style={td} className="num">{l.lineTotal}</td>
                 <td style={td} className="num">{l.vatAmount ?? "—"}</td>

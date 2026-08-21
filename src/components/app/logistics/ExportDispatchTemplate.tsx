@@ -9,7 +9,10 @@ export type DispatchDocData = {
 };
 
 const d = (s?: string | null) => s ? new Date(s).toLocaleDateString("bg-BG") : "";
-const n3 = (v?: number | null) => v == null ? "" : v.toFixed(3);
+// Количество — винаги 3 знака, BG десетичен разделител (документът е bg-BG). Само
+// визуализация; snapshot стойността в data не се променя.
+const nf3 = new Intl.NumberFormat("bg-BG", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+const n3 = (v?: number | null) => v == null ? "" : nf3.format(v);
 
 export function ExportDispatchTemplate({ data, blank = false }: { data: DispatchDocData; blank?: boolean }) {
   const rows = data.rows ?? [];

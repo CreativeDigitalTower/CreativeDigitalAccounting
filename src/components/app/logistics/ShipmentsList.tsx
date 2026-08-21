@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useT } from "@/components/i18n/I18nProvider";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 import { SHIPMENT_STATUSES } from "@/lib/logistics/config";
 
 type Shipment = {
@@ -11,6 +11,7 @@ type Shipment = {
 
 export function ShipmentsList({ canManage }: { canManage: boolean }) {
   const t = useT();
+  const { qty, qtyUnit } = useI18n();
   const [items, setItems] = useState<Shipment[]>([]);
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("");
@@ -63,7 +64,7 @@ export function ShipmentsList({ canManage }: { canManage: boolean }) {
                   <td style={td}>{dt(s.dispatchDate)}</td>
                   <td style={td}>{s.vehicleRegSnapshot ?? "—"}</td>
                   <td style={td}>{s.productNameSnapshot ?? "—"}</td>
-                  <td style={td} className="num">{s.netQuantity != null ? `${s.netQuantity} ${s.unit}` : "—"}</td>
+                  <td style={td} className="num">{s.netQuantity != null ? qtyUnit(s.netQuantity, s.unit) : "—"}</td>
                   <td style={td}>{s.destination ?? "—"}</td>
                   <td style={td}><span style={{ fontSize: 11, fontWeight: 700, background: "rgba(15,138,106,.12)", color: "var(--emerald-dark,#0F8A6A)", borderRadius: 10, padding: "2px 8px" }}>{t(`logistics.shipmentStatus.${s.status}`)}</span>{s.delayed && <span style={{ fontSize: 11, fontWeight: 700, color: "var(--brick)", marginLeft: 6 }}>{t("logistics.transport.delayedBadge")}</span>}</td>
                 </tr>

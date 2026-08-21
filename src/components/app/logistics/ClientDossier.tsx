@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useT } from "@/components/i18n/I18nProvider";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 import { confirmDelete } from "@/lib/confirmDelete";
+import { parseQuantity } from "@/lib/i18n/format";
 
 type ByProduct = { product: string; quantity: number; revenue: number };
 type Summary = { invoicesCount: number; revenue: number; quantity: number; lastPurchase: string | null; avgPricePerUnit: number | null; byProduct: ByProduct[] };
@@ -13,23 +14,30 @@ type Data = { id: string; name: string; eik: string | null; summary: Summary; in
 
 export function ClientDossier({ id, canManage }: { id: string; canManage: boolean }) {
   const t = useT();
+  const { qty, qtyUnit } = useI18n();
   const [d, setD] = useState<Data | null>(null);
   const [hy, setHy] = useState({ year: "", revenue: "", quantity: "", unit: "t", note: "" });
   const [hp, setHp] = useState({ year: "", product: "", quantity: "", revenue: "" });
+  const [histErr, setHistErr] = useState("");
 
   async function load() { const r = await fetch(`/api/logistics/clients/${id}`); if (r.ok) setD(await r.json()); }
   useEffect(() => { load(); }, [id]);
   if (!d) return null;
 
   async function addYear() {
-    if (!hy.year) return;
-    const r = await fetch(`/api/logistics/clients/${id}/historical`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: "year", year: Number(hy.year), revenue: hy.revenue ? Number(hy.revenue) : null, quantity: hy.quantity ? Number(hy.quantity) : null, unit: hy.unit, note: hy.note || null }) });
+    setHistErr("");
+    if (!hy.year) { setHistErr(t("logistics.validation.date")); return; }
+    const r = await fetch(`/api/logistics/clients/${id}/historical`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: "year", year: Number(hy.year), revenue: hy.revenue ? Number(hy.revenue) : null, quantity: parseQuantity(hy.quantity), unit: hy.unit, note: hy.note || null }) });
     if (r.ok) { setHy({ year: "", revenue: "", quantity: "", unit: "t", note: "" }); load(); }
+    else { const j = await r.json().catch(() => ({})); setHistErr(j.error ?? t("logistics.common.err")); }
   }
   async function addProduct() {
-    if (!hp.year || !hp.product) return;
-    const r = await fetch(`/api/logistics/clients/${id}/historical`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: "product", year: Number(hp.year), product: hp.product, quantity: hp.quantity ? Number(hp.quantity) : null, revenue: hp.revenue ? Number(hp.revenue) : null }) });
+    setHistErr("");
+    if (!hp.year) { setHistErr(t("logistics.validation.date")); return; }
+    if (!hp.product) { setHistErr(t("logistics.validation.product")); return; }
+    const r = await fetch(`/api/logistics/clients/${id}/historical`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: "product", year: Number(hp.year), product: hp.product, quantity: parseQuantity(hp.quantity), revenue: hp.revenue ? Number(hp.revenue) : null }) });
     if (r.ok) { setHp({ year: "", product: "", quantity: "", revenue: "" }); load(); }
+    else { const j = await r.json().catch(() => ({})); setHistErr(j.error ?? t("logistics.common.err")); }
   }
   async function del(kind: "year" | "product", rowId: string) {
     if (!(await confirmDelete())) return;
@@ -54,7 +62,7 @@ export function ClientDossier({ id, canManage }: { id: string; canManage: boolea
       <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 8px" }}>{t("logistics.clients.salesTitle")}</h3>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(130px,1fr))", gap: 10, marginBottom: 8 }}>
         {kpi(t("logistics.clients.invoices"), s.invoicesCount)}
-        {kpi(t("logistics.clients.quantity"), s.quantity)}
+        {kpi(t("logistics.clients.quantity"), qty(s.quantity))}
         {kpi(t("logistics.clients.revenue"), s.revenue)}
         {kpi(t("logistics.clients.avgPrice"), s.avgPricePerUnit ?? "—")}
         {kpi(t("logistics.clients.lastPurchase"), dt(s.lastPurchase))}
@@ -62,7 +70,7 @@ export function ClientDossier({ id, canManage }: { id: string; canManage: boolea
       {s.byProduct.length > 0 && (
         <div className="glass panel" style={{ marginBottom: 14 }}>
           <div style={{ fontSize: 12.5, fontWeight: 600, marginBottom: 4 }}>{t("logistics.clients.byProduct")}</div>
-          {s.byProduct.map((p) => <div key={p.product} style={{ fontSize: 12.5, display: "flex", justifyContent: "space-between", padding: "3px 0" }}><span>{p.product}</span><span className="num">{p.quantity} · {p.revenue}</span></div>)}
+          {s.byProduct.map((p) => <div key={p.product} style={{ fontSize: 12.5, display: "flex", justifyContent: "space-between", padding: "3px 0" }}><span>{p.product}</span><span className="num">{qty(p.quantity)} · {p.revenue}</span></div>)}
         </div>
       )}
 
@@ -83,6 +91,7 @@ export function ClientDossier({ id, canManage }: { id: string; canManage: boolea
       {/* Исторически данни */}
       <div className="glass panel">
         <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 4px" }}>{t("logistics.clients.historicalTitle")}</h3>
+        {histErr && <div role="alert" style={{ color: "var(--brick)", fontSize: 11.5, margin: "2px 0 6px" }}>{histErr}</div>}
         <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 0 }}>{t("logistics.clients.aggregatedNote")}</p>
         {canManage && (
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "end", marginBottom: 8 }}>
@@ -97,7 +106,7 @@ export function ClientDossier({ id, canManage }: { id: string; canManage: boolea
           <thead><tr><th style={th}>{t("logistics.clients.year")}</th><th style={th}>{t("logistics.clients.revenue")}</th><th style={th}>{t("logistics.clients.quantity")}</th><th style={th}>{t("logistics.clients.note")}</th><th style={th}></th></tr></thead>
           <tbody>
             {d.historical.map((h) => (
-              <tr key={h.id}><td style={td}>{h.year}</td><td style={td} className="num">{h.revenue ?? "—"}</td><td style={td} className="num">{h.quantity ?? "—"} {h.unit}</td><td style={td}>{h.note ?? ""}</td>
+              <tr key={h.id}><td style={td}>{h.year}</td><td style={td} className="num">{h.revenue ?? "—"}</td><td style={td} className="num">{h.quantity != null ? qtyUnit(h.quantity, h.unit) : "—"}</td><td style={td}>{h.note ?? ""}</td>
                 <td style={{ ...td, textAlign: "right" }}>{canManage && <button className="btn btn-ghost btn-sm" style={{ color: "var(--brick)", padding: "1px 6px" }} onClick={() => del("year", h.id)}>✕</button>}</td></tr>
             ))}
           </tbody>
@@ -117,7 +126,7 @@ export function ClientDossier({ id, canManage }: { id: string; canManage: boolea
             <thead><tr><th style={th}>{t("logistics.clients.year")}</th><th style={th}>{t("logistics.clients.product")}</th><th style={th}>{t("logistics.clients.quantity")}</th><th style={th}>{t("logistics.clients.revenue")}</th><th style={th}></th></tr></thead>
             <tbody>
               {d.historicalProducts.map((h) => (
-                <tr key={h.id}><td style={td}>{h.year}</td><td style={td}>{h.product}</td><td style={td} className="num">{h.quantity ?? "—"}</td><td style={td} className="num">{h.revenue ?? "—"}</td>
+                <tr key={h.id}><td style={td}>{h.year}</td><td style={td}>{h.product}</td><td style={td} className="num">{h.quantity != null ? qty(h.quantity) : "—"}</td><td style={td} className="num">{h.revenue ?? "—"}</td>
                   <td style={{ ...td, textAlign: "right" }}>{canManage && <button className="btn btn-ghost btn-sm" style={{ color: "var(--brick)", padding: "1px 6px" }} onClick={() => del("product", h.id)}>✕</button>}</td></tr>
               ))}
             </tbody>

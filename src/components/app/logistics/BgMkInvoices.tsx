@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useT } from "@/components/i18n/I18nProvider";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 
 type Row = { id: string; number: string; date: string | null; currency: string; party: string; direction: string; lines: number; net: number; gross: number };
 type Sellable = { id: string; code: string; productNameSnapshot: string | null; netQuantity: number; unit: string; vehicleRegSnapshot: string | null; dispatchNoteNumber: string | null };
@@ -11,6 +11,7 @@ const round2 = (n: number) => Math.round(n * 100) / 100;
 
 export function BgMkInvoices({ canManage, counterparties }: { canManage: boolean; counterparties: Counterparty[] }) {
   const t = useT();
+  const { qty, qtyUnit } = useI18n();
   const [issued, setIssued] = useState<Row[]>([]);
   const [received, setReceived] = useState<Row[]>([]);
   const [sellable, setSellable] = useState<Sellable[]>([]);
@@ -113,7 +114,7 @@ export function BgMkInvoices({ canManage, counterparties }: { canManage: boolean
                       <tr key={s.id}>
                         <td style={td}><input type="checkbox" checked={on} onChange={(e) => setPrices((p) => { const n = { ...p }; if (e.target.checked) n[s.id] = ""; else delete n[s.id]; return n; })} /></td>
                         <td style={td}>{s.code}</td><td style={td}>{s.productNameSnapshot ?? "—"}</td>
-                        <td style={td} className="num">{s.netQuantity} {s.unit}</td>
+                        <td style={td} className="num">{qtyUnit(s.netQuantity, s.unit)}</td>
                         <td style={td}>{on && <input type="number" step="0.01" style={{ ...inp, width: 80 }} value={prices[s.id]} onChange={(e) => setPrices((p) => ({ ...p, [s.id]: e.target.value }))} />}</td>
                         <td style={td} className="num">{lt ?? "—"}</td>
                       </tr>
