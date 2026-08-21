@@ -533,7 +533,11 @@
     "unit": "U.M.",
     "valueMkd": "Valoare (denari)",
     "downloadPdf": "Descarcă PDF",
-    "print": "Printează"
+    "print": "Printează",
+    "goodsLines": "Linii produse",
+    "line": "Linie",
+    "addLine": "Adaugă produs",
+    "value": "Valoare"
   },
   "fleet": {
     "title": "Fleet",

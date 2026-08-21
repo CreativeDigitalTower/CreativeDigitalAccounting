@@ -122,6 +122,15 @@ export function ExportDocEditor({ setId, docId, canManage }: { setId: string; do
   const area = (label: string, path: string) => <Area label={label} value={str(path)} disabled={readOnly} onChange={(v) => set(path, v)} />;
   const truckField = (label: string, path: string) => <TruckField label={label} value={str(path)} disabled={readOnly} options={trucks} onChange={(v) => set(path, v)} />;
 
+  // ── Продуктови редове на фактурата (§10/§11/§27): неограничен брой, add/edit/delete/move. ──
+  type GoodsLine = { description?: string | null; quantity?: number | null; unitPrice?: number | null; value?: number | null; unit?: string | null; currency?: string | null; certificate?: string | null; truck?: string | null; note?: string | null };
+  const goodsLines = (): GoodsLine[] => { const g = getPath(data, "goods"); return Array.isArray(g) ? (g as GoodsLine[]) : []; };
+  const writeGoods = (arr: GoodsLine[]) => set("goods", arr);
+  const addLine = () => writeGoods([...goodsLines(), { description: null, quantity: null, unit: "TNE", unitPrice: null, value: null, currency: "EUR", certificate: null, truck: null }]);
+  const updateLine = (i: number, patch: Partial<GoodsLine>) => { const a = goodsLines().slice(); a[i] = { ...a[i], ...patch }; writeGoods(a); };
+  const removeLine = (i: number) => { const a = goodsLines().slice(); a.splice(i, 1); writeGoods(a); };
+  const moveLine = (i: number, dir: -1 | 1) => { const a = goodsLines().slice(); const j = i + dir; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; writeGoods(a); };
+
   const dt = doc.docType;
   const isInvoice = dt === "invoice";
   const isBlank = dt === "blank";
@@ -138,7 +147,7 @@ export function ExportDocEditor({ setId, docId, canManage }: { setId: string; do
         {!isSeller && <span style={{ fontSize: 11, fontWeight: 700, color: "var(--muted)" }}>{t("logistics.export.receivedBadge")}</span>}
         {doc.overridden && <span style={{ fontSize: 11, fontWeight: 700, color: "var(--brass)" }}>{t("logistics.export.overridden")}</span>}
         <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
-          {isDispatchLike ? (
+          {isDispatchLike || isInvoice ? (
             <>
               {/* Един и същ canonical layout за сваляне и печат (визуална консистентност). */}
               <a className="btn btn-ghost btn-sm" href={`${printUrl}?intent=download`} target="_blank" rel="noreferrer">{t("logistics.export.downloadPdf")}</a>
@@ -176,11 +185,38 @@ export function ExportDocEditor({ setId, docId, canManage }: { setId: string; do
               {txt(t("logistics.export.destinationCountry"), "destinationCountry")}
               {txt(t("logistics.export.city"), "city")}
               {txt(t("logistics.export.manager"), "manager")}
-              {txt("Description", "goods.0.description")}
-              {number(t("logistics.export.quantity"), "goods.0.quantity")}
-              {number("Unit price (EUR)", "goods.0.unitPrice")}
               {number("VAT %", "vatRate")}
               {txt("Payment conditions", "paymentConditions")}
+              {/* Продуктови редове (repeater) */}
+              <div style={{ marginTop: 6, borderTop: "1px solid rgba(217,215,200,.7)", paddingTop: 8 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6 }}>{t("logistics.export.goodsLines")}</div>
+                {goodsLines().map((g, i) => {
+                  const val = g.value != null ? g.value : (Number(g.quantity) > 0 && Number(g.unitPrice) >= 0 ? Number(g.quantity) * Number(g.unitPrice) : null);
+                  return (
+                    <div key={i} style={{ border: "1px solid rgba(217,215,200,.8)", borderRadius: 8, padding: 8, marginBottom: 8, display: "grid", gap: 5 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontSize: 11, color: "var(--muted)" }}>{t("logistics.export.line")} {i + 1}</span>
+                        {!readOnly && (
+                          <span style={{ display: "flex", gap: 4 }}>
+                            <button className="btn btn-ghost btn-sm" style={{ padding: "0 6px" }} disabled={i === 0} onClick={() => moveLine(i, -1)}>↑</button>
+                            <button className="btn btn-ghost btn-sm" style={{ padding: "0 6px" }} disabled={i === goodsLines().length - 1} onClick={() => moveLine(i, 1)}>↓</button>
+                            <button className="btn btn-ghost btn-sm" style={{ padding: "0 6px", color: "var(--brick)" }} onClick={() => removeLine(i)}>✕</button>
+                          </span>
+                        )}
+                      </div>
+                      <textarea style={{ padding: "5px 7px", fontSize: 12, minHeight: 34 }} disabled={readOnly} placeholder="Description" value={g.description ?? ""} onChange={(e) => updateLine(i, { description: e.target.value })} />
+                      <input style={{ padding: "5px 7px", fontSize: 12 }} disabled={readOnly} placeholder="Certificate No" value={g.certificate ?? ""} onChange={(e) => updateLine(i, { certificate: e.target.value || null })} />
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 5 }}>
+                        <input type="number" step="0.001" style={{ padding: "5px 7px", fontSize: 12 }} disabled={readOnly} placeholder={t("logistics.export.quantity")} value={g.quantity ?? ""} onChange={(e) => updateLine(i, { quantity: e.target.value === "" ? null : Number(e.target.value) })} />
+                        <input type="number" step="0.01" style={{ padding: "5px 7px", fontSize: 12 }} disabled={readOnly} placeholder="Unit price EUR" value={g.unitPrice ?? ""} onChange={(e) => updateLine(i, { unitPrice: e.target.value === "" ? null : Number(e.target.value) })} />
+                      </div>
+                      <TruckField label={t("logistics.export.truck")} value={g.truck ?? ""} disabled={readOnly} options={trucks} onChange={(v) => updateLine(i, { truck: v || null })} />
+                      <div style={{ fontSize: 11, color: "var(--muted)", textAlign: "right" }}>{t("logistics.export.value")}: <b>{val != null ? `${val.toFixed(2)} €` : "—"}</b></div>
+                    </div>
+                  );
+                })}
+                {!readOnly && <button className="btn btn-ghost btn-sm" onClick={addLine}>+ {t("logistics.export.addLine")}</button>}
+              </div>
             </>
           ) : isDispatchLike ? (
             <>

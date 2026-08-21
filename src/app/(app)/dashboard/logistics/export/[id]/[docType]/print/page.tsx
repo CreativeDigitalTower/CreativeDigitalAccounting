@@ -58,16 +58,30 @@ export default async function Page({ params }: { params: Promise<{ id: string; d
     );
   }
 
+  // Име на файла за фактурата: Invoice-{номер}-{година} (§32).
+  const inv = data as InvoiceDocData;
+  const invYear = doc.docType === "invoice" && inv.invoiceDate ? new Date(inv.invoiceDate).getFullYear() : "";
+  const invTitle = doc.docType === "invoice"
+    ? `Invoice-${(inv.invoiceNumber ?? "").replace(/[^\w-]/g, "") || "export"}${invYear ? `-${invYear}` : ""}`
+    : undefined;
+
   return (
-    <div>
-      <AutoPrint />
-      <div className="print-sheet">
-        <div className="print-doc">
-          {doc.docType === "invoice" ? <ExportInvoiceTemplate data={data as InvoiceDocData} />
-            : doc.docType === "declaration" ? <ExportDeclarationTemplate data={data as DeclarationDocData} />
-            : (doc.docType === "cmr_epson" || doc.docType === "cmr_hp") ? <ExportCmrTemplate data={data as CmrDocData} />
-            : <ExportDispatchTemplate data={data as DispatchDocData} />}
-        </div>
+    <div className="doc-print-root">
+      <style>{`
+        @page { size: A4 portrait; margin: 0; }
+        @media print {
+          html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
+          .doc-print-root { margin: 0; }
+        }
+        .doc-sheet { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; box-sizing: border-box; }
+        @media print { .doc-sheet { page-break-after: avoid; } .invoice-doc thead { display: table-header-group; } }
+      `}</style>
+      <AutoPrint fileTitle={invTitle} />
+      <div className="doc-sheet">
+        {doc.docType === "invoice" ? <ExportInvoiceTemplate data={inv} />
+          : doc.docType === "declaration" ? <ExportDeclarationTemplate data={data as DeclarationDocData} />
+          : (doc.docType === "cmr_epson" || doc.docType === "cmr_hp") ? <ExportCmrTemplate data={data as CmrDocData} />
+          : <ExportDispatchTemplate data={data as DispatchDocData} />}
       </div>
     </div>
   );

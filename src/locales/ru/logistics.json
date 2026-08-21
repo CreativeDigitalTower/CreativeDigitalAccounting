@@ -533,7 +533,11 @@
     "unit": "Ед.",
     "valueMkd": "Сумма (денары)",
     "downloadPdf": "Скачать PDF",
-    "print": "Печать"
+    "print": "Печать",
+    "goodsLines": "Строки товаров",
+    "line": "Строка",
+    "addLine": "Добавить продукт",
+    "value": "Сумма"
   },
   "fleet": {
     "title": "Fleet",

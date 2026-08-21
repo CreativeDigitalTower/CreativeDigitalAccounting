@@ -533,7 +533,11 @@
     "unit": "Μονάδα",
     "valueMkd": "Αξία (δηνάρια)",
     "downloadPdf": "Λήψη PDF",
-    "print": "Εκτύπωση"
+    "print": "Εκτύπωση",
+    "goodsLines": "Γραμμές προϊόντων",
+    "line": "Γραμμή",
+    "addLine": "Προσθήκη προϊόντος",
+    "value": "Αξία"
   },
   "fleet": {
     "title": "Fleet",
