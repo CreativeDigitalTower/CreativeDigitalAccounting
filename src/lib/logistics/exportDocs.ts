@@ -5,6 +5,7 @@
  */
 import { netAmount } from "@/lib/logistics/money";
 import { resolveDispatchIssuer } from "@/lib/logistics/dispatchIssuer";
+import { resolveInvoiceParty } from "@/lib/logistics/invoiceParties";
 import { Prisma } from "@prisma/client";
 import type { ExportDocType } from "@/lib/logistics/config";
 
@@ -171,6 +172,14 @@ export function displayUnit(u?: string | null): string {
   return (u ?? "").toUpperCase();
 }
 
+/** Мерна единица за export ФАКТУРАТА (§14): t/T/ton/tonne/тон → „TNE". Presentation only. */
+export function displayUnitTNE(u?: string | null): string {
+  const k = (u ?? "").trim().toLowerCase();
+  if (k === "") return "TNE";
+  if (["t", "т", "ton", "tone", "tonne", "tons", "tne", "тон", "тона"].includes(k)) return "TNE";
+  return (u ?? "").toUpperCase();
+}
+
 export function dispatchTotalQuantity(rows: { quantity?: number | null }[]): number {
   return rows.reduce<Prisma.Decimal>((s, r) => s.plus(r.quantity ?? 0), new Prisma.Decimal(0)).toDecimalPlaces(3).toNumber();
 }
@@ -188,7 +197,8 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
     case "invoice":
       return {
         invoiceNumber: src.invoiceNumber, invoiceDate: src.invoiceDate,
-        seller: sellerEn, buyer: buyerEn,
+        // Английската фирмена версия както в оригинала (§5/§6); presentation only.
+        seller: resolveInvoiceParty(sellerEn), buyer: resolveInvoiceParty(buyerEn),
         contract: null, annex: null, order: null,
         // Default „FCA {град}" (нормализиран един интервал), editable, само при initial generation.
         termsOfDelivery: `FCA ${sellerCityEn}`.replace(/\s+/g, " ").trim(),
@@ -196,7 +206,7 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
         destination: src.destination, destinationCountry: buyerEn.country ?? null,
         // Date/City/Manager блок (auto-fill, editable snapshot).
         date: src.invoiceDate, city: sellerCityEn || null, manager: parties.seller.manager ?? null,
-        goods: [{ description: src.productSnapshot ? `CEMENT ${src.productSnapshot} - IN BULK` : null, quantity: src.quantity, unit: src.unit || "TNE", unitPrice: null, value: null, currency: "EUR", certificate: null }],
+        goods: [{ description: src.productSnapshot ? `CEMENT ${src.productSnapshot} - IN BULK` : null, quantity: src.quantity, unit: displayUnitTNE(src.unit), unitPrice: null, value: null, currency: "EUR", certificate: null }],
         vatText: "Export, Art.28 Bulgarian VAT Legislation", vatRate: 0, vatAmount: 0,
         originText: "ИЗНОСИТЕЛЯТ НА ПРОДУКТИТЕ, ОБХВАНАТИ ОТ ТОЗИ ДОКУМЕНТ, ДЕКЛАРИРА, ЧЕ ОСВЕН КЪДЕТО ЯСНО Е ОТБЕЛЯЗАНО ДРУГО, ТЕЗИ ПРОДУКТИ СА С EU ПРЕФЕРЕНЦИАЛЕН ПРОИЗХОД",
         originPlace: sellerCityEn || null,

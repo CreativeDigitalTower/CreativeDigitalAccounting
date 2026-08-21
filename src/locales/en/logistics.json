@@ -533,7 +533,11 @@
     "unit": "Unit",
     "valueMkd": "Value (denari)",
     "downloadPdf": "Download PDF",
-    "print": "Print"
+    "print": "Print",
+    "goodsLines": "Product lines",
+    "line": "Line",
+    "addLine": "Add product",
+    "value": "Value"
   },
   "fleet": {
     "title": "Fleet",

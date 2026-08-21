@@ -533,7 +533,11 @@
     "unit": "Birim",
     "valueMkd": "Tutar (dinar)",
     "downloadPdf": "PDF indir",
-    "print": "Yazdır"
+    "print": "Yazdır",
+    "goodsLines": "Ürün satırları",
+    "line": "Satır",
+    "addLine": "Ürün ekle",
+    "value": "Tutar"
   },
   "fleet": {
     "title": "Fleet",
