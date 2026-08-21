@@ -2,13 +2,24 @@
 
 import { useEffect } from "react";
 
-/** Отваря диалога за печат/сваляне на PDF за няколко документа наведнъж. */
-export function AutoPrint({ auto = true }: { auto?: boolean }) {
+/**
+ * Отваря диалога за печат/сваляне на PDF. `fileTitle` става document.title, така че
+ * при „Save as PDF" браузърът предлага смислено име (напр. Ispratnica-9654-2026).
+ * Един и същ canonical layout се ползва и за печат, и за сваляне (визуална консистентност).
+ */
+export function AutoPrint({ auto = true, fileTitle }: { auto?: boolean; fileTitle?: string }) {
   function print() {
     document.body.classList.add("printing-multi");
     window.print();
     setTimeout(() => document.body.classList.remove("printing-multi"), 800);
   }
+  useEffect(() => {
+    if (fileTitle) {
+      const prev = document.title;
+      document.title = fileTitle;
+      return () => { document.title = prev; };
+    }
+  }, [fileTitle]);
   useEffect(() => {
     if (!auto) return;
     const t = setTimeout(print, 400); // изчакваме документите да се изрисуват

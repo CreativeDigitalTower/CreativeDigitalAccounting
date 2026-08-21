@@ -57,3 +57,38 @@ describe("dispatchTotalQuantity", () => {
     expect(dispatchTotalQuantity([{}, { quantity: null }])).toBe(0);
   });
 });
+
+import { displayUnit } from "@/lib/logistics/exportDocs";
+import { resolveDispatchIssuer } from "@/lib/logistics/dispatchIssuer";
+
+describe("displayUnit -> ТОН в Испратницата (§1)", () => {
+  it("t / T / ton / tons / tne → ТОН", () => {
+    for (const u of ["t", "T", "ton", "Tone", "TONNE", "tons", "tne", "тон", "Тона"]) {
+      expect(displayUnit(u)).toBe("ТОН");
+    }
+  });
+  it("празно остава празно; други единици → uppercase", () => {
+    expect(displayUnit("")).toBe("");
+    expect(displayUnit(null)).toBe("");
+    expect(displayUnit("kg")).toBe("KG");
+  });
+});
+
+describe("resolveDispatchIssuer - кирилски хедър (§3)", () => {
+  const NATIVE = { name: '"Сем Интернационал" ДООЕЛ', address: 'ул. "Маршал Тито" бр.55', city: "Тетово" };
+  it("маппва английския/изкривен вариант към точния кирилски текст", () => {
+    expect(resolveDispatchIssuer({ name: "SEM INERNAIONAL JOUEL", address: "55 Marshal Tito Str.", city: "Tetovo. North Macedonia" }))
+      .toEqual(NATIVE);
+  });
+  it("маппва и коректния латински/кирилски вариант", () => {
+    expect(resolveDispatchIssuer({ name: "Sem Internacional DOOEL" })).toMatchObject(NATIVE);
+    expect(resolveDispatchIssuer({ name: '"Сем Интернационал" ДООЕЛ' })).toMatchObject(NATIVE);
+  });
+  it("непознат издател остава непроменен (без глобални промени)", () => {
+    const other = { name: "Друга Фирма ЕООД", address: "ул. Х", city: "София" };
+    expect(resolveDispatchIssuer(other)).toEqual(other);
+  });
+  it("null → празно име", () => {
+    expect(resolveDispatchIssuer(null)).toEqual({ name: null });
+  });
+});

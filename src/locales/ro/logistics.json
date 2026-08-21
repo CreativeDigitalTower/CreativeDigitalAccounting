@@ -531,7 +531,9 @@
     "receivedEmpty": "Niciun document de export primit.",
     "seller": "Vânzător",
     "unit": "U.M.",
-    "valueMkd": "Valoare (denari)"
+    "valueMkd": "Valoare (denari)",
+    "downloadPdf": "Descarcă PDF",
+    "print": "Printează"
   },
   "fleet": {
     "title": "Fleet",

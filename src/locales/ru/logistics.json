@@ -531,7 +531,9 @@
     "receivedEmpty": "Нет полученных экспортных документов.",
     "seller": "Продавец",
     "unit": "Ед.",
-    "valueMkd": "Сумма (денары)"
+    "valueMkd": "Сумма (денары)",
+    "downloadPdf": "Скачать PDF",
+    "print": "Печать"
   },
   "fleet": {
     "title": "Fleet",

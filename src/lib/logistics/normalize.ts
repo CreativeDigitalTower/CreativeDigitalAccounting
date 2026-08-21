@@ -16,7 +16,7 @@
 const CYRILLIC_LOOKALIKE: Record<string, string> = {
   "А": "A", "В": "B", "Е": "E", "С": "C", "О": "O", "Р": "P", "Н": "H", "К": "K", "М": "M", "Т": "T", "Х": "X",
 };
-function foldCyrillic(s: string): string {
+export function foldCyrillic(s: string): string {
   return s.replace(/[АВЕСОРНКМТХ]/g, (ch) => CYRILLIC_LOOKALIKE[ch] ?? ch);
 }
 

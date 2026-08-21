@@ -531,7 +531,9 @@
     "receivedEmpty": "Alınan ihracat belgesi yok.",
     "seller": "Satıcı",
     "unit": "Birim",
-    "valueMkd": "Tutar (dinar)"
+    "valueMkd": "Tutar (dinar)",
+    "downloadPdf": "PDF indir",
+    "print": "Yazdır"
   },
   "fleet": {
     "title": "Fleet",

@@ -531,7 +531,9 @@
     "receivedEmpty": "Δεν υπάρχουν ληφθέντα έγγραφα εξαγωγής.",
     "seller": "Πωλητής",
     "unit": "Μονάδα",
-    "valueMkd": "Αξία (δηνάρια)"
+    "valueMkd": "Αξία (δηνάρια)",
+    "downloadPdf": "Λήψη PDF",
+    "print": "Εκτύπωση"
   },
   "fleet": {
     "title": "Fleet",

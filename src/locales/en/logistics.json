@@ -531,7 +531,9 @@
     "receivedEmpty": "No received export documents.",
     "seller": "Seller",
     "unit": "Unit",
-    "valueMkd": "Value (denari)"
+    "valueMkd": "Value (denari)",
+    "downloadPdf": "Download PDF",
+    "print": "Print"
   },
   "fleet": {
     "title": "Fleet",
