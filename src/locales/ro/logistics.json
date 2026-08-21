@@ -529,7 +529,9 @@
     "receivedTitle": "Documente de export primite",
     "receivedIntro": "Livrări de export emise către compania dvs. de un vânzător asociat din grup (doar vizualizare și tipărire).",
     "receivedEmpty": "Niciun document de export primit.",
-    "seller": "Vânzător"
+    "seller": "Vânzător",
+    "unit": "U.M.",
+    "valueMkd": "Valoare (denari)"
   },
   "fleet": {
     "title": "Fleet",

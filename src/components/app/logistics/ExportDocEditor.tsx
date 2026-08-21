@@ -182,7 +182,9 @@ export function ExportDocEditor({ setId, docId, canManage }: { setId: string; do
               {!isBlank && <>{txt(t("logistics.export.client"), "recipient.name")}{txt(t("logistics.export.address"), "recipient.address")}</>}
               {truckField(t("logistics.export.truck"), "rows.0.truck")}
               {txt(t("logistics.export.material"), "rows.0.material")}
+              {txt(t("logistics.export.unit"), "rows.0.unit")}
               {number(t("logistics.export.quantity"), "rows.0.quantity")}
+              {txt(t("logistics.export.valueMkd"), "rows.0.valueMkd")}
             </>
           ) : isDeclaration ? (
             <>
