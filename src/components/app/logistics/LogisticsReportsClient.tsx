@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useT, useI18n } from "@/components/i18n/I18nProvider";
+import { toCsv, csvBlob } from "@/lib/csv";
 
 type Vol = { totalTons: number; deliveries: number };
 type Data = {
@@ -35,6 +36,30 @@ export function LogisticsReportsClient() {
   }, [from, to, status]);
   useEffect(() => { void load(); }, [load]);
 
+  function download(name: string, csv: string) {
+    const url = URL.createObjectURL(csvBlob(csv));
+    const a = document.createElement("a"); a.href = url; a.download = name; a.click();
+    URL.revokeObjectURL(url);
+  }
+  // Един CSV с трите секции една под друга (превозвач / влекач / продукт) + обем.
+  function exportCsv() {
+    if (!data) return;
+    const L = (k: string) => t(k);
+    const blocks: string[] = [];
+    blocks.push(toCsv([L("logistics.reports.byCarrier")], []));
+    blocks.push(toCsv([L("logistics.fleet.carrier"), L("logistics.reports.deliveries"), L("logistics.reports.totalTons")],
+      data.byCarrier.map((r) => [r.label, r.deliveries, r.totalTons])));
+    blocks.push("");
+    blocks.push(toCsv([L("logistics.reports.byTruck")], []));
+    blocks.push(toCsv([L("logistics.fleet.truck"), L("logistics.fleet.carrier"), L("logistics.reports.deliveries"), L("logistics.reports.totalTons"), L("logistics.reports.avgTons"), L("logistics.fleet.maxLoad"), L("logistics.reports.utilization")],
+      data.byTruck.map((r) => [r.label, r.carrierName ?? "—", r.deliveries, r.totalTons, r.avgTons, r.maxPayloadTons ?? "—", r.utilizationPct != null ? `${r.utilizationPct}%` : "—"])));
+    blocks.push("");
+    blocks.push(toCsv([L("logistics.reports.byProduct")], []));
+    blocks.push(toCsv([L("logistics.export.product"), L("logistics.reports.deliveries"), L("logistics.reports.totalTons")],
+      data.byProduct.map((r) => [r.label, r.deliveries, r.totalTons])));
+    download(`logistics-report_${from}_${to}.csv`, blocks.join("\r\n"));
+  }
+
   const tons = (v: number) => `${num(v)} t`;
   const th = { textAlign: "left" as const, padding: "7px 8px", color: "var(--muted)", fontSize: 12, whiteSpace: "nowrap" as const };
   const tdr = { padding: "7px 8px", fontSize: 12.5, borderTop: "1px solid rgba(217,215,200,.5)" };
@@ -59,6 +84,8 @@ export function LogisticsReportsClient() {
 
   return (
     <div>
+      <style>{`@media print { .no-print { display: none !important; } .print-only { display: block !important; } @page { size: A4 landscape; margin: 12mm; } .glass.panel { box-shadow: none !important; } }`}</style>
+      <div className="print-only" style={{ display: "none", fontSize: 12, marginBottom: 8 }}>{from} – {to}</div>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6, flexWrap: "wrap" }}>
         <Link href="/dashboard/logistics" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← {t("logistics.fleet.back")}</Link>
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{t("logistics.reports.title")}</h1>
@@ -76,6 +103,10 @@ export function LogisticsReportsClient() {
           <option value="cancelled">{t("logistics.reports.status.cancelled")}</option>
         </select>
         {loading && <span style={{ fontSize: 12, color: "var(--muted)" }}>…</span>}
+        <span className="no-print" style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+          <button className="btn btn-ghost btn-sm" disabled={!data || data.totalDeliveries === 0} onClick={exportCsv}>{t("logistics.reports.exportCsv")}</button>
+          <button className="btn btn-ghost btn-sm" disabled={!data} onClick={() => window.print()}>{t("logistics.reports.print")}</button>
+        </span>
       </div>
 
       {data && (
