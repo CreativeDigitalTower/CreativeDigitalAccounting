@@ -147,7 +147,9 @@
     "create": "Create shipment",
     "creating": "Creating…",
     "selectVehicle": "Select vehicle",
-    "selectProduct": "Select product"
+    "selectProduct": "Select product",
+    "carrierFilter": "Carrier (filter)",
+    "allCarriers": "All carriers"
   },
   "shipDetail": {
     "basic": "Basic data",

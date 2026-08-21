@@ -131,3 +131,25 @@ describe("import review — fleetGaps / fleetReviewSummary (§34)", () => {
     expect(s.missingPayload).toBe(1);
   });
 });
+
+import { pickVehicleConfig } from "@/lib/logistics/fleet";
+
+describe("pickVehicleConfig — избор при нова доставка (§27)", () => {
+  const rows = [
+    { carrierId: "unik", cargoMode: "bulk" },
+    { carrierId: "pctrans", cargoMode: "bags" },
+  ];
+  it("prefers the config for the selected carrier", () => {
+    expect(pickVehicleConfig(rows, "pctrans")).toEqual({ carrierId: "pctrans", cargoMode: "bags" });
+  });
+  it("falls back to the first config when carrier not chosen", () => {
+    expect(pickVehicleConfig(rows, "")).toEqual({ carrierId: "unik", cargoMode: "bulk" });
+    expect(pickVehicleConfig(rows, null)).toEqual({ carrierId: "unik", cargoMode: "bulk" });
+  });
+  it("falls back to first when selected carrier has no config", () => {
+    expect(pickVehicleConfig(rows, "other")).toEqual({ carrierId: "unik", cargoMode: "bulk" });
+  });
+  it("returns null for no configs", () => {
+    expect(pickVehicleConfig([], "unik")).toBeNull();
+  });
+});

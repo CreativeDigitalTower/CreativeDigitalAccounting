@@ -46,6 +46,16 @@ export function truckTrailerDisplay(truck: string | null | undefined, trailer: s
   return [truck, trailer].filter(Boolean).join(" / ");
 }
 
+/**
+ * Избор на конфигурация за автомобил при създаване на доставка (§27): предпочита
+ * конфигурация за избрания превозвач; иначе — първата налична. null, ако няма.
+ */
+export function pickVehicleConfig<T extends { carrierId: string | null }>(rows: T[], carrierId: string | null | undefined): T | null {
+  if (!rows.length) return null;
+  if (carrierId) { const match = rows.find((r) => r.carrierId === carrierId); if (match) return match; }
+  return rows[0];
+}
+
 /** Полетата, които импортът оставя празни при неясни данни (§34). */
 export type FleetGap = "driver" | "trailer" | "cargo" | "payload";
 

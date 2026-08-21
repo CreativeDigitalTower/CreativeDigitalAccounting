@@ -147,7 +147,9 @@
     "create": "Создать рейс",
     "creating": "Создание…",
     "selectVehicle": "Выберите автомобиль",
-    "selectProduct": "Выберите продукт"
+    "selectProduct": "Выберите продукт",
+    "carrierFilter": "Перевозчик (фильтр)",
+    "allCarriers": "Все перевозчики"
   },
   "shipDetail": {
     "basic": "Основные данные",

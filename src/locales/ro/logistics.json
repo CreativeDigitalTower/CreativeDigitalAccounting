@@ -147,7 +147,9 @@
     "create": "Creează cursă",
     "creating": "Se creează…",
     "selectVehicle": "Selectați vehicul",
-    "selectProduct": "Selectați produs"
+    "selectProduct": "Selectați produs",
+    "carrierFilter": "Transportator (filtru)",
+    "allCarriers": "Toți transportatorii"
   },
   "shipDetail": {
     "basic": "Date de bază",
