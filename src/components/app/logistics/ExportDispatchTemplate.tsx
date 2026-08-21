@@ -1,5 +1,6 @@
 "use client";
-import { dispatchTotalQuantity } from "@/lib/logistics/exportDocs";
+import { dispatchTotalQuantity, displayUnit } from "@/lib/logistics/exportDocs";
+import { resolveDispatchIssuer } from "@/lib/logistics/dispatchIssuer";
 
 type Party = { name?: string | null; address?: string | null; city?: string | null; vatNumber?: string | null; registrationNumber?: string | null };
 type Row = { lineNo?: number; truck?: string | null; material?: string | null; unit?: string | null; quantity?: number | null; valueMkd?: string | null };
@@ -15,8 +16,8 @@ const yearOf = (s?: string | null) => s ? String(new Date(s).getFullYear()) : ""
 const nf3 = new Intl.NumberFormat("bg-BG", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 const n3 = (v?: number | null) => v == null ? "" : nf3.format(v);
 
-// Точни пропорции на колоните по оригиналния Excel шаблон (widths A..L).
-const COL = { no: "7%", truck: "19%", material: "36%", unit: "10%", qty: "9%", value: "19%" };
+// Точни пропорции на колоните по оригиналния Excel шаблон (widths A..L, нормализирани).
+const COL = { no: "7.2%", truck: "18.6%", material: "36.6%", unit: "9.9%", qty: "9.4%", value: "18.3%" };
 const MIN_ROWS = 6; // първи активен ред + празни редове за ръчно дописване (§7)
 
 /**
@@ -26,21 +27,23 @@ const MIN_ROWS = 6; // първи активен ред + празни редо�
  */
 export function ExportDispatchTemplate({ data, blank = false }: { data: DispatchDocData; blank?: boolean }) {
   const rows = data.rows ?? [];
+  const issuer = resolveDispatchIssuer(data.issuer);
   const totalQ = data.totalQuantity ?? dispatchTotalQuantity(rows);
   const bodyRows: (Row | null)[] = [...rows];
   while (bodyRows.length < MIN_ROWS) bodyRows.push(null);
 
   const B = "1px solid #000";
-  const cell: React.CSSProperties = { border: B, padding: "2px 5px", fontSize: 11.5, verticalAlign: "middle", height: 22 };
+  const cell: React.CSSProperties = { border: B, padding: "2px 4px", fontSize: 11, verticalAlign: "middle", height: 22, overflow: "hidden" };
+  const hcell: React.CSSProperties = { ...cell, textAlign: "center", fontWeight: 700, fontSize: 10.5, lineHeight: 1.05, whiteSpace: "nowrap" };
   const dots = (n = 90) => "." .repeat(n);
   const recipientText = blank ? "" : [data.recipient?.name, data.recipient?.address, data.recipient?.city].filter(Boolean).join(", ");
 
   return (
     <div className="printable dispatch-copy" style={{ fontFamily: "'Times New Roman', Times, serif", color: "#000", background: "#fff", width: "100%", boxSizing: "border-box", padding: "4mm 6mm", fontSize: 12, lineHeight: 1.25 }}>
-      {/* Фирмен хедър — горе вляво (§2) */}
-      <div style={{ fontWeight: 700 }}>{data.issuer?.name ?? ""}</div>
-      <div>{data.issuer?.address ?? ""}</div>
-      <div>{data.issuer?.city ?? ""}</div>
+      {/* Фирмен хедър — горе вляво, на кирилица както в оригинала (§3) */}
+      <div style={{ fontWeight: 700 }}>{issuer.name ?? ""}</div>
+      <div>{issuer.address ?? ""}</div>
+      <div>{issuer.city ?? ""}</div>
 
       {/* Заглавие центрирано + номер вдясно (§3) */}
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: 6, margin: "8px 0 6px" }}>
@@ -71,12 +74,12 @@ export function ExportDispatchTemplate({ data, blank = false }: { data: Dispatch
         </colgroup>
         <thead>
           <tr>
-            <th style={{ ...cell, textAlign: "center", fontWeight: 700 }}>Ред бр.</th>
-            <th style={{ ...cell, textAlign: "center", fontWeight: 700, lineHeight: 1.05 }}>Камион<br />рег. бр</th>
-            <th style={{ ...cell, textAlign: "center", fontWeight: 700 }}>НАЗИВ НА МАТЕРИЈАЛИТЕ</th>
-            <th style={{ ...cell, textAlign: "center", fontWeight: 700 }}>Мера</th>
-            <th style={{ ...cell, textAlign: "center", fontWeight: 700 }}>Количина</th>
-            <th style={{ ...cell, textAlign: "center", fontWeight: 700 }}>ИЗНОС ДЕНАРИ</th>
+            <th style={hcell}>Ред бр.</th>
+            <th style={hcell}>Камион<br />рег. бр</th>
+            <th style={hcell}>НАЗИВ НА МАТЕРИЈАЛИТЕ</th>
+            <th style={hcell}>Мера</th>
+            <th style={hcell}>Количина</th>
+            <th style={hcell}>ИЗНОС ДЕНАРИ</th>
           </tr>
         </thead>
         <tbody>
@@ -85,7 +88,7 @@ export function ExportDispatchTemplate({ data, blank = false }: { data: Dispatch
               <td style={{ ...cell, textAlign: "center" }}>{r ? (r.lineNo ?? i + 1) : ""}</td>
               <td style={{ ...cell, textAlign: "center" }}>{r?.truck ?? ""}</td>
               <td style={{ ...cell, textAlign: "left" }}>{r?.material ?? ""}</td>
-              <td style={{ ...cell, textAlign: "center" }}>{r?.unit ?? ""}</td>
+              <td style={{ ...cell, textAlign: "center" }}>{r ? displayUnit(r.unit) : ""}</td>
               <td style={{ ...cell, textAlign: "right" }}>{r && r.quantity != null ? n3(r.quantity) : ""}</td>
               <td style={{ ...cell, textAlign: "right" }}>{r?.valueMkd ?? ""}</td>
             </tr>

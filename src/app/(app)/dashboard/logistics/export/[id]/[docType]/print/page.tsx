@@ -26,7 +26,11 @@ export default async function Page({ params }: { params: Promise<{ id: string; d
   // ДВЕ идентични копия (за шофьора и за получателя, §29–32). Само print layout —
   // съдържанието/данните са абсолютно еднакви и непроменени. ──
   if (isDispatch) {
-    const copy = <ExportDispatchTemplate data={data as DispatchDocData} blank={doc.docType === "blank"} />;
+    const dd = data as DispatchDocData;
+    const copy = <ExportDispatchTemplate data={dd} blank={doc.docType === "blank"} />;
+    // Име на файла за „Save as PDF": Ispratnica-{номер}-{година}.
+    const yr = dd.date ? new Date(dd.date).getFullYear() : "";
+    const fileTitle = `Ispratnica-${(dd.dispatchNumber ?? "").replace(/[^\w-]/g, "") || "dispatch"}${yr ? `-${yr}` : ""}`;
     // ЕДНА A4 portrait страница = ДВЕ идентични копия (по ~148.5mm), фина линия за рязане
     // по средата. margin:0 на @page, за да няма скалиране/втора страница/браузърски полета.
     return (
@@ -44,7 +48,7 @@ export default async function Page({ params }: { params: Promise<{ id: string; d
           .disp-cut::after { content: "✂ — — — — — — — — — — — — — — — — — — — — — — — — — — — — —"; position: absolute; left: 8mm; top: -8px; font-size: 9px; letter-spacing: 1px; color: #9a9a9a; background: #fff; padding: 0 4px; white-space: nowrap; }
           @media print { .disp-half { break-inside: avoid; page-break-inside: avoid; } .disp-sheet { page-break-after: avoid; } }
         `}</style>
-        <AutoPrint />
+        <AutoPrint fileTitle={fileTitle} />
         <div className="disp-sheet">
           <div className="disp-half">{copy}</div>
           <div className="disp-cut no-print-hide" />

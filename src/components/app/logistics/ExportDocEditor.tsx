@@ -138,7 +138,15 @@ export function ExportDocEditor({ setId, docId, canManage }: { setId: string; do
         {!isSeller && <span style={{ fontSize: 11, fontWeight: 700, color: "var(--muted)" }}>{t("logistics.export.receivedBadge")}</span>}
         {doc.overridden && <span style={{ fontSize: 11, fontWeight: 700, color: "var(--brass)" }}>{t("logistics.export.overridden")}</span>}
         <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
-          <a className="btn btn-ghost btn-sm" href={printUrl} target="_blank" rel="noreferrer">{t("logistics.export.printPdf")}</a>
+          {isDispatchLike ? (
+            <>
+              {/* Един и същ canonical layout за сваляне и печат (визуална консистентност). */}
+              <a className="btn btn-ghost btn-sm" href={`${printUrl}?intent=download`} target="_blank" rel="noreferrer">{t("logistics.export.downloadPdf")}</a>
+              <a className="btn btn-ghost btn-sm" href={`${printUrl}?intent=print`} target="_blank" rel="noreferrer">{t("logistics.export.print")}</a>
+            </>
+          ) : (
+            <a className="btn btn-ghost btn-sm" href={printUrl} target="_blank" rel="noreferrer">{t("logistics.export.printPdf")}</a>
+          )}
           {canEdit && <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => save()}>{t("logistics.export.save")}</button>}
           {canEdit && <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => action({ finalize: true })}>{t("logistics.export.finalize")}</button>}
           {canManage && isSeller && finalized && <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => action({ reopen: true })}>{t("logistics.export.reopen")}</button>}

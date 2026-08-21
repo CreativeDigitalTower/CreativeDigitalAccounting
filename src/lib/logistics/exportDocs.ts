@@ -4,6 +4,7 @@
  * резултатът се пази като snapshot и после е напълно editable (не се презаписва тихо).
  */
 import { netAmount } from "@/lib/logistics/money";
+import { resolveDispatchIssuer } from "@/lib/logistics/dispatchIssuer";
 import { Prisma } from "@prisma/client";
 import type { ExportDocType } from "@/lib/logistics/config";
 
@@ -159,6 +160,17 @@ export function cmrPrintOffset(layout: string | null | undefined): { top: number
 }
 
 /** Общо количество за испратница/празна (3 знака). */
+/**
+ * Presentation mapping на мерната единица за Испратницата (§1): вътрешно
+ * t/T/ton/tone/tne → визуално „ТОН". Не променя DB/бизнес логиката.
+ */
+export function displayUnit(u?: string | null): string {
+  const k = (u ?? "").trim().toLowerCase();
+  if (k === "") return "";
+  if (["t", "т", "ton", "tone", "tonne", "tons", "tne", "тон", "тона"].includes(k)) return "ТОН";
+  return (u ?? "").toUpperCase();
+}
+
 export function dispatchTotalQuantity(rows: { quantity?: number | null }[]): number {
   return rows.reduce<Prisma.Decimal>((s, r) => s.plus(r.quantity ?? 0), new Prisma.Decimal(0)).toDecimalPlaces(3).toNumber();
 }
@@ -195,9 +207,10 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
       const recipient = docType === "blank" ? null : (parties.client ?? null);
       return {
         dispatchNumber: src.dispatchNumber, date: src.invoiceDate,
-        issuer: parties.buyer, // MK фирмата издава испратницата
+        // MK фирмата издава испратницата — на кирилица както в оригинала (§3).
+        issuer: resolveDispatchIssuer(parties.buyer),
         recipient, destination: src.destination,
-        rows: [{ lineNo: 1, truck, material: src.productSnapshot, unit: src.unit || "t", quantity: src.quantity, valueMkd: "по фактура" }],
+        rows: [{ lineNo: 1, truck, material: src.productSnapshot, unit: src.unit || "ТОН", quantity: src.quantity, valueMkd: "по фактура" }],
         totalQuantity: src.quantity,
       };
     }

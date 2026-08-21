@@ -64,7 +64,8 @@ describe("buildDocumentData — едно въвеждане → всички д�
   it("Испратница: номер, камион, продукт, количество; издател = MK фирмата", () => {
     const disp = buildDocumentData(SRC, PARTIES, "dispatch") as Record<string, unknown>;
     expect(disp.dispatchNumber).toBe("9617");
-    expect((disp.issuer as { name: string }).name).toBe("SEM INTERNATIONAL DOOEL");
+    // Издателят на Испратницата се показва на кирилица както в оригинала (§3, resolveDispatchIssuer).
+    expect((disp.issuer as { name: string }).name).toBe('"Сем Интернационал" ДООЕЛ');
     expect((disp.recipient as { name: string })?.name).toBe("ARADIKO KOP DOOEL");
     const row = (disp.rows as { truck: string; quantity: number }[])[0];
     expect(row.truck).toBe("SK501TO / SK5022AE");
