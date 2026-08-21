@@ -1,11 +1,14 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useT } from "@/components/i18n/I18nProvider";
 import { SearchableSelect } from "@/components/app/logistics/SearchableSelect";
 import { computeNet } from "@/lib/logistics/shipmentCalc";
+import { normalizeRegistration } from "@/lib/logistics/normalize";
+import { exceedsPayload, pickVehicleConfig } from "@/lib/logistics/fleet";
 
+type ConfigRow = { id: string; truck: string; trailer: string | null; carrierId: string | null; carrierName: string | null; driver: string | null; cargoMode: string; maxPayloadTons: number | null; active: boolean };
 type Vehicle = { id: string; registration: string; trailerReg: string | null; carrierId: string | null; driver: string | null };
 type Product = { id: string; canonicalName: string; materialCode: string | null; unit: string };
 type Carrier = { id: string; name: string };
@@ -25,11 +28,61 @@ export function NewShipmentForm({ vehicles, products, carriers, suppliers }: {
     gross: "", tara: "", net: "",
     contract: "", clientNumber: "", factory: "", loadingPlace: "", incoterm: "", destination: "", recipient: "", note: "",
   });
+  // Конфигурации на автопарка (§27): филтър по превозвач → само неговите автомобили;
+  // изборът на автомобил snapshot-ва влекач/ремарке/последен шофьор/капацитет/вид товар.
+  // Шофьорът остава редактируем (§35). Капацитетът се валидира (§28).
+  const [configs, setConfigs] = useState<ConfigRow[]>([]);
+  const [carrierFilter, setCarrierFilter] = useState("");
+  const [cfg, setCfg] = useState<{ maxPayloadTons: number | null; cargoMode: string } | null>(null);
 
-  // Автоматично попълване от досието на автомобила (ремарке/превозвач/шофьор).
+  useEffect(() => {
+    void (async () => {
+      const r = await fetch("/api/logistics/vehicle-configs?active=1");
+      if (r.ok) setConfigs(await r.json());
+    })();
+  }, []);
+
+  // Влекач(рег.) → конфигурации, съпоставени по нормализиран рег. номер към vehicles.
+  const configsByVehicleId = useMemo(() => {
+    const byNorm = new Map<string, ConfigRow[]>();
+    for (const c of configs) {
+      const k = normalizeRegistration(c.truck);
+      (byNorm.get(k) ?? byNorm.set(k, []).get(k)!).push(c);
+    }
+    const m = new Map<string, ConfigRow[]>();
+    for (const v of vehicles) { const rows = byNorm.get(normalizeRegistration(v.registration)); if (rows) m.set(v.id, rows); }
+    return m;
+  }, [configs, vehicles]);
+
+  // Превозвачи, които реално имат автомобили в конфигурациите.
+  const carrierOptions = useMemo(() => {
+    const seen = new Map<string, string>();
+    for (const c of configs) if (c.carrierId && c.carrierName) seen.set(c.carrierId, c.carrierName);
+    const known = [...seen.entries()].map(([id, name]) => ({ value: id, label: name }));
+    return known.length ? known : carriers.map((c) => ({ value: c.id, label: c.name }));
+  }, [configs, carriers]);
+
+  // Автомобили, филтрирани по избрания превозвач (§27).
+  const vehicleOptions = useMemo(() => {
+    const list = carrierFilter
+      ? vehicles.filter((v) => (configsByVehicleId.get(v.id) ?? []).some((c) => c.carrierId === carrierFilter))
+      : vehicles;
+    return list.map((v) => ({ value: v.id, label: v.registration }));
+  }, [vehicles, carrierFilter, configsByVehicleId]);
+
+  // Автоматично попълване от конфигурацията (или досието на автомобила като fallback).
   function pickVehicle(id: string) {
     const v = vehicles.find((x) => x.id === id);
-    setF((s) => ({ ...s, vehicleId: id, trailerReg: v?.trailerReg ?? s.trailerReg, carrierId: v?.carrierId ?? s.carrierId, driver: v?.driver ?? s.driver }));
+    const rows = configsByVehicleId.get(id) ?? [];
+    const c = pickVehicleConfig(rows, carrierFilter);
+    setCfg(c ? { maxPayloadTons: c.maxPayloadTons, cargoMode: c.cargoMode } : null);
+    setF((s) => ({
+      ...s,
+      vehicleId: id,
+      trailerReg: c?.trailer ?? v?.trailerReg ?? s.trailerReg,
+      carrierId: c?.carrierId ?? v?.carrierId ?? s.carrierId,
+      driver: c?.driver ?? v?.driver ?? s.driver,
+    }));
   }
   // Автоматично попълване от продукта (material code + мерна единица).
   function pickProduct(id: string) {
@@ -84,8 +137,16 @@ export function NewShipmentForm({ vehicles, products, carriers, suppliers }: {
           <SearchableSelect options={suppliers.map((s) => ({ value: s.id, label: s.name }))} value={f.supplierId} onChange={(v) => setF({ ...f, supplierId: v })} emptyLabel="—" />
         </Field>
 
+        <Field label={t("logistics.shipNew.carrierFilter")}>
+          <SearchableSelect options={carrierOptions} value={carrierFilter} onChange={(v) => { setCarrierFilter(v); setF((s) => ({ ...s, vehicleId: "" })); setCfg(null); }} emptyLabel={t("logistics.shipNew.allCarriers")} />
+        </Field>
         <Field label={t("logistics.shipNew.vehicle")}>
-          <SearchableSelect options={vehicles.map((v) => ({ value: v.id, label: v.registration }))} value={f.vehicleId} onChange={pickVehicle} placeholder={t("logistics.shipNew.selectVehicle")} allowEmpty={false} />
+          <SearchableSelect options={vehicleOptions} value={f.vehicleId} onChange={pickVehicle} placeholder={t("logistics.shipNew.selectVehicle")} allowEmpty={false} />
+          {cfg && (cfg.cargoMode === "bulk" || cfg.cargoMode === "bags") && (
+            <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>
+              {cfg.cargoMode === "bulk" ? t("logistics.fleet.bulk") : t("logistics.fleet.bags")}{cfg.maxPayloadTons != null ? ` · ${t("logistics.fleet.maxLoad")} ${cfg.maxPayloadTons} t` : ""}
+            </div>
+          )}
         </Field>
         <Field label={t("logistics.shipNew.trailer")}><input style={inp} value={f.trailerReg} onChange={(e) => setF({ ...f, trailerReg: e.target.value })} /></Field>
         <Field label={t("logistics.shipNew.carrier")}>
@@ -104,6 +165,9 @@ export function NewShipmentForm({ vehicles, products, carriers, suppliers }: {
         <Field label={t("logistics.shipNew.net")}>
           <input type="number" step="0.001" style={{ ...inp, fontWeight: 700 }} value={f.net} onChange={(e) => setF({ ...f, net: e.target.value })} placeholder={net != null ? String(net) : "26.14"} />
           {f.net === "" && net != null && <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>= {net} {f.unit}</div>}
+          {cfg && cfg.cargoMode !== "bags" && net != null && exceedsPayload(net, cfg.maxPayloadTons) && (
+            <div style={{ color: "var(--brick)", fontSize: 11, marginTop: 3 }}>⚠ {t("logistics.fleet.capacityWarn").replace("{max}", (cfg.maxPayloadTons ?? 0).toFixed(1))}</div>
+          )}
         </Field>
 
         <Field label={t("logistics.shipNew.contract")}><input style={inp} value={f.contract} onChange={(e) => setF({ ...f, contract: e.target.value })} /></Field>

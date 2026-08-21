@@ -147,7 +147,9 @@
     "create": "Δημιουργία",
     "creating": "Δημιουργία…",
     "selectVehicle": "Επιλέξτε όχημα",
-    "selectProduct": "Επιλέξτε προϊόν"
+    "selectProduct": "Επιλέξτε προϊόν",
+    "carrierFilter": "Μεταφορέας (φίλτρο)",
+    "allCarriers": "Όλοι οι μεταφορείς"
   },
   "shipDetail": {
     "basic": "Βασικά στοιχεία",

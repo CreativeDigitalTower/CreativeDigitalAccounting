@@ -147,7 +147,9 @@
     "create": "Sefer oluştur",
     "creating": "Oluşturuluyor…",
     "selectVehicle": "Araç seçin",
-    "selectProduct": "Ürün seçin"
+    "selectProduct": "Ürün seçin",
+    "carrierFilter": "Taşıyıcı (filtre)",
+    "allCarriers": "Tüm taşıyıcılar"
   },
   "shipDetail": {
     "basic": "Temel bilgiler",

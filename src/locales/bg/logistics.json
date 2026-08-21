@@ -147,7 +147,9 @@
     "create": "Създай курс",
     "creating": "Създаване…",
     "selectVehicle": "Изберете автомобил",
-    "selectProduct": "Изберете продукт"
+    "selectProduct": "Изберете продукт",
+    "carrierFilter": "Превозвач (филтър)",
+    "allCarriers": "Всички превозвачи"
   },
   "shipDetail": {
     "basic": "Основни данни",
