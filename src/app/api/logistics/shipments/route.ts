@@ -7,6 +7,7 @@ import { nextSequenceValue } from "@/lib/logistics/sequence";
 import { SEQ_SCOPE, formatShipmentId, DEFAULT_SHIPMENT_STATUS } from "@/lib/logistics/config";
 import { computeNet, validateShipmentCore } from "@/lib/logistics/shipmentCalc";
 import { shipmentDelayed } from "@/lib/logistics/transport";
+import { validationError, zodFieldErrors, VMSG } from "@/lib/logistics/validation";
 import { z } from "zod";
 
 const listSelect = {
@@ -31,13 +32,13 @@ export async function GET(req: Request) {
 const optDate = z.string().datetime().nullable().optional().or(z.literal("").transform(() => null));
 const schema = z.object({
   dispatchNoteNumber: z.string().max(120).nullable().optional(),
-  dispatchDate: z.string().datetime().or(z.string().min(1)), // критично
+  dispatchDate: z.string().datetime().or(z.string().min(1, VMSG.date)), // критично
   supplierId: z.string().nullable().optional(),
-  vehicleId: z.string().min(1),          // критично
+  vehicleId: z.string().min(1, VMSG.vehicle),          // критично
   trailerReg: z.string().max(40).nullable().optional(),
   carrierId: z.string().nullable().optional(),
   driver: z.string().max(120).nullable().optional(),
-  productId: z.string().min(1),          // критично
+  productId: z.string().min(1, VMSG.product),          // критично
   grossWeight: z.number().nonnegative().nullable().optional(),
   tara: z.number().nonnegative().nullable().optional(),
   netQuantity: z.number().positive().nullable().optional(),
@@ -74,7 +75,7 @@ export async function POST(req: Request) {
 
     const net = computeNet(d.grossWeight, d.tara, d.netQuantity);
     const v = validateShipmentCore({ dispatchDate: d.dispatchDate, vehicleId: vehicle.id, productId: product.id, netQuantity: net });
-    if (!v.ok) return NextResponse.json({ error: v.error }, { status: 400 });
+    if (!v.ok) return validationError({ net: net == null || !(net > 0) ? VMSG.quantity : (v.error ?? VMSG.quantity) });
 
     const dispatchDate = new Date(d.dispatchDate);
     const year = dispatchDate.getFullYear();
@@ -114,7 +115,7 @@ export async function POST(req: Request) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
       return NextResponse.json({ error: "Тази експедиционна бележка вече е въведена." }, { status: 409 });
     }
-    if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues[0]?.message ?? "Невалидни данни." }, { status: 400 });
+    if (err instanceof z.ZodError) return validationError(zodFieldErrors(err));
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
   }
 }

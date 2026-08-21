@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useT } from "@/components/i18n/I18nProvider";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 
 type Client = { client: string; revenue: number; quantity: number };
 type Product = { product: string; soldQuantity: number; salesRevenue: number; avgSalePrice: number | null; avgPurchasePrice: number | null; marginPerUnit: number | null };
@@ -13,6 +13,7 @@ type Data = {
 
 export function LogisticsAnalytics() {
   const t = useT();
+  const { qty, qtyUnit } = useI18n();
   const [d, setD] = useState<Data | null>(null);
   useEffect(() => { fetch("/api/logistics/analytics").then((r) => r.ok ? r.json() : null).then(setD); }, []);
   if (!d) return null;
@@ -65,7 +66,7 @@ export function LogisticsAnalytics() {
               {d.products.map((p, i) => (
                 <tr key={i}>
                   <td style={td}>{p.product}</td>
-                  <td style={{ ...td, textAlign: "right" }} className="num">{p.soldQuantity}</td>
+                  <td style={{ ...td, textAlign: "right" }} className="num">{qty(p.soldQuantity)}</td>
                   <td style={{ ...td, textAlign: "right" }} className="num">{p.salesRevenue}</td>
                   <td style={{ ...td, textAlign: "right" }} className="num">{p.avgSalePrice ?? "—"}</td>
                   <td style={{ ...td, textAlign: "right" }} className="num">{p.avgPurchasePrice ?? "—"}</td>
@@ -83,7 +84,7 @@ export function LogisticsAnalytics() {
           <thead><tr><th style={th}></th><th style={{ ...th, textAlign: "right" }}>{d.comparison.prevYear}</th><th style={{ ...th, textAlign: "right" }}>{d.comparison.curYear}</th><th style={{ ...th, textAlign: "right" }}>Δ</th></tr></thead>
           <tbody>
             <tr><td style={td}>{t("logistics.analytics.revenue")}</td><td style={{ ...td, textAlign: "right" }} className="num">{d.comparison.revenue.prev}</td><td style={{ ...td, textAlign: "right" }} className="num">{d.comparison.revenue.cur}</td><td style={{ ...td, textAlign: "right" }}>{chg(d.comparison.revenue)}</td></tr>
-            <tr><td style={td}>{t("logistics.analytics.quantity")}</td><td style={{ ...td, textAlign: "right" }} className="num">{d.comparison.quantity.prev}</td><td style={{ ...td, textAlign: "right" }} className="num">{d.comparison.quantity.cur}</td><td style={{ ...td, textAlign: "right" }}>{chg(d.comparison.quantity)}</td></tr>
+            <tr><td style={td}>{t("logistics.analytics.quantity")}</td><td style={{ ...td, textAlign: "right" }} className="num">{qty(d.comparison.quantity.prev)}</td><td style={{ ...td, textAlign: "right" }} className="num">{qty(d.comparison.quantity.cur)}</td><td style={{ ...td, textAlign: "right" }}>{chg(d.comparison.quantity)}</td></tr>
           </tbody>
         </table>
       </div>

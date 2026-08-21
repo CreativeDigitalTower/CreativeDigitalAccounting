@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { useT } from "@/components/i18n/I18nProvider";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 
 type Gap = "driver" | "trailer" | "cargo" | "payload";
 type Row = {
@@ -15,6 +15,7 @@ type Draft = { defaultDriver: string; driverPhone: string; trailerReg: string; c
 
 export function FleetReviewClient({ canManage }: { canManage: boolean }) {
   const t = useT();
+  const { qty, qtyUnit } = useI18n();
   const [rows, setRows] = useState<Row[]>([]);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [showAll, setShowAll] = useState(false);
@@ -144,7 +145,7 @@ export function FleetReviewClient({ canManage }: { canManage: boolean }) {
                   <td style={td}>{r.carrierName ?? "—"}</td>
                   <td style={td}>{r.driver ?? "—"}{r.driverPhone ? <div style={{ fontSize: 11, color: "var(--muted)" }} className="num">{r.driverPhone}</div> : null}</td>
                   <td style={td}>{cargoLabel(r.cargoMode)}</td>
-                  <td style={td} className="num">{r.maxPayloadTons != null ? `${r.maxPayloadTons} t` : "—"}</td>
+                  <td style={td} className="num">{r.maxPayloadTons != null ? qtyUnit(r.maxPayloadTons, "t") : "—"}</td>
                   <td style={td}>{r.gaps.length ? r.gaps.map(gapChip) : <span style={{ color: "var(--muted)" }}>✓</span>}</td>
                   {canManage && <td style={td}>{r.gaps.length > 0 && <button className="btn" style={{ padding: "3px 10px", fontSize: 12 }} onClick={() => startEdit(r)}>{t("logistics.fleet.review.complete")}</button>}</td>}
                 </tr>

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useT } from "@/components/i18n/I18nProvider";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 import { SearchableSelect } from "@/components/app/logistics/SearchableSelect";
 
 type Row = { id: string; number: string; date: string | null; currency: string; client: string; lines: number; net: number; gross: number };
@@ -12,6 +12,7 @@ const round2 = (n: number) => Math.round(n * 100) / 100;
 
 export function MkSales({ canManage, clients }: { canManage: boolean; clients: Client[] }) {
   const t = useT();
+  const { qty, qtyUnit } = useI18n();
   const [rows, setRows] = useState<Row[]>([]);
   const [inv, setInv] = useState<Inv[]>([]);
   const [open, setOpen] = useState(false);
@@ -101,9 +102,9 @@ export function MkSales({ canManage, clients }: { canManage: boolean; clients: C
                       <tr key={s.id}>
                         <td style={td}>{s.productSnapshot ?? "—"}</td>
                         <td style={td}>{s.sourceInvoice}{s.shipmentCode ? ` · ${s.shipmentCode}` : ""}</td>
-                        <td style={td} className="num">{s.received} {s.unit}</td>
-                        <td style={td} className="num">{s.sold}</td>
-                        <td style={{ ...td, fontWeight: 600 }} className="num">{s.remaining}</td>
+                        <td style={td} className="num">{qtyUnit(s.received, s.unit)}</td>
+                        <td style={td} className="num">{qty(s.sold)}</td>
+                        <td style={{ ...td, fontWeight: 600 }} className="num">{qty(s.remaining)}</td>
                         <td style={td}><input type="number" step="0.001" style={{ ...inp, width: 78, borderColor: over ? "var(--brick)" : undefined }} value={pick[s.id]?.qty ?? ""} onChange={(e) => setPickField(s.id, "qty", e.target.value)} placeholder={`≤ ${s.remaining}`} /></td>
                         <td style={td}><input type="number" step="0.01" style={{ ...inp, width: 78 }} value={pick[s.id]?.price ?? ""} onChange={(e) => setPickField(s.id, "price", e.target.value)} /></td>
                         <td style={td} className="num">{lt ?? "—"}</td>

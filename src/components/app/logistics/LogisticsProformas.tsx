@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useT } from "@/components/i18n/I18nProvider";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 import { SearchableSelect } from "@/components/app/logistics/SearchableSelect";
 
 type Proforma = {
@@ -13,6 +13,7 @@ type Allocatable = { id: string; code: string; dispatchNoteNumber: string | null
 
 export function LogisticsProformas({ canManage, products }: { canManage: boolean; products: Product[] }) {
   const t = useT();
+  const { qty, qtyUnit } = useI18n();
   const [items, setItems] = useState<Proforma[]>([]);
   const [alloc, setAlloc] = useState<Allocatable[]>([]);
   const [err, setErr] = useState("");
@@ -96,9 +97,9 @@ export function LogisticsProformas({ canManage, products }: { canManage: boolean
                   <td style={td}><strong>{p.number ?? "—"}</strong></td>
                   <td style={td}>{dt(p.date)}</td>
                   <td style={td}>{p.productSnapshot ?? "—"}</td>
-                  <td style={td} className="num">{p.initialQuantity} {p.unit}</td>
-                  <td style={td} className="num">{p.used} {p.unit}</td>
-                  <td style={{ ...td, color: p.negative ? "var(--brick)" : "inherit", fontWeight: 600 }} className="num">{p.remaining} {p.unit}</td>
+                  <td style={td} className="num">{qtyUnit(p.initialQuantity, p.unit)}</td>
+                  <td style={td} className="num">{qtyUnit(p.used, p.unit)}</td>
+                  <td style={{ ...td, color: p.negative ? "var(--brick)" : "inherit", fontWeight: 600 }} className="num">{qtyUnit(p.remaining, p.unit)}</td>
                   <td style={td}>{t(`logistics.proformas.status${p.status.charAt(0).toUpperCase() + p.status.slice(1)}`)}</td>
                   {canManage && (
                     <td style={td}>

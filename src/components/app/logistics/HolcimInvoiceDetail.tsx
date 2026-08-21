@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useT } from "@/components/i18n/I18nProvider";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 
 type Line = {
   id: string; lineNumber: number | null; dispatchNoteSnapshot: string | null; truckSnapshot: string | null;
@@ -19,6 +19,7 @@ type Invoice = {
 
 export function HolcimInvoiceDetail({ id }: { id: string }) {
   const t = useT();
+  const { qty, qtyUnit } = useI18n();
   const [inv, setInv] = useState<Invoice | null>(null);
   useEffect(() => { fetch(`/api/logistics/supplier-invoices/${id}`).then((r) => r.ok ? r.json() : null).then(setInv); }, [id]);
   if (!inv) return null;
@@ -60,7 +61,7 @@ export function HolcimInvoiceDetail({ id }: { id: string }) {
                 <td style={td}>{l.materialCodeSnapshot ?? "—"}</td>
                 <td style={td}>{l.materialName ?? l.productSnapshot ?? "—"}</td>
                 <td style={td}>{l.unit ?? "—"}</td>
-                <td style={td} className="num">{l.quantity}</td>
+                <td style={td} className="num">{qty(l.quantity)}</td>
                 <td style={td} className="num">{l.unitPrice}</td>
                 <td style={td} className="num">{l.lineTotal}</td>
                 <td style={td} className="num">{l.vatAmount ?? "—"}</td>

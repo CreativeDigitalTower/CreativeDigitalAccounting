@@ -6,6 +6,7 @@ import { audit } from "@/lib/documents";
 import { nextSequenceValue } from "@/lib/logistics/sequence";
 import { SEQ_SCOPE, formatSequenceNumber, EXPORT_INVOICE_FORMAT, suggestDispatchFromInvoice } from "@/lib/logistics/config";
 import { truckTrailerLabel } from "@/lib/logistics/exportDocs";
+import { validationError, zodFieldErrors, VMSG, type FieldErrors } from "@/lib/logistics/validation";
 import { z } from "zod";
 
 const listSelect = {
@@ -62,6 +63,17 @@ export async function POST(req: Request) {
   try {
     const d = schema.parse(await req.json());
 
+    // Задължителни полета (§10) — структуриран validation отговор, без silent failure.
+    // При създаване от нулата (без съществуващ курс) искаме автомобил, продукт и количество.
+    if (!d.shipmentId) {
+      const fe: FieldErrors = {};
+      if (!d.truckVehicleId) fe.truckVehicleId = VMSG.vehicle;
+      if (!d.logisticsProductId) fe.logisticsProductId = VMSG.product;
+      if (d.quantity == null) fe.quantity = VMSG.quantity;
+      else if (!(d.quantity > 0)) fe.quantity = VMSG.quantityPositive;
+      if (Object.keys(fe).length) return validationError(fe);
+    }
+
     // Snapshots + валидиране на собственост.
     const [vehicle, product, shipment, buyer, client] = await Promise.all([
       d.truckVehicleId ? prisma.vehicle.findFirst({ where: { id: d.truckVehicleId, companyId: g.companyId }, select: { registration: true, logisticsProfile: { select: { trailerReg: true } } } }) : Promise.resolve(null),
@@ -113,7 +125,7 @@ export async function POST(req: Request) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
       return NextResponse.json({ error: "Фактура с този номер вече съществува." }, { status: 409 });
     }
-    if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues[0]?.message ?? "Невалидни данни." }, { status: 400 });
+    if (err instanceof z.ZodError) return validationError(zodFieldErrors(err));
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
   }
 }

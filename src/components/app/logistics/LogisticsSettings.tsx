@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useT } from "@/components/i18n/I18nProvider";
+import { parseQuantity } from "@/lib/i18n/format";
 
 type Settings = { bgCurrency: string; mkCurrency: string; mkVatRate: number };
 type Rate = { id: string; baseCurrency: string; quoteCurrency: string; rate: number; date: string | null; source: string | null };
@@ -12,15 +13,20 @@ export function LogisticsSettings({ canManage }: { canManage: boolean }) {
   const [msg, setMsg] = useState("");
   const [rates, setRates] = useState<Rate[]>([]);
   const [rf, setRf] = useState({ base: "EUR", quote: "MKD", rate: "", date: "", source: "" });
+  const [rateErr, setRateErr] = useState("");
 
   useEffect(() => { fetch("/api/logistics/settings").then((r) => r.ok ? r.json() : null).then(setS); loadRates(); }, []);
   async function loadRates() { const r = await fetch("/api/logistics/exchange-rates"); if (r.ok) setRates(await r.json()); }
   async function addRate() {
-    if (!(Number(rf.rate) > 0)) return;
+    setRateErr("");
+    const rate = parseQuantity(rf.rate);
+    if (rate == null) { setRateErr(t("logistics.validation.quantityInvalid")); return; }
+    if (!(rate > 0)) { setRateErr(t("logistics.validation.quantityPositive")); return; }
     setBusy(true);
-    const r = await fetch("/api/logistics/exchange-rates", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ baseCurrency: rf.base, quoteCurrency: rf.quote, rate: Number(rf.rate), date: rf.date ? new Date(rf.date).toISOString() : null, source: rf.source || null }) });
+    const r = await fetch("/api/logistics/exchange-rates", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ baseCurrency: rf.base, quoteCurrency: rf.quote, rate, date: rf.date ? new Date(rf.date).toISOString() : null, source: rf.source || null }) });
     setBusy(false);
     if (r.ok) { setRf({ base: "EUR", quote: "MKD", rate: "", date: "", source: "" }); loadRates(); }
+    else { const j = await r.json().catch(() => ({})); setRateErr(j.error ?? t("logistics.common.err")); }
   }
 
   async function save() {
@@ -59,9 +65,10 @@ export function LogisticsSettings({ canManage }: { canManage: boolean }) {
             <input type="number" step="0.0001" style={{ ...inp, width: 100 }} placeholder={t("logistics.fx.rate")} value={rf.rate} onChange={(e) => setRf({ ...rf, rate: e.target.value })} />
             <input type="date" style={{ ...inp, width: 140 }} value={rf.date} onChange={(e) => setRf({ ...rf, date: e.target.value })} />
             <input style={{ ...inp, width: 120 }} placeholder={t("logistics.fx.source")} value={rf.source} onChange={(e) => setRf({ ...rf, source: e.target.value })} />
-            <button className="btn btn-primary btn-sm" disabled={busy || !(Number(rf.rate) > 0)} onClick={addRate}>{t("logistics.fx.add")}</button>
+            <button className="btn btn-primary btn-sm" disabled={busy} onClick={addRate}>{t("logistics.fx.add")}</button>
           </div>
         )}
+        {rateErr && <div role="alert" style={{ color: "var(--brick)", fontSize: 11.5, marginBottom: 8 }}>{rateErr}</div>}
         {rates.length === 0 ? <div style={{ fontSize: 12.5, color: "var(--muted)" }}>{t("logistics.fx.empty")}</div> : (
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
             <tbody>

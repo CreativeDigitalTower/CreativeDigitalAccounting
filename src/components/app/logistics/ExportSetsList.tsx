@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useT } from "@/components/i18n/I18nProvider";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 import { ACTIVE_EXPORT_DOC_TYPES, isActiveExportDocType } from "@/lib/logistics/config";
 
 type DocLite = { docType: string; status: string; overridden: boolean };
@@ -15,6 +15,7 @@ const ACTIVE_TOTAL = ACTIVE_EXPORT_DOC_TYPES.length; // 5
 
 export function ExportSetsList({ canManage }: { canManage: boolean }) {
   const t = useT();
+  const { qty, qtyUnit } = useI18n();
   const [rows, setRows] = useState<Row[]>([]);
   const [q, setQ] = useState("");
   const [dest, setDest] = useState("");
@@ -74,7 +75,7 @@ export function ExportSetsList({ canManage }: { canManage: boolean }) {
                   <td style={td}>{dt(r.invoiceDate)}</td><td style={td}>{r.destination ?? "—"}</td>
                   <td style={td}>{[r.truckRegSnapshot, r.trailerReg].filter(Boolean).join(" / ") || "—"}</td>
                   <td style={td}>{r.productSnapshot ?? "—"}</td>
-                  <td style={td} className="num">{r.quantity != null ? `${r.quantity} ${r.unit}` : "—"}</td>
+                  <td style={td} className="num">{r.quantity != null ? qtyUnit(r.quantity, r.unit) : "—"}</td>
                   <td style={td}>{r.buyer ?? "—"}</td>
                   <td style={td}>{r.status === "finalized" ? t("logistics.export.stReady") : t("logistics.export.stDraft")}</td>
                   <td style={td} className="num">{activeDocs(r.documents)}/{ACTIVE_TOTAL}</td>
