@@ -5,6 +5,7 @@ import { audit } from "@/lib/documents";
 import { LOGISTICS_MODULE_KEY, LOGISTICS_SETUP_EIK } from "@/lib/logistics/config";
 import { seedLogisticsMasterData } from "@/lib/logistics/seed";
 import { importCementFleet } from "@/lib/logistics/cementFleet";
+import { fixSemInternationalNames } from "@/lib/logistics/companyNameFix";
 import { z } from "zod";
 
 // Super Admin активиране на модула (корекции 1, 2, 19). ЕИК се ползва САМО за
@@ -18,6 +19,7 @@ const schema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("setupClient"), eik: z.string().optional() }),
   z.object({ action: z.literal("seedMasterData"), companyId: z.string() }),
   z.object({ action: z.literal("importCementFleet"), companyId: z.string() }),
+  z.object({ action: z.literal("fixSemInternationalNames"), companyId: z.string() }),
 ]);
 
 export async function GET() {
@@ -99,6 +101,15 @@ export async function POST(req: Request) {
       await audit(body.companyId, userId, "import_fleet", "Company", body.companyId,
         `Автопарк (цимент): ${res.carriers} превозвача, ${res.trucks} влекача, ${res.configurations} конфигурации`);
       return NextResponse.json({ success: true, imported: res });
+    }
+
+    if (body.action === "fixSemInternationalNames") {
+      const company = await prisma.company.findUnique({ where: { id: body.companyId }, select: { id: true } });
+      if (!company) return NextResponse.json({ error: "Фирмата не е намерена." }, { status: 404 });
+      const res = await fixSemInternationalNames(body.companyId);
+      await audit(body.companyId, userId, "fix_names", "Company", body.companyId,
+        `Корекция на име: ${res.companiesFixed.length} фирми, ${res.clientsFixed.length} клиенти → SEM INTERNATIONAL DOOEL`);
+      return NextResponse.json({ success: true, fixed: res });
     }
 
     // setupClient: еднократна безопасна начална настройка за клиента по ЕИК.

@@ -72,3 +72,18 @@ describe("buildDocumentData — фактура autofill (§1/§16) без #REF!"
     expect(JSON.stringify(inv)).not.toContain("#REF!");
   });
 });
+
+import { isSemInternational } from "@/lib/logistics/semName";
+
+describe("isSemInternational — разпознаване на грешните варианти (§6)", () => {
+  it("хваща typo вариантите", () => {
+    for (const n of ["SEM INIERNAIIONAL JOUEL", "SEM INERNAIONAL JOUEL", "SEM INTERNATIONAL JOUEL", "SEM INTERNACIONAL DOOEL", "Сем Интернационал ДООЕЛ", "SEM INTERNATIONAL DOOEL"]) {
+      expect(isSemInternational(n)).toBe(true);
+    }
+  });
+  it("не хваща други фирми", () => {
+    expect(isSemInternational("METAL TRADE KUSTENDIL 2005 Ltd.")).toBe(false);
+    expect(isSemInternational("Друга Фирма ЕООД")).toBe(false);
+    expect(isSemInternational(null)).toBe(false);
+  });
+});
