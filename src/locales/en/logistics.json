@@ -529,7 +529,9 @@
     "receivedTitle": "Received export documents",
     "receivedIntro": "Export deliveries issued to your company by a linked seller in the group (view and print only).",
     "receivedEmpty": "No received export documents.",
-    "seller": "Seller"
+    "seller": "Seller",
+    "unit": "Unit",
+    "valueMkd": "Value (denari)"
   },
   "fleet": {
     "title": "Fleet",

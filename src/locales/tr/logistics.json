@@ -529,7 +529,9 @@
     "receivedTitle": "Alınan ihracat belgeleri",
     "receivedIntro": "Gruptaki bağlı bir satıcı tarafından şirketinize düzenlenen ihracat teslimatları (yalnızca görüntüleme ve yazdırma).",
     "receivedEmpty": "Alınan ihracat belgesi yok.",
-    "seller": "Satıcı"
+    "seller": "Satıcı",
+    "unit": "Birim",
+    "valueMkd": "Tutar (dinar)"
   },
   "fleet": {
     "title": "Fleet",

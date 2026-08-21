@@ -27,23 +27,28 @@ export default async function Page({ params }: { params: Promise<{ id: string; d
   // съдържанието/данните са абсолютно еднакви и непроменени. ──
   if (isDispatch) {
     const copy = <ExportDispatchTemplate data={data as DispatchDocData} blank={doc.docType === "blank"} />;
+    // ЕДНА A4 portrait страница = ДВЕ идентични копия (по ~148.5mm), фина линия за рязане
+    // по средата. margin:0 на @page, за да няма скалиране/втора страница/браузърски полета.
     return (
-      <div>
+      <div className="disp-print-root">
         <style>{`
-          @media print { @page { size: A4 portrait; margin: 8mm; } body.printing-multi { background: #fff; } }
-          .disp-2up { display: flex; flex-direction: column; }
-          .disp-copy { transform-origin: top center; }
-          .disp-cut { border-top: 1px dashed #9a9a9a; margin: 5mm 0; height: 0; position: relative; }
-          .disp-cut::after { content: "✂"; position: absolute; left: 6px; top: -9px; font-size: 11px; color: #9a9a9a; background: #fff; padding: 0 4px; }
-          @media print { .disp-copy { break-inside: avoid; } .disp-2up { break-inside: avoid; } }
+          @page { size: A4 portrait; margin: 0; }
+          @media print {
+            html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
+            body.printing-multi { background: #fff; }
+            .disp-print-root { margin: 0; }
+          }
+          .disp-sheet { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; box-sizing: border-box; display: flex; flex-direction: column; }
+          .disp-half { height: 148.5mm; box-sizing: border-box; overflow: hidden; padding: 3mm 0; }
+          .disp-cut { border-top: 1px dashed #8a8a8a; position: relative; height: 0; }
+          .disp-cut::after { content: "✂ — — — — — — — — — — — — — — — — — — — — — — — — — — — — —"; position: absolute; left: 8mm; top: -8px; font-size: 9px; letter-spacing: 1px; color: #9a9a9a; background: #fff; padding: 0 4px; white-space: nowrap; }
+          @media print { .disp-half { break-inside: avoid; page-break-inside: avoid; } .disp-sheet { page-break-after: avoid; } }
         `}</style>
         <AutoPrint />
-        <div className="print-sheet">
-          <div className="print-doc disp-2up">
-            <div className="disp-copy">{copy}</div>
-            <div className="disp-cut no-print-hide" />
-            <div className="disp-copy">{copy}</div>
-          </div>
+        <div className="disp-sheet">
+          <div className="disp-half">{copy}</div>
+          <div className="disp-cut no-print-hide" />
+          <div className="disp-half">{copy}</div>
         </div>
       </div>
     );
