@@ -24,6 +24,26 @@ export type NameFixResult = {
 export async function fixSemInternationalNames(companyId: string): Promise<NameFixResult> {
   const res: NameFixResult = { companiesFixed: [], clientsFixed: [], duplicates: [], scanned: 0 };
 
+  // (0) Самата подадена фирма — ако нейното СОБСТВЕНО име е грешен вариант на SEM,
+  // коригирай master записа (напр. пусковото действие върху реда на SEM в админ панела).
+  const self = await prisma.company.findUnique({
+    where: { id: companyId },
+    select: { id: true, name: true, nameEn: true, address: true, addressEn: true, city: true, cityEn: true, country: true, countryEn: true },
+  });
+  res.scanned += self ? 1 : 0;
+  if (self && (isSemInternational(self.name) || isSemInternational(self.nameEn)) && !isCanonical(self)) {
+    await prisma.company.update({
+      where: { id: self.id },
+      data: {
+        name: CANON.name, nameEn: CANON.name,
+        address: CANON.address, addressEn: CANON.address,
+        city: CANON.city, cityEn: CANON.city,
+        country: self.country ?? CANON.country, countryEn: CANON.country,
+      },
+    });
+    res.companiesFixed.push({ id: self.id, before: self.nameEn || self.name, after: CANON.name });
+  }
+
   // Обхват: фирмите-купувачи по export set-овете на тази фирма (company-scoped).
   const sets = await prisma.exportDocumentSet.findMany({
     where: { companyId, buyerCompanyId: { not: null } },

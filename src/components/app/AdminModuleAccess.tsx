@@ -46,8 +46,18 @@ export function AdminModuleAccess() {
     });
     const j = await r.json().catch(() => ({}));
     setBusy(false);
-    setMsg(r.ok ? `✅ ${note}` : `⚠️ ${j.error ?? "Грешка."}`);
-    if (r.ok) await load();
+    if (!r.ok) { setMsg(`⚠️ ${j.error ?? "Грешка."}`); return; }
+    // Детайлен резултат за import/fix действията (created/updated/skipped).
+    let detail = "";
+    if (j.imported) {
+      const im = j.imported;
+      if (typeof im.created === "number") detail = ` (създадени: ${im.created}, обновени: ${im.updated}, пропуснати: ${im.skipped}${im.errors?.length ? `, грешки: ${im.errors.length}` : ""})`;
+      else if (typeof im.carriers === "number") detail = ` (превозвачи: ${im.carriers}, влекачи: ${im.trucks}, конфигурации: ${im.configurations})`;
+    } else if (j.fixed) {
+      detail = ` (фирми: ${j.fixed.companiesFixed?.length ?? 0}, клиенти: ${j.fixed.clientsFixed?.length ?? 0})`;
+    }
+    setMsg(`✅ ${note}${detail}`);
+    await load();
   }
 
   const filtered = companies.filter((c) =>
@@ -119,10 +129,26 @@ export function AdminModuleAccess() {
                     {c.logisticsEnabled ? "Деактивирай" : "Активирай"}
                   </button>
                   {c.logisticsEnabled && (
-                    <button className="btn btn-ghost btn-sm" disabled={busy} style={{ marginLeft: 6 }}
-                      onClick={() => post({ action: "seedMasterData", companyId: c.id }, "Master data е зареден (idempotent).")}>
-                      Зареди master data
-                    </button>
+                    <span style={{ display: "inline-flex", gap: 6, flexWrap: "wrap", marginLeft: 6 }}>
+                      <button className="btn btn-ghost btn-sm" disabled={busy}
+                        onClick={() => post({ action: "seedMasterData", companyId: c.id }, "Master data е зареден (idempotent).")}>
+                        Зареди master data
+                      </button>
+                      <button className="btn btn-ghost btn-sm" disabled={busy}
+                        onClick={() => post({ action: "importCementFleet", companyId: c.id }, "Автопаркът (цимент) е импортиран (idempotent).")}>
+                        Импортирай автопарк
+                      </button>
+                      {/* Поправя master името SEM INIERNAIIONAL JOUEL → SEM INTERNATIONAL DOOEL */}
+                      <button className="btn btn-ghost btn-sm" disabled={busy}
+                        onClick={() => post({ action: "fixSemInternationalNames", companyId: c.id }, "Името е коригирано → SEM INTERNATIONAL DOOEL.")}>
+                        Поправи име (SEM)
+                      </button>
+                      {/* Импортира 19-те MK клиента, company-scoped, idempotent */}
+                      <button className="btn btn-primary btn-sm" disabled={busy}
+                        onClick={() => post({ action: "importMkClients", companyId: c.id }, "MK клиентите са импортирани (idempotent).")}>
+                        Импортирай MK клиенти
+                      </button>
+                    </span>
                   )}
                 </td>
               </tr>
