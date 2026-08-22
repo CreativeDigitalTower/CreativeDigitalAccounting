@@ -60,11 +60,12 @@ export default async function Page({ params, searchParams }: { params: Promise<{
     );
   }
 
-  // ── CMR EPSON: PRINT OVERLAY върху предпечатана бланка. A4 portrait, margin 0,
+  // ── CMR EPSON/HP: PRINT OVERLAY върху предпечатана бланка. A4 portrait, margin 0,
   // само динамични данни; калибриране ox/oy (mm) от query. Без browser header/footer. ──
-  if (doc.docType === "cmr_epson") {
+  if (doc.docType === "cmr_epson" || doc.docType === "cmr_hp") {
     const cmr = { ...(data as CmrDocData), calibX: numParam("ox"), calibY: numParam("oy"), preview: false };
-    const fileTitle = `CMR-${(cmr.invoiceNumber ?? "").replace(/[^\w-]/g, "") || "epson"}`;
+    const which = doc.docType === "cmr_hp" ? "HP" : "Epson";
+    const fileTitle = `CMR-${which}-${(cmr.invoiceNumber ?? "").replace(/[^\w-]/g, "") || "export"}`;
     return (
       <div className="cmr-print-root">
         <style>{`
@@ -74,11 +75,11 @@ export default async function Page({ params, searchParams }: { params: Promise<{
             .cmr-print-root { margin: 0; }
             .cmr-ref { display: none !important; }
           }
-          .cmr-epson-sheet { margin: 0 auto; }
+          .cmr-epson-sheet, .cmr-hp-sheet { margin: 0 auto; }
         `}</style>
         <AutoPrint fileTitle={fileTitle} />
         <div className="no-print" style={{ maxWidth: 760, margin: "0 auto 10px", fontSize: 12.5, color: "#333", background: "#fff7e6", border: "1px solid #e0c070", borderRadius: 8, padding: "8px 12px" }}>
-          ⚠ Поставете предпечатаната CMR (Epson) бланка в принтера. Печатайте при <b>мащаб 100% / Actual size</b> (без „Fit to page"). <b>Изключете Headers and footers.</b>
+          ⚠ Поставете предпечатаната CMR ({which}) бланка в принтера. Печатайте при <b>мащаб 100% / Actual size</b> (без „Fit to page"). <b>Изключете Headers and footers.</b>
         </div>
         <ExportCmrTemplate data={cmr} />
       </div>

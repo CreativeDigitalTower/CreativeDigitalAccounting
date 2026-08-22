@@ -251,22 +251,21 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
       const cmrSender = resolveInvoiceParty(sellerEn);
       const cmrBuyer = resolveInvoiceParty(buyerEn);
       const cmrCity = (cmrSender.city ?? sellerCityEn ?? "").toUpperCase();
-      const isEpson = docType === "cmr_epson";
+      // И двата CMR overlay-а (Epson/HP) ползват едни и същи presentation defaults (§2/§3/§17).
       return {
-        layout: isEpson ? "epson" : "hp",
+        layout: docType === "cmr_epson" ? "epson" : "hp",
         sender: cmrSender, consignee: cmrBuyer,
-        // CMR Epson defaults (editable): дестинация „SKOPIE", държава „NORTH MACEDONIA",
-        // спедитор „ENIGMA" (§2/§3/§17). HP пази текущото поведение.
-        destination: isEpson ? "SKOPIE" : src.destination,
+        // CMR defaults (editable): дестинация „SKOPIE", държава „NORTH MACEDONIA", спедитор „ENIGMA".
+        destination: "SKOPIE",
         placeOfShipment: [cmrCity, (cmrSender.country ?? "").toUpperCase()].filter(Boolean).join(", "),
         // CMR транспортна дата = дата на изпращане (fallback CMR/деклар. → issue), §8/§13.
         date: src.shipmentDate ?? src.declarationCmrDate ?? src.invoiceDate,
         invoiceDate: src.invoiceDate,
-        destinationCountry: isEpson ? "NORTH MACEDONIA" : ((cmrBuyer.country ?? "").toUpperCase() || null),
+        destinationCountry: "NORTH MACEDONIA",
         placeBottom: cmrCity || null,
         truck, invoiceNumber: src.invoiceNumber,
         goods: { description: src.productSnapshot ? `CEMENT Holcim ${src.productSnapshot} - IN BULK` : "CEMENT", customsCode: src.customsCode ?? null, certificate: null },
-        quantity: src.quantity, weightKg: kgFromTonnes(src.quantity), speditor: isEpson ? "ENIGMA" : null,
+        quantity: src.quantity, weightKg: kgFromTonnes(src.quantity), speditor: "ENIGMA",
       };
     }
   }

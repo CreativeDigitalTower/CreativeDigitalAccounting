@@ -136,9 +136,9 @@ export function ExportDocEditor({ setId, docId, canManage }: { setId: string; do
   const isBlank = dt === "blank";
   const isDispatchLike = dt === "dispatch" || dt === "blank";
   const isDeclaration = dt === "declaration";
-  const isCmrEpson = dt === "cmr_epson";
+  const isCmrOverlay = dt === "cmr_epson" || dt === "cmr_hp";
   // Калибриране на CMR Epson overlay (mm) → подава се в print URL-а.
-  const calib = isCmrEpson ? `&ox=${encodeURIComponent(str("calibX") || "0")}&oy=${encodeURIComponent(str("calibY") || "0")}` : "";
+  const calib = isCmrOverlay ? `&ox=${encodeURIComponent(str("calibX") || "0")}&oy=${encodeURIComponent(str("calibY") || "0")}` : "";
   const printUrl = `/dashboard/logistics/export/${setId}/${doc.docType}/print`;
 
   return (
@@ -150,7 +150,7 @@ export function ExportDocEditor({ setId, docId, canManage }: { setId: string; do
         {!isSeller && <span style={{ fontSize: 11, fontWeight: 700, color: "var(--muted)" }}>{t("logistics.export.receivedBadge")}</span>}
         {doc.overridden && <span style={{ fontSize: 11, fontWeight: 700, color: "var(--brass)" }}>{t("logistics.export.overridden")}</span>}
         <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
-          {isDispatchLike || isInvoice || isCmrEpson ? (
+          {isDispatchLike || isInvoice || isCmrOverlay ? (
             <>
               {/* Един и същ canonical layout за сваляне и печат (визуална консистентност). */}
               <a className="btn btn-ghost btn-sm" href={`${printUrl}?intent=download${calib}`} target="_blank" rel="noreferrer">{t("logistics.export.downloadPdf")}</a>
@@ -252,23 +252,23 @@ export function ExportDocEditor({ setId, docId, canManage }: { setId: string; do
               {txt(t("logistics.export.sender"), "sender.name")}
               {txt(t("logistics.export.consignee"), "consignee.name")}
               {txt(t("logistics.export.destination"), "destination")}
-              {isCmrEpson && txt(t("logistics.export.destinationCountry"), "destinationCountry")}
+              {isCmrOverlay && txt(t("logistics.export.destinationCountry"), "destinationCountry")}
               {txt(t("logistics.export.placeOfLoading"), "placeOfShipment")}
               {date(t("logistics.export.shipmentDate"), "date")}
               {truckField(t("logistics.export.truck"), "truck")}
               {txt(t("logistics.export.invoiceNumber"), "invoiceNumber")}
-              {isCmrEpson && date(t("logistics.export.issueDate"), "invoiceDate")}
+              {isCmrOverlay && date(t("logistics.export.issueDate"), "invoiceDate")}
               {txt(t("logistics.export.goodsDesc"), "goods.description")}
               {txt(t("logistics.export.customsCode"), "goods.customsCode")}
-              {isCmrEpson && <>
+              {isCmrOverlay && <>
                 {txt(t("logistics.export.certificate"), "goods.certificate")}
                 {number(t("logistics.export.quantity"), "quantity")}
                 {txt(t("logistics.export.speditor"), "speditor")}
                 {txt(t("logistics.export.placeBottom"), "placeBottom")}
               </>}
-              {!isCmrEpson && number(t("logistics.export.grossKg"), "weightKg")}
+              {!isCmrOverlay && number(t("logistics.export.grossKg"), "weightKg")}
               {txt(t("logistics.export.carrier"), "carrier")}
-              {isCmrEpson && (
+              {isCmrOverlay && (
                 <div style={{ marginTop: 6, borderTop: "1px solid rgba(217,215,200,.7)", paddingTop: 8 }}>
                   <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 4 }}>{t("logistics.export.calibration")}</div>
                   <div style={{ fontSize: 11, color: "var(--muted)", marginBottom: 6 }}>{t("logistics.export.calibrationHint")}</div>
@@ -286,7 +286,7 @@ export function ExportDocEditor({ setId, docId, canManage }: { setId: string; do
           {isInvoice ? <ExportInvoiceTemplate data={data as InvoiceDocData} />
             : isDispatchLike ? <ExportDispatchTemplate data={data as DispatchDocData} blank={isBlank} />
             : isDeclaration ? <ExportDeclarationTemplate data={data as DeclarationDocData} />
-            : <ExportCmrTemplate data={{ ...(data as CmrDocData), preview: isCmrEpson }} />}
+            : <ExportCmrTemplate data={{ ...(data as CmrDocData), preview: isCmrOverlay }} />}
         </div>
       </div>
     </div>
