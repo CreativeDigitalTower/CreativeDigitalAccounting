@@ -537,7 +537,9 @@
     "goodsLines": "Product lines",
     "line": "Line",
     "addLine": "Add product",
-    "value": "Value"
+    "value": "Value",
+    "issueDate": "Invoice issue date",
+    "shipmentDate": "Shipment date"
   },
   "fleet": {
     "title": "Fleet",

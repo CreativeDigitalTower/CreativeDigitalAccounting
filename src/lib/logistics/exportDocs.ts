@@ -65,7 +65,7 @@ export function splitTruckTrailer(label: string | null | undefined): { truck: st
   return { truck: parts[0] ?? null, trailer: parts.length > 1 ? parts.slice(1).join(" / ") : null };
 }
 export type ExportSetSource = {
-  invoiceNumber: string | null; invoiceDate: string | null;
+  invoiceNumber: string | null; invoiceDate: string | null; shipmentDate?: string | null;
   destination: string | null; truckRegSnapshot: string | null; trailerReg: string | null;
   productSnapshot: string | null; customsCode?: string | null;
   quantity: number | null; unit: string; declarationCmrDate: string | null; dispatchNumber: string | null;
@@ -202,7 +202,8 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
         contract: null, annex: null, order: null,
         // Default „FCA {град}" (нормализиран един интервал), editable, само при initial generation.
         termsOfDelivery: `FCA ${sellerCityEn}`.replace(/\s+/g, " ").trim(),
-        truck, placeOfShipment: sellerEn.city ?? null, dateOfShipment: src.invoiceDate,
+        // Date of shipment = отделната дата на изпращане (fallback към issue date за legacy записи).
+        truck, placeOfShipment: sellerEn.city ?? null, dateOfShipment: src.shipmentDate ?? src.invoiceDate,
         destination: src.destination, destinationCountry: buyerEn.country ?? null,
         // Date/City/Manager блок (auto-fill, editable snapshot).
         date: src.invoiceDate, city: sellerCityEn || null, manager: parties.seller.manager ?? null,

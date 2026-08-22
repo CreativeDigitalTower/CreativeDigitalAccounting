@@ -87,3 +87,23 @@ describe("isSemInternational — разпознаване на грешните 
     expect(isSemInternational(null)).toBe(false);
   });
 });
+
+describe("Фактура — invoice number string + две дати (§1-4)", () => {
+  const two = buildDocumentData(
+    { ...SRC, invoiceNumber: "0000009654", invoiceDate: "2026-08-20T00:00:00.000Z", shipmentDate: "2026-08-22T00:00:00.000Z" },
+    PARTIES, "invoice",
+  ) as Record<string, any>;
+  it("invoiceNumber се пази като string с водещи нули", () => {
+    expect(two.invoiceNumber).toBe("0000009654");
+    expect(typeof two.invoiceNumber).toBe("string");
+  });
+  it("issue date и shipment date са различни полета", () => {
+    expect(two.invoiceDate).toBe("2026-08-20T00:00:00.000Z");
+    expect(two.dateOfShipment).toBe("2026-08-22T00:00:00.000Z");
+    expect(two.invoiceDate).not.toBe(two.dateOfShipment);
+  });
+  it("legacy без shipmentDate → dateOfShipment fallback към issue date", () => {
+    const legacy = buildDocumentData({ ...SRC, shipmentDate: null }, PARTIES, "invoice") as Record<string, any>;
+    expect(legacy.dateOfShipment).toBe(legacy.invoiceDate);
+  });
+});

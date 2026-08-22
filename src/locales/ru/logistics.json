@@ -537,7 +537,9 @@
     "goodsLines": "Строки товаров",
     "line": "Строка",
     "addLine": "Добавить продукт",
-    "value": "Сумма"
+    "value": "Сумма",
+    "issueDate": "Дата выставления счёта",
+    "shipmentDate": "Дата отгрузки"
   },
   "fleet": {
     "title": "Fleet",

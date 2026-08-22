@@ -22,10 +22,8 @@ const DECLARATION = [
   "ПРОДУКТИ СА С EU ПРЕФЕРЕНЦИАЛЕН ПРОИЗХОД",
 ];
 
+// Единен формат DD/MM/YYYY за фактурата (§14).
 const d = (s?: string | null) => s ? new Date(s).toLocaleDateString("en-GB") : "";
-const yearOf = (s?: string | null) => s ? String(new Date(s).getFullYear()) : "";
-// Номер за показване: без излишни водещи нули (0000009654 → 9654), ако е чисто число (§3).
-const dispNo = (n?: string | null) => { const s = (n ?? "").trim(); return /^\d+$/.test(s) ? String(Number(s)) : s; };
 const nfQty = new Intl.NumberFormat("en-US", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 const q3 = (v?: number | null) => v == null ? "" : nfQty.format(v);
 const nfMoney = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -70,9 +68,9 @@ export function ExportInvoiceTemplate({ data }: { data: InvoiceDocData }) {
   return (
     // Точна A4 геометрия (§1,§2,§21): print area A1:J48, margins L8/R6/T8/B9, ~ пълна страница.
     <div className="printable invoice-doc" style={{ fontFamily: "'Times New Roman', Times, serif", color: "#000", background: "#fff", width: "210mm", height: "297mm", boxSizing: "border-box", padding: "8mm 6mm 9mm 8mm", fontSize: 11.5, lineHeight: 1.15, display: "flex", flexDirection: "column" }}>
-      {/* Заглавие (§3) */}
+      {/* Заглавие: INVOICE № {точен string номер} / {дата на издаване DD/MM/YYYY} (§1,§2) */}
       <div style={{ display: "flex", justifyContent: "center", alignItems: "baseline", gap: 8, fontWeight: 700, fontSize: 15, height: "12mm" }}>
-        <span>INVOICE №</span><span>{dispNo(data.invoiceNumber)}</span>{yearOf(data.invoiceDate) && <><span>/</span><span>{yearOf(data.invoiceDate)}</span></>}
+        <span>INVOICE №</span><span>{data.invoiceNumber ?? ""}</span>{data.invoiceDate && <><span>/</span><span>{d(data.invoiceDate)}</span></>}
       </div>
 
       {/* Горни boxed блокове: Seller|Contract, Consignee|Buyer (§4) */}
@@ -136,8 +134,9 @@ export function ExportInvoiceTemplate({ data }: { data: InvoiceDocData }) {
               <div style={{ fontSize: 10.5, marginTop: "6mm" }}>
                 {DECLARATION.map((ln, i) => <div key={i}>{ln}</div>)}
               </div>
+              {/* Ляво = дата на ИЗДАВАНЕ на фактурата (същият source като заглавието, §3); дясно = BELI IZVOR */}
               <div style={{ display: "flex", marginTop: "12mm" }}>
-                <span style={{ width: "45%" }}>{data.originPlace && data.originPlace !== data.placeOfShipment ? data.originPlace : ""}</span>
+                <span style={{ width: "45%" }}>{d(data.invoiceDate)}</span>
                 <span>{data.placeOfShipment ?? ""}</span>
               </div>
               <div style={{ fontWeight: 700 }}>{representative}</div>
