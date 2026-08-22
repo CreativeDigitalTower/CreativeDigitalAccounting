@@ -21,7 +21,7 @@ export async function regenerateSetDocuments(
   const set = await prisma.exportDocumentSet.findFirst({
     where: { id: setId, companyId },
     select: {
-      invoiceNumber: true, invoiceDate: true, shipmentDate: true, destination: true, truckRegSnapshot: true, trailerReg: true,
+      invoiceNumber: true, invoiceDate: true, shipmentDate: true, deliveryTerm: true, destination: true, truckRegSnapshot: true, trailerReg: true,
       productSnapshot: true, quantity: true, unit: true, declarationCmrDate: true, dispatchNumber: true,
       logisticsProductId: true, buyerCompanyId: true, clientId: true,
       documents: { select: { docType: true, overridden: true, status: true } },
@@ -44,6 +44,7 @@ export async function regenerateSetDocuments(
   const src = {
     invoiceNumber: set.invoiceNumber, invoiceDate: set.invoiceDate?.toISOString() ?? null,
     shipmentDate: set.shipmentDate?.toISOString() ?? null,
+    deliveryTerm: set.deliveryTerm ?? null,
     destination: set.destination, truckRegSnapshot: set.truckRegSnapshot, trailerReg: set.trailerReg,
     productSnapshot: set.productSnapshot, customsCode: product?.customsCode ?? null,
     quantity: set.quantity, unit: set.unit, declarationCmrDate: set.declarationCmrDate?.toISOString() ?? null,

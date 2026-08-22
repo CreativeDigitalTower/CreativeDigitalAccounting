@@ -544,7 +544,9 @@
     "speditor": "Nakliyeci",
     "placeBottom": "Yer (alt)",
     "calibration": "Baskı kalibrasyonu (CMR Epson)",
-    "calibrationHint": "Tüm overlay'i matbu forma göre kaydırır. 0/0 = offset yok."
+    "calibrationHint": "Tüm overlay'i matbu forma göre kaydırır. 0/0 = offset yok.",
+    "deliveryTerm": "Teslim şartları",
+    "selectPlaceholder": "Seçiniz"
   },
   "fleet": {
     "title": "Fleet",
@@ -633,6 +635,8 @@
     "name": "Lütfen bir ad girin.",
     "amount": "Lütfen bir değer girin.",
     "payload": "Miktar aracın maks. yükünü aşıyor – {max} t.",
-    "banner": "Zorunlu alanların tümü doldurulmadı. Lütfen işaretli alanları kontrol edin."
+    "banner": "Zorunlu alanların tümü doldurulmadı. Lütfen işaretli alanları kontrol edin.",
+    "deliveryTerm": "Lütfen teslim şartını seçin – FCA veya CPT.",
+    "destination": "Lütfen bir varış yeri seçin veya girin."
   }
 }

@@ -1332,6 +1332,7 @@ model ExportDocumentSet {
   invoiceNumber      String
   invoiceDate        DateTime?   // дата на ИЗДАВАНЕ на фактурата (issue date)
   shipmentDate       DateTime?   // дата на ИЗПРАЩАНЕ (date of shipment) — отделна бизнес дата
+  deliveryTerm       String?     // условия на доставка: FCA | CPT (Incoterm)
   destination        String?
   routeId            String?
   truckVehicleId     String?
