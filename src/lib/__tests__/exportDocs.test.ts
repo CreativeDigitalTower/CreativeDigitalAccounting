@@ -265,14 +265,17 @@ describe("DOCUMENT SYNC — English snapshot, promote-to-source, деклара�
     expect(resolveExportSetRole("OTHER", set, true)).toBe(null);   // чужда фирма
   });
 
-  it("#19 CMR Epson/HP: идентично съдържание, различен само layout offset (RETAINED)", () => {
+  it("#19 CMR Epson/HP: споделен източник, но Epson има собствени print defaults (RETAINED)", () => {
     const ep = buildDocumentData(SRC, P, "cmr_epson") as Record<string, unknown>;
     const hp = buildDocumentData(SRC, P, "cmr_hp") as Record<string, unknown>;
     expect(ep.layout).toBe("epson"); expect(hp.layout).toBe("hp");
-    // съдържанието (без layout) е еднакво
-    const { layout: _a, ...epRest } = ep; const { layout: _b, ...hpRest } = hp;
-    expect(JSON.stringify(epRest)).toBe(JSON.stringify(hpRest));
-    // разликата е само в печатния offset
+    // Общи снапшот полета (sender/invoice/тегло) са еднакви.
+    expect((ep.sender as { name: string }).name).toBe((hp.sender as { name: string }).name);
+    expect(ep.invoiceNumber).toBe(hp.invoiceNumber);
+    expect(ep.weightKg).toBe(hp.weightKg);
+    // Epson форсира print defaults (SKOPIE/ENIGMA), HP — не (§2/§3/§23).
+    expect(ep.destination).toBe("SKOPIE"); expect(ep.speditor).toBe("ENIGMA");
+    expect(hp.speditor).toBeNull();
     expect(cmrPrintOffset("epson")).not.toEqual(cmrPrintOffset("hp"));
   });
 });
