@@ -537,7 +537,9 @@
     "goodsLines": "Linii produse",
     "line": "Linie",
     "addLine": "Adaugă produs",
-    "value": "Valoare"
+    "value": "Valoare",
+    "issueDate": "Data emiterii facturii",
+    "shipmentDate": "Data expedierii"
   },
   "fleet": {
     "title": "Fleet",

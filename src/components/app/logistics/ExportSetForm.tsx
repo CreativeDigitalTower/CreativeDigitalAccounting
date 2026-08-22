@@ -31,7 +31,7 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients }: {
   const [busy, setBusy] = useState(false);
   const { errors, banner, register, clearField, fail, setBanner } = useFieldErrors();
   const [f, setF] = useState({
-    invoiceNumber: "", invoiceDate: new Date().toISOString().slice(0, 10), destination: "", routeId: "",
+    invoiceNumber: "", invoiceDate: new Date().toISOString().slice(0, 10), shipmentDate: new Date().toISOString().slice(0, 10), destination: "", routeId: "",
     truckVehicleId: "", trailerReg: "", logisticsProductId: "", quantity: "", declarationCmrDate: new Date().toISOString().slice(0, 10),
     dispatchNumber: "", buyerCompanyId: buyers[0]?.id ?? "", clientId: "",
   });
@@ -67,6 +67,8 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients }: {
   function validate(): FieldErrors {
     const e: FieldErrors = {};
     if (!f.truckVehicleId) e.truckVehicleId = t("logistics.validation.vehicle");
+    if (!f.invoiceDate) e.invoiceDate = t("logistics.validation.date");
+    if (!f.shipmentDate) e.shipmentDate = t("logistics.validation.date");
     if (!f.logisticsProductId) e.logisticsProductId = t("logistics.validation.product");
     const q = parseQuantity(f.quantity);
     if (f.quantity.trim() === "") e.quantity = t("logistics.validation.quantity");
@@ -83,6 +85,7 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients }: {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         invoiceNumber: f.invoiceNumber || null, invoiceDate: f.invoiceDate ? new Date(f.invoiceDate).toISOString() : null,
+        shipmentDate: f.shipmentDate ? new Date(f.shipmentDate).toISOString() : null,
         destination: f.destination || null, routeId: f.routeId || null,
         truckVehicleId: f.truckVehicleId, trailerReg: f.trailerReg || null,
         logisticsProductId: f.logisticsProductId, quantity: parseQuantity(f.quantity),
@@ -115,7 +118,8 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients }: {
 
       <div className="glass panel" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 12 }}>
         <F label={`${t("logistics.export.invoiceNumber")} ${t("logistics.export.invoiceAuto")}`}><input style={inp} value={f.invoiceNumber} onChange={(e) => setF({ ...f, invoiceNumber: e.target.value })} placeholder="0000009617" /></F>
-        <F label={t("logistics.export.date")}><input type="date" style={inp} value={f.invoiceDate} onChange={(e) => setF({ ...f, invoiceDate: e.target.value })} /></F>
+        <F label={t("logistics.export.issueDate")}><input type="date" style={inp} value={f.invoiceDate} onChange={(e) => setF({ ...f, invoiceDate: e.target.value })} /></F>
+        <F label={t("logistics.export.shipmentDate")}><input type="date" style={inp} value={f.shipmentDate} onChange={(e) => setF({ ...f, shipmentDate: e.target.value })} /></F>
         <F label={t("logistics.export.destination")}>
           <SearchableSelect options={routes.map((r) => ({ value: r.id, label: r.label }))} value={f.routeId} onChange={pickRoute} emptyLabel="—" />
           <input style={{ ...inp, marginTop: 4 }} value={f.destination} onChange={(e) => setF({ ...f, destination: e.target.value })} placeholder="SKOPIE" />

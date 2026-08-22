@@ -45,6 +45,7 @@ const schema = z.object({
   clientId: z.string().nullable().optional(),
   invoiceNumber: z.string().max(60).nullable().optional(), // празно → auto
   invoiceDate: optDate,
+  shipmentDate: optDate,
   destination: z.string().max(200).nullable().optional(),
   routeId: z.string().nullable().optional(),
   truckVehicleId: z.string().nullable().optional(),
@@ -109,6 +110,7 @@ export async function POST(req: Request) {
         data: {
           companyId: g.companyId, shipmentId: d.shipmentId || null, buyerCompanyId: d.buyerCompanyId || null, clientId: d.clientId || null,
           invoiceNumber, invoiceDate: d.invoiceDate ? new Date(d.invoiceDate) : new Date(),
+          shipmentDate: d.shipmentDate ? new Date(d.shipmentDate) : (d.invoiceDate ? new Date(d.invoiceDate) : new Date()),
           destination: d.destination ?? null, routeId: d.routeId || null,
           truckVehicleId: d.truckVehicleId || null, truckRegSnapshot: vehicle?.registration ?? null, trailerReg: trailer,
           logisticsProductId: d.logisticsProductId || null, productSnapshot: product?.canonicalName ?? null,

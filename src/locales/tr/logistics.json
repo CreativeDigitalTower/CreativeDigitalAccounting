@@ -537,7 +537,9 @@
     "goodsLines": "Ürün satırları",
     "line": "Satır",
     "addLine": "Ürün ekle",
-    "value": "Tutar"
+    "value": "Tutar",
+    "issueDate": "Fatura düzenleme tarihi",
+    "shipmentDate": "Sevkiyat tarihi"
   },
   "fleet": {
     "title": "Fleet",

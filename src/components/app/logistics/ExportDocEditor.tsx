@@ -175,7 +175,8 @@ export function ExportDocEditor({ setId, docId, canManage }: { setId: string; do
           {isInvoice ? (
             <>
               {txt(t("logistics.export.invoiceNumber"), "invoiceNumber")}
-              {date(t("logistics.export.date"), "invoiceDate")}
+              {date(t("logistics.export.issueDate"), "invoiceDate")}
+              {date(t("logistics.export.shipmentDate"), "dateOfShipment")}
               {txt("Seller", "seller.name")}
               {txt("Buyer", "buyer.name")}
               {txt(t("logistics.export.terms"), "termsOfDelivery")}

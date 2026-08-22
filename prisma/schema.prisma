@@ -1329,7 +1329,8 @@ model ExportDocumentSet {
   buyerCompanyId     String?   // свързаната MK фирма
   clientId           String?   // краен MK клиент (за Испратница)
   invoiceNumber      String
-  invoiceDate        DateTime?
+  invoiceDate        DateTime?   // дата на ИЗДАВАНЕ на фактурата (issue date)
+  shipmentDate       DateTime?   // дата на ИЗПРАЩАНЕ (date of shipment) — отделна бизнес дата
   destination        String?
   routeId            String?
   truckVehicleId     String?
