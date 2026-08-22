@@ -547,7 +547,8 @@
     "calibrationHint": "Tüm overlay'i matbu forma göre kaydırır. 0/0 = offset yok.",
     "deliveryTerm": "Teslim şartları",
     "selectPlaceholder": "Seçiniz",
-    "placeOfShipment": "Sevkiyat yeri"
+    "placeOfShipment": "Sevkiyat yeri",
+    "addDestination": "Ekle"
   },
   "fleet": {
     "title": "Fleet",

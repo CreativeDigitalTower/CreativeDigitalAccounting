@@ -147,15 +147,19 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
             <FieldError id="err-placeOfShipment" message={errors.placeOfShipment} />
           </F>
         </div>
-        {/* Дестинация — крайна дестинация, editable за FCA И CPT (§5/§8): dropdown + ръчно */}
+        {/* Дестинация — ЕДНО creatable combobox поле (§1): избор/търсене/нова стойност.
+            Една canonical стойност; важи еднакво за FCA и CPT (§9). */}
         <div ref={register("destination")}>
           <F label={<>{t("logistics.export.destination")}<Req /></>}>
-            {destinations.length > 0 && (
-              <SearchableSelect options={destinations.map((d) => ({ value: d, label: d }))} value={destinations.includes(f.destination) ? f.destination : ""}
-                onChange={(v) => { clearField("destination"); setF({ ...f, destination: v }); }} emptyLabel="—" placeholder={t("logistics.export.selectPlaceholder")} />
-            )}
             <div {...ariaProps("destination", errors)}>
-              <input style={{ ...inp, marginTop: destinations.length > 0 ? 4 : 0 }} value={f.destination} onChange={(e) => { clearField("destination"); setF({ ...f, destination: e.target.value }); }} placeholder="SKOPIE" />
+              <SearchableSelect
+                options={destinations.map((d) => ({ value: d, label: d }))}
+                value={f.destination}
+                onChange={(v) => { clearField("destination"); setF({ ...f, destination: v }); }}
+                allowCreate allowEmpty={false}
+                placeholder={t("logistics.export.selectPlaceholder")}
+                createLabel={(q) => `${t("logistics.export.addDestination")} „${q}"`}
+              />
             </div>
             <FieldError id="err-destination" message={errors.destination} />
           </F>
