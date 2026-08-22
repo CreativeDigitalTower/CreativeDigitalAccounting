@@ -1,6 +1,7 @@
 "use client";
 import { companyIdentifier } from "@/lib/company/identifier";
 import { cmrPrintOffset } from "@/lib/logistics/exportDocs";
+import { resolveInvoiceParty } from "@/lib/logistics/invoiceParties";
 
 type Party = { name?: string | null; address?: string | null; city?: string | null; country?: string | null; eik?: string | null; registrationNumber?: string | null; vatNumber?: string | null };
 export type CmrDocData = {
@@ -18,11 +19,63 @@ export type CmrDocData = {
   preview?: boolean;
 };
 
-const d = (s?: string | null) => s ? new Date(s).toLocaleDateString("en-CA") : ""; // YYYY-MM-DD както в оригинала
-const yearOf = (s?: string | null) => s ? String(new Date(s).getFullYear()) : "";
+const d = (s?: string | null) => s ? new Date(s).toLocaleDateString("en-CA") : ""; // YYYY-MM-DD (долен place/date)
+const dmy = (s?: string | null) => s ? new Date(s).toLocaleDateString("en-GB") : ""; // DD/MM/YYYY (фактура §4)
 // Количество/тегло — 3 знака, BG десетичен разделител (26.040 t → „26,040"; kg → „26,040 kg.").
 const nf3 = new Intl.NumberFormat("bg-BG", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 const q3 = (v?: number | null) => v == null ? "" : nf3.format(v);
+
+// Град + държава без дублиране (§2/§14): ако градът вече съдържа държавата, не я добавяме пак.
+function cityCountry(city?: string | null, country?: string | null): string {
+  const ci = (city ?? "").trim(); const co = (country ?? "").trim();
+  if (!co) return ci; if (!ci) return co;
+  const n = (s: string) => s.toLowerCase().replace(/[.,]/g, "").trim();
+  return n(ci).includes(n(co)) ? ci : `${ci}, ${co}`;
+}
+// Транслитерация кирилица→латиница за дестинацията (напр. „Скопие" → „SKOPIE").
+const CYR2LAT: Record<string, string> = { а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ж: "z", з: "z", и: "i", й: "i", к: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r", с: "s", т: "t", у: "u", ф: "f", х: "h", ц: "c", ч: "c", ш: "s", щ: "s", ъ: "a", ю: "u", я: "a", ј: "j", ѓ: "g", ќ: "k", љ: "lj", њ: "nj", џ: "d" };
+function translitLat(s: string): string {
+  return s.split("").map((ch) => CYR2LAT[ch.toLowerCase()] ? (ch === ch.toUpperCase() ? CYR2LAT[ch.toLowerCase()].toUpperCase() : CYR2LAT[ch.toLowerCase()]) : ch).join("");
+}
+// „Чиста" дестинация за CMR: без „FCA …"/route шум → само града, латиница (§2). Default SKOPIE.
+function cleanDestination(dst?: string | null): string {
+  const first = (dst ?? "").split("/")[0].replace(/\bFCA\b/gi, "").trim();
+  return translitLat(first || "SKOPIE").toUpperCase();
+}
+// Продуктово описание: гарантира „Holcim" след „CEMENT" (§7/§13), ако липсва. Editable.
+function productDescription(desc?: string | null): string {
+  const t = (desc ?? "").trim();
+  if (!t) return "CEMENT Holcim CEM II/A-LL 42,5 R - IN BULK";
+  if (/holcim/i.test(t)) return t;
+  return t.replace(/^CEMENT\s+/i, "CEMENT Holcim ");
+}
+
+// CMR Epson presentation defaults (editable override на document ниво, §17). Company-scoped.
+const CMR_DEFAULTS = { speditor: "ENIGMA", destinationCountry: "NORTH MACEDONIA", customsCode: "25232900", certificate: "2032-CPR-19.135C" };
+
+/**
+ * Нормализира CMR Epson данните в canonical renderer-а (§14/§15/§16): прилага
+ * правилните фирмени имена, дедупликация на държава, дестинация SKOPIE и default-ите
+ * за спедитор/митн. код/сертификат — така СТАРИ snapshot-и също се рендират коректно,
+ * а preview = PDF = print. НЕ променя master данните.
+ */
+function normalizeCmrEpson(data: CmrDocData): CmrDocData {
+  const sender = resolveInvoiceParty(data.sender ?? {});
+  const consignee = resolveInvoiceParty(data.consignee ?? {});
+  const g = data.goods ?? {};
+  return {
+    ...data,
+    sender, consignee,
+    destination: cleanDestination(data.destination),
+    destinationCountry: data.destinationCountry?.trim() || CMR_DEFAULTS.destinationCountry,
+    speditor: data.speditor?.trim() || CMR_DEFAULTS.speditor,
+    goods: {
+      description: productDescription(g.description),
+      customsCode: (g.customsCode ?? "").trim() || CMR_DEFAULTS.customsCode,
+      certificate: (g.certificate ?? "").trim() || CMR_DEFAULTS.certificate,
+    },
+  };
+}
 
 // ── HP layout: непроменен (стар рендер), не е предмет на тази задача (§1,§23). ──
 function partyText(p?: Party) {
@@ -71,47 +124,49 @@ function CmrHpTemplate({ data }: { data: CmrDocData }) {
 // portrait, margins L9/T8mm). Никакви рамки/labels на CMR формуляра при печат. ──
 type Field = { x: number; y: number; text: string; w?: number; size?: number; bold?: boolean; pre?: boolean };
 
-function CmrEpsonOverlay({ data }: { data: CmrDocData }) {
+function CmrEpsonOverlay({ data: raw }: { data: CmrDocData }) {
+  const data = normalizeCmrEpson(raw);
   const s = data.sender ?? {}; const c = data.consignee ?? {};
   const speditor = data.speditor ? `SPEDITOR :  ${data.speditor}` : "";
+  const qty = q3(data.quantity);
+  const truck = raw.truck ?? "";
   const F: Field[] = [
-    // Изпращач (координати B3/B4/B5 + вътрешен отстъп както в оригинала)
+    // Изпращач (B3/B4/B5)
     { x: 18, y: 30.5, text: s.name ?? "", bold: true },
     { x: 18, y: 35.3, text: s.address ?? "" },
-    { x: 18, y: 40.0, text: [s.city, s.country].filter(Boolean).join(", ").toUpperCase() },
-    // Получател (B8/B9/B10)
+    { x: 18, y: 40.0, text: cityCountry(s.city, s.country).toUpperCase() },
+    // Получател (B8/B9/B10) — без дублирана държава (§14)
     { x: 18, y: 58.8, text: c.name ?? "", bold: true },
     { x: 18, y: 63.3, text: c.address ?? "" },
-    { x: 18, y: 67.8, text: [c.city, c.country].filter(Boolean).join(", ").toUpperCase() },
-    // Дестинация (C13) + държава (C14)
+    { x: 18, y: 67.8, text: cityCountry(c.city, c.country).toUpperCase() },
+    // Дестинация (C13) + държава (C14) — §2
     { x: 36.3, y: 81.1, text: (data.destination ?? "").toUpperCase() },
     { x: 36.3, y: 85.6, text: (data.destinationCountry ?? "") },
-    // Спедитор (H13)
+    // Спедитор (H13) — §3
     { x: 114.2, y: 81.1, text: speditor },
     // Място/произход (C17)
     { x: 36.3, y: 98.5, text: data.placeOfShipment ?? "" },
-    // Фактура (B20 + C20 + D20)
+    // Дата на натоварване (C18) = shipment/CMR дата
+    { x: 36.3, y: 103.0, text: d(data.date) },
+    // Фактура (B20 + C20 + D20) — пълна дата, компактно (§4/§6/§7)
     { x: 13.1, y: 114.4, text: "INVOICE No" },
-    { x: 40, y: 114.4, text: data.invoiceNumber ?? "", bold: true },
-    { x: 92, y: 114.4, text: yearOf(data.invoiceDate) ? `/ ${yearOf(data.invoiceDate)}` : "/" },
+    { x: 38, y: 114.4, text: data.invoiceNumber ?? "", bold: true },
+    { x: 62, y: 114.4, text: dmy(data.invoiceDate) ? `/ ${dmy(data.invoiceDate)}` : "/" },
     // Продукт (B25) + митн. код (I25) + количество (J25)
     { x: 19, y: 136.4, text: data.goods?.description ?? "", bold: true },
     { x: 127.6, y: 136.4, text: data.goods?.customsCode ?? "" },
-    { x: 148.4, y: 136.4, text: q3(data.quantity) },
-    // Сертификат (B26)
+    { x: 148.4, y: 136.4, text: qty },
+    // Сертификат (B26) — §12
     { x: 24, y: 141.4, text: data.goods?.certificate ? `(Certificate No ${data.goods.certificate})` : "" },
-    // NET WEIGHT (B28 + D28 + E28)
-    { x: 22, y: 152.5, text: "NET  WEIGHT:" },
-    { x: 58, y: 152.5, text: q3(data.quantity), bold: true },
-    { x: 76.3, y: 152.5, text: "kg." },
-    // TOTAL (H31 + J31 + K31)
-    { x: 129, y: 167.6, text: "TOTAL:", bold: true },
-    { x: 148.4, y: 167.6, text: q3(data.quantity), bold: true },
-    { x: 168.5, y: 167.6, text: "kg." },
-    // Камион / ремарке — на реда за рег. № (около H..K, y≈114 в бланката е горе; тук
-    // го поставяме до фактурата вдясно, спрямо оригинала — I19 зоната)
-    { x: 118.6, y: 108.5, text: data.truck ?? "", bold: true },
-    // Долу: място (B49) + дата (E49)
+    // NET WEIGHT — компактно като един блок (§9): „NET  WEIGHT:  26,040 kg."
+    { x: 22, y: 152.5, text: `NET  WEIGHT:  ${qty} kg.`, bold: true },
+    // TOTAL — компактно (§10): „TOTAL:  26,040 kg."
+    { x: 121, y: 167.6, text: `TOTAL:  ${qty} kg.`, bold: true },
+    // Камион / ремарке — ГОРНА позиция (I19, §4/§11)
+    { x: 118.6, y: 108.5, text: truck, bold: true },
+    // Камион / ремарке — ВТОРА позиция (повторено в оригинала, §11) — долен блок E53
+    { x: 76.3, y: 281.3, text: truck },
+    // Долу: място (B49) + дата (E49) = shipment/CMR дата (§13)
     { x: 13.1, y: 261.3, text: data.placeBottom ?? "" },
     { x: 76.3, y: 261.3, text: d(data.date) },
   ];
