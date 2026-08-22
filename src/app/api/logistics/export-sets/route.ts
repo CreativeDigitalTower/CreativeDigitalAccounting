@@ -6,6 +6,7 @@ import { audit } from "@/lib/documents";
 import { nextSequenceValue } from "@/lib/logistics/sequence";
 import { SEQ_SCOPE, formatSequenceNumber, EXPORT_INVOICE_FORMAT, suggestDispatchFromInvoice } from "@/lib/logistics/config";
 import { truckTrailerLabel } from "@/lib/logistics/exportDocs";
+import { resolveDestination } from "@/lib/logistics/deliveryTerms";
 import { validationError, zodFieldErrors, VMSG, type FieldErrors } from "@/lib/logistics/validation";
 import { z } from "zod";
 
@@ -46,6 +47,7 @@ const schema = z.object({
   invoiceNumber: z.string().max(60).nullable().optional(), // празно → auto
   invoiceDate: optDate,
   shipmentDate: optDate,
+  deliveryTerm: z.enum(["FCA", "CPT"]).nullable().optional(),
   destination: z.string().max(200).nullable().optional(),
   routeId: z.string().nullable().optional(),
   truckVehicleId: z.string().nullable().optional(),
@@ -72,6 +74,9 @@ export async function POST(req: Request) {
       if (!d.logisticsProductId) fe.logisticsProductId = VMSG.product;
       if (d.quantity == null) fe.quantity = VMSG.quantity;
       else if (!(d.quantity > 0)) fe.quantity = VMSG.quantityPositive;
+      // Условия на доставка са задължителни (§1/§19); при CPT — и дестинация (§3).
+      if (!d.deliveryTerm) fe.deliveryTerm = "Моля, изберете условия на доставка – FCA или CPT.";
+      else if (d.deliveryTerm === "CPT" && !(d.destination ?? "").trim()) fe.destination = "Моля, изберете или въведете крайна дестинация.";
       if (Object.keys(fe).length) return validationError(fe);
     }
 
@@ -111,7 +116,9 @@ export async function POST(req: Request) {
           companyId: g.companyId, shipmentId: d.shipmentId || null, buyerCompanyId: d.buyerCompanyId || null, clientId: d.clientId || null,
           invoiceNumber, invoiceDate: d.invoiceDate ? new Date(d.invoiceDate) : new Date(),
           shipmentDate: d.shipmentDate ? new Date(d.shipmentDate) : (d.invoiceDate ? new Date(d.invoiceDate) : new Date()),
-          destination: d.destination ?? null, routeId: d.routeId || null,
+          // Условия на доставка (§1/§6): FCA → дестинация винаги Враца; CPT → подадената (§2/§3).
+          deliveryTerm: d.deliveryTerm ?? null,
+          destination: resolveDestination(d.deliveryTerm, d.destination), routeId: d.routeId || null,
           truckVehicleId: d.truckVehicleId || null, truckRegSnapshot: vehicle?.registration ?? null, trailerReg: trailer,
           logisticsProductId: d.logisticsProductId || null, productSnapshot: product?.canonicalName ?? null,
           quantity: d.quantity ?? null, unit, declarationCmrDate: d.declarationCmrDate ? new Date(d.declarationCmrDate) : null,

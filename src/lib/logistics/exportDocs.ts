@@ -6,6 +6,7 @@
 import { netAmount } from "@/lib/logistics/money";
 import { resolveDispatchIssuer } from "@/lib/logistics/dispatchIssuer";
 import { resolveInvoiceParty } from "@/lib/logistics/invoiceParties";
+import { invoiceDeliveryTerms, destinationEn, resolveDestination } from "@/lib/logistics/deliveryTerms";
 import { Prisma } from "@prisma/client";
 import type { ExportDocType } from "@/lib/logistics/config";
 
@@ -66,6 +67,7 @@ export function splitTruckTrailer(label: string | null | undefined): { truck: st
 }
 export type ExportSetSource = {
   invoiceNumber: string | null; invoiceDate: string | null; shipmentDate?: string | null;
+  deliveryTerm?: string | null;
   destination: string | null; truckRegSnapshot: string | null; trailerReg: string | null;
   productSnapshot: string | null; customsCode?: string | null;
   quantity: number | null; unit: string; declarationCmrDate: string | null; dispatchNumber: string | null;
@@ -200,11 +202,11 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
         // Английската фирмена версия както в оригинала (§5/§6); presentation only.
         seller: resolveInvoiceParty(sellerEn), buyer: resolveInvoiceParty(buyerEn),
         contract: null, annex: null, order: null,
-        // Default „FCA {град}" (нормализиран един интервал), editable, само при initial generation.
-        termsOfDelivery: `FCA ${sellerCityEn}`.replace(/\s+/g, " ").trim(),
+        // Terms of delivery = „{deliveryTerm} {DEST_EN}" (§9); legacy fallback „FCA {град}".
+        termsOfDelivery: invoiceDeliveryTerms(src.deliveryTerm, src.destination, `FCA ${sellerCityEn}`.replace(/\s+/g, " ").trim()),
         // Date of shipment = отделната дата на изпращане (fallback към issue date за legacy записи).
         truck, placeOfShipment: sellerEn.city ?? null, dateOfShipment: src.shipmentDate ?? src.invoiceDate,
-        destination: src.destination, destinationCountry: buyerEn.country ?? null,
+        destination: destinationEn(resolveDestination(src.deliveryTerm, src.destination)) || src.destination, destinationCountry: buyerEn.country ?? null,
         // Date/City/Manager блок (auto-fill, editable snapshot).
         date: src.invoiceDate, city: sellerCityEn || null, manager: parties.seller.manager ?? null,
         goods: [{ description: src.productSnapshot ? `CEMENT ${src.productSnapshot} - IN BULK` : null, quantity: src.quantity, unit: displayUnitTNE(src.unit), unitPrice: null, value: null, currency: "EUR", certificate: null }],

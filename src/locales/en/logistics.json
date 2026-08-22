@@ -544,7 +544,9 @@
     "speditor": "Speditor",
     "placeBottom": "Place (bottom)",
     "calibration": "Print calibration (CMR Epson)",
-    "calibrationHint": "Shifts the whole overlay vs the pre-printed form. 0/0 = no offset."
+    "calibrationHint": "Shifts the whole overlay vs the pre-printed form. 0/0 = no offset.",
+    "deliveryTerm": "Delivery terms",
+    "selectPlaceholder": "Select"
   },
   "fleet": {
     "title": "Fleet",
@@ -633,6 +635,8 @@
     "name": "Please enter a name.",
     "amount": "Please enter a value.",
     "payload": "Quantity exceeds the vehicle's max load – {max} t.",
-    "banner": "Not all required fields are filled in. Please check the highlighted fields."
+    "banner": "Not all required fields are filled in. Please check the highlighted fields.",
+    "deliveryTerm": "Please select delivery terms – FCA or CPT.",
+    "destination": "Please select or enter a destination."
   }
 }
