@@ -43,6 +43,15 @@ export function normalizeProductKey(input: string | null | undefined): string {
 }
 
 /** Нормализира Holcim material code (само цифри/букви, главни). */
+/**
+ * Нормализира фирмено име за dedupe/търсене (НЕ за display): fold кирилица→латиница,
+ * lowercase, само буквено-цифрови. Пази оригиналното legal име непроменено другаде.
+ */
+export function normalizeCompanyName(input: string | null | undefined): string {
+  // fold се прилага върху UPPERCASE (както за регистрации), после lowercase + само буквено-цифрови.
+  return foldCyrillic((input ?? "").toUpperCase()).toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
 export function normalizeMaterialCode(input: string | null | undefined): string {
   return (input ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
