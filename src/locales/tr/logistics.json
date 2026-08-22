@@ -546,7 +546,8 @@
     "calibration": "Baskı kalibrasyonu (CMR Epson)",
     "calibrationHint": "Tüm overlay'i matbu forma göre kaydırır. 0/0 = offset yok.",
     "deliveryTerm": "Teslim şartları",
-    "selectPlaceholder": "Seçiniz"
+    "selectPlaceholder": "Seçiniz",
+    "placeOfShipment": "Sevkiyat yeri"
   },
   "fleet": {
     "title": "Fleet",
@@ -637,6 +638,7 @@
     "payload": "Miktar aracın maks. yükünü aşıyor – {max} t.",
     "banner": "Zorunlu alanların tümü doldurulmadı. Lütfen işaretli alanları kontrol edin.",
     "deliveryTerm": "Lütfen teslim şartını seçin – FCA veya CPT.",
-    "destination": "Lütfen bir varış yeri seçin veya girin."
+    "destination": "Lütfen bir varış yeri seçin veya girin.",
+    "placeOfShipment": "Lütfen sevkiyat yerini girin."
   }
 }

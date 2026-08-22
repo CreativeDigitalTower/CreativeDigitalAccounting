@@ -546,7 +546,8 @@
     "calibration": "Print calibration (CMR Epson)",
     "calibrationHint": "Shifts the whole overlay vs the pre-printed form. 0/0 = no offset.",
     "deliveryTerm": "Delivery terms",
-    "selectPlaceholder": "Select"
+    "selectPlaceholder": "Select",
+    "placeOfShipment": "Place of shipment"
   },
   "fleet": {
     "title": "Fleet",
@@ -637,6 +638,7 @@
     "payload": "Quantity exceeds the vehicle's max load – {max} t.",
     "banner": "Not all required fields are filled in. Please check the highlighted fields.",
     "deliveryTerm": "Please select delivery terms – FCA or CPT.",
-    "destination": "Please select or enter a destination."
+    "destination": "Please select or enter a destination.",
+    "placeOfShipment": "Please enter a place of shipment."
   }
 }
