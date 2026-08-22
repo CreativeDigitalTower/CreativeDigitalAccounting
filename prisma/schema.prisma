@@ -377,6 +377,7 @@ model Client {
   vatNumber     String?
   address       String?
   city          String?
+  country       String?  // за чуждестранни клиенти (напр. MK клиенти на SEM INTERNATIONAL)
   mol           String?
   contactPerson String?
   contactEmail  String?
