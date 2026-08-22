@@ -6,7 +6,7 @@
 import { netAmount } from "@/lib/logistics/money";
 import { resolveDispatchIssuer } from "@/lib/logistics/dispatchIssuer";
 import { resolveInvoiceParty } from "@/lib/logistics/invoiceParties";
-import { invoiceDeliveryTerms, destinationEn, resolveDestination } from "@/lib/logistics/deliveryTerms";
+import { invoiceDeliveryTerms, destinationEn, PLACE_OF_SHIPMENT_DEFAULT } from "@/lib/logistics/deliveryTerms";
 import { Prisma } from "@prisma/client";
 import type { ExportDocType } from "@/lib/logistics/config";
 
@@ -67,7 +67,7 @@ export function splitTruckTrailer(label: string | null | undefined): { truck: st
 }
 export type ExportSetSource = {
   invoiceNumber: string | null; invoiceDate: string | null; shipmentDate?: string | null;
-  deliveryTerm?: string | null;
+  deliveryTerm?: string | null; placeOfShipment?: string | null;
   destination: string | null; truckRegSnapshot: string | null; trailerReg: string | null;
   productSnapshot: string | null; customsCode?: string | null;
   quantity: number | null; unit: string; declarationCmrDate: string | null; dispatchNumber: string | null;
@@ -205,14 +205,16 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
         // Terms of delivery = „{deliveryTerm} {DEST_EN}" (§9); legacy fallback „FCA {град}".
         termsOfDelivery: invoiceDeliveryTerms(src.deliveryTerm, src.destination, `FCA ${sellerCityEn}`.replace(/\s+/g, " ").trim()),
         // Date of shipment = отделната дата на изпращане (fallback към issue date за legacy записи).
-        truck, placeOfShipment: sellerEn.city ?? null, dateOfShipment: src.shipmentDate ?? src.invoiceDate,
-        destination: destinationEn(resolveDestination(src.deliveryTerm, src.destination)) || src.destination, destinationCountry: buyerEn.country ?? null,
+        // Place of shipment = „BELI IZVOR" (заводът), НЕ градът на продавача (§2/§3/§15).
+        truck, placeOfShipment: destinationEn(src.placeOfShipment) || PLACE_OF_SHIPMENT_DEFAULT, dateOfShipment: src.shipmentDate ?? src.invoiceDate,
+        destination: destinationEn(src.destination) || src.destination, destinationCountry: buyerEn.country ?? null,
         // Date/City/Manager блок (auto-fill, editable snapshot).
         date: src.invoiceDate, city: sellerCityEn || null, manager: parties.seller.manager ?? null,
         goods: [{ description: src.productSnapshot ? `CEMENT ${src.productSnapshot} - IN BULK` : null, quantity: src.quantity, unit: displayUnitTNE(src.unit), unitPrice: null, value: null, currency: "EUR", certificate: null }],
         vatText: "Export, Art.28 Bulgarian VAT Legislation", vatRate: 0, vatAmount: 0,
         originText: "ИЗНОСИТЕЛЯТ НА ПРОДУКТИТЕ, ОБХВАНАТИ ОТ ТОЗИ ДОКУМЕНТ, ДЕКЛАРИРА, ЧЕ ОСВЕН КЪДЕТО ЯСНО Е ОТБЕЛЯЗАНО ДРУГО, ТЕЗИ ПРОДУКТИ СА С EU ПРЕФЕРЕНЦИАЛЕН ПРОИЗХОД",
-        originPlace: sellerCityEn || null,
+        // Declaration place = СЪЩИЯТ source като „Place of shipment" (§11/§12) → BELI IZVOR.
+        originPlace: destinationEn(src.placeOfShipment) || PLACE_OF_SHIPMENT_DEFAULT,
         paymentConditions: "Bank transfer", totalQuantity: src.quantity, totalValue: null, notes: null,
       };
     case "dispatch":

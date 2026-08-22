@@ -1,33 +1,26 @@
 /**
  * Условия на доставка (Incoterm) за export доставката (§1). Чиста логика, тествана.
- * FCA → товарът се предава в завода във Враца → дестинация = Враца (§2).
- * CPT → крайна дестинация в Северна Македония (избор/ръчно, §3/§4).
+ * КРИТИЧНО (§4): FCA/CPT е Incoterm — НЕ определя дестинацията и НЕ е Враца.
+ * deliveryTerm, placeOfShipment и destination са ТРИ отделни бизнес стойности (§14):
+ *   - deliveryTerm : FCA | CPT
+ *   - placeOfShipment : винаги „BELI IZVOR" (заводът за товарене, §2)
+ *   - destination : крайната дестинация (избор/ръчно, независима от term-а, §5/§8)
  */
 export const DELIVERY_TERMS = ["FCA", "CPT"] as const;
 export type DeliveryTerm = (typeof DELIVERY_TERMS)[number];
 
-/** Каноничната FCA дестинация (заводът във Враца). */
-export const FCA_DESTINATION = "Враца";
+/** Мястото на натоварване по подразбиране за този Cement workflow (§2). */
+export const PLACE_OF_SHIPMENT_DEFAULT = "BELI IZVOR";
 
 export function isDeliveryTerm(v: string | null | undefined): v is DeliveryTerm {
   return v === "FCA" || v === "CPT";
 }
 
-/**
- * Крайната дестинация според условията: FCA → винаги Враца; CPT → подадената
- * (избрана/ръчна). Ползва се при create/edit на доставката (snapshot).
- */
-export function resolveDestination(term: string | null | undefined, destination: string | null | undefined): string | null {
-  if (term === "FCA") return FCA_DESTINATION;
-  const d = (destination ?? "").trim();
-  return d || null;
-}
-
-// Транслитерация за английската фактура (Terms of delivery: „FCA VRATSA" / „CPT SKOPIE").
+// Транслитерация за английската фактура (Terms of delivery / Destination).
 const CYR2LAT: Record<string, string> = { а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ж: "z", з: "z", и: "i", й: "i", к: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r", с: "s", т: "t", у: "u", ф: "f", х: "h", ц: "c", ч: "c", ш: "s", щ: "s", ъ: "a", ю: "u", я: "a", ј: "j", ќ: "k", ѓ: "g", љ: "lj", њ: "nj", џ: "d" };
-const DEST_EN_OVERRIDE: Record<string, string> = { враца: "VRATSA", скопие: "SKOPIE", скопjе: "SKOPIE", тетово: "TETOVO" };
+const DEST_EN_OVERRIDE: Record<string, string> = { скопие: "SKOPIE", скопjе: "SKOPIE", тетово: "TETOVO", "бели извор": "BELI IZVOR" };
 
-/** Латинско (英) изписване на дестинацията за фактурата. */
+/** Латинско (англ.) изписване на дестинация/място за фактурата. */
 export function destinationEn(destination: string | null | undefined): string {
   const d = (destination ?? "").trim();
   if (!d) return "";
@@ -39,6 +32,6 @@ export function destinationEn(destination: string | null | undefined): string {
 /** Terms of delivery за фактурата: „{TERM} {DEST_EN}" (§9). Fallback за legacy без term. */
 export function invoiceDeliveryTerms(term: string | null | undefined, destination: string | null | undefined, legacyFallback: string): string {
   if (!isDeliveryTerm(term)) return legacyFallback;
-  const dest = destinationEn(resolveDestination(term, destination));
+  const dest = destinationEn(destination);
   return `${term}${dest ? ` ${dest}` : ""}`;
 }

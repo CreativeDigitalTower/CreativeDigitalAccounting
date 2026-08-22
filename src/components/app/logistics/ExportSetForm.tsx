@@ -8,7 +8,7 @@ import { exceedsPayload, bagsCalc, BAGS_DEFAULTS } from "@/lib/logistics/fleet";
 import { parseQuantity, fmtQuantity } from "@/lib/i18n/format";
 import { QuantityInput } from "@/components/app/logistics/QuantityInput";
 import { useFieldErrors, Req, FieldError, ValidationBanner, ariaProps, errStyle, type FieldErrors } from "@/components/app/logistics/formValidation";
-import { FCA_DESTINATION } from "@/lib/logistics/deliveryTerms";
+import { PLACE_OF_SHIPMENT_DEFAULT } from "@/lib/logistics/deliveryTerms";
 
 // Дефиниран на модулно ниво, за да НЕ се пресъздава при всеки render — иначе полетата
 // вътре remount-ват и губят focus / дата не може да се въвежда с клавиатура. (bug #1/#2)
@@ -32,7 +32,7 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
   const [busy, setBusy] = useState(false);
   const { errors, banner, register, clearField, fail, setBanner } = useFieldErrors();
   const [f, setF] = useState({
-    invoiceNumber: "", invoiceDate: new Date().toISOString().slice(0, 10), shipmentDate: new Date().toISOString().slice(0, 10), deliveryTerm: "", destination: "", routeId: "",
+    invoiceNumber: "", invoiceDate: new Date().toISOString().slice(0, 10), shipmentDate: new Date().toISOString().slice(0, 10), deliveryTerm: "", placeOfShipment: PLACE_OF_SHIPMENT_DEFAULT, destination: "", routeId: "",
     truckVehicleId: "", trailerReg: "", logisticsProductId: "", quantity: "", declarationCmrDate: new Date().toISOString().slice(0, 10),
     dispatchNumber: "", buyerCompanyId: buyers[0]?.id ?? "", clientId: "",
   });
@@ -64,21 +64,19 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
     const r = routes.find((x) => x.id === id);
     setF((s) => ({ ...s, routeId: id, destination: r ? r.label : s.destination }));
   }
-  // Условия на доставка (§1-§4): FCA → дестинация винаги Враца (заключена); CPT → избор/ръчно.
+  // Условия на доставка (§4): FCA/CPT е само Incoterm — НЕ задава дестинация/Враца.
+  // placeOfShipment и destination остават независими.
   function setDeliveryTerm(term: string) {
-    clearField("deliveryTerm"); clearField("destination");
-    setF((s) => ({
-      ...s, deliveryTerm: term,
-      destination: term === "FCA" ? FCA_DESTINATION : (s.destination === FCA_DESTINATION ? "" : s.destination),
-      routeId: term === "FCA" ? "" : s.routeId,
-    }));
+    clearField("deliveryTerm");
+    setF((s) => ({ ...s, deliveryTerm: term }));
   }
 
   function validate(): FieldErrors {
     const e: FieldErrors = {};
     if (!f.truckVehicleId) e.truckVehicleId = t("logistics.validation.vehicle");
     if (!f.deliveryTerm) e.deliveryTerm = t("logistics.validation.deliveryTerm");
-    else if (f.deliveryTerm === "CPT" && !f.destination.trim()) e.destination = t("logistics.validation.destination");
+    if (!f.destination.trim()) e.destination = t("logistics.validation.destination"); // §5/§20 — и за FCA, и за CPT
+    if (!f.placeOfShipment.trim()) e.placeOfShipment = t("logistics.validation.placeOfShipment");
     if (!f.invoiceDate) e.invoiceDate = t("logistics.validation.date");
     if (!f.shipmentDate) e.shipmentDate = t("logistics.validation.date");
     if (!f.logisticsProductId) e.logisticsProductId = t("logistics.validation.product");
@@ -98,7 +96,7 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
       body: JSON.stringify({
         invoiceNumber: f.invoiceNumber || null, invoiceDate: f.invoiceDate ? new Date(f.invoiceDate).toISOString() : null,
         shipmentDate: f.shipmentDate ? new Date(f.shipmentDate).toISOString() : null,
-        deliveryTerm: f.deliveryTerm || null,
+        deliveryTerm: f.deliveryTerm || null, placeOfShipment: f.placeOfShipment || null,
         destination: f.destination || null, routeId: f.routeId || null,
         truckVehicleId: f.truckVehicleId, trailerReg: f.trailerReg || null,
         logisticsProductId: f.logisticsProductId, quantity: parseQuantity(f.quantity),
@@ -133,7 +131,7 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
         <F label={`${t("logistics.export.invoiceNumber")} ${t("logistics.export.invoiceAuto")}`}><input style={inp} value={f.invoiceNumber} onChange={(e) => setF({ ...f, invoiceNumber: e.target.value })} placeholder="0000009617" /></F>
         <F label={t("logistics.export.issueDate")}><input type="date" style={inp} value={f.invoiceDate} onChange={(e) => setF({ ...f, invoiceDate: e.target.value })} /></F>
         <F label={t("logistics.export.shipmentDate")}><input type="date" style={inp} value={f.shipmentDate} onChange={(e) => setF({ ...f, shipmentDate: e.target.value })} /></F>
-        {/* Условия на доставка (§1) — задължително; управлява дестинацията (§2/§3) */}
+        {/* Условия на доставка (§1) — задължително. Incoterm; НЕ определя дестинацията (§4). */}
         <div ref={register("deliveryTerm")}>
           <F label={<>{t("logistics.export.deliveryTerm")}<Req /></>}>
             <div {...ariaProps("deliveryTerm", errors)}>
@@ -142,23 +140,24 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
             <FieldError id="err-deliveryTerm" message={errors.deliveryTerm} />
           </F>
         </div>
-        {/* Дестинация: FCA → заключена Враца; CPT → избор от MK дестинации + ръчно (§4) */}
+        {/* Място на натоварване — default BELI IZVOR, отделно от дестинацията (§2/§7) */}
+        <div ref={register("placeOfShipment")}>
+          <F label={<>{t("logistics.export.placeOfShipment")}<Req /></>}>
+            <input style={{ ...inp, ...errStyle("placeOfShipment", errors) }} value={f.placeOfShipment} onChange={(e) => { clearField("placeOfShipment"); setF({ ...f, placeOfShipment: e.target.value }); }} placeholder="BELI IZVOR" />
+            <FieldError id="err-placeOfShipment" message={errors.placeOfShipment} />
+          </F>
+        </div>
+        {/* Дестинация — крайна дестинация, editable за FCA И CPT (§5/§8): dropdown + ръчно */}
         <div ref={register("destination")}>
-          <F label={<>{t("logistics.export.destination")}{f.deliveryTerm === "CPT" && <Req />}</>}>
-            {f.deliveryTerm === "FCA" ? (
-              <input style={{ ...inp, background: "rgba(0,0,0,.04)" }} value={f.destination} readOnly />
-            ) : (
-              <>
-                {destinations.length > 0 && (
-                  <SearchableSelect options={destinations.map((d) => ({ value: d, label: d }))} value={destinations.includes(f.destination) ? f.destination : ""}
-                    onChange={(v) => { clearField("destination"); setF({ ...f, destination: v }); }} emptyLabel="—" placeholder={t("logistics.export.selectPlaceholder")} />
-                )}
-                <div {...ariaProps("destination", errors)}>
-                  <input style={{ ...inp, marginTop: destinations.length > 0 ? 4 : 0 }} value={f.destination} onChange={(e) => { clearField("destination"); setF({ ...f, destination: e.target.value }); }} placeholder="SKOPIE" disabled={!f.deliveryTerm} />
-                </div>
-                <FieldError id="err-destination" message={errors.destination} />
-              </>
+          <F label={<>{t("logistics.export.destination")}<Req /></>}>
+            {destinations.length > 0 && (
+              <SearchableSelect options={destinations.map((d) => ({ value: d, label: d }))} value={destinations.includes(f.destination) ? f.destination : ""}
+                onChange={(v) => { clearField("destination"); setF({ ...f, destination: v }); }} emptyLabel="—" placeholder={t("logistics.export.selectPlaceholder")} />
             )}
+            <div {...ariaProps("destination", errors)}>
+              <input style={{ ...inp, marginTop: destinations.length > 0 ? 4 : 0 }} value={f.destination} onChange={(e) => { clearField("destination"); setF({ ...f, destination: e.target.value }); }} placeholder="SKOPIE" />
+            </div>
+            <FieldError id="err-destination" message={errors.destination} />
           </F>
         </div>
         <div ref={register("truckVehicleId")}>

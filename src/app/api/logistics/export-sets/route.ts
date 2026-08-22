@@ -6,7 +6,7 @@ import { audit } from "@/lib/documents";
 import { nextSequenceValue } from "@/lib/logistics/sequence";
 import { SEQ_SCOPE, formatSequenceNumber, EXPORT_INVOICE_FORMAT, suggestDispatchFromInvoice } from "@/lib/logistics/config";
 import { truckTrailerLabel } from "@/lib/logistics/exportDocs";
-import { resolveDestination } from "@/lib/logistics/deliveryTerms";
+import { PLACE_OF_SHIPMENT_DEFAULT } from "@/lib/logistics/deliveryTerms";
 import { validationError, zodFieldErrors, VMSG, type FieldErrors } from "@/lib/logistics/validation";
 import { z } from "zod";
 
@@ -48,6 +48,7 @@ const schema = z.object({
   invoiceDate: optDate,
   shipmentDate: optDate,
   deliveryTerm: z.enum(["FCA", "CPT"]).nullable().optional(),
+  placeOfShipment: z.string().max(200).nullable().optional(),
   destination: z.string().max(200).nullable().optional(),
   routeId: z.string().nullable().optional(),
   truckVehicleId: z.string().nullable().optional(),
@@ -76,7 +77,8 @@ export async function POST(req: Request) {
       else if (!(d.quantity > 0)) fe.quantity = VMSG.quantityPositive;
       // Условия на доставка са задължителни (§1/§19); при CPT — и дестинация (§3).
       if (!d.deliveryTerm) fe.deliveryTerm = "Моля, изберете условия на доставка – FCA или CPT.";
-      else if (d.deliveryTerm === "CPT" && !(d.destination ?? "").trim()) fe.destination = "Моля, изберете или въведете крайна дестинация.";
+      // Дестинацията е задължителна за FCA и CPT (§5/§20); place of shipment има default.
+      if (!(d.destination ?? "").trim()) fe.destination = "Моля, изберете или въведете крайна дестинация.";
       if (Object.keys(fe).length) return validationError(fe);
     }
 
@@ -117,8 +119,11 @@ export async function POST(req: Request) {
           invoiceNumber, invoiceDate: d.invoiceDate ? new Date(d.invoiceDate) : new Date(),
           shipmentDate: d.shipmentDate ? new Date(d.shipmentDate) : (d.invoiceDate ? new Date(d.invoiceDate) : new Date()),
           // Условия на доставка (§1/§6): FCA → дестинация винаги Враца; CPT → подадената (§2/§3).
+          // deliveryTerm/placeOfShipment/destination са ТРИ отделни стойности (§14).
+          // Place of shipment по подразбиране = BELI IZVOR; destination е независима.
           deliveryTerm: d.deliveryTerm ?? null,
-          destination: resolveDestination(d.deliveryTerm, d.destination), routeId: d.routeId || null,
+          placeOfShipment: (d.placeOfShipment ?? "").trim() || PLACE_OF_SHIPMENT_DEFAULT,
+          destination: (d.destination ?? "").trim() || null, routeId: d.routeId || null,
           truckVehicleId: d.truckVehicleId || null, truckRegSnapshot: vehicle?.registration ?? null, trailerReg: trailer,
           logisticsProductId: d.logisticsProductId || null, productSnapshot: product?.canonicalName ?? null,
           quantity: d.quantity ?? null, unit, declarationCmrDate: d.declarationCmrDate ? new Date(d.declarationCmrDate) : null,
