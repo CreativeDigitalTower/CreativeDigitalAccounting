@@ -539,7 +539,12 @@
     "addLine": "Ürün ekle",
     "value": "Tutar",
     "issueDate": "Fatura düzenleme tarihi",
-    "shipmentDate": "Sevkiyat tarihi"
+    "shipmentDate": "Sevkiyat tarihi",
+    "certificate": "Sertifika No",
+    "speditor": "Nakliyeci",
+    "placeBottom": "Yer (alt)",
+    "calibration": "Baskı kalibrasyonu (CMR Epson)",
+    "calibrationHint": "Tüm overlay'i matbu forma göre kaydırır. 0/0 = offset yok."
   },
   "fleet": {
     "title": "Fleet",

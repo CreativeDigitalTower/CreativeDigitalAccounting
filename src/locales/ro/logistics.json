@@ -539,7 +539,12 @@
     "addLine": "Adaugă produs",
     "value": "Valoare",
     "issueDate": "Data emiterii facturii",
-    "shipmentDate": "Data expedierii"
+    "shipmentDate": "Data expedierii",
+    "certificate": "Certificat nr.",
+    "speditor": "Expeditor",
+    "placeBottom": "Loc (jos)",
+    "calibration": "Calibrare tipărire (CMR Epson)",
+    "calibrationHint": "Deplasează întregul overlay față de formular. 0/0 = fără offset."
   },
   "fleet": {
     "title": "Fleet",

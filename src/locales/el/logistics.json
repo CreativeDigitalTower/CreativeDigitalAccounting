@@ -539,7 +539,12 @@
     "addLine": "Προσθήκη προϊόντος",
     "value": "Αξία",
     "issueDate": "Ημερομηνία έκδοσης τιμολογίου",
-    "shipmentDate": "Ημερομηνία αποστολής"
+    "shipmentDate": "Ημερομηνία αποστολής",
+    "certificate": "Πιστοποιητικό αρ.",
+    "speditor": "Μεταφορέας",
+    "placeBottom": "Τόπος (κάτω)",
+    "calibration": "Βαθμονόμηση εκτύπωσης (CMR Epson)",
+    "calibrationHint": "Μετατοπίζει όλο το overlay ως προς το έντυπο. 0/0 = χωρίς μετατόπιση."
   },
   "fleet": {
     "title": "Fleet",
