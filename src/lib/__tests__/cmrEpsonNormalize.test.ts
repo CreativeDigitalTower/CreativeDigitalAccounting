@@ -43,11 +43,12 @@ describe("resolveInvoiceParty — typo варианти (§1)", () => {
   });
 });
 
-describe("CMR HP — незасегнат (§23)", () => {
-  it("HP не форсира SKOPIE/ENIGMA", () => {
+describe("CMR HP — същите CMR defaults + собствена геометрия (§21)", () => {
+  it("HP ползва SKOPIE/ENIGMA defaults, но layout=hp (различна координатна карта)", () => {
     const hp = buildDocumentData(SRC, PARTIES, "cmr_hp") as Record<string, any>;
     expect(hp.layout).toBe("hp");
-    expect(hp.destination).toBe("Скопие / FCA СКОПИЕ");
-    expect(hp.speditor).toBeNull();
+    expect(hp.destination).toBe("SKOPIE");
+    expect(hp.speditor).toBe("ENIGMA");
+    expect(hp.consignee.name).toBe("SEM INTERNATIONAL DOOEL");
   });
 });

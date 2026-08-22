@@ -273,9 +273,10 @@ describe("DOCUMENT SYNC — English snapshot, promote-to-source, деклара�
     expect((ep.sender as { name: string }).name).toBe((hp.sender as { name: string }).name);
     expect(ep.invoiceNumber).toBe(hp.invoiceNumber);
     expect(ep.weightKg).toBe(hp.weightKg);
-    // Epson форсира print defaults (SKOPIE/ENIGMA), HP — не (§2/§3/§23).
+    // И двата CMR overlay-а ползват едни и същи print defaults (SKOPIE/ENIGMA),
+    // но различна физическа геометрия (отделни координатни карти, §21).
     expect(ep.destination).toBe("SKOPIE"); expect(ep.speditor).toBe("ENIGMA");
-    expect(hp.speditor).toBeNull();
+    expect(hp.destination).toBe("SKOPIE"); expect(hp.speditor).toBe("ENIGMA");
     expect(cmrPrintOffset("epson")).not.toEqual(cmrPrintOffset("hp"));
   });
 });
