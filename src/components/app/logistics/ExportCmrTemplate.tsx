@@ -18,8 +18,15 @@ export type CmrDocData = {
   preview?: boolean;
 };
 
-const d = (s?: string | null) => s ? new Date(s).toLocaleDateString("en-CA") : ""; // YYYY-MM-DD както в оригинала
-const yearOf = (s?: string | null) => s ? String(new Date(s).getFullYear()) : "";
+const d = (s?: string | null) => s ? new Date(s).toLocaleDateString("en-CA") : ""; // YYYY-MM-DD (долен place/date блок)
+const dmy = (s?: string | null) => s ? new Date(s).toLocaleDateString("en-GB") : ""; // DD/MM/YYYY (фактура)
+// Град + държава без дублиране (§14): ако градът вече съдържа държавата, не я добавяме пак.
+function cityCountry(city?: string | null, country?: string | null): string {
+  const ci = (city ?? "").trim(); const co = (country ?? "").trim();
+  if (!co) return ci; if (!ci) return co;
+  const n = (s: string) => s.toLowerCase().replace(/[.,]/g, "").trim();
+  return n(ci).includes(n(co)) ? ci : `${ci}, ${co}`;
+}
 // Количество/тегло — 3 знака, BG десетичен разделител (26.040 t → „26,040"; kg → „26,040 kg.").
 const nf3 = new Intl.NumberFormat("bg-BG", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 const q3 = (v?: number | null) => v == null ? "" : nf3.format(v);
@@ -74,43 +81,43 @@ type Field = { x: number; y: number; text: string; w?: number; size?: number; bo
 function CmrEpsonOverlay({ data }: { data: CmrDocData }) {
   const s = data.sender ?? {}; const c = data.consignee ?? {};
   const speditor = data.speditor ? `SPEDITOR :  ${data.speditor}` : "";
+  const qty = q3(data.quantity);
   const F: Field[] = [
-    // Изпращач (координати B3/B4/B5 + вътрешен отстъп както в оригинала)
+    // Изпращач (B3/B4/B5)
     { x: 18, y: 30.5, text: s.name ?? "", bold: true },
     { x: 18, y: 35.3, text: s.address ?? "" },
-    { x: 18, y: 40.0, text: [s.city, s.country].filter(Boolean).join(", ").toUpperCase() },
-    // Получател (B8/B9/B10)
+    { x: 18, y: 40.0, text: cityCountry(s.city, s.country).toUpperCase() },
+    // Получател (B8/B9/B10) — без дублирана държава (§14)
     { x: 18, y: 58.8, text: c.name ?? "", bold: true },
     { x: 18, y: 63.3, text: c.address ?? "" },
-    { x: 18, y: 67.8, text: [c.city, c.country].filter(Boolean).join(", ").toUpperCase() },
-    // Дестинация (C13) + държава (C14)
+    { x: 18, y: 67.8, text: cityCountry(c.city, c.country).toUpperCase() },
+    // Дестинация (C13) + държава (C14) — §2
     { x: 36.3, y: 81.1, text: (data.destination ?? "").toUpperCase() },
     { x: 36.3, y: 85.6, text: (data.destinationCountry ?? "") },
-    // Спедитор (H13)
+    // Спедитор (H13) — §3
     { x: 114.2, y: 81.1, text: speditor },
     // Място/произход (C17)
     { x: 36.3, y: 98.5, text: data.placeOfShipment ?? "" },
-    // Фактура (B20 + C20 + D20)
+    // Дата на натоварване (C18)
+    { x: 36.3, y: 103.0, text: d(data.date) },
+    // Фактура (B20 + C20 + D20) — пълна дата, компактно (§4,§7)
     { x: 13.1, y: 114.4, text: "INVOICE No" },
-    { x: 40, y: 114.4, text: data.invoiceNumber ?? "", bold: true },
-    { x: 92, y: 114.4, text: yearOf(data.invoiceDate) ? `/ ${yearOf(data.invoiceDate)}` : "/" },
+    { x: 38, y: 114.4, text: data.invoiceNumber ?? "", bold: true },
+    { x: 62, y: 114.4, text: dmy(data.invoiceDate) ? `/ ${dmy(data.invoiceDate)}` : "/" },
     // Продукт (B25) + митн. код (I25) + количество (J25)
     { x: 19, y: 136.4, text: data.goods?.description ?? "", bold: true },
     { x: 127.6, y: 136.4, text: data.goods?.customsCode ?? "" },
-    { x: 148.4, y: 136.4, text: q3(data.quantity) },
+    { x: 148.4, y: 136.4, text: qty },
     // Сертификат (B26)
     { x: 24, y: 141.4, text: data.goods?.certificate ? `(Certificate No ${data.goods.certificate})` : "" },
-    // NET WEIGHT (B28 + D28 + E28)
-    { x: 22, y: 152.5, text: "NET  WEIGHT:" },
-    { x: 58, y: 152.5, text: q3(data.quantity), bold: true },
-    { x: 76.3, y: 152.5, text: "kg." },
-    // TOTAL (H31 + J31 + K31)
-    { x: 129, y: 167.6, text: "TOTAL:", bold: true },
-    { x: 148.4, y: 167.6, text: q3(data.quantity), bold: true },
-    { x: 168.5, y: 167.6, text: "kg." },
-    // Камион / ремарке — на реда за рег. № (около H..K, y≈114 в бланката е горе; тук
-    // го поставяме до фактурата вдясно, спрямо оригинала — I19 зоната)
+    // NET WEIGHT — компактно като един блок (§8): „NET  WEIGHT:  26,000 kg."
+    { x: 22, y: 152.5, text: `NET  WEIGHT:  ${qty} kg.`, bold: true },
+    // TOTAL — компактно (§9): „TOTAL:  26,000 kg."
+    { x: 121, y: 167.6, text: `TOTAL:  ${qty} kg.`, bold: true },
+    // Камион / ремарке — ГОРНА позиция (I19, §10)
     { x: 118.6, y: 108.5, text: data.truck ?? "", bold: true },
+    // Камион / ремарке — ВТОРА позиция (повторено в оригинала, §11) — долен блок E53
+    { x: 76.3, y: 281.3, text: data.truck ?? "" },
     // Долу: място (B49) + дата (E49)
     { x: 13.1, y: 261.3, text: data.placeBottom ?? "" },
     { x: 76.3, y: 261.3, text: d(data.date) },

@@ -251,18 +251,22 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
       const cmrSender = resolveInvoiceParty(sellerEn);
       const cmrBuyer = resolveInvoiceParty(buyerEn);
       const cmrCity = (cmrSender.city ?? sellerCityEn ?? "").toUpperCase();
+      const isEpson = docType === "cmr_epson";
       return {
-        layout: docType === "cmr_epson" ? "epson" : "hp",
+        layout: isEpson ? "epson" : "hp",
         sender: cmrSender, consignee: cmrBuyer,
-        destination: src.destination, placeOfShipment: [cmrCity, (cmrSender.country ?? "").toUpperCase()].filter(Boolean).join(", "),
-        // CMR транспортна дата = дата на изпращане (fallback CMR/деклар. → issue), §10.
+        // CMR Epson defaults (editable): дестинация „SKOPIE", държава „NORTH MACEDONIA",
+        // спедитор „ENIGMA" (§2,§3,§15). HP пази текущото поведение.
+        destination: isEpson ? "SKOPIE" : src.destination,
+        placeOfShipment: [cmrCity, (cmrSender.country ?? "").toUpperCase()].filter(Boolean).join(", "),
+        // CMR транспортна дата = дата на изпращане (fallback CMR/деклар. → issue), §10/§12.
         date: src.shipmentDate ?? src.declarationCmrDate ?? src.invoiceDate,
         invoiceDate: src.invoiceDate,
-        destinationCountry: (cmrBuyer.country ?? "").toUpperCase() || null,
+        destinationCountry: isEpson ? "NORTH MACEDONIA" : ((cmrBuyer.country ?? "").toUpperCase() || null),
         placeBottom: cmrCity || null,
         truck, invoiceNumber: src.invoiceNumber,
         goods: { description: src.productSnapshot ? `CEMENT ${src.productSnapshot} - IN BULK` : "CEMENT", customsCode: src.customsCode ?? null, certificate: null },
-        quantity: src.quantity, weightKg: kgFromTonnes(src.quantity), speditor: null,
+        quantity: src.quantity, weightKg: kgFromTonnes(src.quantity), speditor: isEpson ? "ENIGMA" : null,
       };
     }
   }

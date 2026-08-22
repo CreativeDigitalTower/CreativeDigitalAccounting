@@ -44,3 +44,41 @@ describe("CMR HP — непроменен (§1/§23)", () => {
     expect(hp.sender.name).toBe("METAL TRADE KUSTENDIL 2005 Ltd.");
   });
 });
+
+import { resolveInvoiceParty } from "@/lib/logistics/invoiceParties";
+
+describe("CMR Epson — финални корекции (§1-§14)", () => {
+  const cmr = buildDocumentData(
+    { ...SRC, invoiceNumber: "0000009654", invoiceDate: "2026-08-20T00:00:00.000Z", shipmentDate: "2026-08-20T00:00:00.000Z", destination: "Скопие / FCA СКОПИЕ" },
+    { ...PARTIES, buyer: { name: "SEM INIERNAIIONAL JOUEL", city: "TETOVO, NORTH MACEDONIA", country: "North Macedonia" } },
+    "cmr_epson",
+  ) as Record<string, any>;
+  it("default consignee = SEM INTERNATIONAL DOOEL (typo прихванат, §1/§13)", () => {
+    expect(cmr.consignee.name).toBe("SEM INTERNATIONAL DOOEL");
+    expect(cmr.consignee.city).toBe("Tetovo");
+    expect(cmr.consignee.country).toBe("North Macedonia");
+  });
+  it("default destination = SKOPIE + NORTH MACEDONIA (§2)", () => {
+    expect(cmr.destination).toBe("SKOPIE");
+    expect(cmr.destinationCountry).toBe("NORTH MACEDONIA");
+  });
+  it("default speditor = ENIGMA (§3)", () => { expect(cmr.speditor).toBe("ENIGMA"); });
+  it("invoice number води нули + issue date отделно (§4)", () => {
+    expect(cmr.invoiceNumber).toBe("0000009654");
+    expect(cmr.invoiceDate).toBe("2026-08-20T00:00:00.000Z");
+  });
+  it("resolveInvoiceParty хваща typo варианта директно", () => {
+    expect(resolveInvoiceParty({ name: "SEM INIERNAIIONAL JOUEL" }).name).toBe("SEM INTERNATIONAL DOOEL");
+  });
+});
+
+describe("CMR HP defaults непроменени (§19)", () => {
+  const hp = buildDocumentData(
+    { ...SRC, destination: "Скопие / FCA СКОПИЕ" },
+    PARTIES, "cmr_hp",
+  ) as Record<string, any>;
+  it("HP НЕ форсира SKOPIE/ENIGMA defaults", () => {
+    expect(hp.destination).toBe("Скопие / FCA СКОПИЕ");
+    expect(hp.speditor).toBeNull();
+  });
+});

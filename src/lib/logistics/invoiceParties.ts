@@ -5,6 +5,7 @@
  * CDA шаблони (§34) — само визуализацията на този документ.
  */
 import { nameKey } from "@/lib/logistics/nameMatch";
+import { isSemInternational } from "@/lib/logistics/semName";
 
 type PartyLike = {
   name?: string | null; address?: string | null; city?: string | null; country?: string | null;
@@ -13,16 +14,17 @@ type PartyLike = {
 
 type EnIdentity = { name: string; address: string; city: string; country: string | null };
 
-const EN_IDENTITIES: { match: (key: string) => boolean; identity: EnIdentity }[] = [
+const EN_IDENTITIES: { match: (name: string | null | undefined) => boolean; identity: EnIdentity }[] = [
   {
     // Продавачът (BG): „Метал Трейд Кюстендил 2005" — латиница/кирилица/варианти
     // („Трейд" се транслитерира като „trejd", затова матчваме по „metal"+„kustendil").
-    match: (k) => k.includes("metal") && k.includes("kustendil"),
+    match: (n) => { const k = nameKey(n); return k.includes("metal") && k.includes("kustendil"); },
     identity: { name: "METAL TRADE KUSTENDIL 2005 Ltd.", address: "23 Kaloyan Str.", city: "Kyustendil", country: "Bulgaria" },
   },
   {
-    // Купувач/получател (MK): „Сем Интернационал" ДООЕЛ.
-    match: (k) => k.startsWith("sem") && (k.includes("internacion") || k.includes("inernaion") || k.includes("internation")),
+    // Купувач/получател (MK): „Сем Интернационал" ДООЕЛ — вкл. typo вариантите
+    // (SEM INIERNAIIONAL JOUEL / …JOUEL), споделено с master-data проверката.
+    match: (n) => isSemInternational(n),
     identity: { name: "SEM INTERNATIONAL DOOEL", address: "55 Marshal Tito Str.", city: "Tetovo", country: "North Macedonia" },
   },
 ];
@@ -33,7 +35,7 @@ const EN_IDENTITIES: { match: (key: string) => boolean; identity: EnIdentity }[]
  */
 export function resolveInvoiceParty<T extends PartyLike>(party: T | null | undefined): T {
   if (!party) return { name: null } as unknown as T;
-  const hit = EN_IDENTITIES.find((n) => n.match(nameKey(party.name)));
+  const hit = EN_IDENTITIES.find((n) => n.match(party.name));
   if (!hit) return party;
   return { ...party, name: hit.identity.name, address: hit.identity.address, city: hit.identity.city, country: hit.identity.country };
 }
