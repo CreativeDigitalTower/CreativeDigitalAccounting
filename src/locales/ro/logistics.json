@@ -547,7 +547,8 @@
     "calibrationHint": "Deplasează întregul overlay față de formular. 0/0 = fără offset.",
     "deliveryTerm": "Termeni de livrare",
     "selectPlaceholder": "Selectați",
-    "placeOfShipment": "Loc de expediere"
+    "placeOfShipment": "Loc de expediere",
+    "addDestination": "Adaugă"
   },
   "fleet": {
     "title": "Fleet",

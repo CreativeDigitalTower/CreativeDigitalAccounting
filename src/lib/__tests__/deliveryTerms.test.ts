@@ -73,3 +73,30 @@ describe("CMR остава по шаблона (§16), без regression", () =>
     expect(JSON.stringify(cmr)).not.toContain("CPT");
   });
 });
+
+import { MK_DESTINATIONS, mergeDestinations, normalizeDestination } from "@/lib/logistics/deliveryTerms";
+
+describe("Destination combobox — canonical list + dedupe (§4/§6/§18)", () => {
+  it("началните canonical дестинации включват основните MK градове", () => {
+    for (const c of ["SKOPIE", "PETROVEC", "GOSTIVAR", "KUMANOVO", "STRUMICA", "VINICA", "TETOVO", "KRIVA PALANKA", "SHTIP", "LIPKOVO", "KOCHANI"]) {
+      expect(MK_DESTINATIONS).toContain(c);
+    }
+  });
+  it("dedupe: Skopje / SKOPIE / Skopie / Скопие → една опция (§6)", () => {
+    const merged = mergeDestinations(["Skopje", "SKOPIE", "Skopie", "Скопие"]);
+    expect(merged.length).toBe(1);
+    expect(merged[0]).toBe("SKOPIE");
+  });
+  it("нормализиран ключ е еднакъв за вариантите", () => {
+    expect(normalizeDestination("Скопие")).toBe(normalizeDestination("SKOPIE"));
+    expect(normalizeDestination("Tetovo")).toBe(normalizeDestination("TETOVO"));
+  });
+  it("обогатяване от routes/export sets без дубли; нова стойност се добавя", () => {
+    const merged = mergeDestinations(MK_DESTINATIONS, ["SKOPIE"], ["OHRID"]);
+    expect(merged.filter((d) => d === "SKOPIE").length).toBe(1);
+    expect(merged).toContain("OHRID");
+  });
+  it("празни/невалидни се игнорират", () => {
+    expect(mergeDestinations(["", "  ", null, undefined])).toEqual([]);
+  });
+});

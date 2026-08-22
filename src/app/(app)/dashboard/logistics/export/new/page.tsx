@@ -2,6 +2,7 @@ import { requireLogistics, groupCounterparties } from "@/lib/logistics/access";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { ExportSetForm } from "@/components/app/logistics/ExportSetForm";
+import { MK_DESTINATIONS, mergeDestinations } from "@/lib/logistics/deliveryTerms";
 
 export default async function Page() {
   const { companyId, caps } = await requireLogistics();
@@ -15,8 +16,16 @@ export default async function Page() {
     prisma.client.findMany({ where: { companyId }, select: { id: true, name: true }, orderBy: { name: "asc" }, take: 1000 }),
   ]);
 
-  // MK дестинации за CPT (§14): динамично от маршрутите (toPlace), без hardcode.
-  const destinations = [...new Set(routes.map((r) => (r.toPlace ?? "").trim()).filter(Boolean))].sort();
+  // Уникален списък дестинации (§4/§5): canonical MK + от маршрутите + вече ползвани в
+  // Export Sets, dedupe по нормализиран ключ (без Skopje/SKOPIE/Скопие дубли).
+  const usedDestinations = await prisma.exportDocumentSet.findMany({
+    where: { companyId, destination: { not: null } }, select: { destination: true }, take: 2000,
+  });
+  const destinations = mergeDestinations(
+    MK_DESTINATIONS,
+    routes.map((r) => r.toPlace),
+    usedDestinations.map((s) => s.destination),
+  );
 
   return (
     <ExportSetForm

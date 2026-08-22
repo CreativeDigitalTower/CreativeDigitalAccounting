@@ -547,7 +547,8 @@
     "calibrationHint": "Μετατοπίζει όλο το overlay ως προς το έντυπο. 0/0 = χωρίς μετατόπιση.",
     "deliveryTerm": "Όροι παράδοσης",
     "selectPlaceholder": "Επιλέξτε",
-    "placeOfShipment": "Τόπος αποστολής"
+    "placeOfShipment": "Τόπος αποστολής",
+    "addDestination": "Προσθήκη"
   },
   "fleet": {
     "title": "Fleet",

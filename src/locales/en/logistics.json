@@ -547,7 +547,8 @@
     "calibrationHint": "Shifts the whole overlay vs the pre-printed form. 0/0 = no offset.",
     "deliveryTerm": "Delivery terms",
     "selectPlaceholder": "Select",
-    "placeOfShipment": "Place of shipment"
+    "placeOfShipment": "Place of shipment",
+    "addDestination": "Add"
   },
   "fleet": {
     "title": "Fleet",
