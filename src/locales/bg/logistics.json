@@ -539,7 +539,12 @@
     "addLine": "Добави продукт",
     "value": "Стойност",
     "issueDate": "Дата на издаване на фактурата",
-    "shipmentDate": "Дата на изпращане"
+    "shipmentDate": "Дата на изпращане",
+    "certificate": "Сертификат №",
+    "speditor": "Спедитор",
+    "placeBottom": "Място (долу)",
+    "calibration": "Калибриране на печата (CMR Epson)",
+    "calibrationHint": "Отмества целия overlay спрямо предпечатаната бланка. 0/0 = без корекция."
   },
   "fleet": {
     "title": "Автопарк",

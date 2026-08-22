@@ -539,7 +539,12 @@
     "addLine": "Add product",
     "value": "Value",
     "issueDate": "Invoice issue date",
-    "shipmentDate": "Shipment date"
+    "shipmentDate": "Shipment date",
+    "certificate": "Certificate No",
+    "speditor": "Speditor",
+    "placeBottom": "Place (bottom)",
+    "calibration": "Print calibration (CMR Epson)",
+    "calibrationHint": "Shifts the whole overlay vs the pre-printed form. 0/0 = no offset."
   },
   "fleet": {
     "title": "Fleet",

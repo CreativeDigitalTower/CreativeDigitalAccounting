@@ -247,14 +247,23 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
       };
     }
     case "cmr_epson":
-    case "cmr_hp":
+    case "cmr_hp": {
+      const cmrSender = resolveInvoiceParty(sellerEn);
+      const cmrBuyer = resolveInvoiceParty(buyerEn);
+      const cmrCity = (cmrSender.city ?? sellerCityEn ?? "").toUpperCase();
       return {
         layout: docType === "cmr_epson" ? "epson" : "hp",
-        sender: sellerEn, consignee: buyerEn,
-        destination: src.destination, placeOfShipment: [sellerCityEn, (sellerEn.country ?? "").toUpperCase()].filter(Boolean).join(", "),
-        date: src.declarationCmrDate, truck, invoiceNumber: src.invoiceNumber,
-        goods: { description: src.productSnapshot ? `CEMENT ${src.productSnapshot}` : "CEMENT", customsCode: src.customsCode ?? null },
-        weightKg: kgFromTonnes(src.quantity), speditor: null,
+        sender: cmrSender, consignee: cmrBuyer,
+        destination: src.destination, placeOfShipment: [cmrCity, (cmrSender.country ?? "").toUpperCase()].filter(Boolean).join(", "),
+        // CMR транспортна дата = дата на изпращане (fallback CMR/деклар. → issue), §10.
+        date: src.shipmentDate ?? src.declarationCmrDate ?? src.invoiceDate,
+        invoiceDate: src.invoiceDate,
+        destinationCountry: (cmrBuyer.country ?? "").toUpperCase() || null,
+        placeBottom: cmrCity || null,
+        truck, invoiceNumber: src.invoiceNumber,
+        goods: { description: src.productSnapshot ? `CEMENT ${src.productSnapshot} - IN BULK` : "CEMENT", customsCode: src.customsCode ?? null, certificate: null },
+        quantity: src.quantity, weightKg: kgFromTonnes(src.quantity), speditor: null,
       };
+    }
   }
 }

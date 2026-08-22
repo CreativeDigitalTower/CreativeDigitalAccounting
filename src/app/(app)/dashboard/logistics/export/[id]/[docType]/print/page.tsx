@@ -9,9 +9,11 @@ import { ExportCmrTemplate, type CmrDocData } from "@/components/app/logistics/E
 
 export const dynamic = "force-dynamic";
 
-export default async function Page({ params }: { params: Promise<{ id: string; docType: string }> }) {
+export default async function Page({ params, searchParams }: { params: Promise<{ id: string; docType: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const { companyId } = await requireLogistics();
   const { id, docType } = await params;
+  const sp = await searchParams;
+  const numParam = (k: string) => { const v = Array.isArray(sp[k]) ? sp[k]?.[0] : sp[k]; const n = v == null ? NaN : Number(v); return Number.isFinite(n) ? n : 0; };
   const doc = await prisma.exportDocument.findFirst({
     where: { docType, set: { id } },
     select: { data: true, docType: true, set: { select: { companyId: true, buyerCompanyId: true } } },
@@ -54,6 +56,31 @@ export default async function Page({ params }: { params: Promise<{ id: string; d
           <div className="disp-cut no-print-hide" />
           <div className="disp-half">{copy}</div>
         </div>
+      </div>
+    );
+  }
+
+  // ── CMR EPSON: PRINT OVERLAY върху предпечатана бланка. A4 portrait, margin 0,
+  // само динамични данни; калибриране ox/oy (mm) от query. Без browser header/footer. ──
+  if (doc.docType === "cmr_epson") {
+    const cmr = { ...(data as CmrDocData), calibX: numParam("ox"), calibY: numParam("oy"), preview: false };
+    const fileTitle = `CMR-${(cmr.invoiceNumber ?? "").replace(/[^\w-]/g, "") || "epson"}`;
+    return (
+      <div className="cmr-print-root">
+        <style>{`
+          @page { size: A4 portrait; margin: 0; }
+          @media print {
+            html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
+            .cmr-print-root { margin: 0; }
+            .cmr-ref { display: none !important; }
+          }
+          .cmr-epson-sheet { margin: 0 auto; }
+        `}</style>
+        <AutoPrint fileTitle={fileTitle} />
+        <div className="no-print" style={{ maxWidth: 760, margin: "0 auto 10px", fontSize: 12.5, color: "#333", background: "#fff7e6", border: "1px solid #e0c070", borderRadius: 8, padding: "8px 12px" }}>
+          ⚠ Поставете предпечатаната CMR (Epson) бланка в принтера. Печатайте при <b>мащаб 100% / Actual size</b> (без „Fit to page"). <b>Изключете Headers and footers.</b>
+        </div>
+        <ExportCmrTemplate data={cmr} />
       </div>
     );
   }
