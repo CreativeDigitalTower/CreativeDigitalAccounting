@@ -593,6 +593,29 @@
         "complete": "Complete",
         "incomplete": "Incomplete"
       }
+    },
+    "ownership": "Sahiplik",
+    "status": "Durum",
+    "actions": "İşlemler",
+    "capacity": "Kapasite",
+    "dossier": "Dosya",
+    "addVehicle": "Araç ekle",
+    "archive": "Arşivle",
+    "activate": "Etkinleştir",
+    "archived": "Arşivlendi",
+    "active": "Aktif",
+    "showArchived": "Arşivlenenleri göster",
+    "complete": "Verileri tamamla",
+    "configsCount": "konfig.",
+    "allOwnership": "Tüm sahiplik",
+    "onlyMissing": "Yalnızca eksik",
+    "vehicles": "araç",
+    "missingData": "Eksik veri",
+    "own": {
+      "own": "Kendi",
+      "carrier": "Taşıyıcının",
+      "subcontractor": "Kiralık",
+      "unspecified": "Belirsiz"
     }
   },
   "reports": {

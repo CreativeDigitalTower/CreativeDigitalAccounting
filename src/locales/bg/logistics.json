@@ -593,6 +593,29 @@
         "complete": "Попълнени",
         "incomplete": "Непълни"
       }
+    },
+    "ownership": "Собственост",
+    "status": "Статус",
+    "actions": "Действия",
+    "capacity": "Капацитет",
+    "dossier": "Досие",
+    "addVehicle": "Добави влекач",
+    "archive": "Архивирай",
+    "activate": "Активирай",
+    "archived": "Архивиран",
+    "active": "Активен",
+    "showArchived": "Включи архивираните",
+    "complete": "Допълни данни",
+    "configsCount": "конфиг.",
+    "allOwnership": "Всяка собственост",
+    "onlyMissing": "Само с липсващи данни",
+    "vehicles": "влекачи",
+    "missingData": "Липсващи данни",
+    "own": {
+      "own": "Собствен",
+      "carrier": "На превозвач",
+      "subcontractor": "На лизинг",
+      "unspecified": "Неопределено"
     }
   },
   "reports": {

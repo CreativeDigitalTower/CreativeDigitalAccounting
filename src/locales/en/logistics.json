@@ -593,6 +593,29 @@
         "complete": "Complete",
         "incomplete": "Incomplete"
       }
+    },
+    "ownership": "Ownership",
+    "status": "Status",
+    "actions": "Actions",
+    "capacity": "Capacity",
+    "dossier": "Dossier",
+    "addVehicle": "Add vehicle",
+    "archive": "Archive",
+    "activate": "Activate",
+    "archived": "Archived",
+    "active": "Active",
+    "showArchived": "Include archived",
+    "complete": "Complete data",
+    "configsCount": "config.",
+    "allOwnership": "Any ownership",
+    "onlyMissing": "Only missing data",
+    "vehicles": "vehicles",
+    "missingData": "Missing data",
+    "own": {
+      "own": "Own",
+      "carrier": "Carrier's",
+      "subcontractor": "Leased",
+      "unspecified": "Unspecified"
     }
   },
   "reports": {
