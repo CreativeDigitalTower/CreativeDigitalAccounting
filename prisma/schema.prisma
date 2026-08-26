@@ -1278,6 +1278,11 @@ model MkInvoice {
   id          String   @id @default(cuid())
   companyId   String   // MK фирма (продавач)
   clientId    String?  // MK клиент
+  // Директна връзка към получената BG→MK доставка (ExportDocumentSet), от която е
+  // издадена тази MK фактура. Additive/nullable — allocation-based MK продажби
+  // (mk-sales) остават с null. Статусът „Фактурирана" на получената доставка се
+  // извежда от СЪЩЕСТВУВАНЕТО на MkInvoice с този sourceExportSetId (§18/§19).
+  sourceExportSetId String?
   number      String
   date        DateTime?
   currency    String   @default("MKD")
@@ -1287,13 +1292,15 @@ model MkInvoice {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  company Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  client  Client?         @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  lines   MkInvoiceLine[]
+  company         Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  client          Client?            @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  sourceExportSet ExportDocumentSet? @relation(fields: [sourceExportSetId], references: [id], onDelete: SetNull)
+  lines           MkInvoiceLine[]
 
   @@unique([companyId, number])
   @@index([companyId])
   @@index([clientId])
+  @@index([sourceExportSetId])
 }
 
 // Позиция от MK фактура = един ред от allocation ledger-а. Приспада quantity от
@@ -1351,9 +1358,10 @@ model ExportDocumentSet {
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
-  company   Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  shipment  Shipment?        @relation(fields: [shipmentId], references: [id], onDelete: SetNull)
-  documents ExportDocument[]
+  company    Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  shipment   Shipment?        @relation(fields: [shipmentId], references: [id], onDelete: SetNull)
+  documents  ExportDocument[]
+  mkInvoices MkInvoice[]      // MK фактури, издадени от получателя за тази доставка (§18)
 
   @@unique([companyId, invoiceNumber])
   @@index([companyId, status])

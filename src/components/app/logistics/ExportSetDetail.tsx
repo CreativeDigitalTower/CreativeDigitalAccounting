@@ -10,6 +10,7 @@ type SetDto = {
   truckRegSnapshot: string | null; trailerReg: string | null; productSnapshot: string | null;
   quantity: number | null; unit: string; declarationCmrDate: string | null; dispatchNumber: string | null;
   status: string; sellerName: string | null; buyerName: string | null; clientName: string | null; documents: Doc[];
+  mkInvoice?: { id: string; number: string } | null;
   viewerRole?: string;
 };
 const DOC_LABEL: Record<string, string> = { invoice: "docInvoice", dispatch: "docDispatch", declaration: "docDeclaration", cmr_epson: "docCmrEpson", cmr_hp: "docCmrHp" };
@@ -109,6 +110,14 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
                   <span style={{ color: "var(--muted)" }}>{l}</span><span style={{ textAlign: "right" }}>{v || "—"}</span>
                 </div>
               ))}
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, fontSize: 13, padding: "5px 0" }}>
+                <span style={{ color: "var(--muted)" }}>{t("logistics.received.mkInvoice")}</span>
+                <span style={{ textAlign: "right" }}>
+                  {s.mkInvoice
+                    ? <Link href={`/dashboard/logistics/mk-sales/${s.mkInvoice.id}`} style={{ fontWeight: 600 }}>{s.mkInvoice.number} · {t("logistics.received.stInvoiced")}</Link>
+                    : <span style={{ color: "var(--brick)" }}>{t("logistics.received.stUninvoiced")}</span>}
+                </span>
+              </div>
             </>
           )}
         </div>

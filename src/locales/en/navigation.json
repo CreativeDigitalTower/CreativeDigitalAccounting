@@ -75,7 +75,7 @@
   "logisticsClients": "Clients (log.)",
   "logisticsAnalytics": "Analytics (log.)",
   "logisticsExport": "Export deliveries",
-  "logisticsExportReceived": "Received export documents",
+  "logisticsExportReceived": "Received deliveries",
   "featureRequest": "Custom solution",
   "logisticsFleet": "Fleet",
   "logisticsReports": "Reports (carrier/cargo)"

@@ -22,12 +22,14 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   if (!set) return NextResponse.json({ error: "Не е намерена." }, { status: 404 });
   const role = await exportSetReadRole(g.companyId, set);
   if (!role) return NextResponse.json({ error: "Няма достъп." }, { status: 403 });
-  const [seller, buyer, client] = await Promise.all([
+  const [seller, buyer, client, mkInvoice] = await Promise.all([
     prisma.company.findUnique({ where: { id: set.companyId }, select: { name: true } }),
     set.buyerCompanyId ? prisma.company.findUnique({ where: { id: set.buyerCompanyId }, select: { name: true } }) : Promise.resolve(null),
     set.clientId ? prisma.client.findFirst({ where: { id: set.clientId, companyId: set.companyId }, select: { name: true } }) : Promise.resolve(null),
+    // MK фактурата, издадена от получателя за тази доставка (group visibility, §18/§31).
+    set.buyerCompanyId ? prisma.mkInvoice.findFirst({ where: { sourceExportSetId: set.id, companyId: set.buyerCompanyId }, select: { id: true, number: true } }) : Promise.resolve(null),
   ]);
-  return NextResponse.json({ ...set, sellerName: seller?.name ?? null, buyerName: buyer?.name ?? null, clientName: client?.name ?? null, viewerRole: role });
+  return NextResponse.json({ ...set, sellerName: seller?.name ?? null, buyerName: buyer?.name ?? null, clientName: client?.name ?? null, mkInvoice, viewerRole: role });
 }
 
 const optDate = z.string().datetime().nullable().optional().or(z.literal("").transform(() => null));

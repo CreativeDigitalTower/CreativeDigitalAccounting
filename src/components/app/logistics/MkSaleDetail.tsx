@@ -5,7 +5,8 @@ import { useT, useI18n } from "@/components/i18n/I18nProvider";
 
 type Trace = { bgMkInvoiceId: string; bgMkInvoice: string; shipmentId: string | null; shipmentCode: string | null; dispatchNote: string | null; holcimInvoiceId: string | null; holcimInvoice: string | null; proforma: string | null };
 type Line = { id: string; productSnapshot: string | null; unit: string; quantity: number; unitPrice: number; lineTotal: number; vatAmount: number | null; grossAmount: number | null; trace: Trace | null };
-type Invoice = { id: string; number: string; date: string | null; currency: string; vatRate: number | null; client: string; net: number; vat: number; gross: number; lines: Line[] };
+type SourceSet = { id: string; invoiceNumber: string; destination: string | null; truck: string | null };
+type Invoice = { id: string; number: string; date: string | null; currency: string; vatRate: number | null; client: string; sourceExportSet?: SourceSet | null; net: number; vat: number; gross: number; lines: Line[] };
 
 export function MkSaleDetail({ id }: { id: string }) {
   const t = useT();
@@ -31,6 +32,12 @@ export function MkSaleDetail({ id }: { id: string }) {
         <div><span style={{ color: "var(--muted)" }}>{t("logistics.mksale.client")}: </span>{inv.client}</div>
         <div><span style={{ color: "var(--muted)" }}>{t("logistics.mksale.vatRate")}: </span>{inv.vatRate ?? "—"}</div>
         <div><span style={{ color: "var(--muted)" }}>{t("logistics.mksale.currency")}: </span>{inv.currency}</div>
+        {inv.sourceExportSet && (
+          <div><span style={{ color: "var(--muted)" }}>{t("logistics.received.sourceDelivery")}: </span>
+            <Link href={`/dashboard/logistics/export/${inv.sourceExportSet.id}`} style={{ fontWeight: 600 }}>{inv.sourceExportSet.invoiceNumber}</Link>
+            {inv.sourceExportSet.destination ? <span style={{ color: "var(--muted)" }}> · {inv.sourceExportSet.destination}</span> : null}
+          </div>
+        )}
       </div>
 
       <div className="glass panel" style={{ overflowX: "auto", marginBottom: 12 }}>
