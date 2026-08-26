@@ -96,3 +96,38 @@ export function fleetReviewSummary(rows: FleetRowLike[]) {
   }
   return s;
 }
+
+/**
+ * Обединен изглед „Автопарк" (§2/§18): агрегира master Vehicle + неговите
+ * VehicleConfiguration-и в един ред с primary config, брой конфигурации, липси и KPI.
+ * Чиста логика (без DB), за да е тествана и споделена от API-то. НЕ трие и НЕ дублира
+ * записи — само проекция.
+ */
+export type FleetVehicleInput = {
+  id: string; registration: string; active: boolean;
+  ownershipType: string | null; aliases: string[];
+  configs: { id: string; trailer: string | null; carrierName: string | null; driver: string | null; driverPhone: string | null; cargoMode: string; maxPayloadTons: number | null; active: boolean }[];
+};
+
+export function buildFleetView(vehicles: FleetVehicleInput[], searchKey: (s: string) => string) {
+  const kpi = { total: 0, active: 0, bulk: 0, bags: 0, missing: 0 };
+  const rows = vehicles.map((v) => {
+    const configs = v.configs.map((c) => ({ ...c, gaps: fleetGaps({ driver: c.driver, trailer: c.trailer, cargoMode: c.cargoMode, maxPayloadTons: c.maxPayloadTons }) }));
+    const primary = configs.find((c) => c.active) ?? configs[0] ?? null;
+    const anyGaps = configs.length === 0 || configs.some((c) => c.gaps.length > 0);
+    kpi.total++;
+    if (v.active) kpi.active++;
+    for (const c of configs) { if (c.cargoMode === "bulk") kpi.bulk++; else if (c.cargoMode === "bags") kpi.bags++; }
+    kpi.missing += configs.length === 0 ? 1 : configs.filter((c) => c.gaps.length > 0).length;
+    return {
+      id: v.id, registration: v.registration, active: v.active,
+      ownershipType: v.ownershipType, aliases: v.aliases,
+      trailer: primary?.trailer ?? null, carrierName: primary?.carrierName ?? null,
+      driver: primary?.driver ?? null, driverPhone: primary?.driverPhone ?? null,
+      cargoMode: primary?.cargoMode ?? "", maxPayloadTons: primary?.maxPayloadTons ?? null,
+      configCount: configs.length, configs, anyGaps,
+      _search: searchKey(v.registration + " " + v.aliases.join(" ")),
+    };
+  });
+  return { kpi, rows };
+}

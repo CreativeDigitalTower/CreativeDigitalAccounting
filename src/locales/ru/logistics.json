@@ -593,6 +593,29 @@
         "complete": "Complete",
         "incomplete": "Incomplete"
       }
+    },
+    "ownership": "Собственность",
+    "status": "Статус",
+    "actions": "Действия",
+    "capacity": "Вместимость",
+    "dossier": "Досье",
+    "addVehicle": "Добавить тягач",
+    "archive": "Архивировать",
+    "activate": "Активировать",
+    "archived": "Архивный",
+    "active": "Активный",
+    "showArchived": "Показать архивные",
+    "complete": "Дополнить данные",
+    "configsCount": "конфиг.",
+    "allOwnership": "Любая собственность",
+    "onlyMissing": "Только с пробелами",
+    "vehicles": "тягачи",
+    "missingData": "Нет данных",
+    "own": {
+      "own": "Собственный",
+      "carrier": "Перевозчика",
+      "subcontractor": "Лизинг",
+      "unspecified": "Не указано"
     }
   },
   "reports": {

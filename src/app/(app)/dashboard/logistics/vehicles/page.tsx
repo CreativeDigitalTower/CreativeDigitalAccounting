@@ -1,7 +1,7 @@
-import { requireLogistics } from "@/lib/logistics/access";
-import { LogisticsVehicles } from "@/components/app/logistics/LogisticsVehicles";
+import { redirect } from "next/navigation";
 
-export default async function Page() {
-  const { caps } = await requireLogistics();
-  return <LogisticsVehicles canManage={caps.manage_shipments} />;
+// Обединено с „Автопарк" (§1/§17). Старият route пренасочва към canonical /fleet, за да
+// не дава 404 за bookmarks/links. Vehicle досието остава на /logistics/vehicles/[id].
+export default function Page() {
+  redirect("/dashboard/logistics/fleet");
 }

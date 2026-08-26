@@ -593,6 +593,29 @@
         "complete": "Complete",
         "incomplete": "Incomplete"
       }
+    },
+    "ownership": "Proprietate",
+    "status": "Status",
+    "actions": "Acțiuni",
+    "capacity": "Capacitate",
+    "dossier": "Dosar",
+    "addVehicle": "Adaugă vehicul",
+    "archive": "Arhivează",
+    "activate": "Activează",
+    "archived": "Arhivat",
+    "active": "Activ",
+    "showArchived": "Include arhivate",
+    "complete": "Completează date",
+    "configsCount": "config.",
+    "allOwnership": "Orice proprietate",
+    "onlyMissing": "Doar cu date lipsă",
+    "vehicles": "vehicule",
+    "missingData": "Date lipsă",
+    "own": {
+      "own": "Propriu",
+      "carrier": "Al transportatorului",
+      "subcontractor": "Leasing",
+      "unspecified": "Nespecificat"
     }
   },
   "reports": {

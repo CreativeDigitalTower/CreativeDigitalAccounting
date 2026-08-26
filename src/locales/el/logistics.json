@@ -593,6 +593,29 @@
         "complete": "Complete",
         "incomplete": "Incomplete"
       }
+    },
+    "ownership": "Ιδιοκτησία",
+    "status": "Κατάσταση",
+    "actions": "Ενέργειες",
+    "capacity": "Χωρητικότητα",
+    "dossier": "Φάκελος",
+    "addVehicle": "Προσθήκη οχήματος",
+    "archive": "Αρχειοθέτηση",
+    "activate": "Ενεργοποίηση",
+    "archived": "Αρχειοθετημένο",
+    "active": "Ενεργό",
+    "showArchived": "Συμπερίληψη αρχειοθετημένων",
+    "complete": "Συμπλήρωση",
+    "configsCount": "διαμ.",
+    "allOwnership": "Κάθε ιδιοκτησία",
+    "onlyMissing": "Μόνο ελλιπή",
+    "vehicles": "οχήματα",
+    "missingData": "Ελλιπή δεδομένα",
+    "own": {
+      "own": "Ιδιόκτητο",
+      "carrier": "Μεταφορέα",
+      "subcontractor": "Leasing",
+      "unspecified": "Απροσδιόριστο"
     }
   },
   "reports": {
