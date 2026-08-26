@@ -29,6 +29,14 @@ export default async function LogisticsDashboardPage() {
     prisma.company.findUnique({ where: { id: companyId }, select: { companyGroup: { select: { name: true, companies: { select: { id: true, name: true, eik: true, defaultCurrency: true } } } } } }),
   ]);
 
+  // §25 — получени BG→MK доставки без издадена MK фактура (за да не се пропусне доставка).
+  const myGroupId = await prisma.company.findUnique({ where: { id: companyId }, select: { companyGroupId: true } });
+  const uninvoicedReceived = myGroupId?.companyGroupId
+    ? await prisma.exportDocumentSet.count({
+        where: { buyerCompanyId: companyId, company: { companyGroupId: myGroupId.companyGroupId }, mkInvoices: { none: {} } },
+      })
+    : 0;
+
   const stCount = (s: string) => statusGroups.find((x) => x.status === s)?._count ?? 0;
   const delayed = activeMs.filter((s) => shipmentDelayed(s.milestones)).length;
   const sales = sumMoney([mkNet._sum.lineTotal ?? 0, bgmkIssuedNet._sum.lineTotal ?? 0]);
@@ -55,6 +63,13 @@ export default async function LogisticsDashboardPage() {
           <Link href="/dashboard/logistics/shipments/new" className="btn btn-primary btn-sm">{t("logistics.shipments.add")}</Link>
         </div>
       </div>
+
+      {uninvoicedReceived > 0 && (
+        <Link href="/dashboard/logistics/export-received" className="glass panel" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", color: "inherit", marginBottom: 14, borderLeft: "3px solid var(--brick)" }}>
+          <span style={{ fontFamily: "'Fraunces', serif", fontSize: 20, fontWeight: 700, color: "var(--brick)" }}>{uninvoicedReceived}</span>
+          <span style={{ fontSize: 13 }}>{t("logistics.received.dashWarn")} →</span>
+        </Link>
+      )}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 14, marginBottom: 16 }}>
         <KpiGroup title={t("logistics.dash.today")} items={[

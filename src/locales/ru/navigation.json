@@ -75,7 +75,7 @@
   "logisticsClients": "Клиенты (лог.)",
   "logisticsAnalytics": "Аналитика",
   "logisticsExport": "Экспорт",
-  "logisticsExportReceived": "Полученные экспортные документы",
+  "logisticsExportReceived": "Полученные поставки",
   "featureRequest": "Индивидуальное решение",
   "logisticsFleet": "Автопарк",
   "logisticsReports": "Отчёты (перевозчик/груз)"

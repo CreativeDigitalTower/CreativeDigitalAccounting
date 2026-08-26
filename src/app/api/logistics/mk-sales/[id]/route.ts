@@ -13,6 +13,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     select: {
       id: true, number: true, date: true, currency: true, vatRate: true, note: true,
       client: { select: { name: true } },
+      // Директен източник: получената BG→MK доставка, от която е издадена (§18).
+      sourceExportSet: { select: { id: true, invoiceNumber: true, destination: true, truckRegSnapshot: true, trailerReg: true } },
       lines: {
         select: {
           id: true, productSnapshot: true, unit: true, quantity: true, unitPrice: true, lineTotal: true, vatAmount: true, grossAmount: true,
@@ -47,6 +49,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   return NextResponse.json({
     id: inv.id, number: inv.number, date: inv.date, currency: inv.currency, vatRate: inv.vatRate, note: inv.note,
     client: inv.client?.name ?? "—",
+    sourceExportSet: inv.sourceExportSet ? {
+      id: inv.sourceExportSet.id, invoiceNumber: inv.sourceExportSet.invoiceNumber, destination: inv.sourceExportSet.destination,
+      truck: [inv.sourceExportSet.truckRegSnapshot, inv.sourceExportSet.trailerReg].filter(Boolean).join(" / ") || null,
+    } : null,
     net: sumMoney(lines.map((l) => l.lineTotal)), vat: sumMoney(lines.map((l) => l.vatAmount)), gross: sumMoney(lines.map((l) => l.grossAmount)),
     lines,
   });
