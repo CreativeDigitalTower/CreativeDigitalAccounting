@@ -8,6 +8,7 @@ import { exceedsPayload, bagsCalc, BAGS_DEFAULTS } from "@/lib/logistics/fleet";
 import { parseQuantity, fmtQuantity } from "@/lib/i18n/format";
 import { QuantityInput } from "@/components/app/logistics/QuantityInput";
 import { DateField } from "@/components/app/logistics/DateField";
+import { todayISODate, toISODateLocal } from "@/lib/date/week";
 import { useFieldErrors, Req, FieldError, ValidationBanner, ariaProps, errStyle, type FieldErrors } from "@/components/app/logistics/formValidation";
 import { PLACE_OF_SHIPMENT_DEFAULT } from "@/lib/logistics/deliveryTerms";
 
@@ -33,7 +34,8 @@ export type ExportSetInitial = {
   mkInvoice?: { id: string; number: string } | null;
 };
 
-const ymd = (x: string | null | undefined) => (x ? new Date(x).toISOString().slice(0, 10) : "");
+// Локална (timezone-safe) дата за date input-ите — пази записания календарен ден (§32).
+const ymd = (x: string | null | undefined) => (x ? toISODateLocal(new Date(x)) : "");
 
 export function ExportSetForm({ vehicles, products, routes, buyers, clients, destinations = [], initial, mkInvoice }: {
   vehicles: Vehicle[]; products: Product[]; routes: Route[]; buyers: Company[]; clients: Client[]; destinations?: string[];
@@ -53,8 +55,9 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
     quantity: initial.quantity != null ? fmtQuantity(initial.quantity, locale) : "", declarationCmrDate: ymd(initial.declarationCmrDate),
     dispatchNumber: initial.dispatchNumber ?? "", buyerCompanyId: initial.buyerCompanyId ?? "", clientId: initial.clientId ?? "",
   } : {
-    invoiceNumber: "", invoiceDate: new Date().toISOString().slice(0, 10), shipmentDate: new Date().toISOString().slice(0, 10), deliveryTerm: "", placeOfShipment: PLACE_OF_SHIPMENT_DEFAULT, destination: "", routeId: "",
-    truckVehicleId: "", trailerReg: "", logisticsProductId: "", quantity: "", declarationCmrDate: new Date().toISOString().slice(0, 10),
+    // Create: датите default-ват към ДНЕШНАТА локална дата (§1/§32), но остават editable.
+    invoiceNumber: "", invoiceDate: todayISODate(), shipmentDate: todayISODate(), deliveryTerm: "", placeOfShipment: PLACE_OF_SHIPMENT_DEFAULT, destination: "", routeId: "",
+    truckVehicleId: "", trailerReg: "", logisticsProductId: "", quantity: "", declarationCmrDate: todayISODate(),
     dispatchNumber: "", buyerCompanyId: buyers[0]?.id ?? "", clientId: "",
   });
   // Автофил от конфигурацията на превозвача (§27): последен шофьор, макс. товар, вид товар.

@@ -207,6 +207,9 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
         // Date of shipment = отделната дата на изпращане (fallback към issue date за legacy записи).
         // Place of shipment = „BELI IZVOR" (заводът), НЕ градът на продавача (§2/§3/§15).
         truck, placeOfShipment: destinationEn(src.placeOfShipment) || PLACE_OF_SHIPMENT_DEFAULT, dateOfShipment: src.shipmentDate ?? src.invoiceDate,
+        // Дата на декларацията в Invoice (§18/§21) — от declarationCmrDate (fallback invoiceDate),
+        // рендира се YYYY.MM.DD (различно от invoice date). НЕ shipmentDate — тя е само в испратницата (§5).
+        declarationDate: src.declarationCmrDate ?? src.invoiceDate,
         destination: destinationEn(src.destination) || src.destination, destinationCountry: buyerEn.country ?? null,
         // Date/City/Manager блок (auto-fill, editable snapshot).
         date: src.invoiceDate, city: sellerCityEn || null, manager: parties.seller.manager ?? null,
@@ -221,7 +224,8 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
     case "blank": {
       const recipient = docType === "blank" ? null : (parties.client ?? null);
       return {
-        dispatchNumber: src.dispatchNumber, date: src.invoiceDate,
+        // „Денес {дата}" в испратницата = ДАТА НА ИЗПРАЩАНЕ (§4/§28/§29), не invoiceDate.
+        dispatchNumber: src.dispatchNumber, date: src.shipmentDate ?? src.invoiceDate,
         // MK фирмата издава испратницата — на кирилица както в оригинала (§3).
         issuer: resolveDispatchIssuer(parties.buyer),
         recipient, destination: src.destination,
