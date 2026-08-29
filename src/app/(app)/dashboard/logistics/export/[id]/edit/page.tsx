@@ -23,7 +23,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
   const [vehicles, products, routes, buyers, usedDestinations, mkInvoice] = await Promise.all([
     prisma.vehicle.findMany({ where: { companyId, active: true, normalizedRegistration: { not: null } }, select: { id: true, registration: true, logisticsProfile: { select: { trailerReg: true } } }, orderBy: { registration: "asc" } }),
-    prisma.logisticsProduct.findMany({ where: { companyId, active: true }, select: { id: true, canonicalName: true }, orderBy: { canonicalName: "asc" } }),
+    prisma.logisticsProduct.findMany({ where: { companyId, active: true }, select: { id: true, canonicalName: true, category: true }, orderBy: { canonicalName: "asc" } }),
     prisma.logisticsRoute.findMany({ where: { companyId, active: true }, select: { id: true, toPlace: true, note: true }, orderBy: { toPlace: "asc" } }),
     groupCounterparties(companyId),
     prisma.exportDocumentSet.findMany({ where: { companyId, destination: { not: null } }, select: { destination: true }, take: 2000 }),
@@ -33,10 +33,18 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
   const destinations = mergeDestinations(MK_DESTINATIONS, routes.map((r) => r.toPlace), usedDestinations.map((s) => s.destination));
 
+  // §10: ако доставката сочи архивиран продукт, добави го в опциите, за да не се губи
+  // избраната стойност (snapshot остава видим), без да го активираме в каталога.
+  let productOptions = products;
+  if (set.logisticsProductId && !products.some((p) => p.id === set.logisticsProductId)) {
+    const archived = await prisma.logisticsProduct.findFirst({ where: { id: set.logisticsProductId, companyId }, select: { id: true, canonicalName: true, category: true } });
+    if (archived) productOptions = [...products, archived];
+  }
+
   return (
     <ExportSetForm
       vehicles={vehicles.map((v) => ({ id: v.id, registration: v.registration, trailerReg: v.logisticsProfile?.trailerReg ?? null }))}
-      products={products}
+      products={productOptions}
       routes={routes.map((r) => ({ id: r.id, label: `${r.note ? r.note + " " : ""}${r.toPlace}` }))}
       buyers={buyers}
       clients={clientList}

@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useT, useI18n } from "@/components/i18n/I18nProvider";
+import { DateField } from "@/components/app/logistics/DateField";
 
 // „document" = стандартна фактура (Document); „mk" = легаси MkInvoice (detail route се
 // различава).
@@ -109,9 +110,9 @@ export function ReceivedDeliveries({ canManage }: { canManage: boolean }) {
         </div>
         <input style={{ ...sel, minWidth: 190 }} value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("logistics.received.search")} />
         <label style={{ fontSize: 11.5, color: "var(--muted)", display: "flex", alignItems: "center", gap: 4 }}>{t("logistics.received.from")}
-          <input type="date" style={sel} value={from} onChange={(e) => setFrom(e.target.value)} /></label>
+          <DateField value={from} onChange={setFrom} style={{ ...sel, minWidth: 120 }} /></label>
         <label style={{ fontSize: 11.5, color: "var(--muted)", display: "flex", alignItems: "center", gap: 4 }}>{t("logistics.received.to")}
-          <input type="date" style={sel} value={to} onChange={(e) => setTo(e.target.value)} /></label>
+          <DateField value={to} onChange={setTo} style={{ ...sel, minWidth: 120 }} /></label>
         <select style={sel} value={clientF} onChange={(e) => setClientF(e.target.value)}>
           <option value="">{t("logistics.received.allClients")}</option>
           {clientNames.map((n) => <option key={n} value={n}>{n}</option>)}

@@ -28,7 +28,11 @@
     "packaging": "Разфасовка",
     "aliases": "Alias-и",
     "addAlias": "Нов alias",
-    "empty": "Няма продукти. Добавете първия."
+    "empty": "Няма продукти. Добавете първия.",
+    "category": "Вид",
+    "categoryBulk": "Насипен",
+    "categoryPackaged": "Пакетиран",
+    "categoryNone": "Без категория"
   },
   "vehicles": {
     "title": "Автомобили",
@@ -729,5 +733,16 @@
     "issue": "Издай фактура",
     "sourceDelivery": "Източник (доставка)",
     "dashWarn": "доставки очакват фактуриране"
+  },
+  "calendar": {
+    "mon": "Пн",
+    "tue": "Вт",
+    "wed": "Ср",
+    "thu": "Чт",
+    "fri": "Пт",
+    "sat": "Сб",
+    "sun": "Нд",
+    "today": "Днес",
+    "clear": "Изчисти"
   }
 }

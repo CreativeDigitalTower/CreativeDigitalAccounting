@@ -28,7 +28,11 @@
     "packaging": "Ambalaj",
     "aliases": "Aliasuri",
     "addAlias": "Alias nou",
-    "empty": "Niciun produs încă."
+    "empty": "Niciun produs încă.",
+    "category": "Tip",
+    "categoryBulk": "Vrac",
+    "categoryPackaged": "Ambalat",
+    "categoryNone": "Fără categorie"
   },
   "vehicles": {
     "title": "Vehicule",
@@ -729,5 +733,16 @@
     "issue": "Emite factura",
     "sourceDelivery": "Sursă (livrare)",
     "dashWarn": "livrări așteaptă facturarea"
+  },
+  "calendar": {
+    "mon": "Lu",
+    "tue": "Ma",
+    "wed": "Mi",
+    "thu": "Jo",
+    "fri": "Vi",
+    "sat": "Sâ",
+    "sun": "Du",
+    "today": "Azi",
+    "clear": "Șterge"
   }
 }

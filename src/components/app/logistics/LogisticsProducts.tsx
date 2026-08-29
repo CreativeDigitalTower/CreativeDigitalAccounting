@@ -1,11 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useT } from "@/components/i18n/I18nProvider";
 
 type Alias = { id: string; alias: string };
 type Product = {
   id: string; canonicalName: string; materialCode: string | null; unit: string;
-  packaging: string | null; active: boolean; notes: string | null; aliases: Alias[];
+  packaging: string | null; category: string | null; isSystemDefault: boolean; active: boolean; notes: string | null; aliases: Alias[];
 };
 
 export function LogisticsProducts({ canManage }: { canManage: boolean }) {
@@ -13,7 +13,7 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
   const [items, setItems] = useState<Product[]>([]);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState({ canonicalName: "", materialCode: "", unit: "t", packaging: "" });
+  const [form, setForm] = useState({ canonicalName: "", materialCode: "", unit: "t", packaging: "", category: "bulk" });
   const [aliasDraft, setAliasDraft] = useState<Record<string, string>>({});
 
   async function load() {
@@ -26,12 +26,12 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
     setErr(""); setBusy(true);
     const r = await fetch("/api/logistics/products", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ canonicalName: form.canonicalName, materialCode: form.materialCode || null, unit: form.unit, packaging: form.packaging || null }),
+      body: JSON.stringify({ canonicalName: form.canonicalName, materialCode: form.materialCode || null, unit: form.unit, packaging: form.packaging || null, category: form.category || null }),
     });
     const j = await r.json().catch(() => ({}));
     setBusy(false);
     if (!r.ok) { setErr(j.error ?? t("logistics.common.err")); return; }
-    setForm({ canonicalName: "", materialCode: "", unit: "t", packaging: "" });
+    setForm({ canonicalName: "", materialCode: "", unit: "t", packaging: "", category: "bulk" });
     load();
   }
 
@@ -47,6 +47,11 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
   const inp = { padding: "6px 9px", fontSize: 13 } as const;
   const th = { textAlign: "left" as const, padding: "7px 8px", color: "var(--muted)", fontSize: 12 };
   const td = { padding: "7px 8px", fontSize: 12.5, borderTop: "1px solid rgba(217,215,200,.5)", verticalAlign: "top" as const };
+  // Групиране по вид (§6): Насипен → Пакетиран → без категория; вътре по име.
+  const order = (c: string | null) => (c === "bulk" ? 0 : c === "packaged" ? 1 : 2);
+  const grouped = [...items].sort((a, b) => order(a.category) - order(b.category) || a.canonicalName.localeCompare(b.canonicalName));
+  const catLabel = (c: string | null) => c === "bulk" ? t("logistics.products.categoryBulk") : c === "packaged" ? t("logistics.products.categoryPackaged") : t("logistics.products.categoryNone");
+  const catCols = canManage ? 8 : 7;
 
   return (
     <div>
@@ -61,6 +66,11 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
             <input style={{ ...inp, width: 120 }} value={form.materialCode} onChange={(e) => setForm({ ...form, materialCode: e.target.value })} /></div>
           <div><label style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.products.unit")}</label><br />
             <input style={{ ...inp, width: 60 }} value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })} /></div>
+          <div><label style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.products.category")}</label><br />
+            <select style={{ ...inp, width: 130 }} value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+              <option value="bulk">{t("logistics.products.categoryBulk")}</option>
+              <option value="packaged">{t("logistics.products.categoryPackaged")}</option>
+            </select></div>
           <div><label style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.products.packaging")}</label><br />
             <input style={{ ...inp, width: 120 }} value={form.packaging} onChange={(e) => setForm({ ...form, packaging: e.target.value })} /></div>
           <button className="btn btn-primary btn-sm" disabled={busy || !form.canonicalName} onClick={add}>{t("logistics.products.add")}</button>
@@ -71,15 +81,23 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
         {items.length === 0 ? <div style={{ fontSize: 13, color: "var(--muted)" }}>{t("logistics.products.empty")}</div> : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead><tr>
-              <th style={th}>{t("logistics.products.name")}</th><th style={th}>{t("logistics.products.materialCode")}</th>
+              <th style={th}>{t("logistics.products.name")}</th><th style={th}>{t("logistics.products.category")}</th><th style={th}>{t("logistics.products.materialCode")}</th>
               <th style={th}>{t("logistics.products.unit")}</th><th style={th}>{t("logistics.products.packaging")}</th>
               <th style={th}>{t("logistics.products.aliases")}</th><th style={th}>{t("logistics.common.status")}</th>
               {canManage && <th style={th}>{t("logistics.common.actions")}</th>}
             </tr></thead>
             <tbody>
-              {items.map((p) => (
+              {grouped.map((p, i) => {
+                const prev = grouped[i - 1];
+                const header = i === 0 || prev.category !== p.category ? (
+                  <tr key={`h-${p.category ?? "none"}`}><td colSpan={catCols} style={{ padding: "10px 8px 4px", fontFamily: "'Fraunces', serif", fontSize: 13, fontWeight: 700, color: "var(--brick)" }}>{catLabel(p.category)}</td></tr>
+                ) : null;
+                return (
+                <Fragment key={p.id}>
+                {header}
                 <tr key={p.id} style={{ opacity: p.active ? 1 : 0.55 }}>
-                  <td style={td}><strong>{p.canonicalName}</strong></td>
+                  <td style={td}><strong>{p.canonicalName}</strong>{p.isSystemDefault ? <span style={{ marginLeft: 6, fontSize: 10, color: "var(--muted)" }}>●</span> : null}</td>
+                  <td style={td}><span style={{ fontSize: 11, background: p.category === "bulk" ? "rgba(15,138,106,.12)" : p.category === "packaged" ? "rgba(178,120,42,.14)" : "rgba(0,0,0,.06)", borderRadius: 8, padding: "1px 7px" }}>{catLabel(p.category)}</span></td>
                   <td style={td}>{p.materialCode ?? "—"}</td>
                   <td style={td}>{p.unit}</td>
                   <td style={td}>{p.packaging ?? "—"}</td>
@@ -105,7 +123,9 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
                     </td>
                   )}
                 </tr>
-              ))}
+                </Fragment>
+                );
+              })}
             </tbody>
           </table>
         )}

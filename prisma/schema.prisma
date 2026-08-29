@@ -831,6 +831,12 @@ model LogisticsProduct {
   customsCode    String?  // митнически/CN код за CMR (напр. 25232900) — nullable
   unit           String   @default("t")
   packaging      String?  // напр. „25 kg bags"
+  // Вид цимент (§5): "bulk" (Насипен) | "packaged" (Пакетиран). Nullable/additive —
+  // старите записи остават без категория до sync-а. Управлява bulk/packaged cargo логиката.
+  category       String?
+  // Различава seeded canonical продукти от user-created (§16/§17). Canonical sync
+  // архивира само стари system defaults, НИКОГА custom продукт на клиента.
+  isSystemDefault Boolean @default(false)
   active         Boolean  @default(true)
   notes          String?  @db.Text
   createdAt      DateTime @default(now())
