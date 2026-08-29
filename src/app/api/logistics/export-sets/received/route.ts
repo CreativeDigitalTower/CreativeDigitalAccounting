@@ -16,7 +16,7 @@ export async function GET() {
   if (!me?.companyGroupId) return NextResponse.json({ kpi: { received: 0, uninvoiced: 0, invoiced: 0, totalQuantity: 0 }, rows: [] });
 
   const sets = await prisma.exportDocumentSet.findMany({
-    where: { buyerCompanyId: g.companyId, company: { companyGroupId: me.companyGroupId } },
+    where: { buyerCompanyId: g.companyId, deletedAt: null, company: { companyGroupId: me.companyGroupId } },
     select: {
       id: true, invoiceNumber: true, invoiceDate: true, destination: true, deliveryTerm: true,
       truckRegSnapshot: true, trailerReg: true, productSnapshot: true, quantity: true, unit: true, status: true,

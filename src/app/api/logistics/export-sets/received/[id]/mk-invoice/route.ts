@@ -34,9 +34,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     // Източникът е получена доставка на активната MK фирма (buyer) в същата група (§30).
     const set = await prisma.exportDocumentSet.findUnique({
       where: { id },
-      select: { id: true, companyId: true, buyerCompanyId: true, productSnapshot: true, quantity: true, unit: true, invoiceNumber: true },
+      select: { id: true, companyId: true, buyerCompanyId: true, productSnapshot: true, quantity: true, unit: true, invoiceNumber: true, deletedAt: true },
     });
-    if (!set) return NextResponse.json({ error: "Доставката не е намерена." }, { status: 404 });
+    if (!set || set.deletedAt) return NextResponse.json({ error: "Доставката не е намерена." }, { status: 404 });
     if (set.buyerCompanyId !== g.companyId || !(await inSameGroup(g.companyId, set.companyId))) {
       return NextResponse.json({ error: "Няма достъп до тази доставка." }, { status: 403 });
     }

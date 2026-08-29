@@ -33,7 +33,7 @@ export default async function LogisticsDashboardPage() {
   const myGroupId = await prisma.company.findUnique({ where: { id: companyId }, select: { companyGroupId: true } });
   const uninvoicedReceived = myGroupId?.companyGroupId
     ? await prisma.exportDocumentSet.count({
-        where: { buyerCompanyId: companyId, company: { companyGroupId: myGroupId.companyGroupId }, mkInvoices: { none: {} } },
+        where: { buyerCompanyId: companyId, deletedAt: null, company: { companyGroupId: myGroupId.companyGroupId }, mkInvoices: { none: {} } },
       })
     : 0;
 

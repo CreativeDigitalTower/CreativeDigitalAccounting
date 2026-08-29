@@ -1,15 +1,26 @@
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { logisticsApiGuard, exportSetReadRole } from "@/lib/logistics/access";
+import { logisticsApiGuard, exportSetReadRole, groupCounterparties } from "@/lib/logistics/access";
 import { audit } from "@/lib/documents";
+import { validationError, VMSG, type FieldErrors } from "@/lib/logistics/validation";
+import { PLACE_OF_SHIPMENT_DEFAULT } from "@/lib/logistics/deliveryTerms";
+import { missingEditFields, exportDeleteDecision } from "@/lib/logistics/exportSetEdit";
 import { z } from "zod";
+
+const EDIT_FIELD_MSG: Record<string, string> = {
+  invoiceNumber: VMSG.required, placeOfShipment: VMSG.required, quantity: VMSG.quantityPositive,
+  logisticsProductId: VMSG.product, truckVehicleId: VMSG.vehicle,
+  deliveryTerm: "Моля, изберете условия на доставка – FCA или CPT.",
+  destination: "Моля, изберете или въведете крайна дестинация.",
+};
 
 const detailSelect = {
   id: true, companyId: true, shipmentId: true, buyerCompanyId: true, clientId: true,
-  invoiceNumber: true, invoiceDate: true, destination: true, routeId: true,
+  invoiceNumber: true, invoiceDate: true, shipmentDate: true, deliveryTerm: true, placeOfShipment: true,
+  destination: true, routeId: true,
   truckVehicleId: true, truckRegSnapshot: true, trailerReg: true, logisticsProductId: true, productSnapshot: true,
-  quantity: true, unit: true, declarationCmrDate: true, dispatchNumber: true, status: true, note: true, createdAt: true,
+  quantity: true, unit: true, declarationCmrDate: true, dispatchNumber: true, status: true, note: true, createdAt: true, deletedAt: true,
   documents: { select: { id: true, docType: true, status: true, overridden: true, updatedAt: true } },
 } as const;
 
@@ -19,7 +30,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const { id } = await params;
   // Зареждаме по id, после авторизираме (продавач или купувач от групата).
   const set = await prisma.exportDocumentSet.findUnique({ where: { id }, select: detailSelect });
-  if (!set) return NextResponse.json({ error: "Не е намерена." }, { status: 404 });
+  if (!set || set.deletedAt) return NextResponse.json({ error: "Не е намерена." }, { status: 404 });
   const role = await exportSetReadRole(g.companyId, set);
   if (!role) return NextResponse.json({ error: "Няма достъп." }, { status: 403 });
   const [seller, buyer, client, mkInvoice] = await Promise.all([
@@ -36,7 +47,11 @@ const optDate = z.string().datetime().nullable().optional().or(z.literal("").tra
 const patchSchema = z.object({
   invoiceNumber: z.string().max(60).optional(),
   invoiceDate: optDate,
+  shipmentDate: optDate,
+  deliveryTerm: z.enum(["FCA", "CPT"]).nullable().optional(),
+  placeOfShipment: z.string().max(200).nullable().optional(),
   destination: z.string().max(200).nullable().optional(),
+  buyerCompanyId: z.string().nullable().optional(),
   truckVehicleId: z.string().nullable().optional(),
   truckRegSnapshot: z.string().max(40).nullable().optional(), // директна корекция на камиона (source-of-truth)
   trailerReg: z.string().max(40).nullable().optional(),
@@ -49,19 +64,35 @@ const patchSchema = z.object({
   note: z.string().max(2000).nullable().optional(),
 });
 
+// PATCH e умишлено PARTIAL (частична редакция): работи и за пълната форма „Редактирай",
+// и за inline quick-edit-а в detail-а. Пази срещу ИЗПРАЗВАНЕ на задължителни полета —
+// ако ключ е подаден, но празен, връща structured грешка (§18), без да блокира полета,
+// които просто не са в payload-а.
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const g = await logisticsApiGuard("manage_documents");
   if (!g.ok) return g.res;
   try {
     const { id } = await params;
-    const existing = await prisma.exportDocumentSet.findFirst({ where: { id, companyId: g.companyId }, select: { id: true } });
+    // company-scoped + не позволяваме редакция на изтрита доставка (§35).
+    const existing = await prisma.exportDocumentSet.findFirst({ where: { id, companyId: g.companyId, deletedAt: null }, select: { id: true } });
     if (!existing) return NextResponse.json({ error: "Не е намерена." }, { status: 404 });
     const d = patchSchema.parse(await req.json());
+
+    // Валидация: подадено, но празно задължително поле → грешка (не silent, §18/§27).
+    const missing = missingEditFields(d);
+    if (missing.length) {
+      const fe: FieldErrors = {};
+      for (const k of missing) fe[k] = EDIT_FIELD_MSG[k] ?? VMSG.required;
+      return validationError(fe);
+    }
 
     const data: Record<string, unknown> = {};
     if (d.invoiceNumber !== undefined) data.invoiceNumber = d.invoiceNumber.trim();
     if (d.invoiceDate !== undefined) data.invoiceDate = d.invoiceDate ? new Date(d.invoiceDate) : null;
-    if (d.destination !== undefined) data.destination = d.destination;
+    if (d.shipmentDate !== undefined) data.shipmentDate = d.shipmentDate ? new Date(d.shipmentDate) : null;
+    if (d.deliveryTerm !== undefined) data.deliveryTerm = d.deliveryTerm;
+    if (d.placeOfShipment !== undefined) data.placeOfShipment = (d.placeOfShipment ?? "").trim() || PLACE_OF_SHIPMENT_DEFAULT;
+    if (d.destination !== undefined) data.destination = (d.destination ?? "").trim() || null;
     if (d.trailerReg !== undefined) data.trailerReg = d.trailerReg;
     if (d.truckRegSnapshot !== undefined) data.truckRegSnapshot = d.truckRegSnapshot;
     if (d.quantity !== undefined) data.quantity = d.quantity;
@@ -72,6 +103,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (d.clientId !== undefined) {
       if (d.clientId) { const c = await prisma.client.findFirst({ where: { id: d.clientId, companyId: g.companyId }, select: { id: true } }); if (!c) return NextResponse.json({ error: "Клиентът не е намерен." }, { status: 404 }); }
       data.clientId = d.clientId || null;
+    }
+    if (d.buyerCompanyId !== undefined) {
+      if (d.buyerCompanyId) {
+        const cps = await groupCounterparties(g.companyId);
+        if (!cps.some((c) => c.id === d.buyerCompanyId)) return NextResponse.json({ error: "Купувачът не е свързана фирма от групата." }, { status: 400 });
+      }
+      data.buyerCompanyId = d.buyerCompanyId || null;
     }
     if (d.truckVehicleId !== undefined) {
       if (d.truckVehicleId) {
@@ -93,6 +131,39 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") return NextResponse.json({ error: "Фактура с този номер вече съществува." }, { status: 409 });
     if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues[0]?.message ?? "Невалидни данни." }, { status: 400 });
+    return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
+  }
+}
+
+const delSchema = z.object({ reason: z.string().max(500).nullable().optional() });
+
+// Soft delete (Кошче, §7). Пази срещу orphaned MK фактура (§4/§6): ако доставката вече е
+// фактурирана от получателя, НЕ трие — връща 409 с линк към фактурата. Company-scoped +
+// IDOR-safe: само собственикът (BG) може да трие своята source доставка (§35).
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const g = await logisticsApiGuard("manage_documents");
+  if (!g.ok) return g.res;
+  try {
+    const { id } = await params;
+    const set = await prisma.exportDocumentSet.findFirst({
+      where: { id, companyId: g.companyId, deletedAt: null },
+      select: { id: true, invoiceNumber: true },
+    });
+    if (!set) return NextResponse.json({ error: "Не е намерена." }, { status: 404 });
+
+    // Зависимост: издадена MK фактура → блокирай (§6), за да няма фактура без източник.
+    const mkInvoice = await prisma.mkInvoice.findFirst({ where: { sourceExportSetId: set.id }, select: { id: true, number: true } });
+    const decision = exportDeleteDecision({ hasMkInvoice: !!mkInvoice });
+    if (!decision.ok) {
+      return NextResponse.json({ error: "MK_INVOICE_LINKED", mkInvoice, message: `Тази доставка е свързана с MK фактура № ${mkInvoice!.number}. Първо анулирайте/премахнете свързаната фактура.` }, { status: 409 });
+    }
+
+    const reason = delSchema.parse(await req.json().catch(() => ({}))).reason ?? null;
+    await prisma.exportDocumentSet.update({ where: { id }, data: { deletedAt: new Date(), deletedById: g.userId, deleteReason: reason } });
+    await audit(g.companyId, g.userId, "delete", "ExportDocumentSet", id, `EXPORT_DELIVERY_DELETED ${set.invoiceNumber}${reason ? ` — ${reason}` : ""}`);
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    if (err instanceof z.ZodError) return NextResponse.json({ error: "Невалидни данни." }, { status: 400 });
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
   }
 }

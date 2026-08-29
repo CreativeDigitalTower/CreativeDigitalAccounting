@@ -1,8 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useT, useI18n } from "@/components/i18n/I18nProvider";
 import { ACTIVE_EXPORT_DOC_TYPES } from "@/lib/logistics/config";
+import { ExportDeleteModal } from "@/components/app/logistics/ExportDeleteModal";
 
 type Doc = { id: string; docType: string; status: string; overridden: boolean; updatedAt: string };
 type SetDto = {
@@ -17,11 +19,13 @@ const DOC_LABEL: Record<string, string> = { invoice: "docInvoice", dispatch: "do
 
 export function ExportSetDetail({ id, canManage }: { id: string; canManage: boolean }) {
   const t = useT();
+  const router = useRouter();
   const { qty, qtyUnit } = useI18n();
   const [s, setS] = useState<SetDto | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
   const [editSrc, setEditSrc] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
   const [src, setSrc] = useState({ truckRegSnapshot: "", trailerReg: "", destination: "" });
 
   async function load() { const r = await fetch(`/api/logistics/export-sets/${id}`); if (r.ok) setS(await r.json()); }
@@ -67,6 +71,12 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
           {s.status === "finalized" ? t("logistics.export.stReady") : t("logistics.export.stDraft")}
         </span>
         {!isSeller && <span style={{ fontSize: 11, fontWeight: 700, color: "var(--muted)" }}>{t("logistics.export.receivedBadge")}</span>}
+        {manage && (
+          <span style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+            <Link href={`/dashboard/logistics/export/${s.id}/edit`} className="btn btn-ghost btn-sm">{t("logistics.export.edit")}</Link>
+            <button className="btn btn-ghost btn-sm" style={{ color: "var(--brick)" }} onClick={() => setShowDelete(true)}>{t("logistics.export.delete")}</button>
+          </span>
+        )}
       </div>
       {msg && <div style={{ background: "var(--brass-soft)", border: "1px solid var(--brass)", borderRadius: 8, padding: "8px 12px", fontSize: 12.5, marginBottom: 12 }}>{msg}</div>}
 
@@ -159,6 +169,14 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
           )}
         </div>
       </div>
+
+      {showDelete && (
+        <ExportDeleteModal
+          set={{ id: s.id, invoiceNumber: s.invoiceNumber, invoiceDate: s.invoiceDate, clientName: s.clientName ?? s.buyerName, truckRegSnapshot: s.truckRegSnapshot, trailerReg: s.trailerReg, productSnapshot: s.productSnapshot, quantity: s.quantity, unit: s.unit }}
+          onClose={() => setShowDelete(false)}
+          onDeleted={() => router.push("/dashboard/logistics/export")}
+        />
+      )}
     </div>
   );
 }
