@@ -51,7 +51,10 @@ export default async function Page({ params, searchParams }: { params: Promise<{
           @media print { .disp-half { break-inside: avoid; page-break-inside: avoid; } .disp-sheet { page-break-after: avoid; } }
         `}</style>
         <AutoPrint fileTitle={fileTitle} />
-        <div className="disp-sheet">
+        {/* print-sheet + print-doc → участва в canonical printing-multi механизма: вижда се
+            само този лист, позициониран top-left (извън dashboard chrome) → без blank/2-ра
+            страница (§7/§8/§12). */}
+        <div className="disp-sheet print-sheet print-doc">
           <div className="disp-half">{copy}</div>
           <div className="disp-cut no-print-hide" />
           <div className="disp-half">{copy}</div>
@@ -81,7 +84,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         <div className="no-print" style={{ maxWidth: 760, margin: "0 auto 10px", fontSize: 12.5, color: "#333", background: "#fff7e6", border: "1px solid #e0c070", borderRadius: 8, padding: "8px 12px" }}>
           ⚠ Поставете предпечатаната CMR ({which}) бланка в принтера. Печатайте при <b>мащаб 100% / Actual size</b> (без „Fit to page"). <b>Изключете Headers and footers.</b>
         </div>
-        <ExportCmrTemplate data={cmr} />
+        <div className="print-sheet print-doc"><ExportCmrTemplate data={cmr} /></div>
       </div>
     );
   }
@@ -105,11 +108,13 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         @media print { .doc-sheet { page-break-after: avoid; } .invoice-doc thead { display: table-header-group; } }
       `}</style>
       <AutoPrint fileTitle={invTitle} />
-      <div className="doc-sheet">
-        {doc.docType === "invoice" ? <ExportInvoiceTemplate data={inv} />
-          : doc.docType === "declaration" ? <ExportDeclarationTemplate data={data as DeclarationDocData} />
-          : (doc.docType === "cmr_epson" || doc.docType === "cmr_hp") ? <ExportCmrTemplate data={data as CmrDocData} />
-          : <ExportDispatchTemplate data={data as DispatchDocData} />}
+      <div className="doc-sheet print-sheet">
+        <div className="print-doc">
+          {doc.docType === "invoice" ? <ExportInvoiceTemplate data={inv} />
+            : doc.docType === "declaration" ? <ExportDeclarationTemplate data={data as DeclarationDocData} />
+            : (doc.docType === "cmr_epson" || doc.docType === "cmr_hp") ? <ExportCmrTemplate data={data as CmrDocData} />
+            : <ExportDispatchTemplate data={data as DispatchDocData} />}
+        </div>
       </div>
     </div>
   );

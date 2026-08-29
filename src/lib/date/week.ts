@@ -6,6 +6,20 @@
 
 export const WEEK_STARTS_ON = 1; // 0=неделя, 1=понеделник (§20)
 
+/**
+ * Локална (timezone-safe) ISO дата „yyyy-mm-dd" от местните компоненти на деня — НЕ
+ * `toISOString().slice(0,10)`, който около полунощ дава предходен/следващ ден за BG/MK
+ * часовия пояс. Ползва се за default стойности в date input-ите.
+ */
+export function toISODateLocal(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+/** Днешната локална дата като „yyyy-mm-dd". */
+export function todayISODate(): string {
+  return toISODateLocal(new Date());
+}
+
 // Ключове в реда понеделник → неделя. Етикетите идват от i18n (виж calendar.* ключове).
 export const WEEKDAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 export type WeekdayKey = (typeof WEEKDAY_KEYS)[number];

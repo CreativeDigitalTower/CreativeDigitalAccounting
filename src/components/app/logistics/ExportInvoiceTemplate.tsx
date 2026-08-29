@@ -1,6 +1,7 @@
 "use client";
 import { goodsRowValue, invoiceTotals } from "@/lib/logistics/exportDocs";
 import { resolveInvoiceParty } from "@/lib/logistics/invoiceParties";
+import { formatInvoiceDate, formatDeclarationDate } from "@/lib/logistics/exportDates";
 
 type Party = { name?: string | null; address?: string | null; city?: string | null; country?: string | null; eik?: string | null; registrationNumber?: string | null; vatNumber?: string | null };
 type Goods = { description?: string | null; quantity?: number | null; unit?: string | null; unitPrice?: number | null; value?: number | null; currency?: string | null; certificate?: string | null; truck?: string | null; note?: string | null };
@@ -8,6 +9,7 @@ export type InvoiceDocData = {
   invoiceNumber?: string | null; invoiceDate?: string | null; seller?: Party; buyer?: Party;
   contract?: string | null; annex?: string | null; order?: string | null;
   termsOfDelivery?: string | null; truck?: string | null; placeOfShipment?: string | null; dateOfShipment?: string | null;
+  declarationDate?: string | null;
   destination?: string | null; destinationCountry?: string | null; goods?: Goods[];
   vatText?: string | null; vatRate?: number | null; originText?: string | null; originPlace?: string | null;
   paymentConditions?: string | null; certificatesText?: string | null; notes?: string | null;
@@ -22,8 +24,8 @@ const DECLARATION = [
   "ПРОДУКТИ СА С EU ПРЕФЕРЕНЦИАЛЕН ПРОИЗХОД",
 ];
 
-// Единен формат DD/MM/YYYY за фактурата (§14).
-const d = (s?: string | null) => s ? new Date(s).toLocaleDateString("en-GB") : "";
+// Invoice date → DD.MM.YYYY (централен helper, §14/§17).
+const d = (s?: string | null) => formatInvoiceDate(s);
 const nfQty = new Intl.NumberFormat("en-US", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 const q3 = (v?: number | null) => v == null ? "" : nfQty.format(v);
 const nfMoney = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -67,7 +69,7 @@ export function ExportInvoiceTemplate({ data }: { data: InvoiceDocData }) {
 
   return (
     // Точна A4 геометрия (§1,§2,§21): print area A1:J48, margins L8/R6/T8/B9, ~ пълна страница.
-    <div className="printable invoice-doc" style={{ fontFamily: "'Times New Roman', Times, serif", color: "#000", background: "#fff", width: "210mm", height: "297mm", boxSizing: "border-box", padding: "8mm 6mm 9mm 8mm", fontSize: 11.5, lineHeight: 1.15, display: "flex", flexDirection: "column" }}>
+    <div className="printable invoice-doc" style={{ fontFamily: "'Times New Roman', Times, serif", color: "#000", background: "#fff", width: "210mm", height: "297mm", boxSizing: "border-box", padding: "8mm 6mm 9mm 8mm", fontSize: 11.5, lineHeight: 1.15, display: "flex", flexDirection: "column", overflow: "hidden" }}>
       {/* Заглавие: INVOICE № {точен string номер} / {дата на издаване DD/MM/YYYY} (§1,§2) */}
       <div style={{ display: "flex", justifyContent: "center", alignItems: "baseline", gap: 8, fontWeight: 700, fontSize: 15, height: "12mm" }}>
         <span>INVOICE №</span><span>{data.invoiceNumber ?? ""}</span>{data.invoiceDate && <><span>/</span><span>{d(data.invoiceDate)}</span></>}
@@ -98,7 +100,8 @@ export function ExportInvoiceTemplate({ data }: { data: InvoiceDocData }) {
         <div><span style={{ display: "inline-block", width: 150 }}>Terms of delivery :</span><b>{data.termsOfDelivery ?? ""}</b></div>
         <div><span style={{ display: "inline-block", width: 150 }}>Means of transport :</span>Truck № : <b>{truckText}</b></div>
         <div><span style={{ display: "inline-block", width: 150 }}>Place of shipment :</span><b>{data.placeOfShipment ?? ""}</b></div>
-        <div><span style={{ display: "inline-block", width: 150 }}>Date of shipment :</span><b>{d(data.dateOfShipment)}</b></div>
+        {/* „Date of shipment" НЕ се показва в Invoice (§5) — датата на изпращане е само в
+            Испратницата след „Денес". Полето остава в данните, но не се рендира. */}
         <div><span style={{ display: "inline-block", width: 150 }}>Destination :</span><b>{data.destination ?? ""}</b>{data.destinationCountry ? <>&nbsp;&nbsp;&nbsp;{data.destinationCountry}</> : null}</div>
       </div>
 
@@ -134,9 +137,9 @@ export function ExportInvoiceTemplate({ data }: { data: InvoiceDocData }) {
               <div style={{ fontSize: 10.5, marginTop: "6mm" }}>
                 {DECLARATION.map((ln, i) => <div key={i}>{ln}</div>)}
               </div>
-              {/* Ляво = дата на ИЗДАВАНЕ на фактурата (същият source като заглавието, §3); дясно = BELI IZVOR */}
+              {/* Ляво = ДАТА НА ДЕКЛАРАЦИЯТА във формат YYYY.MM.DD (§18/§20); дясно = BELI IZVOR */}
               <div style={{ display: "flex", marginTop: "12mm" }}>
-                <span style={{ width: "45%" }}>{d(data.invoiceDate)}</span>
+                <span style={{ width: "45%" }}>{formatDeclarationDate(data.declarationDate ?? data.invoiceDate)}</span>
                 <span>{data.placeOfShipment ?? ""}</span>
               </div>
               <div style={{ fontWeight: 700 }}>{representative}</div>
@@ -169,11 +172,13 @@ export function ExportInvoiceTemplate({ data }: { data: InvoiceDocData }) {
         <span style={{ fontStyle: "italic", textDecoration: "underline" }}>Payment conditions :</span>&nbsp;&nbsp;<b>{data.paymentConditions ?? ""}</b>
       </div>
 
-      {/* Seller / signature — долу вдясно (§11/§20) */}
-      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "auto" }}>
+      {/* Seller / signature — долу вдясно, с реално място за подпис + печат (§22/§24/§25).
+          marginTop:auto държи блока в долната част; по-голямото вътрешно разстояние дава
+          визуалното пространство от референцията, без да излиза от една A4 страница. */}
+      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "auto", paddingTop: "6mm" }}>
         <div style={{ width: "62mm", textAlign: "center" }}>
           <div style={{ textAlign: "left" }}>Seller :</div>
-          <div style={{ marginTop: "10mm", borderTop: B }} />
+          <div style={{ marginTop: "18mm", borderTop: B }} />
           <div style={{ fontSize: 10 }}>/ Sign. &amp; Stamp /</div>
         </div>
       </div>
