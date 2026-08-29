@@ -201,7 +201,8 @@
     "copyAttachmentsAsk": "Copy the attachments too?",
     "vatInvalid": "Invalid VAT number format.",
     "vatInconsistent": "A VAT number is entered, but the client is marked as not VAT-registered. Please check the data.",
-    "duplicateInvoice": "Duplicate invoice"
+    "duplicateInvoice": "Duplicate invoice",
+    "fromDelivery": "New invoice from a logistics delivery (BG invoice №{number}) — review and adjust before issuing."
   },
   "detail": {
     "back": "← Documents",
@@ -210,7 +211,8 @@
     "internalTitle": "Internal comment (not visible to the client)",
     "openInvoice": "Open invoice №{number}",
     "fromProforma": "← Created from proforma №{number}",
-    "basedOn": "← Based on {type} № {number}"
+    "basedOn": "← Based on {type} № {number}",
+    "fromDelivery": "← Issued from logistics delivery №{number}"
   },
   "send": {
     "btn": "Send to client",

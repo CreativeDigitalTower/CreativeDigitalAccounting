@@ -2,10 +2,10 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useT, useI18n } from "@/components/i18n/I18nProvider";
-import { SearchableSelect } from "@/components/app/logistics/SearchableSelect";
-import { parseQuantity } from "@/lib/i18n/format";
 
-type MkInvoice = { id: string; number: string } | null;
+// „document" = стандартна фактура (Document); „mk" = легаси MkInvoice (detail route се
+// различава).
+type MkInvoice = { id: string; number: string; kind?: "document" | "mk" } | null;
 type Row = {
   id: string; invoiceNumber: string; invoiceDate: string | null; destination: string | null; deliveryTerm: string | null;
   truckRegSnapshot: string | null; trailerReg: string | null; productSnapshot: string | null;
@@ -13,11 +13,15 @@ type Row = {
   mkInvoice: MkInvoice; invoiceStatus: "uninvoiced" | "invoiced"; suggestedClientId: string | null;
 };
 type Kpi = { received: number; uninvoiced: number; invoiced: number; totalQuantity: number };
-type Client = { id: string; name: string };
 
-export function ReceivedDeliveries({ clients, companyName, mkVatRate, canManage }: { clients: Client[]; companyName: string; mkVatRate: number; canManage: boolean }) {
+// Линк към detail-а на издадената фактура — стандартна (Document) или легаси (MkInvoice).
+function invoiceHref(inv: NonNullable<MkInvoice>): string {
+  return inv.kind === "mk" ? `/dashboard/logistics/mk-sales/${inv.id}` : `/dashboard/documents/${inv.id}`;
+}
+
+export function ReceivedDeliveries({ canManage }: { canManage: boolean }) {
   const t = useT();
-  const { qtyUnit, qty } = useI18n();
+  const { qtyUnit } = useI18n();
   const [rows, setRows] = useState<Row[]>([]);
   const [kpi, setKpi] = useState<Kpi | null>(null);
   const [status, setStatus] = useState<"all" | "uninvoiced" | "invoiced">("all");
@@ -26,7 +30,6 @@ export function ReceivedDeliveries({ clients, companyName, mkVatRate, canManage 
   const [clientF, setClientF] = useState("");
   const [q, setQ] = useState("");
   const [sortBy, setSortBy] = useState<"date" | "quantity" | "client" | "status">("date");
-  const [modal, setModal] = useState<Row | null>(null);
 
   async function load() {
     const r = await fetch("/api/logistics/export-sets/received");
@@ -35,7 +38,6 @@ export function ReceivedDeliveries({ clients, companyName, mkVatRate, canManage 
   useEffect(() => { void load(); }, []);
 
   const dt = (x: string | null) => x ? new Date(x).toLocaleDateString() : "—";
-  const clientName = (id: string) => clients.find((c) => c.id === id)?.name ?? "";
 
   const filtered = useMemo(() => {
     const nq = q.trim().toLowerCase();
@@ -59,7 +61,6 @@ export function ReceivedDeliveries({ clients, companyName, mkVatRate, canManage 
     return [...list].sort(cmp[sortBy]);
   }, [rows, status, from, to, clientF, q, sortBy]);
 
-  const clientOptions = clients.map((c) => ({ value: c.id, label: c.name }));
   const clientNames = [...new Set(rows.map((r) => r.clientName).filter((x): x is string => !!x))].sort();
 
   const th = { textAlign: "left" as const, padding: "7px 8px", color: "var(--muted)", fontSize: 12, whiteSpace: "nowrap" as const };
@@ -146,12 +147,12 @@ export function ReceivedDeliveries({ clients, companyName, mkVatRate, canManage 
                   <td style={td}>{r.destination ?? "—"}</td>
                   <td style={td}>{r.clientName ?? "—"}</td>
                   <td style={td}><Chip st={r.invoiceStatus} /></td>
-                  <td style={td}>{r.mkInvoice ? <Link href={`/dashboard/logistics/mk-sales/${r.mkInvoice.id}`} style={{ fontWeight: 600 }}>{r.mkInvoice.number}</Link> : "—"}</td>
+                  <td style={td}>{r.mkInvoice ? <Link href={invoiceHref(r.mkInvoice)} style={{ fontWeight: 600 }}>{r.mkInvoice.number}</Link> : "—"}</td>
                   <td style={td}>
                     {r.mkInvoice
-                      ? <Link className="btn btn-ghost btn-sm" style={{ fontSize: 11, padding: "2px 10px" }} href={`/dashboard/logistics/mk-sales/${r.mkInvoice.id}`}>{t("logistics.received.openInvoice")}</Link>
+                      ? <Link className="btn btn-ghost btn-sm" style={{ fontSize: 11, padding: "2px 10px" }} href={invoiceHref(r.mkInvoice)}>{t("logistics.received.openInvoice")}</Link>
                       : canManage
-                        ? <button className="btn btn-primary btn-sm" style={{ fontSize: 11, padding: "2px 10px" }} onClick={() => setModal(r)}>{t("logistics.received.createInvoice")}</button>
+                        ? <Link className="btn btn-primary btn-sm" style={{ fontSize: 11, padding: "2px 10px" }} href={`/dashboard/documents/new?fromDelivery=${r.id}`}>{t("logistics.received.createInvoice")}</Link>
                         : <span style={{ fontSize: 11, color: "var(--muted)" }}>—</span>}
                   </td>
                 </tr>
@@ -159,75 +160,6 @@ export function ReceivedDeliveries({ clients, companyName, mkVatRate, canManage 
             </tbody>
           </table>
         )}
-      </div>
-
-      {modal && <CreateModal row={modal} clients={clientOptions} clientName={clientName} companyName={companyName} mkVatRate={mkVatRate} qty={qty}
-        onClose={() => setModal(null)} onDone={() => { setModal(null); void load(); }} />}
-    </div>
-  );
-}
-
-function CreateModal({ row, clients, clientName, companyName, mkVatRate, qty, onClose, onDone }: {
-  row: Row; clients: { value: string; label: string }[]; clientName: (id: string) => string; companyName: string; mkVatRate: number;
-  qty: (v: number | null | undefined) => string; onClose: () => void; onDone: () => void;
-}) {
-  const t = useT();
-  const [clientId, setClientId] = useState(row.suggestedClientId ?? "");
-  const [quantity, setQuantity] = useState(row.quantity != null ? qty(row.quantity) : "");
-  const [unitPrice, setUnitPrice] = useState("");
-  const [vatRate, setVatRate] = useState(String(mkVatRate));
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState("");
-
-  async function submit() {
-    setErr("");
-    const qn = parseQuantity(quantity) ?? 0;
-    const up = Number(unitPrice.replace(",", "."));
-    if (!clientId) { setErr(t("logistics.received.errClient")); return; }
-    if (!(qn > 0)) { setErr(t("logistics.received.errQty")); return; }
-    if (!(up >= 0) || unitPrice.trim() === "") { setErr(t("logistics.received.errPrice")); return; }
-    setBusy(true);
-    const r = await fetch(`/api/logistics/export-sets/received/${row.id}/mk-invoice`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ clientId, quantity: qn, unitPrice: up, vatRate: Number(vatRate) || 0 }),
-    });
-    const j = await r.json().catch(() => ({}));
-    setBusy(false);
-    if (!r.ok) { setErr(j.error ?? t("logistics.common.err")); return; }
-    onDone();
-  }
-
-  const lbl = { fontSize: 11.5, color: "var(--muted)", display: "block", marginBottom: 3 } as const;
-  const inp = { width: "100%", padding: "7px 9px", fontSize: 13 } as const;
-  return (
-    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.4)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-      <div className="glass panel" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 480, width: "100%", padding: 20 }}>
-        <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, margin: "0 0 4px" }}>{t("logistics.received.createTitle")}</h2>
-        <p style={{ fontSize: 12, color: "var(--muted)", margin: "0 0 14px" }}>{t("logistics.received.fromDelivery")} {row.invoiceNumber}</p>
-
-        <div style={{ display: "grid", gap: 10 }}>
-          <div><span style={lbl}>{t("logistics.received.seller")}</span><div style={{ fontSize: 13, fontWeight: 600 }}>{companyName}</div></div>
-          <div><span style={lbl}>{t("logistics.received.buyer")} *</span>
-            <SearchableSelect options={clients} value={clientId} onChange={setClientId} placeholder={t("logistics.received.pickClient")} allowEmpty={false} />
-            {clientId && <span style={{ fontSize: 11, color: "var(--muted)" }}>{clientName(clientId)}</span>}
-          </div>
-          <div><span style={lbl}>{t("logistics.received.product")}</span><div style={{ fontSize: 13 }}>{row.productSnapshot ?? "—"}</div></div>
-          <div style={{ display: "flex", gap: 10 }}>
-            <div style={{ flex: 1 }}><span style={lbl}>{t("logistics.received.quantity")} ({row.unit})</span>
-              <input style={inp} className="num" value={quantity} onChange={(e) => setQuantity(e.target.value)} /></div>
-            <div style={{ flex: 1 }}><span style={lbl}>{t("logistics.received.unitPrice")} *</span>
-              <input style={inp} className="num" value={unitPrice} onChange={(e) => setUnitPrice(e.target.value)} placeholder="0.00" autoFocus /></div>
-            <div style={{ width: 90 }}><span style={lbl}>{t("logistics.received.vat")} %</span>
-              <input style={inp} className="num" value={vatRate} onChange={(e) => setVatRate(e.target.value)} /></div>
-          </div>
-          <p style={{ fontSize: 11, color: "var(--muted)", margin: 0 }}>{t("logistics.received.priceHint")}</p>
-        </div>
-
-        {err && <div style={{ color: "var(--brick)", fontSize: 12.5, marginTop: 10 }}>{err}</div>}
-        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
-          <button className="btn btn-ghost btn-sm" onClick={onClose} disabled={busy}>{t("logistics.received.cancel")}</button>
-          <button className="btn btn-primary btn-sm" onClick={submit} disabled={busy}>{t("logistics.received.issue")}</button>
-        </div>
       </div>
     </div>
   );

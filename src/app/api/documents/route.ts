@@ -42,6 +42,8 @@ const schema = z.object({
   vatExempt: z.boolean().optional(),
   vatExemptReason: z.string().optional().nullable(),
   clientIsIndividual: z.boolean().optional(),
+  // Логистика: издаване на стандартна фактура от получена BG→MK доставка (§18/§41).
+  sourceExportSetId: z.string().optional(),
 });
 
 export async function POST(req: Request) {
@@ -92,6 +94,23 @@ export async function POST(req: Request) {
       }
     }
 
+    // ─── Логистика: фактура от получена BG→MK доставка (§18/§22/§35) ───
+    // Активната фирма трябва да е получателят (buyer) на доставката; една доставка →
+    // една валидна фактура (dup guard service-side, за бъдещо split invoicing §42).
+    if (data.sourceExportSetId) {
+      const set = await prisma.exportDocumentSet.findUnique({
+        where: { id: data.sourceExportSetId },
+        select: { id: true, buyerCompanyId: true, deletedAt: true },
+      });
+      if (!set || set.deletedAt) return NextResponse.json({ error: "Логистичната доставка не е намерена." }, { status: 404 });
+      if (set.buyerCompanyId !== companyId) return NextResponse.json({ error: "Няма достъп до тази доставка." }, { status: 403 });
+      const dup = await prisma.document.findFirst({
+        where: { companyId, type: "invoice", sourceExportSetId: set.id, deletedAt: null, status: { not: "cancelled" } },
+        select: { id: true, number: true },
+      });
+      if (dup) return NextResponse.json({ error: "Вече е издадена фактура за тази доставка.", invoiceId: dup.id, invoiceNumber: dup.number }, { status: 409 });
+    }
+
     // Ръчно зададен номер или автоматичен; проверка за дублиране
     let number = data.number?.trim();
     if (number) {
@@ -126,6 +145,7 @@ export async function POST(req: Request) {
         internalComment: data.internalComment,
         status: data.status,
         parentDocumentId: data.parentDocumentId ?? null,
+        sourceExportSetId: data.sourceExportSetId ?? null,
         vatExempt: data.vatExempt ?? false,
         vatExemptReason: data.vatExempt ? (data.vatExemptReason ?? null) : null,
         clientIsIndividual: data.clientIsIndividual ?? false,

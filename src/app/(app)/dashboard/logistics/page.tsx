@@ -33,7 +33,12 @@ export default async function LogisticsDashboardPage() {
   const myGroupId = await prisma.company.findUnique({ where: { id: companyId }, select: { companyGroupId: true } });
   const uninvoicedReceived = myGroupId?.companyGroupId
     ? await prisma.exportDocumentSet.count({
-        where: { buyerCompanyId: companyId, deletedAt: null, company: { companyGroupId: myGroupId.companyGroupId }, mkInvoices: { none: {} } },
+        where: {
+          buyerCompanyId: companyId, deletedAt: null, company: { companyGroupId: myGroupId.companyGroupId },
+          // Нефактурирана = няма валидна стандартна фактура И няма легаси MkInvoice (§21/§30).
+          invoices: { none: { deletedAt: null, status: { not: "cancelled" } } },
+          mkInvoices: { none: { documentId: null } },
+        },
       })
     : 0;
 

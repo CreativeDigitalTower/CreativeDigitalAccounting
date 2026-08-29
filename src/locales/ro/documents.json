@@ -201,7 +201,8 @@
     "copyAttachmentsAsk": "Copiați și atașamentele?",
     "vatInvalid": "Format invalid al numărului de TVA.",
     "vatInconsistent": "Este introdus un număr de TVA, dar clientul este marcat ca neînregistrat în scopuri de TVA. Verificați datele.",
-    "duplicateInvoice": "Duplică factura"
+    "duplicateInvoice": "Duplică factura",
+    "fromDelivery": "Factură nouă dintr-o livrare logistică (factură BG №{number}) — verificați și ajustați înainte de emitere."
   },
   "detail": {
     "back": "← Documente",
@@ -210,7 +211,8 @@
     "internalTitle": "Comentariu intern (nevizibil clientului)",
     "openInvoice": "Deschide factura №{number}",
     "fromProforma": "← Creată din proforma №{number}",
-    "basedOn": "← Pe baza {type} № {number}"
+    "basedOn": "← Pe baza {type} № {number}",
+    "fromDelivery": "← Emisă din livrarea logistică №{number}"
   },
   "send": {
     "btn": "Trimite clientului",

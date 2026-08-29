@@ -29,6 +29,7 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
       attachments: { orderBy: { createdAt: "asc" }, select: { id: true, filename: true, originalFilename: true, mimeType: true, size: true, pages: true, createdAt: true } },
       childDocuments: { where: { type: "invoice" }, select: { id: true, number: true }, orderBy: { createdAt: "asc" } },
       parentDocument: { select: { id: true, number: true, type: true } },
+      sourceExportSet: { select: { id: true, invoiceNumber: true, destination: true } },
       events: { orderBy: { at: "asc" }, select: { type: true, at: true, channel: true, recipient: true, device: true } },
     },
   });
@@ -90,6 +91,14 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
         <div style={{ marginBottom: 14, fontSize: 12.5 }} className="no-print">
           <Link href={`/dashboard/documents/${sourceProforma.id}`} style={{ color: "var(--muted)", textDecoration: "none" }}>
             {t("documents.detail.fromProforma", { number: sourceProforma.number })}
+          </Link>
+        </div>
+      )}
+
+      {doc.sourceExportSet && (
+        <div style={{ marginBottom: 14, fontSize: 12.5 }} className="no-print">
+          <Link href={`/dashboard/logistics/export/${doc.sourceExportSet.id}`} style={{ color: "var(--muted)", textDecoration: "none" }}>
+            {t("documents.detail.fromDelivery", { number: doc.sourceExportSet.invoiceNumber })}
           </Link>
         </div>
       )}

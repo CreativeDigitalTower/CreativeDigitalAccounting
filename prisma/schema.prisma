@@ -1283,6 +1283,9 @@ model MkInvoice {
   // (mk-sales) остават с null. Статусът „Фактурирана" на получената доставка се
   // извежда от СЪЩЕСТВУВАНЕТО на MkInvoice с този sourceExportSetId (§18/§19).
   sourceExportSetId String?
+  // Bridge към стандартната фактура (Document), ако легаси записът е консолидиран (§41/§43).
+  // Additive/nullable + unique → 1:1. Новите MK продажби минават директно през Document.
+  documentId  String?  @unique
   number      String
   date        DateTime?
   currency    String   @default("MKD")
@@ -1295,6 +1298,7 @@ model MkInvoice {
   company         Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
   client          Client?            @relation(fields: [clientId], references: [id], onDelete: SetNull)
   sourceExportSet ExportDocumentSet? @relation(fields: [sourceExportSetId], references: [id], onDelete: SetNull)
+  document        Document?          @relation(fields: [documentId], references: [id], onDelete: SetNull)
   lines           MkInvoiceLine[]
 
   @@unique([companyId, number])
@@ -1367,7 +1371,8 @@ model ExportDocumentSet {
   company    Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
   shipment   Shipment?        @relation(fields: [shipmentId], references: [id], onDelete: SetNull)
   documents  ExportDocument[]
-  mkInvoices MkInvoice[]      // MK фактури, издадени от получателя за тази доставка (§18)
+  mkInvoices MkInvoice[]      // легаси MK фактури (operational ledger) за тази доставка (§18)
+  invoices   Document[]       @relation("ExportSetInvoices") // стандартни фактури (§17/§41)
 
   @@unique([companyId, invoiceNumber])
   @@index([companyId, status])
@@ -1642,6 +1647,11 @@ model Document {
   vatExempt          Boolean        @default(false)
   vatExemptReason    String?        // код/текст на основанието
   clientIsIndividual Boolean        @default(false) // получателят е физическо лице (без ЕИК/ДДС)
+  // Логистика: ако фактурата е издадена от получена BG→MK доставка, пази relation към
+  // изходния ExportDocumentSet (§18/§41). Additive/nullable — стандартните фактури са с
+  // null. Статусът „Фактурирана" на доставката се извежда от СЪЩЕСТВУВАНЕТО на активен
+  // (не изтрит) Document с този sourceExportSetId.
+  sourceExportSetId  String?
   // External client sharing (email + accept/reject portal)
   clientEmail        String?
   publicToken        String?        @unique
@@ -1662,13 +1672,16 @@ model Document {
   client         Client?        @relation(fields: [clientId], references: [id])
   parentDocument Document?      @relation("DocumentChain", fields: [parentDocumentId], references: [id])
   childDocuments Document[]     @relation("DocumentChain")
+  sourceExportSet ExportDocumentSet? @relation("ExportSetInvoices", fields: [sourceExportSetId], references: [id], onDelete: SetNull)
   lines          DocumentLine[]
   attachments    DocumentAttachment[]
   events         DocumentEvent[]
   assetLinks     AssetDocument[]      @relation("AssetDocLink")
+  mkInvoice      MkInvoice?           // легаси operational wrapper (1:1), ако е свързан
 
   @@index([recipientCompanyId])
   @@index([companyId, deletedAt])
+  @@index([sourceExportSetId])
 }
 
 // ─── Document Tracking ───────────────────────────────────────────────────

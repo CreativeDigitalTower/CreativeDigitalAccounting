@@ -71,6 +71,10 @@ function NewDocumentForm() {
   const [parentId] = useState(searchParams.get("parent") ?? searchParams.get("duplicate") ?? "");
   const [parentInfo, setParentInfo] = useState<{ number: string; type: string } | null>(null);
   const [copyAttachments, setCopyAttachments] = useState(!searchParams.get("duplicate")); // при дублиране по подразбиране Не
+  // Логистика: издаване на стандартна фактура от получена BG→MK доставка (§4/§7/§18).
+  const [fromDelivery] = useState(searchParams.get("fromDelivery") ?? "");
+  const [sourceExportSetId, setSourceExportSetId] = useState("");
+  const [deliveryInfo, setDeliveryInfo] = useState<{ bgInvoiceNumber: string } | null>(null);
 
   // Предложения за клиент при ръчно въвеждане (по име или ЕИК)
   const suggestions = mClient.name.length >= 2 || mClient.eik.length >= 2
@@ -190,6 +194,38 @@ function NewDocumentForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parentId]);
 
+  // Логистика: предварително попълване от получена BG→MK доставка (§7). Не създаваме
+  // фактурата тук — това е стандартният екран за преглед/редакция преди издаване (§40).
+  useEffect(() => {
+    if (!fromDelivery) return;
+    fetch(`/api/logistics/export-sets/received/${fromDelivery}/invoice-prefill`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!d) return;
+        // Дубликат (§22): вече има фактура → отвори я вместо нов празен формуляр.
+        if (d.existing) { router.replace(d.existing.kind === "document" ? `/dashboard/documents/${d.existing.id}` : `/dashboard/logistics/mk-sales/${d.existing.id}`); return; }
+        setType("invoice");
+        setSourceExportSetId(d.sourceExportSetId);
+        setDeliveryInfo({ bgInvoiceNumber: d.bgInvoiceNumber });
+        if (d.line) setLines([{ description: d.line.description, quantity: d.line.quantity, unitPrice: 0, vatRate: d.line.vatRate }]);
+        if (d.currency) setCurrency(d.currency);
+        if (d.language) setLanguage(d.language);
+        if (d.notes) setNotes(d.notes);
+        // Краен клиент: match към CRM → select; иначе ръчно попълнени данни (§6).
+        if (d.matchedClientId) {
+          fetch("/api/clients").then((r) => r.json()).then((list: ClientFull[]) => {
+            const c = list.find((x) => x.id === d.matchedClientId);
+            if (c) { setClientMode("manual"); pickClient(c); }
+          }).catch(() => {});
+        } else if (d.clientSnapshot) {
+          setClientMode("manual");
+          setMClient((m) => ({ ...m, name: d.clientSnapshot.name, eik: d.clientSnapshot.eik, vatNumber: d.clientSnapshot.vatNumber, vatRegistered: !!d.clientSnapshot.vatNumber, city: d.clientSnapshot.city, address: d.clientSnapshot.address, contactEmail: d.clientSnapshot.contactEmail }));
+        }
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromDelivery]);
+
   // Зареди предложен номер при смяна на типа
   useEffect(() => {
     fetch(`/api/documents/next-number?type=${type}`)
@@ -278,6 +314,7 @@ function NewDocumentForm() {
         parentDocumentId: parentId || undefined,
         copyAttachmentsFrom: parentId && copyAttachments ? parentId : undefined,
         duplicate: isDuplicate || undefined,
+        sourceExportSetId: sourceExportSetId || undefined,
       }),
     });
     setSaving(false);
@@ -299,6 +336,11 @@ function NewDocumentForm() {
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{t("documents.form.heading")}</h1>
       </div>
 
+      {deliveryInfo && (
+        <div className="glass panel" style={{ marginBottom: 18, padding: "12px 16px", borderLeft: "3px solid var(--brass)", fontSize: 13 }}>
+          {t("documents.form.fromDelivery", { number: deliveryInfo.bgInvoiceNumber })}
+        </div>
+      )}
       {parentInfo && (
         <div className="glass panel" style={{ marginBottom: 18, padding: "12px 16px", borderLeft: "3px solid var(--brass)", display: "flex", flexWrap: "wrap", alignItems: "center", gap: 14 }}>
           <span style={{ fontSize: 13 }}>{isDuplicate

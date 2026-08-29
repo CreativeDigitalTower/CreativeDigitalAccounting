@@ -34,7 +34,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   try {
     const { companyId } = await requireCompany();
     const { id } = await params;
-    const doc = await prisma.document.findUnique({ where: { id }, include: { lines: true, client: true } });
+    const doc = await prisma.document.findUnique({ where: { id }, include: { lines: true, client: true, sourceExportSet: { select: { id: true, invoiceNumber: true, destination: true } } } });
     if (!doc || doc.companyId !== companyId) return NextResponse.json({ error: "Не е намерен." }, { status: 404 });
     return NextResponse.json(doc);
   } catch {
