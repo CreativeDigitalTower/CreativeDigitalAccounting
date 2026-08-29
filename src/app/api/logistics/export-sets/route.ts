@@ -17,10 +17,15 @@ const listSelect = {
   documents: { select: { docType: true, status: true, overridden: true } },
 } as const;
 
-export async function GET() {
+export async function GET(req: Request) {
   const g = await logisticsApiGuard("view_logistics");
   if (!g.ok) return g.res;
-  const sets = await prisma.exportDocumentSet.findMany({ where: { companyId: g.companyId }, select: listSelect, orderBy: { createdAt: "desc" }, take: 500 });
+  // ?trash=1 → Кошче (изтрити доставки за възстановяване/audit); иначе само активните (§7/§30).
+  const trash = new URL(req.url).searchParams.get("trash") === "1";
+  const sets = await prisma.exportDocumentSet.findMany({
+    where: { companyId: g.companyId, deletedAt: trash ? { not: null } : null },
+    select: listSelect, orderBy: trash ? { deletedAt: "desc" } : { createdAt: "desc" }, take: 500,
+  });
 
   // Имена на купувача/клиента (няма пряка релация — резолваме наведнъж без N+1).
   const buyerIds = [...new Set(sets.map((s) => s.buyerCompanyId).filter(Boolean) as string[])];

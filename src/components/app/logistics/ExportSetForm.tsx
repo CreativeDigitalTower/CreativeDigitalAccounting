@@ -22,16 +22,36 @@ type Product = { id: string; canonicalName: string };
 type Route = { id: string; label: string };
 type Company = { id: string; name: string };
 type Client = { id: string; name: string };
+// Начални стойности при РЕДАКЦИЯ (§11/§12) — всички business полета на доставката.
+export type ExportSetInitial = {
+  id: string; invoiceNumber: string; invoiceDate: string | null; shipmentDate: string | null;
+  deliveryTerm: string | null; placeOfShipment: string | null; destination: string | null;
+  truckVehicleId: string | null; trailerReg: string | null; logisticsProductId: string | null;
+  quantity: number | null; declarationCmrDate: string | null; dispatchNumber: string | null;
+  buyerCompanyId: string | null; clientId: string | null;
+  mkInvoice?: { id: string; number: string } | null;
+};
 
-export function ExportSetForm({ vehicles, products, routes, buyers, clients, destinations = [] }: {
+const ymd = (x: string | null | undefined) => (x ? new Date(x).toISOString().slice(0, 10) : "");
+
+export function ExportSetForm({ vehicles, products, routes, buyers, clients, destinations = [], initial, mkInvoice }: {
   vehicles: Vehicle[]; products: Product[]; routes: Route[]; buyers: Company[]; clients: Client[]; destinations?: string[];
+  initial?: ExportSetInitial; mkInvoice?: { id: string; number: string } | null;
 }) {
   const t = useT();
   const { locale } = useI18n();
   const router = useRouter();
+  const isEdit = !!initial;
   const [busy, setBusy] = useState(false);
+  const [okMsg, setOkMsg] = useState("");
   const { errors, banner, register, clearField, fail, setBanner } = useFieldErrors();
-  const [f, setF] = useState({
+  const [f, setF] = useState(initial ? {
+    invoiceNumber: initial.invoiceNumber ?? "", invoiceDate: ymd(initial.invoiceDate), shipmentDate: ymd(initial.shipmentDate),
+    deliveryTerm: initial.deliveryTerm ?? "", placeOfShipment: initial.placeOfShipment ?? PLACE_OF_SHIPMENT_DEFAULT, destination: initial.destination ?? "", routeId: "",
+    truckVehicleId: initial.truckVehicleId ?? "", trailerReg: initial.trailerReg ?? "", logisticsProductId: initial.logisticsProductId ?? "",
+    quantity: initial.quantity != null ? fmtQuantity(initial.quantity, locale) : "", declarationCmrDate: ymd(initial.declarationCmrDate),
+    dispatchNumber: initial.dispatchNumber ?? "", buyerCompanyId: initial.buyerCompanyId ?? "", clientId: initial.clientId ?? "",
+  } : {
     invoiceNumber: "", invoiceDate: new Date().toISOString().slice(0, 10), shipmentDate: new Date().toISOString().slice(0, 10), deliveryTerm: "", placeOfShipment: PLACE_OF_SHIPMENT_DEFAULT, destination: "", routeId: "",
     truckVehicleId: "", trailerReg: "", logisticsProductId: "", quantity: "", declarationCmrDate: new Date().toISOString().slice(0, 10),
     dispatchNumber: "", buyerCompanyId: buyers[0]?.id ?? "", clientId: "",
@@ -90,19 +110,19 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
   async function submit() {
     const e = validate();
     if (Object.keys(e).length) { fail(e, t("logistics.validation.banner")); return; }
-    setBanner(""); setBusy(true);
-    const r = await fetch("/api/logistics/export-sets", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        invoiceNumber: f.invoiceNumber || null, invoiceDate: f.invoiceDate ? new Date(f.invoiceDate).toISOString() : null,
-        shipmentDate: f.shipmentDate ? new Date(f.shipmentDate).toISOString() : null,
-        deliveryTerm: f.deliveryTerm || null, placeOfShipment: f.placeOfShipment || null,
-        destination: f.destination || null, routeId: f.routeId || null,
-        truckVehicleId: f.truckVehicleId, trailerReg: f.trailerReg || null,
-        logisticsProductId: f.logisticsProductId, quantity: parseQuantity(f.quantity),
-        declarationCmrDate: f.declarationCmrDate ? new Date(f.declarationCmrDate).toISOString() : null,
-        dispatchNumber: f.dispatchNumber || null, buyerCompanyId: f.buyerCompanyId || null, clientId: f.clientId || null,
-      }),
+    setBanner(""); setOkMsg(""); setBusy(true);
+    const body = {
+      invoiceNumber: f.invoiceNumber || null, invoiceDate: f.invoiceDate ? new Date(f.invoiceDate).toISOString() : null,
+      shipmentDate: f.shipmentDate ? new Date(f.shipmentDate).toISOString() : null,
+      deliveryTerm: f.deliveryTerm || null, placeOfShipment: f.placeOfShipment || null,
+      destination: f.destination || null, routeId: f.routeId || null,
+      truckVehicleId: f.truckVehicleId, trailerReg: f.trailerReg || null,
+      logisticsProductId: f.logisticsProductId, quantity: parseQuantity(f.quantity),
+      declarationCmrDate: f.declarationCmrDate ? new Date(f.declarationCmrDate).toISOString() : null,
+      dispatchNumber: f.dispatchNumber || null, buyerCompanyId: f.buyerCompanyId || null, clientId: f.clientId || null,
+    };
+    const r = await fetch(isEdit ? `/api/logistics/export-sets/${initial!.id}` : "/api/logistics/export-sets", {
+      method: isEdit ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
     });
     const j = await r.json().catch(() => ({}));
     setBusy(false);
@@ -112,7 +132,8 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
       else setBanner(j.error ?? t("logistics.common.err"));
       return;
     }
-    router.push(`/dashboard/logistics/export/${j.id}`);
+    if (isEdit) { setOkMsg(t("logistics.export.savedChanges")); router.refresh(); setTimeout(() => router.push(`/dashboard/logistics/export/${initial!.id}`), 700); }
+    else router.push(`/dashboard/logistics/export/${j.id}`);
   }
 
   const inp = { padding: "6px 9px", fontSize: 13, width: "100%" } as const;
@@ -121,10 +142,17 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
   return (
     <div style={{ maxWidth: 820 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6, flexWrap: "wrap" }}>
-        <Link href="/dashboard/logistics/export" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← {t("logistics.export.title")}</Link>
-        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{t("logistics.export.heading")}</h1>
+        <Link href={isEdit ? `/dashboard/logistics/export/${initial!.id}` : "/dashboard/logistics/export"} style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← {isEdit ? initial!.invoiceNumber : t("logistics.export.title")}</Link>
+        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{isEdit ? t("logistics.export.editHeading") : t("logistics.export.heading")}</h1>
       </div>
-      <p style={{ fontSize: 12.5, color: "var(--muted)", marginBottom: 16 }}>{t("logistics.export.intro")}</p>
+      <p style={{ fontSize: 12.5, color: "var(--muted)", marginBottom: 16 }}>{isEdit ? t("logistics.export.editIntro") : t("logistics.export.intro")}</p>
+      {mkInvoice && (
+        <div style={{ background: "var(--brass-soft)", border: "1px solid var(--brass)", borderRadius: 8, padding: "9px 12px", fontSize: 12.5, marginBottom: 12 }}>
+          {t("logistics.export.mkInvoiceWarn").replace("{number}", mkInvoice.number)}{" "}
+          <Link href={`/dashboard/logistics/mk-sales/${mkInvoice.id}`} style={{ fontWeight: 600 }}>{t("logistics.export.openMkInvoice")} →</Link>
+        </div>
+      )}
+      {okMsg && <div style={{ background: "rgba(15,138,106,.12)", border: "1px solid var(--emerald,#0f8a6a)", borderRadius: 8, padding: "8px 12px", fontSize: 12.5, marginBottom: 12 }}>{okMsg}</div>}
       <ValidationBanner message={banner} />
 
       <div className="glass panel" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 12 }}>
@@ -202,8 +230,9 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
         </F>
       </div>
 
-      <div style={{ marginTop: 14 }}>
-        <button className="btn btn-primary" disabled={busy} onClick={submit}>{busy ? "…" : t("logistics.export.create")}</button>
+      <div style={{ marginTop: 14, display: "flex", gap: 8 }}>
+        <button className="btn btn-primary" disabled={busy} onClick={submit}>{busy ? "…" : isEdit ? t("logistics.export.saveChanges") : t("logistics.export.create")}</button>
+        {isEdit && <Link href={`/dashboard/logistics/export/${initial!.id}`} className="btn btn-ghost">{t("logistics.common.cancel")}</Link>}
       </div>
     </div>
   );

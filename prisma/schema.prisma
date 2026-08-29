@@ -1355,6 +1355,12 @@ model ExportDocumentSet {
   status             String    @default("draft") // draft | ready | finalized | cancelled
   note               String?   @db.Text
   createdById        String?
+  // Soft delete (Кошче). deletedAt != null → доставката е в Кошчето: скрита от
+  // оперативните списъци, received-deliveries и MK invoicing, но пазена за
+  // възстановяване/audit. Номерът НЕ се освобождава (§31). Same pattern като Document.
+  deletedAt          DateTime?
+  deletedById        String?
+  deleteReason       String?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
@@ -1365,6 +1371,7 @@ model ExportDocumentSet {
 
   @@unique([companyId, invoiceNumber])
   @@index([companyId, status])
+  @@index([companyId, deletedAt])
 }
 
 // Документ-snapshot от export set-а. `data` пази попълнените полета (auto-fill), после
