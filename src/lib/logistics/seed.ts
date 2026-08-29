@@ -9,6 +9,7 @@ import {
   SEED_VEHICLE_REGISTRATIONS, SEED_VEHICLE_ALIASES, SEED_PRODUCTS,
   SEED_TRUCK_TRAILERS, SEED_DESTINATIONS, SEED_PRODUCT_EXTRA_ALIASES,
 } from "@/lib/logistics/masterData";
+import { applyCementCatalog } from "@/lib/logistics/cementSync";
 
 export type SeedResult = { vehicles: number; vehicleAliases: number; products: number; productAliases: number; destinations: number };
 
@@ -116,6 +117,10 @@ export async function seedLogisticsMasterData(companyId: string): Promise<SeedRe
       result.productAliases++;
     }
   }
+
+  // Canonical cement каталог (§16): гарантира шестте марки + category, архивира стари
+  // system defaults. Изпълнява се СЛЕД историческия seed, за да остане един source of truth.
+  await applyCementCatalog(prisma, companyId);
 
   return result;
 }

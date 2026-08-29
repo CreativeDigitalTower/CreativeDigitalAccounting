@@ -28,7 +28,11 @@
     "packaging": "Упаковка",
     "aliases": "Псевдонимы",
     "addAlias": "Новый alias",
-    "empty": "Пока нет продуктов."
+    "empty": "Пока нет продуктов.",
+    "category": "Вид",
+    "categoryBulk": "Насыпной",
+    "categoryPackaged": "Фасованный",
+    "categoryNone": "Без категории"
   },
   "vehicles": {
     "title": "Автомобили",
@@ -729,5 +733,16 @@
     "issue": "Выставить счёт",
     "sourceDelivery": "Источник (поставка)",
     "dashWarn": "поставок ждут выставления счёта"
+  },
+  "calendar": {
+    "mon": "Пн",
+    "tue": "Вт",
+    "wed": "Ср",
+    "thu": "Чт",
+    "fri": "Пт",
+    "sat": "Сб",
+    "sun": "Вс",
+    "today": "Сегодня",
+    "clear": "Очистить"
   }
 }

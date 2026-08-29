@@ -28,7 +28,11 @@
     "packaging": "Ambalaj",
     "aliases": "Takma adlar",
     "addAlias": "Yeni takma ad",
-    "empty": "Henüz ürün yok."
+    "empty": "Henüz ürün yok.",
+    "category": "Tür",
+    "categoryBulk": "Dökme",
+    "categoryPackaged": "Paketli",
+    "categoryNone": "Kategorisiz"
   },
   "vehicles": {
     "title": "Araçlar",
@@ -729,5 +733,16 @@
     "issue": "Fatura kes",
     "sourceDelivery": "Kaynak (sevkiyat)",
     "dashWarn": "sevkiyat faturalandırma bekliyor"
+  },
+  "calendar": {
+    "mon": "Pzt",
+    "tue": "Sal",
+    "wed": "Çar",
+    "thu": "Per",
+    "fri": "Cum",
+    "sat": "Cmt",
+    "sun": "Paz",
+    "today": "Bugün",
+    "clear": "Temizle"
   }
 }

@@ -7,6 +7,7 @@ import { SearchableSelect } from "@/components/app/logistics/SearchableSelect";
 import { exceedsPayload, bagsCalc, BAGS_DEFAULTS } from "@/lib/logistics/fleet";
 import { parseQuantity, fmtQuantity } from "@/lib/i18n/format";
 import { QuantityInput } from "@/components/app/logistics/QuantityInput";
+import { DateField } from "@/components/app/logistics/DateField";
 import { useFieldErrors, Req, FieldError, ValidationBanner, ariaProps, errStyle, type FieldErrors } from "@/components/app/logistics/formValidation";
 import { PLACE_OF_SHIPMENT_DEFAULT } from "@/lib/logistics/deliveryTerms";
 
@@ -18,7 +19,7 @@ function F({ label, children }: { label: React.ReactNode; children: React.ReactN
 }
 
 type Vehicle = { id: string; registration: string; trailerReg: string | null };
-type Product = { id: string; canonicalName: string };
+type Product = { id: string; canonicalName: string; category?: string | null };
 type Route = { id: string; label: string };
 type Company = { id: string; name: string };
 type Client = { id: string; name: string };
@@ -139,6 +140,13 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
   const inp = { padding: "6px 9px", fontSize: 13, width: "100%" } as const;
   const qErr = parseQuantity(f.quantity);
 
+  // Продуктови опции, групирани по вид (§9): Насипен → Пакетиран → без категория.
+  const catOrder = (c: string | null | undefined) => (c === "bulk" ? 0 : c === "packaged" ? 1 : 2);
+  const catGroup = (c: string | null | undefined) => c === "bulk" ? t("logistics.products.categoryBulk") : c === "packaged" ? t("logistics.products.categoryPackaged") : t("logistics.products.categoryNone");
+  const productOptions = [...products]
+    .sort((a, b) => catOrder(a.category) - catOrder(b.category) || a.canonicalName.localeCompare(b.canonicalName))
+    .map((p) => ({ value: p.id, label: p.canonicalName, group: catGroup(p.category) }));
+
   return (
     <div style={{ maxWidth: 820 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6, flexWrap: "wrap" }}>
@@ -157,8 +165,8 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
 
       <div className="glass panel" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 12 }}>
         <F label={`${t("logistics.export.invoiceNumber")} ${t("logistics.export.invoiceAuto")}`}><input style={inp} value={f.invoiceNumber} onChange={(e) => setF({ ...f, invoiceNumber: e.target.value })} placeholder="0000009617" /></F>
-        <F label={t("logistics.export.issueDate")}><input type="date" style={inp} value={f.invoiceDate} onChange={(e) => setF({ ...f, invoiceDate: e.target.value })} /></F>
-        <F label={t("logistics.export.shipmentDate")}><input type="date" style={inp} value={f.shipmentDate} onChange={(e) => setF({ ...f, shipmentDate: e.target.value })} /></F>
+        <F label={t("logistics.export.issueDate")}><DateField value={f.invoiceDate} onChange={(v) => setF({ ...f, invoiceDate: v })} style={inp} /></F>
+        <F label={t("logistics.export.shipmentDate")}><DateField value={f.shipmentDate} onChange={(v) => setF({ ...f, shipmentDate: v })} style={inp} /></F>
         {/* Условия на доставка (§1) — задължително. Incoterm; НЕ определя дестинацията (§4). */}
         <div ref={register("deliveryTerm")}>
           <F label={<>{t("logistics.export.deliveryTerm")}<Req /></>}>
@@ -204,7 +212,7 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
         <div ref={register("logisticsProductId")}>
           <F label={<>{t("logistics.export.product")}<Req /></>}>
             <div style={errStyle("logisticsProductId", errors)} {...ariaProps("logisticsProductId", errors)}>
-              <SearchableSelect options={products.map((p) => ({ value: p.id, label: p.canonicalName }))} value={f.logisticsProductId} onChange={(v) => { clearField("logisticsProductId"); setF({ ...f, logisticsProductId: v }); }} allowEmpty={false} />
+              <SearchableSelect options={productOptions} value={f.logisticsProductId} onChange={(v) => { clearField("logisticsProductId"); setF({ ...f, logisticsProductId: v }); }} allowEmpty={false} />
             </div>
             <FieldError id="err-logisticsProductId" message={errors.logisticsProductId} />
           </F>
@@ -220,7 +228,7 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
             )}
           </F>
         </div>
-        <F label={t("logistics.export.cmrDate")}><input type="date" style={inp} value={f.declarationCmrDate} onChange={(e) => setF({ ...f, declarationCmrDate: e.target.value })} /></F>
+        <F label={t("logistics.export.cmrDate")}><DateField value={f.declarationCmrDate} onChange={(v) => setF({ ...f, declarationCmrDate: v })} style={inp} /></F>
         <F label={`${t("logistics.export.dispatch")} ${t("logistics.export.dispatchAuto")}`}><input style={inp} value={f.dispatchNumber} onChange={(e) => setF({ ...f, dispatchNumber: e.target.value })} placeholder="9617" /></F>
         <F label={t("logistics.export.buyer")}>
           <SearchableSelect options={buyers.map((b) => ({ value: b.id, label: b.name }))} value={f.buyerCompanyId} onChange={(v) => setF({ ...f, buyerCompanyId: v })} emptyLabel="—" />

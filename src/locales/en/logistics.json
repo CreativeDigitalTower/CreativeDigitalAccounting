@@ -28,7 +28,11 @@
     "packaging": "Packaging",
     "aliases": "Aliases",
     "addAlias": "New alias",
-    "empty": "No products yet. Add the first."
+    "empty": "No products yet. Add the first.",
+    "category": "Type",
+    "categoryBulk": "Bulk",
+    "categoryPackaged": "Packaged",
+    "categoryNone": "Uncategorized"
   },
   "vehicles": {
     "title": "Vehicles",
@@ -729,5 +733,16 @@
     "issue": "Issue invoice",
     "sourceDelivery": "Source (delivery)",
     "dashWarn": "deliveries awaiting invoicing"
+  },
+  "calendar": {
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun",
+    "today": "Today",
+    "clear": "Clear"
   }
 }

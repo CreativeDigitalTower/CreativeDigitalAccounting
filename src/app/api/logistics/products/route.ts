@@ -7,7 +7,7 @@ import { z } from "zod";
 
 const select = {
   id: true, canonicalName: true, materialCode: true, unit: true, packaging: true,
-  active: true, notes: true, createdAt: true, updatedAt: true,
+  category: true, isSystemDefault: true, active: true, notes: true, createdAt: true, updatedAt: true,
   aliases: { select: { id: true, alias: true } },
 } as const;
 
@@ -25,6 +25,7 @@ const schema = z.object({
   materialCode: z.string().max(60).nullable().optional(),
   unit: z.string().min(1).max(20).default("t"),
   packaging: z.string().max(120).nullable().optional(),
+  category: z.enum(["bulk", "packaged"]).nullable().optional(),
   notes: z.string().max(2000).nullable().optional(),
 });
 
@@ -44,7 +45,8 @@ export async function POST(req: Request) {
     const product = await prisma.logisticsProduct.create({
       data: {
         companyId: g.companyId, canonicalName: d.canonicalName, normalizedName,
-        materialCode: d.materialCode?.trim() || null, unit: d.unit, packaging: d.packaging ?? null, notes: d.notes ?? null,
+        materialCode: d.materialCode?.trim() || null, unit: d.unit, packaging: d.packaging ?? null,
+        category: d.category ?? null, isSystemDefault: false, notes: d.notes ?? null,
       }, select,
     });
     await audit(g.companyId, g.userId, "create", "LogisticsProduct", product.id, `Продукт „${d.canonicalName}"`);

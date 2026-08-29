@@ -10,7 +10,7 @@ export default async function Page() {
 
   const [vehicles, products, routes, buyers, clients] = await Promise.all([
     prisma.vehicle.findMany({ where: { companyId, active: true, normalizedRegistration: { not: null } }, select: { id: true, registration: true, logisticsProfile: { select: { trailerReg: true } } }, orderBy: { registration: "asc" } }),
-    prisma.logisticsProduct.findMany({ where: { companyId, active: true }, select: { id: true, canonicalName: true }, orderBy: { canonicalName: "asc" } }),
+    prisma.logisticsProduct.findMany({ where: { companyId, active: true }, select: { id: true, canonicalName: true, category: true }, orderBy: { canonicalName: "asc" } }),
     prisma.logisticsRoute.findMany({ where: { companyId, active: true }, select: { id: true, fromPlace: true, toPlace: true, note: true }, orderBy: { toPlace: "asc" } }),
     groupCounterparties(companyId),
     prisma.client.findMany({ where: { companyId }, select: { id: true, name: true }, orderBy: { name: "asc" }, take: 1000 }),

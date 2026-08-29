@@ -3,7 +3,7 @@ import { useMemo, useRef, useState } from "react";
 
 // Преизползваем searchable dropdown (за автомобили/продукти/превозвачи…). Phase 3
 // ще го ползва директно при създаване на курс: пишеш „ST86" → предлага ST8669AE.
-export type Option = { value: string; label: string; keywords?: string };
+export type Option = { value: string; label: string; keywords?: string; group?: string };
 
 export function SearchableSelect({
   options, value, onChange, placeholder = "", allowEmpty = true, emptyLabel = "—",
@@ -45,13 +45,19 @@ export function SearchableSelect({
             <div role="option" tabIndex={0} onClick={() => { onChange(""); setOpen(false); setQ(""); }}
               style={{ padding: "7px 9px", fontSize: 13, cursor: "pointer", color: "var(--muted)" }}>{emptyLabel}</div>
           )}
-          {filtered.map((o) => (
-            <div key={o.value} role="option" tabIndex={0}
-              onClick={() => { onChange(o.value); setOpen(false); setQ(""); }}
-              style={{ padding: "7px 9px", fontSize: 13, cursor: "pointer", background: o.value === value ? "rgba(15,138,106,.1)" : "transparent" }}>
-              {o.label}
-            </div>
-          ))}
+          {filtered.map((o, i) => {
+            const showGroup = o.group && (i === 0 || filtered[i - 1].group !== o.group);
+            return (
+              <div key={o.value}>
+                {showGroup && <div style={{ padding: "6px 9px 2px", fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".04em", color: "var(--brick)" }}>{o.group}</div>}
+                <div role="option" tabIndex={0}
+                  onClick={() => { onChange(o.value); setOpen(false); setQ(""); }}
+                  style={{ padding: "7px 9px", fontSize: 13, cursor: "pointer", background: o.value === value ? "rgba(15,138,106,.1)" : "transparent" }}>
+                  {o.label}
+                </div>
+              </div>
+            );
+          })}
           {showCreate && (
             <div role="option" tabIndex={0} onClick={() => { onChange(qTrim); setOpen(false); setQ(""); }}
               style={{ padding: "7px 9px", fontSize: 13, cursor: "pointer", fontWeight: 600, color: "var(--brick)" }}>

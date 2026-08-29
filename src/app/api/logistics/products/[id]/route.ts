@@ -14,6 +14,7 @@ const patchSchema = z.object({
   materialCode: z.string().max(60).nullable().optional(),
   unit: z.string().min(1).max(20).optional(),
   packaging: z.string().max(120).nullable().optional(),
+  category: z.enum(["bulk", "packaged"]).nullable().optional(),
   notes: z.string().max(2000).nullable().optional(),
   active: z.boolean().optional(),
   // добавяне/премахване на alias
@@ -52,6 +53,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (d.materialCode !== undefined) data.materialCode = d.materialCode?.trim() || null;
     if (d.unit !== undefined) data.unit = d.unit;
     if (d.packaging !== undefined) data.packaging = d.packaging;
+    if (d.category !== undefined) data.category = d.category;
     if (d.notes !== undefined) data.notes = d.notes;
     if (d.active !== undefined) data.active = d.active;
 
@@ -69,7 +71,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     await audit(g.companyId, g.userId, "update", "LogisticsProduct", id, "Редакция на продукт");
     const fresh = await prisma.logisticsProduct.findUnique({
       where: { id },
-      select: { id: true, canonicalName: true, materialCode: true, unit: true, packaging: true, active: true, notes: true, aliases: { select: { id: true, alias: true } } },
+      select: { id: true, canonicalName: true, materialCode: true, unit: true, packaging: true, category: true, isSystemDefault: true, active: true, notes: true, aliases: { select: { id: true, alias: true } } },
     });
     return NextResponse.json(fresh);
   } catch (err) {
