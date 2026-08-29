@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logisticsApiGuard } from "@/lib/logistics/access";
 import { normalizeCompanyName } from "@/lib/logistics/normalize";
-import { buildReceivedView, type ReceivedSetInput } from "@/lib/logistics/received";
+import { buildReceivedView, resolveReceivedInvoice, type ReceivedSetInput } from "@/lib/logistics/received";
 
 // Споделена intercompany visibility (§2/§4): получените доставки са export set-овете,
 // в които АКТИВНАТА фирма (MK) е купувач (buyerCompanyId), издадени от продавач (BG) в
@@ -29,19 +29,30 @@ export async function GET() {
   const bgClientIds = [...new Set(sets.map((s) => s.clientId).filter((x): x is string => !!x))];
   const setIds = sets.map((s) => s.id);
 
-  const [sellers, bgClients, mkInvoices, mkClients] = await Promise.all([
+  const [sellers, bgClients, docInvoices, mkInvoices, mkClients] = await Promise.all([
     sellerIds.length ? prisma.company.findMany({ where: { id: { in: sellerIds } }, select: { id: true, name: true } }) : Promise.resolve([]),
     // Имената на крайните клиенти, посочени от BG страната (за предложение при фактуриране).
     bgClientIds.length ? prisma.client.findMany({ where: { id: { in: bgClientIds } }, select: { id: true, name: true } }) : Promise.resolve([]),
-    // MK фактурите на активната фирма, издадени от тези доставки (§18/§19).
-    setIds.length ? prisma.mkInvoice.findMany({ where: { companyId: g.companyId, sourceExportSetId: { in: setIds } }, select: { id: true, number: true, sourceExportSetId: true } }) : Promise.resolve([]),
+    // Стандартните фактури (Document, source of truth §17), издадени от тези доставки —
+    // валидни = не изтрити и не анулирани (§21).
+    setIds.length ? prisma.document.findMany({ where: { companyId: g.companyId, type: "invoice", sourceExportSetId: { in: setIds }, deletedAt: null, status: { not: "cancelled" } }, select: { id: true, number: true, sourceExportSetId: true } }) : Promise.resolve([]),
+    // Легаси MkInvoice (operational ledger) — само за доставки без стандартна фактура.
+    setIds.length ? prisma.mkInvoice.findMany({ where: { companyId: g.companyId, sourceExportSetId: { in: setIds } }, select: { id: true, number: true, sourceExportSetId: true, documentId: true } }) : Promise.resolve([]),
     // Собствените CRM клиенти на MK фирмата — за автопопълване на крайния клиент (§12/§13).
     prisma.client.findMany({ where: { companyId: g.companyId }, select: { id: true, name: true } }),
   ]);
 
   const sellerName = new Map(sellers.map((c) => [c.id, c.name]));
   const bgClientName = new Map(bgClients.map((c) => [c.id, c.name]));
-  const invoiceBySetId = new Map(mkInvoices.filter((i) => i.sourceExportSetId).map((i) => [i.sourceExportSetId as string, { id: i.id, number: i.number }]));
+  // Приоритет: стандартна фактура (Document). Легаси MkInvoice се показва само ако няма
+  // Document за тази доставка и не е bridge-нат към Document (§23/§43).
+  const docBySet = new Map(docInvoices.filter((d) => d.sourceExportSetId).map((d) => [d.sourceExportSetId as string, { id: d.id, number: d.number }]));
+  const mkBySet = new Map(mkInvoices.filter((m) => m.sourceExportSetId).map((m) => [m.sourceExportSetId as string, { id: m.id, number: m.number, documentId: m.documentId }]));
+  const invoiceBySetId = new Map<string, NonNullable<ReturnType<typeof resolveReceivedInvoice>>>();
+  for (const sid of new Set([...docBySet.keys(), ...mkBySet.keys()])) {
+    const resolved = resolveReceivedInvoice(docBySet.get(sid) ?? null, mkBySet.get(sid) ?? null);
+    if (resolved) invoiceBySetId.set(sid, resolved);
+  }
   const mkClientByNorm = new Map(mkClients.map((c) => [normalizeCompanyName(c.name), c.id]));
   const bgClientNameBySet = new Map(sets.map((s) => [s.id, s.clientId ? (bgClientName.get(s.clientId) ?? null) : null]));
 

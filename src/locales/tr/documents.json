@@ -201,7 +201,8 @@
     "copyAttachmentsAsk": "Ekler de kopyalansın mı?",
     "vatInvalid": "Geçersiz KDV numarası biçimi.",
     "vatInconsistent": "Bir KDV numarası girildi, ancak müşteri KDV mükellefi değil olarak işaretlendi. Verileri kontrol edin.",
-    "duplicateInvoice": "Faturayı çoğalt"
+    "duplicateInvoice": "Faturayı çoğalt",
+    "fromDelivery": "Bir lojistik sevkiyattan yeni fatura (BG fatura №{number}) — kesmeden önce inceleyip düzenleyin."
   },
   "detail": {
     "back": "← Belgeler",
@@ -210,7 +211,8 @@
     "internalTitle": "Dahili yorum (müşteriye görünmez)",
     "openInvoice": "Faturayı aç №{number}",
     "fromProforma": "← Proforma №{number} belgesinden oluşturuldu",
-    "basedOn": "← {type} № {number} temel alınarak"
+    "basedOn": "← {type} № {number} temel alınarak",
+    "fromDelivery": "← Lojistik sevkiyat №{number} kaynaklı"
   },
   "send": {
     "btn": "Müşteriye gönder",

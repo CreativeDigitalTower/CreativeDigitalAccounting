@@ -26,7 +26,9 @@ export type ReceivedSetInput = {
   clientName: string | null;
 };
 
-export type ReceivedMkInvoice = { id: string; number: string } | null;
+// „document" = стандартна фактура (Document, source of truth, §17); „mk" = легаси
+// MkInvoice (operational ledger). UI линква към съответния detail route.
+export type ReceivedMkInvoice = { id: string; number: string; kind?: "document" | "mk" } | null;
 
 /** Статусът се определя ЕДИНСТВЕНО от наличието на валидна MK фактура (§19/§20). */
 export function receivedInvoiceStatus(mkInvoice: ReceivedMkInvoice): ReceivedInvoiceStatus {
@@ -47,7 +49,7 @@ export type ReceivedKpi = { received: number; uninvoiced: number; invoiced: numb
  */
 export function buildReceivedView(
   sets: ReceivedSetInput[],
-  invoiceBySetId: Map<string, { id: string; number: string }>,
+  invoiceBySetId: Map<string, NonNullable<ReceivedMkInvoice>>,
   suggestClientId: (set: ReceivedSetInput) => string | null,
 ): { kpi: ReceivedKpi; rows: ReceivedRow[] } {
   const kpi: ReceivedKpi = { received: 0, uninvoiced: 0, invoiced: 0, totalQuantity: 0 };
@@ -73,4 +75,18 @@ export function mkInvoiceMissingFields(p: MkInvoicePrereq): Array<"client" | "qu
   if (p.quantity == null || p.quantity <= 0) missing.push("quantity");
   if (!(p.product ?? "").trim()) missing.push("product");
   return missing;
+}
+
+/**
+ * Избор на активната фактура за доставка (§17/§23): приоритет — стандартна фактура
+ * (Document); легаси MkInvoice се показва само ако няма Document и не е bridge-нат.
+ * Чиста функция за тестове и API-то.
+ */
+export function resolveReceivedInvoice(
+  doc: { id: string; number: string } | null | undefined,
+  legacyMk: { id: string; number: string; documentId: string | null } | null | undefined,
+): NonNullable<ReceivedMkInvoice> | null {
+  if (doc) return { id: doc.id, number: doc.number, kind: "document" };
+  if (legacyMk && !legacyMk.documentId) return { id: legacyMk.id, number: legacyMk.number, kind: "mk" };
+  return null;
 }
