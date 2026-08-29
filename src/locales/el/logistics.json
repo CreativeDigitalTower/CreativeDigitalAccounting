@@ -32,7 +32,11 @@
     "category": "Τύπος",
     "categoryBulk": "Χύμα",
     "categoryPackaged": "Συσκευασμένο",
-    "categoryNone": "Χωρίς κατηγορία"
+    "categoryNone": "Χωρίς κατηγορία",
+    "showArchived": "Εμφάνιση αρχειοθετημένων",
+    "deleteTitle": "Διαγραφή προϊόντος",
+    "deleteConfirm": "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτό το προϊόν; Οι ιστορικές παραδόσεις διατηρούν το όνομά τους.",
+    "deleteConfirmBtn": "Διαγραφή προϊόντος"
   },
   "vehicles": {
     "title": "Οχήματα",

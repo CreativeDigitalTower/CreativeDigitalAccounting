@@ -52,3 +52,35 @@ describe("cement catalog — sync classification (16/17/24)", () => {
     for (const n of LEGACY_DEFAULT_NAMES) expect(canon.has(n)).toBe(false);
   });
 });
+
+import { classifyReset } from "@/lib/logistics/cementCatalog";
+
+describe("cement catalog — full reset classification (2/19/25)", () => {
+  const key = (n: string) => normalizeProductKey(n);
+  it("reset yields exactly six canonical products", () => { expect(CEMENT_CATALOG.length).toBe(6); });
+  it("no canonical product is uncategorized (only bulk/packaged, 4/5)", () => {
+    for (const p of CEMENT_CATALOG) expect(["bulk", "packaged"]).toContain(p.category);
+  });
+  it("known material codes preserved (14)", () => {
+    const byName = Object.fromEntries(CEMENT_CATALOG.map((p) => [p.canonicalName, p.materialCode]));
+    expect(byName["CEM II A-LL 42.5 R"]).toBe("14008014");
+    expect(byName["CEM II A-LL 52.5 N"]).toBe("14012840");
+    expect(byName["CEM II B0LL 52.5 N"]).toBeNull();
+  });
+  it("old non-canonical product -> DELETE", () => {
+    expect(classifyReset({ normalizedName: key("CEM II B-V 52.5 N"), exists: true })).toBe("DELETE");
+    expect(classifyReset({ normalizedName: key("CEM II 42.5 R"), exists: true })).toBe("DELETE");
+    expect(classifyReset({ normalizedName: key("CEM IV B(V) 42.5 N"), exists: true })).toBe("DELETE");
+  });
+  it("canonical missing -> CREATE, present -> UPDATE (idempotent rerun)", () => {
+    expect(classifyReset({ normalizedName: key("CEM II B0LL 52.5 N"), exists: false })).toBe("CREATE");
+    expect(classifyReset({ normalizedName: key("CEM II A-LL 42.5 R"), exists: true })).toBe("UPDATE");
+  });
+  it("first reset purges custom too; --keep-custom protects user products (21)", () => {
+    expect(classifyReset({ normalizedName: key("CEM TEST NEW"), exists: true, isSystemDefault: false })).toBe("DELETE");
+    expect(classifyReset({ normalizedName: key("CEM TEST NEW"), exists: true, isSystemDefault: false }, { keepCustom: true })).toBe("KEEP_CUSTOM");
+  });
+  it("--keep-custom still deletes legacy system defaults", () => {
+    expect(classifyReset({ normalizedName: key("DEGASET"), exists: true, isSystemDefault: true }, { keepCustom: true })).toBe("DELETE");
+  });
+});

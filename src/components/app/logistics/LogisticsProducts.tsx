@@ -15,6 +15,17 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({ canonicalName: "", materialCode: "", unit: "t", packaging: "", category: "bulk" });
   const [aliasDraft, setAliasDraft] = useState<Record<string, string>>({});
+  const [showArchived, setShowArchived] = useState(false);
+  const [delTarget, setDelTarget] = useState<Product | null>(null);
+  const [delBusy, setDelBusy] = useState(false);
+
+  async function del(id: string) {
+    setDelBusy(true);
+    const r = await fetch(`/api/logistics/products/${id}`, { method: "DELETE" });
+    setDelBusy(false);
+    if (r.ok) { setDelTarget(null); load(); }
+    else { const j = await r.json().catch(() => ({})); setErr(j.error ?? t("logistics.common.err")); setDelTarget(null); }
+  }
 
   async function load() {
     const r = await fetch("/api/logistics/products");
@@ -49,13 +60,18 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
   const td = { padding: "7px 8px", fontSize: 12.5, borderTop: "1px solid rgba(217,215,200,.5)", verticalAlign: "top" as const };
   // Групиране по вид (§6): Насипен → Пакетиран → без категория; вътре по име.
   const order = (c: string | null) => (c === "bulk" ? 0 : c === "packaged" ? 1 : 2);
-  const grouped = [...items].sort((a, b) => order(a.category) - order(b.category) || a.canonicalName.localeCompare(b.canonicalName));
+  const grouped = [...items].filter((p) => showArchived || p.active).sort((a, b) => order(a.category) - order(b.category) || a.canonicalName.localeCompare(b.canonicalName));
   const catLabel = (c: string | null) => c === "bulk" ? t("logistics.products.categoryBulk") : c === "packaged" ? t("logistics.products.categoryPackaged") : t("logistics.products.categoryNone");
   const catCols = canManage ? 8 : 7;
 
   return (
     <div>
-      <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, marginBottom: 14 }}>{t("logistics.products.title")}</h1>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
+        <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{t("logistics.products.title")}</h1>
+        <label style={{ marginLeft: "auto", fontSize: 12, color: "var(--muted)", display: "flex", alignItems: "center", gap: 5 }}>
+          <input type="checkbox" checked={showArchived} onChange={(e) => setShowArchived(e.target.checked)} />{t("logistics.products.showArchived")}
+        </label>
+      </div>
       {err && <div style={{ color: "var(--brick)", fontSize: 12.5, marginBottom: 10 }}>{err}</div>}
 
       {canManage && (
@@ -119,7 +135,8 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
                   {canManage && (
                     <td style={td}>
                       <button className="btn btn-ghost btn-sm" onClick={() => { const mc = prompt(t("logistics.products.materialCode"), p.materialCode ?? ""); if (mc !== null) patch(p.id, { materialCode: mc || null }); }}>{t("logistics.common.edit")}</button>{" "}
-                      <button className="btn btn-ghost btn-sm" onClick={() => patch(p.id, { active: !p.active })}>{p.active ? t("logistics.common.archive") : t("logistics.common.activate")}</button>
+                      <button className="btn btn-ghost btn-sm" onClick={() => patch(p.id, { active: !p.active })}>{p.active ? t("logistics.common.archive") : t("logistics.common.activate")}</button>{" "}
+                      <button className="btn btn-ghost btn-sm" style={{ color: "var(--brick)" }} onClick={() => setDelTarget(p)}>{t("logistics.common.delete")}</button>
                     </td>
                   )}
                 </tr>
@@ -130,6 +147,24 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
           </table>
         )}
       </div>
+
+      {delTarget && (
+        <div onClick={() => setDelTarget(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.4)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+          <div className="glass panel" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 420, width: "100%", padding: 20 }}>
+            <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, margin: "0 0 8px", color: "var(--brick)" }}>{t("logistics.products.deleteTitle")}</h2>
+            <p style={{ fontSize: 13, margin: "0 0 12px" }}>{t("logistics.products.deleteConfirm")}</p>
+            <div style={{ background: "rgba(0,0,0,.03)", borderRadius: 8, padding: "8px 12px", marginBottom: 14, fontSize: 12.5 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "3px 0" }}><span style={{ color: "var(--muted)" }}>{t("logistics.products.name")}</span><strong>{delTarget.canonicalName}</strong></div>
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "3px 0" }}><span style={{ color: "var(--muted)" }}>{t("logistics.products.category")}</span><span>{catLabel(delTarget.category)}</span></div>
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "3px 0" }}><span style={{ color: "var(--muted)" }}>{t("logistics.products.materialCode")}</span><span>{delTarget.materialCode ?? "—"}</span></div>
+            </div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+              <button className="btn btn-ghost btn-sm" onClick={() => setDelTarget(null)} disabled={delBusy}>{t("logistics.common.cancel")}</button>
+              <button className="btn btn-sm" style={{ background: "var(--brick)", color: "#fff" }} onClick={() => del(delTarget.id)} disabled={delBusy}>{t("logistics.products.deleteConfirmBtn")}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

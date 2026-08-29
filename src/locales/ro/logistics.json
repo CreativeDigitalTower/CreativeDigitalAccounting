@@ -32,7 +32,11 @@
     "category": "Tip",
     "categoryBulk": "Vrac",
     "categoryPackaged": "Ambalat",
-    "categoryNone": "Fără categorie"
+    "categoryNone": "Fără categorie",
+    "showArchived": "Arată arhivate",
+    "deleteTitle": "Ștergere produs",
+    "deleteConfirm": "Sigur doriți să ștergeți acest produs? Livrările istorice își păstrează denumirea.",
+    "deleteConfirmBtn": "Șterge produsul"
   },
   "vehicles": {
     "title": "Vehicule",

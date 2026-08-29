@@ -14,19 +14,20 @@ export type CementProduct = {
   category: CementCategory;
   unit: string;
   packaging: string | null;
+  materialCode: string | null; // реален Holcim material code, само когато е еднозначен (§14)
   aliases: string[];
 };
 
-// Точните шест canonical марки (изписване както е зададено, §1/§26).
+// Точните шест canonical марки (изписване както е зададено, §1/§22/§26).
 export const CEMENT_CATALOG: CementProduct[] = [
   // ── НАСИПЕН / BULK ─────────────────────────────────────────────
-  { canonicalName: "CEM II A-LL 52.5 N", category: "bulk", unit: "t", packaging: null, aliases: ["CEM II A-LL 52,5 N", "A-LL 52.5 N", "A-LL 52,5 N", "CEM II / A-LL 52,5 N"] },
-  { canonicalName: "CEM II A-LL 42.5 R", category: "bulk", unit: "t", packaging: null, aliases: ["CEM II A-LL 42,5 R", "CEM II 42,5 R", "CEM II 42.5 R", "CEM II/A-LL 42,5 R"] },
-  { canonicalName: "CEM II B0LL 52.5 N", category: "bulk", unit: "t", packaging: null, aliases: ["CEM II B0LL 52,5 N"] },
+  { canonicalName: "CEM II A-LL 52.5 N", category: "bulk", unit: "t", packaging: null, materialCode: "14012840", aliases: ["CEM II A-LL 52,5 N", "A-LL 52.5 N", "A-LL 52,5 N", "CEM II / A-LL 52,5 N"] },
+  { canonicalName: "CEM II A-LL 42.5 R", category: "bulk", unit: "t", packaging: null, materialCode: "14008014", aliases: ["CEM II A-LL 42,5 R", "CEM II 42,5 R", "CEM II 42.5 R", "CEM II/A-LL 42,5 R"] },
+  { canonicalName: "CEM II B0LL 52.5 N", category: "bulk", unit: "t", packaging: null, materialCode: null, aliases: ["CEM II B0LL 52,5 N"] },
   // ── ПАКЕТИРАН / PACKAGED ───────────────────────────────────────
-  { canonicalName: "CEM II B-LL 42.5 R", category: "packaged", unit: "t", packaging: "25 kg bags", aliases: ["CEM II B-LL 42,5 R", "B-LL 42.5 R", "B-LL 42,5 R", "CEM II / B-LL 42,5 R"] },
-  { canonicalName: "CEM II B-LL 32.5 R", category: "packaged", unit: "t", packaging: "25 kg bags", aliases: ["CEM II B-LL 32,5 R", "B-LL 32.5 R", "B-LL 32,5 R"] },
-  { canonicalName: "CEM II C-M V-LL 42.5 N", category: "packaged", unit: "t", packaging: "25 kg bags", aliases: ["CEM II C-M V-LL 42,5 N", "C-M V-LL 42.5 N", "C-M (V-LL) 42,5 N"] },
+  { canonicalName: "CEM II B-LL 42.5 R", category: "packaged", unit: "t", packaging: "25 kg bags", materialCode: null, aliases: ["CEM II B-LL 42,5 R", "B-LL 42.5 R", "B-LL 42,5 R", "CEM II / B-LL 42,5 R"] },
+  { canonicalName: "CEM II B-LL 32.5 R", category: "packaged", unit: "t", packaging: "25 kg bags", materialCode: null, aliases: ["CEM II B-LL 32,5 R", "B-LL 32.5 R", "B-LL 32,5 R"] },
+  { canonicalName: "CEM II C-M V-LL 42.5 N", category: "packaged", unit: "t", packaging: "25 kg bags", materialCode: null, aliases: ["CEM II C-M V-LL 42,5 N", "C-M V-LL 42.5 N", "C-M (V-LL) 42,5 N"] },
 ];
 
 /**
@@ -69,4 +70,20 @@ export function classifyProduct(input: { normalizedName: string; existsActive: b
 export function missingCanonical(existingNormalizedNames: Iterable<string>): CementProduct[] {
   const present = new Set(existingNormalizedNames);
   return CEMENT_CATALOG.filter((p) => !present.has(normalizeProductKey(p.canonicalName)));
+}
+
+export type ResetAction = "CREATE" | "UPDATE" | "DELETE" | "KEEP_CUSTOM";
+
+/**
+ * Класификация за ПЪЛЕН reset на каталога (§2/§19). За разлика от `classifyProduct`
+ * (архивиране), тук non-canonical се ИЗТРИВА — освен когато е защитен user custom
+ * (keepCustom + isSystemDefault=false). Чиста функция за тестове и за reset скрипта.
+ *   - canonical, липсва   → CREATE
+ *   - canonical, налице   → UPDATE (привежда name/category/unit/material)
+ *   - non-canonical       → DELETE (или KEEP_CUSTOM при защита)
+ */
+export function classifyReset(input: { normalizedName: string; exists: boolean; isSystemDefault?: boolean }, opts: { keepCustom: boolean } = { keepCustom: false }): ResetAction {
+  if (CANONICAL_KEYS.has(input.normalizedName)) return input.exists ? "UPDATE" : "CREATE";
+  if (opts.keepCustom && input.isSystemDefault === false) return "KEEP_CUSTOM";
+  return "DELETE";
 }
