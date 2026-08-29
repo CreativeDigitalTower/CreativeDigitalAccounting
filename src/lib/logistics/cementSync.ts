@@ -20,10 +20,10 @@ export async function applyCementCatalog(prisma: PrismaClient, companyId: string
     });
     const prod = await prisma.logisticsProduct.upsert({
       where: { companyId_normalizedName: { companyId, normalizedName: norm } },
-      create: { companyId, canonicalName: p.canonicalName, normalizedName: norm, unit: p.unit, packaging: p.packaging, category: p.category, isSystemDefault: true, active: true },
-      // НЕ пренаписваме canonicalName (§1/§3 — пази изписването), само привеждаме
-      // category/active/isSystemDefault и попълваме packaging, ако липсва.
-      update: { category: p.category, isSystemDefault: true, active: true },
+      create: { companyId, canonicalName: p.canonicalName, normalizedName: norm, unit: p.unit, packaging: p.packaging, category: p.category, materialCode: p.materialCode, isSystemDefault: true, active: true },
+      // Привеждаме към canonical: точното изписване (§22), category, unit, active. Material
+      // code се попълва само ако е известен (§14). Historical snapshots не се пипат (§12).
+      update: { canonicalName: p.canonicalName, category: p.category, unit: p.unit, isSystemDefault: true, active: true, ...(p.materialCode ? { materialCode: p.materialCode } : {}) },
       select: { id: true },
     });
     if (existing) res.kept++; else res.created++;

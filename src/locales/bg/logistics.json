@@ -32,7 +32,11 @@
     "category": "Вид",
     "categoryBulk": "Насипен",
     "categoryPackaged": "Пакетиран",
-    "categoryNone": "Без категория"
+    "categoryNone": "Без категория",
+    "showArchived": "Покажи архивираните",
+    "deleteTitle": "Изтриване на продукт",
+    "deleteConfirm": "Сигурни ли сте, че искате да изтриете този продукт? Историческите доставки запазват името си.",
+    "deleteConfirmBtn": "Изтрий продукта"
   },
   "vehicles": {
     "title": "Автомобили",

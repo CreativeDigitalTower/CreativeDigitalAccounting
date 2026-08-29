@@ -32,7 +32,11 @@
     "category": "Tür",
     "categoryBulk": "Dökme",
     "categoryPackaged": "Paketli",
-    "categoryNone": "Kategorisiz"
+    "categoryNone": "Kategorisiz",
+    "showArchived": "Arşivlenenleri göster",
+    "deleteTitle": "Ürünü sil",
+    "deleteConfirm": "Bu ürünü silmek istediğinize emin misiniz? Geçmiş sevkiyatlar adını korur.",
+    "deleteConfirmBtn": "Ürünü sil"
   },
   "vehicles": {
     "title": "Araçlar",

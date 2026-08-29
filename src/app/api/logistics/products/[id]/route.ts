@@ -79,3 +79,18 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
   }
 }
+
+// Изтриване на продукт от каталога (§9/§11). FK-safe hard delete: alias-ите падат по
+// Cascade; Shipment.product → SetNull (пази productNameSnapshot); ExportDocumentSet.
+// logisticsProductId е гола колона (пази productSnapshot). Historical snapshots остават
+// непокътнати (§12). Различно от „Архивирай" (§13): записът се премахва напълно.
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const g = await logisticsApiGuard("manage_rates");
+  if (!g.ok) return g.res;
+  const { id } = await params;
+  const prod = await prisma.logisticsProduct.findFirst({ where: { id, companyId: g.companyId }, select: { id: true, canonicalName: true } });
+  if (!prod) return NextResponse.json({ error: "Не е намерен." }, { status: 404 });
+  await prisma.logisticsProduct.delete({ where: { id } });
+  await audit(g.companyId, g.userId, "delete", "LogisticsProduct", id, `Изтрит продукт „${prod.canonicalName}"`);
+  return NextResponse.json({ ok: true });
+}

@@ -32,7 +32,11 @@
     "category": "Type",
     "categoryBulk": "Bulk",
     "categoryPackaged": "Packaged",
-    "categoryNone": "Uncategorized"
+    "categoryNone": "Uncategorized",
+    "showArchived": "Show archived",
+    "deleteTitle": "Delete product",
+    "deleteConfirm": "Are you sure you want to delete this product? Historical deliveries keep their snapshot name.",
+    "deleteConfirmBtn": "Delete product"
   },
   "vehicles": {
     "title": "Vehicles",

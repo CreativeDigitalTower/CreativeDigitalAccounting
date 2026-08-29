@@ -25,7 +25,8 @@ const schema = z.object({
   materialCode: z.string().max(60).nullable().optional(),
   unit: z.string().min(1).max(20).default("t"),
   packaging: z.string().max(120).nullable().optional(),
-  category: z.enum(["bulk", "packaged"]).nullable().optional(),
+  // Вид е ЗАДЪЛЖИТЕЛЕН при създаване (§5) — само насипен/пакетиран, без „Без категория".
+  category: z.enum(["bulk", "packaged"], { message: "Изберете вид: Насипен или Пакетиран." }),
   notes: z.string().max(2000).nullable().optional(),
 });
 
@@ -46,13 +47,13 @@ export async function POST(req: Request) {
       data: {
         companyId: g.companyId, canonicalName: d.canonicalName, normalizedName,
         materialCode: d.materialCode?.trim() || null, unit: d.unit, packaging: d.packaging ?? null,
-        category: d.category ?? null, isSystemDefault: false, notes: d.notes ?? null,
+        category: d.category, isSystemDefault: false, notes: d.notes ?? null,
       }, select,
     });
     await audit(g.companyId, g.userId, "create", "LogisticsProduct", product.id, `Продукт „${d.canonicalName}"`);
     return NextResponse.json(product);
   } catch (err) {
-    if (err instanceof z.ZodError) return NextResponse.json({ error: "Невалидни данни." }, { status: 400 });
+    if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues[0]?.message ?? "Невалидни данни." }, { status: 400 });
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
   }
 }

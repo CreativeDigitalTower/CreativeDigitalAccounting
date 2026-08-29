@@ -32,7 +32,11 @@
     "category": "Вид",
     "categoryBulk": "Насыпной",
     "categoryPackaged": "Фасованный",
-    "categoryNone": "Без категории"
+    "categoryNone": "Без категории",
+    "showArchived": "Показать архивные",
+    "deleteTitle": "Удаление продукта",
+    "deleteConfirm": "Удалить этот продукт? Исторические поставки сохранят своё название.",
+    "deleteConfirmBtn": "Удалить продукт"
   },
   "vehicles": {
     "title": "Автомобили",
