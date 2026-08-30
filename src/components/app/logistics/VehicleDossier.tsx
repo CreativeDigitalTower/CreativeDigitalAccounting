@@ -7,6 +7,7 @@ import { confirmDelete } from "@/lib/confirmDelete";
 
 type Profile = { trailerReg: string | null; carrierId: string | null; defaultDriver: string | null; ownershipType: string | null };
 type Vehicle = { id: string; registration: string; active: boolean; notes: string | null; logisticsProfile: Profile | null; aliases: { id: string; alias: string }[] };
+type Delivery = { id: string; invoiceNumber: string; invoiceDate: string | null; dispatchNumber: string | null; trailerReg: string | null; destination: string | null; productSnapshot: string | null; quantity: number | null; unit: string; status: string; client: string | null; attachmentCount: number };
 type Carrier = { id: string; name: string };
 type Doc = { id: string; docType: string | null; name: string | null; number: string | null; issueDate: string | null; validTo: string | null; originalFilename: string | null; mimeType: string | null };
 type History = { trips: number; totalTons: number; firstTrip: string | null; lastTrip: string | null; products: string[]; destinations: string[] };
@@ -26,6 +27,16 @@ export function VehicleDossier({ vehicle, carriers, canManage, canDocs, history 
 
   async function loadDocs() { const r = await fetch(`/api/logistics/vehicles/${v.id}/documents`); if (r.ok) setDocs(await r.json()); }
   useEffect(() => { loadDocs(); }, [v.id]);
+
+  // Курсове/доставки на този автомобил (§25-§28) — server-side paginated.
+  const [deliveries, setDeliveries] = useState<Delivery[]>([]);
+  const [delTotal, setDelTotal] = useState(0);
+  const [delPage, setDelPage] = useState(1);
+  useEffect(() => {
+    fetch(`/api/logistics/vehicles/${v.id}/deliveries?page=${delPage}`).then((r) => r.ok ? r.json() : null)
+      .then((j) => { if (j) { setDeliveries(j.rows ?? []); setDelTotal(j.total ?? 0); } });
+  }, [v.id, delPage]);
+  const delPages = Math.max(1, Math.ceil(delTotal / 20));
 
   async function save(patch: Record<string, unknown>) {
     setBusy(true); setErr("");
@@ -150,6 +161,48 @@ export function VehicleDossier({ vehicle, carriers, canManage, canDocs, history 
             {history.products.length > 0 && <div style={{ fontSize: 12, color: "var(--muted)" }}>{t("logistics.vhist.products")}: {history.products.join(", ")}</div>}
             {history.destinations.length > 0 && <div style={{ fontSize: 12, color: "var(--muted)" }}>{t("logistics.vhist.destinations")}: {history.destinations.join(", ")}</div>}
           </>
+        )}
+      </div>
+
+      {/* Доставки / История на курсовете (§25-§28) — всеки ред отваря пълното досие. */}
+      <div className="glass panel">
+        <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 8px" }}>{t("logistics.dossier.deliveries")}</h3>
+        {deliveries.length === 0 ? <div style={{ fontSize: 13, color: "var(--muted)" }}>{t("logistics.dossier.noDeliveries")}</div> : (
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+              <thead><tr>
+                <th style={{ textAlign: "left", padding: "6px 8px", color: "var(--muted)", fontSize: 11.5 }}>{t("logistics.export.date")}</th>
+                <th style={{ textAlign: "left", padding: "6px 8px", color: "var(--muted)", fontSize: 11.5 }}>{t("logistics.export.invoiceNumber")}</th>
+                <th style={{ textAlign: "left", padding: "6px 8px", color: "var(--muted)", fontSize: 11.5 }}>{t("logistics.export.trailer")}</th>
+                <th style={{ textAlign: "left", padding: "6px 8px", color: "var(--muted)", fontSize: 11.5 }}>{t("logistics.export.client")}</th>
+                <th style={{ textAlign: "left", padding: "6px 8px", color: "var(--muted)", fontSize: 11.5 }}>{t("logistics.export.destination")}</th>
+                <th style={{ textAlign: "left", padding: "6px 8px", color: "var(--muted)", fontSize: 11.5 }}>{t("logistics.export.quantity")}</th>
+                <th style={{ padding: "6px 8px" }} />
+              </tr></thead>
+              <tbody>
+                {deliveries.map((d) => (
+                  <tr key={d.id}>
+                    <td style={{ padding: "6px 8px", borderTop: "1px solid rgba(217,215,200,.5)" }}>{d.invoiceDate ? new Date(d.invoiceDate).toLocaleDateString() : "—"}</td>
+                    <td style={{ padding: "6px 8px", borderTop: "1px solid rgba(217,215,200,.5)" }}>{d.invoiceNumber}</td>
+                    <td style={{ padding: "6px 8px", borderTop: "1px solid rgba(217,215,200,.5)" }}>{d.trailerReg ?? "—"}</td>
+                    <td style={{ padding: "6px 8px", borderTop: "1px solid rgba(217,215,200,.5)" }}>{d.client ?? "—"}</td>
+                    <td style={{ padding: "6px 8px", borderTop: "1px solid rgba(217,215,200,.5)" }}>{d.destination ?? "—"}</td>
+                    <td style={{ padding: "6px 8px", borderTop: "1px solid rgba(217,215,200,.5)" }} className="num">{d.quantity != null ? `${d.quantity} ${d.unit}` : "—"}</td>
+                    <td style={{ padding: "6px 8px", borderTop: "1px solid rgba(217,215,200,.5)", whiteSpace: "nowrap" }}>
+                      <Link href={`/dashboard/logistics/export/${d.id}`} className="btn btn-ghost btn-sm" style={{ fontSize: 11, padding: "2px 8px" }}>{t("logistics.export.dossier")}{d.attachmentCount > 0 ? ` · +${d.attachmentCount}` : ""}</Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {delPages > 1 && (
+              <div style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "center", marginTop: 10 }}>
+                <button className="btn btn-ghost btn-sm" disabled={delPage <= 1} onClick={() => setDelPage((p) => p - 1)}>←</button>
+                <span style={{ fontSize: 12, color: "var(--muted)" }}>{delPage} / {delPages} · {delTotal}</span>
+                <button className="btn btn-ghost btn-sm" disabled={delPage >= delPages} onClick={() => setDelPage((p) => p + 1)}>→</button>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

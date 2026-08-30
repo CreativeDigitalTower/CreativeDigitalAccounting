@@ -12,37 +12,91 @@ import { clientCompanyAllowed } from "@/lib/logistics/clientScope";
 import { z } from "zod";
 
 const listSelect = {
-  id: true, invoiceNumber: true, invoiceDate: true, destination: true, truckRegSnapshot: true, trailerReg: true,
+  id: true, invoiceNumber: true, invoiceDate: true, shipmentDate: true, destination: true, truckRegSnapshot: true, trailerReg: true,
   productSnapshot: true, quantity: true, unit: true, dispatchNumber: true, status: true, createdAt: true,
   buyerCompanyId: true, clientId: true,
   documents: { select: { docType: true, status: true, overridden: true } },
+  _count: { select: { attachments: true } },
 } as const;
 
+// Архивът е реална база данни (§29-§33): server-side филтри, сортиране, pagination и
+// KPI-та. Списъкът връща само БРОЙКИ на документи (не файлове, §50).
 export async function GET(req: Request) {
   const g = await logisticsApiGuard("view_logistics");
   if (!g.ok) return g.res;
-  // ?trash=1 → Кошче (изтрити доставки за възстановяване/audit); иначе само активните (§7/§30).
-  const trash = new URL(req.url).searchParams.get("trash") === "1";
-  const sets = await prisma.exportDocumentSet.findMany({
-    where: { companyId: g.companyId, deletedAt: trash ? { not: null } : null },
-    select: listSelect, orderBy: trash ? { deletedAt: "desc" } : { createdAt: "desc" }, take: 500,
-  });
+  const sp = new URL(req.url).searchParams;
+  const trash = sp.get("trash") === "1";
+  const q = (sp.get("q") ?? "").trim();
+  const status = sp.get("status") ?? "";
+  const destination = sp.get("destination") ?? "";
+  const vehicle = (sp.get("vehicle") ?? "").trim();
+  const product = (sp.get("product") ?? "").trim();
+  const clientId = sp.get("clientId") ?? "";
+  const hasAttachments = sp.get("hasAttachments"); // "1" | "0" | null
+  const sort = sp.get("sort") ?? "date";
+  const page = Math.max(1, Number(sp.get("page")) || 1);
+  const pageSize = Math.min(100, Math.max(5, Number(sp.get("pageSize")) || 25));
 
-  // Имена на купувача/клиента (няма пряка релация — резолваме наведнъж без N+1).
+  // Диапазон по дата: dateFrom/dateTo или месец/година (§30). Върху invoiceDate.
+  let gte: Date | undefined, lte: Date | undefined;
+  const df = sp.get("dateFrom"), dt = sp.get("dateTo");
+  const year = Number(sp.get("year")) || 0, month = sp.get("month") != null ? Number(sp.get("month")) : NaN;
+  if (df) gte = new Date(df + "T00:00:00");
+  if (dt) lte = new Date(dt + "T23:59:59");
+  if (year) { gte = new Date(year, Number.isNaN(month) ? 0 : month, 1); lte = new Date(year, Number.isNaN(month) ? 12 : month + 1, 0, 23, 59, 59); }
+
+  const where: Prisma.ExportDocumentSetWhereInput = {
+    companyId: g.companyId, deletedAt: trash ? { not: null } : null,
+    ...(status ? { status } : {}),
+    ...(destination ? { destination } : {}),
+    ...(clientId ? { clientId } : {}),
+    ...(vehicle ? { OR: [{ truckRegSnapshot: { contains: vehicle, mode: "insensitive" } }, { trailerReg: { contains: vehicle, mode: "insensitive" } }] } : {}),
+    ...(product ? { productSnapshot: { contains: product, mode: "insensitive" } } : {}),
+    ...(gte || lte ? { invoiceDate: { ...(gte ? { gte } : {}), ...(lte ? { lte } : {}) } } : {}),
+    ...(hasAttachments === "1" ? { attachments: { some: {} } } : hasAttachments === "0" ? { attachments: { none: {} } } : {}),
+    ...(q ? { OR: [
+      { invoiceNumber: { contains: q, mode: "insensitive" } },
+      { dispatchNumber: { contains: q, mode: "insensitive" } },
+      { truckRegSnapshot: { contains: q, mode: "insensitive" } },
+      { trailerReg: { contains: q, mode: "insensitive" } },
+      { destination: { contains: q, mode: "insensitive" } },
+      { productSnapshot: { contains: q, mode: "insensitive" } },
+    ] } : {}),
+  };
+
+  const orderBy: Prisma.ExportDocumentSetOrderByWithRelationInput =
+    trash ? { deletedAt: "desc" }
+    : sort === "quantity" ? { quantity: "desc" }
+    : sort === "invoice" ? { invoiceNumber: "desc" }
+    : { invoiceDate: "desc" };
+
+  const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  const [total, sets, kAll, kMonth, kQty, kWithAtt] = await Promise.all([
+    prisma.exportDocumentSet.count({ where }),
+    prisma.exportDocumentSet.findMany({ where, select: listSelect, orderBy, skip: (page - 1) * pageSize, take: pageSize }),
+    prisma.exportDocumentSet.count({ where: { companyId: g.companyId, deletedAt: null } }),
+    prisma.exportDocumentSet.count({ where: { companyId: g.companyId, deletedAt: null, invoiceDate: { gte: monthStart } } }),
+    prisma.exportDocumentSet.aggregate({ where: { companyId: g.companyId, deletedAt: null }, _sum: { quantity: true } }),
+    prisma.exportDocumentSet.count({ where: { companyId: g.companyId, deletedAt: null, attachments: { some: {} } } }),
+  ]);
+
   const buyerIds = [...new Set(sets.map((s) => s.buyerCompanyId).filter(Boolean) as string[])];
   const clientIds = [...new Set(sets.map((s) => s.clientId).filter(Boolean) as string[])];
   const [buyers, clients] = await Promise.all([
     buyerIds.length ? prisma.company.findMany({ where: { id: { in: buyerIds } }, select: { id: true, name: true } }) : Promise.resolve([]),
-    clientIds.length ? prisma.client.findMany({ where: { id: { in: clientIds }, companyId: g.companyId }, select: { id: true, name: true } }) : Promise.resolve([]),
+    // Клиентите може да са на buyer (SEM) фирмата → резолваме по id, без company scope.
+    clientIds.length ? prisma.client.findMany({ where: { id: { in: clientIds } }, select: { id: true, name: true } }) : Promise.resolve([]),
   ]);
   const buyerName = new Map(buyers.map((b) => [b.id, b.name]));
   const clientName = new Map(clients.map((c) => [c.id, c.name]));
 
-  const rows = sets.map(({ buyerCompanyId, clientId, ...s }) => ({
-    ...s,
-    buyer: (buyerCompanyId && buyerName.get(buyerCompanyId)) || (clientId && clientName.get(clientId)) || null,
+  const rows = sets.map(({ buyerCompanyId, clientId: cid, _count, documents, ...s }) => ({
+    ...s, documents,
+    buyer: (buyerCompanyId && buyerName.get(buyerCompanyId)) || (cid && clientName.get(cid)) || null,
+    attachmentCount: _count.attachments,
   }));
-  return NextResponse.json(rows);
+  const kpi = { total: kAll, thisMonth: kMonth, totalQuantity: Math.round((kQty._sum.quantity ?? 0) * 1000) / 1000, withAttachments: kWithAtt, withoutAttachments: kAll - kWithAtt };
+  return NextResponse.json({ rows, total, page, pageSize, kpi });
 }
 
 const optDate = z.string().datetime().nullable().optional().or(z.literal("").transform(() => null));

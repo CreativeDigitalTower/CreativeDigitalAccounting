@@ -217,6 +217,7 @@ model Company {
   bgMkInvoicesReceived BgMkInvoice[] @relation("BgMkRecipient")
   mkInvoices           MkInvoice[]
   exportSets           ExportDocumentSet[]
+  exportAttachments    ExportAttachment[]
   fashionSettings      FashionSettings?
   fashionMaterials     FashionMaterial[]
   fashionCategories    FashionMaterialCategory[]
@@ -1374,15 +1375,45 @@ model ExportDocumentSet {
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
-  company    Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  shipment   Shipment?        @relation(fields: [shipmentId], references: [id], onDelete: SetNull)
-  documents  ExportDocument[]
-  mkInvoices MkInvoice[]      // легаси MK фактури (operational ledger) за тази доставка (§18)
-  invoices   Document[]       @relation("ExportSetInvoices") // стандартни фактури (§17/§41)
+  company     Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  shipment    Shipment?         @relation(fields: [shipmentId], references: [id], onDelete: SetNull)
+  documents   ExportDocument[]
+  mkInvoices  MkInvoice[]       // легаси MK фактури (operational ledger) за тази доставка (§18)
+  invoices    Document[]        @relation("ExportSetInvoices") // стандартни фактури (§17/§41)
+  attachments ExportAttachment[] // допълнителни (качени) документи в досието (§7/§14)
 
   @@unique([companyId, invoiceNumber])
   @@index([companyId, status])
   @@index([companyId, deletedAt])
+}
+
+// Допълнителен (качен) документ в досието на експортна доставка (§7/§14). Съхранение по
+// установения платформен механизъм — base64 dataUrl в БД (§12/§13, като DocumentAttachment/
+// ClientFile). Metadata се зарежда в списъка; съдържанието (dataUrl) — само при сваляне (§50).
+// Soft-delete на доставката НЕ трие attachment-ите (§40); hard delete cascade-ва (§41).
+model ExportAttachment {
+  id               String    @id @default(cuid())
+  companyId        String
+  exportSetId      String
+  category         String    // enum-подобно: customs | dispatch_note | quality_spec | ... | other (§8)
+  name             String    // име/описание (може да е custom label при „Друг документ")
+  originalFilename String
+  mimeType         String
+  size             Int
+  dataUrl          String    @db.Text
+  documentNumber   String?
+  documentDate     DateTime?
+  notes            String?   @db.Text
+  uploadedById     String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  company   Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  exportSet ExportDocumentSet @relation(fields: [exportSetId], references: [id], onDelete: Cascade)
+
+  @@index([exportSetId])
+  @@index([companyId, documentDate])
+  @@index([companyId, category])
 }
 
 // Документ-snapshot от export set-а. `data` пази попълнените полета (auto-fill), после

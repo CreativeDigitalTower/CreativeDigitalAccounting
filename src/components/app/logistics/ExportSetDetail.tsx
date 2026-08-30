@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { useT, useI18n } from "@/components/i18n/I18nProvider";
 import { ACTIVE_EXPORT_DOC_TYPES } from "@/lib/logistics/config";
 import { ExportDeleteModal } from "@/components/app/logistics/ExportDeleteModal";
+import { ExportDossierExtras } from "@/components/app/logistics/ExportDossierExtras";
 
 type Doc = { id: string; docType: string; status: string; overridden: boolean; updatedAt: string };
 type SetDto = {
   id: string; invoiceNumber: string; invoiceDate: string | null; destination: string | null;
-  truckRegSnapshot: string | null; trailerReg: string | null; productSnapshot: string | null;
+  truckRegSnapshot: string | null; trailerReg: string | null; truckVehicleId: string | null; productSnapshot: string | null;
   quantity: number | null; unit: string; declarationCmrDate: string | null; dispatchNumber: string | null;
   status: string; sellerName: string | null; buyerName: string | null; clientName: string | null; documents: Doc[];
   mkInvoice?: { id: string; number: string } | null;
@@ -177,6 +178,10 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
           onDeleted={() => router.push("/dashboard/logistics/export")}
         />
       )}
+
+      {/* Досие: допълнителни документи + свързани записи + хронология (§7/§20/§53). */}
+      <ExportDossierExtras id={s.id} canManage={manage} truckVehicleId={s.truckVehicleId}
+        mkInvoice={s.mkInvoice ?? null} receivedBy={!isSeller ? s.buyerName : (s.buyerName ?? null)} />
     </div>
   );
 }
