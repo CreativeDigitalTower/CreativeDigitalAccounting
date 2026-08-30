@@ -88,7 +88,13 @@
     "cat_weight_note": "Kantar fişi",
     "cat_transport_doc": "Taşıma belgesi",
     "cat_extra_invoice": "Ek fatura",
-    "cat_other": "Diğer belge"
+    "cat_other": "Diğer belge",
+    "deliveryHistory": "Sevkiyat geçmişi",
+    "vehicleDossier": "ARAÇ DOSYASI",
+    "lastDelivery": "Son sevkiyat",
+    "totalDocs": "Toplam belge",
+    "dispatchNo": "İrsaliye №",
+    "showDeleted": "Silinenleri göster"
   },
   "docTypes": {
     "dispatch_note": "Sevk irsaliyesi",

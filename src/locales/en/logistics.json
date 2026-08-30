@@ -88,7 +88,13 @@
     "cat_weight_note": "Weighbridge note",
     "cat_transport_doc": "Transport document",
     "cat_extra_invoice": "Additional invoice",
-    "cat_other": "Other document"
+    "cat_other": "Other document",
+    "deliveryHistory": "Delivery history",
+    "vehicleDossier": "VEHICLE DOSSIER",
+    "lastDelivery": "Last delivery",
+    "totalDocs": "Total documents",
+    "dispatchNo": "Dispatch №",
+    "showDeleted": "Show deleted"
   },
   "docTypes": {
     "dispatch_note": "Dispatch note",
