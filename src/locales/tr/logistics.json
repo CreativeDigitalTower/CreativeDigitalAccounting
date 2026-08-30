@@ -88,7 +88,15 @@
     "cat_weight_note": "Kantar fişi",
     "cat_transport_doc": "Taşıma belgesi",
     "cat_extra_invoice": "Ek fatura",
-    "cat_other": "Diğer belge"
+    "cat_other": "Diğer belge",
+    "basic": "Temel bilgiler",
+    "documents": "Araç belgeleri",
+    "docType": "Belge türü",
+    "docName": "Ad",
+    "validTo": "Geçerlilik",
+    "noDocs": "Araca eklenmiş belge yok.",
+    "history": "Geçmiş",
+    "historyPlaceholder": "Bu araç için henüz kayıtlı geçmiş yok."
   },
   "docTypes": {
     "dispatch_note": "Sevk irsaliyesi",
@@ -105,7 +113,14 @@
     "bg_mk_invoice": "BG→MK fatura",
     "mk_invoice": "MK fatura",
     "payment_doc": "Ödeme belgesi",
-    "other": "Diğer belge"
+    "other": "Diğer belge",
+    "registration": "Ruhsat belgesi",
+    "insurance": "Sigorta",
+    "inspection": "Teknik muayene",
+    "license": "Lisans / izin",
+    "permit": "İzin",
+    "contract": "Sözleşme",
+    "certificate": "Sertifika"
   },
   "carriers": {
     "title": "Taşıyıcılar",

@@ -88,7 +88,15 @@
     "cat_weight_note": "Weighbridge note",
     "cat_transport_doc": "Transport document",
     "cat_extra_invoice": "Additional invoice",
-    "cat_other": "Other document"
+    "cat_other": "Other document",
+    "basic": "Basic data",
+    "documents": "Vehicle documents",
+    "docType": "Document type",
+    "docName": "Name",
+    "validTo": "Valid until",
+    "noDocs": "No documents added to the vehicle.",
+    "history": "History",
+    "historyPlaceholder": "No history recorded for this vehicle yet."
   },
   "docTypes": {
     "dispatch_note": "Dispatch note",
@@ -105,7 +113,14 @@
     "bg_mk_invoice": "BG→MK invoice",
     "mk_invoice": "MK invoice",
     "payment_doc": "Payment document",
-    "other": "Other document"
+    "other": "Other document",
+    "registration": "Registration document",
+    "insurance": "Insurance",
+    "inspection": "Technical inspection",
+    "license": "License / permit",
+    "permit": "Permit",
+    "contract": "Contract",
+    "certificate": "Certificate"
   },
   "carriers": {
     "title": "Carriers",

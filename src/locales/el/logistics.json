@@ -88,7 +88,15 @@
     "cat_weight_note": "Σημείωμα ζύγισης",
     "cat_transport_doc": "Έγγραφο μεταφοράς",
     "cat_extra_invoice": "Πρόσθετο τιμολόγιο",
-    "cat_other": "Άλλο έγγραφο"
+    "cat_other": "Άλλο έγγραφο",
+    "basic": "Βασικά στοιχεία",
+    "documents": "Έγγραφα οχήματος",
+    "docType": "Τύπος εγγράφου",
+    "docName": "Ονομασία",
+    "validTo": "Ισχύει έως",
+    "noDocs": "Δεν έχουν προστεθεί έγγραφα στο όχημα.",
+    "history": "Ιστορικό",
+    "historyPlaceholder": "Δεν υπάρχει ακόμη καταγεγραμμένο ιστορικό για αυτό το όχημα."
   },
   "docTypes": {
     "dispatch_note": "Δελτίο αποστολής",
@@ -105,7 +113,14 @@
     "bg_mk_invoice": "Τιμολόγιο BG→MK",
     "mk_invoice": "Τιμολόγιο MK",
     "payment_doc": "Έγγραφο πληρωμής",
-    "other": "Άλλο έγγραφο"
+    "other": "Άλλο έγγραφο",
+    "registration": "Έγγραφο ταξινόμησης",
+    "insurance": "Ασφάλιση",
+    "inspection": "Τεχνικός έλεγχος",
+    "license": "Άδεια",
+    "permit": "Άδεια κυκλοφορίας",
+    "contract": "Σύμβαση",
+    "certificate": "Πιστοποιητικό"
   },
   "carriers": {
     "title": "Μεταφορείς",

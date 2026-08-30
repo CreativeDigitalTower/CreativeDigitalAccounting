@@ -88,7 +88,15 @@
     "cat_weight_note": "Bon de cântar",
     "cat_transport_doc": "Document de transport",
     "cat_extra_invoice": "Factură suplimentară",
-    "cat_other": "Alt document"
+    "cat_other": "Alt document",
+    "basic": "Date de bază",
+    "documents": "Documentele vehiculului",
+    "docType": "Tip document",
+    "docName": "Denumire",
+    "validTo": "Valabil până la",
+    "noDocs": "Niciun document adăugat la vehicul.",
+    "history": "Istoric",
+    "historyPlaceholder": "Încă nu există istoric pentru acest vehicul."
   },
   "docTypes": {
     "dispatch_note": "Aviz de expediție",
@@ -105,7 +113,14 @@
     "bg_mk_invoice": "Factură BG→MK",
     "mk_invoice": "Factură MK",
     "payment_doc": "Document de plată",
-    "other": "Alt document"
+    "other": "Alt document",
+    "registration": "Document de înmatriculare",
+    "insurance": "Asigurare",
+    "inspection": "Inspecție tehnică",
+    "license": "Licență / autorizație",
+    "permit": "Autorizație",
+    "contract": "Contract",
+    "certificate": "Certificat"
   },
   "carriers": {
     "title": "Transportatori",
