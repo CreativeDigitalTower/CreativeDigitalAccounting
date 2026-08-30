@@ -88,7 +88,13 @@
     "cat_weight_note": "Bon de cântar",
     "cat_transport_doc": "Document de transport",
     "cat_extra_invoice": "Factură suplimentară",
-    "cat_other": "Alt document"
+    "cat_other": "Alt document",
+    "deliveryHistory": "Istoricul livrărilor",
+    "vehicleDossier": "DOSARUL VEHICULULUI",
+    "lastDelivery": "Ultima livrare",
+    "totalDocs": "Total documente",
+    "dispatchNo": "Aviz №",
+    "showDeleted": "Arată șterse"
   },
   "docTypes": {
     "dispatch_note": "Aviz de expediție",

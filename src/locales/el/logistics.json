@@ -88,7 +88,13 @@
     "cat_weight_note": "Σημείωμα ζύγισης",
     "cat_transport_doc": "Έγγραφο μεταφοράς",
     "cat_extra_invoice": "Πρόσθετο τιμολόγιο",
-    "cat_other": "Άλλο έγγραφο"
+    "cat_other": "Άλλο έγγραφο",
+    "deliveryHistory": "Ιστορικό παραδόσεων",
+    "vehicleDossier": "ΦΑΚΕΛΟΣ ΟΧΗΜΑΤΟΣ",
+    "lastDelivery": "Τελευταία παράδοση",
+    "totalDocs": "Σύνολο εγγράφων",
+    "dispatchNo": "Δελτίο №",
+    "showDeleted": "Εμφάνιση διαγραμμένων"
   },
   "docTypes": {
     "dispatch_note": "Δελτίο αποστολής",

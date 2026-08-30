@@ -10,8 +10,8 @@ type Ev = { id: string; action: string; entity: string; summary: string | null; 
 
 const KB = (n: number) => n < 1024 * 1024 ? `${Math.round(n / 1024)} KB` : `${(n / 1024 / 1024).toFixed(1)} MB`;
 
-export function ExportDossierExtras({ id, canManage, truckVehicleId, mkInvoice, receivedBy }: {
-  id: string; canManage: boolean; truckVehicleId?: string | null; mkInvoice?: { id: string; number: string } | null; receivedBy?: string | null;
+export function ExportDossierExtras({ id, canManage, truckVehicleId, mkInvoice, receivedBy, onChanged }: {
+  id: string; canManage: boolean; truckVehicleId?: string | null; mkInvoice?: { id: string; number: string } | null; receivedBy?: string | null; onChanged?: () => void;
 }) {
   const t = useT();
   const [atts, setAtts] = useState<Att[]>([]);
@@ -27,7 +27,7 @@ export function ExportDossierExtras({ id, canManage, truckVehicleId, mkInvoice, 
   async function del(att: Att) {
     if (!(await confirmDelete(att.name))) return;
     const r = await fetch(`/api/logistics/export-sets/${id}/attachments/${att.id}`, { method: "DELETE" });
-    if (r.ok) { loadAtts(); loadTimeline(); }
+    if (r.ok) { loadAtts(); loadTimeline(); onChanged?.(); }
   }
 
   const th = { textAlign: "left" as const, padding: "6px 8px", color: "var(--muted)", fontSize: 11.5 };
@@ -97,7 +97,7 @@ export function ExportDossierExtras({ id, canManage, truckVehicleId, mkInvoice, 
         )}
       </div>
 
-      {showAdd && <AttachModal id={id} onClose={() => setShowAdd(false)} onDone={() => { setShowAdd(false); loadAtts(); loadTimeline(); }} />}
+      {showAdd && <AttachModal id={id} onClose={() => setShowAdd(false)} onDone={() => { setShowAdd(false); loadAtts(); loadTimeline(); onChanged?.(); }} />}
       {edit && <EditMetaModal id={id} att={edit} onClose={() => setEdit(null)} onDone={() => { setEdit(null); loadAtts(); }} />}
     </>
   );

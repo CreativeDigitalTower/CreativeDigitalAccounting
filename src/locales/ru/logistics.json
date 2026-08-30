@@ -88,7 +88,13 @@
     "cat_weight_note": "Весовая записка",
     "cat_transport_doc": "Транспортный документ",
     "cat_extra_invoice": "Дополнительный счёт",
-    "cat_other": "Другой документ"
+    "cat_other": "Другой документ",
+    "deliveryHistory": "История поставок",
+    "vehicleDossier": "ДОСЬЕ АВТОМОБИЛЯ",
+    "lastDelivery": "Последняя поставка",
+    "totalDocs": "Всего документов",
+    "dispatchNo": "Отгрузка №",
+    "showDeleted": "Показать удалённые"
   },
   "docTypes": {
     "dispatch_note": "Накладная",

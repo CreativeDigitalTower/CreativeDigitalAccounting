@@ -88,7 +88,13 @@
     "cat_weight_note": "Кантарна бележка",
     "cat_transport_doc": "Транспортен документ",
     "cat_extra_invoice": "Допълнителна фактура",
-    "cat_other": "Друг документ"
+    "cat_other": "Друг документ",
+    "deliveryHistory": "История на доставките",
+    "vehicleDossier": "ДОСИЕ НА АВТОМОБИЛА",
+    "lastDelivery": "Последна доставка",
+    "totalDocs": "Общо документи",
+    "dispatchNo": "Испратница №",
+    "showDeleted": "Покажи изтритите"
   },
   "docTypes": {
     "dispatch_note": "Експедиционна бележка",
