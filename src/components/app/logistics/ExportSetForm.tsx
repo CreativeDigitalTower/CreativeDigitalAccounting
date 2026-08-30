@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useT, useI18n } from "@/components/i18n/I18nProvider";
@@ -63,6 +63,30 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
   // Автофил от конфигурацията на превозвача (§27): последен шофьор, макс. товар, вид товар.
   // Шофьорът НЕ се заключва — потребителят може да го смени. Товарът се валидира (§28).
   const [cfg, setCfg] = useState<{ maxPayloadTons: number | null; cargoMode: string; driver: string | null } | null>(null);
+  // Краен клиент — локален списък (за да се вижда новосъздаден клиент веднага, §24/§26).
+  const [clientList, setClientList] = useState<Client[]>(clients);
+  const [clientBusy, setClientBusy] = useState(false);
+
+  // Автоматично предложение на Invoice номер при СЪЗДАВАНЕ (§15) — editable (§16).
+  useEffect(() => {
+    if (isEdit) return;
+    fetch("/api/logistics/export-sets/next-number").then((r) => (r.ok ? r.json() : null))
+      .then((j) => { if (j?.number) setF((s) => ({ ...s, invoiceNumber: s.invoiceNumber || j.number })); })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Избор/създаване на краен клиент (§24-§27). Съществуващ → clientId; ново име → създава
+  // клиент в текущата фирма (без да преименува master запис, §27). Company-scoped (§43).
+  async function pickClient(v: string) {
+    if (!v) { setF((s) => ({ ...s, clientId: "" })); return; }
+    if (clientList.some((c) => c.id === v)) { setF((s) => ({ ...s, clientId: v })); return; }
+    setClientBusy(true);
+    try {
+      const r = await fetch("/api/clients", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: v.trim() }) });
+      if (r.ok) { const c = await r.json(); setClientList((l) => [...l.filter((x) => x.id !== c.id), { id: c.id, name: c.name }]); setF((s) => ({ ...s, clientId: c.id })); }
+    } finally { setClientBusy(false); }
+  }
 
   async function pickTruck(id: string) {
     const v = vehicles.find((x) => x.id === id);
@@ -237,7 +261,7 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
           <SearchableSelect options={buyers.map((b) => ({ value: b.id, label: b.name }))} value={f.buyerCompanyId} onChange={(v) => setF({ ...f, buyerCompanyId: v })} emptyLabel="—" />
         </F>
         <F label={t("logistics.export.client")}>
-          <SearchableSelect options={clients.map((c) => ({ value: c.id, label: c.name }))} value={f.clientId} onChange={(v) => setF({ ...f, clientId: v })} emptyLabel="—" />
+          <SearchableSelect options={clientList.map((c) => ({ value: c.id, label: c.name }))} value={f.clientId} onChange={pickClient} allowCreate emptyLabel={clientBusy ? "…" : "—"} createLabel={(q) => `${t("logistics.export.addClient")} „${q}"`} />
         </F>
       </div>
 

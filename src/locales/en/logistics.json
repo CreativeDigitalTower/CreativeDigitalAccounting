@@ -572,7 +572,8 @@
     "deleteBlocked": "This delivery is linked to MK invoice № {number}. First cancel/remove the linked invoice or unlink it through the allowed process.",
     "trash": "Trash",
     "trashEmpty": "Trash is empty.",
-    "restore": "Restore"
+    "restore": "Restore",
+    "addClient": "Add client:"
   },
   "fleet": {
     "title": "Fleet",

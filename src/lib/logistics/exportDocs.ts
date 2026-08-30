@@ -247,8 +247,8 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
       return {
         regulation: "Регламент – EC №2447/2015, Приложение 22-10", title: "ДЕКЛАРАЦИЯ",
         ...vars, holcim: PROFORMA_SUPPLIER, bgCompany: parties.seller, product: src.productSnapshot,
-        // Град по подразбиране = град на продавача (напр. КЮСТЕНДИЛ), editable.
-        place: (parties.seller.city ?? "").toUpperCase() || null, city: (parties.seller.city ?? "").toUpperCase() || null,
+        // Място/град = град на продавача (напр. „Кюстендил") — както в референцията (§32), editable.
+        place: (parties.seller.city ?? "").trim() || null, city: (parties.seller.city ?? "").trim() || null,
         date: src.declarationCmrDate,
         bodyText: buildDeclarationText(vars),
         statementText: DECLARATION_STATEMENT,

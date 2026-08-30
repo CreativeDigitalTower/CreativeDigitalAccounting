@@ -127,13 +127,18 @@ describe("Декларация + CMR (PR3)", () => {
 });
 
 describe("BUGFIX/UX — активни документи, декларация, регенерация, persistence", () => {
-  it("активният workflow е точно 5 документа, без blank", () => {
-    expect(ACTIVE_EXPORT_DOC_TYPES.length).toBe(5);
+  it("активният workflow е точно 4 документа (Invoice/Испратница/Декларация/CMR HP), без blank и без CMR Epson", () => {
+    expect(ACTIVE_EXPORT_DOC_TYPES.length).toBe(4);
     expect((ACTIVE_EXPORT_DOC_TYPES as readonly string[]).includes("blank")).toBe(false);
+    // CMR Epson е премахнат от НОВОТО генериране (§12), но остава в историческия набор (§13).
+    expect((ACTIVE_EXPORT_DOC_TYPES as readonly string[]).includes("cmr_epson")).toBe(false);
+    expect(isActiveExportDocType("cmr_epson")).toBe(false);
+    expect(isActiveExportDocType("cmr_hp")).toBe(true);
     expect(isActiveExportDocType("blank")).toBe(false);
     expect(isActiveExportDocType("invoice")).toBe(true);
-    // blank остава в историческия набор за backward compatibility
+    // blank и cmr_epson остават в историческия набор за backward compatibility
     expect((EXPORT_DOC_TYPES as readonly string[]).includes("blank")).toBe(true);
+    expect((EXPORT_DOC_TYPES as readonly string[]).includes("cmr_epson")).toBe(true);
   });
 
   it("декларацията съдържа задължителния нормативен текст", () => {
@@ -251,10 +256,11 @@ describe("DOCUMENT SYNC — English snapshot, promote-to-source, деклара�
     const cmr = buildDocumentData({ ...SRC, invoiceNumber: "0000009999" }, P, "cmr_epson") as { invoiceNumber: string };
     expect(cmr.invoiceNumber).toBe("0000009999");
   });
-  it("#14 Declaration city = КЮСТЕНДИЛ (от град на продавача, не София)", () => {
+  it("#14 Declaration place = град на продавача (Кюстендил), както в референцията (§32)", () => {
     const dec = buildDocumentData(SRC, P, "declaration") as { city: string; place: string };
-    expect(dec.city).toBe("КЮСТЕНДИЛ");
-    expect(dec.place).toBe("КЮСТЕНДИЛ");
+    // Запазва изписването на града (без насилствено uppercase) — sheet „Декларация": „Кюстендил".
+    expect(dec.city).toBe("Кюстендил");
+    expect(dec.place).toBe("Кюстендил");
   });
 
   it("#16/#17 resolveExportSetRole: продавач/купувач виждат, чужда фирма — не", () => {
