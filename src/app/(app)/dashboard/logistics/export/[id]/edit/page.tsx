@@ -29,7 +29,16 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     prisma.exportDocumentSet.findMany({ where: { companyId, destination: { not: null } }, select: { destination: true }, take: 2000 }),
     prisma.mkInvoice.findFirst({ where: { sourceExportSetId: set.id }, select: { id: true, number: true } }),
   ]);
-  const clientList = await prisma.client.findMany({ where: { companyId }, select: { id: true, name: true }, orderBy: { name: "asc" }, take: 1000 });
+  // Краен клиент = клиент на buyer фирмата (SEM) на доставката (§1/§2); ако липсва buyer,
+  // fallback към counterparty. Плюс името на текущо избрания клиент (§5) — резолва се по id
+  // (може да е стар BG клиент), за да остане видим при редакция.
+  const clientScopeId = set.buyerCompanyId ?? buyers[0]?.id ?? null;
+  const [clientList, currentClient] = await Promise.all([
+    clientScopeId
+      ? prisma.client.findMany({ where: { companyId: clientScopeId, status: { notIn: ["inactive", "lost"] } }, select: { id: true, name: true }, orderBy: { name: "asc" }, take: 2000 })
+      : Promise.resolve([]),
+    set.clientId ? prisma.client.findUnique({ where: { id: set.clientId }, select: { name: true } }) : Promise.resolve(null),
+  ]);
 
   const destinations = mergeDestinations(MK_DESTINATIONS, routes.map((r) => r.toPlace), usedDestinations.map((s) => s.destination));
 
@@ -57,6 +66,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         quantity: set.quantity, declarationCmrDate: set.declarationCmrDate?.toISOString() ?? null,
         dispatchNumber: set.dispatchNumber, buyerCompanyId: set.buyerCompanyId, clientId: set.clientId,
       }}
+      initialClientName={currentClient?.name ?? null}
       mkInvoice={mkInvoice}
     />
   );

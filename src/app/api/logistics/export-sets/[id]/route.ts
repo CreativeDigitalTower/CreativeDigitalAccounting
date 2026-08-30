@@ -36,7 +36,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const [seller, buyer, client, mkInvoice] = await Promise.all([
     prisma.company.findUnique({ where: { id: set.companyId }, select: { name: true } }),
     set.buyerCompanyId ? prisma.company.findUnique({ where: { id: set.buyerCompanyId }, select: { name: true } }) : Promise.resolve(null),
-    set.clientId ? prisma.client.findFirst({ where: { id: set.clientId, companyId: set.companyId }, select: { name: true } }) : Promise.resolve(null),
+    // Клиентът може да е на buyer фирмата (SEM), затова резолвим по id (§2).
+    set.clientId ? prisma.client.findUnique({ where: { id: set.clientId }, select: { name: true } }) : Promise.resolve(null),
     // MK фактурата, издадена от получателя за тази доставка (group visibility, §18/§31).
     set.buyerCompanyId ? prisma.mkInvoice.findFirst({ where: { sourceExportSetId: set.id, companyId: set.buyerCompanyId }, select: { id: true, number: true } }) : Promise.resolve(null),
   ]);
@@ -74,7 +75,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   try {
     const { id } = await params;
     // company-scoped + не позволяваме редакция на изтрита доставка (§35).
-    const existing = await prisma.exportDocumentSet.findFirst({ where: { id, companyId: g.companyId, deletedAt: null }, select: { id: true } });
+    const existing = await prisma.exportDocumentSet.findFirst({ where: { id, companyId: g.companyId, deletedAt: null }, select: { id: true, buyerCompanyId: true } });
     if (!existing) return NextResponse.json({ error: "Не е намерена." }, { status: 404 });
     const d = patchSchema.parse(await req.json());
 
@@ -101,7 +102,20 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (d.dispatchNumber !== undefined) data.dispatchNumber = d.dispatchNumber;
     if (d.note !== undefined) data.note = d.note;
     if (d.clientId !== undefined) {
-      if (d.clientId) { const c = await prisma.client.findFirst({ where: { id: d.clientId, companyId: g.companyId }, select: { id: true } }); if (!c) return NextResponse.json({ error: "Клиентът не е намерен." }, { status: 404 }); }
+      if (d.clientId) {
+        // Клиентът може да е на buyer фирмата (SEM) или на активната (§1/§3). Валидираме
+        // членство в групата за ефективния buyer (нов от payload-а или текущия на записа).
+        const effectiveBuyer = d.buyerCompanyId !== undefined ? d.buyerCompanyId : existing.buyerCompanyId;
+        const c = await prisma.client.findUnique({ where: { id: d.clientId }, select: { id: true, companyId: true } });
+        if (!c) return NextResponse.json({ error: "Клиентът не е намерен." }, { status: 404 });
+        const allowed = new Set([g.companyId, ...(effectiveBuyer ? [effectiveBuyer] : [])]);
+        if (!allowed.has(c.companyId)) {
+          if (c.companyId !== g.companyId) {
+            const cps = await groupCounterparties(g.companyId);
+            if (!cps.some((x) => x.id === c.companyId)) return NextResponse.json({ error: "Клиентът не е от свързана фирма." }, { status: 400 });
+          }
+        }
+      }
       data.clientId = d.clientId || null;
     }
     if (d.buyerCompanyId !== undefined) {

@@ -8,6 +8,7 @@ import { SEQ_SCOPE, formatSequenceNumber, EXPORT_INVOICE_FORMAT, suggestDispatch
 import { truckTrailerLabel } from "@/lib/logistics/exportDocs";
 import { PLACE_OF_SHIPMENT_DEFAULT } from "@/lib/logistics/deliveryTerms";
 import { validationError, zodFieldErrors, VMSG, type FieldErrors } from "@/lib/logistics/validation";
+import { clientCompanyAllowed } from "@/lib/logistics/clientScope";
 import { z } from "zod";
 
 const listSelect = {
@@ -93,7 +94,9 @@ export async function POST(req: Request) {
       d.logisticsProductId ? prisma.logisticsProduct.findFirst({ where: { id: d.logisticsProductId, companyId: g.companyId }, select: { canonicalName: true, unit: true } }) : Promise.resolve(null),
       d.shipmentId ? prisma.shipment.findFirst({ where: { id: d.shipmentId, companyId: g.companyId }, select: { id: true } }) : Promise.resolve(null),
       d.buyerCompanyId ? prisma.company.findUnique({ where: { id: d.buyerCompanyId }, select: { id: true } }) : Promise.resolve(null),
-      d.clientId ? prisma.client.findFirst({ where: { id: d.clientId, companyId: g.companyId }, select: { id: true } }) : Promise.resolve(null),
+      // Краен клиент: зареждаме по id (+ companyId за валидация), защото може да е клиент
+      // на СВЪРЗАНАТА buyer фирма (SEM), не на активната (§1/§2).
+      d.clientId ? prisma.client.findUnique({ where: { id: d.clientId }, select: { id: true, companyId: true } }) : Promise.resolve(null),
     ]);
     if (d.truckVehicleId && !vehicle) return NextResponse.json({ error: "Автомобилът не е намерен." }, { status: 404 });
     if (d.logisticsProductId && !product) return NextResponse.json({ error: "Продуктът не е намерен." }, { status: 404 });
@@ -103,7 +106,14 @@ export async function POST(req: Request) {
       const cps = await groupCounterparties(g.companyId);
       if (!cps.some((c) => c.id === d.buyerCompanyId)) return NextResponse.json({ error: "Купувачът не е свързана фирма от групата." }, { status: 400 });
     }
-    if (d.clientId && !client) return NextResponse.json({ error: "Клиентът не е намерен." }, { status: 404 });
+    // Клиентът трябва да е на buyer фирмата (SEM) или на активната (legacy) — cross-company
+    // само в рамките на групата (§3).
+    if (d.clientId) {
+      if (!client) return NextResponse.json({ error: "Клиентът не е намерен." }, { status: 404 });
+      if (!clientCompanyAllowed(client.companyId, { activeCompanyId: g.companyId, buyerCompanyId: d.buyerCompanyId })) {
+        return NextResponse.json({ error: "Клиентът не е от свързана фирма." }, { status: 400 });
+      }
+    }
 
     const year = (d.invoiceDate ? new Date(d.invoiceDate) : new Date()).getFullYear();
     const trailer = d.trailerReg ?? vehicle?.logisticsProfile?.trailerReg ?? null;

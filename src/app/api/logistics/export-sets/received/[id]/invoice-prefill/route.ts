@@ -31,7 +31,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     prisma.document.findFirst({ where: { companyId: g.companyId, type: "invoice", sourceExportSetId: set.id, deletedAt: null, status: { not: "cancelled" } }, select: { id: true, number: true, status: true } }),
     prisma.mkInvoice.findFirst({ where: { companyId: g.companyId, sourceExportSetId: set.id, documentId: null }, select: { id: true, number: true } }),
     prisma.company.findUnique({ where: { id: g.companyId }, select: { defaultCurrency: true, defaultLanguage: true } }),
-    set.clientId ? prisma.client.findUnique({ where: { id: set.clientId }, select: { name: true, eik: true, vatNumber: true, city: true, address: true, contactEmail: true } }) : Promise.resolve(null),
+    set.clientId ? prisma.client.findUnique({ where: { id: set.clientId }, select: { companyId: true, name: true, eik: true, vatNumber: true, city: true, address: true, contactEmail: true } }) : Promise.resolve(null),
     prisma.client.findMany({ where: { companyId: g.companyId }, select: { id: true, name: true } }),
   ]);
 
@@ -41,7 +41,11 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 
   // Краен клиент (§6/§13): match на BG-посочения клиент към собствен CRM клиент по име.
   const byNorm = new Map(mkClients.map((c) => [normalizeCompanyName(c.name), c.id]));
-  const matchedClientId = bgClient ? (byNorm.get(normalizeCompanyName(bgClient.name)) ?? null) : null;
+  // Ако крайният клиент вече е клиент на активната (MK) фирма — ползваме го директно (§8),
+  // иначе fallback към match по нормализирано име (legacy BG клиент).
+  const matchedClientId = bgClient
+    ? (bgClient.companyId === g.companyId ? set.clientId : (byNorm.get(normalizeCompanyName(bgClient.name)) ?? null))
+    : null;
 
   const refs = [
     `Логистична доставка: BG фактура ${set.invoiceNumber}`,

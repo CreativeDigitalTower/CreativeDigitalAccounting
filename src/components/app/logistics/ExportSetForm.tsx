@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useT, useI18n } from "@/components/i18n/I18nProvider";
@@ -37,9 +37,9 @@ export type ExportSetInitial = {
 // Локална (timezone-safe) дата за date input-ите — пази записания календарен ден (§32).
 const ymd = (x: string | null | undefined) => (x ? toISODateLocal(new Date(x)) : "");
 
-export function ExportSetForm({ vehicles, products, routes, buyers, clients, destinations = [], initial, mkInvoice }: {
+export function ExportSetForm({ vehicles, products, routes, buyers, clients, destinations = [], initial, initialClientName, mkInvoice }: {
   vehicles: Vehicle[]; products: Product[]; routes: Route[]; buyers: Company[]; clients: Client[]; destinations?: string[];
-  initial?: ExportSetInitial; mkInvoice?: { id: string; number: string } | null;
+  initial?: ExportSetInitial; initialClientName?: string | null; mkInvoice?: { id: string; number: string } | null;
 }) {
   const t = useT();
   const { locale } = useI18n();
@@ -63,9 +63,23 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
   // Автофил от конфигурацията на превозвача (§27): последен шофьор, макс. товар, вид товар.
   // Шофьорът НЕ се заключва — потребителят може да го смени. Товарът се валидира (§28).
   const [cfg, setCfg] = useState<{ maxPayloadTons: number | null; cargoMode: string; driver: string | null } | null>(null);
-  // Краен клиент — локален списък (за да се вижда новосъздаден клиент веднага, §24/§26).
+  // Краен клиент — списъкът идва от СВЪРЗАНАТА buyer фирма (SEM), не от активната (§1/§2).
+  // Инициализира се от подадените (server-side заредени за default buyer) и се презарежда
+  // при смяна на buyer.
   const [clientList, setClientList] = useState<Client[]>(clients);
   const [clientBusy, setClientBusy] = useState(false);
+  const buyerLoaded = useRef(initial?.buyerCompanyId ?? buyers[0]?.id ?? "");
+
+  // Презареждане на клиентите при смяна на buyer фирмата (cross-company, group-scoped, §2/§3).
+  useEffect(() => {
+    const bid = f.buyerCompanyId;
+    if (!bid || bid === buyerLoaded.current) return;
+    buyerLoaded.current = bid;
+    fetch(`/api/logistics/buyer-clients?companyId=${encodeURIComponent(bid)}`).then((r) => (r.ok ? r.json() : []))
+      .then((list: Client[]) => { if (Array.isArray(list)) { setClientList(list); if (!list.some((c) => c.id === f.clientId)) setF((s) => ({ ...s, clientId: "" })); } })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [f.buyerCompanyId]);
 
   // Автоматично предложение на Invoice номер при СЪЗДАВАНЕ (§15) — editable (§16).
   useEffect(() => {
@@ -76,14 +90,16 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Избор/създаване на краен клиент (§24-§27). Съществуващ → clientId; ново име → създава
-  // клиент в текущата фирма (без да преименува master запис, §27). Company-scoped (§43).
+  // Избор/създаване на краен клиент (§4/§6/§7). Съществуващ → clientId; ново име → създава
+  // клиент в CRM на BUYER фирмата (SEM), НЕ на активната (§6), group-scoped; без да
+  // преименува master запис (§7).
   async function pickClient(v: string) {
     if (!v) { setF((s) => ({ ...s, clientId: "" })); return; }
     if (clientList.some((c) => c.id === v)) { setF((s) => ({ ...s, clientId: v })); return; }
+    if (!f.buyerCompanyId) return; // няма buyer → няма къде да се създаде клиент
     setClientBusy(true);
     try {
-      const r = await fetch("/api/clients", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: v.trim() }) });
+      const r = await fetch("/api/logistics/buyer-clients", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ companyId: f.buyerCompanyId, name: v.trim() }) });
       if (r.ok) { const c = await r.json(); setClientList((l) => [...l.filter((x) => x.id !== c.id), { id: c.id, name: c.name }]); setF((s) => ({ ...s, clientId: c.id })); }
     } finally { setClientBusy(false); }
   }
@@ -261,7 +277,14 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
           <SearchableSelect options={buyers.map((b) => ({ value: b.id, label: b.name }))} value={f.buyerCompanyId} onChange={(v) => setF({ ...f, buyerCompanyId: v })} emptyLabel="—" />
         </F>
         <F label={t("logistics.export.client")}>
-          <SearchableSelect options={clientList.map((c) => ({ value: c.id, label: c.name }))} value={f.clientId} onChange={pickClient} allowCreate emptyLabel={clientBusy ? "…" : "—"} createLabel={(q) => `${t("logistics.export.addClient")} „${q}"`} />
+          <SearchableSelect
+            options={(() => {
+              const opts = clientList.map((c) => ({ value: c.id, label: c.name }));
+              // Пази избрания (вкл. legacy) клиент видим, дори да не е в текущия SEM списък (§5).
+              if (f.clientId && !opts.some((o) => o.value === f.clientId)) opts.unshift({ value: f.clientId, label: initialClientName || f.clientId });
+              return opts;
+            })()}
+            value={f.clientId} onChange={pickClient} allowCreate emptyLabel={clientBusy ? "…" : "—"} createLabel={(q) => `${t("logistics.export.addClient")} „${q}"`} />
         </F>
       </div>
 
