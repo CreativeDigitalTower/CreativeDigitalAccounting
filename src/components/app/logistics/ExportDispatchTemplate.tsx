@@ -1,6 +1,7 @@
 "use client";
 import { dispatchTotalQuantity, displayUnit } from "@/lib/logistics/exportDocs";
 import { resolveDispatchIssuer } from "@/lib/logistics/dispatchIssuer";
+import { formatInvoiceDate } from "@/lib/logistics/exportDates";
 
 type Party = { name?: string | null; address?: string | null; city?: string | null; vatNumber?: string | null; registrationNumber?: string | null };
 type Row = { lineNo?: number; truck?: string | null; material?: string | null; unit?: string | null; quantity?: number | null; valueMkd?: string | null };
@@ -9,10 +10,9 @@ export type DispatchDocData = {
   destination?: string | null; rows?: Row[]; totalQuantity?: number | null; blank?: boolean;
 };
 
-// Документът е на македонски/административен формат. Датата и количествата следват
-// локалната нотация; количеството е винаги с 3 знака (само визуализация, snapshot-ът е реален).
-const d = (s?: string | null) => s ? new Date(s).toLocaleDateString("mk-MK") : "";
-const yearOf = (s?: string | null) => s ? String(new Date(s).getFullYear()) : "";
+// Датата в испратницата е ПЪЛНА DD.MM.YYYY (§1/§3, sheet „Празна": „9705 / 28.08.2026",
+// „Денес 28.08.2026"). Количеството е винаги с 3 знака (само визуализация).
+const d = (s?: string | null) => formatInvoiceDate(s);
 const nf3 = new Intl.NumberFormat("bg-BG", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 const n3 = (v?: number | null) => v == null ? "" : nf3.format(v);
 
@@ -49,7 +49,8 @@ export function ExportDispatchTemplate({ data, blank = false }: { data: Dispatch
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: 6, margin: "8px 0 6px" }}>
         <span style={{ fontWeight: 700, fontSize: 14 }}>ИСПРАТНИЦА бр.</span>
         <span style={{ fontWeight: 700, fontSize: 14, minWidth: 36, textAlign: "center" }}>{data.dispatchNumber ?? ""}</span>
-        {yearOf(data.date) && <><span style={{ fontSize: 14 }}>/</span><span style={{ fontSize: 14 }}>{yearOf(data.date)}</span></>}
+        {/* ПЪЛНА дата след номера: „бр. 9705 / 28.08.2026" (§1). */}
+        {d(data.date) && <><span style={{ fontSize: 14 }}>/</span><span style={{ fontSize: 14 }}>{d(data.date)}</span></>}
       </div>
 
       {/* До: (получател, autofilled + пунктир) (§4) */}

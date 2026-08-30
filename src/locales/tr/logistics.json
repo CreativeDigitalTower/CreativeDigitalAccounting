@@ -572,7 +572,8 @@
     "deleteBlocked": "Bu sevkiyat MK fatura № {number} ile bağlantılı. Önce bağlı faturayı iptal edin/kaldırın veya izin verilen süreçle bağlantıyı kesin.",
     "trash": "Çöp kutusu",
     "trashEmpty": "Çöp kutusu boş.",
-    "restore": "Geri yükle"
+    "restore": "Geri yükle",
+    "addClient": "Müşteri ekle:"
   },
   "fleet": {
     "title": "Fleet",

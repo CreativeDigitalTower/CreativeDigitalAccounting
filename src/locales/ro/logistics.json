@@ -572,7 +572,8 @@
     "deleteBlocked": "Această livrare este legată de factura MK № {number}. Anulați/eliminați mai întâi factura legată sau deconectați-o prin procesul permis.",
     "trash": "Coș",
     "trashEmpty": "Coșul este gol.",
-    "restore": "Restaurează"
+    "restore": "Restaurează",
+    "addClient": "Adaugă client:"
   },
   "fleet": {
     "title": "Fleet",

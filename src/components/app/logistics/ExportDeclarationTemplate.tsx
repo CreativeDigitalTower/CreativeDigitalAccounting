@@ -1,6 +1,6 @@
 "use client";
-import { companyIdentifier } from "@/lib/company/identifier";
-import { DECLARATION_STATEMENT, buildDeclarationText } from "@/lib/logistics/exportDocs";
+import { buildDeclarationText } from "@/lib/logistics/exportDocs";
+import { formatInvoiceDate } from "@/lib/logistics/exportDates";
 
 type Party = { name?: string | null; address?: string | null; city?: string | null; country?: string | null; eik?: string | null; registrationNumber?: string | null; vatNumber?: string | null };
 export type DeclarationDocData = {
@@ -13,38 +13,55 @@ export type DeclarationDocData = {
   representedCompany?: string | null; proformaSupplier?: string | null;
 };
 
-const d = (s?: string | null) => s ? new Date(s).toLocaleDateString("bg-BG") : "";
-function idText(p?: Party) { if (!p) return ""; const id = companyIdentifier(p); return id ? `${id.kind === "eik" ? "ЕИК" : "Reg.No"} ${id.value}` : ""; }
+// Фиксираният юридически текст (§33, sheet „Декларация" B19/B21/B24-25) — не се перифразира.
+const STMT_INTRO = "Декларирам, че:";
+const STMT_CUMULATION = "Кумулация не е приложена";
+const STMT_OBLIGATION = "Задължавам се, при поискване от митническите власти, да предоставя всички допълнителни документи.";
 
+/**
+ * „Декларация" — възпроизвежда 1:1 sheet „Декларация" от SK501(1).xlsx (§30-§39):
+ * нормативно основание горе вдясно, центрирано заглавие, наративни абзаци с динамични
+ * номера/дати, „Декларирам, че:" + „Кумулация не е приложена" + задължение, място/дата,
+ * ред за декларатор. A4 portrait, една страница, с щедро вертикално пространство (§38).
+ * Датата тук е DD.MM.YYYY (§35) — независимо от YYYY.MM.DD правилото в Invoice.
+ */
 export function ExportDeclarationTemplate({ data }: { data: DeclarationDocData }) {
+  // Наративните абзаци идват от структурираните променливи (§34); „−" bullet на проформа реда.
+  const lines = buildDeclarationText(data).split("\n");
+  const placeDate = [data.place, formatInvoiceDate(data.date)].filter(Boolean).join(", ");
+
   return (
-    <div className="printable" style={{ fontFamily: "Arial, sans-serif", color: "#000", background: "#fff", width: 720, margin: "0 auto", padding: 28, fontSize: 13, lineHeight: 1.6 }}>
-      <div style={{ textAlign: "right", fontSize: 11, marginBottom: 18 }}>{data.regulation ?? ""}</div>
-      <div style={{ textAlign: "center", fontWeight: 700, fontSize: 18, letterSpacing: 1, marginBottom: 20 }}>{data.title ?? "ДЕКЛАРАЦИЯ"}</div>
+    <div className="printable" style={{ fontFamily: "'Times New Roman', Times, serif", color: "#000", background: "#fff", width: "210mm", minHeight: "297mm", boxSizing: "border-box", padding: "22mm 24mm", fontSize: "13.5pt", lineHeight: 1.7, overflow: "hidden" }}>
+      {/* Нормативно основание — горе вдясно (F4). */}
+      <div style={{ textAlign: "right", fontSize: "10.5pt", marginBottom: "14mm" }}>{data.regulation ?? "Регламент – EC №2447/2015, Приложение 22-10"}</div>
 
-      <div style={{ marginBottom: 8 }}>
-        <div style={{ fontWeight: 700 }}>{data.bgCompany?.name ?? data.declarantName ?? ""}</div>
-        <div>{data.bgCompany?.address}{data.bgCompany?.city ? `, ${data.bgCompany.city}` : ""}</div>
-        <div>{idText(data.bgCompany)}{data.bgCompany?.vatNumber ? ` · ДДС ${data.bgCompany.vatNumber}` : ""}</div>
+      {/* Заглавие — центрирано (B8). */}
+      <div style={{ textAlign: "center", fontWeight: 700, fontSize: "18pt", letterSpacing: 1, marginBottom: "14mm" }}>{data.title ?? "ДЕКЛАРАЦИЯ"}</div>
+
+      {/* Наративни абзаци (C12-B16). Проформа редът е с „−" и висящ отстъп. */}
+      <div style={{ textAlign: "justify" }}>
+        {lines.map((ln, i) => {
+          const isProforma = ln.startsWith("Проформа");
+          return (
+            <p key={i} style={{ margin: "0 0 4mm", ...(isProforma ? { paddingLeft: "8mm", textIndent: "-8mm" } : {}) }}>
+              {isProforma ? `− ${ln}` : ln}
+            </p>
+          );
+        })}
       </div>
 
-      {/* Текстът се съставя от структурираните променливи → редакцията им обновява живо. */}
-      <p style={{ textAlign: "justify", marginBottom: 12, whiteSpace: "pre-line" }}>{buildDeclarationText(data)}</p>
-      {/* Задължителен нормативен текст (fallback към константата за стари snapshots). */}
-      <p style={{ textAlign: "justify", marginBottom: 16, whiteSpace: "pre-line" }}>{data.statementText ?? DECLARATION_STATEMENT}</p>
+      {/* „Декларирам, че:" + „Кумулация не е приложена" (B19/B21). */}
+      <p style={{ margin: "10mm 0 4mm" }}>{STMT_INTRO}</p>
+      <p style={{ margin: "0 0 10mm", paddingLeft: "8mm" }}>{STMT_CUMULATION}</p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 16px", marginBottom: 24 }}>
-        <div>Фактура №: <b>{data.invoiceNumber ?? ""}</b></div>
-        <div>Дата: <b>{d(data.invoiceDate)}</b></div>
-        <div>Стока: <b>{data.product ?? ""}</b></div>
-        <div>Произход: <b>{data.origin ?? ""}</b></div>
-        {(data.proformaNumber || data.holcim) && <div style={{ gridColumn: "1 / -1" }}>Проформа {data.holcim ?? ""}: <b>{data.proformaNumber ?? ""}</b>{data.proformaDate ? ` / ${d(data.proformaDate)}` : ""}</div>}
-      </div>
+      {/* Задължение (B24-25). */}
+      <p style={{ margin: "0 0 22mm", textAlign: "justify" }}>{STMT_OBLIGATION}</p>
 
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 28 }}>
-        <div>Място/Дата: <b>{[data.place, d(data.date)].filter(Boolean).join(", ")}</b></div>
-        <div style={{ textAlign: "center" }}>Декларатор: ______________<br /><span style={{ fontSize: 11 }}>/ подпис и печат /</span></div>
-      </div>
+      {/* Място, дата (B28) — DD.MM.YYYY. */}
+      <p style={{ margin: "0 0 16mm" }}>{placeDate}</p>
+
+      {/* Ред за декларатор (B32). */}
+      <p style={{ margin: 0 }}>Декларатор : ...................................</p>
     </div>
   );
 }

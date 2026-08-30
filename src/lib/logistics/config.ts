@@ -59,9 +59,10 @@ export function suggestDispatchFromInvoice(invoiceNumber: string | null | undefi
 export const EXPORT_DOC_TYPES = ["invoice", "dispatch", "blank", "declaration", "cmr_epson", "cmr_hp"] as const;
 export type ExportDocType = (typeof EXPORT_DOC_TYPES)[number];
 
-// Активни документи в текущия workflow (Sheet „Празна" отпадна — беше празен вариант
-// на Испратницата, не отделен бизнес документ). Точно 5 документа на комплект.
-export const ACTIVE_EXPORT_DOC_TYPES = ["invoice", "dispatch", "declaration", "cmr_epson", "cmr_hp"] as const satisfies readonly ExportDocType[];
+// Активни документи в текущия workflow: Invoice, Испратница, Декларация, CMR HP (§41).
+// „CMR EPSON" отпадна от НОВОТО генериране (§12) — типът остава в EXPORT_DOC_TYPES само
+// за преглед на ИСТОРИЧЕСКИ записи (§13), но не се предлага повече за създаване.
+export const ACTIVE_EXPORT_DOC_TYPES = ["invoice", "dispatch", "declaration", "cmr_hp"] as const satisfies readonly ExportDocType[];
 export type ActiveExportDocType = (typeof ACTIVE_EXPORT_DOC_TYPES)[number];
 /** Активен ли е този docType в текущия workflow (blank = само за преглед на стари записи). */
 export function isActiveExportDocType(docType: string): boolean {
