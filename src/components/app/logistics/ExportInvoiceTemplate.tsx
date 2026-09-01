@@ -16,7 +16,7 @@ export type InvoiceDocData = {
   date?: string | null; city?: string | null; manager?: string | null;
 };
 
-// Декларацията (§12/§15) — ТОЧНО 4 реда, explicit line breaks (не разчитаме на wrapping).
+// Декларацията — ТОЧНО 4 реда, explicit line breaks (не разчитаме на wrapping).
 const DECLARATION = [
   "ИЗНОСИТЕЛЯТ НА ПРОДУКТИТЕ, ОБХВАНАТИ",
   "ОТ ТОЗИ ДОКУМЕНТ, ДЕКЛАРИРА, ЧЕ ОСВЕН",
@@ -24,7 +24,7 @@ const DECLARATION = [
   "ПРОДУКТИ СА С EU ПРЕФЕРЕНЦИАЛЕН ПРОИЗХОД",
 ];
 
-// Invoice date → DD.MM.YYYY (централен helper, §14/§17).
+// Invoice date → DD.MM.YYYY (централен helper, §27/§28).
 const d = (s?: string | null) => formatInvoiceDate(s);
 const nfQty = new Intl.NumberFormat("en-US", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 const q3 = (v?: number | null) => v == null ? "" : nfQty.format(v);
@@ -34,7 +34,7 @@ const nfBg2 = new Intl.NumberFormat("bg-BG", { minimumFractionDigits: 2, maximum
 const bg2 = (v?: number | null) => nfBg2.format(v ?? 0);
 const lineValue = (g: Goods) => goodsRowValue(g);
 
-// Град + държава без дублиране (§7): ако градът вече съдържа държавата, не я добавяме пак.
+// Град + държава без дублиране (§26): ако градът вече съдържа държавата, не я добавяме пак.
 function cityCountry(p?: Party): string {
   const city = (p?.city ?? "").trim();
   const country = (p?.country ?? "").trim();
@@ -45,17 +45,29 @@ function cityCountry(p?: Party): string {
   return `${city}, ${country}`;
 }
 
+/**
+ * BG Export Invoice — 1:1 по клиентския Invocieee.xlsx.pdf (§1-§12/§25/§42):
+ * ЕДНА непрекъсната външна рамка (един border-collapse `<table>`) от Seller до подпис/печат;
+ * Terms и Payment/Signature са ВЪТРЕ в рамката; вертикалните разделители на числовите
+ * колони продължават през декларацията до TOTAL. Побира се на ЕДНА A4 страница (§13/§14):
+ * фиксирани mm височини сумиращи под printable area + `height:297mm; overflow:hidden` +
+ * box-sizing:border-box (§17-§20). Screen/PDF/Print ползват този единствен layout (§24).
+ */
 export function ExportInvoiceTemplate({ data }: { data: InvoiceDocData }) {
   const seller = resolveInvoiceParty(data.seller);
   const buyer = resolveInvoiceParty(data.buyer);
   const goods = (data.goods ?? []).length ? data.goods! : [{}];
+  const first = goods[0];
   const { quantity: totalQ, value: totalV } = invoiceTotals(goods);
   const trucks = Array.from(new Set([data.truck, ...goods.map((g) => g.truck)].filter(Boolean))) as string[];
   const truckText = trucks.length ? trucks.join(", ") : (data.truck ?? "");
   const representative = (data.manager ?? "").toUpperCase();
 
   const B = "1px solid #000";
-  const partyBlock = (p: Party, title: string) => (
+  const cell: React.CSSProperties = { border: B, padding: "3px 8px", fontSize: 11.5, verticalAlign: "top" };
+  const num: React.CSSProperties = { ...cell, textAlign: "right", whiteSpace: "nowrap" };
+  const lab: React.CSSProperties = { display: "inline-block", width: 148, fontStyle: "italic" };
+  const party = (p: Party, title: string) => (
     <>
       <div style={{ fontStyle: "italic" }}>{title}</div>
       <div style={{ fontWeight: 700 }}>{p?.name ?? ""}</div>
@@ -63,125 +75,101 @@ export function ExportInvoiceTemplate({ data }: { data: InvoiceDocData }) {
       <div>{cityCountry(p)}</div>
     </>
   );
-  const gcell: React.CSSProperties = { border: B, padding: "2px 6px", fontSize: 11, verticalAlign: "top" };
-  const gnum: React.CSSProperties = { ...gcell, textAlign: "right", whiteSpace: "nowrap", verticalAlign: "top" };
-  const lab: React.CSSProperties = { display: "inline-block", width: 44 };
 
   return (
-    // Точна A4 геометрия (§1,§2,§21): print area A1:J48, margins L8/R6/T8/B9, ~ пълна страница.
-    <div className="printable invoice-doc" style={{ fontFamily: "'Times New Roman', Times, serif", color: "#000", background: "#fff", width: "210mm", height: "297mm", boxSizing: "border-box", padding: "8mm 6mm 9mm 8mm", fontSize: 11.5, lineHeight: 1.15, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-      {/* Заглавие: INVOICE № {точен string номер} / {дата на издаване DD/MM/YYYY} (§1,§2) */}
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "baseline", gap: 8, fontWeight: 700, fontSize: 15, height: "12mm" }}>
+    <div className="printable invoice-doc" style={{ fontFamily: "'Times New Roman', Times, serif", color: "#000", background: "#fff", width: "210mm", height: "297mm", boxSizing: "border-box", padding: "6mm 6mm 6mm 8mm", fontSize: 11.5, lineHeight: 1.2, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      {/* Заглавие над рамката: INVOICE № {точен номер, водещи нули} / {DD.MM.YYYY} (§28) */}
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "baseline", gap: 8, fontWeight: 700, fontSize: 14, padding: "1mm 0 3mm" }}>
         <span>INVOICE №</span><span>{data.invoiceNumber ?? ""}</span>{data.invoiceDate && <><span>/</span><span>{d(data.invoiceDate)}</span></>}
       </div>
 
-      {/* Горни boxed блокове: Seller|Contract, Consignee|Buyer (§4) */}
+      {/* ЕДНА рамка за целия документ (§3/§33): border-collapse table с 4 колони 56/16/13/15. */}
       <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
-        <tbody>
-          <tr>
-            <td style={{ border: B, padding: "3px 8px", width: "56%", height: "23mm", verticalAlign: "top" }}>{partyBlock(seller, "Seller")}</td>
-            <td style={{ border: B, padding: "3px 8px", verticalAlign: "top" }}>
-              <div style={{ lineHeight: 1.6 }}>
-                <div>Contract : <b>{data.contract ?? ""}</b></div>
-                <div>Anex № <b>{data.annex ?? ""}</b></div>
-                <div>Order № <b>{data.order ?? ""}</b></div>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td style={{ border: B, padding: "3px 8px", height: "23mm", verticalAlign: "top" }}>{partyBlock(buyer, "Consignee")}</td>
-            <td style={{ border: B, padding: "3px 8px", verticalAlign: "top" }}>{partyBlock(buyer, "Buyer / importer /")}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      {/* Delivery / transport (§8) */}
-      <div style={{ height: "34mm", paddingTop: "4mm", lineHeight: 1.9 }}>
-        <div><span style={{ display: "inline-block", width: 150 }}>Terms of delivery :</span><b>{data.termsOfDelivery ?? ""}</b></div>
-        <div><span style={{ display: "inline-block", width: 150 }}>Means of transport :</span>Truck № : <b>{truckText}</b></div>
-        <div><span style={{ display: "inline-block", width: 150 }}>Place of shipment :</span><b>{data.placeOfShipment ?? ""}</b></div>
-        {/* „Date of shipment" НЕ се показва в Invoice (§5) — датата на изпращане е само в
-            Испратницата след „Денес". Полето остава в данните, но не се рендира. */}
-        <div><span style={{ display: "inline-block", width: 150 }}>Destination :</span><b>{data.destination ?? ""}</b>{data.destinationCountry ? <>&nbsp;&nbsp;&nbsp;{data.destinationCountry}</> : null}</div>
-      </div>
-
-      {/* Голяма goods зона: продукти + декларация + BELI IZVOR + представител + VAT + празен ред + TOTAL (§9,§16-19) */}
-      <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", height: "122mm" }}>
         <colgroup>
           <col style={{ width: "56%" }} /><col style={{ width: "16%" }} /><col style={{ width: "13%" }} /><col style={{ width: "15%" }} />
         </colgroup>
-        <thead>
-          <tr style={{ height: "13mm" }}>
-            <th style={{ ...gcell, textAlign: "left", fontWeight: 700, verticalAlign: "middle" }}>Description of goods<br /><span style={{ fontWeight: 400, fontSize: 10 }}>Number and kind of packages</span></th>
-            <th style={{ ...gcell, textAlign: "center", fontWeight: 700, verticalAlign: "middle" }}>Quantity<br />TNE</th>
-            <th style={{ ...gcell, textAlign: "center", fontWeight: 700, verticalAlign: "middle" }}>Unit price<br />EUR</th>
-            <th style={{ ...gcell, textAlign: "center", fontWeight: 700, verticalAlign: "middle" }}>Value<br />EUR</th>
-          </tr>
-        </thead>
         <tbody>
-          {goods.map((g, i) => (
-            <tr key={i} style={{ height: "7mm" }}>
-              <td style={{ ...gcell }}>
-                <span style={{ fontWeight: 700 }}>{g.description ?? ""}</span>
-                {g.certificate ? <div style={{ fontWeight: 400 }}>(Certificate No {g.certificate})</div> : null}
-                {g.truck && trucks.length > 1 ? <div style={{ fontSize: 10 }}>Truck № : {g.truck}</div> : null}
-              </td>
-              <td style={{ ...gnum, fontWeight: 700 }}>{q3(g.quantity)}</td>
-              <td style={{ ...gnum, fontWeight: 700 }}>{eur(g.unitPrice)}</td>
-              <td style={{ ...gnum, fontWeight: 700 }}>{eur(lineValue(g))}</td>
-            </tr>
-          ))}
-          {/* Декларация + BELI IZVOR + представител — заема свободното вертикално пространство (§13-15) */}
-          <tr>
-            <td style={{ ...gcell }}>
-              <div style={{ fontSize: 10.5, marginTop: "6mm" }}>
+          {/* Seller | Contract */}
+          <tr style={{ height: "22mm" }}>
+            <td style={cell}>{party(seller, "Seller")}</td>
+            <td style={cell} colSpan={3}>
+              <div style={{ lineHeight: 1.7 }}>
+                <div><i>Contract :</i> <b>{data.contract ?? ""}</b></div>
+                <div><i>Anex №</i> <b>{data.annex ?? ""}</b></div>
+                <div><i>Order №</i> <b>{data.order ?? ""}</b></div>
+              </div>
+            </td>
+          </tr>
+          {/* Consignee | Buyer */}
+          <tr style={{ height: "22mm" }}>
+            <td style={cell}>{party(buyer, "Consignee")}</td>
+            <td style={cell} colSpan={3}>{party(buyer, "Buyer / importer /")}</td>
+          </tr>
+          {/* Terms — ВЪТРЕ в рамката, full width, без вътрешни хоризонтални линии (§2/§4) */}
+          <tr style={{ height: "28mm" }}>
+            <td style={{ ...cell, lineHeight: 1.9 }} colSpan={4}>
+              <div><span style={lab}>Terms of delivery :</span><b>{data.termsOfDelivery ?? ""}</b></div>
+              <div><span style={lab}>Means of transport :</span>Truck № : <b>{truckText}</b></div>
+              <div><span style={lab}>Place of shipment :</span><b>{data.placeOfShipment ?? ""}</b></div>
+              <div><span style={lab}>Destination :</span><b>{data.destination ?? ""}</b>{data.destinationCountry ? <>&nbsp;&nbsp;&nbsp;{data.destinationCountry}</> : null}</div>
+            </td>
+          </tr>
+          {/* Goods header (§6) */}
+          <tr style={{ height: "12mm" }}>
+            <td style={{ ...cell, textAlign: "center", fontWeight: 700, verticalAlign: "middle" }}>Description of goods<br /><span style={{ fontWeight: 400, fontSize: 10.5 }}>Number and kind of packages</span></td>
+            <td style={{ ...cell, textAlign: "center", fontWeight: 700, verticalAlign: "middle" }}>Quantity<br /><span style={{ fontWeight: 400 }}>TNE</span></td>
+            <td style={{ ...cell, textAlign: "center", fontWeight: 700, verticalAlign: "middle" }}>Unit price<br /><span style={{ fontWeight: 400 }}>EUR</span></td>
+            <td style={{ ...cell, textAlign: "center", fontWeight: 700, verticalAlign: "middle" }}>Value<br /><span style={{ fontWeight: 400 }}>EUR</span></td>
+          </tr>
+          {/* Продукт + декларация — ЕДИН висок ред; числата top-aligned, вертикалите продължават (§32) */}
+          <tr style={{ height: "104mm" }}>
+            <td style={cell}>
+              <div style={{ fontWeight: 700 }}>{first.description ?? ""}</div>
+              {first.certificate ? <div style={{ textAlign: "center" }}>(Certificate No {first.certificate})</div> : null}
+              <div style={{ marginTop: "7mm", fontSize: 10.5, fontWeight: 700 }}>
                 {DECLARATION.map((ln, i) => <div key={i}>{ln}</div>)}
               </div>
-              {/* Ляво = ДАТА НА ДЕКЛАРАЦИЯТА във формат YYYY.MM.DD (§18/§20); дясно = BELI IZVOR */}
-              <div style={{ display: "flex", marginTop: "12mm" }}>
-                <span style={{ width: "45%" }}>{formatDeclarationDate(data.declarationDate ?? data.invoiceDate)}</span>
+              <div style={{ display: "flex", marginTop: "8mm", fontWeight: 700 }}>
+                <span style={{ width: "42%" }}>{formatDeclarationDate(data.declarationDate ?? data.invoiceDate)}</span>
                 <span>{data.placeOfShipment ?? ""}</span>
               </div>
               <div style={{ fontWeight: 700 }}>{representative}</div>
             </td>
-            <td style={gcell} /><td style={gcell} /><td style={gcell} />
+            <td style={{ ...num, fontWeight: 700 }}>{q3(first.quantity)}</td>
+            <td style={{ ...num, fontWeight: 700 }}>{eur(first.unitPrice)}</td>
+            <td style={{ ...num, fontWeight: 700 }}>{eur(lineValue(first))}</td>
           </tr>
-          {/* VAT (§16) */}
-          <tr style={{ height: "12mm" }}>
-            <td style={{ ...gcell, verticalAlign: "middle" }}>{data.vatText ?? ""}</td>
-            <td style={gcell} />
-            <td style={{ ...gcell, textAlign: "right", verticalAlign: "middle" }}>VAT {bg2(data.vatRate)} %</td>
-            <td style={{ ...gcell, textAlign: "right", verticalAlign: "middle" }}>{bg2(0)}</td>
+          {/* VAT (§9): текст | „VAT x %" (colSpan 2, center) | стойност */}
+          <tr style={{ height: "9mm" }}>
+            <td style={{ ...cell, verticalAlign: "middle", fontWeight: 700, textAlign: "center" }}>{data.vatText ?? ""}</td>
+            <td style={{ ...cell, verticalAlign: "middle", textAlign: "center", fontWeight: 700 }} colSpan={2}>VAT {bg2(data.vatRate)} %</td>
+            <td style={{ ...num, verticalAlign: "middle", fontWeight: 700 }}>{bg2(0)}</td>
           </tr>
-          {/* Празен bordered ред преди TOTAL (§8/§17) */}
+          {/* Празен ред (§9) */}
           <tr style={{ height: "7mm" }}>
-            <td style={gcell} /><td style={gcell} /><td style={gcell} /><td style={gcell} />
+            <td style={cell} /><td style={cell} /><td style={cell} /><td style={cell} />
           </tr>
-          {/* TOTAL (§18) */}
-          <tr style={{ height: "8mm" }}>
-            <td style={{ ...gcell, textAlign: "right", fontWeight: 700, verticalAlign: "middle" }}>TOTAL :</td>
-            <td style={{ ...gnum, fontWeight: 700, verticalAlign: "middle" }}>{q3(totalQ)}</td>
-            <td style={{ ...gcell, verticalAlign: "middle" }} />
-            <td style={{ ...gnum, fontWeight: 700, verticalAlign: "middle" }}>{eur(totalV)}</td>
+          {/* TOTAL — вътре в grid-а, изцяло очертан (§7/§8) */}
+          <tr style={{ height: "9mm" }}>
+            <td style={{ ...cell, textAlign: "right", fontWeight: 700, verticalAlign: "middle" }}>TOTAL :</td>
+            <td style={{ ...num, fontWeight: 700, verticalAlign: "middle" }}>{q3(totalQ)}</td>
+            <td style={{ ...cell, verticalAlign: "middle" }} />
+            <td style={{ ...num, fontWeight: 700, verticalAlign: "middle" }}>{eur(totalV)}</td>
+          </tr>
+          {/* Payment conditions + Seller/Sign & Stamp — ВЪТРЕ в долната част на рамката (§10/§11/§12) */}
+          <tr style={{ height: "42mm" }}>
+            <td style={{ ...cell, position: "relative" }} colSpan={4}>
+              <div style={{ marginTop: "3mm" }}>
+                <span style={{ fontStyle: "italic", textDecoration: "underline" }}>Payment conditions :</span>&nbsp;&nbsp;<b>{data.paymentConditions ?? ""}</b>
+              </div>
+              <div style={{ marginTop: "16mm", marginLeft: "46%", textAlign: "center" }}>
+                <div style={{ textAlign: "left" }}>Seller :</div>
+                <div style={{ marginTop: "9mm" }}>/ Sign. &amp; Stamp /</div>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
-
-      {/* Payment conditions — по-ниско (§10/§19) */}
-      <div style={{ paddingTop: "11mm" }}>
-        <span style={{ fontStyle: "italic", textDecoration: "underline" }}>Payment conditions :</span>&nbsp;&nbsp;<b>{data.paymentConditions ?? ""}</b>
-      </div>
-
-      {/* Seller / signature — долу вдясно, с реално място за подпис + печат (§22/§24/§25).
-          marginTop:auto държи блока в долната част; по-голямото вътрешно разстояние дава
-          визуалното пространство от референцията, без да излиза от една A4 страница. */}
-      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "auto", paddingTop: "6mm" }}>
-        <div style={{ width: "62mm", textAlign: "center" }}>
-          <div style={{ textAlign: "left" }}>Seller :</div>
-          <div style={{ marginTop: "18mm", borderTop: B }} />
-          <div style={{ fontSize: 10 }}>/ Sign. &amp; Stamp /</div>
-        </div>
-      </div>
     </div>
   );
 }
