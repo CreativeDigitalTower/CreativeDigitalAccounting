@@ -38,15 +38,17 @@ export async function POST(req: Request) {
     const norm = normalizeRegistration(d.registration);
     if (!norm) return NextResponse.json({ error: "Невалиден регистрационен номер." }, { status: 400 });
 
-    // Dedup срещу формат разлики (главни/интервали/тирета) + alias резолюция.
+    // Dedup срещу формат разлики (главни/интервали/тирета) + alias резолюция. При съвпадение
+    // връщаме СЪЩЕСТВУВАЩИЯ автомобил в 409 тялото, за да може UI-то да го избере (§6/§7/§23),
+    // вместо да създава дубликат. Включваме и статуса (архивиран/активен, §23).
     const existing = await prisma.vehicle.findUnique({
-      where: { companyId_normalizedRegistration: { companyId: g.companyId, normalizedRegistration: norm } }, select: { id: true },
+      where: { companyId_normalizedRegistration: { companyId: g.companyId, normalizedRegistration: norm } }, select: listSelect,
     });
-    if (existing) return NextResponse.json({ error: "Автомобил с този номер вече съществува." }, { status: 409 });
+    if (existing) return NextResponse.json({ error: existing.active ? "Автомобил с този номер вече съществува." : "Автомобилът съществува, но е архивиран.", existing }, { status: 409 });
     const asAlias = await prisma.vehicleAlias.findUnique({
-      where: { companyId_normalizedAlias: { companyId: g.companyId, normalizedAlias: norm } }, select: { vehicleId: true },
-    });
-    if (asAlias?.vehicleId) return NextResponse.json({ error: "Този номер е съкратен запис на съществуващ автомобил." }, { status: 409 });
+      where: { companyId_normalizedAlias: { companyId: g.companyId, normalizedAlias: norm } }, select: { vehicle: { select: listSelect } } },
+    );
+    if (asAlias?.vehicle) return NextResponse.json({ error: "Този номер е съкратен запис на съществуващ автомобил.", existing: asAlias.vehicle }, { status: 409 });
 
     const vehicle = await prisma.vehicle.create({
       data: {
