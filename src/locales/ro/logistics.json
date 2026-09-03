@@ -809,5 +809,18 @@
     "sun": "Du",
     "today": "Azi",
     "clear": "Șterge"
+  },
+  "vehicleCreate": {
+    "addNew": "Adaugă vehicul nou",
+    "title": "Adăugare vehicul",
+    "hint": "Doar numărul de înmatriculare este obligatoriu. Restul îl completați ulterior din Parc auto.",
+    "registration": "Număr de înmatriculare",
+    "trailer": "Remorcă",
+    "carrier": "Transportator",
+    "driver": "Șofer",
+    "ownership": "Proprietate",
+    "add": "Adaugă vehiculul",
+    "err": "Adăugarea vehiculului a eșuat.",
+    "required": "Introduceți numărul de înmatriculare."
   }
 }

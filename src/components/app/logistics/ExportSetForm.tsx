@@ -11,6 +11,8 @@ import { DateField } from "@/components/app/logistics/DateField";
 import { todayISODate, toISODateLocal } from "@/lib/date/week";
 import { useFieldErrors, Req, FieldError, ValidationBanner, ariaProps, errStyle, type FieldErrors } from "@/components/app/logistics/formValidation";
 import { PLACE_OF_SHIPMENT_DEFAULT } from "@/lib/logistics/deliveryTerms";
+import { isNewVehicleRegistration } from "@/lib/logistics/vehicleQuickCreate";
+import { VehicleQuickCreateModal } from "@/components/app/logistics/VehicleQuickCreateModal";
 
 // Дефиниран на модулно ниво, за да НЕ се пресъздава при всеки render — иначе полетата
 // вътре remount-ват и губят focus / дата не може да се въвежда с клавиатура. (bug #1/#2)
@@ -63,6 +65,9 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
   // Автофил от конфигурацията на превозвача (§27): последен шофьор, макс. товар, вид товар.
   // Шофьорът НЕ се заключва — потребителят може да го смени. Товарът се валидира (§28).
   const [cfg, setCfg] = useState<{ maxPayloadTons: number | null; cargoMode: string; driver: string | null } | null>(null);
+  // Camion / Ремарке: локален списък (за да се вижда новосъздаден автомобил веднага, §7/§18).
+  const [vehicleList, setVehicleList] = useState<Vehicle[]>(vehicles);
+  const [vehModal, setVehModal] = useState<string | null>(null); // въведената нова регистрация
   // Краен клиент — списъкът идва от СВЪРЗАНАТА buyer фирма (SEM), не от активната (§1/§2).
   // Инициализира се от подадените (server-side заредени за default buyer) и се презарежда
   // при смяна на buyer.
@@ -104,8 +109,16 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
     } finally { setClientBusy(false); }
   }
 
-  async function pickTruck(id: string) {
-    const v = vehicles.find((x) => x.id === id);
+  // Избор от полето „Камион / Ремарке": ако е id на съществуващ автомобил → autofill;
+  // ако е ВЪВЕДЕНА нова регистрация (creatable) → отваряме quick-create modal (§2/§6).
+  function onTruckChange(value: string) {
+    if (isNewVehicleRegistration(value, vehicleList.map((v) => v.id))) { setVehModal(value.trim()); return; }
+    void selectExistingVehicle(value);
+  }
+
+  // Избор на съществуващ автомобил + autofill от VehicleConfiguration (§1/§26/§27).
+  async function selectExistingVehicle(id: string) {
+    const v = vehicleList.find((x) => x.id === id);
     clearField("truckVehicleId");
     setF((s) => ({ ...s, truckVehicleId: id, trailerReg: v?.trailerReg ?? s.trailerReg }));
     setCfg(null);
@@ -114,7 +127,7 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
       const r = await fetch(`/api/logistics/vehicle-configs?truck=${encodeURIComponent(v.registration)}&active=1`);
       const j = await r.json().catch(() => []);
       const row = Array.isArray(j) ? j[0] : null;
-      if (!row) return;
+      if (!row) return; // нов автомобил без конфигурация → полетата остават празни (§27)
       setCfg({ maxPayloadTons: row.maxPayloadTons ?? null, cargoMode: row.cargoMode ?? "", driver: row.driver ?? null });
       setF((s) => ({
         ...s,
@@ -123,6 +136,13 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
         quantity: s.quantity || (row.cargoMode === "bags" ? fmtQuantity(bagsCalc(BAGS_DEFAULTS.pallets).totalTons, locale) : s.quantity),
       }));
     } catch { /* автофилът е best-effort — не блокира формата */ }
+  }
+
+  // Резултат от quick-create/dedup → добавя автомобила в списъка и го избира (§7/§23).
+  function adoptVehicle(v: { id: string; registration: string; trailerReg?: string | null }) {
+    setVehicleList((l) => (l.some((x) => x.id === v.id) ? l : [...l, { id: v.id, registration: v.registration, trailerReg: v.trailerReg ?? null }]));
+    clearField("truckVehicleId");
+    setF((s) => ({ ...s, truckVehicleId: v.id, trailerReg: s.trailerReg || v.trailerReg || "" }));
   }
   function pickRoute(id: string) {
     const r = routes.find((x) => x.id === id);
@@ -246,7 +266,7 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
         <div ref={register("truckVehicleId")}>
           <F label={<>{t("logistics.export.truck")}<Req /></>}>
             <div style={errStyle("truckVehicleId", errors)} {...ariaProps("truckVehicleId", errors)}>
-              <SearchableSelect options={vehicles.map((v) => ({ value: v.id, label: `${v.registration}${v.trailerReg ? ` / ${v.trailerReg}` : ""}` }))} value={f.truckVehicleId} onChange={pickTruck} allowEmpty={false} placeholder="SK501TO / SK5022AE" />
+              <SearchableSelect options={vehicleList.map((v) => ({ value: v.id, label: `${v.registration}${v.trailerReg ? ` / ${v.trailerReg}` : ""}` }))} value={f.truckVehicleId} onChange={onTruckChange} allowCreate allowEmpty={false} placeholder="SK501TO / SK5022AE" createLabel={(q) => `${t("logistics.vehicleCreate.addNew")} „${q}"`} />
             </div>
             <FieldError id="err-truckVehicleId" message={errors.truckVehicleId} />
           </F>
@@ -292,6 +312,14 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
         <button className="btn btn-primary" disabled={busy} onClick={submit}>{busy ? "…" : isEdit ? t("logistics.export.saveChanges") : t("logistics.export.create")}</button>
         {isEdit && <Link href={`/dashboard/logistics/export/${initial!.id}`} className="btn btn-ghost">{t("logistics.common.cancel")}</Link>}
       </div>
+
+      {vehModal !== null && (
+        <VehicleQuickCreateModal
+          registration={vehModal}
+          onClose={() => setVehModal(null)}
+          onDone={(v) => { adoptVehicle(v); setVehModal(null); }}
+        />
+      )}
     </div>
   );
 }

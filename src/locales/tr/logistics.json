@@ -809,5 +809,18 @@
     "sun": "Paz",
     "today": "Bugün",
     "clear": "Temizle"
+  },
+  "vehicleCreate": {
+    "addNew": "Yeni araç ekle",
+    "title": "Araç ekle",
+    "hint": "Yalnızca plaka zorunludur. Geri kalanını daha sonra Araç filosundan doldurabilirsiniz.",
+    "registration": "Plaka",
+    "trailer": "Dorse",
+    "carrier": "Taşıyıcı",
+    "driver": "Şoför",
+    "ownership": "Mülkiyet",
+    "add": "Aracı ekle",
+    "err": "Araç eklenemedi.",
+    "required": "Bir plaka girin."
   }
 }

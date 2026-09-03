@@ -809,5 +809,18 @@
     "sun": "Sun",
     "today": "Today",
     "clear": "Clear"
+  },
+  "vehicleCreate": {
+    "addNew": "Add new vehicle",
+    "title": "Add vehicle",
+    "hint": "Only the registration number is required. You can fill in the rest later from the Fleet.",
+    "registration": "Registration number",
+    "trailer": "Trailer",
+    "carrier": "Carrier",
+    "driver": "Driver",
+    "ownership": "Ownership",
+    "add": "Add vehicle",
+    "err": "Failed to add the vehicle.",
+    "required": "Enter a registration number."
   }
 }
