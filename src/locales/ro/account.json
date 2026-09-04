@@ -76,6 +76,8 @@
     "autoExempt": "Întrucât firma nu este înregistrată în scop de TVA, facturile noi vor fi automat fără TVA, în temeiul art. 113 alin. 9 din Legea TVA.",
     "noVatDefault": "Nu aplica TVA în mod implicit",
     "reasonLabel": "Temei implicit",
+    "defaultRateLabel": "Cotă TVA implicită",
+    "defaultRateHint": "Se aplică liniilor noi ale fiecărei facturi noi. Poate fi modificată pentru un document.",
     "select": "— Selectați —"
   },
   "email": {

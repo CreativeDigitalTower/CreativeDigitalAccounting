@@ -5,7 +5,7 @@ import { z } from "zod";
 
 export async function GET() {
   const { companyId } = await requireCompany();
-  const c = await prisma.company.findUnique({ where: { id: companyId }, select: { vatRegistered: true, vatNumber: true, defaultVatExempt: true, defaultVatExemptReason: true } });
+  const c = await prisma.company.findUnique({ where: { id: companyId }, select: { vatRegistered: true, vatNumber: true, defaultVatExempt: true, defaultVatExemptReason: true, defaultVatRate: true } });
   return NextResponse.json(c ?? {});
 }
 
@@ -16,6 +16,7 @@ export async function POST(req: Request) {
       vatRegistered: z.boolean().optional(),
       defaultVatExempt: z.boolean().optional(),
       defaultVatExemptReason: z.string().nullable().optional(),
+      defaultVatRate: z.number().min(0).max(100).nullable().optional(),
     }).parse(await req.json());
 
     const current = await prisma.company.findUnique({ where: { id: companyId }, select: { vatNumber: true } });

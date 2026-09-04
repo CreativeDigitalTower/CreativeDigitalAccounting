@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   formatCurrency,
-  CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, PAYMENT_METHODS, allowedTemplateCount, VAT_EXEMPT_REASONS, type PlanId,
+  CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, PAYMENT_METHODS, allowedTemplateCount, VAT_EXEMPT_REASONS, VAT_RATES, type PlanId,
 } from "@/lib/constants";
 import { TemplateGallery } from "@/components/app/TemplateGallery";
 import { useI18n } from "@/components/i18n/I18nProvider";
@@ -46,6 +46,9 @@ function NewDocumentForm() {
   const [template, setTemplate] = useState("classic");
   const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
   const [lines, setLines] = useState<Line[]>([{ description: "", quantity: 1, unitPrice: 0, vatRate: 20 }]);
+  // Фирмена ставка ДДС по подразбиране за нови редове (напр. SEM → 18%), §3/§4.
+  // Пази се отделно, за да се възстанови при повторно включване на ДДС (§5).
+  const [defaultVatRate, setDefaultVatRate] = useState(20);
   const [issueDate, setIssueDate] = useState(new Date().toISOString().slice(0, 10));
   const [taxEventDate, setTaxEventDate] = useState(new Date().toISOString().slice(0, 10));
   const [dueDate, setDueDate] = useState(() => {
@@ -151,6 +154,7 @@ function NewDocumentForm() {
       } else if (typeof c?.defaultVatRate === "number") {
         // Фирмена ставка на ДДС по подразбиране за нови фактури (напр. SEM → 18%), §3.
         // Остава editable — само default за новите редове.
+        setDefaultVatRate(c.defaultVatRate);
         setLines((p) => p.map((l) => ({ ...l, vatRate: c.defaultVatRate })));
       }
       // Изисква попълнени фирмени данни преди фактуриране
@@ -245,7 +249,7 @@ function NewDocumentForm() {
       return next;
     });
   }
-  const addLine = () => setLines((p) => [...p, { description: "", quantity: 1, unitPrice: 0, vatRate: vatExempt ? 0 : 20 }]);
+  const addLine = () => setLines((p) => [...p, { description: "", quantity: 1, unitPrice: 0, vatRate: vatExempt ? 0 : defaultVatRate }]);
   const removeLine = (idx: number) => setLines((p) => p.filter((_, i) => i !== idx));
 
   const subtotal = lines.reduce((s, l) => s + l.quantity * l.unitPrice, 0);
@@ -538,9 +542,9 @@ function NewDocumentForm() {
                 <td><NumberField value={line.unitPrice} onValueChange={(n) => updateLine(idx, "unitPrice", n ?? 0)} style={{ padding: "7px 8px", fontSize: 13, textAlign: "right" }} /></td>
                 <td>
                   <select value={line.vatRate} onChange={(e) => updateLine(idx, "vatRate", e.target.value)} style={{ padding: "7px 8px", fontSize: 13 }}>
-                    <option value={20}>20%</option>
-                    <option value={9}>9%</option>
-                    <option value={0}>0%</option>
+                    {(VAT_RATES.includes(line.vatRate as typeof VAT_RATES[number]) ? VAT_RATES : [line.vatRate, ...VAT_RATES]).map((r) => (
+                      <option key={r} value={r}>{r}%</option>
+                    ))}
                   </select>
                 </td>
                 <td style={{ textAlign: "right", fontFamily: "'IBM Plex Mono', monospace", fontWeight: 600, fontSize: 13 }}>
@@ -573,7 +577,7 @@ function NewDocumentForm() {
         {type !== "quote" && (
           <div style={{ borderTop: "1px solid var(--border)", paddingTop: 16, marginTop: 20 }}>
             <label style={{ display: "flex", gap: 8, alignItems: "center", fontWeight: 600, cursor: "pointer" }}>
-              <input type="checkbox" checked={vatExempt} onChange={(e) => { setVatExempt(e.target.checked); if (e.target.checked) setLines((p) => p.map((l) => ({ ...l, vatRate: 0 }))); }} style={{ width: "auto" }} />
+              <input type="checkbox" checked={vatExempt} onChange={(e) => { setVatExempt(e.target.checked); setLines((p) => p.map((l) => ({ ...l, vatRate: e.target.checked ? 0 : defaultVatRate }))); }} style={{ width: "auto" }} />
               {t("documents.form.vatExemptToggle")}
             </label>
             {vatExempt && (

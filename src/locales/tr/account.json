@@ -76,6 +76,8 @@
     "autoExempt": "Firma KDV kayıtlı olmadığından, yeni faturalar otomatik olarak KDV'siz olacaktır (KDV Kanunu md. 113/9 gereğince).",
     "noVatDefault": "Varsayılan olarak KDV uygulama",
     "reasonLabel": "Varsayılan gerekçe",
+    "defaultRateLabel": "Varsayılan KDV oranı",
+    "defaultRateHint": "Her yeni faturanın yeni satırlarına uygulanır. Belge bazında değiştirilebilir.",
     "select": "— Seçin —"
   },
   "email": {

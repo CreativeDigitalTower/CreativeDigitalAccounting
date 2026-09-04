@@ -4,7 +4,7 @@ import { NumberField } from "@/components/i18n/NumberField";
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, PAYMENT_METHODS, formatCurrency, VAT_EXEMPT_REASONS } from "@/lib/constants";
+import { CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, PAYMENT_METHODS, formatCurrency, VAT_EXEMPT_REASONS, VAT_RATES } from "@/lib/constants";
 import { useT } from "@/components/i18n/I18nProvider";
 import { InvoiceAttachments } from "@/components/app/InvoiceAttachments";
 
@@ -152,7 +152,7 @@ export default function EditDocumentPage({ params }: { params: Promise<{ id: str
                 <td><input value={line.description} onChange={(e) => updateLine(i, "description", e.target.value)} style={{ padding: "7px 8px", fontSize: 13 }} /></td>
                 <td><NumberField value={line.quantity} decimals={3} onValueChange={(n) => updateLine(i, "quantity", n ?? 0)} style={{ padding: "7px 8px", fontSize: 13, textAlign: "right" }} /></td>
                 <td><NumberField value={line.unitPrice} onValueChange={(n) => updateLine(i, "unitPrice", n ?? 0)} style={{ padding: "7px 8px", fontSize: 13, textAlign: "right" }} /></td>
-                <td><select value={line.vatRate} onChange={(e) => updateLine(i, "vatRate", e.target.value)} style={{ padding: "7px 8px", fontSize: 13 }}><option value={20}>20%</option><option value={9}>9%</option><option value={0}>0%</option></select></td>
+                <td><select value={line.vatRate} onChange={(e) => updateLine(i, "vatRate", e.target.value)} style={{ padding: "7px 8px", fontSize: 13 }}>{(VAT_RATES.includes(line.vatRate as typeof VAT_RATES[number]) ? VAT_RATES : [line.vatRate, ...VAT_RATES]).map((r) => <option key={r} value={r}>{r}%</option>)}</select></td>
                 <td>{lines.length > 1 && <button onClick={() => removeLine(i)} style={{ background: "none", border: "none", color: "var(--brick)", cursor: "pointer", fontSize: 16 }}>×</button>}</td>
               </tr>
             ))}
