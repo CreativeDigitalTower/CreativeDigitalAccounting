@@ -35,6 +35,7 @@ const schema = z.object({
   invoiceNumberStart: z.number().int().min(1).optional(),
   defaultVatExempt: z.boolean().optional(),
   defaultVatExemptReason: z.string().optional().nullable(),
+  defaultVatRate: z.number().min(0).max(100).nullable().optional(),
 });
 
 export async function GET() {

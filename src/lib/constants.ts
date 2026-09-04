@@ -66,6 +66,7 @@ export const DOC_PREFIXES: Record<string, string> = {
 // Поддържани валути за фактуриране
 export const CURRENCIES = [
   { code: "EUR", label: "Евро (€)", symbol: "€" },
+  { code: "MKD", label: "Македонски денар (MKD)", symbol: "ден" },
   { code: "USD", label: "Щатски долар ($)", symbol: "$" },
   { code: "GBP", label: "Британска лира (£)", symbol: "£" },
   { code: "CHF", label: "Швейцарски франк", symbol: "CHF" },

@@ -6,6 +6,7 @@
  * enabled запис. Всички проверки са server-side и permission-scoped.
  */
 import { prisma } from "@/lib/prisma";
+import { isExportCreateAllowed } from "@/lib/logistics/exportPermissions";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
 import { requireCompany, getMyRole, isSuperAdmin } from "@/lib/session";
@@ -34,6 +35,16 @@ export async function groupCounterparties(companyId: string): Promise<{ id: stri
     select: { id: true, name: true }, orderBy: { name: "asc" },
   });
   return others;
+}
+
+/**
+ * Може ли активната фирма да СЪЗДАВА експортни доставки (§1). BG продавачът (Metal Trade)
+ * → true; MK получателят (SEM) → false (конфигурира се на Company.logisticsExportCreate).
+ * Централизирано, company-scoped — ползва се и в API guard-а, и в page/UI проверките.
+ */
+export async function companyCanCreateExports(companyId: string): Promise<boolean> {
+  const c = await prisma.company.findUnique({ where: { id: companyId }, select: { logisticsExportCreate: true } });
+  return isExportCreateAllowed(c?.logisticsExportCreate);
 }
 
 /** Дали двете фирми са в една и съща бизнес група (за достъп до споделени документи). */

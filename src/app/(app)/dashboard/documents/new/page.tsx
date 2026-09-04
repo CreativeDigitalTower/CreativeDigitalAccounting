@@ -148,6 +148,10 @@ function NewDocumentForm() {
         setVatExempt(true);
         setVatReasonCode(c.defaultVatExemptReason || "");
         setLines((p) => p.map((l) => ({ ...l, vatRate: 0 })));
+      } else if (typeof c?.defaultVatRate === "number") {
+        // Фирмена ставка на ДДС по подразбиране за нови фактури (напр. SEM → 18%), §3.
+        // Остава editable — само default за новите редове.
+        setLines((p) => p.map((l) => ({ ...l, vatRate: c.defaultVatRate })));
       }
       // Изисква попълнени фирмени данни преди фактуриране
       setCompanyReady(!!(c?.name && c?.eik && c?.address));
