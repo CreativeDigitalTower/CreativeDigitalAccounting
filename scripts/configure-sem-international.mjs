@@ -2,6 +2,9 @@
 //   - defaultCurrency = MKD (§5)
 //   - defaultVatRate  = 18 (§3)
 //   - logisticsExportCreate = false (§1 — не може да създава BG експортни доставки)
+//   - vatRegistered = true, defaultVatExempt = false (§4/§15 — за да важи 18% ставка
+//     по подразбиране при НОВА фактура; иначе нерегистрирана фирма → авто-освобождаване 0%).
+//     „Не начислявай ДДС" остава ръчна опция за конкретна фактура (§5).
 //
 // БЕЗОПАСНО + idempotent:
 //   - dry-run по подразбиране (показва текущи → целеви стойности); --apply записва.
@@ -26,17 +29,17 @@ const prisma = new PrismaClient({ adapter });
 const APPLY = process.argv.includes("--apply");
 const idArg = (() => { const i = process.argv.indexOf("--id"); return i >= 0 ? process.argv[i + 1] : null; })();
 
-const TARGET = { defaultCurrency: "MKD", defaultVatRate: 18, logisticsExportCreate: false };
+const TARGET = { defaultCurrency: "MKD", defaultVatRate: 18, logisticsExportCreate: false, vatRegistered: true, defaultVatExempt: false };
 
 async function main() {
   let company;
   if (idArg) {
-    company = await prisma.company.findUnique({ where: { id: idArg }, select: { id: true, name: true, defaultCurrency: true, defaultVatRate: true, logisticsExportCreate: true } });
+    company = await prisma.company.findUnique({ where: { id: idArg }, select: { id: true, name: true, defaultCurrency: true, defaultVatRate: true, logisticsExportCreate: true, vatRegistered: true, defaultVatExempt: true } });
     if (!company) { console.error(`Няма фирма с id=${idArg}.`); process.exit(1); }
   } else {
     const matches = await prisma.company.findMany({
       where: { name: { contains: "SEM INTERNATIONAL", mode: "insensitive" }, archivedAt: null },
-      select: { id: true, name: true, defaultCurrency: true, defaultVatRate: true, logisticsExportCreate: true },
+      select: { id: true, name: true, defaultCurrency: true, defaultVatRate: true, logisticsExportCreate: true, vatRegistered: true, defaultVatExempt: true },
     });
     if (matches.length === 0) { console.error("Не е намерена фирма SEM INTERNATIONAL. Подайте --id <companyId>."); process.exit(1); }
     if (matches.length > 1) { console.error("Намерени са няколко фирми — подайте изрично --id:", matches.map((m) => `${m.id} (${m.name})`).join(", ")); process.exit(1); }
@@ -48,6 +51,8 @@ async function main() {
   console.log(`  defaultCurrency:       ${company.defaultCurrency}  →  ${TARGET.defaultCurrency}`);
   console.log(`  defaultVatRate:        ${company.defaultVatRate ?? "—"}  →  ${TARGET.defaultVatRate}`);
   console.log(`  logisticsExportCreate: ${company.logisticsExportCreate}  →  ${TARGET.logisticsExportCreate}`);
+  console.log(`  vatRegistered:         ${company.vatRegistered}  →  ${TARGET.vatRegistered}`);
+  console.log(`  defaultVatExempt:      ${company.defaultVatExempt}  →  ${TARGET.defaultVatExempt}`);
 
   if (!APPLY) { console.log("\nНищо не е променяно. Пуснете с --apply за реално прилагане."); return; }
   await prisma.company.update({ where: { id: company.id }, data: TARGET });

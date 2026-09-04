@@ -76,6 +76,8 @@
     "autoExempt": "Since the company is not VAT registered, new invoices will automatically be without VAT, on grounds of art. 113(9) of the VAT Act.",
     "noVatDefault": "Do not charge VAT by default",
     "reasonLabel": "Default ground",
+    "defaultRateLabel": "Default VAT rate",
+    "defaultRateHint": "Applied to new lines on every new invoice. Still editable per document.",
     "select": "— Select —"
   },
   "email": {

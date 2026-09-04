@@ -18,6 +18,7 @@
   },
   "currency": {
     "EUR": "Euro (€)",
+    "MKD": "Macedonian denar (MKD)",
     "USD": "US dollar ($)",
     "GBP": "British pound (£)",
     "CHF": "Swiss franc",

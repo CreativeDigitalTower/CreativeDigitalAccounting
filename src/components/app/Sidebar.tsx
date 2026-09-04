@@ -9,7 +9,9 @@ import { CompanySwitcher, type SwitcherCompany } from "@/components/app/CompanyS
 import { useT } from "@/components/i18n/I18nProvider";
 
 // Навигацията е групирана в логични сектори за по-ясен и структуриран изглед.
-const navGroups: { title: string; titleKey: string; items: { href: string; label: string; icon: string; feature: string; tKey: string; accent?: boolean }[] }[] = [
+type NavGroup = { title: string; titleKey: string; accent?: boolean; items: { href: string; label: string; icon: string; feature: string; tKey: string }[] };
+
+const navGroups: NavGroup[] = [
   {
     title: "Общ преглед", titleKey: "navigation.groups.overview",
     items: [
@@ -25,14 +27,13 @@ const navGroups: { title: string; titleKey: string; items: { href: string; label
       { href: "/dashboard/invoices", label: "Фактури", icon: "invoice", feature: "documents", tKey: "navigation.invoices" },
       { href: "/dashboard/documents", label: "Документи", icon: "document", feature: "documents", tKey: "navigation.documents" },
       { href: "/dashboard/business-docs", label: "Бизнес документи", icon: "businessDocs", feature: "dashboard", tKey: "navigation.businessDocs" },
+      { href: "/dashboard/clients", label: "Клиенти (CRM)", icon: "clients", feature: "clients", tKey: "navigation.clients" },
       { href: "/dashboard/inbox", label: "Входящи документи", icon: "inbox", feature: "dashboard", tKey: "navigation.inbox" },
     ],
   },
   {
     title: "Финанси", titleKey: "navigation.groups.finance",
     items: [
-      // Основен CRM „Клиенти" — веднага под Финанси, с дискретен accent (§2).
-      { href: "/dashboard/clients", label: "Клиенти (CRM)", icon: "clients", feature: "clients", tKey: "navigation.clients", accent: true },
       { href: "/dashboard/cash", label: "Каса", icon: "cash", feature: "cash", tKey: "navigation.cash" },
       { href: "/dashboard/payments", label: "Плащания", icon: "cash", feature: "cash", tKey: "navigation.payments" },
       { href: "/dashboard/expenses", label: "Разходи", icon: "expenses", feature: "expenses", tKey: "navigation.expenses" },
@@ -100,8 +101,8 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
 
   // Индивидуален модул — показва се само при database-driven достъп (не по план).
   // Само входна точка (Phase 1); подстраниците идват в следващите фази.
-  const logisticsGroup = logisticsEnabled ? {
-    title: "Търговия и логистика", titleKey: "navigation.groups.logistics",
+  const logisticsGroup: NavGroup | null = logisticsEnabled ? {
+    title: "Търговия и логистика", titleKey: "navigation.groups.logistics", accent: true,
     items: [
       { href: "/dashboard/logistics", label: "Табло (логистика)", icon: "suppliers", feature: "dashboard", tKey: "navigation.logisticsDashboard" },
       { href: "/dashboard/logistics/shipments", label: "Курсове / Доставки", icon: "invoice", feature: "dashboard", tKey: "navigation.logisticsShipments" },
@@ -123,7 +124,7 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
   } : null;
   // Модул „Модно производство" — database-driven достъп (не по план). Само входните
   // точки; подстраниците се разгръщат в следващите фази.
-  const fashionGroup = fashionEnabled ? {
+  const fashionGroup: NavGroup | null = fashionEnabled ? {
     title: "Модно производство", titleKey: "fashion.nav.group",
     items: [
       { href: "/dashboard/fashion", label: "Табло", icon: "production", feature: "dashboard", tKey: "fashion.nav.dashboard" },
@@ -143,7 +144,14 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
       { href: "/dashboard/fashion/settings", label: "Настройки", icon: "settings", feature: "dashboard", tKey: "fashion.nav.settings" },
     ],
   } : null;
-  const groups = [...navGroups, ...(logisticsGroup ? [logisticsGroup] : []), ...(fashionGroup ? [fashionGroup] : [])];
+  // Специализираните модули са позиционирани непосредствено след „Финанси" и преди
+  // „Операции" (§9). Видимостта им остава database-driven (logisticsEnabled/fashionEnabled),
+  // т.е. позицията се променя само за фирмите, които вече имат достъп (§10).
+  const groups: NavGroup[] = [...navGroups];
+  const financeIdx = groups.findIndex((g) => g.titleKey === "navigation.groups.finance");
+  const insertAt = financeIdx >= 0 ? financeIdx + 1 : groups.length;
+  const specialModules = [...(logisticsGroup ? [logisticsGroup] : []), ...(fashionGroup ? [fashionGroup] : [])];
+  groups.splice(insertAt, 0, ...specialModules);
 
   return (
     <aside
@@ -203,7 +211,7 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
       {/* Navigation — групирана по сектори */}
       <nav style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1 }}>
         {groups.map((group) => (
-          <div key={group.title} className="sb-group">
+          <div key={group.title} className={`sb-group${group.accent ? " sb-group-accent" : ""}`}>
             <div className="sb-group-title">{t(group.titleKey)}</div>
             {group.items.map((item) => {
               const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
@@ -214,7 +222,7 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
                   key={item.href}
                   href={href}
                   title={locked ? "Достъпно в по-висок план" : undefined}
-                  className={`sb-link${isActive ? " sb-active" : ""}${locked ? " sb-locked" : ""}${("accent" in item && item.accent) ? " sb-accent" : ""}`}
+                  className={`sb-link${isActive ? " sb-active" : ""}${locked ? " sb-locked" : ""}`}
                 >
                   <span className="sb-icon">{NavIcon[item.icon]?.({ width: 17, height: 17 })}</span>
                   <span className="sb-label">{t(item.tKey)}</span>

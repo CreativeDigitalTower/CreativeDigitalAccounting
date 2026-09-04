@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { VAT_EXEMPT_REASONS } from "@/lib/constants";
+import { VAT_EXEMPT_REASONS, VAT_RATES } from "@/lib/constants";
 import { useT } from "@/components/i18n/I18nProvider";
 
 export function VatSettings() {
@@ -9,6 +9,8 @@ export function VatSettings() {
   const [vatNumber, setVatNumber] = useState<string>("");
   const [defaultVatExempt, setDefaultVatExempt] = useState(false);
   const [reason, setReason] = useState("");
+  // Фирмена ставка ДДС по подразбиране за нови фактури (§6). null = стандартните 20% (BG).
+  const [defaultVatRate, setDefaultVatRate] = useState<number | null>(null);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
 
@@ -18,12 +20,13 @@ export function VatSettings() {
       setVatNumber(d.vatNumber ?? "");
       setDefaultVatExempt(!!d.defaultVatExempt);
       setReason(d.defaultVatExemptReason ?? "");
+      setDefaultVatRate(typeof d.defaultVatRate === "number" ? d.defaultVatRate : null);
     });
   }, []);
 
   async function save(patch: Record<string, unknown>) {
     setError("");
-    const body = { vatRegistered: vatRegistered ?? false, defaultVatExempt, defaultVatExemptReason: reason || null, ...patch };
+    const body = { vatRegistered: vatRegistered ?? false, defaultVatExempt, defaultVatExemptReason: reason || null, defaultVatRate, ...patch };
     const res = await fetch("/api/company/vat-settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     if (res.ok) { setSaved(true); setTimeout(() => setSaved(false), 1500); }
     else setError((await res.json().catch(() => ({}))).error ?? t("account.vat.errSave"));
@@ -67,6 +70,16 @@ export function VatSettings() {
         <input type="checkbox" checked={defaultVatExempt} onChange={(e) => { setDefaultVatExempt(e.target.checked); save({ defaultVatExempt: e.target.checked }); }} style={{ width: "auto" }} />
         {t("account.vat.noVatDefault")}
       </label>
+
+      {!defaultVatExempt && vatRegistered !== false && (
+        <div style={{ maxWidth: 260, marginBottom: 12 }}>
+          <label style={{ fontSize: 12, display: "block", marginBottom: 4 }}>{t("account.vat.defaultRateLabel")}</label>
+          <select value={defaultVatRate ?? 20} onChange={(e) => { const v = Number(e.target.value); setDefaultVatRate(v); save({ defaultVatRate: v }); }}>
+            {VAT_RATES.map((r) => <option key={r} value={r}>{r}%</option>)}
+          </select>
+          <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 5 }}>{t("account.vat.defaultRateHint")}</div>
+        </div>
+      )}
 
       {(defaultVatExempt || vatRegistered === false) && (
         <div style={{ maxWidth: 560 }}>
