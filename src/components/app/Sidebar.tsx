@@ -9,7 +9,7 @@ import { CompanySwitcher, type SwitcherCompany } from "@/components/app/CompanyS
 import { useT } from "@/components/i18n/I18nProvider";
 
 // Навигацията е групирана в логични сектори за по-ясен и структуриран изглед.
-const navGroups: { title: string; titleKey: string; items: { href: string; label: string; icon: string; feature: string; tKey: string }[] }[] = [
+const navGroups: { title: string; titleKey: string; items: { href: string; label: string; icon: string; feature: string; tKey: string; accent?: boolean }[] }[] = [
   {
     title: "Общ преглед", titleKey: "navigation.groups.overview",
     items: [
@@ -25,13 +25,14 @@ const navGroups: { title: string; titleKey: string; items: { href: string; label
       { href: "/dashboard/invoices", label: "Фактури", icon: "invoice", feature: "documents", tKey: "navigation.invoices" },
       { href: "/dashboard/documents", label: "Документи", icon: "document", feature: "documents", tKey: "navigation.documents" },
       { href: "/dashboard/business-docs", label: "Бизнес документи", icon: "businessDocs", feature: "dashboard", tKey: "navigation.businessDocs" },
-      { href: "/dashboard/clients", label: "Клиенти (CRM)", icon: "clients", feature: "clients", tKey: "navigation.clients" },
       { href: "/dashboard/inbox", label: "Входящи документи", icon: "inbox", feature: "dashboard", tKey: "navigation.inbox" },
     ],
   },
   {
     title: "Финанси", titleKey: "navigation.groups.finance",
     items: [
+      // Основен CRM „Клиенти" — веднага под Финанси, с дискретен accent (§2).
+      { href: "/dashboard/clients", label: "Клиенти (CRM)", icon: "clients", feature: "clients", tKey: "navigation.clients", accent: true },
       { href: "/dashboard/cash", label: "Каса", icon: "cash", feature: "cash", tKey: "navigation.cash" },
       { href: "/dashboard/payments", label: "Плащания", icon: "cash", feature: "cash", tKey: "navigation.payments" },
       { href: "/dashboard/expenses", label: "Разходи", icon: "expenses", feature: "expenses", tKey: "navigation.expenses" },
@@ -213,7 +214,7 @@ export function Sidebar({ companyName, plan, isSuperAdmin, logoUrl, inboxUnread 
                   key={item.href}
                   href={href}
                   title={locked ? "Достъпно в по-висок план" : undefined}
-                  className={`sb-link${isActive ? " sb-active" : ""}${locked ? " sb-locked" : ""}`}
+                  className={`sb-link${isActive ? " sb-active" : ""}${locked ? " sb-locked" : ""}${("accent" in item && item.accent) ? " sb-accent" : ""}`}
                 >
                   <span className="sb-icon">{NavIcon[item.icon]?.({ width: 17, height: 17 })}</span>
                   <span className="sb-label">{t(item.tKey)}</span>

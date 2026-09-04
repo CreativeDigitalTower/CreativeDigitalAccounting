@@ -1,4 +1,4 @@
-import { requireLogistics, groupCounterparties } from "@/lib/logistics/access";
+import { requireLogistics, groupCounterparties, companyCanCreateExports } from "@/lib/logistics/access";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { ExportSetForm } from "@/components/app/logistics/ExportSetForm";
@@ -6,7 +6,8 @@ import { MK_DESTINATIONS, mergeDestinations } from "@/lib/logistics/deliveryTerm
 
 export default async function Page() {
   const { companyId, caps } = await requireLogistics();
-  if (!caps.manage_documents) redirect("/dashboard/logistics/export");
+  // §1: без право за управление ИЛИ фирма без export-create (SEM) → обратно към списъка.
+  if (!caps.manage_documents || !(await companyCanCreateExports(companyId))) redirect("/dashboard/logistics/export");
 
   const [vehicles, products, routes, buyers] = await Promise.all([
     prisma.vehicle.findMany({ where: { companyId, active: true, normalizedRegistration: { not: null } }, select: { id: true, registration: true, logisticsProfile: { select: { trailerReg: true } } }, orderBy: { registration: "asc" } }),

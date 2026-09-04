@@ -128,6 +128,12 @@ model Company {
   // ДДС настройки по подразбиране
   defaultVatExempt       Boolean @default(false) // по подразбиране не начислявай ДДС
   defaultVatExemptReason String?                 // основание по подразбиране (код)
+  // Ставка на ДДС по подразбиране за НОВИ фактури (напр. 18 за MK фирми). Nullable/additive —
+  // при null се ползва глобалният default (20). Editable във всяка фактура (не заключва).
+  defaultVatRate         Float?
+  // Логистика: може ли фирмата да СЪЗДАВА експортни доставки (BG продавач). За MK фирми
+  // (получатели) → false. Additive, default true — не чупи съществуващите фирми.
+  logisticsExportCreate  Boolean @default(true)
   // JSON map of email-automation preferences (which automated emails the company receives)
   emailPrefs      String?  @db.Text
   // JSON конфиг какви модули виждат служителите (роля employee): { projects, clients, suppliers, warehouse }

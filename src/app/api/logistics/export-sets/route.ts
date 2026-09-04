@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { logisticsApiGuard, groupCounterparties } from "@/lib/logistics/access";
+import { logisticsApiGuard, groupCounterparties, companyCanCreateExports } from "@/lib/logistics/access";
 import { audit } from "@/lib/documents";
 import { nextSequenceValue } from "@/lib/logistics/sequence";
 import { SEQ_SCOPE, formatSequenceNumber, EXPORT_INVOICE_FORMAT, suggestDispatchFromInvoice } from "@/lib/logistics/config";
@@ -124,6 +124,11 @@ const schema = z.object({
 export async function POST(req: Request) {
   const g = await logisticsApiGuard("manage_documents");
   if (!g.ok) return g.res;
+  // §1/§11: MK получателят (SEM) НЕ може да създава BG експортни доставки — server-side,
+  // независимо от body/URL. Company-scoped флаг, не hardcode.
+  if (!(await companyCanCreateExports(g.companyId))) {
+    return NextResponse.json({ error: "Тази фирма не може да създава експортни доставки." }, { status: 403 });
+  }
   try {
     const d = schema.parse(await req.json());
 

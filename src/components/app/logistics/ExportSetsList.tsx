@@ -17,7 +17,7 @@ const ACTIVE_TOTAL = ACTIVE_EXPORT_DOC_TYPES.length;
 const YEARS = (() => { const y = new Date().getFullYear(); return [y, y - 1, y - 2, y - 3]; })();
 const MONTHS = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
 
-export function ExportSetsList({ canManage }: { canManage: boolean }) {
+export function ExportSetsList({ canManage, canCreate = canManage }: { canManage: boolean; canCreate?: boolean }) {
   const t = useT();
   const { qtyUnit } = useI18n();
   const [rows, setRows] = useState<Row[]>([]);
@@ -84,7 +84,7 @@ export function ExportSetsList({ canManage }: { canManage: boolean }) {
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{t("logistics.export.title")}</h1>
         <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
           <button className="btn btn-ghost btn-sm" onClick={() => setTrash((v) => !v)} style={trash ? { background: "var(--brick)", color: "#fff" } : undefined}>{t("logistics.export.trash")}</button>
-          {canManage && !trash && <Link href="/dashboard/logistics/export/new" className="btn btn-primary btn-sm">{t("logistics.export.add")}</Link>}
+          {canCreate && !trash && <Link href="/dashboard/logistics/export/new" className="btn btn-primary btn-sm">{t("logistics.export.add")}</Link>}
         </div>
       </div>
 
