@@ -36,7 +36,17 @@
     "showArchived": "Показать архивные",
     "deleteTitle": "Удаление продукта",
     "deleteConfirm": "Удалить этот продукт? Исторические поставки сохранят своё название.",
-    "deleteConfirmBtn": "Удалить продукт"
+    "deleteConfirmBtn": "Удалить продукт",
+    "certificate": "Сертификат",
+    "purchasePrice": "Закупочная цена",
+    "currency": "Валюта",
+    "editTitle": "Редактировать продукт",
+    "certPdf": "PDF сертификат",
+    "uploadCert": "Загрузить сертификат",
+    "viewCert": "Просмотр/Скачать",
+    "replaceCert": "Заменить",
+    "deleteCert": "Удалить",
+    "pdfOnly": "Разрешены только PDF-файлы."
   },
   "vehicles": {
     "title": "Автомобили",

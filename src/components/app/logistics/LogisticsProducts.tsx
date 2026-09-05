@@ -1,11 +1,14 @@
 "use client";
 import { Fragment, useEffect, useState } from "react";
 import { useT } from "@/components/i18n/I18nProvider";
+import { CURRENCIES } from "@/lib/constants";
+import { ProductEditModal, type ProductForm } from "@/components/app/logistics/ProductEditModal";
 
 type Alias = { id: string; alias: string };
 type Product = {
   id: string; canonicalName: string; materialCode: string | null; unit: string;
   packaging: string | null; category: string | null; isSystemDefault: boolean; active: boolean; notes: string | null; aliases: Alias[];
+  certificateNumber: string | null; purchasePrice: number | null; purchaseCurrency: string | null; hasCertificatePdf: boolean; certificateFileName: string | null;
 };
 
 export function LogisticsProducts({ canManage }: { canManage: boolean }) {
@@ -13,9 +16,10 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
   const [items, setItems] = useState<Product[]>([]);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState({ canonicalName: "", materialCode: "", unit: "t", packaging: "", category: "bulk" });
+  const [form, setForm] = useState({ canonicalName: "", materialCode: "", unit: "t", packaging: "", category: "bulk", certificateNumber: "", purchasePrice: "", purchaseCurrency: "EUR" });
   const [aliasDraft, setAliasDraft] = useState<Record<string, string>>({});
   const [showArchived, setShowArchived] = useState(false);
+  const [editTarget, setEditTarget] = useState<Product | null>(null);
   const [delTarget, setDelTarget] = useState<Product | null>(null);
   const [delBusy, setDelBusy] = useState(false);
 
@@ -37,12 +41,12 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
     setErr(""); setBusy(true);
     const r = await fetch("/api/logistics/products", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ canonicalName: form.canonicalName, materialCode: form.materialCode || null, unit: form.unit, packaging: form.packaging || null, category: form.category || null }),
+      body: JSON.stringify({ canonicalName: form.canonicalName, materialCode: form.materialCode || null, unit: form.unit, packaging: form.packaging || null, category: form.category || null, certificateNumber: form.certificateNumber || null, purchasePrice: form.purchasePrice === "" ? null : Number(form.purchasePrice), purchaseCurrency: form.purchaseCurrency || "EUR" }),
     });
     const j = await r.json().catch(() => ({}));
     setBusy(false);
     if (!r.ok) { setErr(j.error ?? t("logistics.common.err")); return; }
-    setForm({ canonicalName: "", materialCode: "", unit: "t", packaging: "", category: "bulk" });
+    setForm({ canonicalName: "", materialCode: "", unit: "t", packaging: "", category: "bulk", certificateNumber: "", purchasePrice: "", purchaseCurrency: "EUR" });
     load();
   }
 
@@ -62,7 +66,8 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
   const order = (c: string | null) => (c === "bulk" ? 0 : c === "packaged" ? 1 : 2);
   const grouped = [...items].filter((p) => showArchived || p.active).sort((a, b) => order(a.category) - order(b.category) || a.canonicalName.localeCompare(b.canonicalName));
   const catLabel = (c: string | null) => c === "bulk" ? t("logistics.products.categoryBulk") : c === "packaged" ? t("logistics.products.categoryPackaged") : t("logistics.products.categoryNone");
-  const catCols = canManage ? 8 : 7;
+  const priceLabel = (p: Product) => p.purchasePrice != null ? `${p.purchasePrice.toFixed(2)} ${p.purchaseCurrency ?? "EUR"}/${p.unit}` : "—";
+  const catCols = canManage ? 10 : 9;
 
   return (
     <div>
@@ -89,6 +94,12 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
             </select></div>
           <div><label style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.products.packaging")}</label><br />
             <input style={{ ...inp, width: 120 }} value={form.packaging} onChange={(e) => setForm({ ...form, packaging: e.target.value })} /></div>
+          <div><label style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.products.certificate")}</label><br />
+            <input style={{ ...inp, width: 150 }} value={form.certificateNumber} onChange={(e) => setForm({ ...form, certificateNumber: e.target.value })} placeholder="2032-CPR-…" /></div>
+          <div><label style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.products.purchasePrice")}</label><br />
+            <input style={{ ...inp, width: 90 }} type="number" min={0} step="0.01" value={form.purchasePrice} onChange={(e) => setForm({ ...form, purchasePrice: e.target.value })} /></div>
+          <div><label style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.products.currency")}</label><br />
+            <select style={{ ...inp, width: 80 }} value={form.purchaseCurrency} onChange={(e) => setForm({ ...form, purchaseCurrency: e.target.value })}>{CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.code}</option>)}</select></div>
           <button className="btn btn-primary btn-sm" disabled={busy || !form.canonicalName} onClick={add}>{t("logistics.products.add")}</button>
         </div>
       )}
@@ -99,6 +110,7 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
             <thead><tr>
               <th style={th}>{t("logistics.products.name")}</th><th style={th}>{t("logistics.products.category")}</th><th style={th}>{t("logistics.products.materialCode")}</th>
               <th style={th}>{t("logistics.products.unit")}</th><th style={th}>{t("logistics.products.packaging")}</th>
+              <th style={th}>{t("logistics.products.certificate")}</th><th style={{ ...th, textAlign: "right" }}>{t("logistics.products.purchasePrice")}</th>
               <th style={th}>{t("logistics.products.aliases")}</th><th style={th}>{t("logistics.common.status")}</th>
               {canManage && <th style={th}>{t("logistics.common.actions")}</th>}
             </tr></thead>
@@ -118,6 +130,11 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
                   <td style={td}>{p.unit}</td>
                   <td style={td}>{p.packaging ?? "—"}</td>
                   <td style={td}>
+                    {p.certificateNumber ?? "—"}
+                    {p.hasCertificatePdf && <a href={`/api/logistics/products/${p.id}/certificate/file?inline=1`} target="_blank" rel="noreferrer" title={p.certificateFileName ?? "PDF"} style={{ marginLeft: 5, textDecoration: "none" }}>📄</a>}
+                  </td>
+                  <td style={{ ...td, textAlign: "right", whiteSpace: "nowrap" }} className="num">{priceLabel(p)}</td>
+                  <td style={td}>
                     {p.aliases.map((a) => (
                       <span key={a.id} style={{ display: "inline-block", fontSize: 11, background: "rgba(0,0,0,.05)", borderRadius: 8, padding: "1px 6px", margin: "1px 3px 1px 0" }}>
                         {a.alias}{canManage && <button onClick={() => patch(p.id, { removeAliasId: a.id })} style={{ marginLeft: 4, border: "none", background: "none", cursor: "pointer", color: "var(--brick)" }}>×</button>}
@@ -134,7 +151,7 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
                   <td style={td}>{p.active ? t("logistics.common.active") : t("logistics.common.inactive")}</td>
                   {canManage && (
                     <td style={td}>
-                      <button className="btn btn-ghost btn-sm" onClick={() => { const mc = prompt(t("logistics.products.materialCode"), p.materialCode ?? ""); if (mc !== null) patch(p.id, { materialCode: mc || null }); }}>{t("logistics.common.edit")}</button>{" "}
+                      <button className="btn btn-ghost btn-sm" onClick={() => setEditTarget(p)}>{t("logistics.common.edit")}</button>{" "}
                       <button className="btn btn-ghost btn-sm" onClick={() => patch(p.id, { active: !p.active })}>{p.active ? t("logistics.common.archive") : t("logistics.common.activate")}</button>{" "}
                       <button className="btn btn-ghost btn-sm" style={{ color: "var(--brick)" }} onClick={() => setDelTarget(p)}>{t("logistics.common.delete")}</button>
                     </td>
@@ -147,6 +164,14 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
           </table>
         )}
       </div>
+
+      {editTarget && (
+        <ProductEditModal
+          initial={{ id: editTarget.id, canonicalName: editTarget.canonicalName, category: editTarget.category, materialCode: editTarget.materialCode, unit: editTarget.unit, packaging: editTarget.packaging, certificateNumber: editTarget.certificateNumber, purchasePrice: editTarget.purchasePrice, purchaseCurrency: editTarget.purchaseCurrency, active: editTarget.active, hasCertificatePdf: editTarget.hasCertificatePdf, certificateFileName: editTarget.certificateFileName } satisfies ProductForm}
+          onClose={() => setEditTarget(null)}
+          onSaved={() => { setEditTarget(null); void load(); }}
+        />
+      )}
 
       {delTarget && (
         <div onClick={() => setDelTarget(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.4)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>

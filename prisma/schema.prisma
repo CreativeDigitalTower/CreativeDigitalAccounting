@@ -850,6 +850,17 @@ model LogisticsProduct {
   isSystemDefault Boolean @default(false)
   active         Boolean  @default(true)
   notes          String?  @db.Text
+  // Сертификат + покупна цена (master product data). Additive/nullable. purchasePrice
+  // е ВЪТРЕШНА информация — не влиза в клиентски документи (§18). Decimal за пари (§7).
+  certificateNumber String?
+  purchasePrice     Decimal? @db.Decimal(12, 4)
+  purchaseCurrency  String?
+  // PDF сертификат — inline (същия pattern като документните прикачени файлове, §10/§11).
+  certificateFileData     String?   @db.Text
+  certificateFileName     String?
+  certificateFileMime     String?
+  certificateUploadedAt   DateTime?
+  certificateUploadedById String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -1369,6 +1380,9 @@ model ExportDocumentSet {
   trailerReg         String?
   logisticsProductId String?
   productSnapshot    String?
+  // Snapshot на сертификатния номер към момента на създаване (§17) — историческият
+  // документ пази своя сертификат, дори ако master продуктът смени сертификата по-късно.
+  certificateNumberSnapshot String?
   quantity           Float?
   unit               String    @default("t")
   declarationCmrDate DateTime?

@@ -36,7 +36,17 @@
     "showArchived": "Покажи архивираните",
     "deleteTitle": "Изтриване на продукт",
     "deleteConfirm": "Сигурни ли сте, че искате да изтриете този продукт? Историческите доставки запазват името си.",
-    "deleteConfirmBtn": "Изтрий продукта"
+    "deleteConfirmBtn": "Изтрий продукта",
+    "certificate": "Сертификат",
+    "purchasePrice": "Покупна цена",
+    "currency": "Валута",
+    "editTitle": "Редакция на продукт",
+    "certPdf": "PDF сертификат",
+    "uploadCert": "Качи сертификат",
+    "viewCert": "Преглед/Изтегли",
+    "replaceCert": "Замени",
+    "deleteCert": "Изтрий",
+    "pdfOnly": "Разрешен е само PDF файл."
   },
   "vehicles": {
     "title": "Автомобили",

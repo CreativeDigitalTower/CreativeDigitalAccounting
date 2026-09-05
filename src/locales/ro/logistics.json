@@ -36,7 +36,17 @@
     "showArchived": "Arată arhivate",
     "deleteTitle": "Ștergere produs",
     "deleteConfirm": "Sigur doriți să ștergeți acest produs? Livrările istorice își păstrează denumirea.",
-    "deleteConfirmBtn": "Șterge produsul"
+    "deleteConfirmBtn": "Șterge produsul",
+    "certificate": "Certificat",
+    "purchasePrice": "Preț de achiziție",
+    "currency": "Monedă",
+    "editTitle": "Editează produsul",
+    "certPdf": "Certificat PDF",
+    "uploadCert": "Încarcă certificat",
+    "viewCert": "Vizualizează/Descarcă",
+    "replaceCert": "Înlocuiește",
+    "deleteCert": "Șterge",
+    "pdfOnly": "Sunt permise doar fișiere PDF."
   },
   "vehicles": {
     "title": "Vehicule",

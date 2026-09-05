@@ -3,7 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { logisticsApiGuard } from "@/lib/logistics/access";
 import { audit } from "@/lib/documents";
 import { normalizeProductKey, normalizeMaterialCode } from "@/lib/logistics/normalize";
+import { CURRENCIES } from "@/lib/constants";
 import { z } from "zod";
+
+const CURRENCY_CODES: string[] = CURRENCIES.map((c) => c.code);
 
 async function owned(companyId: string, id: string) {
   return prisma.logisticsProduct.findFirst({ where: { id, companyId }, select: { id: true } });
@@ -17,6 +20,10 @@ const patchSchema = z.object({
   category: z.enum(["bulk", "packaged"]).nullable().optional(),
   notes: z.string().max(2000).nullable().optional(),
   active: z.boolean().optional(),
+  // Сертификат + покупна цена (§9/§20).
+  certificateNumber: z.string().trim().max(120).nullable().optional(),
+  purchasePrice: z.number().min(0).nullable().optional(),
+  purchaseCurrency: z.string().refine((c) => CURRENCY_CODES.includes(c), "Невалидна валута.").nullable().optional(),
   // добавяне/премахване на alias
   addAlias: z.string().min(1).max(200).optional(),
   removeAliasId: z.string().optional(),
@@ -56,6 +63,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (d.category !== undefined) data.category = d.category;
     if (d.notes !== undefined) data.notes = d.notes;
     if (d.active !== undefined) data.active = d.active;
+    if (d.certificateNumber !== undefined) data.certificateNumber = d.certificateNumber?.trim() || null;
+    if (d.purchasePrice !== undefined) data.purchasePrice = d.purchasePrice;
+    if (d.purchaseCurrency !== undefined) data.purchaseCurrency = d.purchaseCurrency;
 
     if (Object.keys(data).length) await prisma.logisticsProduct.update({ where: { id }, data });
 
@@ -71,9 +81,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     await audit(g.companyId, g.userId, "update", "LogisticsProduct", id, "Редакция на продукт");
     const fresh = await prisma.logisticsProduct.findUnique({
       where: { id },
-      select: { id: true, canonicalName: true, materialCode: true, unit: true, packaging: true, category: true, isSystemDefault: true, active: true, notes: true, aliases: { select: { id: true, alias: true } } },
+      select: { id: true, canonicalName: true, materialCode: true, unit: true, packaging: true, category: true, isSystemDefault: true, active: true, notes: true, certificateNumber: true, purchasePrice: true, purchaseCurrency: true, certificateFileName: true, certificateFileMime: true, certificateUploadedAt: true, aliases: { select: { id: true, alias: true } } },
     });
-    return NextResponse.json(fresh);
+    return NextResponse.json(fresh ? { ...fresh, purchasePrice: fresh.purchasePrice == null ? null : Number(fresh.purchasePrice), hasCertificatePdf: !!fresh.certificateFileName } : null);
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: "Невалидни данни." }, { status: 400 });
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });

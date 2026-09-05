@@ -22,7 +22,7 @@ export async function regenerateSetDocuments(
     where: { id: setId, companyId },
     select: {
       invoiceNumber: true, invoiceDate: true, shipmentDate: true, deliveryTerm: true, placeOfShipment: true, destination: true, truckRegSnapshot: true, trailerReg: true,
-      productSnapshot: true, quantity: true, unit: true, declarationCmrDate: true, dispatchNumber: true,
+      productSnapshot: true, certificateNumberSnapshot: true, quantity: true, unit: true, declarationCmrDate: true, dispatchNumber: true,
       logisticsProductId: true, buyerCompanyId: true, clientId: true,
       documents: { select: { docType: true, overridden: true, status: true } },
     },
@@ -33,7 +33,7 @@ export async function regenerateSetDocuments(
     prisma.company.findUnique({ where: { id: companyId }, select: COMPANY_EXPORT_SELECT }),
     set.buyerCompanyId ? prisma.company.findUnique({ where: { id: set.buyerCompanyId }, select: COMPANY_EXPORT_SELECT }) : Promise.resolve(null),
     set.clientId ? prisma.client.findUnique({ where: { id: set.clientId }, select: { name: true, address: true, city: true, vatNumber: true, eik: true } }) : Promise.resolve(null),
-    set.logisticsProductId ? prisma.logisticsProduct.findUnique({ where: { id: set.logisticsProductId }, select: { customsCode: true } }) : Promise.resolve(null),
+    set.logisticsProductId ? prisma.logisticsProduct.findUnique({ where: { id: set.logisticsProductId }, select: { customsCode: true, certificateNumber: true } }) : Promise.resolve(null),
   ]);
 
   const parties = {
@@ -48,6 +48,9 @@ export async function regenerateSetDocuments(
     placeOfShipment: set.placeOfShipment ?? null,
     destination: set.destination, truckRegSnapshot: set.truckRegSnapshot, trailerReg: set.trailerReg,
     productSnapshot: set.productSnapshot, customsCode: product?.customsCode ?? null,
+    // Сертификат: snapshot-ът е source of truth за историческа коректност (§17); при legacy
+    // записи без snapshot → fallback към текущия сертификат на продукта (best effort).
+    certificateNumberSnapshot: set.certificateNumberSnapshot ?? product?.certificateNumber ?? null,
     quantity: set.quantity, unit: set.unit, declarationCmrDate: set.declarationCmrDate?.toISOString() ?? null,
     dispatchNumber: set.dispatchNumber, holcimProforma: null as { number: string | null; date: string | null } | null,
   };
