@@ -69,7 +69,7 @@ export type ExportSetSource = {
   invoiceNumber: string | null; invoiceDate: string | null; shipmentDate?: string | null;
   deliveryTerm?: string | null; placeOfShipment?: string | null;
   destination: string | null; truckRegSnapshot: string | null; trailerReg: string | null;
-  productSnapshot: string | null; customsCode?: string | null;
+  productSnapshot: string | null; customsCode?: string | null; certificateNumberSnapshot?: string | null;
   quantity: number | null; unit: string; declarationCmrDate: string | null; dispatchNumber: string | null;
   holcimProforma?: { number: string | null; date: string | null } | null;
 };
@@ -213,7 +213,7 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
         destination: destinationEn(src.destination) || src.destination, destinationCountry: buyerEn.country ?? null,
         // Date/City/Manager блок (auto-fill, editable snapshot).
         date: src.invoiceDate, city: sellerCityEn || null, manager: parties.seller.manager ?? null,
-        goods: [{ description: src.productSnapshot ? `CEMENT ${src.productSnapshot} - IN BULK` : null, quantity: src.quantity, unit: displayUnitTNE(src.unit), unitPrice: null, value: null, currency: "EUR", certificate: null }],
+        goods: [{ description: src.productSnapshot ? `CEMENT ${src.productSnapshot} - IN BULK` : null, quantity: src.quantity, unit: displayUnitTNE(src.unit), unitPrice: null, value: null, currency: "EUR", certificate: src.certificateNumberSnapshot ?? null }],
         vatText: "Export, Art.28 Bulgarian VAT Legislation", vatRate: 0, vatAmount: 0,
         originText: "ИЗНОСИТЕЛЯТ НА ПРОДУКТИТЕ, ОБХВАНАТИ ОТ ТОЗИ ДОКУМЕНТ, ДЕКЛАРИРА, ЧЕ ОСВЕН КЪДЕТО ЯСНО Е ОТБЕЛЯЗАНО ДРУГО, ТЕЗИ ПРОДУКТИ СА С EU ПРЕФЕРЕНЦИАЛЕН ПРОИЗХОД",
         // Declaration place = СЪЩИЯТ source като „Place of shipment" (§11/§12) → BELI IZVOR.

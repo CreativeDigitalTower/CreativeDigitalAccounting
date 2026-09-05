@@ -36,7 +36,17 @@
     "showArchived": "Arşivlenenleri göster",
     "deleteTitle": "Ürünü sil",
     "deleteConfirm": "Bu ürünü silmek istediğinize emin misiniz? Geçmiş sevkiyatlar adını korur.",
-    "deleteConfirmBtn": "Ürünü sil"
+    "deleteConfirmBtn": "Ürünü sil",
+    "certificate": "Sertifika",
+    "purchasePrice": "Alış fiyatı",
+    "currency": "Para birimi",
+    "editTitle": "Ürünü düzenle",
+    "certPdf": "Sertifika PDF",
+    "uploadCert": "Sertifika yükle",
+    "viewCert": "Görüntüle/İndir",
+    "replaceCert": "Değiştir",
+    "deleteCert": "Sil",
+    "pdfOnly": "Yalnızca PDF dosyalarına izin verilir."
   },
   "vehicles": {
     "title": "Araçlar",

@@ -36,7 +36,17 @@
     "showArchived": "Show archived",
     "deleteTitle": "Delete product",
     "deleteConfirm": "Are you sure you want to delete this product? Historical deliveries keep their snapshot name.",
-    "deleteConfirmBtn": "Delete product"
+    "deleteConfirmBtn": "Delete product",
+    "certificate": "Certificate",
+    "purchasePrice": "Purchase price",
+    "currency": "Currency",
+    "editTitle": "Edit product",
+    "certPdf": "Certificate PDF",
+    "uploadCert": "Upload certificate",
+    "viewCert": "View/Download",
+    "replaceCert": "Replace",
+    "deleteCert": "Delete",
+    "pdfOnly": "Only PDF files are allowed."
   },
   "vehicles": {
     "title": "Vehicles",

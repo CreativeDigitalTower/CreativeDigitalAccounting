@@ -150,7 +150,7 @@ export async function POST(req: Request) {
     // Snapshots + валидиране на собственост.
     const [vehicle, product, shipment, buyer, client] = await Promise.all([
       d.truckVehicleId ? prisma.vehicle.findFirst({ where: { id: d.truckVehicleId, companyId: g.companyId }, select: { registration: true, logisticsProfile: { select: { trailerReg: true } } } }) : Promise.resolve(null),
-      d.logisticsProductId ? prisma.logisticsProduct.findFirst({ where: { id: d.logisticsProductId, companyId: g.companyId }, select: { canonicalName: true, unit: true } }) : Promise.resolve(null),
+      d.logisticsProductId ? prisma.logisticsProduct.findFirst({ where: { id: d.logisticsProductId, companyId: g.companyId }, select: { canonicalName: true, unit: true, certificateNumber: true } }) : Promise.resolve(null),
       d.shipmentId ? prisma.shipment.findFirst({ where: { id: d.shipmentId, companyId: g.companyId }, select: { id: true } }) : Promise.resolve(null),
       d.buyerCompanyId ? prisma.company.findUnique({ where: { id: d.buyerCompanyId }, select: { id: true } }) : Promise.resolve(null),
       // Краен клиент: зареждаме по id (+ companyId за валидация), защото може да е клиент
@@ -200,6 +200,7 @@ export async function POST(req: Request) {
           destination: (d.destination ?? "").trim() || null, routeId: d.routeId || null,
           truckVehicleId: d.truckVehicleId || null, truckRegSnapshot: vehicle?.registration ?? null, trailerReg: trailer,
           logisticsProductId: d.logisticsProductId || null, productSnapshot: product?.canonicalName ?? null,
+          certificateNumberSnapshot: product?.certificateNumber ?? null, // §17 — фиксира сертификата към момента
           quantity: d.quantity ?? null, unit, declarationCmrDate: d.declarationCmrDate ? new Date(d.declarationCmrDate) : null,
           dispatchNumber, note: d.note ?? null, createdById: g.userId,
         },
