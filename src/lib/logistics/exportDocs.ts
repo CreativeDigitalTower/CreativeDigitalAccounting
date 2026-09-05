@@ -75,6 +75,16 @@ export type ExportSetSource = {
 };
 export type Parties = { seller: Party; buyer: Party; client: Party | null };
 
+/**
+ * Единен canonical formatter за сертификатния ред (§1/§8). Ползва се от Invoice, CMR EPSON
+ * и CMR HP — един и същ текст „(Certificate No <номер>)". Липсва сертификат → null (§9):
+ * редът не се рендерира (без „(Certificate No )" / null / undefined).
+ */
+export function formatCertificateLine(value: string | null | undefined): string | null {
+  const v = (value ?? "").trim();
+  return v ? `(Certificate No ${v})` : null;
+}
+
 /** Комбиниран етикет „TRUCK / TRAILER" (визуализация; backend пази структурирано). */
 export function truckTrailerLabel(truck: string | null, trailer: string | null): string {
   return [truck, trailer].filter(Boolean).join(" / ");
@@ -272,7 +282,7 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
         destinationCountry: "NORTH MACEDONIA",
         placeBottom: cmrCity || null,
         truck, invoiceNumber: src.invoiceNumber,
-        goods: { description: src.productSnapshot ? `CEMENT Holcim ${src.productSnapshot} - IN BULK` : "CEMENT", customsCode: src.customsCode ?? null, certificate: null },
+        goods: { description: src.productSnapshot ? `CEMENT Holcim ${src.productSnapshot} - IN BULK` : "CEMENT", customsCode: src.customsCode ?? null, certificate: src.certificateNumberSnapshot ?? null },
         quantity: src.quantity, weightKg: kgFromTonnes(src.quantity), speditor: "ENIGMA",
       };
     }

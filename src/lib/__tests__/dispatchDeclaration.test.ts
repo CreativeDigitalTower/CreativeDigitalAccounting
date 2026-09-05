@@ -46,15 +46,15 @@ describe("Декларация mapping 1:1 (30/32/34/51)", () => {
   });
 });
 
-describe("CMR Epson removed from new generation (12/41/52)", () => {
-  it("cmr_epson not offered; cmr_hp kept", () => {
-    expect((ACTIVE_EXPORT_DOC_TYPES as readonly string[]).includes("cmr_epson")).toBe(false);
+describe("CMR Epson restored as active generation (§5/§11)", () => {
+  it("cmr_epson offered again; cmr_hp kept", () => {
+    expect((ACTIVE_EXPORT_DOC_TYPES as readonly string[]).includes("cmr_epson")).toBe(true);
     expect((ACTIVE_EXPORT_DOC_TYPES as readonly string[]).includes("cmr_hp")).toBe(true);
-    expect(ACTIVE_EXPORT_DOC_TYPES.length).toBe(4);
+    expect(ACTIVE_EXPORT_DOC_TYPES.length).toBe(5);
   });
-  it("historical cmr_epson still renderable (kept in EXPORT_DOC_TYPES)", () => {
+  it("cmr_epson е в EXPORT_DOC_TYPES и е активен", () => {
     expect((EXPORT_DOC_TYPES as readonly string[]).includes("cmr_epson")).toBe(true);
-    expect(isActiveExportDocType("cmr_epson")).toBe(false);
+    expect(isActiveExportDocType("cmr_epson")).toBe(true);
   });
 });
 

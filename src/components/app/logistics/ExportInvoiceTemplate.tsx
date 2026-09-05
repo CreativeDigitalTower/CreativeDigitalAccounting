@@ -1,5 +1,5 @@
 "use client";
-import { goodsRowValue, invoiceTotals } from "@/lib/logistics/exportDocs";
+import { goodsRowValue, invoiceTotals, formatCertificateLine } from "@/lib/logistics/exportDocs";
 import { resolveInvoiceParty } from "@/lib/logistics/invoiceParties";
 import { formatInvoiceDate, formatDeclarationDate } from "@/lib/logistics/exportDates";
 
@@ -125,7 +125,7 @@ export function ExportInvoiceTemplate({ data }: { data: InvoiceDocData }) {
           <tr style={{ height: "104mm" }}>
             <td style={cell}>
               <div style={{ fontWeight: 700 }}>{first.description ?? ""}</div>
-              {first.certificate ? <div style={{ textAlign: "center" }}>(Certificate No {first.certificate})</div> : null}
+              {formatCertificateLine(first.certificate) ? <div style={{ textAlign: "center" }}>{formatCertificateLine(first.certificate)}</div> : null}
               <div style={{ marginTop: "7mm", fontSize: 10.5, fontWeight: 700 }}>
                 {DECLARATION.map((ln, i) => <div key={i}>{ln}</div>)}
               </div>
