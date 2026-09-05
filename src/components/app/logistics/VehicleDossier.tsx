@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useT } from "@/components/i18n/I18nProvider";
+import { useT, useI18n } from "@/components/i18n/I18nProvider";
 import { SearchableSelect } from "@/components/app/logistics/SearchableSelect";
 import { confirmDelete } from "@/lib/confirmDelete";
 
@@ -16,8 +16,16 @@ const DOC_TYPES = ["registration", "insurance", "inspection", "license", "permit
 const OWNERSHIP = ["own", "carrier", "subcontractor", "unspecified"];
 const fileToDataUrl = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = rej; r.readAsDataURL(f); });
 
+type TripSum = { trips: number; quantity: number; firstTrip: string | null; lastTrip: string | null; thisMonthTrips: number; thisMonthQuantity: number };
+type Stats = { allTime: TripSum; period: TripSum & { key: string }; monthly: { month: string; trips: number; quantity: number }[]; yearly: { year: number; trips: number; quantity: number }[] };
+const V_PERIODS = ["this_month", "last_3_months", "last_6_months", "last_12_months", "all_time"] as const;
+const pKey = (p: string) => p === "this_month" ? "thisMonth" : p === "last_3_months" ? "last3" : p === "last_6_months" ? "last6" : p === "last_12_months" ? "last12" : "allTime";
+
 export function VehicleDossier({ vehicle, carriers, canManage, canDocs, history }: { vehicle: Vehicle; carriers: Carrier[]; canManage: boolean; canDocs: boolean; history?: History }) {
   const t = useT();
+  const { qtyUnit } = useI18n();
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [statPeriod, setStatPeriod] = useState<string>("all_time");
   const [v, setV] = useState(vehicle);
   const [docs, setDocs] = useState<Doc[]>([]);
   const [busy, setBusy] = useState(false);
@@ -37,6 +45,11 @@ export function VehicleDossier({ vehicle, carriers, canManage, canDocs, history 
       .then((j) => { if (j) { setDeliveries(j.rows ?? []); setDelTotal(j.total ?? 0); } });
   }, [v.id, delPage]);
   const delPages = Math.max(1, Math.ceil(delTotal / 20));
+
+  // Статистика от експортните доставки (§10-§14) — период влияе върху „period" секцията.
+  useEffect(() => {
+    fetch(`/api/logistics/vehicles/${v.id}/stats?period=${statPeriod}`).then((r) => r.ok ? r.json() : null).then((j) => j && setStats(j));
+  }, [v.id, statPeriod]);
 
   async function save(patch: Record<string, unknown>) {
     setBusy(true); setErr("");
@@ -142,6 +155,48 @@ export function VehicleDossier({ vehicle, carriers, canManage, canDocs, history 
               ))}
             </tbody>
           </table>
+        )}
+      </div>
+
+      {/* Статистика от експортните доставки (§10-§14) */}
+      <div className="glass panel" style={{ marginBottom: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, flexWrap: "wrap" }}>
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>{t("logistics.fleet.statsTitle")}</h3>
+          <select style={{ marginLeft: "auto", padding: "5px 8px", fontSize: 12.5 }} value={statPeriod} onChange={(e) => setStatPeriod(e.target.value)}>
+            {V_PERIODS.map((p) => <option key={p} value={p}>{t(`logistics.period.${pKey(p)}`)}</option>)}
+          </select>
+        </div>
+        {!stats || stats.allTime.trips === 0 ? (
+          <div style={{ fontSize: 13, color: "var(--muted)" }}>{t("logistics.dossier.historyPlaceholder")}</div>
+        ) : (
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 10, marginBottom: 12 }}>
+              <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.fleet.totalTrips")}</div><div className="num" style={{ fontSize: 18, fontWeight: 600 }}>{stats.allTime.trips}</div></div>
+              <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.fleet.totalQty")}</div><div className="num" style={{ fontSize: 18, fontWeight: 600 }}>{qtyUnit(stats.allTime.quantity, "t")}</div></div>
+              <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)" }}>{t(`logistics.period.${pKey(statPeriod)}`)}</div><div className="num" style={{ fontSize: 18, fontWeight: 600 }}>{stats.period.trips} · {qtyUnit(stats.period.quantity, "t")}</div></div>
+              <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.fleet.tripsThisMonth")}</div><div className="num" style={{ fontSize: 18, fontWeight: 600 }}>{stats.allTime.thisMonthTrips} · {qtyUnit(stats.allTime.thisMonthQuantity, "t")}</div></div>
+              <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.fleet.firstTrip")}</div><div className="num" style={{ fontSize: 14, fontWeight: 600 }}>{dt(stats.allTime.firstTrip)}</div></div>
+              <div className="glass kpi-card"><div style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.fleet.lastTrip")}</div><div className="num" style={{ fontSize: 14, fontWeight: 600 }}>{dt(stats.allTime.lastTrip)}</div></div>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+              <div>
+                <div style={{ fontSize: 12.5, fontWeight: 600, marginBottom: 4 }}>{t("logistics.fleet.monthlyTitle")}</div>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+                  <thead><tr><th style={{ textAlign: "left", padding: "3px 6px", color: "var(--muted)" }}>{t("logistics.fleet.month")}</th><th style={{ textAlign: "right", padding: "3px 6px", color: "var(--muted)" }}>{t("logistics.fleet.trips")}</th><th style={{ textAlign: "right", padding: "3px 6px", color: "var(--muted)" }}>{t("logistics.fleet.tripQuantity")}</th></tr></thead>
+                  <tbody>{stats.monthly.map((m) => <tr key={m.month}><td style={{ padding: "3px 6px" }} className="num">{m.month}</td><td style={{ padding: "3px 6px", textAlign: "right" }} className="num">{m.trips || "—"}</td><td style={{ padding: "3px 6px", textAlign: "right" }} className="num">{m.trips ? qtyUnit(m.quantity, "t") : "—"}</td></tr>)}</tbody>
+                </table>
+              </div>
+              {stats.yearly.length > 0 && (
+                <div>
+                  <div style={{ fontSize: 12.5, fontWeight: 600, marginBottom: 4 }}>{t("logistics.fleet.yearlyTitle")}</div>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+                    <thead><tr><th style={{ textAlign: "left", padding: "3px 6px", color: "var(--muted)" }}>{t("logistics.fleet.year")}</th><th style={{ textAlign: "right", padding: "3px 6px", color: "var(--muted)" }}>{t("logistics.fleet.trips")}</th><th style={{ textAlign: "right", padding: "3px 6px", color: "var(--muted)" }}>{t("logistics.fleet.tripQuantity")}</th></tr></thead>
+                    <tbody>{stats.yearly.map((y) => <tr key={y.year}><td style={{ padding: "3px 6px" }} className="num">{y.year}</td><td style={{ padding: "3px 6px", textAlign: "right" }} className="num">{y.trips}</td><td style={{ padding: "3px 6px", textAlign: "right" }} className="num">{qtyUnit(y.quantity, "t")}</td></tr>)}</tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
 

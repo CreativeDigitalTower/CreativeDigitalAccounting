@@ -1391,6 +1391,10 @@ model ExportDocumentSet {
   @@unique([companyId, invoiceNumber])
   @@index([companyId, status])
   @@index([companyId, deletedAt])
+  // Аналитика на автопарка/клиентите (§38): агрегиране по автомобил/клиент за период.
+  @@index([companyId, truckVehicleId, shipmentDate])
+  @@index([companyId, clientId, shipmentDate])
+  @@index([buyerCompanyId, clientId, shipmentDate])
 }
 
 // Допълнителен (качен) документ в досието на експортна доставка (§7/§14). Съхранение по

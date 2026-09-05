@@ -4,18 +4,22 @@ import Link from "next/link";
 import { useT, useI18n } from "@/components/i18n/I18nProvider";
 import { confirmDelete } from "@/lib/confirmDelete";
 import { parseQuantity } from "@/lib/i18n/format";
+import { ClientFormModal, type ClientForm } from "@/components/app/logistics/ClientFormModal";
 
 type ByProduct = { product: string; quantity: number; revenue: number };
 type Summary = { invoicesCount: number; revenue: number; quantity: number; lastPurchase: string | null; avgPricePerUnit: number | null; byProduct: ByProduct[] };
 type Invoice = { id: string; number: string; date: string | null; currency: string; gross: number };
 type Hist = { id: string; year: number; revenue: number | null; quantity: number | null; unit: string; note: string | null };
 type HistP = { id: string; year: number; product: string; quantity: number | null; revenue: number | null };
-type Data = { id: string; name: string; eik: string | null; summary: Summary; invoices: Invoice[]; historical: Hist[]; historicalProducts: HistP[] };
+type DeliveryStats = { trips: number; quantity: number; firstTrip: string | null; lastTrip: string | null; thisMonthTrips: number; thisMonthQuantity: number; distinctVehicles: number; distinctProducts: number; monthly: { month: string; trips: number; quantity: number }[] };
+type DeliveryRow = { id: string; invoiceNumber: string; date: string | null; truck: string | null; trailer: string | null; product: string | null; quantity: number | null; unit: string; destination: string | null; vehicleId: string | null; attachmentCount: number };
+type Data = { id: string; name: string; eik: string | null; vatNumber: string | null; city: string | null; address: string | null; country: string | null; phone: string | null; contactEmail: string | null; contactPerson: string | null; deliveryStats: DeliveryStats; deliveries: DeliveryRow[]; summary: Summary; invoices: Invoice[]; historical: Hist[]; historicalProducts: HistP[] };
 
-export function ClientDossier({ id, canManage }: { id: string; canManage: boolean }) {
+export function ClientDossier({ id, canManage, canEdit = false }: { id: string; canManage: boolean; canEdit?: boolean }) {
   const t = useT();
   const { qty, qtyUnit } = useI18n();
   const [d, setD] = useState<Data | null>(null);
+  const [editing, setEditing] = useState<ClientForm | null>(null);
   const [hy, setHy] = useState({ year: "", revenue: "", quantity: "", unit: "t", note: "" });
   const [hp, setHp] = useState({ year: "", product: "", quantity: "", revenue: "" });
   const [histErr, setHistErr] = useState("");
@@ -57,7 +61,55 @@ export function ClientDossier({ id, canManage }: { id: string; canManage: boolea
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
         <Link href="/dashboard/logistics/clients" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← {t("logistics.clients.title")}</Link>
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{d.name}</h1>
+        {canEdit && <button className="btn btn-ghost btn-sm" style={{ marginLeft: "auto" }} onClick={() => setEditing({ id: d.id, name: d.name, eik: d.eik ?? "", vatNumber: d.vatNumber ?? "", address: d.address ?? "", city: d.city ?? "", country: d.country ?? "", phone: d.phone ?? "", contactEmail: d.contactEmail ?? "", contactPerson: d.contactPerson ?? "" })}>{t("logistics.clients.editClient")}</button>}
       </div>
+
+      {/* Статистика по доставки (§23-§24) — derived от Export Deliveries */}
+      <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 8px" }}>{t("logistics.clients.statsTitle")}</h3>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(130px,1fr))", gap: 10, marginBottom: 10 }}>
+        {kpi(t("logistics.clients.totalDeliveries"), d.deliveryStats.trips)}
+        {kpi(t("logistics.clients.totalQuantity"), qtyUnit(d.deliveryStats.quantity, "t"))}
+        {kpi(t("logistics.clients.lastDelivery"), d.deliveryStats.lastTrip ? new Date(d.deliveryStats.lastTrip).toLocaleDateString() : "—")}
+        {kpi(t("logistics.clients.firstDelivery"), d.deliveryStats.firstTrip ? new Date(d.deliveryStats.firstTrip).toLocaleDateString() : "—")}
+        {kpi(t("logistics.clients.distinctVehicles"), d.deliveryStats.distinctVehicles)}
+        {kpi(t("logistics.clients.distinctProducts"), d.deliveryStats.distinctProducts)}
+      </div>
+      {d.deliveryStats.monthly.some((m) => m.trips > 0) && (
+        <div className="glass panel" style={{ marginBottom: 14, maxWidth: 420 }}>
+          <div style={{ fontSize: 12.5, fontWeight: 600, marginBottom: 4 }}>{t("logistics.clients.monthlyTitle")}</div>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+            <thead><tr><th style={th}>{t("logistics.clients.month")}</th><th style={{ ...th, textAlign: "right" }}>{t("logistics.clients.deliveries")}</th><th style={{ ...th, textAlign: "right" }}>{t("logistics.clients.quantity")}</th></tr></thead>
+            <tbody>{d.deliveryStats.monthly.filter((m) => m.trips > 0).map((m) => <tr key={m.month}><td style={td} className="num">{m.month}</td><td style={{ ...td, textAlign: "right" }} className="num">{m.trips}</td><td style={{ ...td, textAlign: "right" }} className="num">{qtyUnit(m.quantity, "t")}</td></tr>)}</tbody>
+          </table>
+        </div>
+      )}
+      {d.deliveries.length > 0 && (
+        <div className="glass panel" style={{ marginBottom: 14, overflowX: "auto" }}>
+          <div style={{ fontSize: 12.5, fontWeight: 600, marginBottom: 4 }}>{t("logistics.clients.historyTitle")}</div>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+            <thead><tr>
+              <th style={th}>{t("logistics.clients.date")}</th><th style={th}>{t("logistics.clients.number")}</th>
+              <th style={th}>{t("logistics.clients.truck")}</th><th style={th}>{t("logistics.clients.trailer")}</th>
+              <th style={th}>{t("logistics.clients.product")}</th><th style={{ ...th, textAlign: "right" }}>{t("logistics.clients.quantity")}</th>
+              <th style={th}>{t("logistics.clients.destination")}</th><th style={th} />
+            </tr></thead>
+            <tbody>
+              {d.deliveries.map((x) => (
+                <tr key={x.id}>
+                  <td style={td}>{dt(x.date)}</td><td style={td}>{x.invoiceNumber}</td>
+                  <td style={td} className="num">{x.vehicleId ? <Link href={`/dashboard/logistics/vehicles/${x.vehicleId}`}>{x.truck ?? "—"}</Link> : (x.truck ?? "—")}</td>
+                  <td style={td} className="num">{x.trailer ?? "—"}</td>
+                  <td style={td}>{x.product ?? "—"}</td>
+                  <td style={{ ...td, textAlign: "right" }} className="num">{x.quantity != null ? `${x.quantity} ${x.unit}` : "—"}</td>
+                  <td style={td}>{x.destination ?? "—"}</td>
+                  <td style={{ ...td, whiteSpace: "nowrap" }}><Link href={`/dashboard/logistics/export/${x.id}`} className="btn btn-ghost btn-sm" style={{ fontSize: 11, padding: "2px 8px" }}>{t("logistics.clients.dossier")}{x.attachmentCount > 0 ? ` · +${x.attachmentCount}` : ""}</Link></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      {editing && <ClientFormModal initial={editing} onClose={() => setEditing(null)} onSaved={() => { setEditing(null); void load(); }} />}
 
       <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 8px" }}>{t("logistics.clients.salesTitle")}</h3>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(130px,1fr))", gap: 10, marginBottom: 8 }}>
