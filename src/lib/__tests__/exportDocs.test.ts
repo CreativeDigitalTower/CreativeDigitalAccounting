@@ -127,12 +127,12 @@ describe("Декларация + CMR (PR3)", () => {
 });
 
 describe("BUGFIX/UX — активни документи, декларация, регенерация, persistence", () => {
-  it("активният workflow е точно 4 документа (Invoice/Испратница/Декларация/CMR HP), без blank и без CMR Epson", () => {
-    expect(ACTIVE_EXPORT_DOC_TYPES.length).toBe(4);
+  it("активният workflow е 5 документа (Invoice/Испратница/Декларация/CMR EPSON/CMR HP), без blank", () => {
+    expect(ACTIVE_EXPORT_DOC_TYPES.length).toBe(5);
     expect((ACTIVE_EXPORT_DOC_TYPES as readonly string[]).includes("blank")).toBe(false);
-    // CMR Epson е премахнат от НОВОТО генериране (§12), но остава в историческия набор (§13).
-    expect((ACTIVE_EXPORT_DOC_TYPES as readonly string[]).includes("cmr_epson")).toBe(false);
-    expect(isActiveExportDocType("cmr_epson")).toBe(false);
+    // CMR Epson е върнат като активен тип за генериране (§5/§11).
+    expect((ACTIVE_EXPORT_DOC_TYPES as readonly string[]).includes("cmr_epson")).toBe(true);
+    expect(isActiveExportDocType("cmr_epson")).toBe(true);
     expect(isActiveExportDocType("cmr_hp")).toBe(true);
     expect(isActiveExportDocType("blank")).toBe(false);
     expect(isActiveExportDocType("invoice")).toBe(true);

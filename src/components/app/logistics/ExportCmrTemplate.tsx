@@ -1,5 +1,6 @@
 "use client";
 import { resolveInvoiceParty } from "@/lib/logistics/invoiceParties";
+import { formatCertificateLine } from "@/lib/logistics/exportDocs";
 
 type Party = { name?: string | null; address?: string | null; city?: string | null; country?: string | null; eik?: string | null; registrationNumber?: string | null; vatNumber?: string | null };
 export type CmrDocData = {
@@ -49,7 +50,8 @@ function productDescription(desc?: string | null): string {
 }
 
 // CMR Epson presentation defaults (editable override на document ниво, §17). Company-scoped.
-const CMR_DEFAULTS = { speditor: "ENIGMA", destinationCountry: "NORTH MACEDONIA", customsCode: "25232900", certificate: "2032-CPR-19.135C" };
+// Сертификатът вече идва динамично от продукта/snapshot-а (§2/§8) — БЕЗ hardcoded default.
+const CMR_DEFAULTS = { speditor: "ENIGMA", destinationCountry: "NORTH MACEDONIA", customsCode: "25232900" };
 
 /**
  * Нормализира CMR Epson данните в canonical renderer-а (§14/§15/§16): прилага
@@ -70,7 +72,7 @@ function normalizeCmr(data: CmrDocData): CmrDocData {
     goods: {
       description: productDescription(g.description),
       customsCode: (g.customsCode ?? "").trim() || CMR_DEFAULTS.customsCode,
-      certificate: (g.certificate ?? "").trim() || CMR_DEFAULTS.certificate,
+      certificate: (g.certificate ?? "").trim() || null, // §9 — липсва → без ред
     },
   };
 }
@@ -124,7 +126,7 @@ function buildCmrFields(raw: CmrDocData, k: CmrCoords): Field[] {
     F(k.speditor, speditor), F(k.place, data.placeOfShipment ?? ""), F(k.loadDate, d(data.date)),
     F(k.invLabel, "INVOICE No"), F(k.invNo, data.invoiceNumber ?? "", true), F(k.invRef, dmy(data.invoiceDate) ? `/ ${dmy(data.invoiceDate)}` : "/"),
     F(k.product, data.goods?.description ?? "", true), F(k.customs, data.goods?.customsCode ?? ""), F(k.qty, qty),
-    F(k.cert, data.goods?.certificate ? `(Certificate No ${data.goods.certificate})` : ""),
+    F(k.cert, formatCertificateLine(data.goods?.certificate) ?? ""),
     F(k.netWeight, `NET  WEIGHT:  ${qty} kg.`, true), F(k.total, `TOTAL:  ${qty} kg.`, true),
     F(k.truckTop, truck, true), F(k.truckBottom, truck),
     F(k.placeBottom, data.placeBottom ?? ""), F(k.dateBottom, d(data.date)),

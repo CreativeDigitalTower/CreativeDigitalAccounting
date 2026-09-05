@@ -134,8 +134,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       } else { data.truckVehicleId = null; data.truckRegSnapshot = null; }
     }
     if (d.logisticsProductId !== undefined) {
-      if (d.logisticsProductId) { const p = await prisma.logisticsProduct.findFirst({ where: { id: d.logisticsProductId, companyId: g.companyId }, select: { canonicalName: true } }); if (!p) return NextResponse.json({ error: "Продуктът не е намерен." }, { status: 404 }); data.logisticsProductId = d.logisticsProductId; data.productSnapshot = p.canonicalName; }
-      else { data.logisticsProductId = null; data.productSnapshot = null; }
+      if (d.logisticsProductId) { const p = await prisma.logisticsProduct.findFirst({ where: { id: d.logisticsProductId, companyId: g.companyId }, select: { canonicalName: true, certificateNumber: true } }); if (!p) return NextResponse.json({ error: "Продуктът не е намерен." }, { status: 404 }); data.logisticsProductId = d.logisticsProductId; data.productSnapshot = p.canonicalName; data.certificateNumberSnapshot = p.certificateNumber ?? null; }
+      else { data.logisticsProductId = null; data.productSnapshot = null; data.certificateNumberSnapshot = null; }
     }
 
     await prisma.exportDocumentSet.update({ where: { id }, data });
