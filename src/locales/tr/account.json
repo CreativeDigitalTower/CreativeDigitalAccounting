@@ -174,5 +174,16 @@
     "cancel": "İptal",
     "adding": "Ekleniyor…",
     "add": "Ekle"
+  },
+  "numbering": {
+    "title": "Belge numaralandırma",
+    "lastUsed": "Son kullanılan normal numara",
+    "next": "Sonraki otomatik numara",
+    "change": "Sonraki numarayı değiştir",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "helper": "Numara, firmanın sırasına göre otomatik önerilir. Özel manuel numaralar (örn. -1) otomatik sırayı değiştirmez.",
+    "saved": "Kaydedildi ✓",
+    "err": "Kaydetme başarısız."
   }
 }

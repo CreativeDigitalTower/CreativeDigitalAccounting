@@ -1,6 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { DOC_PREFIXES, FREE_PLAN_LIMIT, SUBSCRIPTION_PLANS, getYearMonth } from "@/lib/constants";
-import { DocumentType } from "@prisma/client";
+import { DocumentType, Prisma } from "@prisma/client";
+import { computeNextValue, formatInvoiceNumber, maxRegularValue, coreValue, advancedOverride } from "@/lib/invoiceNumbering";
+
+// Клиент или транзакционен клиент — за да работят и вътре в $transaction (concurrency §18).
+type Db = typeof prisma | Prisma.TransactionClient;
 
 /**
  * Генерира пореден номер за документ по тип.
@@ -14,51 +18,77 @@ import { DocumentType } from "@prisma/client";
  */
 export async function generateDocumentNumber(
   companyId: string,
-  type: DocumentType
+  type: DocumentType,
+  db: Db = prisma,
 ): Promise<string> {
   const prefix = DOC_PREFIXES[type] ?? "";
-
-  // Продължаваме от най-големия използван номер за този тип (+1).
-  // Така при редакция на номер (напр. до 100) следващата фактура е 101 —
-  // номерацията продължава оттам, без грешки/дублиране.
-  const docs = await prisma.document.findMany({
-    where: { companyId, type },
-    select: { number: true },
-  });
-  let maxNum = 0;
-  for (const d of docs) {
-    const n = parseInt(d.number.replace(/\D/g, ""), 10);
-    if (!isNaN(n) && n > maxNum) maxNum = n;
-  }
+  const docs = await db.document.findMany({ where: { companyId, type }, select: { number: true } });
+  const numbers = docs.map((d) => d.number);
 
   let startBase = 1;
+  let override: number | null = null;
   if (type === "invoice") {
-    const company = await prisma.company.findUnique({
+    const company = await db.company.findUnique({
       where: { id: companyId },
-      select: { invoiceNumberStart: true },
+      select: { invoiceNumberStart: true, nextInvoiceNumber: true },
     });
     startBase = company?.invoiceNumberStart ?? 1;
+    override = company?.nextInvoiceNumber ?? null; // изрично управляван следващ номер (§11)
   }
-
-  const next = Math.max(startBase, maxNum + 1);
-
-  if (type === "invoice") {
-    return String(next).padStart(10, "0"); // 0000000001
-  }
-  return `${prefix}${String(next).padStart(9, "0")}`; // PF-000000001
+  // Централно изчисление: специалните номера със suffix се игнорират (§8), leading zeroes се пазят (§16).
+  const next = computeNextValue(numbers, { startBase, override, prefix });
+  return formatInvoiceNumber(next, type === "invoice" ? 10 : 9, prefix);
 }
 
-/** Проверява дали номерът вече се ползва от друг документ в същата фирма. */
+/** Проверява дали номерът вече се ползва от друг документ в същата фирма (§17). */
 export async function isNumberTaken(
   companyId: string,
   number: string,
-  excludeId?: string
+  excludeId?: string,
+  db: Db = prisma,
 ): Promise<boolean> {
-  const existing = await prisma.document.findFirst({
+  const existing = await db.document.findFirst({
     where: { companyId, number, ...(excludeId ? { id: { not: excludeId } } : {}) },
     select: { id: true },
   });
   return !!existing;
+}
+
+/**
+ * След издаване на РЕДОВНА фактура придвижва управлявания следващ номер (§14/§18).
+ * Работи само ако фирмата има активен override; при derived режим (NULL) не пазим нищо —
+ * следващият номер винаги се извежда наlive. Специален номер не мърда последователността (§8).
+ */
+export async function advanceInvoiceSequence(db: Db, companyId: string, usedNumber: string): Promise<void> {
+  const c = await db.company.findUnique({ where: { id: companyId }, select: { nextInvoiceNumber: true } });
+  if (c?.nextInvoiceNumber == null) return;
+  const next = advancedOverride(c.nextInvoiceNumber, usedNumber);
+  if (next !== c.nextInvoiceNumber) await db.company.update({ where: { id: companyId }, data: { nextInvoiceNumber: next } });
+}
+
+/** Състояние на номерацията за фактури на фирмата — за Настройки/Super Admin (§10/§12). */
+export async function getInvoiceSequenceInfo(companyId: string, db: Db = prisma) {
+  const [docs, company] = await Promise.all([
+    db.document.findMany({ where: { companyId, type: "invoice" }, select: { number: true } }),
+    db.company.findUnique({ where: { id: companyId }, select: { invoiceNumberStart: true, nextInvoiceNumber: true } }),
+  ]);
+  const numbers = docs.map((d) => d.number);
+  const maxV = maxRegularValue(numbers);
+  const startBase = company?.invoiceNumberStart ?? 1;
+  const override = company?.nextInvoiceNumber ?? null;
+  const next = computeNextValue(numbers, { startBase, override });
+  return {
+    lastRegularValue: maxV || null,
+    lastRegularNumber: maxV ? formatInvoiceNumber(maxV, 10) : null,
+    overrideSet: override != null,
+    nextValue: next,
+    nextNumber: formatInvoiceNumber(next, 10),
+  };
+}
+
+/** Числовата стойност на редовен номер (или null за специален) — за external validation. */
+export function invoiceNumberValue(number: string): number | null {
+  return coreValue(number);
 }
 
 export async function checkInvoiceLimit(companyId: string): Promise<boolean> {

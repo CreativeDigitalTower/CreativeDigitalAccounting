@@ -125,6 +125,10 @@ model Company {
   website         String?
   // Per-type number start values (next number = max(start, count)+1)
   invoiceNumberStart Int   @default(1)
+  // Изрично управляван „следващ номер на фактура" (per-company). NULL = автоматично
+  // извеждане от най-големия редовен номер (поведението по подразбиране за всички
+  // съществуващи фирми — БЕЗ backfill). Задава се само през „Промени следващия номер".
+  nextInvoiceNumber  Int?
   // ДДС настройки по подразбиране
   defaultVatExempt       Boolean @default(false) // по подразбиране не начислявай ДДС
   defaultVatExemptReason String?                 // основание по подразбиране (код)

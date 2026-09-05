@@ -174,5 +174,16 @@
     "cancel": "Cancel",
     "adding": "Adding…",
     "add": "Add"
+  },
+  "numbering": {
+    "title": "Document numbering",
+    "lastUsed": "Last used regular number",
+    "next": "Next automatic number",
+    "change": "Change next number",
+    "save": "Save",
+    "cancel": "Cancel",
+    "helper": "The number is suggested automatically from the company's sequence. Special manual numbers (e.g. -1) do not change the automatic sequence.",
+    "saved": "Saved ✓",
+    "err": "Save failed."
   }
 }

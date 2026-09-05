@@ -6,6 +6,7 @@ import { planLabel } from "@/lib/constants";
 import type { Prisma } from "@prisma/client";
 import { getT } from "@/lib/i18n/server";
 import { getMessages } from "@/lib/i18n/messages";
+import { AdminInvoiceSequence } from "@/components/app/admin/AdminInvoiceSequence";
 
 type SP = { sector?: string; category?: string; size?: string; country?: string; plan?: string; from?: string; to?: string };
 
@@ -73,7 +74,7 @@ export default async function BusinessesPage({ searchParams }: { searchParams: P
 
       <div className="glass panel" style={{ padding: "8px 0", overflowX: "auto" }}>
         <table>
-          <thead><tr><th>{t("admin.businesses.thCompany")}</th><th>{t("admin.businesses.thSector")}</th><th>{t("admin.businesses.thCategory")}</th><th>{t("admin.businesses.thSize")}</th><th>{t("admin.businesses.thCountry")}</th><th>{t("admin.businesses.thPlan")}</th><th>{t("admin.businesses.thRegistration")}</th></tr></thead>
+          <thead><tr><th>{t("admin.businesses.thCompany")}</th><th>{t("admin.businesses.thSector")}</th><th>{t("admin.businesses.thCategory")}</th><th>{t("admin.businesses.thSize")}</th><th>{t("admin.businesses.thCountry")}</th><th>{t("admin.businesses.thPlan")}</th><th>{t("admin.businesses.thRegistration")}</th><th>{t("account.numbering.title")}</th></tr></thead>
           <tbody>
             {companies.map((c) => (
               <tr key={c.id}>
@@ -84,6 +85,7 @@ export default async function BusinessesPage({ searchParams }: { searchParams: P
                 <td style={{ fontSize: 12.5 }}>{c.country ?? t("admin.businesses.dash")}</td>
                 <td><span style={{ fontSize: 11.5, fontWeight: 700, color: (c.subscription?.plan ?? "free") === "free" ? "var(--muted)" : "var(--emerald-dark)" }}>{planLabel(c.subscription?.plan ?? "free")}</span></td>
                 <td style={{ fontSize: 12.5, color: "var(--ink-soft)" }}>{new Date(c.createdAt).toLocaleDateString(locale)}</td>
+                <td><AdminInvoiceSequence companyId={c.id} /></td>
               </tr>
             ))}
           </tbody>
