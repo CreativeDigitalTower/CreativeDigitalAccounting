@@ -7,6 +7,7 @@ import { TemplatePreview } from "@/components/app/TemplatePreview";
 import { BusinessProfileSettings } from "@/components/app/BusinessProfileSettings";
 import { EmailPreferences } from "@/components/app/EmailPreferences";
 import { VatSettings } from "@/components/app/VatSettings";
+import { InvoiceNumberingSettings } from "@/components/app/InvoiceNumberingSettings";
 import { DocSharingSetting } from "@/components/app/DocSharingSetting";
 import { DangerZone } from "@/components/app/DangerZone";
 import { useT } from "@/components/i18n/I18nProvider";
@@ -264,6 +265,8 @@ export default function SettingsPage() {
       </div>
 
       <VatSettings />
+
+      <InvoiceNumberingSettings />
 
       <EmailPreferences />
 

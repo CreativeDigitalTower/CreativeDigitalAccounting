@@ -8,9 +8,13 @@ import {
   checkInvoiceLimit,
   incrementInvoiceCounter,
   isNumberTaken,
+  advanceInvoiceSequence,
   audit,
 } from "@/lib/documents";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
+
+type CreatedDoc = Prisma.DocumentGetPayload<{ include: { lines: true } }>;
 
 const lineSchema = z.object({
   description: z.string().min(1),
@@ -111,16 +115,6 @@ export async function POST(req: Request) {
       if (dup) return NextResponse.json({ error: "Вече е издадена фактура за тази доставка.", invoiceId: dup.id, invoiceNumber: dup.number }, { status: 409 });
     }
 
-    // Ръчно зададен номер или автоматичен; проверка за дублиране
-    let number = data.number?.trim();
-    if (number) {
-      if (await isNumberTaken(companyId, number)) {
-        return NextResponse.json({ error: "Този номер вече е използван." }, { status: 400 });
-      }
-    } else {
-      number = await generateDocumentNumber(companyId, data.type);
-    }
-
     // Шаблон по подразбиране от фирмения профил, ако не е зададен
     let template = data.template;
     if (!template) {
@@ -128,39 +122,70 @@ export async function POST(req: Request) {
       template = comp?.invoiceTemplate ?? "classic";
     }
 
-    const document = await prisma.document.create({
-      data: {
-        companyId,
-        type: data.type,
-        number,
-        clientId: data.clientId ?? null,
-        issueDate: new Date(data.issueDate),
-        taxEventDate: data.taxEventDate ? new Date(data.taxEventDate) : null,
-        dueDate: data.dueDate ? new Date(data.dueDate) : null,
-        currency: data.currency,
-        language: data.language,
-        template,
-        paymentMethod: data.paymentMethod,
-        notes: data.notes,
-        internalComment: data.internalComment,
-        status: data.status,
-        parentDocumentId: data.parentDocumentId ?? null,
-        sourceExportSetId: data.sourceExportSetId ?? null,
-        vatExempt: data.vatExempt ?? false,
-        vatExemptReason: data.vatExempt ? (data.vatExemptReason ?? null) : null,
-        clientIsIndividual: data.clientIsIndividual ?? false,
-        lines: {
-          create: data.lines.map((l) => ({
-            description: l.description,
-            quantity: l.quantity,
-            unitPrice: l.unitPrice,
-            vatRate: l.vatRate,
-            lineTotal: l.quantity * l.unitPrice * (1 + l.vatRate / 100),
-          })),
-        },
-      },
-      include: { lines: true },
-    });
+    // Присвояване на номер + създаване атомарно (§18): Serializable транзакция с повторение
+    // при конфликт → двама едновременни потребители никога не получават един и същ авто-номер.
+    // Ръчен номер → server-side проверка за дублиране (§17). Специалните номера не мърдат
+    // автоматичната последователност — advanceInvoiceSequence го гарантира (§8/§14).
+    const manualNumber = data.number?.trim() || null;
+    let document: CreatedDoc | null = null;
+    let number = "";
+    let numberTaken = false;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      try {
+        const result = await prisma.$transaction(async (tx) => {
+          let num = manualNumber;
+          if (num) {
+            if (await isNumberTaken(companyId, num, undefined, tx)) return { taken: true as const };
+          } else {
+            num = await generateDocumentNumber(companyId, data.type, tx);
+            if (await isNumberTaken(companyId, num, undefined, tx)) throw { __retry: true };
+          }
+          const doc = await tx.document.create({
+            data: {
+              companyId,
+              type: data.type,
+              number: num,
+              clientId: data.clientId ?? null,
+              issueDate: new Date(data.issueDate),
+              taxEventDate: data.taxEventDate ? new Date(data.taxEventDate) : null,
+              dueDate: data.dueDate ? new Date(data.dueDate) : null,
+              currency: data.currency,
+              language: data.language,
+              template,
+              paymentMethod: data.paymentMethod,
+              notes: data.notes,
+              internalComment: data.internalComment,
+              status: data.status,
+              parentDocumentId: data.parentDocumentId ?? null,
+              sourceExportSetId: data.sourceExportSetId ?? null,
+              vatExempt: data.vatExempt ?? false,
+              vatExemptReason: data.vatExempt ? (data.vatExemptReason ?? null) : null,
+              clientIsIndividual: data.clientIsIndividual ?? false,
+              lines: {
+                create: data.lines.map((l) => ({
+                  description: l.description,
+                  quantity: l.quantity,
+                  unitPrice: l.unitPrice,
+                  vatRate: l.vatRate,
+                  lineTotal: l.quantity * l.unitPrice * (1 + l.vatRate / 100),
+                })),
+              },
+            },
+            include: { lines: true },
+          });
+          if (data.type === "invoice") await advanceInvoiceSequence(tx, companyId, num!);
+          return { doc, num: num! };
+        }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+        if ("taken" in result) { numberTaken = true; break; }
+        document = result.doc; number = result.num; break;
+      } catch (e) {
+        const err = e as { __retry?: boolean; code?: string };
+        if ((err.__retry || err.code === "P2034" || err.code === "P2002") && attempt < 4) continue;
+        throw e;
+      }
+    }
+    if (numberTaken) return NextResponse.json({ error: "Този номер вече е използван." }, { status: 400 });
+    if (!document) return NextResponse.json({ error: "Неуспешно генериране на номер, опитайте отново." }, { status: 409 });
 
     if (issued) {
       await incrementInvoiceCounter(companyId);

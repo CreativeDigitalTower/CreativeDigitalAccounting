@@ -174,5 +174,16 @@
     "cancel": "Anulează",
     "adding": "Se adaugă…",
     "add": "Adaugă"
+  },
+  "numbering": {
+    "title": "Numerotarea documentelor",
+    "lastUsed": "Ultimul număr obișnuit folosit",
+    "next": "Următorul număr automat",
+    "change": "Schimbă următorul număr",
+    "save": "Salvează",
+    "cancel": "Anulează",
+    "helper": "Numărul este sugerat automat din secvența firmei. Numerele manuale speciale (ex. -1) nu modifică secvența automată.",
+    "saved": "Salvat ✓",
+    "err": "Salvare eșuată."
   }
 }
