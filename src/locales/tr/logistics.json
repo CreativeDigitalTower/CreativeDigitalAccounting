@@ -693,7 +693,9 @@
     "sortQty": "Sırala: miktar",
     "sortInvoice": "Sırala: fatura",
     "dossier": "Dosya",
-    "docsBreakdown": "{gen} oluşturuldu + {att} yüklendi"
+    "docsBreakdown": "{gen} oluşturuldu + {att} yüklendi",
+    "regAddress": "Kayıt adresi",
+    "baseAddress": "Üs adresi"
   },
   "fleet": {
     "title": "Fleet",

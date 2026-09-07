@@ -693,7 +693,9 @@
     "sortQty": "Sortare: cantitate",
     "sortInvoice": "Sortare: factură",
     "dossier": "Dosar",
-    "docsBreakdown": "{gen} generate + {att} încărcate"
+    "docsBreakdown": "{gen} generate + {att} încărcate",
+    "regAddress": "Adresă de înregistrare",
+    "baseAddress": "Adresă bază"
   },
   "fleet": {
     "title": "Fleet",

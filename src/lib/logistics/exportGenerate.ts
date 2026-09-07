@@ -32,14 +32,14 @@ export async function regenerateSetDocuments(
   const [seller, buyer, client, product] = await Promise.all([
     prisma.company.findUnique({ where: { id: companyId }, select: COMPANY_EXPORT_SELECT }),
     set.buyerCompanyId ? prisma.company.findUnique({ where: { id: set.buyerCompanyId }, select: COMPANY_EXPORT_SELECT }) : Promise.resolve(null),
-    set.clientId ? prisma.client.findUnique({ where: { id: set.clientId }, select: { name: true, address: true, city: true, vatNumber: true, eik: true } }) : Promise.resolve(null),
+    set.clientId ? prisma.client.findUnique({ where: { id: set.clientId }, select: { name: true, address: true, baseAddress: true, city: true, vatNumber: true, eik: true } }) : Promise.resolve(null),
     set.logisticsProductId ? prisma.logisticsProduct.findUnique({ where: { id: set.logisticsProductId }, select: { customsCode: true, certificateNumber: true } }) : Promise.resolve(null),
   ]);
 
   const parties = {
     seller: toExportParty(seller),
     buyer: toExportParty(buyer),
-    client: client ? { name: client.name, address: client.address, city: client.city, vatNumber: client.vatNumber, registrationNumber: client.eik } : null,
+    client: client ? { name: client.name, address: client.address, baseAddress: client.baseAddress, city: client.city, vatNumber: client.vatNumber, registrationNumber: client.eik } : null,
   };
   const src = {
     invoiceNumber: set.invoiceNumber, invoiceDate: set.invoiceDate?.toISOString() ?? null,

@@ -693,7 +693,9 @@
     "sortQty": "Сортирай: количество",
     "sortInvoice": "Сортирай: фактура",
     "dossier": "Досие",
-    "docsBreakdown": "{gen} генерирани + {att} прикачени"
+    "docsBreakdown": "{gen} генерирани + {att} прикачени",
+    "regAddress": "Адрес на регистрация",
+    "baseAddress": "Адрес на базата"
   },
   "fleet": {
     "title": "Автопарк",

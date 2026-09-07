@@ -11,7 +11,7 @@ import { Prisma } from "@prisma/client";
 import type { ExportDocType } from "@/lib/logistics/config";
 
 export type Party = {
-  name: string | null; address?: string | null; city?: string | null; country?: string | null;
+  name: string | null; address?: string | null; baseAddress?: string | null; city?: string | null; country?: string | null;
   eik?: string | null; registrationNumber?: string | null; vatNumber?: string | null;
   // Английски legal snapshot (за invoice/CMR). Ако липсва → fallback към BG стойностите.
   nameEn?: string | null; addressEn?: string | null; cityEn?: string | null; countryEn?: string | null;
@@ -238,7 +238,10 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
         dispatchNumber: src.dispatchNumber, date: src.shipmentDate ?? src.invoiceDate,
         // MK фирмата издава испратницата — на кирилица както в оригинала (§3).
         issuer: resolveDispatchIssuer(parties.buyer),
-        recipient, destination: src.destination,
+        // recipient (за „До:") ползва registration address (client.address, §2). baseAddress е
+        // ОТДЕЛНА editable стойност за реда „Денес … во бетонска база во …" (§4/§6).
+        recipient, baseAddress: docType === "blank" ? null : (parties.client?.baseAddress ?? null),
+        destination: src.destination,
         rows: [{ lineNo: 1, truck, material: src.productSnapshot, unit: src.unit || "ТОН", quantity: src.quantity, valueMkd: "по фактура" }],
         totalQuantity: src.quantity,
       };
