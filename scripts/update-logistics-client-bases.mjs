@@ -43,19 +43,21 @@ function plan(entry, existing) {
   let cands = eNorm ? existing.filter((c) => normEikMk(c.eik) === eNorm) : existing.filter((c) => normName(c.name) === nName);
   let matchReason = eNorm ? "EIK" : "name";
   if (eNorm && cands.length === 0) { const byName = existing.filter((c) => normName(c.name) === nName); if (byName.length) { cands = byName; matchReason = "name"; } }
-  if (cands.length > 1) return { action: "AMBIGUOUS", matchReason: "ambiguous", client: null, changes: [], conflicts: [`${cands.length} съвпадения`] };
+  if (cands.length > 1) return { action: "AMBIGUOUS", matchReason: "ambiguous", client: null, changes: [], warnings: [`${cands.length} съвпадения`] };
   if (cands.length === 0) {
     const changes = [["name", entry.name], ["eik", entry.eik], ["address", entry.regAddress], ["baseAddress", entry.baseAddress], ["city", entry.city], ["country", entry.country]].filter(([, v]) => nz(v));
-    return { action: "CREATE", matchReason: "NEW", client: null, changes, conflicts: [] };
+    return { action: "CREATE", matchReason: "NEW", client: null, changes, warnings: [] };
   }
-  const c = cands[0]; const changes = []; const conflicts = [];
-  if (nz(entry.eik)) { if (!nz(c.eik)) changes.push(["eik", entry.eik]); else if (normEikMk(c.eik) !== eNorm) conflicts.push(`ЕДБ: ${c.eik} ≠ ${entry.eik} (запазен)`); }
-  if (nz(entry.regAddress) && diff(c.address, entry.regAddress)) changes.push(["address", entry.regAddress]);
+  const c = cands[0]; const changes = []; const warnings = [];
+  // Адрес на база — авторитетен (update); непразните master полета НЕ се презаписват (§1/§6/§9).
   if (nz(entry.baseAddress) && diff(c.baseAddress, entry.baseAddress)) changes.push(["baseAddress", entry.baseAddress]);
-  if (nz(entry.city) && !nz(c.city)) changes.push(["city", entry.city]);
+  if (nz(entry.regAddress)) { if (!nz(c.address)) changes.push(["address", entry.regAddress]); else if (diff(c.address, entry.regAddress)) warnings.push(`registration address differs (current „${nz(c.address)}") — запазен`); }
+  if (nz(entry.city)) { if (!nz(c.city)) changes.push(["city", entry.city]); else if (diff(c.city, entry.city)) warnings.push(`city differs (current „${nz(c.city)}") — запазен`); }
   if (nz(entry.country) && !nz(c.country)) changes.push(["country", entry.country]);
-  const action = conflicts.length ? "CONFLICT" : changes.length ? "UPDATE" : "NO_CHANGE";
-  return { action, matchReason, client: c, changes, conflicts };
+  if (nz(entry.name) && normName(c.name) !== nName) warnings.push(`name differs (current „${nz(c.name)}") — запазено`);
+  if (nz(entry.eik)) { if (!nz(c.eik)) changes.push(["eik", entry.eik]); else if (normEikMk(c.eik) !== eNorm) warnings.push(`EIK differs (current „${nz(c.eik)}" ≠ „${entry.eik}") — MANUAL_REVIEW, запазен`); }
+  const action = changes.length ? "BASE_ADDRESS_UPDATE" : "NO_CHANGE";
+  return { action, matchReason, client: c, changes, warnings };
 }
 
 async function main() {
@@ -64,10 +66,12 @@ async function main() {
   console.log(`\n${APPLY ? "APPLY" : "DRY-RUN"} — logistics client base-address update`);
   console.log(`  SEM: ${sem.name} (${sem.id}) — съществуващи клиенти: ${existing.length}\n`);
 
-  const summary = { CREATE: 0, UPDATE: 0, NO_CHANGE: 0, AMBIGUOUS: 0, CONFLICT: 0 };
+  const summary = { CREATE: 0, BASE_ADDRESS_UPDATE: 0, NO_CHANGE: 0, AMBIGUOUS: 0 };
+  let manualReviewCount = 0;
   for (const entry of DATASET) {
     const p = plan(entry, existing);
     summary[p.action]++;
+    if (p.warnings.length && p.action !== "AMBIGUOUS") manualReviewCount++;
     console.log(`CLIENT: ${entry.name}`);
     console.log(`  MATCH: ${p.matchReason}${p.client ? `  CANONICAL_CLIENT_ID: ${p.client.id}` : ""}`);
     if (p.client) {
@@ -82,7 +86,7 @@ async function main() {
       console.log(`  TARGET_REGISTRATION_ADDRESS: ${entry.regAddress ?? "—"}    TARGET_BASE_ADDRESS: ${entry.baseAddress ?? "—"}`);
     }
     if (entry.mb) console.log(`  NOTE: M.B. ${entry.mb} — няма поле в Client; докладва се, не се записва.`);
-    if (p.conflicts.length) console.log(`  CONFLICTS: ${p.conflicts.join("; ")}`);
+    if (p.warnings.length) { console.log(`  ${p.action === "AMBIGUOUS" ? "AMBIGUOUS" : "MANUAL_REVIEW"} WARNINGS:`); for (const w of p.warnings) console.log(`    - ${w}`); }
     console.log(`  ACTION: ${p.action}${p.changes.length ? `  (${p.changes.map(([f]) => f).join(", ")})` : ""}`);
 
     if (!APPLY) continue;
@@ -93,19 +97,14 @@ async function main() {
       const created = await prisma.client.create({ data: { companyId: sem.id, name: entry.name, eik: entry.eik ?? null, address: entry.regAddress ?? null, baseAddress: entry.baseAddress ?? null, city: entry.city ?? null, country: entry.country ?? null }, select: { id: true, name: true, eik: true, address: true, baseAddress: true, city: true, country: true } });
       existing.push(created);
       console.log(`    ✓ created ${created.id}`);
-    } else if (p.action === "UPDATE") {
+    } else if (p.action === "BASE_ADDRESS_UPDATE") {
       const data = Object.fromEntries(p.changes);
       await prisma.client.update({ where: { id: p.client.id }, data });
       Object.assign(p.client, data);
-      console.log("    ✓ updated");
-    } else if (p.action === "CONFLICT") {
-      // прилагат се само безопасните non-identity промени; ЕДБ конфликтът се пропуска
-      const data = Object.fromEntries(p.changes);
-      if (Object.keys(data).length) { await prisma.client.update({ where: { id: p.client.id }, data }); Object.assign(p.client, data); }
-      console.log("    ⚠ applied non-identity changes; ЕДБ конфликт оставен за ръчна проверка");
+      console.log(`    ✓ updated (${Object.keys(data).join(", ")})`);
     }
   }
-  console.log(`\nОбобщение: ${JSON.stringify(summary)}`);
+  console.log(`\nОбобщение: ${JSON.stringify(summary)}  MANUAL_REVIEW: ${manualReviewCount}`);
   if (!APPLY) console.log("DRY-RUN — нищо не е променяно. Пуснете с --apply.");
 }
 
