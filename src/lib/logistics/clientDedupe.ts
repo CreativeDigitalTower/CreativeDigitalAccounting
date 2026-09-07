@@ -64,6 +64,39 @@ export function pickCanonical(group: DedupeClient[]): DedupeClient {
   )[0];
 }
 
+/**
+ * CROSS-COMPANY collapse: свежда delivery-агрегатите към canonical клиент по match key,
+ * така че един реален клиент (напр. Metal Trade Client + SEM Client) дава ЕДИН ред със
+ * сумарна статистика. `deliveryMeta` описва клиентите, реферирани от доставките (всяка фирма);
+ * `base` са canonical SEM клиентите. Връща map canonicalId → събрана статистика.
+ */
+export type AggRow = { clientId: string; deliveries: number; quantity: number; lastDelivery: string | null };
+export function collapseByCanonical(
+  base: { id: string; name: string; eik: string | null }[],
+  deliveryMeta: { id: string; name: string; eik: string | null }[],
+  agg: AggRow[],
+): Map<string, { deliveries: number; quantity: number; lastDelivery: string | null }> {
+  const round3 = (n: number) => Math.round(n * 1000) / 1000;
+  const baseByKey = new Map<string, string>();
+  for (const b of base) baseByKey.set(clientMatchKey(b), b.id);
+  const metaById = new Map(deliveryMeta.map((m) => [m.id, m]));
+  const canonicalId = (cid: string) => {
+    const m = metaById.get(cid);
+    if (!m) return cid;
+    return baseByKey.get(clientMatchKey(m)) ?? cid;
+  };
+  const out = new Map<string, { deliveries: number; quantity: number; lastDelivery: string | null }>();
+  for (const a of agg) {
+    const canon = canonicalId(a.clientId);
+    const cur = out.get(canon) ?? { deliveries: 0, quantity: 0, lastDelivery: null as string | null };
+    cur.deliveries += a.deliveries;
+    cur.quantity = round3(cur.quantity + a.quantity);
+    if (a.lastDelivery && (!cur.lastDelivery || a.lastDelivery > cur.lastDelivery)) cur.lastDelivery = a.lastDelivery;
+    out.set(canon, cur);
+  }
+  return out;
+}
+
 /** Полетата, които могат безопасно да се допълнят от duplicate → canonical, ако canonical е празен (§6). */
 export const MERGEABLE_FIELDS = ["eik", "vatNumber", "address", "baseAddress", "city", "country", "phone", "contactEmail", "contactPerson", "mol"] as const;
 export type MergeableField = (typeof MERGEABLE_FIELDS)[number];
