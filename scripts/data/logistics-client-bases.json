@@ -1,0 +1,16 @@
+[
+  { "key": "tri-braka", "name": "ТРИ БРАКА ДОО", "eik": "4030000395960", "regAddress": "ул.Боца Иванова ББ, Бутел, Скопjе", "baseAddress": "Бутел, Скопje", "city": "Скопје", "country": "Северна Македония" },
+  { "key": "aradiko", "name": "ARADIKO KOP DOOEL", "eik": "4069010500430", "regAddress": "ul.4, br.11, Rzanicino, Skopje", "baseAddress": "Rzanicino, Skopje", "city": "Skopje", "country": "Северна Македония" },
+  { "key": "lem", "name": "ЛЕМ KOMПАНИ ДООЕЛ", "eik": "4030994367545", "regAddress": "с.Долно Коњари, Петровец", "baseAddress": "Визбегово, Скопje", "city": "Скопје", "country": "Северна Македония" },
+  { "key": "bau", "name": "BAU Inzenering DOOEL", "eik": null, "mb": "5756464", "regAddress": "ul.Bregalnicka, br.5, 2000 Stip", "baseAddress": "с.Чардаклиja", "city": "Штип", "country": "Северна Македония" },
+  { "key": "boni", "name": "БОНИ ИНТЕРГРАДБА ДОО", "eik": "4029008501656", "regAddress": "Агроберза бр.40, Струмица", "baseAddress": "Струмица", "city": "Струмица", "country": "Северна Македония" },
+  { "key": "dac-mi", "name": "ДАЦ-МИ ТРАНС ДООЕЛ ШТИП", "eik": "4029004128810", "regAddress": "ул.Кочанска бр.2", "baseAddress": "Штип", "city": "Штип", "country": "Северна Македония" },
+  { "key": "dine-trejd", "name": "ДИНЕ ТРЕJД ДОО", "eik": null, "regAddress": "ул.11-ти Октомври бр.45, Крива Паланка", "baseAddress": "с.Мождивњак", "city": "Крива Паланка", "country": "Северна Македония" },
+  { "key": "jovanov", "name": "JOВАНОВ ТРАНС ДООЕЛ", "eik": null, "regAddress": "с. Jакимово, Виница", "baseAddress": "с. Jакимово", "city": "Виница", "country": "Северна Македония" },
+  { "key": "kalina", "name": "КАЛИНА ДООЕЛ", "eik": "401300011340", "regAddress": "ул.Царка Георгиева бр.6, Оризари, Кочани", "baseAddress": "Кочани", "city": "Кочани", "country": "Северна Македония" },
+  { "key": "dpgu-beton", "name": "ДПГУ БЕТОН ГРАДБА ДООЕЛ", "eik": "4017010513779", "regAddress": "ул.Билановска ББ, Куманово", "baseAddress": "Куманово", "city": "Куманово", "country": "Северна Македония" },
+  { "key": "mak-bet", "name": "МАК-БЕТ ДОО", "eik": "4030991189794", "regAddress": "ул.8, бр.14, Визбегово, Скопjе", "baseAddress": "Визбегово, Бутел, Скопje", "city": "Скопје", "country": "Северна Македония" },
+  { "key": "dm-preciz", "name": "ДМ ПРЕЦИЗ ДОО", "eik": "4029998115950", "regAddress": "ШТИП", "baseAddress": "ШТИП, ул.Балканска бр.98", "city": "Штип", "country": "Северна Македония" },
+  { "key": "angela-01", "name": "ДПТУ АНГЕЛА - 01 ДОО", "eik": null, "regAddress": "ул.Илинденска бр.19, Марино, Скопje", "baseAddress": "гр.Тетово", "city": "Скопје", "country": "Северна Македония" },
+  { "key": "gradis-koo", "name": "GRADIS-KOO DOOEL", "eik": null, "regAddress": "Nikushtak, Kumanovo", "baseAddress": null, "city": "Kumanovo", "country": "Северна Македония" }
+]
