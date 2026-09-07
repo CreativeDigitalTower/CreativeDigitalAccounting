@@ -227,7 +227,7 @@ export function ExportDocEditor({ setId, docId, canManage }: { setId: string; do
               {txt(t("logistics.export.dispatch"), "dispatchNumber")}
               {date(t("logistics.export.date"), "date")}
               {txt(t("logistics.export.issuer"), "issuer.name")}
-              {!isBlank && <>{txt(t("logistics.export.client"), "recipient.name")}{txt(t("logistics.export.address"), "recipient.address")}</>}
+              {!isBlank && <>{txt(t("logistics.export.client"), "recipient.name")}{txt(t("logistics.export.regAddress"), "recipient.address")}{txt(t("logistics.export.baseAddress"), "baseAddress")}</>}
               {truckField(t("logistics.export.truck"), "rows.0.truck")}
               {txt(t("logistics.export.material"), "rows.0.material")}
               {txt(t("logistics.export.unit"), "rows.0.unit")}

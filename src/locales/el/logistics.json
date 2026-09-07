@@ -693,7 +693,9 @@
     "sortQty": "Ταξ.: ποσότητα",
     "sortInvoice": "Ταξ.: τιμολόγιο",
     "dossier": "Φάκελος",
-    "docsBreakdown": "{gen} δημιουργήθηκαν + {att} μεταφορτώθηκαν"
+    "docsBreakdown": "{gen} δημιουργήθηκαν + {att} μεταφορτώθηκαν",
+    "regAddress": "Διεύθυνση εγγραφής",
+    "baseAddress": "Διεύθυνση βάσης"
   },
   "fleet": {
     "title": "Fleet",

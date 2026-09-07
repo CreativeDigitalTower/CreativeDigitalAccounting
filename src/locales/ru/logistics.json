@@ -693,7 +693,9 @@
     "sortQty": "Сортировка: количество",
     "sortInvoice": "Сортировка: счёт",
     "dossier": "Досье",
-    "docsBreakdown": "{gen} сгенерировано + {att} загружено"
+    "docsBreakdown": "{gen} сгенерировано + {att} загружено",
+    "regAddress": "Адрес регистрации",
+    "baseAddress": "Адрес базы"
   },
   "fleet": {
     "title": "Fleet",

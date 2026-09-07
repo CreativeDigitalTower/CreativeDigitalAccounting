@@ -693,7 +693,9 @@
     "sortQty": "Sort: quantity",
     "sortInvoice": "Sort: invoice",
     "dossier": "Dossier",
-    "docsBreakdown": "{gen} generated + {att} uploaded"
+    "docsBreakdown": "{gen} generated + {att} uploaded",
+    "regAddress": "Registration address",
+    "baseAddress": "Base address"
   },
   "fleet": {
     "title": "Fleet",

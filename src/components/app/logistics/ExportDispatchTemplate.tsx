@@ -7,6 +7,9 @@ type Party = { name?: string | null; address?: string | null; city?: string | nu
 type Row = { lineNo?: number; truck?: string | null; material?: string | null; unit?: string | null; quantity?: number | null; valueMkd?: string | null };
 export type DispatchDocData = {
   dispatchNumber?: string | null; date?: string | null; issuer?: Party; recipient?: Party | null;
+  // Адрес на базата — физическият обект на доставка (§4/§6). Отделен от recipient.address
+  // (адрес на регистрация, който отива в „До:"). Ползва се само в реда „Денес … во база …".
+  baseAddress?: string | null;
   destination?: string | null; rows?: Row[]; totalQuantity?: number | null; blank?: boolean;
 };
 
@@ -60,11 +63,22 @@ export function ExportDispatchTemplate({ data, blank = false }: { data: Dispatch
         <span style={{ flex: 1, letterSpacing: 1, overflow: "hidden" }}>&nbsp;{dots(140)}</span>
       </div>
 
-      {/* Денес: (дата + пунктир) (§5) */}
+      {/* Денес: дата + „во бетонска база во [АДРЕС НА БАЗАТА]" + фиксиран текст (§6). */}
+      {/* Адресът идва от baseAddress snapshot-а, НЕ от registration address. При празно/blank */}
+      {/* — пунктир за ръчно попълване. Геометрията на реда е непроменена (един ред). */}
       <div style={{ display: "flex", alignItems: "baseline", whiteSpace: "nowrap", overflow: "hidden", marginBottom: 6 }}>
         <span>Денес&nbsp;</span>
         <span style={{ fontWeight: 600 }}>{d(data.date)}</span>
-        <span style={{ flex: 1, letterSpacing: 1, overflow: "hidden" }}>&nbsp;{dots(120)}</span>
+        {blank ? (
+          <span style={{ flex: 1, letterSpacing: 1, overflow: "hidden" }}>&nbsp;{dots(120)}</span>
+        ) : (
+          <>
+            <span>&nbsp;во бетонска база во&nbsp;</span>
+            <span style={{ fontWeight: 600 }}>{(data.baseAddress ?? "").trim() || dots(30)}</span>
+            <span>&nbsp;Ви доставуваме следните материјали :</span>
+            <span style={{ flex: 1, overflow: "hidden" }} />
+          </>
+        )}
       </div>
 
       {/* Основна таблица (§6) */}
