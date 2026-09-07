@@ -75,33 +75,21 @@ export function planClientUpdate(entry: ClientEntry, existing: ExistingClient[])
     return { ...base, action: "CREATE", matchReason: "NEW", clientId: null, currentName: null, changes, warnings: [], manualReview: false };
   }
 
-  // Съществуващ canonical: САМО baseAddress + попълване на празни полета. Непразните master
-  // полета НЕ се презаписват — само warning (§1/§6/§9).
+  // Съществуващ canonical: в ТОЗИ batch единственият разрешен write е baseAddress (§1/§9).
+  // НИКОЕ друго master поле не се пише — дори празно (city/address/eik/country) остава както е.
+  // Всички различия са само WARNING / MANUAL_REVIEW (§2).
   const c = candidates[0];
   const changes: FieldChange[] = [];
   const warnings: string[] = [];
 
-  // Адрес на база — авторитетен от списъка (§6): update при подаден и различен; null не трие (§3/§4).
+  // Адрес на база — авторитетен от списъка (§6): update при подаден и различен; null не трие (§3).
   if (norm(entry.baseAddress) && diff(c.baseAddress, entry.baseAddress)) changes.push({ field: "baseAddress", from: c.baseAddress, to: entry.baseAddress });
-  // Адрес на регистрация — попълва се само при празно; иначе запазва се + warning (§2/§5).
-  if (norm(entry.regAddress)) {
-    if (!norm(c.address)) changes.push({ field: "address", from: c.address, to: entry.regAddress });
-    else if (diff(c.address, entry.regAddress)) warnings.push(`registration address differs (current „${norm(c.address)}" ≠ provided „${norm(entry.regAddress)}") — запазен current`);
-  }
-  // Град — попълва се само при празно.
-  if (norm(entry.city)) {
-    if (!norm(c.city)) changes.push({ field: "city", from: c.city, to: entry.city ?? null });
-    else if (diff(c.city, entry.city)) warnings.push(`city differs (current „${norm(c.city)}" ≠ provided „${norm(entry.city)}") — запазен current`);
-  }
-  // Държава — попълва се само при празно.
-  if (norm(entry.country) && !norm(c.country)) changes.push({ field: "country", from: c.country, to: entry.country ?? null });
-  // Име — никога не се преименува автоматично; warning само при различие в НОРМАЛИЗИРАНОТО име.
+
+  // Останалите полета — само отчет, без write (§1/§2). Различия в непразни стойности → warning.
+  if (norm(entry.regAddress) && norm(c.address) && diff(c.address, entry.regAddress)) warnings.push(`registration address differs (current „${norm(c.address)}" ≠ provided „${norm(entry.regAddress)}") — запазен current`);
+  if (norm(entry.city) && norm(c.city) && diff(c.city, entry.city)) warnings.push(`city differs (current „${norm(c.city)}" ≠ provided „${norm(entry.city)}") — запазен current`);
   if (norm(entry.name) && normalizeClientName(c.name) !== nName) warnings.push(`name differs (current „${norm(c.name)}" ≠ provided „${norm(entry.name)}") — запазено current`);
-  // ЕДБ — попълва се при празно; различна непразна стойност → MANUAL_REVIEW, НЕ блокира baseAddress (§4/§6).
-  if (norm(entry.eik)) {
-    if (!norm(c.eik)) changes.push({ field: "eik", from: c.eik ?? null, to: entry.eik });
-    else if (normEikMk(c.eik) !== eNorm) warnings.push(`EIK differs (current „${norm(c.eik)}" ≠ provided „${norm(entry.eik)}") — MANUAL_REVIEW, запазен current`);
-  }
+  if (norm(entry.eik) && norm(c.eik) && normEikMk(c.eik) !== eNorm) warnings.push(`EIK differs (current „${norm(c.eik)}" ≠ provided „${norm(entry.eik)}") — MANUAL_REVIEW, запазен current`);
 
   const action: PlanAction = changes.length ? "BASE_ADDRESS_UPDATE" : "NO_CHANGE";
   return { ...base, action, matchReason, clientId: c.id, currentName: c.name, changes, warnings, manualReview: warnings.length > 0 };

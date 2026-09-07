@@ -60,11 +60,10 @@ describe("Existing client update policy (§1/§2/§5/§6/§9)", () => {
     expect(fieldsOf(p)).not.toContain("name");
     expect(p.warnings.join(" ")).toMatch(/name differs/);
   });
-  it("4/5) EIK conflict → warning (MANUAL_REVIEW) но НЕ блокира baseAddress (КАЛИНА)", () => {
+  it("4/5) EIK conflict → warning (MANUAL_REVIEW) но НЕ блокира baseAddress; EIK/city непроменени (КАЛИНА)", () => {
     const p = planClientUpdate(byKey("kalina") as any, [ex({ id: "k", name: "КАЛИНА ДООЕЛ", eik: "4013000111340", baseAddress: null })]);
-    expect(fieldsOf(p)).not.toContain("eik");                 // не се презаписва
-    expect(fieldsOf(p)).toContain("baseAddress");             // базата се добавя
-    expect(p.changes.find((c) => c.field === "baseAddress")!.to).toBe("Кочани");
+    expect(fieldsOf(p)).toEqual(["baseAddress"]);             // САМО baseAddress
+    expect(p.changes[0].to).toBe("Кочани");
     expect(p.warnings.join(" ")).toMatch(/EIK differs/);
     expect(p.manualReview).toBe(true);
     expect(p.action).toBe("BASE_ADDRESS_UPDATE");
@@ -73,10 +72,19 @@ describe("Existing client update policy (§1/§2/§5/§6/§9)", () => {
     const p = planClientUpdate(byKey("mak-bet") as any, [ex({ id: "m", name: "МАК-БЕТ ДОО", eik: "4030991189794", baseAddress: "стар" })]);
     expect(p.changes.find((c) => c.field === "baseAddress")!.to).toBe("Визбегово, Бутел, Скопje");
   });
-  it("fill: празни полета се допълват (address/city/eik при празно)", () => {
+  it("§1/§9) съществуващ клиент → update payload САМО baseAddress (никакви fills)", () => {
+    // празни city/address/eik → НЕ се попълват в този batch
     const p = planClientUpdate(byKey("boni") as any, [ex({ id: "b", name: "БОНИ ИНТЕРГРАДБА ДОО" })]);
-    expect(fieldsOf(p)).toEqual(expect.arrayContaining(["baseAddress", "address", "city", "country", "eik"]));
-    expect(p.warnings).toHaveLength(0);
+    expect(fieldsOf(p)).toEqual(["baseAddress"]);
+    expect(fieldsOf(p)).not.toContain("address");
+    expect(fieldsOf(p)).not.toContain("city");
+    expect(fieldsOf(p)).not.toContain("eik");
+    expect(fieldsOf(p)).not.toContain("country");
+  });
+  it("§10.1) празен city НЕ се попълва дори когато е подаден", () => {
+    const p = planClientUpdate(byKey("dac-mi") as any, [ex({ id: "d", name: "ДАЦ-МИ ТРАНС ДООЕЛ ШТИП", eik: "4029004128810", city: null })]);
+    expect(fieldsOf(p)).not.toContain("city");
+    expect(fieldsOf(p)).toContain("baseAddress");
   });
 });
 
@@ -111,9 +119,12 @@ describe("Script safeguards (§7/§12/§13)", () => {
     expect(s).toMatch(/APPLY = process\.argv\.includes\("--apply"\)/);
     expect(s).toContain("пропуснат create");
   });
-  it("не презаписва непразни master полета (само fill + baseAddress)", () => {
-    expect(s).toContain("!nz(c.address)");
-    expect(s).toContain("!nz(c.city)");
+  it("съществуващ клиент → само baseAddress write (никакви fills на city/address/eik/country)", () => {
+    // единственият push в existing-клона е baseAddress; останалите са warnings
+    expect(s).toMatch(/changes\.push\(\["baseAddress"/);
+    expect(s).not.toMatch(/changes\.push\(\["city"/);
+    expect(s).not.toMatch(/changes\.push\(\["address"/);
+    expect(s).not.toMatch(/changes\.push\(\["country"/);
     expect(s).toContain("BASE_ADDRESS_UPDATE");
     expect(s).not.toMatch(/Snapshot|exportDocumentSet|updateMany/);
   });

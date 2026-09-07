@@ -49,13 +49,13 @@ function plan(entry, existing) {
     return { action: "CREATE", matchReason: "NEW", client: null, changes, warnings: [] };
   }
   const c = cands[0]; const changes = []; const warnings = [];
-  // Адрес на база — авторитетен (update); непразните master полета НЕ се презаписват (§1/§6/§9).
+  // ТОЗИ batch: единственият write за съществуващ клиент е baseAddress (§1/§9). Другите
+  // полета НЕ се пишат — дори празни; различията са само warning (§2).
   if (nz(entry.baseAddress) && diff(c.baseAddress, entry.baseAddress)) changes.push(["baseAddress", entry.baseAddress]);
-  if (nz(entry.regAddress)) { if (!nz(c.address)) changes.push(["address", entry.regAddress]); else if (diff(c.address, entry.regAddress)) warnings.push(`registration address differs (current „${nz(c.address)}") — запазен`); }
-  if (nz(entry.city)) { if (!nz(c.city)) changes.push(["city", entry.city]); else if (diff(c.city, entry.city)) warnings.push(`city differs (current „${nz(c.city)}") — запазен`); }
-  if (nz(entry.country) && !nz(c.country)) changes.push(["country", entry.country]);
+  if (nz(entry.regAddress) && nz(c.address) && diff(c.address, entry.regAddress)) warnings.push(`registration address differs (current „${nz(c.address)}") — запазен`);
+  if (nz(entry.city) && nz(c.city) && diff(c.city, entry.city)) warnings.push(`city differs (current „${nz(c.city)}") — запазен`);
   if (nz(entry.name) && normName(c.name) !== nName) warnings.push(`name differs (current „${nz(c.name)}") — запазено`);
-  if (nz(entry.eik)) { if (!nz(c.eik)) changes.push(["eik", entry.eik]); else if (normEikMk(c.eik) !== eNorm) warnings.push(`EIK differs (current „${nz(c.eik)}" ≠ „${entry.eik}") — MANUAL_REVIEW, запазен`); }
+  if (nz(entry.eik) && nz(c.eik) && normEikMk(c.eik) !== eNorm) warnings.push(`EIK differs (current „${nz(c.eik)}" ≠ „${entry.eik}") — MANUAL_REVIEW, запазен`);
   const action = changes.length ? "BASE_ADDRESS_UPDATE" : "NO_CHANGE";
   return { action, matchReason, client: c, changes, warnings };
 }
