@@ -386,9 +386,16 @@ model Client {
   name          String
   eik           String?
   vatNumber     String?
-  address       String?
+  address       String?  // Адрес на регистрация (официален/юридически адрес)
+  // Адрес на база — физическият адрес на обекта, до който реално се доставя (§17-§20/§24).
+  // Additive/nullable; НЕ се копира от address автоматично (§28). Source of truth за
+  // delivery destination за следващата фаза.
+  baseAddress   String?
   city          String?
   country       String?  // за чуждестранни клиенти (напр. MK клиенти на SEM INTERNATIONAL)
+  // Архивиране на клиент (soft delete, §13/§14/§16). NULL = активен; при налична история
+  // клиентът се архивира вместо да се трие → без orphan relations.
+  archivedAt    DateTime?
   mol           String?
   contactPerson String?
   contactEmail  String?

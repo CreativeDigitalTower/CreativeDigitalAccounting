@@ -3,11 +3,11 @@ import { useState } from "react";
 import { useT } from "@/components/i18n/I18nProvider";
 
 export type ClientForm = {
-  id?: string; name: string; eik: string; vatNumber: string; address: string;
+  id?: string; name: string; eik: string; vatNumber: string; address: string; baseAddress: string;
   city: string; country: string; phone: string; contactEmail: string; contactPerson: string;
 };
 
-const EMPTY: ClientForm = { name: "", eik: "", vatNumber: "", address: "", city: "", country: "", phone: "", contactEmail: "", contactPerson: "" };
+const EMPTY: ClientForm = { name: "", eik: "", vatNumber: "", address: "", baseAddress: "", city: "", country: "", phone: "", contactEmail: "", contactPerson: "" };
 
 // Общ модал за създаване/редакция на краен клиент (§26-§32). Reuse-ва реалния CRM Client
 // през API-то — без отделен LogisticsClient модел. Snapshot-ите на доставките не се пипат (§31).
@@ -22,7 +22,7 @@ export function ClientFormModal({ initial, onClose, onSaved }: { initial: Client
     setErr("");
     if (f.name.trim().length < 2) { setErr(t("logistics.clients.fName")); return; }
     setBusy(true);
-    const payload = { name: f.name, eik: f.eik || null, vatNumber: f.vatNumber || null, address: f.address || null, city: f.city || null, country: f.country || null, phone: f.phone || null, contactEmail: f.contactEmail || null, contactPerson: f.contactPerson || null };
+    const payload = { name: f.name, eik: f.eik || null, vatNumber: f.vatNumber || null, address: f.address || null, baseAddress: f.baseAddress || null, city: f.city || null, country: f.country || null, phone: f.phone || null, contactEmail: f.contactEmail || null, contactPerson: f.contactPerson || null };
     const r = isEdit
       ? await fetch(`/api/logistics/clients/${initial!.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
       : await fetch(`/api/logistics/clients`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
@@ -51,7 +51,8 @@ export function ClientFormModal({ initial, onClose, onSaved }: { initial: Client
           {field("name", "logistics.clients.fName", true)}
           {field("eik", "logistics.clients.fEik")}
           {field("vatNumber", "logistics.clients.fVat")}
-          {field("address", "logistics.clients.fAddress", true)}
+          {field("address", "logistics.clients.fRegAddress", true)}
+          {field("baseAddress", "logistics.clients.fBaseAddress", true)}
           {field("city", "logistics.clients.fCity")}
           {field("country", "logistics.clients.fCountry")}
           {field("phone", "logistics.clients.fPhone")}

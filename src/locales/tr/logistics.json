@@ -516,7 +516,16 @@
     "sortQuantity": "En büyük miktar",
     "sortRecent": "En yeni teslimat",
     "sortName": "Ad A–Z",
-    "noDeliveries": "Dönemde teslimat yok"
+    "noDeliveries": "Dönemde teslimat yok",
+    "fRegAddress": "Kayıt adresi",
+    "fBaseAddress": "Üs adresi",
+    "showArchived": "Arşivlenenleri göster",
+    "archivedBadge": "Arşivlendi",
+    "restore": "Geri yükle",
+    "deleteTitle": "Müşteriyi sil",
+    "deleteConfirm": "Bu müşteriyi silmek istediğinizden emin misiniz?",
+    "deleteHasHistory": "Bu müşterinin ilişkili geçmişi var — arşivlenecek (geçmiş korunur).",
+    "deleteConfirmBtn": "Müşteriyi sil"
   },
   "dash": {
     "today": "Bugün",

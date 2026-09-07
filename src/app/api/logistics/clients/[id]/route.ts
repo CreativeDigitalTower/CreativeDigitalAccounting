@@ -17,7 +17,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const c = await prisma.client.findUnique({
     where: { id },
     select: {
-      id: true, companyId: true, name: true, eik: true, vatNumber: true, city: true, address: true, country: true, phone: true, contactEmail: true, contactPerson: true,
+      id: true, companyId: true, name: true, eik: true, vatNumber: true, city: true, address: true, baseAddress: true, country: true, phone: true, contactEmail: true, contactPerson: true, archivedAt: true,
       mkInvoices: {
         select: { id: true, number: true, date: true, currency: true, lines: { select: { quantity: true, grossAmount: true, lineTotal: true, productSnapshot: true } } },
         orderBy: { createdAt: "desc" },
@@ -48,7 +48,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const summary = clientSalesSummary(lines, c.mkInvoices.length);
 
   return NextResponse.json({
-    id: c.id, name: c.name, eik: c.eik, vatNumber: c.vatNumber, city: c.city, address: c.address, country: c.country, phone: c.phone, contactEmail: c.contactEmail, contactPerson: c.contactPerson,
+    id: c.id, name: c.name, eik: c.eik, vatNumber: c.vatNumber, city: c.city, address: c.address, baseAddress: c.baseAddress, country: c.country, phone: c.phone, contactEmail: c.contactEmail, contactPerson: c.contactPerson, archived: !!c.archivedAt,
     deliveryStats: { ...summarizeTrips(rows), distinctVehicles, distinctProducts, monthly: bucketByMonth(rows, 12) },
     deliveries: sets.map((s) => ({
       id: s.id, invoiceNumber: s.invoiceNumber, date: (s.shipmentDate ?? s.invoiceDate)?.toISOString() ?? null,
@@ -67,11 +67,13 @@ const patchSchema = z.object({
   eik: z.string().max(40).nullable().optional(),
   vatNumber: z.string().max(40).nullable().optional(),
   address: z.string().max(300).nullable().optional(),
+  baseAddress: z.string().max(300).nullable().optional(),
   city: z.string().max(120).nullable().optional(),
   country: z.string().max(120).nullable().optional(),
   phone: z.string().max(60).nullable().optional(),
   contactEmail: z.string().max(160).nullable().optional(),
   contactPerson: z.string().max(160).nullable().optional(),
+  archived: z.boolean().optional(), // true → архивирай; false → възстанови (§16)
 });
 
 // Редакция на master Client (§29/§30). НЕ пренаписва исторически snapshots (§31) — те са
@@ -93,17 +95,52 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         ...(d.eik !== undefined ? { eik: trim(d.eik) } : {}),
         ...(d.vatNumber !== undefined ? { vatNumber: trim(d.vatNumber) } : {}),
         ...(d.address !== undefined ? { address: trim(d.address) } : {}),
+        ...(d.baseAddress !== undefined ? { baseAddress: trim(d.baseAddress) } : {}),
+        ...(d.archived !== undefined ? { archivedAt: d.archived ? new Date() : null } : {}),
         ...(d.city !== undefined ? { city: trim(d.city) } : {}),
         ...(d.country !== undefined ? { country: trim(d.country) } : {}),
         ...(d.phone !== undefined ? { phone: trim(d.phone) } : {}),
         ...(d.contactEmail !== undefined ? { contactEmail: trim(d.contactEmail) } : {}),
         ...(d.contactPerson !== undefined ? { contactPerson: trim(d.contactPerson) } : {}),
       },
-      select: { id: true, name: true, eik: true, vatNumber: true, city: true, address: true, country: true, phone: true, contactEmail: true, contactPerson: true },
+      select: { id: true, name: true, eik: true, vatNumber: true, city: true, address: true, baseAddress: true, country: true, phone: true, contactEmail: true, contactPerson: true, archivedAt: true },
     });
-    return NextResponse.json(updated);
+    return NextResponse.json({ ...updated, archived: !!updated.archivedAt });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: err.issues[0]?.message ?? "Невалидни данни." }, { status: 400 });
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });
   }
+}
+
+/** Брой свързани бизнес записи към клиента (за safe delete, §13). */
+async function clientRelationCounts(clientId: string) {
+  const [exportSets, documents, mkInvoices, contracts, projects, payments] = await Promise.all([
+    prisma.exportDocumentSet.count({ where: { clientId } }),
+    prisma.document.count({ where: { clientId } }),
+    prisma.mkInvoice.count({ where: { clientId } }),
+    prisma.contract.count({ where: { clientId } }),
+    prisma.project.count({ where: { clientId } }),
+    prisma.payment.count({ where: { clientId } }),
+  ]);
+  const total = exportSets + documents + mkInvoices + contracts + projects + payments;
+  return { exportSets, documents, mkInvoices, contracts, projects, payments, total };
+}
+
+// Безопасно изтриване (§11-§15): при налична бизнес история → soft archive (archivedAt),
+// без orphan relations; без история → hard delete. Company scope в рамките на групата.
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const g = await logisticsApiGuard("manage_documents");
+  if (!g.ok) return g.res;
+  const { id } = await params;
+  const c = await prisma.client.findUnique({ where: { id }, select: { companyId: true, name: true } });
+  if (!c) return NextResponse.json({ error: "Не е намерен." }, { status: 404 });
+  if (!(await assertClientCompanyInGroup(g.companyId, c.companyId))) return NextResponse.json({ error: "Няма достъп." }, { status: 403 });
+
+  const counts = await clientRelationCounts(id);
+  if (counts.total > 0) {
+    await prisma.client.update({ where: { id }, data: { archivedAt: new Date() } });
+    return NextResponse.json({ archived: true, deleted: false, relations: counts });
+  }
+  await prisma.client.delete({ where: { id } });
+  return NextResponse.json({ archived: false, deleted: true });
 }

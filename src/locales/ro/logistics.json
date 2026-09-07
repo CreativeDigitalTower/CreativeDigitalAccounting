@@ -516,7 +516,16 @@
     "sortQuantity": "Cea mai mare cantitate",
     "sortRecent": "Cea mai recentă livrare",
     "sortName": "Nume A–Z",
-    "noDeliveries": "Nicio livrare în perioadă"
+    "noDeliveries": "Nicio livrare în perioadă",
+    "fRegAddress": "Adresă de înregistrare",
+    "fBaseAddress": "Adresă bază",
+    "showArchived": "Arată arhivate",
+    "archivedBadge": "Arhivat",
+    "restore": "Restaurează",
+    "deleteTitle": "Ștergere client",
+    "deleteConfirm": "Sigur doriți să ștergeți acest client?",
+    "deleteHasHistory": "Acest client are istoric asociat — va fi arhivat (istoricul se păstrează).",
+    "deleteConfirmBtn": "Șterge clientul"
   },
   "dash": {
     "today": "Astăzi",

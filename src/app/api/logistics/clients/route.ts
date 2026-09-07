@@ -4,6 +4,7 @@ import { logisticsApiGuard } from "@/lib/logistics/access";
 import { isPeriodKey, resolvePeriodRange, prismaDateFilter } from "@/lib/logistics/period";
 import { sortClients, clientKpis, isClientSort, type ClientStatRow } from "@/lib/logistics/clientStats";
 import { resolveFinalClientCompanyId, assertClientCompanyInGroup } from "@/lib/logistics/finalClient";
+import { normalizeEik, normalizeClientName } from "@/lib/logistics/clientDedupe";
 import { z } from "zod";
 
 // „Клиенти (логистика)" — крайните MK клиенти (CRM на SEM, §20) с автоматична статистика
@@ -20,13 +21,15 @@ export async function GET(req: Request) {
   const hasDate = Object.keys(dateFilter).length > 0;
   const sort = isClientSort(sp.get("sort")) ? sp.get("sort")! : "deliveries_desc";
   const q = (sp.get("q") ?? "").trim().toLowerCase();
+  const showArchived = sp.get("archived") === "1";
 
   const finalCompanyId = await resolveFinalClientCompanyId(g.companyId);
-  const sel = { id: true, name: true, eik: true, city: true, phone: true, contactEmail: true } as const;
+  const sel = { id: true, name: true, eik: true, city: true, phone: true, contactEmail: true, address: true, baseAddress: true, country: true, archivedAt: true } as const;
 
   const [base, agg] = await Promise.all([
     // Базов списък: всички крайни клиенти (вкл. с 0 доставки → новосъздадените се виждат, §50).
-    prisma.client.findMany({ where: { companyId: finalCompanyId }, select: sel, take: 3000, orderBy: { name: "asc" } }),
+    // Архивираните са скрити по подразбиране (§16).
+    prisma.client.findMany({ where: { companyId: finalCompanyId, ...(showArchived ? {} : { archivedAt: null }) }, select: sel, take: 3000, orderBy: { name: "asc" } }),
     // Агрегат по краен клиент за доставки, в които участва активната фирма (продавач или buyer).
     prisma.exportDocumentSet.groupBy({
       by: ["clientId"],
@@ -47,15 +50,16 @@ export async function GET(req: Request) {
   const extraIds = [...aggMap.keys()].filter((id) => !baseIds.has(id));
   const extra = extraIds.length ? await prisma.client.findMany({ where: { id: { in: extraIds } }, select: sel }) : [];
 
-  const all = [...base, ...extra].map((c): ClientStatRow & { city: string | null; phone: string | null; contactEmail: string | null } => ({
+  const all = [...base, ...extra].map((c) => ({
     id: c.id, name: c.name, eik: c.eik, city: c.city, phone: c.phone, contactEmail: c.contactEmail,
+    address: c.address, baseAddress: c.baseAddress, country: c.country, archived: !!c.archivedAt,
     deliveries: aggMap.get(c.id)?.deliveries ?? 0,
     quantity: aggMap.get(c.id)?.quantity ?? 0,
     lastDelivery: aggMap.get(c.id)?.lastDelivery ?? null,
   }));
 
-  const kpi = clientKpis(all); // KPI върху пълния набор (не се влияе от текстовото търсене)
-  const searchMatch = (c: (typeof all)[number]) => !q || [c.name, c.eik, c.city, c.phone, c.contactEmail].some((v) => (v ?? "").toLowerCase().includes(q));
+  const kpi = clientKpis(all as ClientStatRow[]); // KPI върху пълния набор (не се влияе от текстовото търсене)
+  const searchMatch = (c: (typeof all)[number]) => !q || [c.name, c.eik, c.city, c.country, c.phone, c.contactEmail, c.address, c.baseAddress].some((v) => (v ?? "").toLowerCase().includes(q));
   const rows = sortClients(all.filter(searchMatch), sort as never);
 
   return NextResponse.json({ finalCompanyId, sort, period: { key: periodKey }, kpi, rows });
@@ -67,6 +71,7 @@ const createSchema = z.object({
   eik: z.string().max(40).nullable().optional(),
   vatNumber: z.string().max(40).nullable().optional(),
   address: z.string().max(300).nullable().optional(),
+  baseAddress: z.string().max(300).nullable().optional(),
   city: z.string().max(120).nullable().optional(),
   country: z.string().max(120).nullable().optional(),
   phone: z.string().max(60).nullable().optional(),
@@ -87,15 +92,17 @@ export async function POST(req: Request) {
     }
     const name = d.name.trim();
     const eik = d.eik?.trim() || null;
-    const dup = await prisma.client.findFirst({
-      where: { companyId: finalCompanyId, OR: [...(eik ? [{ eik }] : []), { name: { equals: name, mode: "insensitive" as const } }] },
-      select: { id: true, name: true, eik: true },
-    });
+    // Нормализиран dedup (§10): ЕИК има приоритет, иначе нормализирано име. Предотвратява
+    // дубликати при разлики в интервали/пунктуация/регистър. Ambiguous → връща първия match.
+    const nEik = normalizeEik(eik);
+    const nName = normalizeClientName(name);
+    const candidates = await prisma.client.findMany({ where: { companyId: finalCompanyId }, select: { id: true, name: true, eik: true } });
+    const dup = candidates.find((c) => (nEik && normalizeEik(c.eik) === nEik) || (!nEik && normalizeClientName(c.name) === nName));
     if (dup) return NextResponse.json({ ...dup, duplicate: true });
     const created = await prisma.client.create({
       data: {
         companyId: finalCompanyId, name, eik,
-        vatNumber: d.vatNumber?.trim() || null, address: d.address?.trim() || null, city: d.city?.trim() || null,
+        vatNumber: d.vatNumber?.trim() || null, address: d.address?.trim() || null, baseAddress: d.baseAddress?.trim() || null, city: d.city?.trim() || null,
         country: d.country?.trim() || null, phone: d.phone?.trim() || null, contactEmail: d.contactEmail?.trim() || null,
         contactPerson: d.contactPerson?.trim() || null,
       },
