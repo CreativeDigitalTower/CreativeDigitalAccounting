@@ -22,6 +22,7 @@ const patchSchema = z.object({
   active: z.boolean().optional(),
   // Сертификат + покупна цена (§9/§20).
   certificateNumber: z.string().trim().max(120).nullable().optional(),
+  dispatchName: z.string().trim().max(300).nullable().optional(),
   purchasePrice: z.number().min(0).nullable().optional(),
   purchaseCurrency: z.string().refine((c) => CURRENCY_CODES.includes(c), "Невалидна валута.").nullable().optional(),
   // добавяне/премахване на alias
@@ -64,6 +65,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (d.notes !== undefined) data.notes = d.notes;
     if (d.active !== undefined) data.active = d.active;
     if (d.certificateNumber !== undefined) data.certificateNumber = d.certificateNumber?.trim() || null;
+    if (d.dispatchName !== undefined) data.dispatchName = d.dispatchName?.trim() || null;
     if (d.purchasePrice !== undefined) data.purchasePrice = d.purchasePrice;
     if (d.purchaseCurrency !== undefined) data.purchaseCurrency = d.purchaseCurrency;
 
@@ -81,7 +83,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     await audit(g.companyId, g.userId, "update", "LogisticsProduct", id, "Редакция на продукт");
     const fresh = await prisma.logisticsProduct.findUnique({
       where: { id },
-      select: { id: true, canonicalName: true, materialCode: true, unit: true, packaging: true, category: true, isSystemDefault: true, active: true, notes: true, certificateNumber: true, purchasePrice: true, purchaseCurrency: true, certificateFileName: true, certificateFileMime: true, certificateUploadedAt: true, aliases: { select: { id: true, alias: true } } },
+      select: { id: true, canonicalName: true, materialCode: true, unit: true, packaging: true, category: true, isSystemDefault: true, active: true, notes: true, certificateNumber: true, purchasePrice: true, purchaseCurrency: true, dispatchName: true, certificateFileName: true, certificateFileMime: true, certificateUploadedAt: true, aliases: { select: { id: true, alias: true } } },
     });
     return NextResponse.json(fresh ? { ...fresh, purchasePrice: fresh.purchasePrice == null ? null : Number(fresh.purchasePrice), hasCertificatePdf: !!fresh.certificateFileName } : null);
   } catch (err) {

@@ -5,7 +5,7 @@ import { CURRENCIES } from "@/lib/constants";
 
 export type ProductForm = {
   id: string; canonicalName: string; category: string | null; materialCode: string | null; unit: string;
-  packaging: string | null; certificateNumber: string | null; purchasePrice: number | null; purchaseCurrency: string | null;
+  packaging: string | null; certificateNumber: string | null; dispatchName: string | null; purchasePrice: number | null; purchaseCurrency: string | null;
   active: boolean; hasCertificatePdf: boolean; certificateFileName: string | null;
 };
 
@@ -24,7 +24,7 @@ export function ProductEditModal({ initial, onClose, onSaved }: { initial: Produ
     setErr(""); setBusy(true);
     const body = {
       canonicalName: f.canonicalName, category: f.category, materialCode: f.materialCode || null, unit: f.unit,
-      packaging: f.packaging || null, certificateNumber: f.certificateNumber || null,
+      packaging: f.packaging || null, certificateNumber: f.certificateNumber || null, dispatchName: f.dispatchName || null,
       purchasePrice: f.purchasePrice === null || Number.isNaN(f.purchasePrice) ? null : Number(f.purchasePrice),
       purchaseCurrency: f.purchaseCurrency || "EUR", active: f.active,
     };
@@ -74,6 +74,7 @@ export function ProductEditModal({ initial, onClose, onSaved }: { initial: Produ
           <div><label style={lbl}>{t("logistics.products.unit")}</label><input style={inp} value={f.unit} onChange={(e) => setF({ ...f, unit: e.target.value })} /></div>
           <div><label style={lbl}>{t("logistics.products.packaging")}</label><input style={inp} value={f.packaging ?? ""} onChange={(e) => setF({ ...f, packaging: e.target.value })} /></div>
           <div><label style={lbl}>{t("logistics.products.certificate")}</label><input style={inp} value={f.certificateNumber ?? ""} onChange={(e) => setF({ ...f, certificateNumber: e.target.value })} placeholder="2032-CPR-…" /></div>
+          <div style={{ gridColumn: "1 / -1" }}><label style={lbl}>{t("logistics.products.dispatchName")}</label><input style={inp} value={f.dispatchName ?? ""} onChange={(e) => setF({ ...f, dispatchName: e.target.value })} placeholder="цемент … , HOLCIM - рефуз / Цемент - 17 ПАЛЕТИ…" /></div>
           <div><label style={lbl}>{t("logistics.products.purchasePrice")}</label>
             <input style={inp} type="number" min={0} step="0.01" value={f.purchasePrice ?? ""} onChange={(e) => setF({ ...f, purchasePrice: e.target.value === "" ? null : Number(e.target.value) })} /></div>
           <div><label style={lbl}>{t("logistics.products.currency")}</label>

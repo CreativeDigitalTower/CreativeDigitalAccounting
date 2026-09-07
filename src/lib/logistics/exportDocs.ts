@@ -69,7 +69,7 @@ export type ExportSetSource = {
   invoiceNumber: string | null; invoiceDate: string | null; shipmentDate?: string | null;
   deliveryTerm?: string | null; placeOfShipment?: string | null;
   destination: string | null; truckRegSnapshot: string | null; trailerReg: string | null;
-  productSnapshot: string | null; customsCode?: string | null; certificateNumberSnapshot?: string | null;
+  productSnapshot: string | null; customsCode?: string | null; certificateNumberSnapshot?: string | null; dispatchName?: string | null;
   quantity: number | null; unit: string; declarationCmrDate: string | null; dispatchNumber: string | null;
   holcimProforma?: { number: string | null; date: string | null } | null;
 };
@@ -242,7 +242,9 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
         // ОТДЕЛНА editable стойност за реда „Денес … во бетонска база во …" (§4/§6).
         recipient, baseAddress: docType === "blank" ? null : (parties.client?.baseAddress ?? null),
         destination: src.destination,
-        rows: [{ lineNo: 1, truck, material: src.productSnapshot, unit: src.unit || "ТОН", quantity: src.quantity, valueMkd: "по фактура" }],
+        // „НАЗИВ НА МАТЕРИЈАЛИТЕ" ползва специалното име за Испратница (dispatchName); при
+        // празно → fallback към productSnapshot (§7/§8). Само тук — другите документи не се пипат.
+        rows: [{ lineNo: 1, truck, material: (src.dispatchName ?? "").trim() || src.productSnapshot, unit: src.unit || "ТОН", quantity: src.quantity, valueMkd: "по фактура" }],
         totalQuantity: src.quantity,
       };
     }

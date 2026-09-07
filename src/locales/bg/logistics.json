@@ -46,7 +46,8 @@
     "viewCert": "Преглед/Изтегли",
     "replaceCert": "Замени",
     "deleteCert": "Изтрий",
-    "pdfOnly": "Разрешен е само PDF файл."
+    "pdfOnly": "Разрешен е само PDF файл.",
+    "dispatchName": "Име за Испратница"
   },
   "vehicles": {
     "title": "Автомобили",

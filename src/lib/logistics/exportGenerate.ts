@@ -33,7 +33,7 @@ export async function regenerateSetDocuments(
     prisma.company.findUnique({ where: { id: companyId }, select: COMPANY_EXPORT_SELECT }),
     set.buyerCompanyId ? prisma.company.findUnique({ where: { id: set.buyerCompanyId }, select: COMPANY_EXPORT_SELECT }) : Promise.resolve(null),
     set.clientId ? prisma.client.findUnique({ where: { id: set.clientId }, select: { name: true, address: true, baseAddress: true, city: true, vatNumber: true, eik: true } }) : Promise.resolve(null),
-    set.logisticsProductId ? prisma.logisticsProduct.findUnique({ where: { id: set.logisticsProductId }, select: { customsCode: true, certificateNumber: true } }) : Promise.resolve(null),
+    set.logisticsProductId ? prisma.logisticsProduct.findUnique({ where: { id: set.logisticsProductId }, select: { customsCode: true, certificateNumber: true, dispatchName: true } }) : Promise.resolve(null),
   ]);
 
   const parties = {
@@ -51,6 +51,8 @@ export async function regenerateSetDocuments(
     // Сертификат: snapshot-ът е source of truth за историческа коректност (§17); при legacy
     // записи без snapshot → fallback към текущия сертификат на продукта (best effort).
     certificateNumberSnapshot: set.certificateNumberSnapshot ?? product?.certificateNumber ?? null,
+    // Име за Испратница (само за реда „НАЗИВ НА МАТЕРИЈАЛИТЕ"); fallback → productSnapshot.
+    dispatchName: product?.dispatchName ?? null,
     quantity: set.quantity, unit: set.unit, declarationCmrDate: set.declarationCmrDate?.toISOString() ?? null,
     dispatchNumber: set.dispatchNumber, holcimProforma: null as { number: string | null; date: string | null } | null,
   };

@@ -46,7 +46,8 @@
     "viewCert": "Görüntüle/İndir",
     "replaceCert": "Değiştir",
     "deleteCert": "Sil",
-    "pdfOnly": "Yalnızca PDF dosyalarına izin verilir."
+    "pdfOnly": "Yalnızca PDF dosyalarına izin verilir.",
+    "dispatchName": "İrsaliye adı"
   },
   "vehicles": {
     "title": "Araçlar",

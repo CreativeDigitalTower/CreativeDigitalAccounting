@@ -8,7 +8,7 @@ type Alias = { id: string; alias: string };
 type Product = {
   id: string; canonicalName: string; materialCode: string | null; unit: string;
   packaging: string | null; category: string | null; isSystemDefault: boolean; active: boolean; notes: string | null; aliases: Alias[];
-  certificateNumber: string | null; purchasePrice: number | null; purchaseCurrency: string | null; hasCertificatePdf: boolean; certificateFileName: string | null;
+  certificateNumber: string | null; purchasePrice: number | null; purchaseCurrency: string | null; dispatchName: string | null; hasCertificatePdf: boolean; certificateFileName: string | null;
 };
 
 export function LogisticsProducts({ canManage }: { canManage: boolean }) {
@@ -16,7 +16,7 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
   const [items, setItems] = useState<Product[]>([]);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState({ canonicalName: "", materialCode: "", unit: "t", packaging: "", category: "bulk", certificateNumber: "", purchasePrice: "", purchaseCurrency: "EUR" });
+  const [form, setForm] = useState({ canonicalName: "", materialCode: "", unit: "t", packaging: "", category: "bulk", certificateNumber: "", dispatchName: "", purchasePrice: "", purchaseCurrency: "EUR" });
   const [aliasDraft, setAliasDraft] = useState<Record<string, string>>({});
   const [showArchived, setShowArchived] = useState(false);
   const [editTarget, setEditTarget] = useState<Product | null>(null);
@@ -41,12 +41,12 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
     setErr(""); setBusy(true);
     const r = await fetch("/api/logistics/products", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ canonicalName: form.canonicalName, materialCode: form.materialCode || null, unit: form.unit, packaging: form.packaging || null, category: form.category || null, certificateNumber: form.certificateNumber || null, purchasePrice: form.purchasePrice === "" ? null : Number(form.purchasePrice), purchaseCurrency: form.purchaseCurrency || "EUR" }),
+      body: JSON.stringify({ canonicalName: form.canonicalName, materialCode: form.materialCode || null, unit: form.unit, packaging: form.packaging || null, category: form.category || null, certificateNumber: form.certificateNumber || null, dispatchName: form.dispatchName || null, purchasePrice: form.purchasePrice === "" ? null : Number(form.purchasePrice), purchaseCurrency: form.purchaseCurrency || "EUR" }),
     });
     const j = await r.json().catch(() => ({}));
     setBusy(false);
     if (!r.ok) { setErr(j.error ?? t("logistics.common.err")); return; }
-    setForm({ canonicalName: "", materialCode: "", unit: "t", packaging: "", category: "bulk", certificateNumber: "", purchasePrice: "", purchaseCurrency: "EUR" });
+    setForm({ canonicalName: "", materialCode: "", unit: "t", packaging: "", category: "bulk", certificateNumber: "", dispatchName: "", purchasePrice: "", purchaseCurrency: "EUR" });
     load();
   }
 
@@ -67,7 +67,7 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
   const grouped = [...items].filter((p) => showArchived || p.active).sort((a, b) => order(a.category) - order(b.category) || a.canonicalName.localeCompare(b.canonicalName));
   const catLabel = (c: string | null) => c === "bulk" ? t("logistics.products.categoryBulk") : c === "packaged" ? t("logistics.products.categoryPackaged") : t("logistics.products.categoryNone");
   const priceLabel = (p: Product) => p.purchasePrice != null ? `${p.purchasePrice.toFixed(2)} ${p.purchaseCurrency ?? "EUR"}/${p.unit}` : "—";
-  const catCols = canManage ? 10 : 9;
+  const catCols = canManage ? 11 : 10;
 
   return (
     <div>
@@ -96,6 +96,8 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
             <input style={{ ...inp, width: 120 }} value={form.packaging} onChange={(e) => setForm({ ...form, packaging: e.target.value })} /></div>
           <div><label style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.products.certificate")}</label><br />
             <input style={{ ...inp, width: 150 }} value={form.certificateNumber} onChange={(e) => setForm({ ...form, certificateNumber: e.target.value })} placeholder="2032-CPR-…" /></div>
+          <div><label style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.products.dispatchName")}</label><br />
+            <input style={{ ...inp, width: 220 }} value={form.dispatchName} onChange={(e) => setForm({ ...form, dispatchName: e.target.value })} placeholder="цемент … / Цемент - 17 ПАЛЕТИ…" /></div>
           <div><label style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.products.purchasePrice")}</label><br />
             <input style={{ ...inp, width: 90 }} type="number" min={0} step="0.01" value={form.purchasePrice} onChange={(e) => setForm({ ...form, purchasePrice: e.target.value })} /></div>
           <div><label style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.products.currency")}</label><br />
@@ -108,7 +110,7 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
         {items.length === 0 ? <div style={{ fontSize: 13, color: "var(--muted)" }}>{t("logistics.products.empty")}</div> : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead><tr>
-              <th style={th}>{t("logistics.products.name")}</th><th style={th}>{t("logistics.products.category")}</th><th style={th}>{t("logistics.products.materialCode")}</th>
+              <th style={th}>{t("logistics.products.name")}</th><th style={th}>{t("logistics.products.dispatchName")}</th><th style={th}>{t("logistics.products.category")}</th><th style={th}>{t("logistics.products.materialCode")}</th>
               <th style={th}>{t("logistics.products.unit")}</th><th style={th}>{t("logistics.products.packaging")}</th>
               <th style={th}>{t("logistics.products.certificate")}</th><th style={{ ...th, textAlign: "right" }}>{t("logistics.products.purchasePrice")}</th>
               <th style={th}>{t("logistics.products.aliases")}</th><th style={th}>{t("logistics.common.status")}</th>
@@ -125,6 +127,7 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
                 {header}
                 <tr key={p.id} style={{ opacity: p.active ? 1 : 0.55 }}>
                   <td style={td}><strong>{p.canonicalName}</strong>{p.isSystemDefault ? <span style={{ marginLeft: 6, fontSize: 10, color: "var(--muted)" }}>●</span> : null}</td>
+                  <td style={{ ...td, fontSize: 11.5, color: "var(--ink-soft)", maxWidth: 260 }}>{p.dispatchName ?? "—"}</td>
                   <td style={td}><span style={{ fontSize: 11, background: p.category === "bulk" ? "rgba(15,138,106,.12)" : p.category === "packaged" ? "rgba(178,120,42,.14)" : "rgba(0,0,0,.06)", borderRadius: 8, padding: "1px 7px" }}>{catLabel(p.category)}</span></td>
                   <td style={td}>{p.materialCode ?? "—"}</td>
                   <td style={td}>{p.unit}</td>
@@ -167,7 +170,7 @@ export function LogisticsProducts({ canManage }: { canManage: boolean }) {
 
       {editTarget && (
         <ProductEditModal
-          initial={{ id: editTarget.id, canonicalName: editTarget.canonicalName, category: editTarget.category, materialCode: editTarget.materialCode, unit: editTarget.unit, packaging: editTarget.packaging, certificateNumber: editTarget.certificateNumber, purchasePrice: editTarget.purchasePrice, purchaseCurrency: editTarget.purchaseCurrency, active: editTarget.active, hasCertificatePdf: editTarget.hasCertificatePdf, certificateFileName: editTarget.certificateFileName } satisfies ProductForm}
+          initial={{ id: editTarget.id, canonicalName: editTarget.canonicalName, category: editTarget.category, materialCode: editTarget.materialCode, unit: editTarget.unit, packaging: editTarget.packaging, certificateNumber: editTarget.certificateNumber, dispatchName: editTarget.dispatchName, purchasePrice: editTarget.purchasePrice, purchaseCurrency: editTarget.purchaseCurrency, active: editTarget.active, hasCertificatePdf: editTarget.hasCertificatePdf, certificateFileName: editTarget.certificateFileName } satisfies ProductForm}
           onClose={() => setEditTarget(null)}
           onSaved={() => { setEditTarget(null); void load(); }}
         />

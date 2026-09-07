@@ -46,7 +46,8 @@
     "viewCert": "Просмотр/Скачать",
     "replaceCert": "Заменить",
     "deleteCert": "Удалить",
-    "pdfOnly": "Разрешены только PDF-файлы."
+    "pdfOnly": "Разрешены только PDF-файлы.",
+    "dispatchName": "Название для накладной"
   },
   "vehicles": {
     "title": "Автомобили",

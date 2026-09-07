@@ -46,7 +46,8 @@
     "viewCert": "Vizualizează/Descarcă",
     "replaceCert": "Înlocuiește",
     "deleteCert": "Șterge",
-    "pdfOnly": "Sunt permise doar fișiere PDF."
+    "pdfOnly": "Sunt permise doar fișiere PDF.",
+    "dispatchName": "Nume pentru aviz"
   },
   "vehicles": {
     "title": "Vehicule",
