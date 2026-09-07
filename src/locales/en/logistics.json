@@ -46,7 +46,8 @@
     "viewCert": "View/Download",
     "replaceCert": "Replace",
     "deleteCert": "Delete",
-    "pdfOnly": "Only PDF files are allowed."
+    "pdfOnly": "Only PDF files are allowed.",
+    "dispatchName": "Dispatch name"
   },
   "vehicles": {
     "title": "Vehicles",

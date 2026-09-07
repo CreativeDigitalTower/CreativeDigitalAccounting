@@ -46,7 +46,8 @@
     "viewCert": "Προβολή/Λήψη",
     "replaceCert": "Αντικατάσταση",
     "deleteCert": "Διαγραφή",
-    "pdfOnly": "Επιτρέπονται μόνο αρχεία PDF."
+    "pdfOnly": "Επιτρέπονται μόνο αρχεία PDF.",
+    "dispatchName": "Όνομα δελτίου αποστολής"
   },
   "vehicles": {
     "title": "Οχήματα",

@@ -11,7 +11,7 @@ const CURRENCY_CODES: string[] = CURRENCIES.map((c) => c.code);
 const select = {
   id: true, canonicalName: true, materialCode: true, unit: true, packaging: true,
   category: true, isSystemDefault: true, active: true, notes: true, createdAt: true, updatedAt: true,
-  certificateNumber: true, purchasePrice: true, purchaseCurrency: true,
+  certificateNumber: true, purchasePrice: true, purchaseCurrency: true, dispatchName: true,
   certificateFileName: true, certificateFileMime: true, certificateUploadedAt: true,
   aliases: { select: { id: true, alias: true } },
 } as const;
@@ -41,6 +41,7 @@ const schema = z.object({
   notes: z.string().max(2000).nullable().optional(),
   // Сертификат + покупна цена (§7/§15/§20). Optional; валута по подразбиране EUR.
   certificateNumber: z.string().trim().max(120).nullable().optional(),
+  dispatchName: z.string().trim().max(300).nullable().optional(),
   purchasePrice: z.number().min(0).nullable().optional(),
   purchaseCurrency: z.string().refine((c) => CURRENCY_CODES.includes(c), "Невалидна валута.").nullable().optional(),
 });
@@ -64,6 +65,7 @@ export async function POST(req: Request) {
         materialCode: d.materialCode?.trim() || null, unit: d.unit, packaging: d.packaging ?? null,
         category: d.category, isSystemDefault: false, notes: d.notes ?? null,
         certificateNumber: d.certificateNumber?.trim() || null,
+        dispatchName: d.dispatchName?.trim() || null,
         purchasePrice: d.purchasePrice ?? null,
         purchaseCurrency: d.purchasePrice != null ? (d.purchaseCurrency ?? "EUR") : (d.purchaseCurrency ?? null),
       }, select,

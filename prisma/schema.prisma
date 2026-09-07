@@ -862,6 +862,10 @@ model LogisticsProduct {
   certificateNumber String?
   purchasePrice     Decimal? @db.Decimal(12, 4)
   purchaseCurrency  String?
+  // Специално име за документа „Испратница" (само за реда „НАЗИВ НА МАТЕРИЈАЛИТЕ"). Additive/
+  // nullable; НЕ влияе на canonicalName и на другите документи (Invoice/CMR/…). Fallback →
+  // canonicalName при празно.
+  dispatchName      String?
   // PDF сертификат — inline (същия pattern като документните прикачени файлове, §10/§11).
   certificateFileData     String?   @db.Text
   certificateFileName     String?
