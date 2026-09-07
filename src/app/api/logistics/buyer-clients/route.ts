@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logisticsApiGuard, groupCounterparties } from "@/lib/logistics/access";
 import { isLinkedBuyer } from "@/lib/logistics/clientScope";
+import { normalizeClientName } from "@/lib/logistics/clientDedupe";
 import { z } from "zod";
 
 // Клиентите на СВЪРЗАНАТА (buyer) фирма — за полето „До:" в Испратницата (§1/§2).
@@ -39,9 +40,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Фирмата не е свързана в групата." }, { status: 403 });
     }
     const name = d.name.trim();
-    // Dedup по име в рамките на buyer фирмата (не създаваме дубликат, §10).
-    const existing = await prisma.client.findFirst({ where: { companyId: d.companyId, name: { equals: name, mode: "insensitive" } }, select: { id: true, name: true } });
-    if (existing) return NextResponse.json(existing);
+    // Dedup по НОРМАЛИЗИРАНО име в рамките на buyer фирмата (root cause на дубликатите —
+    // преди беше само exact-insensitive, което пропускаше разлики в интервали/пунктуация/тирета).
+    const nName = normalizeClientName(name);
+    const candidates = await prisma.client.findMany({ where: { companyId: d.companyId }, select: { id: true, name: true } });
+    const existing = candidates.find((c) => normalizeClientName(c.name) === nName);
+    if (existing) return NextResponse.json({ id: existing.id, name: existing.name });
     const created = await prisma.client.create({ data: { companyId: d.companyId, name }, select: { id: true, name: true } });
     return NextResponse.json(created);
   } catch (err) {

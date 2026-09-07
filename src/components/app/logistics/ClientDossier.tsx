@@ -13,7 +13,7 @@ type Hist = { id: string; year: number; revenue: number | null; quantity: number
 type HistP = { id: string; year: number; product: string; quantity: number | null; revenue: number | null };
 type DeliveryStats = { trips: number; quantity: number; firstTrip: string | null; lastTrip: string | null; thisMonthTrips: number; thisMonthQuantity: number; distinctVehicles: number; distinctProducts: number; monthly: { month: string; trips: number; quantity: number }[] };
 type DeliveryRow = { id: string; invoiceNumber: string; date: string | null; truck: string | null; trailer: string | null; product: string | null; quantity: number | null; unit: string; destination: string | null; vehicleId: string | null; attachmentCount: number };
-type Data = { id: string; name: string; eik: string | null; vatNumber: string | null; city: string | null; address: string | null; country: string | null; phone: string | null; contactEmail: string | null; contactPerson: string | null; deliveryStats: DeliveryStats; deliveries: DeliveryRow[]; summary: Summary; invoices: Invoice[]; historical: Hist[]; historicalProducts: HistP[] };
+type Data = { id: string; name: string; eik: string | null; vatNumber: string | null; city: string | null; address: string | null; baseAddress: string | null; country: string | null; phone: string | null; contactEmail: string | null; contactPerson: string | null; deliveryStats: DeliveryStats; deliveries: DeliveryRow[]; summary: Summary; invoices: Invoice[]; historical: Hist[]; historicalProducts: HistP[] };
 
 export function ClientDossier({ id, canManage, canEdit = false }: { id: string; canManage: boolean; canEdit?: boolean }) {
   const t = useT();
@@ -61,7 +61,25 @@ export function ClientDossier({ id, canManage, canEdit = false }: { id: string; 
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
         <Link href="/dashboard/logistics/clients" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← {t("logistics.clients.title")}</Link>
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{d.name}</h1>
-        {canEdit && <button className="btn btn-ghost btn-sm" style={{ marginLeft: "auto" }} onClick={() => setEditing({ id: d.id, name: d.name, eik: d.eik ?? "", vatNumber: d.vatNumber ?? "", address: d.address ?? "", city: d.city ?? "", country: d.country ?? "", phone: d.phone ?? "", contactEmail: d.contactEmail ?? "", contactPerson: d.contactPerson ?? "" })}>{t("logistics.clients.editClient")}</button>}
+        {canEdit && <button className="btn btn-ghost btn-sm" style={{ marginLeft: "auto" }} onClick={() => setEditing({ id: d.id, name: d.name, eik: d.eik ?? "", vatNumber: d.vatNumber ?? "", address: d.address ?? "", baseAddress: d.baseAddress ?? "", city: d.city ?? "", country: d.country ?? "", phone: d.phone ?? "", contactEmail: d.contactEmail ?? "", contactPerson: d.contactPerson ?? "" })}>{t("logistics.clients.editClient")}</button>}
+      </div>
+
+      {/* Адреси (§23): регистрация + база (физически адрес на доставка) */}
+      <div className="glass panel" style={{ marginBottom: 14, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 14 }}>
+        <div>
+          <div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 2 }}>{t("logistics.clients.fRegAddress")}</div>
+          <div style={{ fontSize: 13 }}>{d.address || "—"}{d.city ? `, ${d.city}` : ""}{d.country ? `, ${d.country}` : ""}</div>
+        </div>
+        <div>
+          <div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 2 }}>{t("logistics.clients.fBaseAddress")}</div>
+          <div style={{ fontSize: 13 }}>{d.baseAddress || "—"}</div>
+        </div>
+        {(d.eik || d.vatNumber || d.phone || d.contactEmail || d.contactPerson) && (
+          <div>
+            <div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 2 }}>{t("logistics.clients.fContact")}</div>
+            <div style={{ fontSize: 13 }}>{[d.contactPerson, d.phone, d.contactEmail].filter(Boolean).join(" · ") || "—"}</div>
+          </div>
+        )}
       </div>
 
       {/* Статистика по доставки (§23-§24) — derived от Export Deliveries */}

@@ -516,7 +516,16 @@
     "sortQuantity": "Largest quantity",
     "sortRecent": "Most recent delivery",
     "sortName": "Name A–Z",
-    "noDeliveries": "No deliveries in period"
+    "noDeliveries": "No deliveries in period",
+    "fRegAddress": "Registration address",
+    "fBaseAddress": "Base address",
+    "showArchived": "Show archived",
+    "archivedBadge": "Archived",
+    "restore": "Restore",
+    "deleteTitle": "Delete client",
+    "deleteConfirm": "Are you sure you want to delete this client?",
+    "deleteHasHistory": "This client has related history — it will be archived (history is preserved).",
+    "deleteConfirmBtn": "Delete client"
   },
   "dash": {
     "today": "Today",
