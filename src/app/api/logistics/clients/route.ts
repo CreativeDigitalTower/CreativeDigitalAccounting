@@ -4,7 +4,7 @@ import { logisticsApiGuard } from "@/lib/logistics/access";
 import { isPeriodKey, resolvePeriodRange, prismaDateFilter } from "@/lib/logistics/period";
 import { sortClients, clientKpis, isClientSort, type ClientStatRow } from "@/lib/logistics/clientStats";
 import { resolveFinalClientCompanyId, assertClientCompanyInGroup } from "@/lib/logistics/finalClient";
-import { normalizeEik, normalizeClientName } from "@/lib/logistics/clientDedupe";
+import { normalizeEik, normalizeClientName, collapseByCanonical, type AggRow } from "@/lib/logistics/clientDedupe";
 import { z } from "zod";
 
 // „Клиенти (логистика)" — крайните MK клиенти (CRM на SEM, §20) с автоматична статистика
@@ -39,13 +39,22 @@ export async function GET(req: Request) {
   ]);
 
   const round3 = (n: number) => Math.round(n * 1000) / 1000;
-  const aggMap = new Map(agg.map((a) => [a.clientId as string, {
+
+  // CROSS-COMPANY canonical resolution (root cause на дублиращите редове): част от старите
+  // доставки сочат clientId към Client под Metal Trade, докато същият реален MK клиент
+  // съществува и като SEM Client. Тук мапваме всеки delivery clientId към canonical SEM
+  // клиент по нормализиран ЕИК/име и събираме статистиката в ЕДИН ред (§6/§7/§8).
+  const aggClientIds = agg.map((a) => a.clientId as string).filter(Boolean);
+  const meta = aggClientIds.length ? await prisma.client.findMany({ where: { id: { in: aggClientIds } }, select: { id: true, name: true, eik: true } }) : [];
+  const aggRows: AggRow[] = agg.map((a) => ({
+    clientId: a.clientId as string,
     deliveries: a._count._all,
     quantity: round3(a._sum.quantity ?? 0),
     lastDelivery: (a._max.shipmentDate ?? a._max.invoiceDate ?? null)?.toISOString() ?? null,
-  }]));
+  }));
+  const aggMap = collapseByCanonical(base, meta, aggRows);
 
-  // Клиенти с доставки, но извън базовия списък (напр. legacy запис в друга фирма от групата).
+  // Останали клиенти с доставки, за които НЯМА canonical SEM съвпадение → показват се веднъж.
   const baseIds = new Set(base.map((c) => c.id));
   const extraIds = [...aggMap.keys()].filter((id) => !baseIds.has(id));
   const extra = extraIds.length ? await prisma.client.findMany({ where: { id: { in: extraIds } }, select: sel }) : [];
