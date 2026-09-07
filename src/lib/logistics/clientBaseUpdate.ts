@@ -21,12 +21,15 @@ export type ExistingClient = {
   city: string | null; country: string | null;
 };
 
-export type PlanAction = "CREATE" | "UPDATE" | "NO_CHANGE" | "AMBIGUOUS" | "CONFLICT";
+export type PlanAction = "CREATE" | "BASE_ADDRESS_UPDATE" | "NO_CHANGE" | "AMBIGUOUS";
 export type FieldChange = { field: string; from: string | null; to: string | null };
 export type ClientПlan = {
   key: string; action: PlanAction; matchReason: "EIK" | "name" | "NEW" | "ambiguous";
   clientId: string | null; currentName: string | null; targetName: string;
-  changes: FieldChange[]; conflicts: string[]; notes: string[];
+  changes: FieldChange[]; // САМО безопасните записи (baseAddress + попълване на празни полета)
+  warnings: string[];     // различия в непразни master полета — НЕ се презаписват (§1/§9)
+  manualReview: boolean;  // има ли различия за ръчен преглед (напр. EIK conflict)
+  notes: string[];
 };
 
 const norm = (s: string | null | undefined) => (s ?? "").trim();
@@ -56,10 +59,10 @@ export function planClientUpdate(entry: ClientEntry, existing: ExistingClient[])
   const base = { key: entry.key, targetName: entry.name, notes } as const;
 
   if (candidates.length > 1) {
-    return { ...base, action: "AMBIGUOUS", matchReason: "ambiguous", clientId: null, currentName: null, changes: [], conflicts: [`${candidates.length} съвпадения: ${candidates.map((c) => c.id).join(", ")}`] };
+    return { ...base, action: "AMBIGUOUS", matchReason: "ambiguous", clientId: null, currentName: null, changes: [], warnings: [`${candidates.length} съвпадения: ${candidates.map((c) => c.id).join(", ")}`], manualReview: true };
   }
 
-  // CREATE — реално липсва
+  // CREATE — реално липсва: пълни master данни (§7/§10).
   if (candidates.length === 0) {
     const changes: FieldChange[] = [
       { field: "name", from: null, to: entry.name },
@@ -69,27 +72,37 @@ export function planClientUpdate(entry: ClientEntry, existing: ExistingClient[])
       { field: "city", from: null, to: entry.city ?? null },
       { field: "country", from: null, to: entry.country ?? null },
     ].filter((c) => norm(c.to));
-    return { ...base, action: "CREATE", matchReason: "NEW", clientId: null, currentName: null, changes, conflicts: [] };
+    return { ...base, action: "CREATE", matchReason: "NEW", clientId: null, currentName: null, changes, warnings: [], manualReview: false };
   }
 
-  // UPDATE — намерен точно един canonical
+  // Съществуващ canonical: САМО baseAddress + попълване на празни полета. Непразните master
+  // полета НЕ се презаписват — само warning (§1/§6/§9).
   const c = candidates[0];
   const changes: FieldChange[] = [];
-  const conflicts: string[] = [];
+  const warnings: string[] = [];
 
-  // ЕДБ: допълва се само ако е празно; при различна непразна стойност → CONFLICT (не се презаписва).
-  if (entry.eik && norm(entry.eik)) {
-    if (!norm(c.eik)) changes.push({ field: "eik", from: c.eik ?? null, to: entry.eik });
-    else if (normEikMk(c.eik) !== eNorm) conflicts.push(`ЕДБ: съществуващ ${c.eik} ≠ подаден ${entry.eik} (запазва се съществуващият)`);
+  // Адрес на база — авторитетен от списъка (§6): update при подаден и различен; null не трие (§3/§4).
+  if (norm(entry.baseAddress) && diff(c.baseAddress, entry.baseAddress)) changes.push({ field: "baseAddress", from: c.baseAddress, to: entry.baseAddress });
+  // Адрес на регистрация — попълва се само при празно; иначе запазва се + warning (§2/§5).
+  if (norm(entry.regAddress)) {
+    if (!norm(c.address)) changes.push({ field: "address", from: c.address, to: entry.regAddress });
+    else if (diff(c.address, entry.regAddress)) warnings.push(`registration address differs (current „${norm(c.address)}" ≠ provided „${norm(entry.regAddress)}") — запазен current`);
   }
-  // Адрес на регистрация: обновява се към подадения (бизнес актуалност), с отчет при промяна.
-  if (entry.regAddress && diff(c.address, entry.regAddress)) changes.push({ field: "address", from: c.address, to: entry.regAddress });
-  // Адрес на база: задава се при подаден и различен; null НЕ трие съществуващ (§4).
-  if (entry.baseAddress && diff(c.baseAddress, entry.baseAddress)) changes.push({ field: "baseAddress", from: c.baseAddress, to: entry.baseAddress });
-  // city/country: попълват се само ако са празни (без глобален reformat, §7).
-  if (entry.city && !norm(c.city)) changes.push({ field: "city", from: c.city, to: entry.city });
-  if (entry.country && !norm(c.country)) changes.push({ field: "country", from: c.country, to: entry.country });
+  // Град — попълва се само при празно.
+  if (norm(entry.city)) {
+    if (!norm(c.city)) changes.push({ field: "city", from: c.city, to: entry.city ?? null });
+    else if (diff(c.city, entry.city)) warnings.push(`city differs (current „${norm(c.city)}" ≠ provided „${norm(entry.city)}") — запазен current`);
+  }
+  // Държава — попълва се само при празно.
+  if (norm(entry.country) && !norm(c.country)) changes.push({ field: "country", from: c.country, to: entry.country ?? null });
+  // Име — никога не се преименува автоматично; warning само при различие в НОРМАЛИЗИРАНОТО име.
+  if (norm(entry.name) && normalizeClientName(c.name) !== nName) warnings.push(`name differs (current „${norm(c.name)}" ≠ provided „${norm(entry.name)}") — запазено current`);
+  // ЕДБ — попълва се при празно; различна непразна стойност → MANUAL_REVIEW, НЕ блокира baseAddress (§4/§6).
+  if (norm(entry.eik)) {
+    if (!norm(c.eik)) changes.push({ field: "eik", from: c.eik ?? null, to: entry.eik });
+    else if (normEikMk(c.eik) !== eNorm) warnings.push(`EIK differs (current „${norm(c.eik)}" ≠ provided „${norm(entry.eik)}") — MANUAL_REVIEW, запазен current`);
+  }
 
-  const action: PlanAction = conflicts.length ? "CONFLICT" : changes.length ? "UPDATE" : "NO_CHANGE";
-  return { ...base, action, matchReason, clientId: c.id, currentName: c.name, changes, conflicts };
+  const action: PlanAction = changes.length ? "BASE_ADDRESS_UPDATE" : "NO_CHANGE";
+  return { ...base, action, matchReason, clientId: c.id, currentName: c.name, changes, warnings, manualReview: warnings.length > 0 };
 }
