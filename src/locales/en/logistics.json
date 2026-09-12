@@ -696,7 +696,9 @@
     "dossier": "Dossier",
     "docsBreakdown": "{gen} generated + {att} uploaded",
     "regAddress": "Registration address",
-    "baseAddress": "Base address"
+    "baseAddress": "Base address",
+    "blankDispatch": "Blank dispatch note",
+    "blankDispatchHint": "Without auto-filling the „До:“ line and the base address."
   },
   "fleet": {
     "title": "Fleet",

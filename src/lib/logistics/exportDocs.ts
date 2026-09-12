@@ -69,7 +69,7 @@ export type ExportSetSource = {
   invoiceNumber: string | null; invoiceDate: string | null; shipmentDate?: string | null;
   deliveryTerm?: string | null; placeOfShipment?: string | null;
   destination: string | null; truckRegSnapshot: string | null; trailerReg: string | null;
-  productSnapshot: string | null; customsCode?: string | null; certificateNumberSnapshot?: string | null; dispatchName?: string | null;
+  productSnapshot: string | null; customsCode?: string | null; certificateNumberSnapshot?: string | null; dispatchName?: string | null; blankDispatchNote?: boolean;
   quantity: number | null; unit: string; declarationCmrDate: string | null; dispatchNumber: string | null;
   holcimProforma?: { number: string | null; date: string | null } | null;
 };
@@ -232,15 +232,19 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
       };
     case "dispatch":
     case "blank": {
-      const recipient = docType === "blank" ? null : (parties.client ?? null);
+      // „Празна Испратница" (§3): docType „blank" ИЛИ флагът blankDispatchNote → празни „До:"
+      // и „Денес…" (без клиент/адрес). Останалите данни (материал/камион/количество/дата) остават.
+      const blankRecipient = docType === "blank" || src.blankDispatchNote === true;
+      const recipient = blankRecipient ? null : (parties.client ?? null);
       return {
+        blankRecipient,
         // „Денес {дата}" в испратницата = ДАТА НА ИЗПРАЩАНЕ (§4/§28/§29), не invoiceDate.
         dispatchNumber: src.dispatchNumber, date: src.shipmentDate ?? src.invoiceDate,
         // MK фирмата издава испратницата — на кирилица както в оригинала (§3).
         issuer: resolveDispatchIssuer(parties.buyer),
         // recipient (за „До:") ползва registration address (client.address, §2). baseAddress е
         // ОТДЕЛНА editable стойност за реда „Денес … во бетонска база во …" (§4/§6).
-        recipient, baseAddress: docType === "blank" ? null : (parties.client?.baseAddress ?? null),
+        recipient, baseAddress: blankRecipient ? null : (parties.client?.baseAddress ?? null),
         destination: src.destination,
         // „НАЗИВ НА МАТЕРИЈАЛИТЕ" ползва специалното име за Испратница (dispatchName); при
         // празно → fallback към productSnapshot (§7/§8). Само тук — другите документи не се пипат.

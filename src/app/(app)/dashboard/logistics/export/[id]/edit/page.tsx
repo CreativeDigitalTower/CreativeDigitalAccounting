@@ -16,7 +16,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     select: {
       id: true, invoiceNumber: true, invoiceDate: true, shipmentDate: true, deliveryTerm: true, placeOfShipment: true,
       destination: true, truckVehicleId: true, trailerReg: true, logisticsProductId: true, quantity: true,
-      declarationCmrDate: true, dispatchNumber: true, buyerCompanyId: true, clientId: true,
+      declarationCmrDate: true, dispatchNumber: true, buyerCompanyId: true, clientId: true, blankDispatchNote: true,
     },
   });
   if (!set) notFound();
@@ -64,7 +64,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         deliveryTerm: set.deliveryTerm, placeOfShipment: set.placeOfShipment, destination: set.destination,
         truckVehicleId: set.truckVehicleId, trailerReg: set.trailerReg, logisticsProductId: set.logisticsProductId,
         quantity: set.quantity, declarationCmrDate: set.declarationCmrDate?.toISOString() ?? null,
-        dispatchNumber: set.dispatchNumber, buyerCompanyId: set.buyerCompanyId, clientId: set.clientId,
+        dispatchNumber: set.dispatchNumber, buyerCompanyId: set.buyerCompanyId, clientId: set.clientId, blankDispatchNote: set.blankDispatchNote,
       }}
       initialClientName={currentClient?.name ?? null}
       mkInvoice={mkInvoice}

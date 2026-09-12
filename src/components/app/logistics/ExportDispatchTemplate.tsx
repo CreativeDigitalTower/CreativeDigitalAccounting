@@ -10,6 +10,8 @@ export type DispatchDocData = {
   // Адрес на базата — физическият обект на доставка (§4/§6). Отделен от recipient.address
   // (адрес на регистрация, който отива в „До:"). Ползва се само в реда „Денес … во база …".
   baseAddress?: string | null;
+  // „Празна Испратница" на ниво документ (§3): празни „До:" и „Денес…", останалото попълнено.
+  blankRecipient?: boolean;
   destination?: string | null; rows?: Row[]; totalQuantity?: number | null; blank?: boolean;
 };
 
@@ -39,7 +41,9 @@ export function ExportDispatchTemplate({ data, blank = false }: { data: Dispatch
   const cell: React.CSSProperties = { border: B, padding: "2px 4px", fontSize: 11, verticalAlign: "middle", height: 22, overflow: "hidden" };
   const hcell: React.CSSProperties = { ...cell, textAlign: "center", fontWeight: 700, fontSize: 10.5, lineHeight: 1.05, whiteSpace: "nowrap" };
   const dots = (n = 90) => "." .repeat(n);
-  const recipientText = blank ? "" : [data.recipient?.name, data.recipient?.address, data.recipient?.city].filter(Boolean).join(", ");
+  // Празен режим: „blank" копие ИЛИ document-level blankRecipient (§3/§6). Празни „До:"/„Денес".
+  const blankMode = blank || !!data.blankRecipient;
+  const recipientText = blankMode ? "" : [data.recipient?.name, data.recipient?.address, data.recipient?.city].filter(Boolean).join(", ");
 
   return (
     <div className="printable dispatch-copy" style={{ fontFamily: "'Times New Roman', Times, serif", color: "#000", background: "#fff", width: "100%", boxSizing: "border-box", padding: "4mm 6mm", fontSize: 12, lineHeight: 1.25 }}>
@@ -69,7 +73,7 @@ export function ExportDispatchTemplate({ data, blank = false }: { data: Dispatch
       <div style={{ display: "flex", alignItems: "baseline", whiteSpace: "nowrap", overflow: "hidden", marginBottom: 6 }}>
         <span>Денес&nbsp;</span>
         <span style={{ fontWeight: 600 }}>{d(data.date)}</span>
-        {blank ? (
+        {blankMode ? (
           <span style={{ flex: 1, letterSpacing: 1, overflow: "hidden" }}>&nbsp;{dots(120)}</span>
         ) : (
           <>

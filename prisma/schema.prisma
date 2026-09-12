@@ -1399,6 +1399,10 @@ model ExportDocumentSet {
   declarationCmrDate DateTime?
   dispatchNumber     String?
   status             String    @default("draft") // draft | ready | finalized | cancelled
+  // „Празна Испратница" (§1/§10): само за документа Испратница — initial snapshot за „До:" и
+  // реда „Денес…" е празен (без клиент/адрес). НЕ влияе на clientId relation, на другите
+  // документи или на Client/Product master. Additive/nullable-safe с default false (§12).
+  blankDispatchNote  Boolean   @default(false)
   note               String?   @db.Text
   createdById        String?
   // Soft delete (Кошче). deletedAt != null → доставката е в Кошчето: скрита от

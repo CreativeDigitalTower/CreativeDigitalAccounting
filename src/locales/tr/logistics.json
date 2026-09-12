@@ -696,7 +696,9 @@
     "dossier": "Dosya",
     "docsBreakdown": "{gen} oluşturuldu + {att} yüklendi",
     "regAddress": "Kayıt adresi",
-    "baseAddress": "Üs adresi"
+    "baseAddress": "Üs adresi",
+    "blankDispatch": "Boş irsaliye",
+    "blankDispatchHint": "„До:“ satırı ve üs adresi otomatik doldurulmadan."
   },
   "fleet": {
     "title": "Fleet",

@@ -118,6 +118,7 @@ const schema = z.object({
   unit: z.string().max(20).optional(),
   declarationCmrDate: optDate,
   dispatchNumber: z.string().max(60).nullable().optional(),
+  blankDispatchNote: z.boolean().optional(),
   note: z.string().max(2000).nullable().optional(),
 });
 
@@ -201,6 +202,7 @@ export async function POST(req: Request) {
           truckVehicleId: d.truckVehicleId || null, truckRegSnapshot: vehicle?.registration ?? null, trailerReg: trailer,
           logisticsProductId: d.logisticsProductId || null, productSnapshot: product?.canonicalName ?? null,
           certificateNumberSnapshot: product?.certificateNumber ?? null, // §17 — фиксира сертификата към момента
+          blankDispatchNote: d.blankDispatchNote ?? false, // празна Испратница (§1/§10)
           quantity: d.quantity ?? null, unit, declarationCmrDate: d.declarationCmrDate ? new Date(d.declarationCmrDate) : null,
           dispatchNumber, note: d.note ?? null, createdById: g.userId,
         },
