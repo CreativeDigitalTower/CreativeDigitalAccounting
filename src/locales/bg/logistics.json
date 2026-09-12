@@ -696,7 +696,9 @@
     "dossier": "Досие",
     "docsBreakdown": "{gen} генерирани + {att} прикачени",
     "regAddress": "Адрес на регистрация",
-    "baseAddress": "Адрес на базата"
+    "baseAddress": "Адрес на базата",
+    "blankDispatch": "Празна Испратница",
+    "blankDispatchHint": "Без автоматично попълване на „До:“ и адреса на базата."
   },
   "fleet": {
     "title": "Автопарк",

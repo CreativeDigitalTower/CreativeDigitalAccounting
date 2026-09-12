@@ -56,7 +56,7 @@ describe("Template & editor wiring (§2/§3/§6/§12/§13)", () => {
   });
   it("3/11) recipient line uses recipient.address (registration), not baseAddress", () => {
     const s = read("src/components/app/logistics/ExportDispatchTemplate.tsx");
-    expect(s).toMatch(/recipientText = blank \? "" : \[data\.recipient\?\.name, data\.recipient\?\.address, data\.recipient\?\.city\]/);
+    expect(s).toMatch(/recipientText = blankMode \? "" : \[data\.recipient\?\.name, data\.recipient\?\.address, data\.recipient\?\.city\]/);
   });
   it("3-editor) registration + base address fields (baseAddress path)", () => {
     const s = read("src/components/app/logistics/ExportDocEditor.tsx");

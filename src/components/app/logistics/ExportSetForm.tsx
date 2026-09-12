@@ -32,7 +32,7 @@ export type ExportSetInitial = {
   deliveryTerm: string | null; placeOfShipment: string | null; destination: string | null;
   truckVehicleId: string | null; trailerReg: string | null; logisticsProductId: string | null;
   quantity: number | null; declarationCmrDate: string | null; dispatchNumber: string | null;
-  buyerCompanyId: string | null; clientId: string | null;
+  buyerCompanyId: string | null; clientId: string | null; blankDispatchNote?: boolean;
   mkInvoice?: { id: string; number: string } | null;
 };
 
@@ -55,12 +55,12 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
     deliveryTerm: initial.deliveryTerm ?? "", placeOfShipment: initial.placeOfShipment ?? PLACE_OF_SHIPMENT_DEFAULT, destination: initial.destination ?? "", routeId: "",
     truckVehicleId: initial.truckVehicleId ?? "", trailerReg: initial.trailerReg ?? "", logisticsProductId: initial.logisticsProductId ?? "",
     quantity: initial.quantity != null ? fmtQuantity(initial.quantity, locale) : "", declarationCmrDate: ymd(initial.declarationCmrDate),
-    dispatchNumber: initial.dispatchNumber ?? "", buyerCompanyId: initial.buyerCompanyId ?? "", clientId: initial.clientId ?? "",
+    dispatchNumber: initial.dispatchNumber ?? "", buyerCompanyId: initial.buyerCompanyId ?? "", clientId: initial.clientId ?? "", blankDispatchNote: initial.blankDispatchNote ?? false,
   } : {
     // Create: датите default-ват към ДНЕШНАТА локална дата (§1/§32), но остават editable.
     invoiceNumber: "", invoiceDate: todayISODate(), shipmentDate: todayISODate(), deliveryTerm: "", placeOfShipment: PLACE_OF_SHIPMENT_DEFAULT, destination: "", routeId: "",
     truckVehicleId: "", trailerReg: "", logisticsProductId: "", quantity: "", declarationCmrDate: todayISODate(),
-    dispatchNumber: "", buyerCompanyId: buyers[0]?.id ?? "", clientId: "",
+    dispatchNumber: "", buyerCompanyId: buyers[0]?.id ?? "", clientId: "", blankDispatchNote: false,
   });
   // Автофил от конфигурацията на превозвача (§27): последен шофьор, макс. товар, вид товар.
   // Шофьорът НЕ се заключва — потребителят може да го смени. Товарът се валидира (§28).
@@ -184,6 +184,7 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
       logisticsProductId: f.logisticsProductId, quantity: parseQuantity(f.quantity),
       declarationCmrDate: f.declarationCmrDate ? new Date(f.declarationCmrDate).toISOString() : null,
       dispatchNumber: f.dispatchNumber || null, buyerCompanyId: f.buyerCompanyId || null, clientId: f.clientId || null,
+      blankDispatchNote: !!f.blankDispatchNote,
     };
     const r = await fetch(isEdit ? `/api/logistics/export-sets/${initial!.id}` : "/api/logistics/export-sets", {
       method: isEdit ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
@@ -306,6 +307,14 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
             })()}
             value={f.clientId} onChange={pickClient} allowCreate emptyLabel={clientBusy ? "…" : "—"} createLabel={(q) => `${t("logistics.export.addClient")} „${q}"`} />
         </F>
+      </div>
+
+      <div style={{ marginTop: 12 }}>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600 }}>
+          <input type="checkbox" checked={f.blankDispatchNote} onChange={(e) => setF({ ...f, blankDispatchNote: e.target.checked })} style={{ width: "auto" }} />
+          {t("logistics.export.blankDispatch")}
+        </label>
+        <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 3 }}>{t("logistics.export.blankDispatchHint")}</div>
       </div>
 
       <div style={{ marginTop: 14, display: "flex", gap: 8 }}>

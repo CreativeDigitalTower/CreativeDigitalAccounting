@@ -22,7 +22,7 @@ export async function regenerateSetDocuments(
     where: { id: setId, companyId },
     select: {
       invoiceNumber: true, invoiceDate: true, shipmentDate: true, deliveryTerm: true, placeOfShipment: true, destination: true, truckRegSnapshot: true, trailerReg: true,
-      productSnapshot: true, certificateNumberSnapshot: true, quantity: true, unit: true, declarationCmrDate: true, dispatchNumber: true,
+      productSnapshot: true, certificateNumberSnapshot: true, quantity: true, unit: true, declarationCmrDate: true, dispatchNumber: true, blankDispatchNote: true,
       logisticsProductId: true, buyerCompanyId: true, clientId: true,
       documents: { select: { docType: true, overridden: true, status: true } },
     },
@@ -53,6 +53,7 @@ export async function regenerateSetDocuments(
     certificateNumberSnapshot: set.certificateNumberSnapshot ?? product?.certificateNumber ?? null,
     // Име за Испратница (само за реда „НАЗИВ НА МАТЕРИЈАЛИТЕ"); fallback → productSnapshot.
     dispatchName: product?.dispatchName ?? null,
+    blankDispatchNote: set.blankDispatchNote === true, // празна Испратница (§3)
     quantity: set.quantity, unit: set.unit, declarationCmrDate: set.declarationCmrDate?.toISOString() ?? null,
     dispatchNumber: set.dispatchNumber, holcimProforma: null as { number: string | null; date: string | null } | null,
   };

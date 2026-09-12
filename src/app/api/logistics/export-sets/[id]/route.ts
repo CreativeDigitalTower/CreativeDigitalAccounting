@@ -20,7 +20,7 @@ const detailSelect = {
   invoiceNumber: true, invoiceDate: true, shipmentDate: true, deliveryTerm: true, placeOfShipment: true,
   destination: true, routeId: true,
   truckVehicleId: true, truckRegSnapshot: true, trailerReg: true, logisticsProductId: true, productSnapshot: true,
-  quantity: true, unit: true, declarationCmrDate: true, dispatchNumber: true, status: true, note: true, createdAt: true, deletedAt: true,
+  quantity: true, unit: true, declarationCmrDate: true, dispatchNumber: true, status: true, note: true, blankDispatchNote: true, createdAt: true, deletedAt: true,
   documents: { select: { id: true, docType: true, status: true, overridden: true, updatedAt: true } },
 } as const;
 
@@ -62,6 +62,7 @@ const patchSchema = z.object({
   declarationCmrDate: optDate,
   dispatchNumber: z.string().max(60).nullable().optional(),
   clientId: z.string().nullable().optional(),
+  blankDispatchNote: z.boolean().optional(),
   note: z.string().max(2000).nullable().optional(),
 });
 
@@ -100,6 +101,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (d.unit !== undefined) data.unit = d.unit;
     if (d.declarationCmrDate !== undefined) data.declarationCmrDate = d.declarationCmrDate ? new Date(d.declarationCmrDate) : null;
     if (d.dispatchNumber !== undefined) data.dispatchNumber = d.dispatchNumber;
+    if (d.blankDispatchNote !== undefined) data.blankDispatchNote = d.blankDispatchNote;
     if (d.note !== undefined) data.note = d.note;
     if (d.clientId !== undefined) {
       if (d.clientId) {

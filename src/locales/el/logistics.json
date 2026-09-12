@@ -696,7 +696,9 @@
     "dossier": "Φάκελος",
     "docsBreakdown": "{gen} δημιουργήθηκαν + {att} μεταφορτώθηκαν",
     "regAddress": "Διεύθυνση εγγραφής",
-    "baseAddress": "Διεύθυνση βάσης"
+    "baseAddress": "Διεύθυνση βάσης",
+    "blankDispatch": "Κενό δελτίο αποστολής",
+    "blankDispatchHint": "Χωρίς αυτόματη συμπλήρωση της γραμμής „До:“ και της διεύθυνσης βάσης."
   },
   "fleet": {
     "title": "Fleet",

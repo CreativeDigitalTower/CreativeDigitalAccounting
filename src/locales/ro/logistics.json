@@ -696,7 +696,9 @@
     "dossier": "Dosar",
     "docsBreakdown": "{gen} generate + {att} încărcate",
     "regAddress": "Adresă de înregistrare",
-    "baseAddress": "Adresă bază"
+    "baseAddress": "Adresă bază",
+    "blankDispatch": "Aviz gol",
+    "blankDispatchHint": "Fără completarea automată a rândului „До:“ și a adresei bazei."
   },
   "fleet": {
     "title": "Fleet",
