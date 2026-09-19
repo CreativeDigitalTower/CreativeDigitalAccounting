@@ -146,12 +146,9 @@ export function Pricing() {
         <Link href="/contact" className="btn btn-primary" style={{ flexShrink: 0 }}>{t("pricing.corpCta")}</Link>
       </div>
 
-      <div style={{ marginTop: 24, textAlign: "center", display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ marginTop: 24, textAlign: "center" }}>
         <p style={{ fontSize: 13.5, color: "var(--ink-soft)", margin: 0 }}>
           <strong>{t("pricing.trialBold")}</strong>{t("pricing.trialRest")}
-        </p>
-        <p style={{ fontSize: 13, color: "var(--emerald)", margin: 0, fontWeight: 600 }}>
-          {t("pricing.euroNote")}
         </p>
       </div>
     </section>

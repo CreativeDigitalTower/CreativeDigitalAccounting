@@ -235,15 +235,15 @@
     "p_many": "Platformdaki birçok modül müşterilerimizin önerileriyle oluşturuldu ve bugün birçok şirket tarafından başarıyla kullanılıyor.",
     "p_reply": "Bu e-postayı yanıtlayıp ne eklenmesini istediğinizi kısaca yazmanız yeterli. Ekibimiz önerinizi inceleyecek ve gerçekleştirebilirsek en kısa sürede geliştirip devreye alacaktır.",
     "p_signoff": "Creative Digital Accounting'i birlikte büyütmemize yardımcı olduğunuz için teşekkürler.\n\nSaygılarımızla,\nCreative Digital Accounting Ekibi",
-    "button": "Fikrinizi bize gönderin",
-    "mailtoSubject": "Yeni özellik fikri",
-    "partnership": "Bizim için „çok özel“ bir talep yoktur. Bir özellik işinizin daha verimli çalışmasına yardımcı olacaksa, fikrinizi gönderin – en yüksek öncelikle değerlendireceğiz."
+    "button": "Çözüm talep et",
+    "mailtoSubject": "Bireysel çözüm talebi",
+    "partnership": "Bizim için „çok özel“ bir talep yoktur. Bir özellik işinizin daha verimli çalışmasına yardımcı olacaksa, neye ihtiyacınız olduğunu bize anlatın – en yüksek öncelikle değerlendireceğiz."
   },
   "featureRequest": {
     "conf": {
-      "subject": "We received your idea for Creative Digital Accounting",
+      "subject": "Creative Digital Accounting için talebinizi aldık",
       "eyebrow": "Custom request",
-      "title": "Thank you for your idea!",
+      "title": "Talebiniz için teşekkürler!",
       "intro1": "Hello,",
       "intro2": "We received your request: “{title}”",
       "intro3": "Our team will review it and contact you if we need more information.",

@@ -235,15 +235,15 @@
     "p_many": "Multe module ale platformei au fost create din sugestiile clienților și sunt folosite azi cu succes de multe firme.",
     "p_reply": "Este suficient să răspundeți la acest e-mail și să descrieți pe scurt ce ați dori adăugat. Echipa noastră va analiza sugestia și, dacă o putem realiza, o vom dezvolta cât mai rapid.",
     "p_signoff": "Vă mulțumim că ne ajutați să dezvoltăm împreună Creative Digital Accounting.\n\nCu stimă,\nEchipa Creative Digital Accounting",
-    "button": "Trimiteți-ne ideea dvs.",
-    "mailtoSubject": "Idee pentru o funcție nouă",
-    "partnership": "Pentru noi nu există cerințe „prea specifice”. Dacă o funcție vă va ajuta afacerea să lucreze mai eficient, trimiteți-ne ideea – o vom analiza cu cea mai mare prioritate."
+    "button": "Solicită o soluție",
+    "mailtoSubject": "Solicitare pentru o soluție individuală",
+    "partnership": "Pentru noi nu există cerințe „prea specifice”. Dacă o funcție vă va ajuta afacerea să lucreze mai eficient, spuneți-ne de ce aveți nevoie – o vom analiza cu cea mai mare prioritate."
   },
   "featureRequest": {
     "conf": {
-      "subject": "We received your idea for Creative Digital Accounting",
+      "subject": "Am primit solicitarea dumneavoastră pentru Creative Digital Accounting",
       "eyebrow": "Custom request",
-      "title": "Thank you for your idea!",
+      "title": "Vă mulțumim pentru solicitare!",
       "intro1": "Hello,",
       "intro2": "We received your request: “{title}”",
       "intro3": "Our team will review it and contact you if we need more information.",

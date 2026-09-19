@@ -13,7 +13,7 @@ describe("personalizationOfferEmail", () => {
   });
   it("локализира на английски", () => {
     const o = personalizationOfferEmail("en");
-    expect(o.buttonLabel.toLowerCase()).toContain("idea");
+    expect(o.buttonLabel.toLowerCase()).toContain("request");
   });
 });
 

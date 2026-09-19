@@ -38,7 +38,6 @@
     "createdBy": "Hazırlayan"
   },
   "home": {
-    "heroBadge": "✦ Yeni — baştan itibaren euro (EUR) ile faturalama",
     "heroTitle1": "Tüm işiniz,",
     "heroTitle2": "tek bir yerde düzenli.",
     "heroSubtitle": "Faturalar, stok, üretim, giderler, CRM, sözleşmeler ve finansal analiz — işletmeler için tek bir modern platformda birleşti.",
@@ -650,17 +649,17 @@
     "finalContact": "Bize ulaşın"
   },
   "adapt": {
-    "eyebrow": "Adaptability",
-    "title": "Software that adapts to your business",
+    "eyebrow": "BİREYSEL ÇÖZÜMLER",
+    "title": "Kolaylaştırabileceğimiz bir süreç mi var?",
     "subtitle": "Not every business works the same way. That's why Creative Digital Accounting is not a closed system.",
-    "text": "If you need a specific module, document, template, report, automation or other feature, send us your idea. We continuously develop the platform together with our clients and, when approved, can build the solution at no extra charge.",
+    "text": "İşletmenizin zamanını alan veya işini zorlaştıran şeyleri bize anlatın. Süreci ve Creative Digital Accounting içinde özel bir modül veya işlev oluşturma olanağını değerlendireceğiz – ek ücret olmadan.",
     "m1": "Custom modules",
     "m2": "Specific documents and templates",
     "m3": "Automations",
     "m4": "Personalized reports",
     "m5": "Integrations",
     "m6": "No fee for approved development",
-    "ctaGuest": "Sign up and send an idea",
-    "ctaLoggedIn": "Request a custom solution"
+    "ctaGuest": "Kaydolun ve çözüm talep edin",
+    "ctaLoggedIn": "Bireysel çözüm talep et"
   }
 }

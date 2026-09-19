@@ -39,9 +39,6 @@ export default async function HomePage() {
       <section className="home-hero" style={{ maxWidth: 1200, margin: "0 auto", padding: "68px 32px 56px", display: "grid", gridTemplateColumns: "1.05fr .95fr", gap: 48, alignItems: "center" }}>
         <div style={{ position: "relative", paddingLeft: 24 }}>
           <div style={{ position: "absolute", left: 0, top: 6, bottom: 6, width: 4, borderRadius: 4, background: "linear-gradient(var(--emerald), var(--brass))" }} />
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--brass-soft)", border: "1px solid rgba(166,130,47,.3)", borderRadius: 20, padding: "5px 14px", fontSize: 12.5, fontWeight: 600, color: "var(--brass)", marginBottom: 22 }}>
-            {t("marketing.home.heroBadge")}
-          </div>
           <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: "clamp(36px, 5vw, 62px)", fontWeight: 700, lineHeight: 1.08, letterSpacing: "-1px", color: "var(--ink)", margin: "0 0 20px" }}>
             {t("marketing.home.heroTitle1")}<br /><span style={{ color: "var(--emerald)" }}>{t("marketing.home.heroTitle2")}</span>
           </h1>
