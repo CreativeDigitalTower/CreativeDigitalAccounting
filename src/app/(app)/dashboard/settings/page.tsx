@@ -16,7 +16,7 @@ type Company = {
   name: string; eik: string | null; vatNumber: string | null; vatRegistered: boolean;
   address: string | null; city: string | null; mol: string | null;
   nameEn: string | null; addressEn: string | null; cityEn: string | null; countryEn: string | null;
-  phone: string | null; email: string | null; website: string | null;
+  phone: string | null; email: string | null; correspondenceEmail: string | null; website: string | null;
   bankIban: string | null; bankName: string | null; bankBic: string | null;
   logoUrl: string | null; brandColor: string | null;
   defaultCurrency: string; defaultLanguage: string; invoiceTemplate: string;
@@ -173,6 +173,11 @@ export default function SettingsPage() {
           <div>
             <label>{t("account.settings.website")}</label>
             <input type="text" value={c.website ?? ""} onChange={(e) => set("website", e.target.value)} />
+          </div>
+          <div style={{ gridColumn: "1 / -1" }}>
+            <label>{t("account.settings.correspondenceEmail")}</label>
+            <input type="email" value={c.correspondenceEmail ?? ""} onChange={(e) => set("correspondenceEmail", e.target.value)} />
+            <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 4 }}>{t("account.settings.correspondenceEmailHelp")}</div>
           </div>
         </div>
       </div>

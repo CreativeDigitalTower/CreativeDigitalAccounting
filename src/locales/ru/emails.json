@@ -266,5 +266,23 @@
       "intro2": "Thank you for helping us grow Creative Digital Accounting.",
       "button": "Open"
     }
+  },
+  "paymentReminder": {
+    "subject": "Напоминание об оплате счёта № {number}",
+    "greetingName": "Здравствуйте, {name},",
+    "greeting": "Здравствуйте,",
+    "bodyOverdue": "Напоминаем, что оплата по счёту № {number} со сроком {due} ещё не отмечена как полученная.",
+    "bodyUpcoming": "Напоминаем о предстоящей оплате по счёту № {number} со сроком {due}.",
+    "bodyNoDue": "Напоминаем об оплате по счёту № {number}.",
+    "amountLine": "Сумма к оплате: {total}",
+    "dueLine": "Срок оплаты: {due}",
+    "paidHint": "Если вы уже произвели оплату, пожалуйста, считайте это сообщение информационным.",
+    "regards": "С уважением,",
+    "title": "Напоминание об оплате счёта № {number}",
+    "viewBtn": "Открыть счёт",
+    "footnote": "Если оплата уже произведена, пожалуйста, проигнорируйте это напоминание.",
+    "detNumber": "Счёт №",
+    "detTotal": "Сумма к оплате",
+    "detDue": "Срок оплаты"
   }
 }

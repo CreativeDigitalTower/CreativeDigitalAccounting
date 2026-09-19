@@ -48,7 +48,9 @@
     "nameEn": "Название на английском (export)",
     "addressEn": "Адрес на английском (export)",
     "cityEn": "Город на английском (export)",
-    "countryEn": "Страна на английском (export)"
+    "countryEn": "Страна на английском (export)",
+    "correspondenceEmail": "Email для корреспонденции",
+    "correspondenceEmailHelp": "На этот адрес будут приходить ответы на счета, напоминания и другие документы, отправленные через Creative Digital Accounting."
   },
   "businessProfile": {
     "title": "Бизнес-профиль (Smart Workspace)",

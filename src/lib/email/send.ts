@@ -87,6 +87,9 @@ export interface SendArgs {
   documentId?: string | null;
   /** метаданни за приложенията (име/размер) — без secret URL/съдържание */
   attachmentsMeta?: { filename: string; size: number }[] | null;
+  /** per-message Reply-To (напр. фирмата издател за документни имейли, §12/§15). При липса
+   *  се ползва глобалният SMTP_REPLY_TO — поведението на системните имейли не се променя. */
+  replyTo?: string | null;
 }
 
 function toNodemailerAttachments(atts?: MailAttachment[]) {
@@ -152,13 +155,13 @@ export async function sendEmail(args: SendArgs): Promise<{ id: string; status: s
     return { id: log.id, status: "queued" };
   }
 
-  await deliver(log.id, to, args.subject, args.html, args.attachments);
+  await deliver(log.id, to, args.subject, args.html, args.attachments, args.replyTo ?? null);
   const fresh = await prisma.emailLog.findUnique({ where: { id: log.id }, select: { status: true } });
   return { id: log.id, status: fresh?.status ?? "queued" };
 }
 
 /** Inject open-tracking pixel + footer unsubscribe link, then attempt SMTP send. */
-async function deliver(logId: string, to: string, subject: string, html: string, attachments?: MailAttachment[]): Promise<boolean> {
+async function deliver(logId: string, to: string, subject: string, html: string, attachments?: MailAttachment[], replyTo?: string | null): Promise<boolean> {
   const pixel = `<img src="${APP_URL}/api/email/open/${logId}" width="1" height="1" alt="" style="display:none">`;
   const unsub = `Не желаете тези имейли? <a href="${APP_URL}/api/email/unsubscribe/${logId}" style="color:#0F8A6A;">Отпишете се</a>.`;
   let finalHtml = html.replace("{{UNSUB}}", unsub).replace("</body>", `${pixel}</body>`);
@@ -179,7 +182,7 @@ async function deliver(logId: string, to: string, subject: string, html: string,
   }
 
   try {
-    await transport.sendMail({ from: FROM, replyTo: REPLY_TO, to, subject, html: finalHtml, attachments: toNodemailerAttachments(attachments) });
+    await transport.sendMail({ from: FROM, replyTo: replyTo || REPLY_TO, to, subject, html: finalHtml, attachments: toNodemailerAttachments(attachments) });
     await prisma.emailLog.update({
       where: { id: logId },
       data: { status: "sent", sentAt: new Date(), error: null, nextRetryAt: null, attempts: { increment: 1 } },

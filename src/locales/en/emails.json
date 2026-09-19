@@ -266,5 +266,23 @@
       "intro2": "Thank you for helping us grow Creative Digital Accounting.",
       "button": "Open"
     }
+  },
+  "paymentReminder": {
+    "subject": "Payment reminder for invoice No. {number}",
+    "greetingName": "Hello {name},",
+    "greeting": "Hello,",
+    "bodyOverdue": "This is a reminder that payment for invoice No. {number}, due on {due}, has not yet been recorded as received.",
+    "bodyUpcoming": "This is a reminder about the upcoming payment for invoice No. {number}, due on {due}.",
+    "bodyNoDue": "This is a reminder about the payment for invoice No. {number}.",
+    "amountLine": "Amount due: {total}",
+    "dueLine": "Due date: {due}",
+    "paidHint": "If you have already made the payment, please treat this message as informational only.",
+    "regards": "Kind regards,",
+    "title": "Payment reminder for invoice No. {number}",
+    "viewBtn": "View the invoice",
+    "footnote": "If the payment has already been made, please disregard this reminder.",
+    "detNumber": "Invoice No.",
+    "detTotal": "Amount due",
+    "detDue": "Due date"
   }
 }

@@ -308,5 +308,24 @@
     "confirmDelete": "Mutați în Coș?",
     "colCompany": "Firmă",
     "allCompanies": "Toate firmele"
+  },
+  "reminder": {
+    "cta": "Trimite reamintire de plată",
+    "title": "Reamintire de plată",
+    "recipient": "Destinatar",
+    "subject": "Subiect",
+    "message": "Mesaj",
+    "attachPdf": "Atașează factura PDF",
+    "replyToNotice": "Răspunsurile la acest mesaj vor fi trimise la: {email}",
+    "send": "Trimite reamintirea",
+    "sending": "Se trimite…",
+    "cancel": "Anulează",
+    "sent": "Reamintirea a fost trimisă.",
+    "paidNote": "Documentul este deja plătit — nu este necesară o reamintire de plată.",
+    "errLoad": "Eroare la încărcare.",
+    "errNoRecipient": "Introduceți emailul destinatarului.",
+    "errEmpty": "Subiectul și mesajul nu pot fi goale.",
+    "errPdf": "Eroare la generarea PDF-ului.",
+    "errSend": "Eroare la trimitere."
   }
 }

@@ -48,7 +48,9 @@
     "nameEn": "İngilizce ad (export)",
     "addressEn": "İngilizce adres (export)",
     "cityEn": "İngilizce şehir (export)",
-    "countryEn": "İngilizce ülke (export)"
+    "countryEn": "İngilizce ülke (export)",
+    "correspondenceEmail": "Yazışma e-postası",
+    "correspondenceEmailHelp": "Creative Digital Accounting üzerinden gönderilen faturalara, hatırlatmalara ve diğer belgelere gelen yanıtları bu adreste alırsınız."
   },
   "businessProfile": {
     "title": "İş profili (Smart Workspace)",

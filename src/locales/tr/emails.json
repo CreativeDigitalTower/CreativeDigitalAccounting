@@ -266,5 +266,23 @@
       "intro2": "Thank you for helping us grow Creative Digital Accounting.",
       "button": "Open"
     }
+  },
+  "paymentReminder": {
+    "subject": "{number} numaralı fatura için ödeme hatırlatması",
+    "greetingName": "Merhaba {name},",
+    "greeting": "Merhaba,",
+    "bodyOverdue": "{number} numaralı, {due} vadeli faturanın ödemesinin henüz alınmadığını hatırlatırız.",
+    "bodyUpcoming": "{number} numaralı, {due} vadeli faturanın yaklaşan ödemesini hatırlatırız.",
+    "bodyNoDue": "{number} numaralı faturanın ödemesini hatırlatırız.",
+    "amountLine": "Ödenecek tutar: {total}",
+    "dueLine": "Vade: {due}",
+    "paidHint": "Ödemeyi bu arada yaptıysanız, lütfen bu mesajı yalnızca bilgilendirme olarak değerlendirin.",
+    "regards": "Saygılarımızla,",
+    "title": "{number} numaralı fatura için ödeme hatırlatması",
+    "viewBtn": "Faturayı görüntüle",
+    "footnote": "Ödeme zaten yapıldıysa lütfen bu hatırlatmayı dikkate almayın.",
+    "detNumber": "Fatura No.",
+    "detTotal": "Ödenecek tutar",
+    "detDue": "Vade"
   }
 }

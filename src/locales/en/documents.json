@@ -308,5 +308,24 @@
     "confirmDelete": "Move to Trash?",
     "colCompany": "Company",
     "allCompanies": "All companies"
+  },
+  "reminder": {
+    "cta": "Send payment reminder",
+    "title": "Payment reminder",
+    "recipient": "Recipient",
+    "subject": "Subject",
+    "message": "Message",
+    "attachPdf": "Attach the invoice PDF",
+    "replyToNotice": "Replies to this message will be sent to: {email}",
+    "send": "Send the reminder",
+    "sending": "Sending…",
+    "cancel": "Cancel",
+    "sent": "The reminder has been sent.",
+    "paidNote": "This document is already paid — no payment reminder is needed.",
+    "errLoad": "Failed to load.",
+    "errNoRecipient": "Enter the recipient's email.",
+    "errEmpty": "Subject and message cannot be empty.",
+    "errPdf": "Failed to generate the PDF.",
+    "errSend": "Failed to send."
   }
 }

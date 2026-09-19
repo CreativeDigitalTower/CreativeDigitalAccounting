@@ -308,5 +308,24 @@
     "confirmDelete": "Çöp Kutusuna taşınsın mı?",
     "colCompany": "Firma",
     "allCompanies": "Tüm firmalar"
+  },
+  "reminder": {
+    "cta": "Ödeme hatırlatması gönder",
+    "title": "Ödeme hatırlatması",
+    "recipient": "Alıcı",
+    "subject": "Konu",
+    "message": "Mesaj",
+    "attachPdf": "Fatura PDF'ini ekle",
+    "replyToNotice": "Bu mesaja verilen yanıtlar şu adrese gönderilecek: {email}",
+    "send": "Hatırlatmayı gönder",
+    "sending": "Gönderiliyor…",
+    "cancel": "İptal",
+    "sent": "Hatırlatma gönderildi.",
+    "paidNote": "Bu belge zaten ödendi — ödeme hatırlatmasına gerek yok.",
+    "errLoad": "Yükleme hatası.",
+    "errNoRecipient": "Alıcının e-postasını girin.",
+    "errEmpty": "Konu ve mesaj boş olamaz.",
+    "errPdf": "PDF oluşturma hatası.",
+    "errSend": "Gönderme hatası."
   }
 }

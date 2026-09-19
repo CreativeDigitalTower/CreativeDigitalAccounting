@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { useI18n, useT } from "@/components/i18n/I18nProvider";
 import { TrackIcon } from "@/components/app/TrackIcon";
+import { PaymentReminderModal } from "@/components/app/PaymentReminderModal";
 
 export type TimelineEvent = { type: string; at: string; channel?: string | null; recipient?: string | null; device?: string | null };
 
@@ -20,17 +20,6 @@ export function DocumentTimeline({
 }) {
   const t = useT();
   const { locale } = useI18n();
-  const [busy, setBusy] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [err, setErr] = useState("");
-
-  async function remind() {
-    setBusy(true); setErr("");
-    const res = await fetch(`/api/documents/${documentId}/remind`, { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
-    setBusy(false);
-    if (res.ok) setSent(true);
-    else setErr((await res.json().catch(() => ({}))).error ?? "—");
-  }
 
   const fmt = (iso: string) => new Date(iso).toLocaleString(locale, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
   const ordered = [...events].sort((a, b) => new Date(a.at).getTime() - new Date(b.at).getTime());
@@ -47,11 +36,9 @@ export function DocumentTimeline({
       {suggestion && (
         <div style={{ background: "var(--brass-soft)", border: "1px solid var(--brass)", borderRadius: 10, padding: "10px 14px", marginBottom: 14, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
           <span style={{ fontSize: 13, color: "var(--ink)", flex: 1 }}>{t(`tracking.insight.${suggestion.key}`, suggestion.n != null ? { n: suggestion.n } : undefined)}</span>
-          {canRemind && !sent && <button className="btn btn-primary btn-sm" disabled={busy} onClick={remind}>{busy ? "…" : t("tracking.cta.remindPay")}</button>}
-          {sent && <span style={{ fontSize: 12, color: "var(--emerald-dark)", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4 }}><TrackIcon name="check" size={13} /> {t("tracking.event.reminder_sent")}</span>}
+          {canRemind && <PaymentReminderModal documentId={documentId} variant="primary" />}
         </div>
       )}
-      {err && <div style={{ fontSize: 12, color: "var(--brick)", marginBottom: 10 }}>{err}</div>}
 
       {ordered.length === 0 ? (
         <div style={{ fontSize: 13, color: "var(--muted)", padding: "8px 0" }}>{t("tracking.timeline.empty")}</div>
@@ -76,8 +63,7 @@ export function DocumentTimeline({
 
       {canRemind && !suggestion && (
         <div style={{ marginTop: 6 }}>
-          {sent ? <span style={{ fontSize: 12, color: "var(--emerald-dark)", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4 }}><TrackIcon name="check" size={13} /> {t("tracking.event.reminder_sent")}</span>
-                : <button className="btn btn-ghost btn-sm" disabled={busy} onClick={remind}>{busy ? "…" : t("tracking.cta.resend")}</button>}
+          <PaymentReminderModal documentId={documentId} variant="ghost" />
         </div>
       )}
     </div>
