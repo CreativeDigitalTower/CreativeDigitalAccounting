@@ -47,15 +47,15 @@
     "generic": ""
   },
   "cta": {
-    "eyebrow": "Custom solution",
-    "title": "Request a custom free module",
-    "text": "Have a specific process, document or feature that's missing? Tell us what you need and we'll consider building it specifically for your business – at no extra charge.",
-    "button": "Send idea",
+    "eyebrow": "INDIVIDUAL SOLUTIONS",
+    "title": "Have a process we can simplify?",
+    "text": "Tell us what takes time or makes your business harder to run. We will look at the process and the option to build a custom module or feature in Creative Digital Accounting – at no extra charge.",
+    "button": "Request a solution",
     "collapse": "Hide",
     "expand": "Open"
   },
   "form": {
-    "title": "How can we adapt Creative Digital Accounting to your business?",
+    "title": "Request an individual solution",
     "subtitle": "Tell us what would make your daily work easier – a new module, template, document, report, automation, integration or a specific feature. Our team will review it and get in touch.",
     "freeBadge": "The request is completely free.",
     "sentFrom": "This request will be sent from: {company}",
@@ -63,8 +63,8 @@
     "title2": "What would you like us to add?",
     "titlePh": "e.g. Automatic monthly protocol generation",
     "type": "Request type",
-    "desc": "Briefly describe the need",
-    "descPh": "How do you work now and what would you like the platform to do for you?",
+    "desc": "What would you like us to simplify in your business?",
+    "descPh": "Describe a process that currently takes you time, a feature you are missing, or a task you would like Creative Digital Accounting to simplify or automate.",
     "benefit": "How would it help? (optional)",
     "attach": "Attach an example (optional)",
     "addFile": "Add file",

@@ -235,15 +235,15 @@
     "p_many": "Many of the platform's modules were created from our clients' suggestions and are now used successfully by many companies.",
     "p_reply": "Just reply to this email and briefly describe what you'd like added. Our team will review your suggestion and, if we can build it, we'll develop and deploy it as fast as possible.",
     "p_signoff": "Thank you for helping us grow Creative Digital Accounting together.\n\nBest regards,\nThe Creative Digital Accounting Team",
-    "button": "Send us your idea",
-    "mailtoSubject": "Idea for a new feature",
-    "partnership": "For us there is no requirement that is “too specific”. If a feature will help your business work more efficiently, send us your idea – we'll review it with the highest priority."
+    "button": "Request a solution",
+    "mailtoSubject": "Request for an individual solution",
+    "partnership": "For us there is no requirement that is “too specific”. If a feature will help your business work more efficiently, tell us what you need – we'll review it with the highest priority."
   },
   "featureRequest": {
     "conf": {
-      "subject": "We received your idea for Creative Digital Accounting",
+      "subject": "We received your request for Creative Digital Accounting",
       "eyebrow": "Custom request",
-      "title": "Thank you for your idea!",
+      "title": "Thank you for your request!",
       "intro1": "Hello,",
       "intro2": "We received your request: “{title}”",
       "intro3": "Our team will review it and contact you if we need more information.",

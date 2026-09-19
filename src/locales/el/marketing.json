@@ -38,7 +38,6 @@
     "createdBy": "Δημιουργήθηκε από"
   },
   "home": {
-    "heroBadge": "✦ Νέο — τιμολόγηση σε ευρώ (EUR) από την αρχή",
     "heroTitle1": "Όλη η επιχείρησή σας,",
     "heroTitle2": "οργανωμένη σε ένα μέρος.",
     "heroSubtitle": "Τιμολόγια, αποθήκη, παραγωγή, έξοδα, CRM, συμβάσεις και χρηματοοικονομικές αναλύσεις — ενωμένα σε μία σύγχρονη πλατφόρμα για επιχειρήσεις.",
@@ -650,17 +649,17 @@
     "finalContact": "Επικοινωνήστε μαζί μας"
   },
   "adapt": {
-    "eyebrow": "Adaptability",
-    "title": "Software that adapts to your business",
+    "eyebrow": "ΕΞΑΤΟΜΙΚΕΥΜΕΝΕΣ ΛΥΣΕΙΣ",
+    "title": "Έχετε μια διαδικασία που μπορούμε να απλοποιήσουμε;",
     "subtitle": "Not every business works the same way. That's why Creative Digital Accounting is not a closed system.",
-    "text": "If you need a specific module, document, template, report, automation or other feature, send us your idea. We continuously develop the platform together with our clients and, when approved, can build the solution at no extra charge.",
+    "text": "Πείτε μας τι σας παίρνει χρόνο ή δυσκολεύει τη λειτουργία της επιχείρησής σας. Θα εξετάσουμε τη διαδικασία και τη δυνατότητα να δημιουργήσουμε ένα εξατομικευμένο module ή λειτουργία στο Creative Digital Accounting – χωρίς επιπλέον χρέωση.",
     "m1": "Custom modules",
     "m2": "Specific documents and templates",
     "m3": "Automations",
     "m4": "Personalized reports",
     "m5": "Integrations",
     "m6": "No fee for approved development",
-    "ctaGuest": "Sign up and send an idea",
-    "ctaLoggedIn": "Request a custom solution"
+    "ctaGuest": "Εγγραφείτε και ζητήστε λύση",
+    "ctaLoggedIn": "Ζητήστε εξατομικευμένη λύση"
   }
 }

@@ -38,7 +38,6 @@
     "createdBy": "Created by"
   },
   "home": {
-    "heroBadge": "✦ New — invoice in euro (EUR) from the start",
     "heroTitle1": "Your entire business,",
     "heroTitle2": "organized in one place.",
     "heroSubtitle": "Invoices, inventory, production, expenses, CRM, contracts and financial analytics — unified in one modern platform for business.",
@@ -650,17 +649,17 @@
     "finalContact": "Get in touch"
   },
   "adapt": {
-    "eyebrow": "Adaptability",
-    "title": "Software that adapts to your business",
+    "eyebrow": "INDIVIDUAL SOLUTIONS",
+    "title": "Have a process we can simplify?",
     "subtitle": "Not every business works the same way. That's why Creative Digital Accounting is not a closed system.",
-    "text": "If you need a specific module, document, template, report, automation or other feature, send us your idea. We continuously develop the platform together with our clients and, when approved, can build the solution at no extra charge.",
+    "text": "Tell us what takes time or makes your business harder to run. We will look at the process and the option to build a custom module or feature in Creative Digital Accounting – at no extra charge.",
     "m1": "Custom modules",
     "m2": "Specific documents and templates",
     "m3": "Automations",
     "m4": "Personalized reports",
     "m5": "Integrations",
     "m6": "No fee for approved development",
-    "ctaGuest": "Sign up and send an idea",
-    "ctaLoggedIn": "Request a custom solution"
+    "ctaGuest": "Sign up and request a solution",
+    "ctaLoggedIn": "Request an individual solution"
   }
 }

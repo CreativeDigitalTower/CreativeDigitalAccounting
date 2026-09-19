@@ -38,7 +38,6 @@
     "createdBy": "Creat de"
   },
   "home": {
-    "heroBadge": "✦ Nou — facturare în euro (EUR) de la început",
     "heroTitle1": "Întreaga ta afacere,",
     "heroTitle2": "organizată într-un singur loc.",
     "heroSubtitle": "Facturi, stocuri, producție, cheltuieli, CRM, contracte și analize financiare — unite într-o platformă modernă pentru afaceri.",
@@ -650,17 +649,17 @@
     "finalContact": "Contactați-ne"
   },
   "adapt": {
-    "eyebrow": "Adaptability",
-    "title": "Software that adapts to your business",
+    "eyebrow": "SOLUȚII INDIVIDUALE",
+    "title": "Aveți un proces pe care îl putem simplifica?",
     "subtitle": "Not every business works the same way. That's why Creative Digital Accounting is not a closed system.",
-    "text": "If you need a specific module, document, template, report, automation or other feature, send us your idea. We continuously develop the platform together with our clients and, when approved, can build the solution at no extra charge.",
+    "text": "Spuneți-ne ce vă consumă timp sau îngreunează activitatea afacerii dumneavoastră. Vom analiza procesul și posibilitatea de a crea un modul sau o funcționalitate individuală în Creative Digital Accounting – fără costuri suplimentare.",
     "m1": "Custom modules",
     "m2": "Specific documents and templates",
     "m3": "Automations",
     "m4": "Personalized reports",
     "m5": "Integrations",
     "m6": "No fee for approved development",
-    "ctaGuest": "Sign up and send an idea",
-    "ctaLoggedIn": "Request a custom solution"
+    "ctaGuest": "Înregistrați-vă și solicitați o soluție",
+    "ctaLoggedIn": "Solicită o soluție individuală"
   }
 }
