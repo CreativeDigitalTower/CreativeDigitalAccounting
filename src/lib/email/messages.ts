@@ -353,6 +353,76 @@ export function clientDecisionEmail(opts: { docType: string; number: string; cli
 
 // ─────────────────────────── НАПОМНЯНИЯ ───────────────────────────
 
+// ── Ръчно напомняне за плащане (§4/§5/§6/§10) ──
+export type ReminderStatus = "overdue" | "upcoming" | "none";
+export type ReminderDefaultsInput = {
+  clientName?: string | null; number: string; total: string; dueDate?: string | null; status: ReminderStatus; company: string; locale?: Locale;
+};
+
+/**
+ * Централни default стойности за ръчното напомняне (subject + message на обикновен текст).
+ * Ползва се от GET (preview) И от POST (send) — една business логика, без due-date/статус
+ * несъответствия. Не твърди „просрочено", ако падежът не е минал (§6).
+ */
+export function paymentReminderDefaults(o: ReminderDefaultsInput): { subject: string; message: string } {
+  const { E } = emT(o.locale ?? "bg");
+  const R = (k: string, v?: Record<string, string | number>) => E(`paymentReminder.${k}`, v);
+  const subject = R("subject", { number: o.number });
+  const greeting = o.clientName ? R("greetingName", { name: o.clientName }) : R("greeting");
+  const body = o.status === "overdue" && o.dueDate
+    ? R("bodyOverdue", { number: o.number, due: o.dueDate })
+    : o.status === "upcoming" && o.dueDate
+      ? R("bodyUpcoming", { number: o.number, due: o.dueDate })
+      : R("bodyNoDue", { number: o.number });
+  const lines = [
+    greeting, "",
+    body, "",
+    R("amountLine", { total: o.total }),
+    ...(o.dueDate ? [R("dueLine", { due: o.dueDate })] : []),
+    "",
+    R("paidHint"), "",
+    R("regards"), o.company,
+  ];
+  return { subject, message: lines.join("\n") };
+}
+
+/** Превръща обикновен текст в безопасен HTML (escape + запазени нови редове), §7/§24. */
+function messageToHtmlParagraphs(message: string): string[] {
+  return message.replace(/\r\n/g, "\n").split(/\n{2,}/).map((block) =>
+    escapeHtml(block).replace(/\n/g, "<br>"),
+  );
+}
+
+/**
+ * Финалният ръчен reminder имейл: редактираното (санирано) съобщение → CDA branded wrapper,
+ * с данни за фактурата и бутон „Преглед на фактурата". Subject/message идват от route-а
+ * (default или редактирани от потребителя). НЕ приема raw HTML — всичко се escape-ва (§7/§24).
+ */
+export function paymentReminderEmail(o: {
+  company: string; number: string; total: string; dueDate?: string | null;
+  subject: string; message: string; viewUrl: string; locale?: Locale;
+}): Msg {
+  const { loc, E } = emT(o.locale ?? "bg");
+  const R = (k: string, v?: Record<string, string | number>) => E(`paymentReminder.${k}`, v);
+  return {
+    category: "reminder",
+    subject: o.subject,
+    html: baseTemplate({
+      locale: loc,
+      eyebrow: o.company,
+      title: R("title", { number: o.number }),
+      intro: messageToHtmlParagraphs(o.message),
+      details: [
+        { label: R("detNumber"), value: o.number },
+        { label: R("detTotal"), value: o.total },
+        ...(o.dueDate ? [{ label: R("detDue"), value: o.dueDate }] : []),
+      ],
+      button: { label: R("viewBtn"), url: o.viewUrl },
+      footnote: R("footnote"),
+    }),
+  };
+}
+
 export function unpaidInvoiceEmail(company: string, number: string, daysOverdue: number, amount: string, url: string, locale: Locale = "bg"): Msg {
   const { loc, E } = emT(locale);
   const dw = dayWord(loc, E, daysOverdue);

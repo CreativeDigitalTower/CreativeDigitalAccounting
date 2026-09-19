@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireCompany } from "@/lib/session";
 import { sendEmail, type MailAttachment } from "@/lib/email/send";
 import { invoiceToClientEmail } from "@/lib/email/messages";
+import { resolveCompanyReplyToById } from "@/lib/email/replyTo";
 import { APP_URL } from "@/lib/email/templates";
 import { normalizeLocale, intlLocale } from "@/lib/i18n/config";
 import { dedupeRecipients, isValidEmail } from "@/lib/clientEmails";
@@ -98,11 +99,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     // ── Изпращаме поотделно към всеки получател (per-recipient log; blacklist на един
     //    адрес не блокира останалите). Записваме documentId + метаданни за приложенията. ──
+    // §12: Reply-To сочи към фирмата издател (отговорите стигат при нея); From остава CDA.
+    const replyTo = await resolveCompanyReplyToById(companyId);
     const results: { email: string; status: string }[] = [];
     for (const to of recipients) {
       const r = await sendEmail({
         to, toName: doc.client?.name, subject: m.subject, html: m.html, category: m.category,
-        type: "invoice_to_client", companyId, attachments,
+        type: "invoice_to_client", companyId, attachments, replyTo,
         documentId: id, attachmentsMeta: attMeta.length ? attMeta : null,
       });
       results.push({ email: to, status: r.status });

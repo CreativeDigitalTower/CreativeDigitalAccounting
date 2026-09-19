@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireCompany } from "@/lib/session";
 import { audit } from "@/lib/documents";
 import { validateCompanyIdentity, normalizeCountryCode } from "@/lib/validation/companyIdentity";
+import { isValidEmail, normalizeEmail } from "@/lib/clientEmails";
 import { z } from "zod";
 
 const schema = z.object({
@@ -23,6 +24,8 @@ const schema = z.object({
   countryEn: z.string().optional().nullable(),
   phone: z.string().optional().nullable(),
   email: z.string().optional().nullable(),
+  // §13/§14: адрес за отговори (Reply-To) на документните имейли до клиенти.
+  correspondenceEmail: z.string().optional().nullable(),
   website: z.string().optional().nullable(),
   bankIban: z.string().optional().nullable(),
   bankName: z.string().optional().nullable(),
@@ -84,6 +87,15 @@ export async function PUT(req: Request) {
         const dup = await prisma.company.findFirst({ where: { countryCode: idCheck.countryCode, registrationNumber: idCheck.registrationNumber, id: { not: companyId } }, select: { id: true } });
         if (dup) return NextResponse.json({ error: "Фирма с този регистрационен номер вече е регистрирана." }, { status: 400 });
       }
+    }
+
+    // ── Имейл за кореспонденция: празно → null; ако е попълнен, трябва да е валиден ──
+    if (data.correspondenceEmail != null) {
+      const ce = normalizeEmail(data.correspondenceEmail);
+      if (ce && !isValidEmail(ce)) {
+        return NextResponse.json({ error: "Невалиден имейл за кореспонденция." }, { status: 400 });
+      }
+      data.correspondenceEmail = ce || null;
     }
 
     // ── ДДС логика: при „Регистрирана по ЗДДС" номерът е задължителен ──

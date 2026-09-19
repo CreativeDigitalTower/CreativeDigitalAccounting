@@ -122,6 +122,10 @@ model Company {
   bankBic         String?
   phone           String?
   email           String?
+  // Имейл за кореспонденция: Reply-To на документните имейли (фактури/напомняния), които CDA
+  // изпраща от името на фирмата към нейни клиенти. Additive/nullable — при липса се ползва
+  // безопасен fallback (company.email → owner → CDA). Техническият SMTP From остава CDA.
+  correspondenceEmail String?
   website         String?
   // Per-type number start values (next number = max(start, count)+1)
   invoiceNumberStart Int   @default(1)

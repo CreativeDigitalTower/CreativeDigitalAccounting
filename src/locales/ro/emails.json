@@ -266,5 +266,23 @@
       "intro2": "Thank you for helping us grow Creative Digital Accounting.",
       "button": "Open"
     }
+  },
+  "paymentReminder": {
+    "subject": "Reamintire de plată pentru factura nr. {number}",
+    "greetingName": "Bună ziua, {name},",
+    "greeting": "Bună ziua,",
+    "bodyOverdue": "Vă reamintim că plata pentru factura nr. {number}, cu scadența {due}, nu a fost încă înregistrată ca primită.",
+    "bodyUpcoming": "Vă reamintim despre plata viitoare pentru factura nr. {number}, cu scadența {due}.",
+    "bodyNoDue": "Vă reamintim despre plata pentru factura nr. {number}.",
+    "amountLine": "Sumă de plată: {total}",
+    "dueLine": "Scadență: {due}",
+    "paidHint": "Dacă ați efectuat deja plata, vă rugăm să considerați acest mesaj doar informativ.",
+    "regards": "Cu stimă,",
+    "title": "Reamintire de plată pentru factura nr. {number}",
+    "viewBtn": "Vezi factura",
+    "footnote": "Dacă plata a fost deja efectuată, vă rugăm să ignorați această reamintire.",
+    "detNumber": "Factura nr.",
+    "detTotal": "Sumă de plată",
+    "detDue": "Scadență"
   }
 }

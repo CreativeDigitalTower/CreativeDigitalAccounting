@@ -48,7 +48,9 @@
     "nameEn": "Denumire în engleză (export)",
     "addressEn": "Adresă în engleză (export)",
     "cityEn": "Oraș în engleză (export)",
-    "countryEn": "Țară în engleză (export)"
+    "countryEn": "Țară în engleză (export)",
+    "correspondenceEmail": "Email de corespondență",
+    "correspondenceEmailHelp": "La această adresă veți primi răspunsurile la facturi, reamintiri și alte documente trimise prin Creative Digital Accounting."
   },
   "businessProfile": {
     "title": "Profil de afaceri (Smart Workspace)",

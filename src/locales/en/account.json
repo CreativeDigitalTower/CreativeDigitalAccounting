@@ -48,7 +48,9 @@
     "nameEn": "Legal name (EN, export)",
     "addressEn": "Address (EN, export)",
     "cityEn": "City (EN, export)",
-    "countryEn": "Country (EN, export)"
+    "countryEn": "Country (EN, export)",
+    "correspondenceEmail": "Correspondence email",
+    "correspondenceEmailHelp": "Replies to invoices, reminders and other documents sent through Creative Digital Accounting will arrive at this address."
   },
   "businessProfile": {
     "title": "Business profile (Smart Workspace)",
