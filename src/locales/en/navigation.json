@@ -78,5 +78,6 @@
   "logisticsExportReceived": "Received deliveries",
   "featureRequest": "Individual solutions",
   "logisticsFleet": "Fleet",
-  "logisticsReports": "Reports (carrier/cargo)"
+  "logisticsReports": "Reports (carrier/cargo)",
+  "logisticsDestinations": "Destinations"
 }

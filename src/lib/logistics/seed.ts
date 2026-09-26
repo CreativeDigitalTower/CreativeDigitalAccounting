@@ -10,11 +10,12 @@ import {
   SEED_TRUCK_TRAILERS, SEED_DESTINATIONS, SEED_PRODUCT_EXTRA_ALIASES,
 } from "@/lib/logistics/masterData";
 import { applyCementCatalog } from "@/lib/logistics/cementSync";
+import { maintainDestinations } from "@/lib/logistics/destinations";
 
-export type SeedResult = { vehicles: number; vehicleAliases: number; products: number; productAliases: number; destinations: number };
+export type SeedResult = { vehicles: number; vehicleAliases: number; products: number; productAliases: number; destinations: number; destinationMaster: { created: number; deactivated: number; backfilled: number } };
 
 export async function seedLogisticsMasterData(companyId: string): Promise<SeedResult> {
-  const result: SeedResult = { vehicles: 0, vehicleAliases: 0, products: 0, productAliases: 0, destinations: 0 };
+  const result: SeedResult = { vehicles: 0, vehicleAliases: 0, products: 0, productAliases: 0, destinations: 0, destinationMaster: { created: 0, deactivated: 0, backfilled: 0 } };
 
   // Настройки по подразбиране (ако липсват).
   await prisma.logisticsSettings.upsert({
@@ -121,6 +122,9 @@ export async function seedLogisticsMasterData(companyId: string): Promise<SeedRe
   // Canonical cement каталог (§16): гарантира шестте марки + category, архивира стари
   // system defaults. Изпълнява се СЛЕД историческия seed, за да остане един source of truth.
   await applyCementCatalog(prisma, companyId);
+
+  // Дестинации master data (§17/§18): idempotent seed + корекция на неактивните + backfill.
+  result.destinationMaster = await maintainDestinations(prisma, companyId);
 
   return result;
 }

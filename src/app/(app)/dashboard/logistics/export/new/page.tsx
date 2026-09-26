@@ -2,7 +2,6 @@ import { requireLogistics, groupCounterparties, companyCanCreateExports } from "
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { ExportSetForm } from "@/components/app/logistics/ExportSetForm";
-import { MK_DESTINATIONS, mergeDestinations } from "@/lib/logistics/deliveryTerms";
 
 export default async function Page() {
   const { companyId, caps } = await requireLogistics();
@@ -22,16 +21,12 @@ export default async function Page() {
     ? await prisma.client.findMany({ where: { companyId: defaultBuyerId, status: { notIn: ["inactive", "lost"] } }, select: { id: true, name: true }, orderBy: { name: "asc" }, take: 2000 })
     : [];
 
-  // Уникален списък дестинации (§4/§5): canonical MK + от маршрутите + вече ползвани в
-  // Export Sets, dedupe по нормализиран ключ (без Skopje/SKOPIE/Скопие дубли).
-  const usedDestinations = await prisma.exportDocumentSet.findMany({
-    where: { companyId, destination: { not: null } }, select: { destination: true }, take: 2000,
+  // Дестинациите за нова доставка идват САМО от active master записите (§12/§19) — без
+  // hardcoded масив. Клиентът управлява списъка от раздел „Дестинации".
+  const activeDestinations = await prisma.logisticsDestination.findMany({
+    where: { companyId, active: true }, select: { name: true }, orderBy: { name: "asc" },
   });
-  const destinations = mergeDestinations(
-    MK_DESTINATIONS,
-    routes.map((r) => r.toPlace),
-    usedDestinations.map((s) => s.destination),
-  );
+  const destinations = activeDestinations.map((d) => d.name);
 
   return (
     <ExportSetForm

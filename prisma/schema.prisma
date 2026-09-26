@@ -221,6 +221,7 @@ model Company {
   logisticsProducts LogisticsProduct[]
   carriers          Carrier[]
   logisticsRoutes   LogisticsRoute[]
+  logisticsDestinations LogisticsDestination[]
   logisticsSettings LogisticsSettings?
   shipments         Shipment[]
   logisticsProformas LogisticsProforma[]
@@ -942,6 +943,39 @@ model LogisticsRoute {
   @@index([companyId, active])
 }
 
+// Дестинации (крайни места на доставка) като реален master-data раздел (§3/§4). Различни
+// от LogisticsRoute (маршрут ДО дестинацията) и от Terms of Delivery (Incoterm). Управляват
+// се изцяло през UI — dropdown-ите за нови доставки четат САМО active записи оттук (§19).
+// Деактивирането е soft (active=false) — историята/snapshot-ите остават непокътнати (§7).
+model LogisticsDestination {
+  id             String  @id @default(cuid())
+  companyId      String
+  name           String
+  // Нормализиран ключ за dedupe (normalizeDestination): fold кирилица→латиница, само a-z0-9.
+  normalizedName String
+  country        String?
+  city           String?
+  postalCode     String?
+  address        String?
+  code           String?
+  note           String? @db.Text
+  active         Boolean @default(true)
+  // Optional defaults (nullable) — не са задължителни за клиента (§4).
+  defaultRouteId      String?
+  defaultDistanceKm   Float?
+  defaultCarrierId    String?
+  defaultDeliveryTerm String? // FCA | CPT
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  company    Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  exportSets ExportDocumentSet[]
+
+  // Едно име на дестинация на фирма (idempotent seed/upsert по нормализиран ключ, §17).
+  @@unique([companyId, normalizedName])
+  @@index([companyId, active])
+}
+
 // Настройки на модула по фирма (configurable defaults — snapshot към документа по-късно).
 model LogisticsSettings {
   id          String   @id @default(cuid())
@@ -1388,7 +1422,11 @@ model ExportDocumentSet {
   shipmentDate       DateTime?   // дата на ИЗПРАЩАНЕ (date of shipment) — отделна бизнес дата
   deliveryTerm       String?     // условия на доставка: FCA | CPT (Incoterm)
   placeOfShipment    String?     // място на натоварване (default „BELI IZVOR") — отделно от destination
+  // destination = snapshot ИМЕ на дестинацията към момента на издаване (историческо, §12).
   destination        String?
+  // Relation към master дестинацията (§12). Nullable/адитивно: legacy записи без връзка
+  // продължават да работят по snapshot-name. Master промяна НЕ пипа snapshot-а.
+  destinationId      String?
   routeId            String?
   truckVehicleId     String?
   truckRegSnapshot   String?
@@ -1420,6 +1458,7 @@ model ExportDocumentSet {
 
   company     Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
   shipment    Shipment?         @relation(fields: [shipmentId], references: [id], onDelete: SetNull)
+  destinationRef LogisticsDestination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
   documents   ExportDocument[]
   mkInvoices  MkInvoice[]       // легаси MK фактури (operational ledger) за тази доставка (§18)
   invoices    Document[]        @relation("ExportSetInvoices") // стандартни фактури (§17/§41)
@@ -1432,6 +1471,8 @@ model ExportDocumentSet {
   @@index([companyId, truckVehicleId, shipmentDate])
   @@index([companyId, clientId, shipmentDate])
   @@index([buyerCompanyId, clientId, shipmentDate])
+  // Статистика по дестинация (§9): агрегиране по destinationId за период.
+  @@index([companyId, destinationId, shipmentDate])
 }
 
 // Допълнителен (качен) документ в досието на експортна доставка (§7/§14). Съхранение по

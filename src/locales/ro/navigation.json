@@ -78,5 +78,6 @@
   "logisticsExportReceived": "Livrări primite",
   "featureRequest": "Soluții individuale",
   "logisticsFleet": "Parc auto",
-  "logisticsReports": "Rapoarte (transportator/marfă)"
+  "logisticsReports": "Rapoarte (transportator/marfă)",
+  "logisticsDestinations": "Destinații"
 }
