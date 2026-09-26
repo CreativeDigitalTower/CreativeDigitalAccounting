@@ -87,20 +87,33 @@ describe("Date of shipment — explicit shipmentDate се ползва пред 
   });
 });
 
-describe("Print A4 geometry (§1/§2/§7/§12) — source assertions", () => {
+describe("Print A4 geometry (§1-§6/§11-§14) — source assertions", () => {
   const fs = require("node:fs") as typeof import("node:fs");
   const printSrc = fs.readFileSync("src/app/(app)/dashboard/logistics/export/[id]/[docType]/print/page.tsx", "utf-8");
   const tplSrc = fs.readFileSync("src/components/app/logistics/ExportInvoiceTemplate.tsx", "utf-8");
+  const globalsSrc = fs.readFileSync("src/app/globals.css", "utf-8");
+  const layoutSrc = fs.readFileSync("src/app/(app)/layout.tsx", "utf-8");
   it("print CSS ползва A4 portrait", () => { expect(printSrc).toContain("size: A4 portrait"); });
-  it("при печат НЕ форсира пълна височина (min-height: 0 / height: auto)", () => {
-    expect(printSrc).toContain("min-height: 0 !important");
-    expect(printSrc).toContain("height: auto !important");
+  it("doc печатът активира изолационния клас printing-a4", () => {
+    expect(printSrc).toContain('printBodyClass="printing-a4"');
   });
-  it("има break-inside: avoid защита срещу разделяне/празна страница", () => {
-    expect(printSrc).toContain("break-inside: avoid");
-    expect(printSrc).toContain("page-break-inside: avoid");
+  it("globals изолира листа от shell-а: static + без width:100%, реален A4 (§2/§3/§4)", () => {
+    expect(globalsSrc).toContain("body.printing-a4 .print-sheet");
+    expect(globalsSrc).toContain("position:static!important");
+    expect(globalsSrc).toContain("width:210mm!important");
   });
-  it("invoice template вече НЕ съдържа фиксирано height: 297mm (root cause)", () => {
+  it("globals маха chrome-а от печатния поток (§5/§6 — без празни страници)", () => {
+    expect(globalsSrc).toContain("body.printing-a4 .sidebar-wrap");
+    expect(globalsSrc).toContain("body.printing-a4 .app-content{padding:0!important;}");
+    expect(globalsSrc).toContain("body.printing-a4 main");
+  });
+  it("има break-inside: avoid защита срещу разделяне на документа (§14)", () => {
+    expect(globalsSrc).toContain("break-inside:avoid!important");
+  });
+  it("chrome-ът (topbar/банери) е no-print в layout-а", () => {
+    expect(layoutSrc).toContain('<div className="no-print">');
+  });
+  it("invoice template вече НЕ съдържа фиксирано height: 297mm (root cause на предишния bug)", () => {
     expect(tplSrc).not.toContain('height: "297mm"');
   });
 });

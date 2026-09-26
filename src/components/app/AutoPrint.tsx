@@ -7,11 +7,15 @@ import { useEffect } from "react";
  * при „Save as PDF" браузърът предлага смислено име (напр. Ispratnica-9654-2026).
  * Един и същ canonical layout се ползва и за печат, и за сваляне (визуална консистентност).
  */
-export function AutoPrint({ auto = true, fileTitle }: { auto?: boolean; fileTitle?: string }) {
+export function AutoPrint({ auto = true, fileTitle, printBodyClass }: { auto?: boolean; fileTitle?: string; printBodyClass?: string }) {
   function print() {
     document.body.classList.add("printing-multi");
+    if (printBodyClass) document.body.classList.add(printBodyClass);
     window.print();
-    setTimeout(() => document.body.classList.remove("printing-multi"), 800);
+    setTimeout(() => {
+      document.body.classList.remove("printing-multi");
+      if (printBodyClass) document.body.classList.remove(printBodyClass);
+    }, 800);
   }
   useEffect(() => {
     if (fileTitle) {
