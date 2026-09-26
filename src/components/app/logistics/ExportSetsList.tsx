@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useT, useI18n } from "@/components/i18n/I18nProvider";
 import { ACTIVE_EXPORT_DOC_TYPES, isActiveExportDocType } from "@/lib/logistics/config";
 import { ExportDeleteModal, type DeletableSet } from "@/components/app/logistics/ExportDeleteModal";
+import { ExportPurgeModal, type PurgeMode } from "@/components/app/logistics/ExportPurgeModal";
 
 type DocLite = { docType: string; status: string; overridden: boolean };
 type Row = {
@@ -35,6 +36,8 @@ export function ExportSetsList({ canManage, canCreate = canManage }: { canManage
   const [menuId, setMenuId] = useState<string | null>(null);
   const [delTarget, setDelTarget] = useState<DeletableSet | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [purge, setPurge] = useState<{ mode: PurgeMode; ids?: string[]; count: number } | null>(null);
   const pageSize = 25;
 
   function load() {
@@ -52,8 +55,8 @@ export function ExportSetsList({ canManage, canCreate = canManage }: { canManage
       if (j) { setRows(j.rows ?? []); setKpi(j.kpi ?? null); setTotal(j.total ?? 0); }
     });
   }
-  // Всяка смяна на филтър връща на страница 1.
-  useEffect(() => { setPage(1); }, [q, status, vehicle, hasAtt, year, month, sort, trash]);
+  // Всяка смяна на филтър връща на страница 1 и нулира селекцията в Кошчето.
+  useEffect(() => { setPage(1); setSelected(new Set()); }, [q, status, vehicle, hasAtt, year, month, sort, trash]);
   useEffect(() => { load(); }, [q, status, vehicle, hasAtt, year, month, sort, trash, page]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function restore(id: string) {
@@ -62,6 +65,11 @@ export function ExportSetsList({ canManage, canCreate = canManage }: { canManage
     setBusyId(null);
     if (r.ok) load();
   }
+
+  function toggleSel(id: string) { setSelected((prev) => { const n = new Set(prev); if (n.has(id)) n.delete(id); else n.add(id); return n; }); }
+  const allOnPage = rows.length > 0 && rows.every((r) => selected.has(r.id));
+  function toggleAll() { setSelected((prev) => { if (allOnPage) return new Set(); const n = new Set(prev); rows.forEach((r) => n.add(r.id)); return n; }); }
+  function afterPurge() { setPurge(null); setSelected(new Set()); load(); }
 
   const dt = (x: string | null) => x ? new Date(x).toLocaleDateString() : "—";
   const activeDocs = (docs: DocLite[]) => docs.filter((d) => isActiveExportDocType(d.docType)).length;
@@ -83,10 +91,22 @@ export function ExportSetsList({ canManage, canCreate = canManage }: { canManage
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{t("logistics.export.title")}</h1>
         <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+          {trash && canManage && total > 0 && (
+            <button className="btn btn-sm" onClick={() => setPurge({ mode: "empty", count: total })} style={{ background: "var(--brick)", color: "#fff", border: "none" }}>{t("logistics.purge.emptyTrash")}</button>
+          )}
           <button className="btn btn-ghost btn-sm" onClick={() => setTrash((v) => !v)} style={trash ? { background: "var(--brick)", color: "#fff" } : undefined}>{t("logistics.export.trash")}</button>
           {canCreate && !trash && <Link href="/dashboard/logistics/export/new" className="btn btn-primary btn-sm">{t("logistics.export.add")}</Link>}
         </div>
       </div>
+
+      {trash && canManage && selected.size > 0 && (
+        <div className="glass panel" style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12, padding: "8px 14px" }}>
+          <span style={{ fontSize: 13 }}>{t("logistics.purge.selectedN", { n: selected.size })}</span>
+          <button className="btn btn-sm" style={{ marginLeft: "auto", background: "var(--brick)", color: "#fff", border: "none" }}
+            onClick={() => setPurge({ mode: "bulk", ids: [...selected], count: selected.size })}>{t("logistics.purge.deleteSelected")}</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => setSelected(new Set())}>{t("logistics.common.cancel")}</button>
+        </div>
+      )}
 
       {kpi && !trash && (
         <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
@@ -130,6 +150,7 @@ export function ExportSetsList({ canManage, canCreate = canManage }: { canManage
         {rows.length === 0 ? <div style={{ fontSize: 13, color: "var(--muted)" }}>{trash ? t("logistics.export.trashEmpty") : t("logistics.export.empty")}</div> : (
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead><tr>
+              {trash && canManage && <th style={{ ...th, width: 30 }}><input type="checkbox" checked={allOnPage} onChange={toggleAll} aria-label={t("logistics.purge.selectAll")} /></th>}
               <th style={th}>{t("logistics.export.invoiceNumber")}</th><th style={th}>{t("logistics.export.date")}</th><th style={th}>{t("logistics.export.destination")}</th>
               <th style={th}>{t("logistics.export.truck")}</th><th style={th}>{t("logistics.export.product")}</th><th style={th}>{t("logistics.export.quantity")}</th>
               <th style={th}>{t("logistics.export.buyer")}</th><th style={th}>{t("logistics.export.status")}</th><th style={th}>{t("logistics.export.documents")}</th><th style={th} />
@@ -137,6 +158,7 @@ export function ExportSetsList({ canManage, canCreate = canManage }: { canManage
             <tbody>
               {rows.map((r) => (
                 <tr key={r.id}>
+                  {trash && canManage && <td style={td}><input type="checkbox" checked={selected.has(r.id)} onChange={() => toggleSel(r.id)} aria-label={r.invoiceNumber} /></td>}
                   <td style={td}><Link href={`/dashboard/logistics/export/${r.id}`} style={{ fontWeight: 600 }}>{r.invoiceNumber}</Link></td>
                   <td style={td}>{dt(r.invoiceDate)}</td><td style={td}>{r.destination ?? "—"}</td>
                   <td style={td}>{[r.truckRegSnapshot, r.trailerReg].filter(Boolean).join(" / ") || "—"}</td>
@@ -149,7 +171,10 @@ export function ExportSetsList({ canManage, canCreate = canManage }: { canManage
                   </td>
                   <td style={{ ...td, whiteSpace: "nowrap" }}>
                     {trash ? (
-                      canManage && <button className="btn btn-ghost btn-sm" style={{ fontSize: 11, padding: "2px 10px" }} disabled={busyId === r.id} onClick={() => restore(r.id)}>{t("logistics.export.restore")}</button>
+                      canManage && <span style={{ display: "inline-flex", gap: 6 }}>
+                        <button className="btn btn-ghost btn-sm" style={{ fontSize: 11, padding: "2px 10px" }} disabled={busyId === r.id} onClick={() => restore(r.id)}>{t("logistics.export.restore")}</button>
+                        <button className="btn btn-ghost btn-sm" style={{ fontSize: 11, padding: "2px 10px", color: "var(--brick)" }} onClick={() => setPurge({ mode: "single", ids: [r.id], count: 1 })}>{t("logistics.purge.deletePermanent")}</button>
+                      </span>
                     ) : (
                       <span style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
                         <Link href={`/dashboard/logistics/export/${r.id}`} className="btn btn-ghost btn-sm" style={{ fontSize: 11, padding: "2px 10px" }}>{t("logistics.export.dossier")}</Link>
@@ -186,6 +211,7 @@ export function ExportSetsList({ canManage, canCreate = canManage }: { canManage
       )}
 
       {delTarget && <ExportDeleteModal set={delTarget} onClose={() => setDelTarget(null)} onDeleted={() => { setDelTarget(null); load(); }} />}
+      {purge && <ExportPurgeModal mode={purge.mode} count={purge.count} ids={purge.ids} onClose={() => setPurge(null)} onDone={afterPurge} />}
     </div>
   );
 }

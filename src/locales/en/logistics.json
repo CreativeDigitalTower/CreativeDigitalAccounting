@@ -994,5 +994,21 @@
     "byMonth": "By month",
     "byYear": "By year",
     "colPeriod": "Period"
+  },
+  "purge": {
+    "deletePermanent": "Delete permanently",
+    "emptyTrash": "Empty trash",
+    "selectAll": "Select all",
+    "selectedN": "Selected: {n}",
+    "deleteSelected": "Delete selected permanently",
+    "deleting": "Deleting…",
+    "title": "Permanent deletion",
+    "emptyTitle": "Empty the trash",
+    "bodySingle": "Are you sure you want to permanently delete this export delivery? All documents and data belonging to it will be removed.",
+    "bodyBulk": "Are you sure you want to permanently delete the selected {n} deliveries? All related documents and data belonging to them will be removed.",
+    "bodyEmpty": "Are you sure you want to permanently delete all {n} deliveries from the trash? This will permanently remove the deliveries and the documents and data belonging to them.",
+    "irreversible": "This action cannot be undone.",
+    "confirm": "Yes, delete permanently",
+    "confirmEmpty": "Yes, empty the trash"
   }
 }

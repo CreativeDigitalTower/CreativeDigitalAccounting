@@ -994,5 +994,21 @@
     "byMonth": "Pe luni",
     "byYear": "Pe ani",
     "colPeriod": "Perioadă"
+  },
+  "purge": {
+    "deletePermanent": "Șterge definitiv",
+    "emptyTrash": "Golește coșul",
+    "selectAll": "Selectează tot",
+    "selectedN": "Selectate: {n}",
+    "deleteSelected": "Șterge definitiv selectate",
+    "deleting": "Se șterge…",
+    "title": "Ștergere definitivă",
+    "emptyTitle": "Golirea coșului",
+    "bodySingle": "Sigur doriți să ștergeți definitiv această livrare de export? Toate documentele și datele care îi aparțin vor fi eliminate.",
+    "bodyBulk": "Sigur doriți să ștergeți definitiv cele {n} livrări selectate? Toate documentele și datele aferente vor fi eliminate.",
+    "bodyEmpty": "Sigur doriți să ștergeți definitiv toate cele {n} livrări din coș? Aceasta va elimina definitiv livrările și documentele și datele care le aparțin.",
+    "irreversible": "Acțiunea nu poate fi anulată.",
+    "confirm": "Da, șterge definitiv",
+    "confirmEmpty": "Da, golește coșul"
   }
 }

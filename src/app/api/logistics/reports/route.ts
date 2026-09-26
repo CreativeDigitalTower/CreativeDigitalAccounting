@@ -25,7 +25,8 @@ export async function GET(req: Request) {
     : {};
 
   const sets = await prisma.exportDocumentSet.findMany({
-    where: { companyId: g.companyId, ...(status ? { status } : {}), ...dateFilter },
+    // Кошче: trashed доставки НЕ участват в отчетите (§6/§22).
+    where: { companyId: g.companyId, deletedAt: null, ...(status ? { status } : {}), ...dateFilter },
     select: { truckVehicleId: true, truckRegSnapshot: true, productSnapshot: true, quantity: true },
     take: 20000,
   });
