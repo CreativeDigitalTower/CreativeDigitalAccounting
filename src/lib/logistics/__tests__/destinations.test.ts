@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   SEED_DESTINATION_RECORDS, INACTIVE_DESTINATION_NAMES, INACTIVE_NORMALIZED_KEYS,
   stripDeliveryTermSuffix, isInactiveDestinationName, aggregateDestinationDeliveries, maintainDestinations,
-  type DeliveryRow,
+  resolveActiveDestinationNames, type DeliveryRow,
 } from "@/lib/logistics/destinations";
 import { normalizeDestination } from "@/lib/logistics/deliveryTerms";
 import { canLogistics, effectiveRole } from "@/lib/logistics/perms";
@@ -102,8 +102,8 @@ describe("permissions", () => {
 type Dest = { id: string; companyId: string; name: string; normalizedName: string; country: string | null; active: boolean };
 type SetRow = { id: string; companyId: string; destination: string | null; destinationId: string | null };
 
-function makeMock(sets: SetRow[]) {
-  const dests: Dest[] = [];
+function makeMock(sets: SetRow[], routes: { companyId: string; toPlace: string; active?: boolean }[] = [], shipments: { companyId: string; destination: string | null }[] = [], seedDests: Dest[] = []) {
+  const dests: Dest[] = [...seedDests];
   let seq = 0;
   const destApi = {
     findUnique: async ({ where }: { where: { companyId_normalizedName: { companyId: string; normalizedName: string } } }) => {
@@ -112,7 +112,8 @@ function makeMock(sets: SetRow[]) {
     },
     create: async ({ data }: { data: Partial<Dest> }) => { const d = { id: `d${++seq}`, country: null, active: true, ...data } as Dest; dests.push(d); return d; },
     update: async ({ where, data }: { where: { id: string }; data: Partial<Dest> }) => { const d = dests.find((x) => x.id === where.id)!; Object.assign(d, data); return d; },
-    findMany: async ({ where }: { where: { companyId: string } }) => dests.filter((d) => d.companyId === where.companyId),
+    findMany: async ({ where }: { where: { companyId: string; active?: boolean } }) =>
+      dests.filter((d) => d.companyId === where.companyId && (where.active === undefined || d.active === where.active)),
   };
   const setApi = {
     findMany: async ({ where }: { where: Record<string, unknown> }) => {
@@ -124,7 +125,18 @@ function makeMock(sets: SetRow[]) {
     },
     update: async ({ where, data }: { where: { id: string }; data: Partial<SetRow> }) => { const s = sets.find((x) => x.id === where.id)!; Object.assign(s, data); return s; },
   };
-  return { prisma: { logisticsDestination: destApi, exportDocumentSet: setApi } as never, dests, sets };
+  const routeApi = {
+    findMany: async ({ where }: { where: { companyId: string; active?: boolean } }) =>
+      routes.filter((r) => r.companyId === where.companyId && (where.active === undefined || (r.active ?? true) === where.active)),
+  };
+  const shipmentApi = {
+    findMany: async ({ where }: { where: { companyId: string; destination?: { not?: null } } }) => {
+      let res = shipments.filter((s) => s.companyId === where.companyId);
+      if (where.destination && where.destination.not === null) res = res.filter((s) => s.destination !== null);
+      return res;
+    },
+  };
+  return { prisma: { logisticsDestination: destApi, exportDocumentSet: setApi, logisticsRoute: routeApi, shipment: shipmentApi } as never, dests, sets, routes, shipments };
 }
 
 describe("maintainDestinations — idempotent + backfill", () => {
@@ -162,5 +174,56 @@ describe("maintainDestinations — idempotent + backfill", () => {
     const ohrid = m.dests.find((d) => d.normalizedName === normalizeDestination("Ohrid"));
     expect(ohrid?.active).toBe(true);
     expect(m.sets[0].destinationId).toBe(ohrid!.id);
+  });
+
+  it("2) recovers destinations from LogisticsRoute.toPlace and Shipment.destination", async () => {
+    const m = makeMock([], [{ companyId: "co1", toPlace: "Ohrid" }], [{ companyId: "co1", destination: "Bitola" }]);
+    await maintainDestinations(m.prisma, "co1");
+    expect(m.dests.find((d) => d.normalizedName === normalizeDestination("Ohrid"))?.active).toBe(true);
+    expect(m.dests.find((d) => d.normalizedName === normalizeDestination("Bitola"))?.active).toBe(true);
+  });
+
+  it("4/5/6/7/8) Skopie/Kochani/Rankovce/Kriva Palanka/Kumanovo stay active after recovery", async () => {
+    const m = makeMock([]);
+    await maintainDestinations(m.prisma, "co1");
+    for (const name of ["Skopie", "Kochani", "Rankovce", "Kriva Palanka", "Kumanovo"]) {
+      const d = m.dests.find((x) => x.normalizedName === normalizeDestination(name));
+      expect(d, name).toBeTruthy();
+      expect(d!.active, name).toBe(true);
+    }
+  });
+
+  it("10) missing address is not invented (created records have null address)", async () => {
+    const m = makeMock([]);
+    await maintainDestinations(m.prisma, "co1");
+    // Никой създаден запис няма измислен адрес.
+    expect(m.dests.every((d) => (d as unknown as { address?: string | null }).address == null)).toBe(true);
+  });
+});
+
+// ─────────── §8 / §17.1 — dropdown никога не е празен (fallback) ───────────
+describe("resolveActiveDestinationNames (transitional fallback)", () => {
+  it("1) empty master → legacy fallback (routes/used/MK), never empty", async () => {
+    const m = makeMock(
+      [{ id: "s1", companyId: "co1", destination: "Ohrid", destinationId: null }],
+      [{ companyId: "co1", toPlace: "Bitola", active: true }],
+    );
+    const { names, source } = await resolveActiveDestinationNames(m.prisma, "co1");
+    expect(source).toBe("legacy-fallback");
+    expect(names.length).toBeGreaterThan(0);
+    // Съдържа възстановими стойности…
+    expect(names.some((n) => normalizeDestination(n) === normalizeDestination("Ohrid"))).toBe(true);
+    expect(names.some((n) => normalizeDestination(n) === normalizeDestination("Bitola"))).toBe(true);
+    expect(names.some((n) => normalizeDestination(n) === "skopie")).toBe(true);
+    // …но НЕ и 12-те неактивни.
+    expect(names.some((n) => normalizeDestination(n) === normalizeDestination("Gostivar"))).toBe(false);
+  });
+
+  it("populated master → master source (no fallback)", async () => {
+    const seeded: Dest[] = [{ id: "d1", companyId: "co1", name: "Skopie", normalizedName: "skopie", country: "North Macedonia", active: true }];
+    const m = makeMock([], [], [], seeded);
+    const { names, source } = await resolveActiveDestinationNames(m.prisma, "co1");
+    expect(source).toBe("master");
+    expect(names).toEqual(["Skopie"]);
   });
 });
