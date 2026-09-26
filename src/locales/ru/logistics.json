@@ -981,6 +981,17 @@
       "ready": "Готова",
       "finalized": "Финализирована",
       "cancelled": "Отменена"
-    }
+    },
+    "kpiFirst": "Первая доставка",
+    "hDispatch": "Накладная №",
+    "open": "Открыть",
+    "filterFrom": "С даты",
+    "filterTo": "По дату",
+    "searchHistory": "Поиск счёт / накладная",
+    "totalRows": "Всего {n} записей",
+    "periodTitle": "Статистика по периоду",
+    "byMonth": "По месяцам",
+    "byYear": "По годам",
+    "colPeriod": "Период"
   }
 }

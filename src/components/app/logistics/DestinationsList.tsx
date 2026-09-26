@@ -6,6 +6,7 @@ import { DestinationFormModal } from "@/components/app/logistics/DestinationForm
 
 type Row = {
   id: string; name: string; country: string | null; city: string | null; active: boolean;
+  postalCode: string | null; address: string | null; code: string | null; note: string | null;
   deliveries: number; totalQuantity: number; lastDeliveryAt: string | null;
 };
 type StatusFilter = "all" | "active" | "inactive";
@@ -20,6 +21,7 @@ export function DestinationsList({ canManage }: { canManage: boolean }) {
   const [country, setCountry] = useState<string>("");
   const [sort, setSort] = useState<SortKey>("name");
   const [adding, setAdding] = useState(false);
+  const [editRow, setEditRow] = useState<Row | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
   async function load() { const r = await fetch("/api/logistics/destinations"); if (r.ok) setItems(await r.json()); }
@@ -107,7 +109,10 @@ export function DestinationsList({ canManage }: { canManage: boolean }) {
                   <td style={td}>{d.active
                     ? <span style={{ color: "var(--emerald-dark)", fontWeight: 600 }}>{t("logistics.common.active")}</span>
                     : <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: "var(--muted)", borderRadius: 20, padding: "2px 9px" }}>{t("logistics.destinations.inactiveBadge")}</span>}</td>
-                  {canManage && <td style={td}><button className="btn btn-ghost btn-sm" disabled={busyId === d.id} onClick={() => toggleActive(d.id, d.active)}>{d.active ? t("logistics.destinations.deactivate") : t("logistics.common.activate")}</button></td>}
+                  {canManage && <td style={td}><div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    <button className="btn btn-ghost btn-sm" onClick={() => setEditRow(d)}>{t("logistics.common.edit")}</button>
+                    <button className="btn btn-ghost btn-sm" disabled={busyId === d.id} onClick={() => toggleActive(d.id, d.active)}>{d.active ? t("logistics.destinations.deactivate") : t("logistics.common.activate")}</button>
+                  </div></td>}
                 </tr>
               ))}
             </tbody>
@@ -116,6 +121,7 @@ export function DestinationsList({ canManage }: { canManage: boolean }) {
       </div>
 
       {adding && <DestinationFormModal mode="create" onClose={() => setAdding(false)} onSaved={() => { setAdding(false); load(); }} />}
+      {editRow && <DestinationFormModal mode="edit" initial={{ id: editRow.id, name: editRow.name, country: editRow.country ?? "", city: editRow.city ?? "", postalCode: editRow.postalCode ?? "", address: editRow.address ?? "", code: editRow.code ?? "", note: editRow.note ?? "", active: editRow.active }} onClose={() => setEditRow(null)} onSaved={() => { setEditRow(null); load(); }} />}
     </div>
   );
 }

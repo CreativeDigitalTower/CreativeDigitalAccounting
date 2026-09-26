@@ -88,6 +88,23 @@ describe("aggregateDestinationDeliveries", () => {
     expect(s.products[0]).toEqual({ name: "CEM I 42.5 R", quantity: 49.3 });
     expect(s.avgQuantity).toBeCloseTo(19.78, 2);
   });
+  it("8/9) first + last delivery dates from the real records", () => {
+    const s = aggregateDestinationDeliveries(rows, now);
+    expect(s.firstDeliveryAt).toBe(new Date("2026-03-05").toISOString());
+    expect(s.lastDeliveryAt).toBe(new Date("2026-09-10").toISOString());
+  });
+  it("period stats: byMonth + byYear (newest first, decimal-safe)", () => {
+    const s = aggregateDestinationDeliveries(rows, now);
+    expect(s.byMonth[0]).toEqual({ month: "2026-09", deliveries: 2, quantity: 49.3 });
+    expect(s.byYear).toEqual([{ year: "2026", deliveries: 3, quantity: 59.35 }]);
+  });
+  it("empty rows → zero summary, null first/last", () => {
+    const s = aggregateDestinationDeliveries([], now);
+    expect(s.totalDeliveries).toBe(0);
+    expect(s.avgQuantity).toBe(0);
+    expect(s.firstDeliveryAt).toBeNull();
+    expect(s.lastDeliveryAt).toBeNull();
+  });
 });
 
 // ─────────── §16 permissions ───────────

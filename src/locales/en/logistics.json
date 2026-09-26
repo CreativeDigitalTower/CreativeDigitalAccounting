@@ -981,6 +981,17 @@
       "ready": "Ready",
       "finalized": "Finalized",
       "cancelled": "Cancelled"
-    }
+    },
+    "kpiFirst": "First delivery",
+    "hDispatch": "Dispatch No.",
+    "open": "Open",
+    "filterFrom": "From date",
+    "filterTo": "To date",
+    "searchHistory": "Search invoice / dispatch",
+    "totalRows": "{n} records total",
+    "periodTitle": "Statistics by period",
+    "byMonth": "By month",
+    "byYear": "By year",
+    "colPeriod": "Period"
   }
 }
