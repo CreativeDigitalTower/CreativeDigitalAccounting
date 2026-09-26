@@ -994,5 +994,21 @@
     "byMonth": "Aylık",
     "byYear": "Yıllık",
     "colPeriod": "Dönem"
+  },
+  "purge": {
+    "deletePermanent": "Kalıcı olarak sil",
+    "emptyTrash": "Çöp kutusunu boşalt",
+    "selectAll": "Tümünü seç",
+    "selectedN": "Seçili: {n}",
+    "deleteSelected": "Seçilenleri kalıcı sil",
+    "deleting": "Siliniyor…",
+    "title": "Kalıcı silme",
+    "emptyTitle": "Çöp kutusunu boşaltma",
+    "bodySingle": "Bu ihracat teslimatını kalıcı olarak silmek istediğinizden emin misiniz? Ona ait tüm belgeler ve veriler kaldırılacak.",
+    "bodyBulk": "Seçili {n} teslimatı kalıcı olarak silmek istediğinizden emin misiniz? Bunlara ait tüm ilgili belgeler ve veriler kaldırılacak.",
+    "bodyEmpty": "Çöp kutusundaki {n} teslimatın tümünü kalıcı olarak silmek istediğinizden emin misiniz? Bu, teslimatları ve onlara ait belge ve verileri kalıcı olarak kaldırır.",
+    "irreversible": "Bu işlem geri alınamaz.",
+    "confirm": "Evet, kalıcı olarak sil",
+    "confirmEmpty": "Evet, çöp kutusunu boşalt"
   }
 }
