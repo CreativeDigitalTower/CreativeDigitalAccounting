@@ -64,12 +64,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <div style={{ position: "relative", zIndex: 1, display: "flex", width: "100%" }}>
         <SidebarShell companyName={company.name} plan={plan} isSuperAdmin={isSuperAdmin} logoUrl={plan !== "free" ? company.logoUrl : null} inboxUnread={inboxUnread} companyEik={company.eik} companies={myCompanyRows} activeCompanyId={companyId} logisticsEnabled={logisticsEnabled} fashionEnabled={fashionEnabled} />
         <main style={{ flex: 1, minWidth: 0, maxWidth: 1180 }}>
-          {showTrialBanner && <TrialBanner />}
-          {impersonating && <ImpersonationBanner companyName={company.name} />}
-          {company.managedByFirmId && <FirmClientBanner companyName={company.name} />}
-          {company.isAccountingFirm && <FirmClientBanner companyName={company.name} own />}
-          {sub.justExpired && <TrialEndedPopup wasTrial={sub.wasTrial} periodEnd={sub.currentPeriodEnd ? new Date(sub.currentPeriodEnd).toISOString() : ""} />}
-          <AppTopBar initialUnread={inboxUnread} />
+          {/* Chrome-ът (банери + topbar) никога не се печата и не бива да заема място при
+              печат (иначе празни страници при A4 документния печат). */}
+          <div className="no-print">
+            {showTrialBanner && <TrialBanner />}
+            {impersonating && <ImpersonationBanner companyName={company.name} />}
+            {company.managedByFirmId && <FirmClientBanner companyName={company.name} />}
+            {company.isAccountingFirm && <FirmClientBanner companyName={company.name} own />}
+            {sub.justExpired && <TrialEndedPopup wasTrial={sub.wasTrial} periodEnd={sub.currentPeriodEnd ? new Date(sub.currentPeriodEnd).toISOString() : ""} />}
+            <AppTopBar initialUnread={inboxUnread} />
+          </div>
           <div className="app-content" style={{ padding: "14px 36px 60px" }}>{children}</div>
         </main>
       </div>
