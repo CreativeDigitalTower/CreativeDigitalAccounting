@@ -698,7 +698,8 @@
     "regAddress": "Adresă de înregistrare",
     "baseAddress": "Adresă bază",
     "blankDispatch": "Aviz gol",
-    "blankDispatchHint": "Fără completarea automată a rândului „До:“ și a adresei bazei."
+    "blankDispatchHint": "Fără completarea automată a rândului „До:“ și a adresei bazei.",
+    "historicalDoc": "istoric"
   },
   "fleet": {
     "title": "Fleet",

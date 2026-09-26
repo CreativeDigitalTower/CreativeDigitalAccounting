@@ -698,7 +698,8 @@
     "regAddress": "Registration address",
     "baseAddress": "Base address",
     "blankDispatch": "Blank dispatch note",
-    "blankDispatchHint": "Without auto-filling the „До:“ line and the base address."
+    "blankDispatchHint": "Without auto-filling the „До:“ line and the base address.",
+    "historicalDoc": "historical"
   },
   "fleet": {
     "title": "Fleet",

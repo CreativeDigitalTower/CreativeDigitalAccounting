@@ -127,18 +127,20 @@ describe("Декларация + CMR (PR3)", () => {
 });
 
 describe("BUGFIX/UX — активни документи, декларация, регенерация, persistence", () => {
-  it("активният workflow е 5 документа (Invoice/Испратница/Декларация/CMR EPSON/CMR HP), без blank", () => {
-    expect(ACTIVE_EXPORT_DOC_TYPES.length).toBe(5);
+  it("активният workflow е 4 документа (Invoice/Испратница/Декларация/CMR HP), без blank и без CMR EPSON", () => {
+    expect(ACTIVE_EXPORT_DOC_TYPES.length).toBe(4);
     expect((ACTIVE_EXPORT_DOC_TYPES as readonly string[]).includes("blank")).toBe(false);
-    // CMR Epson е върнат като активен тип за генериране (§5/§11).
-    expect((ACTIVE_EXPORT_DOC_TYPES as readonly string[]).includes("cmr_epson")).toBe(true);
-    expect(isActiveExportDocType("cmr_epson")).toBe(true);
+    // CMR Epson е ВРЕМЕННО деактивиран от активния workflow (§5/§7) — остава supported.
+    expect((ACTIVE_EXPORT_DOC_TYPES as readonly string[]).includes("cmr_epson")).toBe(false);
+    expect(isActiveExportDocType("cmr_epson")).toBe(false);
     expect(isActiveExportDocType("cmr_hp")).toBe(true);
     expect(isActiveExportDocType("blank")).toBe(false);
     expect(isActiveExportDocType("invoice")).toBe(true);
-    // blank и cmr_epson остават в историческия набор за backward compatibility
+    // blank и cmr_epson остават в историческия/supported набор за backward compatibility
     expect((EXPORT_DOC_TYPES as readonly string[]).includes("blank")).toBe(true);
     expect((EXPORT_DOC_TYPES as readonly string[]).includes("cmr_epson")).toBe(true);
+    // CMR Epson шаблонът/генерацията остават налични (supported) — buildDocumentData работи.
+    expect(buildDocumentData(SRC, PARTIES, "cmr_epson")).toBeTruthy();
   });
 
   it("декларацията съдържа задължителния нормативен текст", () => {

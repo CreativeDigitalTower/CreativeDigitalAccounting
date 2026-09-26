@@ -698,7 +698,8 @@
     "regAddress": "Адрес регистрации",
     "baseAddress": "Адрес базы",
     "blankDispatch": "Пустая накладная",
-    "blankDispatchHint": "Без автозаполнения строки „До:“ и адреса базы."
+    "blankDispatchHint": "Без автозаполнения строки „До:“ и адреса базы.",
+    "historicalDoc": "исторический"
   },
   "fleet": {
     "title": "Fleet",
