@@ -2,6 +2,7 @@ import { requireLogistics, groupCounterparties, companyCanCreateExports } from "
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { ExportSetForm } from "@/components/app/logistics/ExportSetForm";
+import { resolveActiveDestinationNames } from "@/lib/logistics/destinations";
 
 export default async function Page() {
   const { companyId, caps } = await requireLogistics();
@@ -21,12 +22,10 @@ export default async function Page() {
     ? await prisma.client.findMany({ where: { companyId: defaultBuyerId, status: { notIn: ["inactive", "lost"] } }, select: { id: true, name: true }, orderBy: { name: "asc" }, take: 2000 })
     : [];
 
-  // Дестинациите за нова доставка идват САМО от active master записите (§12/§19) — без
-  // hardcoded масив. Клиентът управлява списъка от раздел „Дестинации".
-  const activeDestinations = await prisma.logisticsDestination.findMany({
-    where: { companyId, active: true }, select: { name: true }, orderBy: { name: "asc" },
-  });
-  const destinations = activeDestinations.map((d) => d.name);
+  // Дестинациите за нова доставка идват от active master записите (§12/§19). TRANSITIONAL:
+  // ако master още не е населен (backfill не е пуснат), fallback към legacy — dropdown-ът
+  // никога не остава празен (§8).
+  const { names: destinations } = await resolveActiveDestinationNames(prisma, companyId);
 
   return (
     <ExportSetForm

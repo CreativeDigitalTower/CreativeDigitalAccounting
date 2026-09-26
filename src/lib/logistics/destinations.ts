@@ -7,7 +7,8 @@
  * (Incoterm FCA/CPT). Тук пазим само мястото на доставка.
  */
 import type { PrismaClient } from "@prisma/client";
-import { normalizeDestination } from "@/lib/logistics/deliveryTerms";
+import { normalizeDestination, mergeDestinations, MK_DESTINATIONS } from "@/lib/logistics/deliveryTerms";
+import { SEED_DESTINATIONS } from "@/lib/logistics/masterData";
 
 export type SeedDestination = { name: string; country: string | null; active: boolean };
 
@@ -96,14 +97,29 @@ export async function maintainDestinations(prisma: PrismaClient, companyId: stri
     }
   }
 
-  // 3) Внасяне на legacy използвани дестинации (от export sets), за да не се губи информация.
-  const used = await prisma.exportDocumentSet.findMany({
-    where: { companyId, destination: { not: null } }, select: { destination: true }, distinct: ["destination"],
-  });
-  for (const u of used) {
-    const display = stripDeliveryTermSuffix(u.destination);
+  // 3) Внасяне на ВСИЧКИ legacy дестинации (recovery), за да не се губи нищо от работещия
+  //    преди PR #213 dropdown (§4): export sets + маршрути (toPlace) + курсове (Shipment)
+  //    + стария hardcoded MK_DESTINATIONS + Cyrillic seed. Приоритетът е structured данни;
+  //    за низовете НЕ измисляме адрес — остава nullable (§4/§5).
+  const [usedSets, routes, shipments] = await Promise.all([
+    prisma.exportDocumentSet.findMany({ where: { companyId, destination: { not: null } }, select: { destination: true }, distinct: ["destination"] }),
+    prisma.logisticsRoute.findMany({ where: { companyId }, select: { toPlace: true } }),
+    prisma.shipment.findMany({ where: { companyId, destination: { not: null } }, select: { destination: true }, distinct: ["destination"] }),
+  ]);
+  const legacyRaw = [
+    ...usedSets.map((s) => s.destination),
+    ...routes.map((r) => r.toPlace),
+    ...shipments.map((s) => s.destination),
+    ...MK_DESTINATIONS,
+    ...SEED_DESTINATIONS,
+  ];
+  // dedupe по нормализиран ключ, като почистваме „/ FCA …" суфикса за display.
+  const seen = new Set<string>();
+  for (const raw of legacyRaw) {
+    const display = stripDeliveryTermSuffix(raw);
     const key = normalizeDestination(display);
-    if (!key) continue;
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
     const existing = await prisma.logisticsDestination.findUnique({
       where: { companyId_normalizedName: { companyId, normalizedName: key } }, select: { id: true },
     });
@@ -130,6 +146,36 @@ export async function maintainDestinations(prisma: PrismaClient, companyId: stri
   }
 
   return { created, deactivated, backfilled };
+}
+
+/**
+ * Имената на дестинациите за dropdown-а на НОВА/редактирана експортна доставка (§6/§8).
+ * Canonical source = active LogisticsDestination master. TRANSITIONAL SAFETY NET: ако master
+ * таблицата още НЕ е населена (backfill не е пуснат), НЕ връщаме празен списък — fallback към
+ * възстановимите legacy дестинации (маршрути + използвани + стария MK_DESTINATIONS/seed),
+ * почистени и без 12-те неактивни. След успешен backfill master остава единствен източник.
+ */
+export async function resolveActiveDestinationNames(prisma: PrismaClient, companyId: string): Promise<{ names: string[]; source: "master" | "legacy-fallback" }> {
+  const master = await prisma.logisticsDestination.findMany({
+    where: { companyId, active: true }, select: { name: true }, orderBy: { name: "asc" },
+  });
+  if (master.length > 0) return { names: master.map((m) => m.name), source: "master" };
+
+  const [routes, used, shipments] = await Promise.all([
+    prisma.logisticsRoute.findMany({ where: { companyId, active: true }, select: { toPlace: true } }),
+    prisma.exportDocumentSet.findMany({ where: { companyId, destination: { not: null } }, select: { destination: true }, take: 2000 }),
+    prisma.shipment.findMany({ where: { companyId, destination: { not: null } }, select: { destination: true }, take: 2000 }),
+  ]);
+  const clean = (arr: (string | null | undefined)[]) => arr.map((x) => stripDeliveryTermSuffix(x)).filter(Boolean);
+  const merged = mergeDestinations(
+    clean(MK_DESTINATIONS),
+    clean(routes.map((r) => r.toPlace)),
+    clean(used.map((s) => s.destination)),
+    clean(shipments.map((s) => s.destination)),
+    clean(SEED_DESTINATIONS),
+  );
+  // Не предлагаме 12-те неактивни за нови доставки (§3), дори във fallback.
+  return { names: merged.filter((n) => !isInactiveDestinationName(n)), source: "legacy-fallback" };
 }
 
 // ─────────────── Статистика по дестинация (§8/§9/§11) ───────────────
