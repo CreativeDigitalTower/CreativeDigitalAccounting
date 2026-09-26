@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logisticsApiGuard } from "@/lib/logistics/access";
 import { audit } from "@/lib/documents";
-import { normalizeDestination } from "@/lib/logistics/deliveryTerms";
-import { stripDeliveryTermSuffix } from "@/lib/logistics/destinations";
+import { canonicalDestinationKey } from "@/lib/logistics/destinations";
 import { z } from "zod";
 
 const select = {
@@ -39,7 +38,7 @@ export async function GET() {
   };
   for (const s of sets) {
     if (s.destinationId) bump(byId, s.destinationId, s.quantity, s.shipmentDate);
-    else { const k = normalizeDestination(stripDeliveryTermSuffix(s.destination)); if (k) bump(byKey, k, s.quantity, s.shipmentDate); }
+    else { const k = canonicalDestinationKey(s.destination); if (k) bump(byKey, k, s.quantity, s.shipmentDate); }
   }
 
   const rows = destinations.map((d) => {
@@ -76,7 +75,7 @@ export async function POST(req: Request) {
   try {
     const d = schema.parse(await req.json());
     const name = d.name.trim();
-    const normalizedName = normalizeDestination(name);
+    const normalizedName = canonicalDestinationKey(name);
     if (!normalizedName) return NextResponse.json({ error: "Невалидно име на дестинация." }, { status: 400 });
 
     const dup = await prisma.logisticsDestination.findUnique({

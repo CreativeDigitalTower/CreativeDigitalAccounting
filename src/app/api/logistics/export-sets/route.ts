@@ -6,8 +6,8 @@ import { audit } from "@/lib/documents";
 import { nextSequenceValue } from "@/lib/logistics/sequence";
 import { SEQ_SCOPE, formatSequenceNumber, EXPORT_INVOICE_FORMAT, suggestDispatchFromInvoice } from "@/lib/logistics/config";
 import { truckTrailerLabel } from "@/lib/logistics/exportDocs";
-import { PLACE_OF_SHIPMENT_DEFAULT, normalizeDestination } from "@/lib/logistics/deliveryTerms";
-import { stripDeliveryTermSuffix } from "@/lib/logistics/destinations";
+import { PLACE_OF_SHIPMENT_DEFAULT } from "@/lib/logistics/deliveryTerms";
+import { canonicalDestinationKey } from "@/lib/logistics/destinations";
 import { validationError, zodFieldErrors, VMSG, type FieldErrors } from "@/lib/logistics/validation";
 import { clientCompanyAllowed } from "@/lib/logistics/clientScope";
 import { z } from "zod";
@@ -180,7 +180,7 @@ export async function POST(req: Request) {
     const trailer = d.trailerReg ?? vehicle?.logisticsProfile?.trailerReg ?? null;
     const unit = d.unit || product?.unit || "t";
     // §12: свързваме към master дестинация по нормализирано име (snapshot низът се пази отделно).
-    const destKey = normalizeDestination(stripDeliveryTermSuffix(d.destination));
+    const destKey = canonicalDestinationKey(d.destination);
     const destMatch = destKey
       ? await prisma.logisticsDestination.findUnique({ where: { companyId_normalizedName: { companyId: g.companyId, normalizedName: destKey } }, select: { id: true } })
       : null;

@@ -4,8 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { logisticsApiGuard, exportSetReadRole, groupCounterparties } from "@/lib/logistics/access";
 import { audit } from "@/lib/documents";
 import { validationError, VMSG, type FieldErrors } from "@/lib/logistics/validation";
-import { PLACE_OF_SHIPMENT_DEFAULT, normalizeDestination } from "@/lib/logistics/deliveryTerms";
-import { stripDeliveryTermSuffix } from "@/lib/logistics/destinations";
+import { PLACE_OF_SHIPMENT_DEFAULT } from "@/lib/logistics/deliveryTerms";
+import { canonicalDestinationKey } from "@/lib/logistics/destinations";
 import { missingEditFields, exportDeleteDecision } from "@/lib/logistics/exportSetEdit";
 import { z } from "zod";
 
@@ -98,7 +98,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (d.destination !== undefined) {
       data.destination = (d.destination ?? "").trim() || null;
       // §12: пресвързваме destinationId към актуалната master стойност (по нормализирано име).
-      const destKey = normalizeDestination(stripDeliveryTermSuffix(d.destination));
+      const destKey = canonicalDestinationKey(d.destination);
       const destMatch = destKey
         ? await prisma.logisticsDestination.findUnique({ where: { companyId_normalizedName: { companyId: g.companyId, normalizedName: destKey } }, select: { id: true } })
         : null;
