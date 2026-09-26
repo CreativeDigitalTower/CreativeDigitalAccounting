@@ -7,6 +7,7 @@ import { netAmount } from "@/lib/logistics/money";
 import { resolveDispatchIssuer } from "@/lib/logistics/dispatchIssuer";
 import { resolveInvoiceParty } from "@/lib/logistics/invoiceParties";
 import { invoiceDeliveryTerms, destinationEn, PLACE_OF_SHIPMENT_DEFAULT } from "@/lib/logistics/deliveryTerms";
+import { stripDeliveryTermSuffix } from "@/lib/logistics/destinations";
 import { Prisma } from "@prisma/client";
 import type { ExportDocType } from "@/lib/logistics/config";
 
@@ -68,7 +69,7 @@ export function splitTruckTrailer(label: string | null | undefined): { truck: st
 export type ExportSetSource = {
   invoiceNumber: string | null; invoiceDate: string | null; shipmentDate?: string | null;
   deliveryTerm?: string | null; placeOfShipment?: string | null;
-  destination: string | null; truckRegSnapshot: string | null; trailerReg: string | null;
+  destination: string | null; destinationCountry?: string | null; truckRegSnapshot: string | null; trailerReg: string | null;
   productSnapshot: string | null; customsCode?: string | null; certificateNumberSnapshot?: string | null; dispatchName?: string | null; blankDispatchNote?: boolean;
   quantity: number | null; unit: string; declarationCmrDate: string | null; dispatchNumber: string | null;
   holcimProforma?: { number: string | null; date: string | null } | null;
@@ -282,13 +283,17 @@ export function buildDocumentData(src: ExportSetSource, parties: Parties, docTyp
       return {
         layout: docType === "cmr_epson" ? "epson" : "hp",
         sender: cmrSender, consignee: cmrBuyer,
-        // CMR defaults (editable): дестинация „SKOPIE", държава „NORTH MACEDONIA", спедитор „ENIGMA".
-        destination: "SKOPIE",
+        // Дестинацията идва от конкретната експортна доставка (source of truth), НЕ е hardcode.
+        // Presentation: латиница/uppercase по CMR конвенцията (напр. Shtip → SHTIP). Snapshot-ва
+        // се в document data → бъдещ rename на master НЕ променя вече генериран/финализиран CMR.
+        destination: destinationEn(stripDeliveryTermSuffix(src.destination)) || (src.destination ?? ""),
         placeOfShipment: [cmrCity, (cmrSender.country ?? "").toUpperCase()].filter(Boolean).join(", "),
         // CMR транспортна дата = дата на изпращане (fallback CMR/деклар. → issue), §8/§13.
         date: src.shipmentDate ?? src.declarationCmrDate ?? src.invoiceDate,
         invoiceDate: src.invoiceDate,
-        destinationCountry: "NORTH MACEDONIA",
+        // Държава: от destination master (ако е налична), иначе държавата на получателя;
+        // fallback „NORTH MACEDONIA". Uppercase по CMR конвенцията. НЕ е градът на купувача (§11).
+        destinationCountry: (src.destinationCountry || buyerEn.country || "NORTH MACEDONIA").toUpperCase(),
         placeBottom: cmrCity || null,
         truck, invoiceNumber: src.invoiceNumber,
         goods: { description: src.productSnapshot ? `CEMENT Holcim ${src.productSnapshot} - IN BULK` : "CEMENT", customsCode: src.customsCode ?? null, certificate: src.certificateNumberSnapshot ?? null },
