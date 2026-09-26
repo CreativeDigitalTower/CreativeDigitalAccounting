@@ -981,6 +981,17 @@
       "ready": "Готова",
       "finalized": "Финализирана",
       "cancelled": "Отказана"
-    }
+    },
+    "kpiFirst": "Първа доставка",
+    "hDispatch": "Изпратница №",
+    "open": "Отвори",
+    "filterFrom": "От дата",
+    "filterTo": "До дата",
+    "searchHistory": "Търси фактура / изпратница",
+    "totalRows": "Общо {n} записа",
+    "periodTitle": "Статистика по период",
+    "byMonth": "По месеци",
+    "byYear": "По години",
+    "colPeriod": "Период"
   }
 }

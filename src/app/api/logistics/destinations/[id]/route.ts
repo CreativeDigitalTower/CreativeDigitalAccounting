@@ -11,7 +11,13 @@ const select = {
   defaultCarrierId: true, defaultDeliveryTerm: true, createdAt: true, updatedAt: true,
 } as const;
 
-/** Detail: master данни + статистика + история на доставките (canonical = ExportDocumentSet). */
+/**
+ * Detail: master данни + обобщена статистика (§4/§7/§9). Статистиката е по CANONICAL
+ * `destinationId` (не по historical string), затова alias вариантите остават в ЕДНО досие и
+ * rename не разделя историята. Историята на доставките се пагинира отделно през
+ * GET .../[id]/deliveries (§5/§6/§13). Зареждат се само леки полета за агрегиране (индексиран
+ * query по destinationId) — без N+1 и без сканиране на цялата таблица.
+ */
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const g = await logisticsApiGuard("view_logistics");
   if (!g.ok) return g.res;
@@ -20,35 +26,13 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const dest = await prisma.logisticsDestination.findFirst({ where: { id, companyId: g.companyId }, select });
   if (!dest) return NextResponse.json({ error: "Не е намерена." }, { status: 404 });
 
-  // Всички доставки на фирмата (без изтритите) → филтрираме по relation ИЛИ нормализирано име.
-  const sets = await prisma.exportDocumentSet.findMany({
-    where: { companyId: g.companyId, deletedAt: null },
-    select: {
-      id: true, destinationId: true, destination: true, shipmentDate: true, quantity: true, unit: true,
-      productSnapshot: true, truckRegSnapshot: true, trailerReg: true, clientId: true, status: true, invoiceNumber: true,
-    },
-    orderBy: { shipmentDate: "desc" },
+  const rows = await prisma.exportDocumentSet.findMany({
+    where: { companyId: g.companyId, deletedAt: null, destinationId: id },
+    select: { id: true, shipmentDate: true, quantity: true, unit: true, productSnapshot: true, truckRegSnapshot: true, invoiceNumber: true },
   });
-  const matched = sets.filter((s) =>
-    s.destinationId ? s.destinationId === id
-      : canonicalDestinationKey(s.destination) === dest.normalizedName,
-  );
+  const stats = aggregateDestinationDeliveries(rows);
 
-  // Получател = име на крайния клиент (ако е зададен). Един batch query, без N+1.
-  const clientIds = [...new Set(matched.map((s) => s.clientId).filter((x): x is string => !!x))];
-  const clients = clientIds.length
-    ? await prisma.client.findMany({ where: { id: { in: clientIds } }, select: { id: true, name: true } })
-    : [];
-  const clientName = new Map(clients.map((c) => [c.id, c.name]));
-
-  const stats = aggregateDestinationDeliveries(matched);
-  const history = matched.map((s) => ({
-    id: s.id, shipmentDate: s.shipmentDate ? s.shipmentDate.toISOString() : null,
-    invoiceNumber: s.invoiceNumber, product: s.productSnapshot, quantity: s.quantity, unit: s.unit,
-    truck: s.truckRegSnapshot, trailer: s.trailerReg, recipient: s.clientId ? clientName.get(s.clientId) ?? null : null, status: s.status,
-  }));
-
-  return NextResponse.json({ destination: dest, stats, history });
+  return NextResponse.json({ destination: dest, stats });
 }
 
 const schema = z.object({

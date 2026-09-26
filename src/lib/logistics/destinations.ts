@@ -253,12 +253,14 @@ export type DestinationStats = {
   quantityThisMonth: number;
   quantityThisYear: number;
   avgQuantity: number;
+  firstDeliveryAt: string | null;
   lastDeliveryAt: string | null;
   topTruck: string | null;
   distinctTrucks: number;
   topProduct: string | null;
   products: { name: string; quantity: number }[];
   byMonth: { month: string; deliveries: number; quantity: number }[];
+  byYear: { year: string; deliveries: number; quantity: number }[];
 };
 
 /**
@@ -268,16 +270,18 @@ export type DestinationStats = {
 export function aggregateDestinationDeliveries(rows: DeliveryRow[], now: Date = new Date()): DestinationStats {
   const y = now.getFullYear(), m = now.getMonth();
   let totalH = 0, monthH = 0, yearH = 0, monthCount = 0;
-  let last: Date | null = null;
+  let last: Date | null = null, first: Date | null = null;
   const truckCount = new Map<string, number>();
   const productH = new Map<string, number>();
   const monthMap = new Map<string, { deliveries: number; h: number }>();
+  const yearMap = new Map<string, { deliveries: number; h: number }>();
 
   for (const r of rows) {
     totalH = addTons(totalH, r.quantity);
     const d = r.shipmentDate ? new Date(r.shipmentDate) : null;
     if (d) {
       if (!last || d.getTime() > last.getTime()) last = d;
+      if (!first || d.getTime() < first.getTime()) first = d;
       if (d.getFullYear() === y) {
         yearH = addTons(yearH, r.quantity);
         if (d.getMonth() === m) { monthH = addTons(monthH, r.quantity); monthCount++; }
@@ -285,6 +289,9 @@ export function aggregateDestinationDeliveries(rows: DeliveryRow[], now: Date = 
       const mk = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
       const cur = monthMap.get(mk) ?? { deliveries: 0, h: 0 };
       cur.deliveries++; cur.h = addTons(cur.h, r.quantity); monthMap.set(mk, cur);
+      const yk = String(d.getFullYear());
+      const yc = yearMap.get(yk) ?? { deliveries: 0, h: 0 };
+      yc.deliveries++; yc.h = addTons(yc.h, r.quantity); yearMap.set(yk, yc);
     }
     const truck = (r.truckRegSnapshot ?? "").trim();
     if (truck) truckCount.set(truck, (truckCount.get(truck) ?? 0) + 1);
@@ -295,8 +302,10 @@ export function aggregateDestinationDeliveries(rows: DeliveryRow[], now: Date = 
   const total = rows.length;
   const products = [...productH.entries()].map(([name, h]) => ({ name, quantity: toTons(h) })).sort((a, b) => b.quantity - a.quantity);
   const topTruckEntry = [...truckCount.entries()].sort((a, b) => b[1] - a[1])[0];
-  const byMonth = [...monthMap.entries()].sort((a, b) => a[0].localeCompare(b[0]))
+  const byMonth = [...monthMap.entries()].sort((a, b) => b[0].localeCompare(a[0]))
     .map(([month, v]) => ({ month, deliveries: v.deliveries, quantity: toTons(v.h) }));
+  const byYear = [...yearMap.entries()].sort((a, b) => b[0].localeCompare(a[0]))
+    .map(([year, v]) => ({ year, deliveries: v.deliveries, quantity: toTons(v.h) }));
 
   return {
     totalDeliveries: total,
@@ -305,11 +314,13 @@ export function aggregateDestinationDeliveries(rows: DeliveryRow[], now: Date = 
     quantityThisMonth: toTons(monthH),
     quantityThisYear: toTons(yearH),
     avgQuantity: total > 0 ? toTons(Math.round(totalH / total)) : 0,
+    firstDeliveryAt: first ? first.toISOString() : null,
     lastDeliveryAt: last ? last.toISOString() : null,
     topTruck: topTruckEntry ? topTruckEntry[0] : null,
     distinctTrucks: truckCount.size,
     topProduct: products[0]?.name ?? null,
     products,
     byMonth,
+    byYear,
   };
 }

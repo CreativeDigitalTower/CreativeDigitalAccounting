@@ -981,6 +981,17 @@
       "ready": "Gata",
       "finalized": "Finalizată",
       "cancelled": "Anulată"
-    }
+    },
+    "kpiFirst": "Prima livrare",
+    "hDispatch": "Aviz nr.",
+    "open": "Deschide",
+    "filterFrom": "De la data",
+    "filterTo": "Până la data",
+    "searchHistory": "Caută factură / aviz",
+    "totalRows": "{n} înregistrări în total",
+    "periodTitle": "Statistici pe perioadă",
+    "byMonth": "Pe luni",
+    "byYear": "Pe ani",
+    "colPeriod": "Perioadă"
   }
 }

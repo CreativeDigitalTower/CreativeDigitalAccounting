@@ -981,6 +981,17 @@
       "ready": "Hazır",
       "finalized": "Sonlandırıldı",
       "cancelled": "İptal edildi"
-    }
+    },
+    "kpiFirst": "İlk teslimat",
+    "hDispatch": "İrsaliye No.",
+    "open": "Aç",
+    "filterFrom": "Başlangıç tarihi",
+    "filterTo": "Bitiş tarihi",
+    "searchHistory": "Fatura / irsaliye ara",
+    "totalRows": "Toplam {n} kayıt",
+    "periodTitle": "Döneme göre istatistik",
+    "byMonth": "Aylık",
+    "byYear": "Yıllık",
+    "colPeriod": "Dönem"
   }
 }
