@@ -77,7 +77,7 @@ export function ExportInvoiceTemplate({ data }: { data: InvoiceDocData }) {
   );
 
   return (
-    <div className="printable invoice-doc" style={{ fontFamily: "'Times New Roman', Times, serif", color: "#000", background: "#fff", width: "210mm", height: "297mm", boxSizing: "border-box", padding: "6mm 6mm 6mm 8mm", fontSize: 11.5, lineHeight: 1.2, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div className="printable invoice-doc" style={{ fontFamily: "'Times New Roman', Times, serif", color: "#000", background: "#fff", width: "210mm", boxSizing: "border-box", padding: "6mm 6mm 6mm 8mm", fontSize: 11.5, lineHeight: 1.2, display: "flex", flexDirection: "column" }}>
       {/* Заглавие над рамката: INVOICE № {точен номер, водещи нули} / {DD.MM.YYYY} (§28) */}
       <div style={{ display: "flex", justifyContent: "center", alignItems: "baseline", gap: 8, fontWeight: 700, fontSize: 14, padding: "1mm 0 3mm" }}>
         <span>INVOICE №</span><span>{data.invoiceNumber ?? ""}</span>{data.invoiceDate && <><span>/</span><span>{d(data.invoiceDate)}</span></>}
@@ -89,11 +89,11 @@ export function ExportInvoiceTemplate({ data }: { data: InvoiceDocData }) {
           <col style={{ width: "56%" }} /><col style={{ width: "16%" }} /><col style={{ width: "13%" }} /><col style={{ width: "15%" }} />
         </colgroup>
         <tbody>
-          {/* Seller | Contract */}
-          <tr style={{ height: "22mm" }}>
+          {/* Seller | Contract — компактна горна секция по еталон №9870 (§4) */}
+          <tr style={{ height: "19mm" }}>
             <td style={cell}>{party(seller, "Seller")}</td>
             <td style={cell} colSpan={3}>
-              <div style={{ lineHeight: 1.7 }}>
+              <div style={{ lineHeight: 1.5 }}>
                 <div><i>Contract :</i> <b>{data.contract ?? ""}</b></div>
                 <div><i>Anex №</i> <b>{data.annex ?? ""}</b></div>
                 <div><i>Order №</i> <b>{data.order ?? ""}</b></div>
@@ -101,16 +101,18 @@ export function ExportInvoiceTemplate({ data }: { data: InvoiceDocData }) {
             </td>
           </tr>
           {/* Consignee | Buyer */}
-          <tr style={{ height: "22mm" }}>
+          <tr style={{ height: "19mm" }}>
             <td style={cell}>{party(buyer, "Consignee")}</td>
             <td style={cell} colSpan={3}>{party(buyer, "Buyer / importer /")}</td>
           </tr>
-          {/* Terms — ВЪТРЕ в рамката, full width, без вътрешни хоризонтални линии (§2/§4) */}
-          <tr style={{ height: "28mm" }}>
-            <td style={{ ...cell, lineHeight: 1.9 }} colSpan={4}>
+          {/* Terms — ВЪТРЕ в рамката, full width, без вътрешни хоризонтални линии (§2/§4).
+              Ред „Date of shipment" между „Place of shipment" и „Destination" (еталон №9870, §5). */}
+          <tr style={{ height: "33mm" }}>
+            <td style={{ ...cell, lineHeight: 1.85 }} colSpan={4}>
               <div><span style={lab}>Terms of delivery :</span><b>{data.termsOfDelivery ?? ""}</b></div>
               <div><span style={lab}>Means of transport :</span>Truck № : <b>{truckText}</b></div>
               <div><span style={lab}>Place of shipment :</span><b>{data.placeOfShipment ?? ""}</b></div>
+              <div><span style={lab}>Date of shipment :</span><b>{d(data.dateOfShipment ?? data.invoiceDate)}</b></div>
               <div><span style={lab}>Destination :</span><b>{data.destination ?? ""}</b>{data.destinationCountry ? <>&nbsp;&nbsp;&nbsp;{data.destinationCountry}</> : null}</div>
             </td>
           </tr>
