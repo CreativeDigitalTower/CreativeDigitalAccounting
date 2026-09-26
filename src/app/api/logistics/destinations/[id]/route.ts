@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logisticsApiGuard } from "@/lib/logistics/access";
 import { audit } from "@/lib/documents";
-import { normalizeDestination } from "@/lib/logistics/deliveryTerms";
-import { stripDeliveryTermSuffix, aggregateDestinationDeliveries } from "@/lib/logistics/destinations";
+import { canonicalDestinationKey, aggregateDestinationDeliveries } from "@/lib/logistics/destinations";
 import { z } from "zod";
 
 const select = {
@@ -32,7 +31,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   });
   const matched = sets.filter((s) =>
     s.destinationId ? s.destinationId === id
-      : normalizeDestination(stripDeliveryTermSuffix(s.destination)) === dest.normalizedName,
+      : canonicalDestinationKey(s.destination) === dest.normalizedName,
   );
 
   // Получател = име на крайния клиент (ако е зададен). Един batch query, без N+1.
@@ -80,7 +79,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     // Промяна на master НЕ пипа финализирани document snapshots (§6). Само актуализира master.
     if (d.name != null) {
       const name = d.name.trim();
-      const normalizedName = normalizeDestination(name);
+      const normalizedName = canonicalDestinationKey(name);
       if (!normalizedName) return NextResponse.json({ error: "Невалидно име на дестинация." }, { status: 400 });
       if (normalizedName !== existing.normalizedName) {
         const dup = await prisma.logisticsDestination.findUnique({
