@@ -15,11 +15,26 @@ const data: InvoiceDocData = {
 const html = renderToStaticMarkup(h(ExportInvoiceTemplate, { data }));
 
 describe("Export Invoice layout — 1:1 & single A4 (46)", () => {
-  it("root uses A4 portrait geometry with border-box + overflow hidden (10/17-20)", () => {
+  it("root uses A4 width + border-box, but does NOT force full page height (blank Page 2 fix)", () => {
     expect(html).toContain("width:210mm");
-    expect(html).toContain("height:297mm");
     expect(html).toContain("box-sizing:border-box");
-    expect(html).toContain("overflow:hidden");
+    // Съдържанието определя височината (< A4) → без празна 2-ра страница при печат.
+    expect(html).not.toContain("height:297mm");
+  });
+  it("Date of shipment се визуализира между Place of shipment и Destination (§5)", () => {
+    expect(html).toContain("Date of shipment :");
+    const place = html.indexOf("Place of shipment");
+    const dateShip = html.indexOf("Date of shipment");
+    const dest = html.indexOf("Destination :");
+    expect(place).toBeGreaterThan(0);
+    expect(dateShip).toBeGreaterThan(place);
+    expect(dest).toBeGreaterThan(dateShip);
+  });
+  it("Date of shipment по подразбиране = invoice date, формат DD.MM.YYYY (§6/§7)", () => {
+    // Тук data няма dateOfShipment → fallback към invoiceDate (31.08.2026).
+    const seg = html.slice(html.indexOf("Date of shipment"), html.indexOf("Destination :"));
+    expect(seg).toContain("31.08.2026");
+    expect(seg).not.toContain("2026-08-31");
   });
   it("is a single continuous frame — exactly one table (3/33)", () => {
     expect((html.match(/<table/g) || []).length).toBe(1);
@@ -56,5 +71,36 @@ describe("Export Invoice layout — 1:1 & single A4 (46)", () => {
   });
   it("preserves full invoice number with leading zeros (28)", () => {
     expect(html).toContain("0000000009200");
+  });
+  it("Terms of delivery + Destination остават непроменени (§8)", () => {
+    expect(html).toContain("FCA SKOPIE");
+    expect(html).toContain("Destination :");
+    expect(html).toContain("North Macedonia");
+  });
+});
+
+describe("Date of shipment — explicit shipmentDate се ползва пред invoice date (§6)", () => {
+  const html2 = renderToStaticMarkup(h(ExportInvoiceTemplate, { data: { ...data, dateOfShipment: "2026-09-03T00:00:00.000Z" } }));
+  it("показва 03.09.2026, не invoice date", () => {
+    const seg = html2.slice(html2.indexOf("Date of shipment"), html2.indexOf("Destination :"));
+    expect(seg).toContain("03.09.2026");
+  });
+});
+
+describe("Print A4 geometry (§1/§2/§7/§12) — source assertions", () => {
+  const fs = require("node:fs") as typeof import("node:fs");
+  const printSrc = fs.readFileSync("src/app/(app)/dashboard/logistics/export/[id]/[docType]/print/page.tsx", "utf-8");
+  const tplSrc = fs.readFileSync("src/components/app/logistics/ExportInvoiceTemplate.tsx", "utf-8");
+  it("print CSS ползва A4 portrait", () => { expect(printSrc).toContain("size: A4 portrait"); });
+  it("при печат НЕ форсира пълна височина (min-height: 0 / height: auto)", () => {
+    expect(printSrc).toContain("min-height: 0 !important");
+    expect(printSrc).toContain("height: auto !important");
+  });
+  it("има break-inside: avoid защита срещу разделяне/празна страница", () => {
+    expect(printSrc).toContain("break-inside: avoid");
+    expect(printSrc).toContain("page-break-inside: avoid");
+  });
+  it("invoice template вече НЕ съдържа фиксирано height: 297mm (root cause)", () => {
+    expect(tplSrc).not.toContain('height: "297mm"');
   });
 });

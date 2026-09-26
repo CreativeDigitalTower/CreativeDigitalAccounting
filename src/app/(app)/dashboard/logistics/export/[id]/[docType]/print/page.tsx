@@ -100,12 +100,20 @@ export default async function Page({ params, searchParams }: { params: Promise<{
     <div className="doc-print-root">
       <style>{`
         @page { size: A4 portrait; margin: 0; }
+        /* Екранен preview: изглежда като A4 лист (пълна височина + сива основа). */
+        .doc-sheet { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; box-sizing: border-box; }
         @media print {
           html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
           .doc-print-root { margin: 0; }
+          /* ROOT CAUSE fix за празната 2-ра страница: при печат НЕ форсираме пълна A4
+             височина. Съдържанието (~275mm) е под printable area → 1 фактура = 1 A4.
+             Фиксирана 297mm височина (== височината на страницата) прелива с ≥1px при
+             растеризация на принтера и ражда празна Page 2. */
+          .doc-sheet { min-height: 0 !important; height: auto !important; overflow: hidden; }
+          .doc-sheet, .print-doc, .invoice-doc { break-inside: avoid !important; page-break-inside: avoid !important; }
+          .doc-sheet { break-after: avoid !important; page-break-after: avoid !important; }
+          .invoice-doc thead { display: table-header-group; }
         }
-        .doc-sheet { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; box-sizing: border-box; }
-        @media print { .doc-sheet { page-break-after: avoid; } .invoice-doc thead { display: table-header-group; } }
       `}</style>
       <AutoPrint fileTitle={invTitle} />
       <div className="doc-sheet print-sheet">
