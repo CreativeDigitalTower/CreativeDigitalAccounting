@@ -2,6 +2,7 @@ import { requireLogistics, exportSetReadRole } from "@/lib/logistics/access";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { AutoPrint } from "@/components/app/AutoPrint";
+import { PrintDocPortal } from "@/components/app/PrintDocPortal";
 import { ExportInvoiceTemplate, type InvoiceDocData } from "@/components/app/logistics/ExportInvoiceTemplate";
 import { ExportDispatchTemplate, type DispatchDocData } from "@/components/app/logistics/ExportDispatchTemplate";
 import { ExportDeclarationTemplate, type DeclarationDocData } from "@/components/app/logistics/ExportDeclarationTemplate";
@@ -96,27 +97,17 @@ export default async function Page({ params, searchParams }: { params: Promise<{
     ? `Invoice-${(inv.invoiceNumber ?? "").replace(/[^\w-]/g, "") || "export"}${invYear ? `-${invYear}` : ""}`
     : undefined;
 
+  // Фактура/декларация → изолиран A4 печат през портал (извън dashboard shell-а), за да е
+  // печатът детерминистичен (виж PrintDocPortal + globals.css .print-portal-root).
   return (
-    <div className="doc-print-root">
-      <style>{`
-        @page { size: A4 portrait; margin: 0; }
-        /* Екранен preview: изглежда като A4 лист (пълна височина + сива основа). */
-        .doc-sheet { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; box-sizing: border-box; }
-        /* Печатната изолация от app shell-а е в globals.css → body.printing-a4 (виж AutoPrint).
-           Тук оставяме само document-специфичното: table header group + без forced full height. */
-        @media print {
-          .invoice-doc thead { display: table-header-group; }
-        }
-      `}</style>
-      <AutoPrint fileTitle={invTitle} printBodyClass="printing-a4" />
-      <div className="doc-sheet print-sheet">
-        <div className="print-doc">
-          {doc.docType === "invoice" ? <ExportInvoiceTemplate data={inv} />
-            : doc.docType === "declaration" ? <ExportDeclarationTemplate data={data as DeclarationDocData} />
-            : (doc.docType === "cmr_epson" || doc.docType === "cmr_hp") ? <ExportCmrTemplate data={data as CmrDocData} />
-            : <ExportDispatchTemplate data={data as DispatchDocData} />}
-        </div>
+    <PrintDocPortal>
+      <AutoPrint fileTitle={invTitle} portal />
+      <div className="print-page">
+        {doc.docType === "invoice" ? <ExportInvoiceTemplate data={inv} />
+          : doc.docType === "declaration" ? <ExportDeclarationTemplate data={data as DeclarationDocData} />
+          : (doc.docType === "cmr_epson" || doc.docType === "cmr_hp") ? <ExportCmrTemplate data={data as CmrDocData} />
+          : <ExportDispatchTemplate data={data as DispatchDocData} />}
       </div>
-    </div>
+    </PrintDocPortal>
   );
 }

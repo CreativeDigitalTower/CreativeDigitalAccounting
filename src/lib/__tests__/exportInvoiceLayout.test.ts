@@ -87,33 +87,43 @@ describe("Date of shipment — explicit shipmentDate се ползва пред 
   });
 });
 
-describe("Print A4 geometry (§1-§6/§11-§14) — source assertions", () => {
+describe("Print isolation architecture (§4/§5/§8/§23) — source assertions", () => {
   const fs = require("node:fs") as typeof import("node:fs");
   const printSrc = fs.readFileSync("src/app/(app)/dashboard/logistics/export/[id]/[docType]/print/page.tsx", "utf-8");
   const tplSrc = fs.readFileSync("src/components/app/logistics/ExportInvoiceTemplate.tsx", "utf-8");
   const globalsSrc = fs.readFileSync("src/app/globals.css", "utf-8");
-  const layoutSrc = fs.readFileSync("src/app/(app)/layout.tsx", "utf-8");
-  it("print CSS ползва A4 portrait", () => { expect(printSrc).toContain("size: A4 portrait"); });
-  it("doc печатът активира изолационния клас printing-a4", () => {
-    expect(printSrc).toContain('printBodyClass="printing-a4"');
+  it("doc печатът се рендира в изолиран портал (извън app shell-а)", () => {
+    expect(printSrc).toContain("<PrintDocPortal>");
+    expect(printSrc).toContain("<AutoPrint fileTitle={invTitle} portal />");
+    expect(printSrc).toContain('className="print-page"');
   });
-  it("globals изолира листа от shell-а: static + без width:100%, реален A4 (§2/§3/§4)", () => {
-    expect(globalsSrc).toContain("body.printing-a4 .print-sheet");
-    expect(globalsSrc).toContain("position:static!important");
-    expect(globalsSrc).toContain("width:210mm!important");
+  it("globals: при печат целият shell е display:none, само порталът остава (§4/§5)", () => {
+    expect(globalsSrc).toContain("body.printing-portal > *:not(.print-portal-root){display:none!important;}");
+    expect(globalsSrc).toContain(".print-portal-root .print-page{width:210mm!important");
   });
-  it("globals маха chrome-а от печатния поток (§5/§6 — без празни страници)", () => {
-    expect(globalsSrc).toContain("body.printing-a4 .sidebar-wrap");
-    expect(globalsSrc).toContain("body.printing-a4 .app-content{padding:0!important;}");
-    expect(globalsSrc).toContain("body.printing-a4 main");
+  it("НЕ разчита на absolute/clip хакове върху документа (§2/§8)", () => {
+    // Порталният печат е нормален block flow — без position:absolute/overflow:hidden върху листа.
+    expect(globalsSrc).not.toContain("body.printing-a4");
+    expect(printSrc).not.toContain("printBodyClass");
   });
-  it("има break-inside: avoid защита срещу разделяне на документа (§14)", () => {
-    expect(globalsSrc).toContain("break-inside:avoid!important");
-  });
-  it("chrome-ът (topbar/банери) е no-print в layout-а", () => {
-    expect(layoutSrc).toContain('<div className="no-print">');
-  });
-  it("invoice template вече НЕ съдържа фиксирано height: 297mm (root cause на предишния bug)", () => {
+  it("@page A4 portrait", () => { expect(globalsSrc).toContain("@page{size:A4 portrait;margin:0;}"); });
+  it("invoice template е content-height (без фиксирано height: 297mm / overflow clip)", () => {
     expect(tplSrc).not.toContain('height: "297mm"');
+    expect(tplSrc).not.toContain('overflow: "hidden"');
+  });
+});
+
+describe("Print CONTENT presence — целият invoice, не само дъното (§17/§18/§20)", () => {
+  // Real-PDF валидация (Chrome --print-to-pdf) е направена локално: 1 страница + пълно
+  // съдържание. Тук заключваме, че всички задължителни секции са в rendered DOM-а.
+  const required = [
+    "INVOICE №", "0000000009200", "METAL TRADE KUSTENDIL 2005 Ltd.", "SEM INTERNATIONAL DOOEL",
+    "Contract :", "Consignee", "Buyer / importer /", "Terms of delivery :", "Means of transport :",
+    "Place of shipment :", "Date of shipment :", "Destination :", "Description of goods",
+    "Quantity", "Unit price", "Value", "CEMENT", "Export, Art.28 Bulgarian VAT Legislation",
+    "VAT 0,00 %", "TOTAL :", "Payment conditions", "Seller :", "Sign. &amp; Stamp",
+  ];
+  it.each(required)("съдържа секция: %s", (needle) => {
+    expect(html).toContain(needle);
   });
 });

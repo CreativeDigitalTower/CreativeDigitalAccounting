@@ -169,25 +169,20 @@ input[type=file]::file-selector-button:hover{background:var(--emerald-dark);}
   body.printing-multi .print-doc:last-child{break-after:auto;page-break-after:auto;}
   body.printing-multi .blob{display:none!important;}
 
-  /* ─── A4 документен печат (фактура/декларация): ПЪЛНА изолация от app shell-а ───
-     Причина за празни страници + изрязване: страницата се рендира ВЪТРЕ в
-     dashboard shell-а (sidebar + main{max-width} + .app-content padding). Само
-     visibility:hidden скрива chrome-а визуално, но той ПРОДЪЛЖАВА да заема място →
-     празни страници; а .print-sheet{position:absolute;width:100%} се позиционира спрямо
-     shell-а (offset зад sidebar + грешна ширина) → изрязване вдясно. Тук неутрализираме
-     веригата от предци, махаме chrome-а от потока и правим листа нормален A4 блок. */
-  body.printing-a4{min-height:0!important;height:auto!important;}
-  body.printing-a4 > div{min-height:0!important;position:static!important;display:block!important;}
-  body.printing-a4 > div > div{display:block!important;position:static!important;}
-  body.printing-a4 main{max-width:none!important;flex:none!important;width:auto!important;min-width:0!important;}
-  body.printing-a4 .app-content{padding:0!important;}
-  body.printing-a4 .sidebar-wrap,
-  body.printing-a4 .mobile-menu-btn{display:none!important;}
-  /* Листът: реален A4, центриран, БЕЗ absolute/width:100% (по-висока специфичност). */
-  body.printing-a4 .print-sheet{position:static!important;left:auto!important;top:auto!important;width:210mm!important;max-width:210mm!important;margin:0 auto!important;overflow:hidden!important;}
-  body.printing-a4 .doc-sheet{min-height:0!important;height:auto!important;}
-  body.printing-a4 .print-doc,body.printing-a4 .invoice-doc{break-inside:avoid!important;page-break-inside:avoid!important;}
+  /* ─── Изолиран A4 документен печат (фактура/декларация) през PrintDocPortal ───
+     Порталът е директно дете на <body> (извън dashboard shell-а). При печат целият shell
+     е display:none (без заемано място → без празни страници), а документът е нормален block
+     flow → 1 A4, без absolute/clipping хакове. */
+  body.printing-portal > *:not(.print-portal-root){display:none!important;}
+  body.printing-portal .print-portal-root{position:static!important;inset:auto!important;z-index:auto!important;background:#fff!important;overflow:visible!important;padding:0!important;display:block!important;}
+  .print-portal-root .no-print{display:none!important;}
+  .print-portal-root .print-page{width:210mm!important;box-shadow:none!important;margin:0!important;}
 }
+
+/* Екранен preview на изолирания печатен документ: чист centered A4 върху сива основа. */
+.print-portal-root{position:fixed;inset:0;z-index:9998;background:#e9e9e9;overflow:auto;display:flex;flex-direction:column;align-items:center;padding:16px;}
+.print-portal-root .print-page{width:210mm;background:#fff;box-sizing:border-box;box-shadow:0 2px 14px rgba(0,0,0,.18);}
+@page{size:A4 portrait;margin:0;}
 
 /* ─── Модерни анимации и hover (визуален ъпгрейд) ─── */
 /* само opacity, за да остане transform свободен за :hover */

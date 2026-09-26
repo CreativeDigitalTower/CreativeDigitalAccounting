@@ -7,15 +7,14 @@ import { useEffect } from "react";
  * при „Save as PDF" браузърът предлага смислено име (напр. Ispratnica-9654-2026).
  * Един и същ canonical layout се ползва и за печат, и за сваляне (визуална консистентност).
  */
-export function AutoPrint({ auto = true, fileTitle, printBodyClass }: { auto?: boolean; fileTitle?: string; printBodyClass?: string }) {
+export function AutoPrint({ auto = true, fileTitle, portal = false }: { auto?: boolean; fileTitle?: string; portal?: boolean }) {
+  // portal режим (фактура/декларация) → изолиран печат през PrintDocPortal (body.printing-portal).
+  // Иначе → съществуващият multi-механизъм (испратница/CMR), непроменен.
+  const cls = portal ? "printing-portal" : "printing-multi";
   function print() {
-    document.body.classList.add("printing-multi");
-    if (printBodyClass) document.body.classList.add(printBodyClass);
+    document.body.classList.add(cls);
     window.print();
-    setTimeout(() => {
-      document.body.classList.remove("printing-multi");
-      if (printBodyClass) document.body.classList.remove(printBodyClass);
-    }, 800);
+    setTimeout(() => document.body.classList.remove(cls), 800);
   }
   useEffect(() => {
     if (fileTitle) {
