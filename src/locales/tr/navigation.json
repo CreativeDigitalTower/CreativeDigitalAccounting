@@ -78,5 +78,6 @@
   "logisticsExportReceived": "Alınan sevkiyatlar",
   "featureRequest": "Bireysel çözümler",
   "logisticsFleet": "Filo",
-  "logisticsReports": "Raporlar (taşıyıcı/yük)"
+  "logisticsReports": "Raporlar (taşıyıcı/yük)",
+  "logisticsDestinations": "Destinasyonlar"
 }

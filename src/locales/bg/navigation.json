@@ -78,5 +78,6 @@
   "logisticsExportReceived": "Получени доставки",
   "featureRequest": "Индивидуални решения",
   "logisticsFleet": "Автопарк",
-  "logisticsReports": "Отчети (превозвач/товар)"
+  "logisticsReports": "Отчети (превозвач/товар)",
+  "logisticsDestinations": "Дестинации"
 }

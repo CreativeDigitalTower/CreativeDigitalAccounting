@@ -2,7 +2,6 @@ import { requireLogistics, groupCounterparties } from "@/lib/logistics/access";
 import { prisma } from "@/lib/prisma";
 import { redirect, notFound } from "next/navigation";
 import { ExportSetForm } from "@/components/app/logistics/ExportSetForm";
-import { MK_DESTINATIONS, mergeDestinations } from "@/lib/logistics/deliveryTerms";
 
 // Пълна редакция на експортна доставка (§11/§12). Само собственикът (BG) може да
 // редактира своята source доставка; MK получателят я вижда read-only (§35).
@@ -21,12 +20,12 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   });
   if (!set) notFound();
 
-  const [vehicles, products, routes, buyers, usedDestinations, mkInvoice] = await Promise.all([
+  const [vehicles, products, routes, buyers, activeDestinations, mkInvoice] = await Promise.all([
     prisma.vehicle.findMany({ where: { companyId, active: true, normalizedRegistration: { not: null } }, select: { id: true, registration: true, logisticsProfile: { select: { trailerReg: true } } }, orderBy: { registration: "asc" } }),
     prisma.logisticsProduct.findMany({ where: { companyId, active: true }, select: { id: true, canonicalName: true, category: true }, orderBy: { canonicalName: "asc" } }),
     prisma.logisticsRoute.findMany({ where: { companyId, active: true }, select: { id: true, toPlace: true, note: true }, orderBy: { toPlace: "asc" } }),
     groupCounterparties(companyId),
-    prisma.exportDocumentSet.findMany({ where: { companyId, destination: { not: null } }, select: { destination: true }, take: 2000 }),
+    prisma.logisticsDestination.findMany({ where: { companyId, active: true }, select: { name: true }, orderBy: { name: "asc" } }),
     prisma.mkInvoice.findFirst({ where: { sourceExportSetId: set.id }, select: { id: true, number: true } }),
   ]);
   // Краен клиент = клиент на buyer фирмата (SEM) на доставката (§1/§2); ако липсва buyer,
@@ -40,7 +39,11 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     set.clientId ? prisma.client.findUnique({ where: { id: set.clientId }, select: { name: true } }) : Promise.resolve(null),
   ]);
 
-  const destinations = mergeDestinations(MK_DESTINATIONS, routes.map((r) => r.toPlace), usedDestinations.map((s) => s.destination));
+  // Active master дестинации + текущата стойност на доставката (може да е legacy/inactive),
+  // за да остане избрана при редакция без загуба (§13).
+  const destSet = new Set(activeDestinations.map((d) => d.name));
+  if (set.destination && !destSet.has(set.destination)) destSet.add(set.destination);
+  const destinations = [...destSet].sort();
 
   // §10: ако доставката сочи архивиран продукт, добави го в опциите, за да не се губи
   // избраната стойност (snapshot остава видим), без да го активираме в каталога.

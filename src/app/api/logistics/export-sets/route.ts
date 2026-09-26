@@ -6,7 +6,8 @@ import { audit } from "@/lib/documents";
 import { nextSequenceValue } from "@/lib/logistics/sequence";
 import { SEQ_SCOPE, formatSequenceNumber, EXPORT_INVOICE_FORMAT, suggestDispatchFromInvoice } from "@/lib/logistics/config";
 import { truckTrailerLabel } from "@/lib/logistics/exportDocs";
-import { PLACE_OF_SHIPMENT_DEFAULT } from "@/lib/logistics/deliveryTerms";
+import { PLACE_OF_SHIPMENT_DEFAULT, normalizeDestination } from "@/lib/logistics/deliveryTerms";
+import { stripDeliveryTermSuffix } from "@/lib/logistics/destinations";
 import { validationError, zodFieldErrors, VMSG, type FieldErrors } from "@/lib/logistics/validation";
 import { clientCompanyAllowed } from "@/lib/logistics/clientScope";
 import { z } from "zod";
@@ -178,6 +179,11 @@ export async function POST(req: Request) {
     const year = (d.invoiceDate ? new Date(d.invoiceDate) : new Date()).getFullYear();
     const trailer = d.trailerReg ?? vehicle?.logisticsProfile?.trailerReg ?? null;
     const unit = d.unit || product?.unit || "t";
+    // §12: свързваме към master дестинация по нормализирано име (snapshot низът се пази отделно).
+    const destKey = normalizeDestination(stripDeliveryTermSuffix(d.destination));
+    const destMatch = destKey
+      ? await prisma.logisticsDestination.findUnique({ where: { companyId_normalizedName: { companyId: g.companyId, normalizedName: destKey } }, select: { id: true } })
+      : null;
 
     const set = await prisma.$transaction(async (tx) => {
       // Invoice номер: ръчен override ИЛИ атомарен пореден (concurrency-safe).
@@ -198,7 +204,7 @@ export async function POST(req: Request) {
           // Place of shipment по подразбиране = BELI IZVOR; destination е независима.
           deliveryTerm: d.deliveryTerm ?? null,
           placeOfShipment: (d.placeOfShipment ?? "").trim() || PLACE_OF_SHIPMENT_DEFAULT,
-          destination: (d.destination ?? "").trim() || null, routeId: d.routeId || null,
+          destination: (d.destination ?? "").trim() || null, destinationId: destMatch?.id ?? null, routeId: d.routeId || null,
           truckVehicleId: d.truckVehicleId || null, truckRegSnapshot: vehicle?.registration ?? null, trailerReg: trailer,
           logisticsProductId: d.logisticsProductId || null, productSnapshot: product?.canonicalName ?? null,
           certificateNumberSnapshot: product?.certificateNumber ?? null, // §17 — фиксира сертификата към момента
