@@ -698,7 +698,8 @@
     "regAddress": "Kayıt adresi",
     "baseAddress": "Üs adresi",
     "blankDispatch": "Boş irsaliye",
-    "blankDispatchHint": "„До:“ satırı ve üs adresi otomatik doldurulmadan."
+    "blankDispatchHint": "„До:“ satırı ve üs adresi otomatik doldurulmadan.",
+    "historicalDoc": "geçmiş"
   },
   "fleet": {
     "title": "Fleet",

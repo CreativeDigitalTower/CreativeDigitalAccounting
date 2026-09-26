@@ -47,12 +47,12 @@ describe("Един и същ historical certificate source за трите до�
   });
 });
 
-describe("CMR EPSON restored (§5/§11/§13)", () => {
-  it("11) cmr_epson е активен тип за генериране", () => {
-    expect((ACTIVE_EXPORT_DOC_TYPES as readonly string[]).includes("cmr_epson")).toBe(true);
-    expect(isActiveExportDocType("cmr_epson")).toBe(true);
+describe("CMR EPSON деактивиран, но поддържан (§5/§11/§13)", () => {
+  it("11) cmr_epson НЕ е активен тип за генериране (но остава supported)", () => {
+    expect((ACTIVE_EXPORT_DOC_TYPES as readonly string[]).includes("cmr_epson")).toBe(false);
+    expect(isActiveExportDocType("cmr_epson")).toBe(false);
   });
-  it("12) генераторът включва cmr_epson в default targets (ACTIVE)", () => {
+  it("12) генераторът ползва ACTIVE_EXPORT_DOC_TYPES като default targets (без cmr_epson)", () => {
     const s = read("src/lib/logistics/exportGenerate.ts");
     expect(s).toContain("ACTIVE_EXPORT_DOC_TYPES");
   });

@@ -46,15 +46,16 @@ describe("Декларация mapping 1:1 (30/32/34/51)", () => {
   });
 });
 
-describe("CMR Epson restored as active generation (§5/§11)", () => {
-  it("cmr_epson offered again; cmr_hp kept", () => {
-    expect((ACTIVE_EXPORT_DOC_TYPES as readonly string[]).includes("cmr_epson")).toBe(true);
+describe("CMR Epson ВРЕМЕННО деактивиран от активния workflow (supported, не active)", () => {
+  it("active workflow = Invoice + Испратница + Декларация + CMR HP (без CMR Epson)", () => {
+    expect((ACTIVE_EXPORT_DOC_TYPES as readonly string[]).includes("cmr_epson")).toBe(false);
     expect((ACTIVE_EXPORT_DOC_TYPES as readonly string[]).includes("cmr_hp")).toBe(true);
-    expect(ACTIVE_EXPORT_DOC_TYPES.length).toBe(5);
+    expect([...ACTIVE_EXPORT_DOC_TYPES]).toEqual(["invoice", "dispatch", "declaration", "cmr_hp"]);
+    expect(ACTIVE_EXPORT_DOC_TYPES.length).toBe(4);
   });
-  it("cmr_epson е в EXPORT_DOC_TYPES и е активен", () => {
+  it("cmr_epson остава SUPPORTED (в EXPORT_DOC_TYPES), но не е active", () => {
     expect((EXPORT_DOC_TYPES as readonly string[]).includes("cmr_epson")).toBe(true);
-    expect(isActiveExportDocType("cmr_epson")).toBe(true);
+    expect(isActiveExportDocType("cmr_epson")).toBe(false);
   });
 });
 

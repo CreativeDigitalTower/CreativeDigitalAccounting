@@ -59,10 +59,13 @@ export function suggestDispatchFromInvoice(invoiceNumber: string | null | undefi
 export const EXPORT_DOC_TYPES = ["invoice", "dispatch", "blank", "declaration", "cmr_epson", "cmr_hp"] as const;
 export type ExportDocType = (typeof EXPORT_DOC_TYPES)[number];
 
-// Активни документи в текущия workflow: Invoice, Испратница, Декларация, CMR EPSON, CMR HP.
-// „CMR EPSON" е върнат като активен тип за генериране (overlay върху предпечатана бланка —
-// layout-ът е непроменен). „blank" остава само за преглед на стари записи.
-export const ACTIVE_EXPORT_DOC_TYPES = ["invoice", "dispatch", "declaration", "cmr_epson", "cmr_hp"] as const satisfies readonly ExportDocType[];
+// Активни документи в текущия workflow: Invoice, Испратница, Декларация, CMR HP.
+// ⚠ CMR EPSON е ВРЕМЕННО ДЕАКТИВИРАН от активния workflow по искане на клиента — остава
+// напълно поддържан (в EXPORT_DOC_TYPES + template/editor/print/исторически документи), но
+// НЕ се генерира по подразбиране, НЕ се брои за завършеност и НЕ се предлага за нови
+// доставки. За повторно активиране: добави обратно "cmr_epson" в списъка по-долу (една
+// централизирана промяна). „blank" остава само за преглед на стари записи.
+export const ACTIVE_EXPORT_DOC_TYPES = ["invoice", "dispatch", "declaration", "cmr_hp"] as const satisfies readonly ExportDocType[];
 export type ActiveExportDocType = (typeof ACTIVE_EXPORT_DOC_TYPES)[number];
 /** Активен ли е този docType в текущия workflow (blank = само за преглед на стари записи). */
 export function isActiveExportDocType(docType: string): boolean {

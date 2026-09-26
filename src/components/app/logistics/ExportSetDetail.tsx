@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useT, useI18n } from "@/components/i18n/I18nProvider";
-import { ACTIVE_EXPORT_DOC_TYPES } from "@/lib/logistics/config";
+import { ACTIVE_EXPORT_DOC_TYPES, isActiveExportDocType } from "@/lib/logistics/config";
 import { ExportDeleteModal } from "@/components/app/logistics/ExportDeleteModal";
 import { ExportDossierExtras } from "@/components/app/logistics/ExportDossierExtras";
 
@@ -165,7 +165,27 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
               </div>
             );
           })}
-          {manage && s.documents.some((d) => d.overridden) && (
+          {/* Исторически документи, чийто тип вече не е активен (напр. деактивиран CMR EPSON):
+              показват се само за преглед/печат на съществуващия документ — БЕЗ генериране и
+              БЕЗ да се броят за завършеност (§8/§9). Не се появяват за нови доставки. */}
+          {s.documents.filter((d) => !isActiveExportDocType(d.docType) && d.docType !== "blank").map((doc) => {
+            const finalized = doc.status === "finalized";
+            return (
+              <div key={doc.docType} style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 0", borderTop: "1px solid rgba(217,215,200,.4)", opacity: 0.75 }}>
+                <span style={{ flex: 1, fontSize: 13 }}>{t(`logistics.export.${DOC_LABEL[doc.docType] ?? "docInvoice"}`)} <span style={{ fontSize: 11, color: "var(--muted)" }}>· {t("logistics.export.historicalDoc")}</span></span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: finalized ? "var(--emerald-dark,#0F8A6A)" : "var(--muted)" }}>
+                  {finalized ? `✓ ${t("logistics.export.stReady")}` : `● ${t("logistics.export.stGenerated")}`}
+                </span>
+                <Link href={`/dashboard/logistics/export/${id}/${doc.docType}`} className="btn btn-ghost btn-sm" style={{ fontSize: 11, padding: "2px 8px" }}>
+                  {finalized ? t("logistics.export.view") : t("logistics.export.edit")}
+                </Link>
+                <a href={`/dashboard/logistics/export/${id}/${doc.docType}/print`} target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm" style={{ fontSize: 11, padding: "2px 8px" }}>
+                  {t("logistics.export.printPdf")}
+                </a>
+              </div>
+            );
+          })}
+          {manage && s.documents.some((d) => d.overridden && isActiveExportDocType(d.docType)) && (
             <button className="btn btn-ghost btn-sm" style={{ marginTop: 10 }} disabled={busy} onClick={() => generate(true)}>{t("logistics.export.regenerate")}</button>
           )}
         </div>
