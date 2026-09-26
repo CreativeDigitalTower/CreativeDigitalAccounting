@@ -66,11 +66,13 @@ describe("placeOfShipment default когато липсва (§10/§15)", () => 
   });
 });
 
-describe("CMR остава по шаблона (§16), без regression", () => {
-  it("CMR Epson destination = SKOPIE, без CPT/BELI IZVOR в destination поле", () => {
+describe("CMR destination идва от доставката (fix), без CPT/BELI IZVOR в destination поле", () => {
+  it("CMR Epson destination = стойността на доставката (TETOVO), не hardcode SKOPIE", () => {
     const cmr = buildDocumentData({ ...base, deliveryTerm: "CPT", destination: "TETOVO" }, PARTIES, "cmr_epson") as Record<string, any>;
-    expect(cmr.destination).toBe("SKOPIE");
-    expect(JSON.stringify(cmr)).not.toContain("CPT");
+    expect(cmr.destination).toBe("TETOVO");
+    // Incoterm-ът (CPT) НЕ изтича в destination полето.
+    expect(cmr.destination).not.toContain("CPT");
+    expect(cmr.destination).not.toContain("BELI IZVOR");
   });
 });
 

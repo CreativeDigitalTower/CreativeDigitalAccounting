@@ -24,6 +24,8 @@ export async function regenerateSetDocuments(
       invoiceNumber: true, invoiceDate: true, shipmentDate: true, deliveryTerm: true, placeOfShipment: true, destination: true, truckRegSnapshot: true, trailerReg: true,
       productSnapshot: true, certificateNumberSnapshot: true, quantity: true, unit: true, declarationCmrDate: true, dispatchNumber: true, blankDispatchNote: true,
       logisticsProductId: true, buyerCompanyId: true, clientId: true,
+      // Държава на дестинацията от canonical master (за CMR country); snapshot безопасно.
+      destinationRef: { select: { country: true } },
       documents: { select: { docType: true, overridden: true, status: true } },
     },
   });
@@ -46,7 +48,8 @@ export async function regenerateSetDocuments(
     shipmentDate: set.shipmentDate?.toISOString() ?? null,
     deliveryTerm: set.deliveryTerm ?? null,
     placeOfShipment: set.placeOfShipment ?? null,
-    destination: set.destination, truckRegSnapshot: set.truckRegSnapshot, trailerReg: set.trailerReg,
+    destination: set.destination, destinationCountry: set.destinationRef?.country ?? null,
+    truckRegSnapshot: set.truckRegSnapshot, trailerReg: set.trailerReg,
     productSnapshot: set.productSnapshot, customsCode: product?.customsCode ?? null,
     // Сертификат: snapshot-ът е source of truth за историческа коректност (§17); при legacy
     // записи без snapshot → fallback към текущия сертификат на продукта (best effort).
