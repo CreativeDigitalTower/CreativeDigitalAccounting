@@ -751,9 +751,9 @@
     "capacity": "Kapasite",
     "dossier": "Dosya",
     "addVehicle": "Araç ekle",
-    "archive": "Arşivle",
+    "archive": "Pasifleştir",
     "activate": "Etkinleştir",
-    "archived": "Arşivlendi",
+    "archived": "Pasif",
     "active": "Aktif",
     "showArchived": "Arşivlenenleri göster",
     "complete": "Verileri tamamla",
@@ -794,7 +794,10 @@
     "monthlyTitle": "Aylık istatistik",
     "yearlyTitle": "Yıllık özet",
     "month": "Ay",
-    "year": "Yıl"
+    "year": "Yıl",
+    "filter_active": "Aktif",
+    "filter_all": "Tümü",
+    "filter_inactive": "Pasif"
   },
   "reports": {
     "title": "Reports (carrier/cargo)",

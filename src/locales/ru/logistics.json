@@ -751,9 +751,9 @@
     "capacity": "Вместимость",
     "dossier": "Досье",
     "addVehicle": "Добавить тягач",
-    "archive": "Архивировать",
+    "archive": "Деактивировать",
     "activate": "Активировать",
-    "archived": "Архивный",
+    "archived": "Неактивный",
     "active": "Активный",
     "showArchived": "Показать архивные",
     "complete": "Дополнить данные",
@@ -794,7 +794,10 @@
     "monthlyTitle": "Статистика по месяцам",
     "yearlyTitle": "Годовая сводка",
     "month": "Месяц",
-    "year": "Год"
+    "year": "Год",
+    "filter_active": "Активные",
+    "filter_all": "Все",
+    "filter_inactive": "Неактивные"
   },
   "reports": {
     "title": "Reports (carrier/cargo)",
