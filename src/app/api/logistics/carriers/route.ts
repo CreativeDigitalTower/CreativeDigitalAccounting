@@ -2,15 +2,43 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logisticsApiGuard } from "@/lib/logistics/access";
 import { audit } from "@/lib/documents";
+import { resolvePeriod, aggregateCarrierOverview, type TripAgg } from "@/lib/logistics/carrierAnalytics";
 import { z } from "zod";
 
 const select = { id: true, name: true, eik: true, contact: true, phone: true, email: true, note: true, active: true } as const;
 
-export async function GET() {
+/** Списък превозвачи + аналитика за период (§1/§2/§13). Company-scoped; без N+1 (groupBy). */
+export async function GET(req: Request) {
   const g = await logisticsApiGuard("view_logistics");
   if (!g.ok) return g.res;
-  const carriers = await prisma.carrier.findMany({ where: { companyId: g.companyId }, select, orderBy: { name: "asc" } });
-  return NextResponse.json(carriers);
+  const sp = new URL(req.url).searchParams;
+  const period = resolvePeriod(sp.get("range") ?? "all", sp.get("from"), sp.get("to"));
+  const dateWhere = period ? { shipmentDate: { gte: period.gte, lt: period.lt } } : {};
+
+  const [carriers, vehicles, tripAgg] = await Promise.all([
+    prisma.carrier.findMany({ where: { companyId: g.companyId }, select, orderBy: { name: "asc" } }),
+    // Автомобил → текущ превозвач (VehicleLogisticsProfile.carrierId). Company-scoped.
+    prisma.vehicle.findMany({ where: { companyId: g.companyId }, select: { id: true, active: true, logisticsProfile: { select: { carrierId: true } } } }),
+    // Превози/количество по автомобил за периода (canonical = ExportDocumentSet, без trash).
+    prisma.exportDocumentSet.groupBy({
+      by: ["truckVehicleId"],
+      where: { companyId: g.companyId, deletedAt: null, truckVehicleId: { not: null }, ...dateWhere },
+      _count: { _all: true }, _sum: { quantity: true }, _max: { shipmentDate: true, invoiceDate: true },
+    }),
+  ]);
+
+  const trips: TripAgg[] = tripAgg.map((a) => ({
+    truckVehicleId: a.truckVehicleId,
+    trips: a._count._all,
+    quantity: a._sum.quantity ?? 0,
+    lastDelivery: (a._max.shipmentDate ?? a._max.invoiceDate ?? null)?.toISOString() ?? null,
+  }));
+  const overview = aggregateCarrierOverview(
+    carriers.map((c) => ({ id: c.id, name: c.name, active: c.active, eik: c.eik, contact: c.contact, phone: c.phone })),
+    vehicles.map((v) => ({ vehicleId: v.id, carrierId: v.logisticsProfile?.carrierId ?? null, active: v.active })),
+    trips,
+  );
+  return NextResponse.json(overview);
 }
 
 const schema = z.object({
