@@ -751,9 +751,9 @@
     "capacity": "Capacitate",
     "dossier": "Dosar",
     "addVehicle": "Adaugă vehicul",
-    "archive": "Arhivează",
+    "archive": "Dezactivează",
     "activate": "Activează",
-    "archived": "Arhivat",
+    "archived": "Inactiv",
     "active": "Activ",
     "showArchived": "Include arhivate",
     "complete": "Completează date",
@@ -794,7 +794,10 @@
     "monthlyTitle": "Statistici lunare",
     "yearlyTitle": "Sumar anual",
     "month": "Lună",
-    "year": "An"
+    "year": "An",
+    "filter_active": "Active",
+    "filter_all": "Toate",
+    "filter_inactive": "Inactive"
   },
   "reports": {
     "title": "Reports (carrier/cargo)",

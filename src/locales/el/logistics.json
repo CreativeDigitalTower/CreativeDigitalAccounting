@@ -751,9 +751,9 @@
     "capacity": "Χωρητικότητα",
     "dossier": "Φάκελος",
     "addVehicle": "Προσθήκη οχήματος",
-    "archive": "Αρχειοθέτηση",
+    "archive": "Απενεργοποίηση",
     "activate": "Ενεργοποίηση",
-    "archived": "Αρχειοθετημένο",
+    "archived": "Ανενεργό",
     "active": "Ενεργό",
     "showArchived": "Συμπερίληψη αρχειοθετημένων",
     "complete": "Συμπλήρωση",
@@ -794,7 +794,10 @@
     "monthlyTitle": "Μηνιαία στατιστικά",
     "yearlyTitle": "Ετήσια σύνοψη",
     "month": "Μήνας",
-    "year": "Έτος"
+    "year": "Έτος",
+    "filter_active": "Ενεργά",
+    "filter_all": "Όλα",
+    "filter_inactive": "Ανενεργά"
   },
   "reports": {
     "title": "Reports (carrier/cargo)",

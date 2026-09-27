@@ -751,9 +751,9 @@
     "capacity": "Capacity",
     "dossier": "Dossier",
     "addVehicle": "Add vehicle",
-    "archive": "Archive",
+    "archive": "Deactivate",
     "activate": "Activate",
-    "archived": "Archived",
+    "archived": "Inactive",
     "active": "Active",
     "showArchived": "Include archived",
     "complete": "Complete data",
@@ -794,7 +794,10 @@
     "monthlyTitle": "Monthly statistics",
     "yearlyTitle": "Yearly summary",
     "month": "Month",
-    "year": "Year"
+    "year": "Year",
+    "filter_active": "Active",
+    "filter_all": "All",
+    "filter_inactive": "Inactive"
   },
   "reports": {
     "title": "Reports (carrier/cargo)",

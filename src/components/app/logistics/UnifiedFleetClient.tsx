@@ -24,7 +24,7 @@ export function UnifiedFleetClient({ carriers, canManage }: { carriers: Carrier[
   const [rows, setRows] = useState<Row[]>([]);
   const [kpi, setKpi] = useState<Kpi | null>(null);
   const [periodKpi, setPeriodKpi] = useState<PeriodKpi | null>(null);
-  const [archived, setArchived] = useState(false);
+  const [fleetStatus, setFleetStatus] = useState<"active" | "all" | "inactive">("active");
   const [period, setPeriod] = useState<string>("all_time");
   const [sort, setSort] = useState<string>("reg");
   const [activity, setActivity] = useState<string>("all");
@@ -40,11 +40,12 @@ export function UnifiedFleetClient({ carriers, canManage }: { carriers: Carrier[
 
   async function load() {
     const qs = new URLSearchParams({ period });
-    if (archived) qs.set("archived", "1");
+    // „Активни" → само active; „Всички"/„Неактивни" → зареждаме и неактивните (архивирани).
+    if (fleetStatus !== "active") qs.set("archived", "1");
     const r = await fetch(`/api/logistics/fleet?${qs}`);
     if (r.ok) { const j = await r.json(); setRows(j.rows); setKpi(j.kpi); setPeriodKpi(j.period ?? null); }
   }
-  useEffect(() => { void load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [archived, period]);
+  useEffect(() => { void load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [fleetStatus, period]);
 
   async function addVehicle() {
     setErr(""); setBusy(true);
@@ -75,6 +76,8 @@ export function UnifiedFleetClient({ carriers, canManage }: { carriers: Carrier[
       if (onlyMissing && !v.anyGaps) return false;
       if (activity === "has" && v.trips === 0) return false;
       if (activity === "none" && v.trips > 0) return false;
+      if (fleetStatus === "inactive" && v.active) return false;
+      if (fleetStatus === "active" && !v.active) return false;
       return true;
     });
     const time = (s: string | null) => (s ? new Date(s).getTime() : 0);
@@ -87,7 +90,7 @@ export function UnifiedFleetClient({ carriers, canManage }: { carriers: Carrier[
       default: list.sort((a, b) => a.registration.localeCompare(b.registration));
     }
     return list;
-  }, [rows, q, carrierId, cargoMode, ownership, onlyMissing, activity, sort, carriers]);
+  }, [rows, q, carrierId, cargoMode, ownership, onlyMissing, activity, sort, carriers, fleetStatus]);
 
   const th = { textAlign: "left" as const, padding: "7px 8px", color: "var(--muted)", fontSize: 12, whiteSpace: "nowrap" as const };
   const td = { padding: "7px 8px", fontSize: 12.5, borderTop: "1px solid rgba(217,215,200,.5)", verticalAlign: "top" as const };
@@ -164,9 +167,13 @@ export function UnifiedFleetClient({ carriers, canManage }: { carriers: Carrier[
         <label style={{ fontSize: 12, color: "var(--muted)", display: "flex", alignItems: "center", gap: 5 }}>
           <input type="checkbox" checked={onlyMissing} onChange={(e) => setOnlyMissing(e.target.checked)} />{t("logistics.fleet.onlyMissing")}
         </label>
-        <label style={{ fontSize: 12, color: "var(--muted)", display: "flex", alignItems: "center", gap: 5 }}>
-          <input type="checkbox" checked={archived} onChange={(e) => setArchived(e.target.checked)} />{t("logistics.fleet.showArchived")}
-        </label>
+        <div style={{ display: "inline-flex", gap: 4 }}>
+          {(["active", "all", "inactive"] as const).map((s) => (
+            <button key={s} type="button" className={`btn btn-sm ${fleetStatus === s ? "btn-primary" : "btn-ghost"}`} onClick={() => setFleetStatus(s)}>
+              {t(`logistics.fleet.filter_${s}`)}
+            </button>
+          ))}
+        </div>
         {canManage && <span style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
           <input style={{ ...sel, width: 150 }} value={reg} onChange={(e) => setReg(e.target.value)} placeholder={t("logistics.vehicles.registration")} />
           <button className="btn btn-primary btn-sm" disabled={busy || reg.trim().length < 2} onClick={addVehicle}>+ {t("logistics.fleet.addVehicle")}</button>

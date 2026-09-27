@@ -21,7 +21,7 @@ function F({ label, children }: { label: React.ReactNode; children: React.ReactN
   return (<div><label style={LBL}>{label}</label>{children}</div>);
 }
 
-type Vehicle = { id: string; registration: string; trailerReg: string | null };
+type Vehicle = { id: string; registration: string; trailerReg: string | null; carrier?: string | null; driver?: string | null };
 type Product = { id: string; canonicalName: string; category?: string | null };
 type Route = { id: string; label: string };
 type Company = { id: string; name: string };
@@ -267,7 +267,7 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
         <div ref={register("truckVehicleId")}>
           <F label={<>{t("logistics.export.truck")}<Req /></>}>
             <div style={errStyle("truckVehicleId", errors)} {...ariaProps("truckVehicleId", errors)}>
-              <SearchableSelect options={vehicleList.map((v) => ({ value: v.id, label: `${v.registration}${v.trailerReg ? ` / ${v.trailerReg}` : ""}` }))} value={f.truckVehicleId} onChange={onTruckChange} allowCreate allowEmpty={false} placeholder="SK501TO / SK5022AE" createLabel={(q) => `${t("logistics.vehicleCreate.addNew")} „${q}"`} />
+              <SearchableSelect options={vehicleList.map((v) => ({ value: v.id, label: `${v.registration}${v.trailerReg ? ` / ${v.trailerReg}` : ""}${v.carrier ? ` · ${v.carrier}` : ""}${v.driver ? ` · ${v.driver}` : ""}` }))} value={f.truckVehicleId} onChange={onTruckChange} allowCreate allowEmpty={false} placeholder="SK501TO / SK5022AE" createLabel={(q) => `${t("logistics.vehicleCreate.addNew")} „${q}"`} />
             </div>
             <FieldError id="err-truckVehicleId" message={errors.truckVehicleId} />
           </F>

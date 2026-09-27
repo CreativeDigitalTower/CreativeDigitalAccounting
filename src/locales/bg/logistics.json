@@ -751,9 +751,9 @@
     "capacity": "Капацитет",
     "dossier": "Досие",
     "addVehicle": "Добави влекач",
-    "archive": "Архивирай",
+    "archive": "Деактивирай",
     "activate": "Активирай",
-    "archived": "Архивиран",
+    "archived": "Неактивен",
     "active": "Активен",
     "showArchived": "Включи архивираните",
     "complete": "Допълни данни",
@@ -794,7 +794,10 @@
     "monthlyTitle": "Статистика по месеци",
     "yearlyTitle": "Годишна справка",
     "month": "Месец",
-    "year": "Година"
+    "year": "Година",
+    "filter_active": "Активни",
+    "filter_all": "Всички",
+    "filter_inactive": "Неактивни"
   },
   "reports": {
     "title": "Отчети (превозвач/товар)",

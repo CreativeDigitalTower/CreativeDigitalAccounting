@@ -22,7 +22,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   if (!set) notFound();
 
   const [vehicles, products, routes, buyers, destResult, mkInvoice] = await Promise.all([
-    prisma.vehicle.findMany({ where: { companyId, active: true, normalizedRegistration: { not: null } }, select: { id: true, registration: true, logisticsProfile: { select: { trailerReg: true } } }, orderBy: { registration: "asc" } }),
+    prisma.vehicle.findMany({ where: { companyId, active: true, normalizedRegistration: { not: null } }, select: { id: true, registration: true, logisticsProfile: { select: { trailerReg: true, defaultDriver: true, carrier: { select: { name: true } } } } }, orderBy: { registration: "asc" } }),
     prisma.logisticsProduct.findMany({ where: { companyId, active: true }, select: { id: true, canonicalName: true, category: true }, orderBy: { canonicalName: "asc" } }),
     prisma.logisticsRoute.findMany({ where: { companyId, active: true }, select: { id: true, toPlace: true, note: true }, orderBy: { toPlace: "asc" } }),
     groupCounterparties(companyId),
@@ -54,9 +54,17 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     if (archived) productOptions = [...products, archived];
   }
 
+  // §9: ако доставката ползва вече ДЕАКТИВИРАН автомобил, добави го в опциите (snapshot остава
+  // видим при редакция) — без да го връщаме като активен в новите dropdown-и.
+  let vehicleOptions = vehicles;
+  if (set.truckVehicleId && !vehicles.some((v) => v.id === set.truckVehicleId)) {
+    const inactive = await prisma.vehicle.findFirst({ where: { id: set.truckVehicleId, companyId }, select: { id: true, registration: true, logisticsProfile: { select: { trailerReg: true, defaultDriver: true, carrier: { select: { name: true } } } } } });
+    if (inactive) vehicleOptions = [...vehicles, inactive];
+  }
+
   return (
     <ExportSetForm
-      vehicles={vehicles.map((v) => ({ id: v.id, registration: v.registration, trailerReg: v.logisticsProfile?.trailerReg ?? null }))}
+      vehicles={vehicleOptions.map((v) => ({ id: v.id, registration: v.registration, trailerReg: v.logisticsProfile?.trailerReg ?? null, carrier: v.logisticsProfile?.carrier?.name ?? null, driver: v.logisticsProfile?.defaultDriver ?? null }))}
       products={productOptions}
       routes={routes.map((r) => ({ id: r.id, label: `${r.note ? r.note + " " : ""}${r.toPlace}` }))}
       buyers={buyers}
