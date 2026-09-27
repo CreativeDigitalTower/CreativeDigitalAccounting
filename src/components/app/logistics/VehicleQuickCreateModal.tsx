@@ -31,8 +31,9 @@ export function VehicleQuickCreateModal({ registration, onClose, onDone }: {
   const [err, setErr] = useState("");
 
   useEffect(() => {
-    fetch("/api/logistics/carriers").then((r) => (r.ok ? r.json() : [])).then((list) => {
-      if (Array.isArray(list)) setCarriers(list.map((c: Carrier) => ({ id: c.id, name: c.name })));
+    fetch("/api/logistics/carriers").then((r) => (r.ok ? r.json() : [])).then((j) => {
+      const list = Array.isArray(j) ? j : (j?.rows ?? []);
+      setCarriers(list.map((c: Carrier) => ({ id: c.id, name: c.name })));
     }).catch(() => {});
   }, []);
 
