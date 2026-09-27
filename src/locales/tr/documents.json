@@ -92,7 +92,8 @@
     },
     "errPdf": "PDF indirilemedi.",
     "errDownload": "İndirme başarısız.",
-    "zipName": "Belgeler"
+    "zipName": "Belgeler",
+    "selectMonth": "Aydaki tümünü seç"
   },
   "actions": {
     "statusLabel": "Durum:",

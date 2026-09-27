@@ -92,7 +92,8 @@
     },
     "errPdf": "Не удалось скачать PDF.",
     "errDownload": "Не удалось скачать.",
-    "zipName": "Документы"
+    "zipName": "Документы",
+    "selectMonth": "Выбрать все за месяц"
   },
   "actions": {
     "statusLabel": "Статус:",

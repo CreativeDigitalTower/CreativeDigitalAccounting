@@ -92,7 +92,8 @@
     },
     "errPdf": "Failed to download PDF.",
     "errDownload": "Download failed.",
-    "zipName": "Documents"
+    "zipName": "Documents",
+    "selectMonth": "Select all in month"
   },
   "actions": {
     "statusLabel": "Status:",

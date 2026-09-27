@@ -92,7 +92,8 @@
     },
     "errPdf": "Неуспешно изтегляне на PDF.",
     "errDownload": "Неуспешно изтегляне.",
-    "zipName": "Документи"
+    "zipName": "Документи",
+    "selectMonth": "Избери всички от месеца"
   },
   "actions": {
     "statusLabel": "Статус:",

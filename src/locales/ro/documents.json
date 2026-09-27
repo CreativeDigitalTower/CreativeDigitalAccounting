@@ -92,7 +92,8 @@
     },
     "errPdf": "Descărcarea PDF a eșuat.",
     "errDownload": "Descărcarea a eșuat.",
-    "zipName": "Documente"
+    "zipName": "Documente",
+    "selectMonth": "Selectează toate din lună"
   },
   "actions": {
     "statusLabel": "Status:",
