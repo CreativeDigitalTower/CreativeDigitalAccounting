@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { StatusSelect, statusMeta } from "@/components/app/StatusSelect";
@@ -10,6 +10,14 @@ import { downloadDocsAsZip, todayStamp } from "@/lib/downloadDocs";
 import { UiIcon } from "@/components/app/NavIcons";
 import { useI18n } from "@/components/i18n/I18nProvider";
 import { SORT_OPTIONS, sortDocs, DEFAULT_SORT, type SortKey } from "@/lib/documentSort";
+import { toggleMonthSelection, monthCheckboxState } from "@/lib/documents/monthSelection";
+
+// Month header checkbox: checked при ALL, indeterminate при SOME (native indeterminate → ref).
+function MonthCheckbox({ state, onToggle, title }: { state: "none" | "some" | "all"; onToggle: () => void; title?: string }) {
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => { if (ref.current) ref.current.indeterminate = state === "some"; }, [state]);
+  return <input ref={ref} type="checkbox" checked={state === "all"} onChange={onToggle} style={{ width: "auto" }} title={title} />;
+}
 
 export type InvoiceRow = {
   id: string; number: string; clientName: string; issueDate: string; dueDate: string | null;
@@ -54,8 +62,6 @@ export function InvoicesTable({ invoices, canDelete = true }: { invoices: Invoic
   }
 
   const groups = groupByMonth(sortDocs(invoices, sort));
-  const allIds = invoices.map((i) => i.id);
-  const allSelected = selected.size > 0 && selected.size === allIds.length;
 
   // Напомняния за плащане: жълто (≤5 дни до падеж) и червено (просрочена)
   const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -73,8 +79,9 @@ export function InvoicesTable({ invoices, canDelete = true }: { invoices: Invoic
   function toggle(id: string) {
     setSelected((prev) => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
   }
-  function toggleAll() {
-    setSelected(allSelected ? new Set() : new Set(allIds));
+  // Toggle САМО на ID-тата от конкретния месец (не глобален select-all, §3/§14).
+  function toggleMonth(monthIds: string[]) {
+    setSelected((prev) => toggleMonthSelection(prev, monthIds));
   }
 
   async function downloadOne(row: InvoiceRow) {
@@ -130,14 +137,17 @@ export function InvoicesTable({ invoices, canDelete = true }: { invoices: Invoic
         </div>
       )}
 
-      {groups.map((group) => (
+      {groups.map((group) => {
+        const monthIds = group.items.map((i) => i.id);
+        const monthState = monthCheckboxState(selected, monthIds);
+        return (
         <div key={group.key} style={{ marginBottom: 18 }}>
           <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 8px", textTransform: "capitalize" }}>{group.label}</h3>
           <div className="glass panel" style={{ padding: "8px 0" }}>
             <table>
               <thead>
                 <tr>
-                  <th style={{ width: 28 }}><input type="checkbox" checked={allSelected} onChange={toggleAll} style={{ width: "auto" }} title={t("documents.table.selectAll")} /></th>
+                  <th style={{ width: 28 }}><MonthCheckbox state={monthState} onToggle={() => toggleMonth(monthIds)} title={t("documents.table.selectMonth")} /></th>
                   <th>№</th><th>{t("documents.page.th.client")}</th><th>{t("documents.page.th.date")}</th><th>{t("documents.page.th.due")}</th><th className="num">{t("documents.page.th.amount")}</th><th>{t("documents.page.th.status")}</th><th></th>
                 </tr>
               </thead>
@@ -184,7 +194,8 @@ export function InvoicesTable({ invoices, canDelete = true }: { invoices: Invoic
             </table>
           </div>
         </div>
-      ))}
+        );
+      })}
 
       {menu && <ContextMenu x={menu.x} y={menu.y} items={menuItems(menu.doc)} onClose={() => setMenu(null)} />}
     </>

@@ -92,7 +92,8 @@
     },
     "errPdf": "Αποτυχία λήψης PDF.",
     "errDownload": "Αποτυχία λήψης.",
-    "zipName": "Έγγραφα"
+    "zipName": "Έγγραφα",
+    "selectMonth": "Επιλογή όλων του μήνα"
   },
   "actions": {
     "statusLabel": "Κατάσταση:",
