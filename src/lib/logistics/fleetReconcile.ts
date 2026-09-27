@@ -63,6 +63,25 @@ export type ExistingVehicle = {
   id: string; registration: string; normalizedRegistration: string; active: boolean;
   trailer: string | null; carrierName: string | null; driver: string | null; capacity: number | null;
 };
+
+// ── Канонична „текуща" конфигурация на автомобила (за capacity read/write) ──
+// Един автомобил може да има НЯКОЛКО VehicleConfiguration (различни cargoMode/carrier/ремарке).
+// За да е reconciliation-ът idempotent, capacity се ЧЕТЕ и ЗАПИСВА от/в ЕДНА И СЪЩА primary
+// конфигурация. Избор (детерминистично): активните пред неактивните → съвпадащо ремарке с
+// текущата композиция → най-старата createdAt. Историческите конфигурации НЕ се трият.
+export type VehicleConfigLite = { id: string; maxPayloadTons: number | null; active: boolean; createdAt: string | Date | number; trailerRegNorm?: string | null };
+
+export function pickPrimaryConfig(configs: VehicleConfigLite[], currentTrailerNorm?: string | null): VehicleConfigLite | null {
+  if (!configs || configs.length === 0) return null;
+  const t = (currentTrailerNorm ?? "").trim();
+  const score = (c: VehicleConfigLite) => (c.active ? 2 : 0) + (t && (c.trailerRegNorm ?? "") === t ? 1 : 0);
+  return [...configs].sort((a, b) => score(b) - score(a) || new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())[0] ?? null;
+}
+
+/** Каноничният текущ capacity на автомобила (от primary конфигурацията). */
+export function readCapacityFromConfigs(configs: VehicleConfigLite[], currentTrailerNorm?: string | null): number | null {
+  return pickPrimaryConfig(configs, currentTrailerNorm)?.maxPayloadTons ?? null;
+}
 export type FleetAction = "KEEP_ACTIVE" | "ACTIVATE" | "UPDATE" | "CREATE" | "DEACTIVATE";
 export type FleetPlanRow = {
   truck: string; trailer: string | null; carrier: string; driver: string | null; capacity: number | null;

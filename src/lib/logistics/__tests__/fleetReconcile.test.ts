@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import fs from "node:fs";
-import { CANONICAL_FLEET, planFleetReconcile, type ExistingVehicle } from "@/lib/logistics/fleetReconcile";
+import { CANONICAL_FLEET, planFleetReconcile, pickPrimaryConfig, readCapacityFromConfigs, type ExistingVehicle, type VehicleConfigLite } from "@/lib/logistics/fleetReconcile";
 import { normalizeRegistration } from "@/lib/logistics/normalize";
 
 const read = (p: string) => fs.readFileSync(p, "utf-8");
@@ -94,5 +94,58 @@ describe("vehicle selector + inactive безопасност (§9/§10) — sour
     const schema = read("prisma/schema.prisma");
     expect(schema).toMatch(/truckRegSnapshot\s+String\?/);
     expect(schema).toMatch(/model Vehicle[\s\S]*?active\s+Boolean\s+@default\(true\)/);
+  });
+});
+
+describe("capacity idempotency (§ повторен apply → KEEP) — read/write от една primary config", () => {
+  const exFrom = (reg: string, trailer: string | null, carrier: string, driver: string | null, configs: VehicleConfigLite[]) => {
+    const trailerNorm = normalizeRegistration(trailer);
+    return ex({ registration: reg, trailer, carrierName: carrier, driver, capacity: readCapacityFromConfigs(configs, trailerNorm) });
+  };
+  it("1-4) capacity различен → UPDATE; след apply (update на primary) → KEEP_ACTIVE", () => {
+    // SK6539AO: Excel capacity 26. Primary config има 24 → трябва UPDATE.
+    const c = CANONICAL_FLEET.find((x) => normalizeRegistration(x.truck) === normalizeRegistration("SK6539AO"))!;
+    let configs: VehicleConfigLite[] = [{ id: "cfgA", maxPayloadTons: 24, active: true, createdAt: "2024-01-01", trailerRegNorm: normalizeRegistration(c.trailer) }];
+    let plan1 = planFleetReconcile([exFrom(c.truck, c.trailer, c.carrier, c.driver, configs)]);
+    const row1 = plan1.rows.find((r) => normalizeRegistration(r.truck) === normalizeRegistration("SK6539AO"))!;
+    expect(row1.action).toBe("UPDATE");
+    expect(row1.notes).toContain("капацитет");
+    // apply симулация: пише в PRIMARY config (cfgA) → 26.
+    const primary = pickPrimaryConfig(configs, normalizeRegistration(c.trailer))!;
+    configs = configs.map((x) => x.id === primary.id ? { ...x, maxPayloadTons: c.capacity } : x);
+    const plan2 = planFleetReconcile([exFrom(c.truck, c.trailer, c.carrier, c.driver, configs)]);
+    expect(plan2.rows.find((r) => normalizeRegistration(r.truck) === normalizeRegistration("SK6539AO"))!.action).toBe("KEEP_ACTIVE");
+  });
+  it("възпроизвежда стария bug: 2 конфигурации → четенето и записът НЕ се разминават", () => {
+    const c = CANONICAL_FLEET.find((x) => normalizeRegistration(x.truck) === normalizeRegistration("SK7503BV"))!;
+    // Стара bulk config (24, по-стара) + нова празна config (26) — старият код четеше 24 (find non-null asc).
+    const configs: VehicleConfigLite[] = [
+      { id: "old", maxPayloadTons: 24, active: true, createdAt: "2023-01-01", trailerRegNorm: normalizeRegistration(c.trailer) },
+      { id: "new", maxPayloadTons: 26.5, active: true, createdAt: "2025-06-01", trailerRegNorm: normalizeRegistration(c.trailer) },
+    ];
+    const primary = pickPrimaryConfig(configs, normalizeRegistration(c.trailer))!;
+    // Четенето ползва СЪЩАТА primary, която apply би обновил → детерминизъм.
+    const capRead = readCapacityFromConfigs(configs, normalizeRegistration(c.trailer));
+    expect(capRead).toBe(primary.maxPayloadTons);
+    // apply на primary → 26.5; повторно четене = 26.5 → KEEP.
+    const after = configs.map((x) => x.id === primary.id ? { ...x, maxPayloadTons: c.capacity } : x);
+    const plan = planFleetReconcile([exFrom(c.truck, c.trailer, c.carrier, c.driver, after)]);
+    expect(plan.rows.find((r) => normalizeRegistration(r.truck) === normalizeRegistration("SK7503BV"))!.action).toBe("KEEP_ACTIVE");
+  });
+  it("pickPrimaryConfig: активна пред неактивна; съвпадащо ремарке; после най-стара", () => {
+    const cfgs: VehicleConfigLite[] = [
+      { id: "inactive_old", maxPayloadTons: 10, active: false, createdAt: "2020-01-01", trailerRegNorm: "T1" },
+      { id: "active_match", maxPayloadTons: 26, active: true, createdAt: "2024-01-01", trailerRegNorm: "T1" },
+      { id: "active_other", maxPayloadTons: 30, active: true, createdAt: "2022-01-01", trailerRegNorm: "T2" },
+    ];
+    expect(pickPrimaryConfig(cfgs, "T1")!.id).toBe("active_match");
+  });
+  it("37-те с празен Excel capacity остават KEEP независимо от DB (§15)", () => {
+    // SK832UU: Excel capacity null → capacity никога не тригерва UPDATE.
+    const c = CANONICAL_FLEET.find((x) => normalizeRegistration(x.truck) === normalizeRegistration("SK832UU"))!;
+    expect(c.capacity).toBeNull();
+    const configs: VehicleConfigLite[] = [{ id: "x", maxPayloadTons: 99, active: true, createdAt: "2024-01-01", trailerRegNorm: normalizeRegistration(c.trailer) }];
+    const plan = planFleetReconcile([exFrom(c.truck, c.trailer, c.carrier, c.driver, configs)]);
+    expect(plan.rows.find((r) => normalizeRegistration(r.truck) === normalizeRegistration("SK832UU"))!.action).toBe("KEEP_ACTIVE");
   });
 });

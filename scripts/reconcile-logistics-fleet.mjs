@@ -14,6 +14,16 @@ import { PrismaPg } from "@prisma/adapter-pg";
 const args = process.argv.slice(2);
 const APPLY = args.includes("--apply");
 const companyArg = (args.find((a) => a.startsWith("--company-id=")) || "").split("=")[1] || null;
+const inspectArg = (args.find((a) => a.startsWith("--inspect=")) || "").split("=")[1] || null;
+
+// Канонична primary конфигурация (огледало на src/lib/logistics/fleetReconcile.ts).
+function pickPrimaryConfig(configs, currentTrailerNorm) {
+  if (!configs || !configs.length) return null;
+  const t = (currentTrailerNorm ?? "").trim();
+  const score = (c) => (c.active ? 2 : 0) + (t && (c.trailerRegNorm ?? "") === t ? 1 : 0);
+  return [...configs].sort((a, b) => score(b) - score(a) || new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())[0] ?? null;
+}
+const readCapacityFromConfigs = (configs, t) => pickPrimaryConfig(configs, t)?.maxPayloadTons ?? null;
 
 // ── Нормализация (огледало на src/lib/logistics/normalize.ts) ──
 const CYR = { "А":"A","В":"B","Е":"E","С":"C","О":"O","Р":"P","Н":"H","К":"K","М":"M","Т":"T","Х":"X" };
@@ -83,16 +93,21 @@ async function loadExisting(companyId) {
     select: {
       id: true, registration: true, normalizedRegistration: true, active: true,
       logisticsProfile: { select: { trailerReg: true, defaultDriver: true, carrier: { select: { name: true } } } },
-      configurations: { select: { maxPayloadTons: true, active: true }, orderBy: { createdAt: "asc" } },
+      configurations: { select: { id: true, maxPayloadTons: true, active: true, createdAt: true, trailerRegNorm: true }, orderBy: { createdAt: "asc" } },
     },
   });
-  return vehicles.map((v) => ({
-    id: v.id, registration: v.registration, normalizedRegistration: v.normalizedRegistration, active: v.active,
-    trailer: v.logisticsProfile?.trailerReg ?? null,
-    carrierName: v.logisticsProfile?.carrier?.name ?? null,
-    driver: v.logisticsProfile?.defaultDriver ?? null,
-    capacity: v.configurations.find((c) => c.maxPayloadTons != null)?.maxPayloadTons ?? null,
-  }));
+  return vehicles.map((v) => {
+    const trailerNorm = normReg(v.logisticsProfile?.trailerReg);
+    return {
+      id: v.id, registration: v.registration, normalizedRegistration: v.normalizedRegistration, active: v.active,
+      trailer: v.logisticsProfile?.trailerReg ?? null,
+      carrierName: v.logisticsProfile?.carrier?.name ?? null,
+      driver: v.logisticsProfile?.defaultDriver ?? null,
+      // Capacity се чете от primary конфигурацията (същата, в която apply записва) → idempotent.
+      capacity: readCapacityFromConfigs(v.configurations, trailerNorm),
+      _configs: v.configurations,
+    };
+  });
 }
 
 function plan(existing) {
@@ -147,14 +162,17 @@ async function apply(companyId, rows) {
         where: { vehicleId }, create: { vehicleId, ...profData, ownershipType: "carrier" }, update: profData,
       });
     }
-    // Капацитет → primary VehicleConfiguration.maxPayloadTons (само ако Excel има стойност).
+    // Капацитет (само ако Excel има стойност, §15) → записва се в PRIMARY конфигурацията
+    // (същата, от която planner-ът чете) → idempotent. Ако автомобилът НЯМА конфигурация,
+    // създаваме една. НЕ създаваме паралелна конфигурация и НЕ трием исторически.
     if (r.capacity != null) {
-      const trailerRegNorm = normReg(r.trailer);
-      await prisma.vehicleConfiguration.upsert({
-        where: { companyId_vehicleId_trailerRegNorm_cargoMode_carrierId: { companyId, vehicleId, trailerRegNorm, cargoMode: "", carrierId: carrierId ?? null } },
-        create: { companyId, vehicleId, trailerReg: r.trailer, trailerRegNorm, carrierId, defaultDriver: r.driver ?? null, cargoMode: "", maxPayloadTons: r.capacity, active: true },
-        update: { maxPayloadTons: r.capacity, active: true, ...(r.driver ? { defaultDriver: r.driver } : {}) },
-      });
+      const configs = await prisma.vehicleConfiguration.findMany({ where: { companyId, vehicleId }, select: { id: true, maxPayloadTons: true, active: true, createdAt: true, trailerRegNorm: true } });
+      const primary = pickPrimaryConfig(configs, normReg(r.trailer));
+      if (primary) {
+        await prisma.vehicleConfiguration.update({ where: { id: primary.id }, data: { maxPayloadTons: r.capacity, active: true, ...(r.driver ? { defaultDriver: r.driver } : {}) } });
+      } else {
+        await prisma.vehicleConfiguration.create({ data: { companyId, vehicleId, trailerReg: r.trailer, trailerRegNorm: normReg(r.trailer), carrierId, defaultDriver: r.driver ?? null, cargoMode: "", maxPayloadTons: r.capacity, active: true } });
+      }
     }
   }
   return { created, activated, updated, deactivated };
@@ -177,9 +195,36 @@ function printPlan(company, rows) {
   if (finalActive !== 41) console.log(`⚠ FINAL ACTIVE != 41 (${finalActive}) — прегледай преди apply.`);
 }
 
+async function inspect(companyId, regs) {
+  const keys = regs.map(normReg);
+  const vehicles = await prisma.vehicle.findMany({
+    where: { companyId },
+    select: { id: true, registration: true, normalizedRegistration: true, active: true,
+      logisticsProfile: { select: { trailerReg: true } },
+      configurations: { select: { id: true, maxPayloadTons: true, active: true, createdAt: true, trailerRegNorm: true, cargoMode: true, carrierId: true }, orderBy: { createdAt: "asc" } } },
+  });
+  const excelCap = new Map(CANONICAL_FLEET.map((c) => [normReg(c.truck), c.capacity]));
+  for (const v of vehicles.filter((x) => keys.includes(x.normalizedRegistration))) {
+    const trailerNorm = normReg(v.logisticsProfile?.trailerReg);
+    const primary = pickPrimaryConfig(v.configurations, trailerNorm);
+    console.log(`\n── ${v.registration}  (vehicleId=${v.id}, active=${v.active}) ──`);
+    console.log(`   profile.trailerReg=${v.logisticsProfile?.trailerReg ?? "—"} (norm ${trailerNorm || "—"})`);
+    console.log(`   Excel capacity=${excelCap.get(v.normalizedRegistration) ?? "—"} | plannerReads(primary)=${primary?.maxPayloadTons ?? "null"} | primaryConfigId=${primary?.id ?? "—"}`);
+    console.log(`   ALL configs (${v.configurations.length}):`);
+    for (const c of v.configurations) {
+      console.log(`     • id=${c.id} active=${c.active} maxPayloadTons=${c.maxPayloadTons ?? "null"} trailerNorm=${c.trailerRegNorm || "—"} cargoMode="${c.cargoMode}" carrierId=${c.carrierId ?? "—"} created=${new Date(c.createdAt).toISOString()}${primary && c.id === primary.id ? "  ← PRIMARY" : ""}`);
+    }
+  }
+}
+
 async function main() {
-  console.log(APPLY ? "*** APPLY MODE ***" : "DRY-RUN (само чете; --apply за запис)");
+  console.log(APPLY ? "*** APPLY MODE ***" : (inspectArg ? "INSPECT (read-only)" : "DRY-RUN (само чете; --apply за запис)"));
   const companies = await resolveCompanies();
+  if (inspectArg) {
+    const regs = inspectArg.split(",").map((s) => s.trim()).filter(Boolean);
+    for (const c of companies) { console.log(`\n=== [${c.name}] inspect ${regs.join(", ")} ===`); await inspect(c.id, regs); }
+    return;
+  }
   if (!companies.length) { console.log("Няма seller logistics фирма (--company-id или модул)."); return; }
   console.log("Целеви фирми:", companies.map((c) => c.name).join(", "));
   for (const c of companies) {
