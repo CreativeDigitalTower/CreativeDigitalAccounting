@@ -34,33 +34,27 @@ export default async function Page({ params, searchParams }: { params: Promise<{
     // Име на файла за „Save as PDF": Ispratnica-{номер}-{година}.
     const yr = dd.date ? new Date(dd.date).getFullYear() : "";
     const fileTitle = `Ispratnica-${(dd.dispatchNumber ?? "").replace(/[^\w-]/g, "") || "dispatch"}${yr ? `-${yr}` : ""}`;
-    // ЕДНА A4 portrait страница = ДВЕ идентични копия (по ~148.5mm), фина линия за рязане
-    // по средата. margin:0 на @page, за да няма скалиране/втора страница/браузърски полета.
+    // ЕДИН A4 лист = ДВЕ идентични копия (§1), едно под друго, с фина линия за рязане и
+    // МАЛКО разстояние между тях (§5). Ползва СЪЩАТА изолирана print архитектура като
+    // фактурата (PrintDocPortal → извън app shell-а) → без празни страници (§12). Копията са
+    // content-height (без фиксирана половин-страница височина → без празно пространство/
+    // overflow, §6/§7/§8). Реален Chrome PDF: 1 A4, всяко копие ~117mm, общо ~248mm < 297mm.
     return (
-      <div className="disp-print-root">
+      <PrintDocPortal>
         <style>{`
-          @page { size: A4 portrait; margin: 0; }
-          @media print {
-            html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
-            body.printing-multi { background: #fff; }
-            .disp-print-root { margin: 0; }
-          }
-          .disp-sheet { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; box-sizing: border-box; display: flex; flex-direction: column; }
-          .disp-half { height: 148.5mm; box-sizing: border-box; overflow: hidden; padding: 3mm 0; }
-          .disp-cut { border-top: 1px dashed #8a8a8a; position: relative; height: 0; }
+          .disp-page { padding: 4mm 0; }
+          .disp-copy { box-sizing: border-box; }
+          .disp-cut { border-top: 1px dashed #8a8a8a; position: relative; height: 0; margin: 3mm 0; }
           .disp-cut::after { content: "✂ — — — — — — — — — — — — — — — — — — — — — — — — — — — — —"; position: absolute; left: 8mm; top: -8px; font-size: 9px; letter-spacing: 1px; color: #9a9a9a; background: #fff; padding: 0 4px; white-space: nowrap; }
-          @media print { .disp-half { break-inside: avoid; page-break-inside: avoid; } .disp-sheet { page-break-after: avoid; } }
+          @media print { .disp-copy { break-inside: avoid; page-break-inside: avoid; } }
         `}</style>
-        <AutoPrint fileTitle={fileTitle} />
-        {/* print-sheet + print-doc → участва в canonical printing-multi механизма: вижда се
-            само този лист, позициониран top-left (извън dashboard chrome) → без blank/2-ра
-            страница (§7/§8/§12). */}
-        <div className="disp-sheet print-sheet print-doc">
-          <div className="disp-half">{copy}</div>
-          <div className="disp-cut no-print-hide" />
-          <div className="disp-half">{copy}</div>
+        <AutoPrint fileTitle={fileTitle} portal />
+        <div className="print-page disp-page">
+          <div className="disp-copy">{copy}</div>
+          <div className="disp-cut" />
+          <div className="disp-copy">{copy}</div>
         </div>
-      </div>
+      </PrintDocPortal>
     );
   }
 
