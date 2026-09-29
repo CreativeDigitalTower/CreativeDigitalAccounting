@@ -629,6 +629,8 @@
     "docStatusHelp": "The status updates automatically based on the state of the required documents.",
     "mkIssued": "Issued: {date}",
     "mkOpen": "Open invoice",
+    "mkAccessDenied": "You do not have access to the company that issued this invoice.",
+    "mkNotFound": "There is no linked invoice for this delivery.",
     "dstatus": {
       "no_docs": "No documents",
       "draft": "Draft",

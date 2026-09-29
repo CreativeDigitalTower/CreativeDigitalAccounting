@@ -66,13 +66,19 @@ export async function regenerateSetDocuments(
     .filter((t) => (EXPORT_DOC_TYPES as readonly string[]).includes(t));
   const generated: string[] = []; const skipped: string[] = [];
 
+  // Business rule (§1): успешно генериран документ = ГОТОВ (finalized). Спестява ръчната
+  // стъпка „Финализирай" за всеки документ. Прилага се САМО при реален запис по-долу —
+  // finalized/overridden документи не влизат тук (shouldRegenerate ги пази, §4/§6), а
+  // историческите draft-ове не се пипат масово (§8), защото не са в `targets`/не се генерират сега.
+  // Документът остава редактируем: finalized → reopen → edit → finalize (§5) е непокътнат.
+  const finalizedAt = new Date();
   for (const docType of targets) {
     if (!shouldRegenerate(byType.get(docType), !!opts.force)) { skipped.push(docType); continue; }
     const data = buildDocumentData(src, parties, docType as (typeof EXPORT_DOC_TYPES)[number]);
     await prisma.exportDocument.upsert({
       where: { setId_docType: { setId, docType } },
-      create: { setId, docType, data: data as object, createdById: actorId },
-      update: { data: data as object, overridden: false },
+      create: { setId, docType, data: data as object, createdById: actorId, status: "finalized", finalizedAt, finalizedById: actorId },
+      update: { data: data as object, overridden: false, status: "finalized", finalizedAt, finalizedById: actorId },
     });
     generated.push(docType);
   }

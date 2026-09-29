@@ -629,6 +629,8 @@
     "docStatusHelp": "Durum, gerekli belgelerin durumuna göre otomatik olarak güncellenir.",
     "mkIssued": "Düzenlendi: {date}",
     "mkOpen": "Faturayı aç",
+    "mkAccessDenied": "Bu faturayı düzenleyen şirkete erişiminiz yok.",
+    "mkNotFound": "Bu teslimat için bağlı bir fatura yok.",
     "dstatus": {
       "no_docs": "Belge yok",
       "draft": "Taslak",
