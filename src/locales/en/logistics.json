@@ -625,6 +625,10 @@
     "stReady": "Ready",
     "stGenerated": "Generated",
     "stNot": "Not generated",
+    "docStatusTitle": "Export documents status",
+    "docStatusHelp": "The status updates automatically based on the state of the required documents.",
+    "mkIssued": "Issued: {date}",
+    "mkOpen": "Open invoice",
     "dstatus": {
       "no_docs": "No documents",
       "draft": "Draft",

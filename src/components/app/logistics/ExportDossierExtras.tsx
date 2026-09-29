@@ -11,8 +11,10 @@ type Ev = { id: string; action: string; entity: string; summary: string | null; 
 const KB = (n: number) => n < 1024 * 1024 ? `${Math.round(n / 1024)} KB` : `${(n / 1024 / 1024).toFixed(1)} MB`;
 
 export function ExportDossierExtras({ id, canManage, truckVehicleId, mkInvoice, receivedBy }: {
-  id: string; canManage: boolean; truckVehicleId?: string | null; mkInvoice?: { id: string; number: string } | null; receivedBy?: string | null;
+  id: string; canManage: boolean; truckVehicleId?: string | null; mkInvoice?: { id: string; number: string; kind?: "document" | "mk" } | null; receivedBy?: string | null;
 }) {
+  // Линк според вида: стандартна фактура (Document) → /documents, легаси → /mk-sales (§8).
+  const mkHref = (inv: { id: string; kind?: "document" | "mk" }) => inv.kind === "mk" ? `/dashboard/logistics/mk-sales/${inv.id}` : `/dashboard/documents/${inv.id}`;
   const t = useT();
   const [atts, setAtts] = useState<Att[]>([]);
   const [events, setEvents] = useState<Ev[]>([]);
@@ -77,7 +79,7 @@ export function ExportDossierExtras({ id, canManage, truckVehicleId, mkInvoice, 
         <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 8px" }}>{t("logistics.dossier.related")}</h3>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 16, fontSize: 12.5 }}>
           {truckVehicleId && <div><span style={{ color: "var(--muted)" }}>{t("logistics.dossier.vehicle")}: </span><Link href={`/dashboard/logistics/vehicles/${truckVehicleId}`} style={{ fontWeight: 600 }}>{t("logistics.dossier.openVehicle")} →</Link></div>}
-          <div><span style={{ color: "var(--muted)" }}>{t("logistics.received.mkInvoice")}: </span>{mkInvoice ? <Link href={`/dashboard/logistics/mk-sales/${mkInvoice.id}`} style={{ fontWeight: 600 }}>{mkInvoice.number} →</Link> : "—"}</div>
+          <div><span style={{ color: "var(--muted)" }}>{t("logistics.received.mkInvoice")}: </span>{mkInvoice ? <Link href={mkHref(mkInvoice)} style={{ fontWeight: 600 }}>{mkInvoice.number} →</Link> : "—"}</div>
           <div><span style={{ color: "var(--muted)" }}>SEM: </span>{receivedBy ?? t("logistics.dossier.notReceived")}</div>
         </div>
       </div>

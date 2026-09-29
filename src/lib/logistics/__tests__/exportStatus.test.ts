@@ -96,3 +96,26 @@ describe("§9 source: списъкът ползва derived статус, не �
     expect(api).not.toContain("...(status ? { status } : {})");
   });
 });
+
+describe("§B MK фактура: detail резолвва И Document, И легаси MkInvoice", () => {
+  const api = read("src/app/api/logistics/export-sets/[id]/route.ts");
+  const detail = read("src/components/app/logistics/ExportSetDetail.tsx");
+  it("detail GET чете стандартна фактура (Document) освен легаси MkInvoice", () => {
+    expect(api).toContain("prisma.document.findFirst");
+    expect(api).toContain('type: "invoice"');
+    expect(api).toContain("sourceExportSetId: set.id");
+    expect(api).toContain("resolveReceivedInvoice(");
+  });
+  it("detail линква по вида (Document → /documents, легаси → /mk-sales) и не hardcode-ва mk-sales", () => {
+    expect(detail).toContain("mkInvoiceHref");
+    expect(detail).toContain("/dashboard/documents/${inv.id}");
+    expect(detail).toContain("/dashboard/logistics/mk-sales/${inv.id}");
+  });
+  it("без фактура → линк към create flow с fromDelivery (не dead UI)", () => {
+    expect(detail).toContain("/dashboard/documents/new?fromDelivery=${s.id}");
+  });
+  it("§11 overall статус НЕ зависи от MK фактурата (derive е само по документите)", () => {
+    // deriveExportSetStatus приема само docs; MK invoice не е вход.
+    expect(deriveExportSetStatus([{ docType: "invoice", status: "finalized" }, { docType: "dispatch", status: "finalized" }, { docType: "declaration", status: "finalized" }, { docType: "cmr_hp", status: "finalized" }])).toBe("finalized");
+  });
+});

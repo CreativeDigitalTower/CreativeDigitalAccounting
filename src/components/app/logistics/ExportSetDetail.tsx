@@ -14,10 +14,21 @@ type SetDto = {
   truckRegSnapshot: string | null; trailerReg: string | null; truckVehicleId: string | null; productSnapshot: string | null;
   quantity: number | null; unit: string; declarationCmrDate: string | null; dispatchNumber: string | null;
   status: string; sellerName: string | null; buyerName: string | null; clientName: string | null; documents: Doc[];
-  mkInvoice?: { id: string; number: string } | null;
+  mkInvoice?: MkInvoiceRef | null;
   viewerRole?: string;
 };
+type MkInvoiceRef = { id: string; number: string; kind?: "document" | "mk"; date?: string | null };
+// Линк към реалния запис според вида (§8): стандартна фактура (Document) → /documents,
+// легаси MkInvoice → /mk-sales.
+const mkInvoiceHref = (inv: MkInvoiceRef) => inv.kind === "mk" ? `/dashboard/logistics/mk-sales/${inv.id}` : `/dashboard/documents/${inv.id}`;
 const DOC_LABEL: Record<string, string> = { invoice: "docInvoice", dispatch: "docDispatch", declaration: "docDeclaration", cmr_epson: "docCmrEpson", cmr_hp: "docCmrHp" };
+// Цветове на derived статус badge-а (общи с списъка) — без emoji, от design system.
+const STATUS_STYLE: Record<string, { bg: string; fg: string }> = {
+  no_docs: { bg: "rgba(0,0,0,.06)", fg: "var(--muted)" },
+  draft: { bg: "var(--brass-soft,rgba(192,138,45,.14))", fg: "var(--brass,#9A6B18)" },
+  in_progress: { bg: "rgba(58,110,165,.14)", fg: "#2F5C8F" },
+  finalized: { bg: "rgba(15,138,106,.14)", fg: "var(--emerald-dark,#0F8A6A)" },
+};
 
 export function ExportSetDetail({ id, canManage }: { id: string; canManage: boolean }) {
   const t = useT();
@@ -71,13 +82,7 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{s.invoiceNumber}</h1>
         {(() => {
           const ds = deriveExportSetStatus(s.documents);
-          const style: Record<string, { bg: string; fg: string }> = {
-            no_docs: { bg: "rgba(0,0,0,.06)", fg: "var(--muted)" },
-            draft: { bg: "var(--brass-soft,rgba(192,138,45,.14))", fg: "var(--brass,#9A6B18)" },
-            in_progress: { bg: "rgba(58,110,165,.14)", fg: "#2F5C8F" },
-            finalized: { bg: "rgba(15,138,106,.14)", fg: "var(--emerald-dark,#0F8A6A)" },
-          };
-          const st = style[ds];
+          const st = STATUS_STYLE[ds];
           const tip = ds === "no_docs" ? t("logistics.export.dstatus.tipNone")
             : t("logistics.export.dstatus.tipCount", { fin: finalizedActiveCount(s.documents), total: ACTIVE_EXPORT_DOC_TYPES.length });
           return <span title={tip} style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 10, background: st.bg, color: st.fg }}>{t(`logistics.export.dstatus.${ds}`)}</span>;
@@ -136,8 +141,12 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
                 <span style={{ color: "var(--muted)" }}>{t("logistics.received.mkInvoice")}</span>
                 <span style={{ textAlign: "right" }}>
                   {s.mkInvoice
-                    ? <Link href={`/dashboard/logistics/mk-sales/${s.mkInvoice.id}`} style={{ fontWeight: 600 }}>{s.mkInvoice.number} · {t("logistics.received.stInvoiced")}</Link>
-                    : <span style={{ color: "var(--brick)" }}>{t("logistics.received.stUninvoiced")}</span>}
+                    ? <span style={{ display: "inline-flex", flexWrap: "wrap", gap: 8, justifyContent: "flex-end", alignItems: "baseline" }}>
+                        <span style={{ fontWeight: 600 }}>{s.mkInvoice.number}</span>
+                        {s.mkInvoice.date && <span style={{ color: "var(--muted)", fontSize: 12 }}>{t("logistics.export.mkIssued", { date: dt(s.mkInvoice.date) })}</span>}
+                        <Link href={mkInvoiceHref(s.mkInvoice)} style={{ fontWeight: 600 }}>{t("logistics.export.mkOpen")} →</Link>
+                      </span>
+                    : <Link href={`/dashboard/documents/new?fromDelivery=${s.id}`} style={{ color: "var(--brick)", fontWeight: 600 }}>{t("logistics.received.stUninvoiced")} →</Link>}
                 </span>
               </div>
             </>
@@ -146,19 +155,35 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
 
         <div className="glass panel">
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>{t("logistics.export.documents")}</h3>
+            <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: 0 }}>{t("logistics.export.docStatusTitle")}</h3>
             {manage && <button className="btn btn-primary btn-sm" style={{ marginLeft: "auto" }} disabled={busy} onClick={() => generate(false)}>{t("logistics.export.generateAll")}</button>}
           </div>
+          {(() => {
+            const ds = deriveExportSetStatus(s.documents);
+            const st = STATUS_STYLE[ds];
+            return (
+              <div style={{ marginBottom: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 10, background: st.bg, color: st.fg }}>{t(`logistics.export.dstatus.${ds}`)}</span>
+                  <span style={{ fontSize: 12, color: "var(--muted)" }}>
+                    {ds === "no_docs" ? t("logistics.export.dstatus.tipNone") : t("logistics.export.dstatus.tipCount", { fin: finalizedActiveCount(s.documents), total: ACTIVE_EXPORT_DOC_TYPES.length })}
+                  </span>
+                </div>
+                <div style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("logistics.export.docStatusHelp")}</div>
+              </div>
+            );
+          })()}
           {ACTIVE_EXPORT_DOC_TYPES.map((dtp) => {
             const doc = docFor(dtp);
             const finalized = doc?.status === "finalized";
+            const dst = finalized ? STATUS_STYLE.finalized : STATUS_STYLE.draft;
             return (
               <div key={dtp} style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 0", borderTop: "1px solid rgba(217,215,200,.4)" }}>
                 <span style={{ flex: 1, fontSize: 13 }}>{t(`logistics.export.${DOC_LABEL[dtp]}`)}</span>
                 {doc ? (
-                  <span style={{ fontSize: 11, fontWeight: 700, color: finalized ? "var(--emerald-dark,#0F8A6A)" : "var(--muted)" }}>
-                    {finalized ? `✓ ${t("logistics.export.stReady")}` : `● ${t("logistics.export.stGenerated")}`}
-                    {doc.overridden && <span style={{ color: "var(--brass)" }}> · {t("logistics.export.overridden")}</span>}
+                  <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 10, background: dst.bg, color: dst.fg, whiteSpace: "nowrap" }}>
+                    {t(`logistics.export.dstatus.${finalized ? "finalized" : "draft"}`)}
+                    {doc.overridden && <span style={{ color: "var(--brass)", fontWeight: 600 }}> · {t("logistics.export.overridden")}</span>}
                   </span>
                 ) : (
                   <span style={{ fontSize: 11, color: "var(--muted)" }}>○ {t("logistics.export.stNot")}</span>

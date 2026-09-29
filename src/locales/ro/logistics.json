@@ -625,6 +625,10 @@
     "stReady": "Gata",
     "stGenerated": "Generat",
     "stNot": "Negenerat",
+    "docStatusTitle": "Statusul documentelor de export",
+    "docStatusHelp": "Statusul se actualizează automat în funcție de starea documentelor necesare.",
+    "mkIssued": "Emisă: {date}",
+    "mkOpen": "Deschide factura",
     "dstatus": {
       "no_docs": "Fără documente",
       "draft": "Ciornă",
