@@ -625,6 +625,10 @@
     "stReady": "Hazır",
     "stGenerated": "Oluşturuldu",
     "stNot": "Oluşturulmadı",
+    "docStatusTitle": "İhracat belgeleri durumu",
+    "docStatusHelp": "Durum, gerekli belgelerin durumuna göre otomatik olarak güncellenir.",
+    "mkIssued": "Düzenlendi: {date}",
+    "mkOpen": "Faturayı aç",
     "dstatus": {
       "no_docs": "Belge yok",
       "draft": "Taslak",
