@@ -449,6 +449,32 @@
     "directionIssued": "Düzenlenen",
     "directionReceived": "Alınan"
   },
+  "mkview": {
+    "readOnly": "Yalnızca görüntüleme",
+    "issuedBy": "Fatura {issuer} tarafından düzenlendi",
+    "number": "Numara",
+    "date": "Tarih",
+    "issuer": "Düzenleyen",
+    "client": "Müşteri",
+    "delivery": "İhracat teslimatı",
+    "payStatus": "Ödeme durumu",
+    "search": "Ara (numara, müşteri, teslimat)…",
+    "empty": "Bağlı MK faturası yok.",
+    "allStatuses": "Tüm durumlar",
+    "kpiTotal": "Toplam fatura",
+    "kpiUnpaid": "Ödenmemiş",
+    "kpiTotalCur": "Toplam ({cur})",
+    "pay": {
+      "draft": "Taslak",
+      "issued": "Düzenlendi",
+      "sent": "Gönderildi",
+      "partially_paid": "Kısmen ödendi",
+      "paid": "Ödendi",
+      "overdue": "Gecikmiş",
+      "cancelled": "İptal edildi",
+      "unpaid": "Ödenmemiş"
+    }
+  },
   "mksale": {
     "title": "MK satışları",
     "add": "+ Yeni MK satışı",
@@ -629,8 +655,6 @@
     "docStatusHelp": "Durum, gerekli belgelerin durumuna göre otomatik olarak güncellenir.",
     "mkIssued": "Düzenlendi: {date}",
     "mkOpen": "Faturayı aç",
-    "mkAccessDenied": "Bu faturayı düzenleyen şirkete erişiminiz yok.",
-    "mkNotFound": "Bu teslimat için bağlı bir fatura yok.",
     "dstatus": {
       "no_docs": "Belge yok",
       "draft": "Taslak",

@@ -141,8 +141,8 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
                     ? <span style={{ display: "inline-flex", flexWrap: "wrap", gap: 8, justifyContent: "flex-end", alignItems: "baseline" }}>
                         <span style={{ fontWeight: 600 }}>{s.mkInvoice.number}</span>
                         {s.mkInvoice.date && <span style={{ color: "var(--muted)", fontSize: 12 }}>{t("logistics.export.mkIssued", { date: dt(s.mkInvoice.date) })}</span>}
-                        {/* Cross-company: минава през canonical open-invoice route (owner-контекст, §13). */}
-                        <a href={`/dashboard/logistics/export/${s.id}/open-invoice`} style={{ fontWeight: 600 }}>{t("logistics.export.mkOpen")} →</a>
+                        {/* Read-only cross-company изглед — БЕЗ смяна на активна фирма (§C2/§C3). */}
+                        <Link href={`/dashboard/logistics/mk-invoice/${s.mkInvoice.id}`} style={{ fontWeight: 600 }}>{t("logistics.export.mkOpen")} →</Link>
                       </span>
                     : <Link href={`/dashboard/documents/new?fromDelivery=${s.id}`} style={{ color: "var(--brick)", fontWeight: 600 }}>{t("logistics.received.stUninvoiced")} →</Link>}
                 </span>

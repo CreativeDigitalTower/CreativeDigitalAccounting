@@ -449,6 +449,32 @@
     "directionIssued": "Issued",
     "directionReceived": "Received"
   },
+  "mkview": {
+    "readOnly": "View only",
+    "issuedBy": "Invoice issued by {issuer}",
+    "number": "Number",
+    "date": "Date",
+    "issuer": "Issuer",
+    "client": "Client",
+    "delivery": "Export delivery",
+    "payStatus": "Payment status",
+    "search": "Search (number, client, delivery)…",
+    "empty": "No linked MK invoices.",
+    "allStatuses": "All statuses",
+    "kpiTotal": "Total invoices",
+    "kpiUnpaid": "Unpaid",
+    "kpiTotalCur": "Total ({cur})",
+    "pay": {
+      "draft": "Draft",
+      "issued": "Issued",
+      "sent": "Sent",
+      "partially_paid": "Partially paid",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "cancelled": "Cancelled",
+      "unpaid": "Unpaid"
+    }
+  },
   "mksale": {
     "title": "MK sales",
     "add": "+ New MK sale",
@@ -629,8 +655,6 @@
     "docStatusHelp": "The status updates automatically based on the state of the required documents.",
     "mkIssued": "Issued: {date}",
     "mkOpen": "Open invoice",
-    "mkAccessDenied": "You do not have access to the company that issued this invoice.",
-    "mkNotFound": "There is no linked invoice for this delivery.",
     "dstatus": {
       "no_docs": "No documents",
       "draft": "Draft",
