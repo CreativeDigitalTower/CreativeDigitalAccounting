@@ -76,9 +76,13 @@ describe("vehicle selector + inactive безопасност (§9/§10) — sour
   const form = read("src/components/app/logistics/ExportSetForm.tsx");
   const newPage = read("src/app/(app)/dashboard/logistics/export/new/page.tsx");
   const editPage = read("src/app/(app)/dashboard/logistics/export/[id]/edit/page.tsx");
-  it("selector-ът показва превозвач + шофьор в етикета (searchable)", () => {
-    expect(form).toContain("v.carrier ? ` · ${v.carrier}`");
-    expect(form).toContain("v.driver ? ` · ${v.driver}`");
+  it("selector: етикетът е САМО Камион / Ремарке; превозвач/шофьор са само в keywords (search)", () => {
+    // Display label = регистрация [/ ремарке]; БЕЗ carrier/driver визуално.
+    expect(form).toContain("label: `${v.registration}${v.trailerReg ? ` / ${v.trailerReg}` : \"\"}`");
+    expect(form).not.toContain("` · ${v.carrier}`");
+    expect(form).not.toContain("` · ${v.driver}`");
+    // Търсене по превозвач/шофьор остава (keywords, не се визуализира).
+    expect(form).toContain("keywords: [v.carrier, v.driver].filter(Boolean).join(\" \")");
   });
   it("нова доставка зарежда САМО active автомобили + carrier/driver", () => {
     expect(newPage).toContain("active: true");

@@ -267,7 +267,13 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
         <div ref={register("truckVehicleId")}>
           <F label={<>{t("logistics.export.truck")}<Req /></>}>
             <div style={errStyle("truckVehicleId", errors)} {...ariaProps("truckVehicleId", errors)}>
-              <SearchableSelect options={vehicleList.map((v) => ({ value: v.id, label: `${v.registration}${v.trailerReg ? ` / ${v.trailerReg}` : ""}${v.carrier ? ` · ${v.carrier}` : ""}${v.driver ? ` · ${v.driver}` : ""}` }))} value={f.truckVehicleId} onChange={onTruckChange} allowCreate allowEmpty={false} placeholder="SK501TO / SK5022AE" createLabel={(q) => `${t("logistics.vehicleCreate.addNew")} „${q}"`} />
+              <SearchableSelect options={vehicleList.map((v) => ({
+                value: v.id,
+                // Показва се САМО Камион / Ремарке (чист списък).
+                label: `${v.registration}${v.trailerReg ? ` / ${v.trailerReg}` : ""}`,
+                // Търсене работи и по превозвач/шофьор, без да се визуализират.
+                keywords: [v.carrier, v.driver].filter(Boolean).join(" "),
+              }))} value={f.truckVehicleId} onChange={onTruckChange} allowCreate allowEmpty={false} placeholder="SK501TO / SK5022AE" createLabel={(q) => `${t("logistics.vehicleCreate.addNew")} „${q}"`} />
             </div>
             <FieldError id="err-truckVehicleId" message={errors.truckVehicleId} />
           </F>
