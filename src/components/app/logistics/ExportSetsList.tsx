@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useT, useI18n } from "@/components/i18n/I18nProvider";
 import { ACTIVE_EXPORT_DOC_TYPES, isActiveExportDocType } from "@/lib/logistics/config";
+import { deriveExportSetStatus, finalizedActiveCount, DERIVED_EXPORT_STATUSES, type DerivedExportStatus } from "@/lib/logistics/exportStatus";
 import { ExportDeleteModal, type DeletableSet } from "@/components/app/logistics/ExportDeleteModal";
 import { ExportPurgeModal, type PurgeMode } from "@/components/app/logistics/ExportPurgeModal";
 
@@ -15,6 +16,13 @@ type Row = {
 type Kpi = { total: number; thisMonth: number; totalQuantity: number; withAttachments: number; withoutAttachments: number };
 
 const ACTIVE_TOTAL = ACTIVE_EXPORT_DOC_TYPES.length;
+// Цветове на DERIVED статус badge-а (compact, без emoji, от design system).
+const STATUS_STYLE: Record<DerivedExportStatus, { bg: string; fg: string }> = {
+  no_docs: { bg: "rgba(0,0,0,.06)", fg: "var(--muted)" },
+  draft: { bg: "var(--brass-soft,rgba(192,138,45,.14))", fg: "var(--brass,#9A6B18)" },
+  in_progress: { bg: "rgba(58,110,165,.14)", fg: "#2F5C8F" },
+  finalized: { bg: "rgba(15,138,106,.14)", fg: "var(--emerald-dark,#0F8A6A)" },
+};
 const YEARS = (() => { const y = new Date().getFullYear(); return [y, y - 1, y - 2, y - 3]; })();
 const MONTHS = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
 
@@ -131,8 +139,7 @@ export function ExportSetsList({ canManage, canCreate = canManage }: { canManage
         </select>
         <select style={sel} value={status} onChange={(e) => setStatus(e.target.value)}>
           <option value="">{t("logistics.export.allStatuses")}</option>
-          <option value="draft">{t("logistics.export.stDraft")}</option>
-          <option value="finalized">{t("logistics.export.stReady")}</option>
+          {DERIVED_EXPORT_STATUSES.map((k) => <option key={k} value={k}>{t(`logistics.export.dstatus.${k}`)}</option>)}
         </select>
         <select style={sel} value={hasAtt} onChange={(e) => setHasAtt(e.target.value)}>
           <option value="">{t("logistics.export.anyDocs")}</option>
@@ -165,7 +172,13 @@ export function ExportSetsList({ canManage, canCreate = canManage }: { canManage
                   <td style={td}>{r.productSnapshot ?? "—"}</td>
                   <td style={td} className="num">{r.quantity != null ? qtyUnit(r.quantity, r.unit) : "—"}</td>
                   <td style={td}>{r.buyer ?? "—"}</td>
-                  <td style={td}>{r.status === "finalized" ? t("logistics.export.stReady") : t("logistics.export.stDraft")}</td>
+                  <td style={td}>{(() => {
+                    const ds = deriveExportSetStatus(r.documents);
+                    const st = STATUS_STYLE[ds];
+                    const tip = ds === "no_docs" ? t("logistics.export.dstatus.tipNone")
+                      : t("logistics.export.dstatus.tipCount", { fin: finalizedActiveCount(r.documents), total: ACTIVE_TOTAL });
+                    return <span title={tip} style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 10, background: st.bg, color: st.fg, whiteSpace: "nowrap" }}>{t(`logistics.export.dstatus.${ds}`)}</span>;
+                  })()}</td>
                   <td style={td} className="num" title={t("logistics.export.docsBreakdown", { gen: activeDocs(r.documents), att: r.attachmentCount })}>
                     {activeDocs(r.documents)}/{ACTIVE_TOTAL}{r.attachmentCount > 0 ? <span style={{ color: "var(--brass)" }}> +{r.attachmentCount}</span> : null}
                   </td>

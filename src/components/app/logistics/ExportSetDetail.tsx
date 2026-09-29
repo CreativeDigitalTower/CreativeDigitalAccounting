@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useT, useI18n } from "@/components/i18n/I18nProvider";
 import { ACTIVE_EXPORT_DOC_TYPES, isActiveExportDocType } from "@/lib/logistics/config";
+import { deriveExportSetStatus, finalizedActiveCount } from "@/lib/logistics/exportStatus";
 import { ExportDeleteModal } from "@/components/app/logistics/ExportDeleteModal";
 import { ExportDossierExtras } from "@/components/app/logistics/ExportDossierExtras";
 
@@ -68,9 +69,19 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
         <Link href="/dashboard/logistics/export" style={{ color: "var(--muted)", textDecoration: "none", fontSize: 13 }}>← {t("logistics.export.title")}</Link>
         <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 22, fontWeight: 600, margin: 0 }}>{s.invoiceNumber}</h1>
-        <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 10, background: s.status === "finalized" ? "var(--emerald-dark,#0F8A6A)" : "rgba(0,0,0,.08)", color: s.status === "finalized" ? "#fff" : "var(--muted)" }}>
-          {s.status === "finalized" ? t("logistics.export.stReady") : t("logistics.export.stDraft")}
-        </span>
+        {(() => {
+          const ds = deriveExportSetStatus(s.documents);
+          const style: Record<string, { bg: string; fg: string }> = {
+            no_docs: { bg: "rgba(0,0,0,.06)", fg: "var(--muted)" },
+            draft: { bg: "var(--brass-soft,rgba(192,138,45,.14))", fg: "var(--brass,#9A6B18)" },
+            in_progress: { bg: "rgba(58,110,165,.14)", fg: "#2F5C8F" },
+            finalized: { bg: "rgba(15,138,106,.14)", fg: "var(--emerald-dark,#0F8A6A)" },
+          };
+          const st = style[ds];
+          const tip = ds === "no_docs" ? t("logistics.export.dstatus.tipNone")
+            : t("logistics.export.dstatus.tipCount", { fin: finalizedActiveCount(s.documents), total: ACTIVE_EXPORT_DOC_TYPES.length });
+          return <span title={tip} style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 10, background: st.bg, color: st.fg }}>{t(`logistics.export.dstatus.${ds}`)}</span>;
+        })()}
         {!isSeller && <span style={{ fontSize: 11, fontWeight: 700, color: "var(--muted)" }}>{t("logistics.export.receivedBadge")}</span>}
         {manage && (
           <span style={{ marginLeft: "auto", display: "flex", gap: 8 }}>

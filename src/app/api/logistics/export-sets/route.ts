@@ -6,6 +6,7 @@ import { audit } from "@/lib/documents";
 import { nextSequenceValue } from "@/lib/logistics/sequence";
 import { SEQ_SCOPE, formatSequenceNumber, EXPORT_INVOICE_FORMAT, suggestDispatchFromInvoice } from "@/lib/logistics/config";
 import { truckTrailerLabel } from "@/lib/logistics/exportDocs";
+import { derivedStatusFilter } from "@/lib/logistics/exportStatus";
 import { PLACE_OF_SHIPMENT_DEFAULT } from "@/lib/logistics/deliveryTerms";
 import { canonicalDestinationKey } from "@/lib/logistics/destinations";
 import { validationError, zodFieldErrors, VMSG, type FieldErrors } from "@/lib/logistics/validation";
@@ -48,7 +49,7 @@ export async function GET(req: Request) {
 
   const where: Prisma.ExportDocumentSetWhereInput = {
     companyId: g.companyId, deletedAt: trash ? { not: null } : null,
-    ...(status ? { status } : {}),
+    ...(derivedStatusFilter(status) ?? {}),
     ...(destination ? { destination } : {}),
     ...(clientId ? { clientId } : {}),
     ...(vehicle ? { OR: [{ truckRegSnapshot: { contains: vehicle, mode: "insensitive" } }, { trailerReg: { contains: vehicle, mode: "insensitive" } }] } : {}),
