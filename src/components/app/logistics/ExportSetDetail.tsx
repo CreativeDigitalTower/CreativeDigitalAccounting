@@ -18,9 +18,6 @@ type SetDto = {
   viewerRole?: string;
 };
 type MkInvoiceRef = { id: string; number: string; kind?: "document" | "mk"; date?: string | null };
-// Линк към реалния запис според вида (§8): стандартна фактура (Document) → /documents,
-// легаси MkInvoice → /mk-sales.
-const mkInvoiceHref = (inv: MkInvoiceRef) => inv.kind === "mk" ? `/dashboard/logistics/mk-sales/${inv.id}` : `/dashboard/documents/${inv.id}`;
 const DOC_LABEL: Record<string, string> = { invoice: "docInvoice", dispatch: "docDispatch", declaration: "docDeclaration", cmr_epson: "docCmrEpson", cmr_hp: "docCmrHp" };
 // Цветове на derived статус badge-а (общи с списъка) — без emoji, от design system.
 const STATUS_STYLE: Record<string, { bg: string; fg: string }> = {
@@ -144,7 +141,8 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
                     ? <span style={{ display: "inline-flex", flexWrap: "wrap", gap: 8, justifyContent: "flex-end", alignItems: "baseline" }}>
                         <span style={{ fontWeight: 600 }}>{s.mkInvoice.number}</span>
                         {s.mkInvoice.date && <span style={{ color: "var(--muted)", fontSize: 12 }}>{t("logistics.export.mkIssued", { date: dt(s.mkInvoice.date) })}</span>}
-                        <Link href={mkInvoiceHref(s.mkInvoice)} style={{ fontWeight: 600 }}>{t("logistics.export.mkOpen")} →</Link>
+                        {/* Cross-company: минава през canonical open-invoice route (owner-контекст, §13). */}
+                        <a href={`/dashboard/logistics/export/${s.id}/open-invoice`} style={{ fontWeight: 600 }}>{t("logistics.export.mkOpen")} →</a>
                       </span>
                     : <Link href={`/dashboard/documents/new?fromDelivery=${s.id}`} style={{ color: "var(--brick)", fontWeight: 600 }}>{t("logistics.received.stUninvoiced")} →</Link>}
                 </span>
