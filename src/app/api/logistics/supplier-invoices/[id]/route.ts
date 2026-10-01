@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logisticsApiGuard } from "@/lib/logistics/access";
 import { sumMoney } from "@/lib/logistics/money";
+import { invoiceRemaining, paymentStatus } from "@/lib/logistics/holcimPayable";
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const g = await logisticsApiGuard("view_logistics");
@@ -33,5 +34,16 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     vat: inv.headerVatTotal != null && Math.abs(inv.headerVatTotal - vat) > 0.01,
     total: inv.headerGrandTotal != null && Math.abs(inv.headerGrandTotal - total) > 0.01,
   };
-  return NextResponse.json({ ...inv, computed: { base, vat, total }, mismatch });
+  // Плащания (§H) + свързани експортни доставки (§G/§J).
+  const [payments, exportLinks] = await Promise.all([
+    prisma.payment.findMany({ where: { companyId: g.companyId, direction: "out", documentId: id }, select: { id: true, amount: true, date: true, reason: true, note: true, method: true }, orderBy: { date: "asc" } }),
+    prisma.supplierInvoiceExportLink.findMany({ where: { invoiceId: id }, select: { id: true, exportSet: { select: { id: true, invoiceNumber: true, destination: true, quantity: true, unit: true, purchaseAmount: true, purchaseCurrency: true } } } }),
+  ]);
+  const paid = sumMoney(payments.map((p) => p.amount));
+  return NextResponse.json({
+    ...inv, computed: { base, vat, total }, mismatch,
+    payments: payments.map((p) => ({ ...p, amount: Number(p.amount) })),
+    paid, remaining: invoiceRemaining(total, paid), paymentStatus: paymentStatus(total, paid),
+    exportLinks: exportLinks.map((l) => ({ linkId: l.id, ...l.exportSet, purchaseAmount: l.exportSet.purchaseAmount == null ? null : Number(l.exportSet.purchaseAmount) })),
+  });
 }

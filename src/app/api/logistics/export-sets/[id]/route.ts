@@ -8,6 +8,7 @@ import { PLACE_OF_SHIPMENT_DEFAULT } from "@/lib/logistics/deliveryTerms";
 import { canonicalDestinationKey } from "@/lib/logistics/destinations";
 import { missingEditFields, exportDeleteDecision } from "@/lib/logistics/exportSetEdit";
 import { resolveReceivedInvoice } from "@/lib/logistics/received";
+import { computePurchaseAmount } from "@/lib/logistics/holcimPayable";
 import { z } from "zod";
 
 const EDIT_FIELD_MSG: Record<string, string> = {
@@ -23,6 +24,8 @@ const detailSelect = {
   destination: true, routeId: true,
   truckVehicleId: true, truckRegSnapshot: true, trailerReg: true, logisticsProductId: true, productSnapshot: true,
   quantity: true, unit: true, declarationCmrDate: true, dispatchNumber: true, status: true, note: true, blankDispatchNote: true, createdAt: true, deletedAt: true,
+  purchaseUnitPrice: true, purchaseCurrency: true, purchaseAmount: true,
+  supplierInvoiceLinks: { select: { invoice: { select: { id: true, number: true, date: true } } } },
   documents: { select: { id: true, docType: true, status: true, overridden: true, updatedAt: true } },
 } as const;
 
@@ -53,7 +56,16 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const mkInvoice = resolved
     ? { ...resolved, date: (resolved.kind === "document" ? docInv?.issueDate : legacyMk?.date) ?? null }
     : null;
-  return NextResponse.json({ ...set, sellerName: seller?.name ?? null, buyerName: buyer?.name ?? null, clientName: client?.name ?? null, mkInvoice, viewerRole: role });
+  // Покупка от Holcim (§K): snapshot + свързана Holcim фактура (payable, не се смесва с MK).
+  const { supplierInvoiceLinks, purchaseUnitPrice, purchaseAmount, ...rest } = set;
+  const holcimInvoice = supplierInvoiceLinks[0]?.invoice ?? null;
+  const purchase = {
+    unitPrice: purchaseUnitPrice == null ? null : Number(purchaseUnitPrice),
+    currency: set.purchaseCurrency,
+    amount: purchaseAmount == null ? null : Number(purchaseAmount),
+    holcimInvoice,
+  };
+  return NextResponse.json({ ...rest, purchase, sellerName: seller?.name ?? null, buyerName: buyer?.name ?? null, clientName: client?.name ?? null, mkInvoice, viewerRole: role });
 }
 
 const optDate = z.string().datetime().nullable().optional().or(z.literal("").transform(() => null));
@@ -76,6 +88,9 @@ const patchSchema = z.object({
   clientId: z.string().nullable().optional(),
   blankDispatchNote: z.boolean().optional(),
   note: z.string().max(2000).nullable().optional(),
+  // Покупна стойност от Holcim (§C/§D) — per-delivery snapshot, не пипа master продукта.
+  purchaseUnitPrice: z.number().min(0).nullable().optional(),
+  purchaseCurrency: z.string().max(8).nullable().optional(),
 });
 
 // PATCH e умишлено PARTIAL (частична редакция): работи и за пълната форма „Редактирай",
@@ -88,7 +103,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   try {
     const { id } = await params;
     // company-scoped + не позволяваме редакция на изтрита доставка (§35).
-    const existing = await prisma.exportDocumentSet.findFirst({ where: { id, companyId: g.companyId, deletedAt: null }, select: { id: true, buyerCompanyId: true } });
+    const existing = await prisma.exportDocumentSet.findFirst({ where: { id, companyId: g.companyId, deletedAt: null }, select: { id: true, buyerCompanyId: true, quantity: true, purchaseUnitPrice: true, purchaseCurrency: true } });
     if (!existing) return NextResponse.json({ error: "Не е намерена." }, { status: 404 });
     const d = patchSchema.parse(await req.json());
 
@@ -158,6 +173,20 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (d.logisticsProductId !== undefined) {
       if (d.logisticsProductId) { const p = await prisma.logisticsProduct.findFirst({ where: { id: d.logisticsProductId, companyId: g.companyId }, select: { canonicalName: true, certificateNumber: true } }); if (!p) return NextResponse.json({ error: "Продуктът не е намерен." }, { status: 404 }); data.logisticsProductId = d.logisticsProductId; data.productSnapshot = p.canonicalName; data.certificateNumberSnapshot = p.certificateNumber ?? null; }
       else { data.logisticsProductId = null; data.productSnapshot = null; data.certificateNumberSnapshot = null; }
+    }
+
+    // Покупна стойност (§C): per-delivery snapshot. Recompute amount при промяна на
+    // количество ИЛИ цена. Не чете master продукта → стари доставки не се влияят.
+    if (d.purchaseUnitPrice !== undefined) {
+      data.purchaseUnitPrice = d.purchaseUnitPrice;
+      data.purchaseCurrency = d.purchaseUnitPrice != null ? (d.purchaseCurrency ?? existing.purchaseCurrency ?? "EUR") : null;
+    } else if (d.purchaseCurrency !== undefined) {
+      data.purchaseCurrency = d.purchaseCurrency;
+    }
+    if (d.quantity !== undefined || d.purchaseUnitPrice !== undefined) {
+      const qty = d.quantity !== undefined ? d.quantity : existing.quantity;
+      const price = d.purchaseUnitPrice !== undefined ? d.purchaseUnitPrice : (existing.purchaseUnitPrice != null ? Number(existing.purchaseUnitPrice) : null);
+      data.purchaseAmount = computePurchaseAmount(qty, price);
     }
 
     await prisma.exportDocumentSet.update({ where: { id }, data });

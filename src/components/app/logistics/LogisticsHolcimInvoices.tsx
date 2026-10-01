@@ -3,7 +3,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useT } from "@/components/i18n/I18nProvider";
 
-type Invoice = { id: string; number: string; date: string | null; currency: string; lines: number; unresolved: number; base: number; vat: number; total: number; mismatch: boolean };
+type Invoice = { id: string; number: string; date: string | null; currency: string; lines: number; unresolved: number; base: number; vat: number; total: number; mismatch: boolean; paid: number; remaining: number; paymentStatus: "unpaid" | "partially_paid" | "paid" };
+type CurrencyPayable = { currency: string; invoiced: number; paid: number; remaining: number; uninvoiced: number };
 type MatchData = {
   products: { materialCode: string; name: string; unit: string }[];
   vehicles: { registration: string; aliases: string[] }[];
@@ -19,6 +20,8 @@ const fileToDataUrl = (f: File) => new Promise<string>((res, rej) => { const r =
 export function LogisticsHolcimInvoices({ canManage }: { canManage: boolean }) {
   const t = useT();
   const [items, setItems] = useState<Invoice[]>([]);
+  const [payables, setPayables] = useState<CurrencyPayable[]>([]);
+  const [payFilter, setPayFilter] = useState("");
   const [md, setMd] = useState<MatchData>({ products: [], vehicles: [], dispatchNotes: [] });
   const [open, setOpen] = useState(false);
   const [err, setErr] = useState("");
@@ -29,9 +32,10 @@ export function LogisticsHolcimInvoices({ canManage }: { canManage: boolean }) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   async function load() {
-    const [ri, rm] = await Promise.all([fetch("/api/logistics/supplier-invoices"), fetch("/api/logistics/supplier-invoices/matchdata")]);
+    const [ri, rm, rp] = await Promise.all([fetch("/api/logistics/supplier-invoices"), fetch("/api/logistics/supplier-invoices/matchdata"), fetch("/api/logistics/holcim-payables")]);
     if (ri.ok) setItems(await ri.json());
     if (rm.ok) setMd(await rm.json());
+    if (rp.ok) { const j = await rp.json(); setPayables(j.byCurrency ?? []); }
   }
   useEffect(() => { load(); }, []);
 
@@ -126,6 +130,29 @@ export function LogisticsHolcimInvoices({ canManage }: { canManage: boolean }) {
       </div>
       {err && <div style={{ color: "var(--brick)", fontSize: 12.5, marginBottom: 10 }}>{err}</div>}
 
+      {/* Дашборд „Колко дължим на Holcim?" (§E) — по валута, без смесване. */}
+      {payables.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
+          {payables.map((p) => (
+            <div key={p.currency} style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "stretch" }}>
+              <PayCard label={`${t("logistics.payable.totalDue")} (${p.currency})`} value={`${p.invoiced.toFixed(2)} ${p.currency}`} />
+              <PayCard label={t("logistics.payable.paid")} value={`${p.paid.toFixed(2)} ${p.currency}`} />
+              <PayCard label={t("logistics.payable.remaining")} value={`${p.remaining.toFixed(2)} ${p.currency}`} warn={p.remaining > 0} />
+              <PayCard label={t("logistics.payable.uninvoiced")} value={`${p.uninvoiced.toFixed(2)} ${p.currency}`} muted />
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+        <select style={{ padding: "5px 8px", fontSize: 12.5 }} value={payFilter} onChange={(e) => setPayFilter(e.target.value)}>
+          <option value="">{t("logistics.payable.allStatuses")}</option>
+          <option value="unpaid">{t("logistics.payable.st_unpaid")}</option>
+          <option value="partially_paid">{t("logistics.payable.st_partially_paid")}</option>
+          <option value="paid">{t("logistics.payable.st_paid")}</option>
+        </select>
+      </div>
+
       <datalist id="dl-materials">{md.products.map((p) => <option key={p.materialCode} value={p.materialCode}>{p.name}</option>)}</datalist>
       <datalist id="dl-vehicles">{md.vehicles.map((v) => <option key={v.registration} value={v.registration} />)}</datalist>
       <datalist id="dl-dispatch">{md.dispatchNotes.map((d) => <option key={d.dispatchNoteNumber} value={d.dispatchNoteNumber}>{d.shipmentCode}{d.invoiced ? " ⚠" : ""}</option>)}</datalist>
@@ -204,15 +231,18 @@ export function LogisticsHolcimInvoices({ canManage }: { canManage: boolean }) {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead><tr>
               <th style={th}>{t("logistics.holcimInv.number")}</th><th style={th}>{t("logistics.holcimInv.date")}</th><th style={th}>{t("logistics.holcimInv.shipments")}</th>
-              <th style={th}>{t("logistics.holcimInv.base")}</th><th style={th}>{t("logistics.holcimInv.vat")}</th><th style={th}>{t("logistics.holcimInv.total")}</th>
+              <th style={th}>{t("logistics.holcimInv.total")}</th><th style={th}>{t("logistics.payable.paid")}</th><th style={th}>{t("logistics.payable.remaining")}</th><th style={th}>{t("logistics.payable.status")}</th>
             </tr></thead>
             <tbody>
-              {items.map((inv) => (
+              {items.filter((inv) => !payFilter || inv.paymentStatus === payFilter).map((inv) => (
                 <tr key={inv.id}>
                   <td style={td}><Link href={`/dashboard/logistics/holcim-invoices/${inv.id}`} style={{ fontWeight: 600 }}>{inv.number}</Link>{inv.mismatch && <span title={t("logistics.holcimInv.headerMismatch")} style={{ color: "var(--brass)", marginLeft: 6 }}>⚠</span>}</td>
                   <td style={td}>{dt(inv.date)}</td>
                   <td style={td} className="num">{inv.lines}{inv.unresolved > 0 && <span style={{ color: "var(--brass)", fontSize: 11 }}> ({inv.unresolved} {t("logistics.holcimInv.unresolved")})</span>}</td>
-                  <td style={td} className="num">{inv.base} {inv.currency}</td><td style={td} className="num">{inv.vat}</td><td style={td} className="num">{inv.total} {inv.currency}</td>
+                  <td style={td} className="num">{inv.total} {inv.currency}</td>
+                  <td style={td} className="num">{inv.paid.toFixed(2)}</td>
+                  <td style={td} className="num">{inv.remaining.toFixed(2)} {inv.currency}</td>
+                  <td style={td}>{payBadge(inv.paymentStatus, t)}</td>
                 </tr>
               ))}
             </tbody>
@@ -221,4 +251,21 @@ export function LogisticsHolcimInvoices({ canManage }: { canManage: boolean }) {
       </div>
     </div>
   );
+}
+
+function PayCard({ label, value, warn, muted }: { label: string; value: string; warn?: boolean; muted?: boolean }) {
+  return <div className="glass panel" style={{ padding: "8px 13px", minWidth: 150, flex: "1 1 150px" }}>
+    <div style={{ fontSize: 16, fontWeight: 600, fontFamily: "'Fraunces', serif", color: warn ? "var(--brass)" : muted ? "var(--muted)" : "inherit" }}>{value}</div>
+    <div style={{ fontSize: 10.5, color: "var(--muted)" }}>{label}</div>
+  </div>;
+}
+
+export function payBadge(status: "unpaid" | "partially_paid" | "paid", t: (k: string) => string) {
+  const style: Record<string, { bg: string; fg: string }> = {
+    unpaid: { bg: "var(--brass-soft,rgba(192,138,45,.14))", fg: "var(--brass,#9A6B18)" },
+    partially_paid: { bg: "rgba(58,110,165,.14)", fg: "#2F5C8F" },
+    paid: { bg: "rgba(15,138,106,.14)", fg: "var(--emerald-dark,#0F8A6A)" },
+  };
+  const s = style[status];
+  return <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 10, background: s.bg, color: s.fg, whiteSpace: "nowrap" }}>{t(`logistics.payable.st_${status}`)}</span>;
 }

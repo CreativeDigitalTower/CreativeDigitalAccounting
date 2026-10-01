@@ -15,10 +15,15 @@ type SetDto = {
   quantity: number | null; unit: string; declarationCmrDate: string | null; dispatchNumber: string | null;
   status: string; sellerName: string | null; buyerName: string | null; clientName: string | null; documents: Doc[];
   mkInvoice?: MkInvoiceRef | null;
+  purchase?: { unitPrice: number | null; currency: string | null; amount: number | null; holcimInvoice: { id: string; number: string } | null } | null;
   viewerRole?: string;
 };
 type MkInvoiceRef = { id: string; number: string; kind?: "document" | "mk"; date?: string | null };
 const DOC_LABEL: Record<string, string> = { invoice: "docInvoice", dispatch: "docDispatch", declaration: "docDeclaration", cmr_epson: "docCmrEpson", cmr_hp: "docCmrHp" };
+
+function Row({ l, v }: { l: string; v: React.ReactNode }) {
+  return <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}><span style={{ color: "var(--muted)" }}>{l}</span><span style={{ textAlign: "right" }}>{v}</span></div>;
+}
 // Цветове на derived статус badge-а (общи с списъка) — без emoji, от design system.
 const STATUS_STYLE: Record<string, { bg: string; fg: string }> = {
   no_docs: { bg: "rgba(0,0,0,.06)", fg: "var(--muted)" },
@@ -148,6 +153,24 @@ export function ExportSetDetail({ id, canManage }: { id: string; canManage: bool
                 </span>
               </div>
             </>
+          )}
+          {/* Покупка от Holcim (payable, §K) — вътрешна информация. */}
+          {s.purchase && (
+            <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(217,215,200,.6)" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--muted)", marginBottom: 6 }}>{t("logistics.payable.purchaseBlock")}</div>
+              {s.purchase.amount == null ? (
+                <div style={{ fontSize: 12.5, color: "var(--brick)" }}>{t("logistics.payable.noPurchasePrice")}</div>
+              ) : (
+                <div style={{ display: "grid", gap: 4, fontSize: 12.5 }}>
+                  <Row l={t("logistics.payable.purchasePrice")} v={`${s.purchase.unitPrice?.toFixed(2)} ${s.purchase.currency}/${s.unit}`} />
+                  <Row l={t("logistics.export.quantity")} v={s.quantity != null ? qtyUnit(s.quantity, s.unit) : "—"} />
+                  <Row l={t("logistics.payable.purchaseAmount")} v={`${s.purchase.amount.toFixed(2)} ${s.purchase.currency}`} />
+                  <Row l={t("logistics.payable.holcimInvoice")} v={s.purchase.holcimInvoice
+                    ? <Link href={`/dashboard/logistics/holcim-invoices/${s.purchase.holcimInvoice.id}`} style={{ fontWeight: 600 }}>{s.purchase.holcimInvoice.number}</Link>
+                    : <span style={{ color: "var(--brass)" }}>{t("logistics.payable.awaitingInvoice")}</span>} />
+                </div>
+              )}
+            </div>
           )}
         </div>
 

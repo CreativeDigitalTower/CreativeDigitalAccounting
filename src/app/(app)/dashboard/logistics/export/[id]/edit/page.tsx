@@ -17,13 +17,14 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       id: true, invoiceNumber: true, invoiceDate: true, shipmentDate: true, deliveryTerm: true, placeOfShipment: true,
       destination: true, truckVehicleId: true, trailerReg: true, logisticsProductId: true, quantity: true,
       declarationCmrDate: true, dispatchNumber: true, buyerCompanyId: true, clientId: true, blankDispatchNote: true,
+      purchaseUnitPrice: true, purchaseCurrency: true,
     },
   });
   if (!set) notFound();
 
   const [vehicles, products, routes, buyers, destResult, mkInvoice] = await Promise.all([
     prisma.vehicle.findMany({ where: { companyId, active: true, normalizedRegistration: { not: null } }, select: { id: true, registration: true, logisticsProfile: { select: { trailerReg: true, defaultDriver: true, carrier: { select: { name: true } } } } }, orderBy: { registration: "asc" } }),
-    prisma.logisticsProduct.findMany({ where: { companyId, active: true }, select: { id: true, canonicalName: true, category: true }, orderBy: { canonicalName: "asc" } }),
+    prisma.logisticsProduct.findMany({ where: { companyId, active: true }, select: { id: true, canonicalName: true, category: true, purchasePrice: true, purchaseCurrency: true }, orderBy: { canonicalName: "asc" } }),
     prisma.logisticsRoute.findMany({ where: { companyId, active: true }, select: { id: true, toPlace: true, note: true }, orderBy: { toPlace: "asc" } }),
     groupCounterparties(companyId),
     resolveActiveDestinationNames(prisma, companyId),
@@ -50,7 +51,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   // избраната стойност (snapshot остава видим), без да го активираме в каталога.
   let productOptions = products;
   if (set.logisticsProductId && !products.some((p) => p.id === set.logisticsProductId)) {
-    const archived = await prisma.logisticsProduct.findFirst({ where: { id: set.logisticsProductId, companyId }, select: { id: true, canonicalName: true, category: true } });
+    const archived = await prisma.logisticsProduct.findFirst({ where: { id: set.logisticsProductId, companyId }, select: { id: true, canonicalName: true, category: true, purchasePrice: true, purchaseCurrency: true } });
     if (archived) productOptions = [...products, archived];
   }
 
@@ -65,7 +66,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   return (
     <ExportSetForm
       vehicles={vehicleOptions.map((v) => ({ id: v.id, registration: v.registration, trailerReg: v.logisticsProfile?.trailerReg ?? null, carrier: v.logisticsProfile?.carrier?.name ?? null, driver: v.logisticsProfile?.defaultDriver ?? null }))}
-      products={productOptions}
+      products={productOptions.map((p) => ({ id: p.id, canonicalName: p.canonicalName, category: p.category, purchasePrice: p.purchasePrice == null ? null : Number(p.purchasePrice), purchaseCurrency: p.purchaseCurrency }))}
       routes={routes.map((r) => ({ id: r.id, label: `${r.note ? r.note + " " : ""}${r.toPlace}` }))}
       buyers={buyers}
       clients={clientList}
@@ -77,6 +78,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         truckVehicleId: set.truckVehicleId, trailerReg: set.trailerReg, logisticsProductId: set.logisticsProductId,
         quantity: set.quantity, declarationCmrDate: set.declarationCmrDate?.toISOString() ?? null,
         dispatchNumber: set.dispatchNumber, buyerCompanyId: set.buyerCompanyId, clientId: set.clientId, blankDispatchNote: set.blankDispatchNote,
+        purchaseUnitPrice: set.purchaseUnitPrice == null ? null : Number(set.purchaseUnitPrice), purchaseCurrency: set.purchaseCurrency,
       }}
       initialClientName={currentClient?.name ?? null}
       mkInvoice={mkInvoice}

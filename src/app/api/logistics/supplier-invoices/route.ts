@@ -6,6 +6,7 @@ import { audit } from "@/lib/documents";
 import { validateUpload, MAX_UPLOAD_BYTES } from "@/lib/fileSecurity";
 import { lineFinancials, sumMoney } from "@/lib/logistics/money";
 import { matchStatusFor } from "@/lib/logistics/invoiceMatch";
+import { invoiceRemaining, paymentStatus } from "@/lib/logistics/holcimPayable";
 import { z } from "zod";
 
 export async function GET() {
@@ -20,13 +21,22 @@ export async function GET() {
     },
     orderBy: { createdAt: "desc" },
   });
+  // Платежи по фактура (payable, §H): reuse generic Payment (direction out, documentId=invoice.id).
+  const ids = rows.map((r) => r.id);
+  const payments = ids.length
+    ? await prisma.payment.findMany({ where: { companyId: g.companyId, direction: "out", documentId: { in: ids } }, select: { documentId: true, amount: true } })
+    : [];
+  const paidByInvoice = new Map<string, number>();
+  for (const p of payments) if (p.documentId) paidByInvoice.set(p.documentId, sumMoney([paidByInvoice.get(p.documentId) ?? 0, p.amount]));
+
   const out = rows.map((inv) => {
     const base = sumMoney(inv.links.map((l) => l.lineTotal));
     const vat = sumMoney(inv.links.map((l) => l.vatAmount));
     const total = sumMoney(inv.links.map((l) => l.grossAmount));
     const mismatch = inv.headerGrandTotal != null && Math.abs(inv.headerGrandTotal - total) > 0.01;
     const unresolved = inv.links.filter((l) => l.matchStatus && l.matchStatus !== "matched").length;
-    return { id: inv.id, number: inv.number, date: inv.date, supplierId: inv.supplierId, currency: inv.currency, lines: inv.links.length, unresolved, base, vat, total, mismatch };
+    const paid = paidByInvoice.get(inv.id) ?? 0;
+    return { id: inv.id, number: inv.number, date: inv.date, supplierId: inv.supplierId, currency: inv.currency, lines: inv.links.length, unresolved, base, vat, total, mismatch, paid, remaining: invoiceRemaining(total, paid), paymentStatus: paymentStatus(total, paid) };
   });
   return NextResponse.json(out);
 }

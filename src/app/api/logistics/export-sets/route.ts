@@ -7,6 +7,7 @@ import { nextSequenceValue } from "@/lib/logistics/sequence";
 import { SEQ_SCOPE, formatSequenceNumber, EXPORT_INVOICE_FORMAT, suggestDispatchFromInvoice } from "@/lib/logistics/config";
 import { truckTrailerLabel } from "@/lib/logistics/exportDocs";
 import { derivedStatusFilter } from "@/lib/logistics/exportStatus";
+import { computePurchaseAmount } from "@/lib/logistics/holcimPayable";
 import { PLACE_OF_SHIPMENT_DEFAULT } from "@/lib/logistics/deliveryTerms";
 import { canonicalDestinationKey } from "@/lib/logistics/destinations";
 import { validationError, zodFieldErrors, VMSG, type FieldErrors } from "@/lib/logistics/validation";
@@ -124,6 +125,9 @@ const schema = z.object({
   dispatchNumber: z.string().max(60).nullable().optional(),
   blankDispatchNote: z.boolean().optional(),
   note: z.string().max(2000).nullable().optional(),
+  // Покупна стойност от Holcim (§C/§D) — per-delivery override. Празно → от продукта.
+  purchaseUnitPrice: z.number().min(0).nullable().optional(),
+  purchaseCurrency: z.string().max(8).nullable().optional(),
 });
 
 export async function POST(req: Request) {
@@ -155,7 +159,7 @@ export async function POST(req: Request) {
     // Snapshots + валидиране на собственост.
     const [vehicle, product, shipment, buyer, client] = await Promise.all([
       d.truckVehicleId ? prisma.vehicle.findFirst({ where: { id: d.truckVehicleId, companyId: g.companyId }, select: { registration: true, logisticsProfile: { select: { trailerReg: true } } } }) : Promise.resolve(null),
-      d.logisticsProductId ? prisma.logisticsProduct.findFirst({ where: { id: d.logisticsProductId, companyId: g.companyId }, select: { canonicalName: true, unit: true, certificateNumber: true } }) : Promise.resolve(null),
+      d.logisticsProductId ? prisma.logisticsProduct.findFirst({ where: { id: d.logisticsProductId, companyId: g.companyId }, select: { canonicalName: true, unit: true, certificateNumber: true, purchasePrice: true, purchaseCurrency: true } }) : Promise.resolve(null),
       d.shipmentId ? prisma.shipment.findFirst({ where: { id: d.shipmentId, companyId: g.companyId }, select: { id: true } }) : Promise.resolve(null),
       d.buyerCompanyId ? prisma.company.findUnique({ where: { id: d.buyerCompanyId }, select: { id: true } }) : Promise.resolve(null),
       // Краен клиент: зареждаме по id (+ companyId за валидация), защото може да е клиент
@@ -182,6 +186,14 @@ export async function POST(req: Request) {
     const year = (d.invoiceDate ? new Date(d.invoiceDate) : new Date()).getFullYear();
     const trailer = d.trailerReg ?? vehicle?.logisticsProfile?.trailerReg ?? null;
     const unit = d.unit || product?.unit || "t";
+    // Покупна стойност от Holcim — SNAPSHOT (§C/§D). Override от payload ИЛИ от продукта.
+    // Няма измисляне на 0: ако няма цена, snapshot-ът остава null (UI показва „Няма цена").
+    const purchaseUnitPrice = d.purchaseUnitPrice != null ? d.purchaseUnitPrice
+      : (product?.purchasePrice != null ? Number(product.purchasePrice) : null);
+    const purchaseCurrency = purchaseUnitPrice != null
+      ? (d.purchaseCurrency || product?.purchaseCurrency || "EUR")
+      : null;
+    const purchaseAmount = computePurchaseAmount(d.quantity ?? null, purchaseUnitPrice);
     // §12: свързваме към master дестинация по нормализирано име (snapshot низът се пази отделно).
     const destKey = canonicalDestinationKey(d.destination);
     const destMatch = destKey
@@ -213,6 +225,7 @@ export async function POST(req: Request) {
           certificateNumberSnapshot: product?.certificateNumber ?? null, // §17 — фиксира сертификата към момента
           blankDispatchNote: d.blankDispatchNote ?? false, // празна Испратница (§1/§10)
           quantity: d.quantity ?? null, unit, declarationCmrDate: d.declarationCmrDate ? new Date(d.declarationCmrDate) : null,
+          purchaseUnitPrice, purchaseCurrency, purchaseAmount,
           dispatchNumber, note: d.note ?? null, createdById: g.userId,
         },
         select: { id: true, invoiceNumber: true, dispatchNumber: true },
