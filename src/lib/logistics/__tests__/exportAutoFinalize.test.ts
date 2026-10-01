@@ -52,51 +52,74 @@ describe("PART A — auto-finalize при генериране (§1–§8)", () 
   });
 });
 
-describe("PART B — cross-company open-invoice route (§11–§19/§22)", () => {
-  const route = read("src/app/(app)/dashboard/logistics/export/[id]/open-invoice/route.ts");
+describe("PART A3 — reconciliation script (§8/§I) — dry-run safe", () => {
+  const script = read("scripts/reconcile-export-document-statuses.mjs");
+  it("7/8) dry-run по подразбиране; пише САМО при --apply", () => {
+    expect(script).toContain('const APPLY = process.argv.includes("--apply")');
+    expect(script).toContain("if (APPLY)");
+  });
+  it("9) idempotent: updateMany само за все още draft, само статус (не data/snapshot)", () => {
+    expect(script).toContain("status: \"draft\" }, // idempotent");
+    expect(script).toContain('data: { status: "finalized", finalizedAt: now }');
+    expect(script).not.toContain("buildDocumentData(");
+    expect(script).not.toContain("exportDocument.create(");
+    expect(script).not.toContain("exportDocument.upsert(");
+  });
+  it("критерий: празен/невалиден draft се SKIP-ва (не се финализира сляпо)", () => {
+    expect(script).toContain("isNonEmpty(d.data)");
+  });
+  it("company-scoped + не докосва изтрити доставки", () => {
+    expect(script).toContain("--company");
+    expect(script).toContain("deletedAt: null");
+  });
+});
+
+describe("PART B/C/D — read-only cross-company MK invoice (§11–§19)", () => {
+  const view = read("src/app/(app)/dashboard/logistics/mk-invoice/[id]/page.tsx");
+  const listApi = read("src/app/api/logistics/mk-invoices/route.ts");
   const detail = read("src/components/app/logistics/ExportSetDetail.tsx");
   const dossier = read("src/components/app/logistics/ExportDossierExtras.tsx");
+  const salesPage = read("src/app/(app)/dashboard/logistics/mk-sales/page.tsx");
 
-  it("1/8/18) резолвва Document (приоритет) и легаси MkInvoice през resolveReceivedInvoice", () => {
-    expect(route).toContain("prisma.document.findFirst");
-    expect(route).toContain("prisma.mkInvoice.findFirst");
-    expect(route).toContain("resolveReceivedInvoice(docInv, legacyMk)");
+  it("11/12) read-only view: БЕЗ смяна на фирма — няма cookie/impersonation", () => {
+    expect(view).not.toContain("IMPERSONATE_COOKIE");
+    expect(view).not.toContain("ACTIVE_COMPANY_COOKIE");
+    expect(view).not.toContain("cookies");
+    // Старият impersonation route е премахнат.
+    expect(fs.existsSync("src/app/(app)/dashboard/logistics/export/[id]/open-invoice/route.ts")).toBe(false);
   });
 
-  it("2/8) redirect target според вида: mk → /mk-sales, document → /documents", () => {
-    expect(route).toContain("/dashboard/logistics/mk-sales/${resolved.id}");
-    expect(route).toContain("/dashboard/documents/${resolved.id}");
+  it("14/D) IDOR: достъпът е САМО през explicit relation (sourceExportSet.companyId = active)", () => {
+    expect(view).toContain("sourceExportSet: { is: { companyId, deletedAt: null } }");
+    expect(view).toContain("notFound()");
+    // Не махаме companyId scope от стандартните documents (проверката е тук, не там).
+    expect(view).not.toContain("prisma.document.findUnique({ where: { id }");
   });
 
-  it("3/4) Super Admin → IMPERSONATE cookie към owner (същия механизъм като admin/impersonate)", () => {
-    expect(route).toContain("isSuperAdmin(userId)");
-    expect(route).toContain("res.cookies.set(IMPERSONATE_COOKIE, owner");
+  it("13) read-only: без edit/delete/payment/ownership мутации", () => {
+    expect(view).not.toContain("prisma.document.update");
+    expect(view).not.toContain("prisma.document.delete");
+    expect(view).not.toContain(".update(");
+    expect(view).not.toContain(".delete(");
   });
 
-  it("5) член на owner фирмата → ACTIVE_COMPANY cookie (след проверка за членство)", () => {
-    expect(route).toContain("prisma.companyUser.findUnique");
-    expect(route).toContain("res.cookies.set(ACTIVE_COMPANY_COOKIE, owner");
+  it("17/16) list API: Document приоритет + легаси MkInvoice fallback, relation-scoped", () => {
+    expect(listApi).toContain("sourceExportSet: setLink");
+    expect(listApi).toContain("companyId: g.companyId");
+    expect(listApi).toContain("resolveReceivedInvoice(null,");
   });
 
-  it("6/7) unauthorized → authorized error (back denied), БЕЗ tenant bypass / без leak", () => {
-    expect(route).toContain('if (!admin && !member) return back("denied")');
-    // Достъпът до доставката минава през exportSetReadRole (group visibility), не global findUnique без scope.
-    expect(route).toContain("exportSetReadRole(companyId, set)");
-    // Owner-scoped заявки (companyId: owner), не глобални.
-    expect(route).toContain("companyId: owner");
+  it("20) list API: суми ПО ВАЛУТА, без смесване на валути", () => {
+    expect(listApi).toContain("byCurrency[r.currency]");
   });
 
-  it("12) не сменя ownership / не създава дубликат — само чете и redirect-ва", () => {
-    expect(route).not.toContain("prisma.document.update");
-    expect(route).not.toContain("prisma.document.create");
-    expect(route).not.toContain("prisma.mkInvoice.update");
-    expect(route).not.toContain("prisma.mkInvoice.create");
+  it("9/10/18) и двата линка водят към единния read-only route /mk-invoice/[id]", () => {
+    expect(detail).toContain("/dashboard/logistics/mk-invoice/${s.mkInvoice.id}");
+    expect(dossier).toContain("/dashboard/logistics/mk-invoice/${mkInvoice.id}");
   });
 
-  it("9/10) и двата линка (Отвори фактура + Свързани записи) сочат към canonical route", () => {
-    expect(detail).toContain("/dashboard/logistics/export/${s.id}/open-invoice");
-    expect(dossier).toContain("/dashboard/logistics/export/${id}/open-invoice");
-    // Вече НЕ линкват директно към company-scoped document детайла.
-    expect(detail).not.toContain("mkInvoiceHref");
+  it("C) МК продажби: продавачът вижда read-only списъка, MK фирмата — легаси create", () => {
+    expect(salesPage).toContain("companyCanCreateExports");
+    expect(salesPage).toContain("MkLinkedInvoices");
   });
 });

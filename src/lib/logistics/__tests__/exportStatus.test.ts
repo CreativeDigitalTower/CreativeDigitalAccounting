@@ -106,8 +106,8 @@ describe("§B MK фактура: detail резолвва И Document, И лег�
     expect(api).toContain("sourceExportSetId: set.id");
     expect(api).toContain("resolveReceivedInvoice(");
   });
-  it("detail отваря фактурата през canonical cross-company route (owner-контекст)", () => {
-    expect(detail).toContain("/dashboard/logistics/export/${s.id}/open-invoice");
+  it("detail отваря фактурата през read-only cross-company изглед (без смяна на фирма)", () => {
+    expect(detail).toContain("/dashboard/logistics/mk-invoice/${s.mkInvoice.id}");
   });
   it("без фактура → линк към create flow с fromDelivery (не dead UI)", () => {
     expect(detail).toContain("/dashboard/documents/new?fromDelivery=${s.id}");

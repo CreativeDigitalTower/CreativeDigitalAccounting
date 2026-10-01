@@ -449,6 +449,32 @@
     "directionIssued": "Emisă",
     "directionReceived": "Primită"
   },
+  "mkview": {
+    "readOnly": "Doar vizualizare",
+    "issuedBy": "Factură emisă de {issuer}",
+    "number": "Număr",
+    "date": "Data",
+    "issuer": "Emitent",
+    "client": "Client",
+    "delivery": "Livrare export",
+    "payStatus": "Stare plată",
+    "search": "Căutare (număr, client, livrare)…",
+    "empty": "Nu există facturi MK asociate.",
+    "allStatuses": "Toate stările",
+    "kpiTotal": "Total facturi",
+    "kpiUnpaid": "Neplătite",
+    "kpiTotalCur": "Total ({cur})",
+    "pay": {
+      "draft": "Ciornă",
+      "issued": "Emisă",
+      "sent": "Trimisă",
+      "partially_paid": "Parțial plătită",
+      "paid": "Plătită",
+      "overdue": "Restantă",
+      "cancelled": "Anulată",
+      "unpaid": "Neplătită"
+    }
+  },
   "mksale": {
     "title": "Vânzări MK",
     "add": "+ Vânzare MK nouă",
@@ -629,8 +655,6 @@
     "docStatusHelp": "Statusul se actualizează automat în funcție de starea documentelor necesare.",
     "mkIssued": "Emisă: {date}",
     "mkOpen": "Deschide factura",
-    "mkAccessDenied": "Nu aveți acces la firma care a emis această factură.",
-    "mkNotFound": "Nu există o factură asociată pentru această livrare.",
     "dstatus": {
       "no_docs": "Fără documente",
       "draft": "Ciornă",

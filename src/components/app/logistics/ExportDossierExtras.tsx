@@ -13,8 +13,8 @@ const KB = (n: number) => n < 1024 * 1024 ? `${Math.round(n / 1024)} KB` : `${(n
 export function ExportDossierExtras({ id, canManage, truckVehicleId, mkInvoice, receivedBy }: {
   id: string; canManage: boolean; truckVehicleId?: string | null; mkInvoice?: { id: string; number: string; kind?: "document" | "mk" } | null; receivedBy?: string | null;
 }) {
-  // Cross-company: и двата MK линка минават през canonical open-invoice route (owner-контекст, §13/§19).
-  const mkHref = `/dashboard/logistics/export/${id}/open-invoice`;
+  // Read-only cross-company изглед — БЕЗ смяна на активна фирма (§C2/§C3/§19).
+  const mkHref = mkInvoice ? `/dashboard/logistics/mk-invoice/${mkInvoice.id}` : "#";
   const t = useT();
   const [atts, setAtts] = useState<Att[]>([]);
   const [events, setEvents] = useState<Ev[]>([]);
@@ -79,7 +79,7 @@ export function ExportDossierExtras({ id, canManage, truckVehicleId, mkInvoice, 
         <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 8px" }}>{t("logistics.dossier.related")}</h3>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 16, fontSize: 12.5 }}>
           {truckVehicleId && <div><span style={{ color: "var(--muted)" }}>{t("logistics.dossier.vehicle")}: </span><Link href={`/dashboard/logistics/vehicles/${truckVehicleId}`} style={{ fontWeight: 600 }}>{t("logistics.dossier.openVehicle")} →</Link></div>}
-          <div><span style={{ color: "var(--muted)" }}>{t("logistics.received.mkInvoice")}: </span>{mkInvoice ? <a href={mkHref} style={{ fontWeight: 600 }}>{mkInvoice.number} →</a> : "—"}</div>
+          <div><span style={{ color: "var(--muted)" }}>{t("logistics.received.mkInvoice")}: </span>{mkInvoice ? <Link href={mkHref} style={{ fontWeight: 600 }}>{mkInvoice.number} →</Link> : "—"}</div>
           <div><span style={{ color: "var(--muted)" }}>SEM: </span>{receivedBy ?? t("logistics.dossier.notReceived")}</div>
         </div>
       </div>
