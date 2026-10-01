@@ -35,7 +35,9 @@ export async function GET(req: Request) {
   const product = (sp.get("product") ?? "").trim();
   const clientId = sp.get("clientId") ?? "";
   const hasAttachments = sp.get("hasAttachments"); // "1" | "0" | null
-  const sort = sp.get("sort") ?? "date";
+  // Default sort = фактура DESC (най-новият номер отгоре). invoiceNumber е zero-padded
+  // с фиксирана ширина → лексикографското DESC съвпада с числовото (без „1,10,100" проблем).
+  const sort = sp.get("sort") ?? "invoice";
   const page = Math.max(1, Number(sp.get("page")) || 1);
   const pageSize = Math.min(100, Math.max(5, Number(sp.get("pageSize")) || 25));
 
