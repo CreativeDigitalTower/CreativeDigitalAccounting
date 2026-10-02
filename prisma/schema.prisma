@@ -1158,10 +1158,30 @@ model SupplierInvoice {
 
   company Company                       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   links   SupplierInvoiceShipmentLink[]
+  exportLinks SupplierInvoiceExportLink[] // връзки към експортни доставки (payable, §G)
 
   // Един и същ номер фактура от същия доставчик не се въвежда два пъти.
   @@unique([companyId, supplierId, number])
   @@index([companyId])
+}
+
+// Връзка Holcim фактура ↔ експортна доставка (M:N, §G). Явна, одитируема; не зависи от
+// Shipment. Една фактура може да покрива N доставки и обратно. Служи за предотвратяване на
+// double counting (§F): доставка с поне една връзка се брои като ФАКТУРИРАНА (реалното
+// задължение идва от фактурата), а без връзка — като ОЧАКВАНА (estimated purchase amount).
+model SupplierInvoiceExportLink {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  exportSetId String
+  createdAt   DateTime @default(now())
+  createdById String?
+
+  invoice   SupplierInvoice   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  exportSet ExportDocumentSet @relation(fields: [exportSetId], references: [id], onDelete: Cascade)
+
+  @@unique([invoiceId, exportSetId])
+  @@index([exportSetId])
+  @@index([invoiceId])
 }
 
 // Ред от Holcim фактура ↔ курс. shipmentId е UNIQUE → една експедиционна бележка/курс
@@ -1441,6 +1461,14 @@ model ExportDocumentSet {
   declarationCmrDate DateTime?
   dispatchNumber     String?
   status             String    @default("draft") // draft | ready | finalized | cancelled
+  // Покупна стойност от Holcim (payable). SNAPSHOT към момента на създаване/редакция —
+  // НЕ се чете динамично от LogisticsProduct, за да не променя стари доставки при смяна на
+  // master цената (§C). Additive/nullable: стари записи остават null до reconciliation (§N).
+  // purchaseAmount = quantity × purchaseUnitPrice (decimal, §B). Вътрешна информация — не
+  // влиза в клиентски документи. Може да се редактира ЗА КОНКРЕТНАТА доставка без да пипа master.
+  purchaseUnitPrice  Decimal?  @db.Decimal(12, 4)
+  purchaseCurrency   String?
+  purchaseAmount     Decimal?  @db.Decimal(14, 4)
   // „Празна Испратница" (§1/§10): само за документа Испратница — initial snapshot за „До:" и
   // реда „Денес…" е празен (без клиент/адрес). НЕ влияе на clientId relation, на другите
   // документи или на Client/Product master. Additive/nullable-safe с default false (§12).
@@ -1460,6 +1488,7 @@ model ExportDocumentSet {
   shipment    Shipment?         @relation(fields: [shipmentId], references: [id], onDelete: SetNull)
   destinationRef LogisticsDestination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
   documents   ExportDocument[]
+  supplierInvoiceLinks SupplierInvoiceExportLink[] // връзки към Holcim фактури (payable, §G)
   mkInvoices  MkInvoice[]       // легаси MK фактури (operational ledger) за тази доставка (§18)
   invoices    Document[]        @relation("ExportSetInvoices") // стандартни фактури (§17/§41)
   attachments ExportAttachment[] // допълнителни (качени) документи в досието (§7/§14)

@@ -11,7 +11,7 @@ export default async function Page() {
 
   const [vehicles, products, routes, buyers] = await Promise.all([
     prisma.vehicle.findMany({ where: { companyId, active: true, normalizedRegistration: { not: null } }, select: { id: true, registration: true, logisticsProfile: { select: { trailerReg: true, defaultDriver: true, carrier: { select: { name: true } } } } }, orderBy: { registration: "asc" } }),
-    prisma.logisticsProduct.findMany({ where: { companyId, active: true }, select: { id: true, canonicalName: true, category: true }, orderBy: { canonicalName: "asc" } }),
+    prisma.logisticsProduct.findMany({ where: { companyId, active: true }, select: { id: true, canonicalName: true, category: true, purchasePrice: true, purchaseCurrency: true }, orderBy: { canonicalName: "asc" } }),
     prisma.logisticsRoute.findMany({ where: { companyId, active: true }, select: { id: true, fromPlace: true, toPlace: true, note: true }, orderBy: { toPlace: "asc" } }),
     groupCounterparties(companyId),
   ]);
@@ -30,7 +30,7 @@ export default async function Page() {
   return (
     <ExportSetForm
       vehicles={vehicles.map((v) => ({ id: v.id, registration: v.registration, trailerReg: v.logisticsProfile?.trailerReg ?? null, carrier: v.logisticsProfile?.carrier?.name ?? null, driver: v.logisticsProfile?.defaultDriver ?? null }))}
-      products={products}
+      products={products.map((p) => ({ id: p.id, canonicalName: p.canonicalName, category: p.category, purchasePrice: p.purchasePrice == null ? null : Number(p.purchasePrice), purchaseCurrency: p.purchaseCurrency }))}
       routes={routes.map((r) => ({ id: r.id, label: `${r.note ? r.note + " " : ""}${r.toPlace}` }))}
       buyers={buyers}
       clients={clients}

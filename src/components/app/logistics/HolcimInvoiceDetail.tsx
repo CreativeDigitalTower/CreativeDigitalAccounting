@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useT, useI18n } from "@/components/i18n/I18nProvider";
+import { payBadge } from "@/components/app/logistics/LogisticsHolcimInvoices";
 
 type Line = {
   id: string; lineNumber: number | null; dispatchNoteSnapshot: string | null; truckSnapshot: string | null;
@@ -10,18 +11,55 @@ type Line = {
   vatRate: number | null; lineTotal: number; vatAmount: number | null; grossAmount: number | null;
   shipment: { id: string; code: string } | null;
 };
+type PaymentRow = { id: string; amount: number; date: string | null; reason: string | null; note: string | null; method: string | null };
+type ExportLink = { linkId: string; id: string; invoiceNumber: string; destination: string | null; quantity: number | null; unit: string; purchaseAmount: number | null; purchaseCurrency: string | null };
 type Invoice = {
   id: string; number: string; date: string | null; taxEventDate: string | null; currency: string;
   supplierSnapshot: string | null; recipientSnapshot: string | null; paymentMethod: string | null; note: string | null;
   headerTaxBase: number | null; headerVatTotal: number | null; headerGrandTotal: number | null; originalFilename: string | null;
   links: Line[]; computed: { base: number; vat: number; total: number }; mismatch: { base: boolean; vat: boolean; total: boolean };
+  payments: PaymentRow[]; paid: number; remaining: number; paymentStatus: "unpaid" | "partially_paid" | "paid"; exportLinks: ExportLink[];
 };
+type DeliveryOpt = { id: string; invoiceNumber: string };
 
-export function HolcimInvoiceDetail({ id }: { id: string }) {
+export function HolcimInvoiceDetail({ id, canManage = false }: { id: string; canManage?: boolean }) {
   const t = useT();
   const { qty, qtyUnit } = useI18n();
   const [inv, setInv] = useState<Invoice | null>(null);
-  useEffect(() => { fetch(`/api/logistics/supplier-invoices/${id}`).then((r) => r.ok ? r.json() : null).then(setInv); }, [id]);
+  const [deliveries, setDeliveries] = useState<DeliveryOpt[]>([]);
+  const [pay, setPay] = useState({ amount: "", date: "", note: "" });
+  const [linkSel, setLinkSel] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+
+  const load = () => fetch(`/api/logistics/supplier-invoices/${id}`).then((r) => r.ok ? r.json() : null).then(setInv);
+  useEffect(() => { load(); }, [id]);
+  useEffect(() => { if (canManage) fetch("/api/logistics/export-sets?pageSize=100").then((r) => r.ok ? r.json() : null).then((j) => { if (j?.rows) setDeliveries(j.rows.map((x: { id: string; invoiceNumber: string }) => ({ id: x.id, invoiceNumber: x.invoiceNumber }))); }); }, [canManage]);
+
+  async function addPayment(markRemaining = false) {
+    setErr(""); setBusy(true);
+    const body = markRemaining ? { markRemaining: true } : { amount: Number(pay.amount), date: pay.date ? new Date(pay.date).toISOString() : null, note: pay.note || null };
+    const r = await fetch(`/api/logistics/supplier-invoices/${id}/payments`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({})); setBusy(false);
+    if (!r.ok) { setErr(j.error ?? t("logistics.common.err")); return; }
+    setPay({ amount: "", date: "", note: "" }); load();
+  }
+  async function delPayment(paymentId: string) {
+    setBusy(true); setErr("");
+    const r = await fetch(`/api/logistics/supplier-invoices/${id}/payments`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ paymentId }) });
+    setBusy(false); if (r.ok) load();
+  }
+  async function linkDelivery() {
+    if (!linkSel) return;
+    setBusy(true); setErr("");
+    const r = await fetch(`/api/logistics/supplier-invoices/${id}/links`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ exportSetId: linkSel }) });
+    setBusy(false); setLinkSel(""); if (r.ok) load();
+  }
+  async function unlinkDelivery(exportSetId: string) {
+    setBusy(true); setErr("");
+    const r = await fetch(`/api/logistics/supplier-invoices/${id}/links`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ exportSetId }) });
+    setBusy(false); if (r.ok) load();
+  }
   if (!inv) return null;
 
   const dt = (s: string | null) => s ? new Date(s).toLocaleDateString() : "—";
@@ -87,6 +125,71 @@ export function HolcimInvoiceDetail({ id }: { id: string }) {
           <div><span style={{ color: "var(--muted)" }}>{t("logistics.holcimInv.total")}: </span><strong className="num">{inv.computed.total} {cur}</strong>{inv.mismatch.total && <span style={{ color: "var(--brass)" }}> (⚠ {inv.headerGrandTotal})</span>}</div>
         </div>
         {anyMismatch && <div style={{ color: "var(--brass)", fontSize: 12, marginTop: 6 }}>{t("logistics.holcimInv.headerMismatch")}</div>}
+      </div>
+
+      {err && <div style={{ color: "var(--brick)", fontSize: 12.5, margin: "10px 0" }}>{err}</div>}
+
+      {/* Payable summary + плащания (§H/§J) */}
+      <div className="glass panel" style={{ marginTop: 14 }}>
+        <div style={{ display: "flex", gap: 20, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+          <div style={{ fontFamily: "'Fraunces', serif", fontSize: 15 }}>{t("logistics.payable.payments")}</div>
+          <div style={{ fontSize: 13 }}><span style={{ color: "var(--muted)" }}>{t("logistics.payable.totalDue")}: </span><strong className="num">{inv.computed.total} {cur}</strong></div>
+          <div style={{ fontSize: 13 }}><span style={{ color: "var(--muted)" }}>{t("logistics.payable.paid")}: </span><strong className="num">{inv.paid.toFixed(2)} {cur}</strong></div>
+          <div style={{ fontSize: 13 }}><span style={{ color: "var(--muted)" }}>{t("logistics.payable.remaining")}: </span><strong className="num">{inv.remaining.toFixed(2)} {cur}</strong></div>
+          {payBadge(inv.paymentStatus, t)}
+        </div>
+        {inv.payments.length > 0 && (
+          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 10 }}>
+            <thead><tr><th style={th}>{t("logistics.payable.date")}</th><th style={th}>{t("logistics.payable.amount")}</th><th style={th}>{t("logistics.payable.note")}</th>{canManage && <th style={th} />}</tr></thead>
+            <tbody>
+              {inv.payments.map((p) => (
+                <tr key={p.id}>
+                  <td style={td}>{dt(p.date)}</td><td style={td} className="num">{p.amount.toFixed(2)} {cur}</td><td style={td}>{p.reason ?? "—"}</td>
+                  {canManage && <td style={td}><button className="btn btn-ghost btn-sm" style={{ color: "var(--brick)", fontSize: 11, padding: "2px 8px" }} disabled={busy} onClick={() => delPayment(p.id)}>✕</button></td>}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        {canManage && inv.remaining > 0 && (
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+            <input type="number" step="0.01" min={0} style={{ padding: "5px 8px", fontSize: 12.5, width: 120 }} placeholder={t("logistics.payable.amount")} value={pay.amount} onChange={(e) => setPay({ ...pay, amount: e.target.value })} />
+            <input type="date" style={{ padding: "5px 8px", fontSize: 12.5 }} value={pay.date} onChange={(e) => setPay({ ...pay, date: e.target.value })} />
+            <input style={{ padding: "5px 8px", fontSize: 12.5, flex: "1 1 160px" }} placeholder={t("logistics.payable.note")} value={pay.note} onChange={(e) => setPay({ ...pay, note: e.target.value })} />
+            <button className="btn btn-ghost btn-sm" disabled={busy || !(Number(pay.amount) > 0)} onClick={() => addPayment(false)}>{t("logistics.payable.addPayment")}</button>
+            <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => { if (confirm(t("logistics.payable.markPaidConfirm"))) addPayment(true); }}>{t("logistics.payable.markPaid")}</button>
+          </div>
+        )}
+      </div>
+
+      {/* Свързани експортни доставки (§G/§J) */}
+      <div className="glass panel" style={{ marginTop: 14 }}>
+        <div style={{ fontFamily: "'Fraunces', serif", fontSize: 15, marginBottom: 10 }}>{t("logistics.payable.linkedDeliveries")}</div>
+        {inv.exportLinks.length === 0 ? <div style={{ fontSize: 12.5, color: "var(--muted)" }}>{t("logistics.payable.noLinks")}</div> : (
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead><tr><th style={th}>{t("logistics.export.invoiceNumber")}</th><th style={th}>{t("logistics.export.destination")}</th><th style={th}>{t("logistics.export.quantity")}</th><th style={th}>{t("logistics.payable.purchaseAmount")}</th>{canManage && <th style={th} />}</tr></thead>
+            <tbody>
+              {inv.exportLinks.map((l) => (
+                <tr key={l.linkId}>
+                  <td style={td}><Link href={`/dashboard/logistics/export/${l.id}`} style={{ fontWeight: 600 }}>{l.invoiceNumber}</Link></td>
+                  <td style={td}>{l.destination ?? "—"}</td>
+                  <td style={td} className="num">{l.quantity != null ? qtyUnit(l.quantity, l.unit) : "—"}</td>
+                  <td style={td} className="num">{l.purchaseAmount != null ? `${l.purchaseAmount.toFixed(2)} ${l.purchaseCurrency ?? cur}` : "—"}</td>
+                  {canManage && <td style={td}><button className="btn btn-ghost btn-sm" style={{ color: "var(--brick)", fontSize: 11, padding: "2px 8px" }} disabled={busy} onClick={() => unlinkDelivery(l.id)}>{t("logistics.payable.unlink")}</button></td>}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        {canManage && (
+          <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
+            <select style={{ padding: "5px 8px", fontSize: 12.5, minWidth: 220 }} value={linkSel} onChange={(e) => setLinkSel(e.target.value)}>
+              <option value="">{t("logistics.payable.selectDelivery")}</option>
+              {deliveries.filter((d) => !inv.exportLinks.some((l) => l.id === d.id)).map((d) => <option key={d.id} value={d.id}>{d.invoiceNumber}</option>)}
+            </select>
+            <button className="btn btn-ghost btn-sm" disabled={busy || !linkSel} onClick={linkDelivery}>{t("logistics.payable.linkDelivery")}</button>
+          </div>
+        )}
       </div>
     </div>
   );

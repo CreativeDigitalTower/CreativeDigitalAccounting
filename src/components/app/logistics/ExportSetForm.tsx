@@ -13,6 +13,7 @@ import { useFieldErrors, Req, FieldError, ValidationBanner, ariaProps, errStyle,
 import { PLACE_OF_SHIPMENT_DEFAULT } from "@/lib/logistics/deliveryTerms";
 import { isNewVehicleRegistration } from "@/lib/logistics/vehicleQuickCreate";
 import { VehicleQuickCreateModal } from "@/components/app/logistics/VehicleQuickCreateModal";
+import { CURRENCIES } from "@/lib/constants";
 
 // Дефиниран на модулно ниво, за да НЕ се пресъздава при всеки render — иначе полетата
 // вътре remount-ват и губят focus / дата не може да се въвежда с клавиатура. (bug #1/#2)
@@ -22,7 +23,7 @@ function F({ label, children }: { label: React.ReactNode; children: React.ReactN
 }
 
 type Vehicle = { id: string; registration: string; trailerReg: string | null; carrier?: string | null; driver?: string | null };
-type Product = { id: string; canonicalName: string; category?: string | null };
+type Product = { id: string; canonicalName: string; category?: string | null; purchasePrice?: number | null; purchaseCurrency?: string | null };
 type Route = { id: string; label: string };
 type Company = { id: string; name: string };
 type Client = { id: string; name: string };
@@ -33,6 +34,7 @@ export type ExportSetInitial = {
   truckVehicleId: string | null; trailerReg: string | null; logisticsProductId: string | null;
   quantity: number | null; declarationCmrDate: string | null; dispatchNumber: string | null;
   buyerCompanyId: string | null; clientId: string | null; blankDispatchNote?: boolean;
+  purchaseUnitPrice?: number | null; purchaseCurrency?: string | null;
   mkInvoice?: { id: string; number: string } | null;
 };
 
@@ -56,11 +58,13 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
     truckVehicleId: initial.truckVehicleId ?? "", trailerReg: initial.trailerReg ?? "", logisticsProductId: initial.logisticsProductId ?? "",
     quantity: initial.quantity != null ? fmtQuantity(initial.quantity, locale) : "", declarationCmrDate: ymd(initial.declarationCmrDate),
     dispatchNumber: initial.dispatchNumber ?? "", buyerCompanyId: initial.buyerCompanyId ?? "", clientId: initial.clientId ?? "", blankDispatchNote: initial.blankDispatchNote ?? false,
+    purchaseUnitPrice: initial.purchaseUnitPrice != null ? String(initial.purchaseUnitPrice) : "", purchaseCurrency: initial.purchaseCurrency ?? "",
   } : {
     // Create: датите default-ват към ДНЕШНАТА локална дата (§1/§32), но остават editable.
     invoiceNumber: "", invoiceDate: todayISODate(), shipmentDate: todayISODate(), deliveryTerm: "", placeOfShipment: PLACE_OF_SHIPMENT_DEFAULT, destination: "", routeId: "",
     truckVehicleId: "", trailerReg: "", logisticsProductId: "", quantity: "", declarationCmrDate: todayISODate(),
     dispatchNumber: "", buyerCompanyId: buyers[0]?.id ?? "", clientId: "", blankDispatchNote: false,
+    purchaseUnitPrice: "", purchaseCurrency: "",
   });
   // Автофил от конфигурацията на превозвача (§27): последен шофьор, макс. товар, вид товар.
   // Шофьорът НЕ се заключва — потребителят може да го смени. Товарът се валидира (§28).
@@ -185,6 +189,10 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
       declarationCmrDate: f.declarationCmrDate ? new Date(f.declarationCmrDate).toISOString() : null,
       dispatchNumber: f.dispatchNumber || null, buyerCompanyId: f.buyerCompanyId || null, clientId: f.clientId || null,
       blankDispatchNote: !!f.blankDispatchNote,
+      // Покупна стойност от Holcim (§D): празно → backend ползва цената от продукта (create)
+      // или оставя snapshot-а непроменен (edit). Стойност → per-delivery override.
+      purchaseUnitPrice: f.purchaseUnitPrice.trim() === "" ? undefined : Number(f.purchaseUnitPrice),
+      purchaseCurrency: f.purchaseCurrency || undefined,
     };
     const r = await fetch(isEdit ? `/api/logistics/export-sets/${initial!.id}` : "/api/logistics/export-sets", {
       method: isEdit ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
@@ -203,6 +211,13 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
 
   const inp = { padding: "6px 9px", fontSize: 13, width: "100%" } as const;
   const qErr = parseQuantity(f.quantity);
+
+  // Покупна стойност от Holcim (§D): цена от продукта, с per-delivery override.
+  const selectedProduct = products.find((p) => p.id === f.logisticsProductId) ?? null;
+  const effPurchasePrice = f.purchaseUnitPrice.trim() !== "" ? Number(f.purchaseUnitPrice) : (selectedProduct?.purchasePrice ?? null);
+  const effPurchaseCurrency = f.purchaseCurrency || selectedProduct?.purchaseCurrency || "EUR";
+  const effQty = parseQuantity(f.quantity);
+  const effPurchaseAmount = (effPurchasePrice != null && effQty != null) ? Math.round(effPurchasePrice * effQty * 100) / 100 : null;
 
   // Продуктови опции, групирани по вид (§9): Насипен → Пакетиран → без категория.
   const catOrder = (c: string | null | undefined) => (c === "bulk" ? 0 : c === "packaged" ? 1 : 2);
@@ -298,6 +313,32 @@ export function ExportSetForm({ vehicles, products, routes, buyers, clients, des
             )}
           </F>
         </div>
+
+        {/* Покупна стойност от Holcim (§D) — информативно + per-delivery override. */}
+        <div style={{ gridColumn: "1 / -1", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 12px", background: "rgba(0,0,0,.015)" }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--muted)", marginBottom: 8 }}>{t("logistics.payable.purchaseBlock")}</div>
+          {effPurchasePrice == null && f.purchaseUnitPrice.trim() === "" && (
+            <div style={{ fontSize: 12, color: "var(--brick)", marginBottom: 8 }}>{t("logistics.payable.noPurchasePrice")}</div>
+          )}
+          <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "flex-end" }}>
+            <F label={t("logistics.payable.purchasePrice")}>
+              <input type="number" min={0} step="0.01" style={{ ...inp, width: 120 }}
+                value={f.purchaseUnitPrice}
+                placeholder={selectedProduct?.purchasePrice != null ? String(selectedProduct.purchasePrice) : "0.00"}
+                onChange={(e) => setF({ ...f, purchaseUnitPrice: e.target.value })} />
+            </F>
+            <F label={t("logistics.products.currency")}>
+              <select style={{ ...inp, width: 90 }} value={effPurchaseCurrency} onChange={(e) => setF({ ...f, purchaseCurrency: e.target.value })}>
+                {CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.code}</option>)}
+              </select>
+            </F>
+            <div style={{ fontSize: 13 }}>
+              <div style={{ color: "var(--muted)", fontSize: 11 }}>{t("logistics.payable.purchaseAmount")}</div>
+              <div style={{ fontWeight: 700, fontFamily: "'Fraunces', serif" }}>{effPurchaseAmount != null ? `${effPurchaseAmount.toFixed(2)} ${effPurchaseCurrency}` : "—"}</div>
+            </div>
+          </div>
+        </div>
+
         <F label={t("logistics.export.cmrDate")}><DateField value={f.declarationCmrDate} onChange={(v) => setF({ ...f, declarationCmrDate: v })} style={inp} /></F>
         <F label={`${t("logistics.export.dispatch")} ${t("logistics.export.dispatchAuto")}`}><input style={inp} value={f.dispatchNumber} onChange={(e) => setF({ ...f, dispatchNumber: e.target.value })} placeholder="9617" /></F>
         <F label={t("logistics.export.buyer")}>
