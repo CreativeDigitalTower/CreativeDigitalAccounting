@@ -30,6 +30,7 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
       childDocuments: { where: { type: "invoice" }, select: { id: true, number: true }, orderBy: { createdAt: "asc" } },
       parentDocument: { select: { id: true, number: true, type: true } },
       sourceExportSet: { select: { id: true, invoiceNumber: true, destination: true } },
+      deliveryLinks: { select: { exportSet: { select: { id: true, invoiceNumber: true, destination: true, productSnapshot: true, quantity: true, unit: true, shipmentDate: true } } }, orderBy: { exportSet: { invoiceNumber: "desc" } } },
       events: { orderBy: { at: "asc" }, select: { type: true, at: true, channel: true, recipient: true, device: true } },
     },
   });
@@ -131,6 +132,31 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
         };
         return doc.type === "quote" ? <OfferDocument data={docData} /> : <InvoiceDocument data={docData} />;
       })()}
+
+      {/* Включени доставки (§15) — traceability за обща MK фактура от получени доставки */}
+      {doc.deliveryLinks.length > 0 && (
+        <div className="no-print glass panel" style={{ maxWidth: 800, marginTop: 16 }}>
+          <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 15, margin: "0 0 8px" }}>{t("logistics.received.bulkIncluded")}</h3>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+            <thead><tr>
+              <th style={{ textAlign: "left", padding: "6px 8px", color: "var(--muted)", fontSize: 11.5 }}>{t("logistics.received.bgInvoice")}</th>
+              <th style={{ textAlign: "left", padding: "6px 8px", color: "var(--muted)", fontSize: 11.5 }}>{t("logistics.received.product")}</th>
+              <th style={{ textAlign: "right", padding: "6px 8px", color: "var(--muted)", fontSize: 11.5 }}>{t("logistics.received.quantity")}</th>
+              <th style={{ textAlign: "left", padding: "6px 8px", color: "var(--muted)", fontSize: 11.5 }}>{t("logistics.received.destination")}</th>
+            </tr></thead>
+            <tbody>
+              {doc.deliveryLinks.map((l) => (
+                <tr key={l.exportSet.id}>
+                  <td style={{ padding: "6px 8px", borderTop: "1px solid rgba(217,215,200,.5)" }}><Link href={`/dashboard/logistics/export/${l.exportSet.id}`} style={{ fontWeight: 600 }}>{l.exportSet.invoiceNumber}</Link></td>
+                  <td style={{ padding: "6px 8px", borderTop: "1px solid rgba(217,215,200,.5)" }}>{l.exportSet.productSnapshot ?? "—"}</td>
+                  <td style={{ padding: "6px 8px", borderTop: "1px solid rgba(217,215,200,.5)", textAlign: "right" }} className="num">{l.exportSet.quantity != null ? `${l.exportSet.quantity} ${l.exportSet.unit}` : "—"}</td>
+                  <td style={{ padding: "6px 8px", borderTop: "1px solid rgba(217,215,200,.5)" }}>{l.exportSet.destination ?? "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Приложени файлове — извън документа, не влияят на стойности/номерация */}
       <div className="no-print" style={{ maxWidth: 800, marginTop: 16 }}>

@@ -7,7 +7,7 @@ import { validationError, VMSG, type FieldErrors } from "@/lib/logistics/validat
 import { PLACE_OF_SHIPMENT_DEFAULT } from "@/lib/logistics/deliveryTerms";
 import { canonicalDestinationKey } from "@/lib/logistics/destinations";
 import { missingEditFields, exportDeleteDecision } from "@/lib/logistics/exportSetEdit";
-import { resolveReceivedInvoice } from "@/lib/logistics/received";
+import { loadDeliveryInvoiceMap } from "@/lib/logistics/deliveryInvoice";
 import { computePurchaseAmount } from "@/lib/logistics/holcimPayable";
 import { z } from "zod";
 
@@ -38,24 +38,15 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   if (!set || set.deletedAt) return NextResponse.json({ error: "Не е намерена." }, { status: 404 });
   const role = await exportSetReadRole(g.companyId, set);
   if (!role) return NextResponse.json({ error: "Няма достъп." }, { status: 403 });
-  const [seller, buyer, client, docInv, legacyMk] = await Promise.all([
+  const [seller, buyer, client, invMap] = await Promise.all([
     prisma.company.findUnique({ where: { id: set.companyId }, select: { name: true } }),
     set.buyerCompanyId ? prisma.company.findUnique({ where: { id: set.buyerCompanyId }, select: { name: true } }) : Promise.resolve(null),
     // Клиентът може да е на buyer фирмата (SEM), затова резолвим по id (§2).
     set.clientId ? prisma.client.findUnique({ where: { id: set.clientId }, select: { name: true } }) : Promise.resolve(null),
-    // MK фактурата за тази доставка (group visibility, §18). Приоритет: стандартна фактура
-    // (Document, source of truth §17); легаси MkInvoice — само ако няма Document (§23/§43).
-    // Едната или другата може да съществува — затова четем и двете и резолвим канонично.
-    set.buyerCompanyId ? prisma.document.findFirst({ where: { companyId: set.buyerCompanyId, type: "invoice", sourceExportSetId: set.id, deletedAt: null, status: { not: "cancelled" } }, select: { id: true, number: true, issueDate: true } }) : Promise.resolve(null),
-    set.buyerCompanyId ? prisma.mkInvoice.findFirst({ where: { companyId: set.buyerCompanyId, sourceExportSetId: set.id }, select: { id: true, number: true, date: true, documentId: true } }) : Promise.resolve(null),
+    // MK фактурата за тази доставка (§12): bulk link → легаси sourceExportSetId → легаси MkInvoice.
+    set.buyerCompanyId ? loadDeliveryInvoiceMap(set.buyerCompanyId, [set.id]) : Promise.resolve(new Map()),
   ]);
-  const resolved = resolveReceivedInvoice(
-    docInv ? { id: docInv.id, number: docInv.number } : null,
-    legacyMk ? { id: legacyMk.id, number: legacyMk.number, documentId: legacyMk.documentId } : null,
-  );
-  const mkInvoice = resolved
-    ? { ...resolved, date: (resolved.kind === "document" ? docInv?.issueDate : legacyMk?.date) ?? null }
-    : null;
+  const mkInvoice = invMap.get(set.id) ?? null;
   // Покупка от Holcim (§K): snapshot + свързана Holcim фактура (payable, не се смесва с MK).
   const { supplierInvoiceLinks, purchaseUnitPrice, purchaseAmount, ...rest } = set;
   const holcimInvoice = supplierInvoiceLinks[0]?.invoice ?? null;
