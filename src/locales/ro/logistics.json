@@ -502,7 +502,16 @@
     "noPurchasePrice": "Fără preț de achiziție",
     "purchasePrice": "Preț de achiziție",
     "holcimInvoice": "Factură Holcim",
-    "awaitingInvoice": "Așteaptă factură"
+    "awaitingInvoice": "Așteaptă factură",
+    "uninvTitle": "Livrări nefacturate",
+    "uninvHint": "Livrări de export cu valoare de achiziție calculată, încă neasociate unei facturi Holcim.",
+    "uninvSearch": "Căutare (nr. livrare, produs)…",
+    "uninvEmpty": "Nu există livrări care așteaptă o factură Holcim.",
+    "uninvFooter": "Total livrări nefacturate: {count}",
+    "sortNewest": "Cele mai noi",
+    "sortOldest": "Cele mai vechi",
+    "sortAmount": "Valoare achiziție",
+    "openDelivery": "Deschide livrarea"
   },
   "mksale": {
     "title": "Vânzări MK",

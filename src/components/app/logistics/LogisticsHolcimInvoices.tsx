@@ -5,6 +5,11 @@ import { useT } from "@/components/i18n/I18nProvider";
 
 type Invoice = { id: string; number: string; date: string | null; currency: string; lines: number; unresolved: number; base: number; vat: number; total: number; mismatch: boolean; paid: number; remaining: number; paymentStatus: "unpaid" | "partially_paid" | "paid" };
 type CurrencyPayable = { currency: string; invoiced: number; paid: number; remaining: number; uninvoiced: number };
+type UninvRow = { id: string; invoiceNumber: string; date: string | null; product: string | null; quantity: number | null; unit: string; purchaseUnitPrice: number | null; purchaseCurrency: string | null; purchaseAmount: number | null };
+type UninvTotal = { currency: string; amount: number; quantity: number; count: number };
+
+const MONTHS = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+const YEARS = (() => { const y = new Date().getFullYear(); return [y, y - 1, y - 2, y - 3]; })();
 type MatchData = {
   products: { materialCode: string; name: string; unit: string }[];
   vehicles: { registration: string; aliases: string[] }[];
@@ -22,6 +27,14 @@ export function LogisticsHolcimInvoices({ canManage }: { canManage: boolean }) {
   const [items, setItems] = useState<Invoice[]>([]);
   const [payables, setPayables] = useState<CurrencyPayable[]>([]);
   const [payFilter, setPayFilter] = useState("");
+  // Разбивка „Нефактурирани доставки" (§2).
+  const [uninv, setUninv] = useState<UninvRow[]>([]);
+  const [uninvTotals, setUninvTotals] = useState<UninvTotal[]>([]);
+  const [uninvCount, setUninvCount] = useState(0);
+  const [uf, setUf] = useState({ q: "", product: "", currency: "", year: "", month: "", sort: "date_desc" });
+  const [uPage, setUPage] = useState(1);
+  const uninvRef = useRef<HTMLDivElement>(null);
+  const uPageSize = 25;
   const [md, setMd] = useState<MatchData>({ products: [], vehicles: [], dispatchNotes: [] });
   const [open, setOpen] = useState(false);
   const [err, setErr] = useState("");
@@ -38,6 +51,21 @@ export function LogisticsHolcimInvoices({ canManage }: { canManage: boolean }) {
     if (rp.ok) { const j = await rp.json(); setPayables(j.byCurrency ?? []); }
   }
   useEffect(() => { load(); }, []);
+
+  useEffect(() => { setUPage(1); }, [uf.q, uf.product, uf.currency, uf.year, uf.month, uf.sort]);
+  useEffect(() => {
+    const p = new URLSearchParams();
+    if (uf.q) p.set("q", uf.q);
+    if (uf.product) p.set("product", uf.product);
+    if (uf.currency) p.set("currency", uf.currency);
+    if (uf.year) p.set("year", uf.year);
+    if (uf.year && uf.month) p.set("month", String(Number(uf.month) - 1));
+    if (uf.sort) p.set("sort", uf.sort);
+    p.set("page", String(uPage));
+    fetch(`/api/logistics/holcim-payables/uninvoiced?${p.toString()}`).then((r) => r.ok ? r.json() : null).then((j) => {
+      if (j) { setUninv(j.rows ?? []); setUninvTotals(j.totals ?? []); setUninvCount(j.total ?? 0); }
+    });
+  }, [uf, uPage]);
 
   const rate = hdr.vatRate ? Number(hdr.vatRate) : 0;
 
@@ -138,7 +166,7 @@ export function LogisticsHolcimInvoices({ canManage }: { canManage: boolean }) {
               <PayCard label={`${t("logistics.payable.totalDue")} (${p.currency})`} value={`${p.invoiced.toFixed(2)} ${p.currency}`} />
               <PayCard label={t("logistics.payable.paid")} value={`${p.paid.toFixed(2)} ${p.currency}`} />
               <PayCard label={t("logistics.payable.remaining")} value={`${p.remaining.toFixed(2)} ${p.currency}`} warn={p.remaining > 0} />
-              <PayCard label={t("logistics.payable.uninvoiced")} value={`${p.uninvoiced.toFixed(2)} ${p.currency}`} muted />
+              <PayCard label={t("logistics.payable.uninvoiced")} value={`${p.uninvoiced.toFixed(2)} ${p.currency}`} muted onClick={() => uninvRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })} />
             </div>
           ))}
         </div>
@@ -249,14 +277,91 @@ export function LogisticsHolcimInvoices({ canManage }: { canManage: boolean }) {
           </table>
         )}
       </div>
+
+      {/* Разбивка „Нефактурирани доставки" (§2) — редовете, формиращи KPI „Нефактурирани". */}
+      <div ref={uninvRef} style={{ marginTop: 22 }}>
+        <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 18, fontWeight: 600, margin: "0 0 2px" }}>{t("logistics.payable.uninvTitle")}</h2>
+        <div style={{ fontSize: 12, color: "var(--muted)", marginBottom: 10 }}>{t("logistics.payable.uninvHint")}</div>
+
+        <div style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
+          <input style={{ padding: "5px 8px", fontSize: 12.5, minWidth: 200 }} value={uf.q} onChange={(e) => setUf({ ...uf, q: e.target.value })} placeholder={t("logistics.payable.uninvSearch")} />
+          <input style={{ padding: "5px 8px", fontSize: 12.5, width: 150 }} value={uf.product} onChange={(e) => setUf({ ...uf, product: e.target.value })} placeholder={t("logistics.export.product")} />
+          <select style={{ padding: "5px 8px", fontSize: 12.5 }} value={uf.year} onChange={(e) => setUf({ ...uf, year: e.target.value })}>
+            <option value="">{t("logistics.export.allYears")}</option>
+            {YEARS.map((y) => <option key={y} value={y}>{y}</option>)}
+          </select>
+          <select style={{ padding: "5px 8px", fontSize: 12.5 }} value={uf.month} onChange={(e) => setUf({ ...uf, month: e.target.value })} disabled={!uf.year}>
+            <option value="">{t("logistics.export.allMonths")}</option>
+            {MONTHS.map((m) => <option key={m} value={m}>{m}</option>)}
+          </select>
+          {uninvTotals.length > 1 && (
+            <select style={{ padding: "5px 8px", fontSize: 12.5 }} value={uf.currency} onChange={(e) => setUf({ ...uf, currency: e.target.value })}>
+              <option value="">{t("logistics.mkview.allStatuses")}</option>
+              {uninvTotals.map((x) => <option key={x.currency} value={x.currency}>{x.currency}</option>)}
+            </select>
+          )}
+          <select style={{ padding: "5px 8px", fontSize: 12.5 }} value={uf.sort} onChange={(e) => setUf({ ...uf, sort: e.target.value })}>
+            <option value="date_desc">{t("logistics.payable.sortNewest")}</option>
+            <option value="date_asc">{t("logistics.payable.sortOldest")}</option>
+            <option value="invoice">{t("logistics.export.sortInvoice")}</option>
+            <option value="quantity">{t("logistics.export.sortQty")}</option>
+            <option value="amount">{t("logistics.payable.sortAmount")}</option>
+          </select>
+        </div>
+
+        <div className="glass panel" style={{ overflowX: "auto" }}>
+          {uninv.length === 0 ? <div style={{ fontSize: 13, color: "var(--muted)" }}>{t("logistics.payable.uninvEmpty")}</div> : (
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead><tr>
+                <th style={th}>{t("logistics.export.invoiceNumber")}</th><th style={th}>{t("logistics.payable.date")}</th><th style={th}>{t("logistics.export.product")}</th>
+                <th style={{ ...th, textAlign: "right" }}>{t("logistics.export.quantity")}</th><th style={{ ...th, textAlign: "right" }}>{t("logistics.payable.purchasePrice")}</th>
+                <th style={{ ...th, textAlign: "right" }}>{t("logistics.payable.purchaseAmount")}</th><th style={th}>{t("logistics.payable.status")}</th><th style={th} />
+              </tr></thead>
+              <tbody>
+                {uninv.map((r) => (
+                  <tr key={r.id}>
+                    <td style={td}><Link href={`/dashboard/logistics/export/${r.id}`} style={{ fontWeight: 600 }}>{r.invoiceNumber}</Link></td>
+                    <td style={td}>{dt(r.date)}</td>
+                    <td style={td}>{r.product ?? "—"}</td>
+                    <td style={{ ...td, textAlign: "right" }} className="num">{r.quantity != null ? `${r.quantity} ${r.unit}` : "—"}</td>
+                    <td style={{ ...td, textAlign: "right" }} className="num">{r.purchaseUnitPrice != null ? `${r.purchaseUnitPrice.toFixed(2)} ${r.purchaseCurrency}/${r.unit}` : "—"}</td>
+                    <td style={{ ...td, textAlign: "right" }} className="num">{r.purchaseAmount != null ? `${r.purchaseAmount.toFixed(2)} ${r.purchaseCurrency}` : "—"}</td>
+                    <td style={td}><span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 10, background: "var(--brass-soft,rgba(192,138,45,.14))", color: "var(--brass,#9A6B18)", whiteSpace: "nowrap" }}>{t("logistics.payable.awaitingInvoice")}</span></td>
+                    <td style={td}><Link href={`/dashboard/logistics/export/${r.id}`} className="btn btn-ghost btn-sm" style={{ fontSize: 11, padding: "2px 10px" }}>{t("logistics.payable.openDelivery")}</Link></td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                {uninvTotals.map((x) => (
+                  <tr key={x.currency}>
+                    <td style={{ ...td, fontWeight: 700 }} colSpan={3}>{t("logistics.payable.uninvFooter", { count: x.count })}</td>
+                    <td style={{ ...td, textAlign: "right", fontWeight: 700 }} className="num">{Math.round(x.quantity * 100) / 100} t</td>
+                    <td style={td} />
+                    <td style={{ ...td, textAlign: "right", fontWeight: 700 }} className="num">{x.amount.toFixed(2)} {x.currency}</td>
+                    <td style={td} colSpan={2} />
+                  </tr>
+                ))}
+              </tfoot>
+            </table>
+          )}
+        </div>
+
+        {uninvCount > uPageSize && (
+          <div style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "center", marginTop: 12 }}>
+            <button className="btn btn-ghost btn-sm" disabled={uPage <= 1} onClick={() => setUPage((p) => p - 1)}>←</button>
+            <span style={{ fontSize: 12.5, color: "var(--muted)" }}>{uPage} / {Math.max(1, Math.ceil(uninvCount / uPageSize))} · {uninvCount}</span>
+            <button className="btn btn-ghost btn-sm" disabled={uPage >= Math.ceil(uninvCount / uPageSize)} onClick={() => setUPage((p) => p + 1)}>→</button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-function PayCard({ label, value, warn, muted }: { label: string; value: string; warn?: boolean; muted?: boolean }) {
-  return <div className="glass panel" style={{ padding: "8px 13px", minWidth: 150, flex: "1 1 150px" }}>
+function PayCard({ label, value, warn, muted, onClick }: { label: string; value: string; warn?: boolean; muted?: boolean; onClick?: () => void }) {
+  return <div className="glass panel" onClick={onClick} style={{ padding: "8px 13px", minWidth: 150, flex: "1 1 150px", cursor: onClick ? "pointer" : undefined }} title={onClick ? label : undefined}>
     <div style={{ fontSize: 16, fontWeight: 600, fontFamily: "'Fraunces', serif", color: warn ? "var(--brass)" : muted ? "var(--muted)" : "inherit" }}>{value}</div>
-    <div style={{ fontSize: 10.5, color: "var(--muted)" }}>{label}</div>
+    <div style={{ fontSize: 10.5, color: "var(--muted)" }}>{label}{onClick ? " →" : ""}</div>
   </div>;
 }
 

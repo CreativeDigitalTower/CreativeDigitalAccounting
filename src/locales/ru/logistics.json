@@ -502,7 +502,16 @@
     "noPurchasePrice": "Закупочная цена не задана",
     "purchasePrice": "Закупочная цена",
     "holcimInvoice": "Счёт Holcim",
-    "awaitingInvoice": "Ожидает счёт"
+    "awaitingInvoice": "Ожидает счёт",
+    "uninvTitle": "Поставки без счёта",
+    "uninvHint": "Экспортные поставки с рассчитанной закупочной стоимостью, ещё не связанные со счётом Holcim.",
+    "uninvSearch": "Поиск (№ поставки, продукт)…",
+    "uninvEmpty": "Нет поставок, ожидающих счёт Holcim.",
+    "uninvFooter": "Всего поставок без счёта: {count}",
+    "sortNewest": "Новые",
+    "sortOldest": "Старые",
+    "sortAmount": "Закупочная стоимость",
+    "openDelivery": "Открыть поставку"
   },
   "mksale": {
     "title": "MK продажи",

@@ -502,7 +502,16 @@
     "noPurchasePrice": "Alış fiyatı tanımlı değil",
     "purchasePrice": "Alış fiyatı",
     "holcimInvoice": "Holcim faturası",
-    "awaitingInvoice": "Fatura bekliyor"
+    "awaitingInvoice": "Fatura bekliyor",
+    "uninvTitle": "Faturasız teslimatlar",
+    "uninvHint": "Hesaplanmış alış değeri olan, henüz bir Holcim faturasına bağlanmamış ihracat teslimatları.",
+    "uninvSearch": "Ara (teslimat no., ürün)…",
+    "uninvEmpty": "Holcim faturası bekleyen teslimat yok.",
+    "uninvFooter": "Toplam faturasız teslimat: {count}",
+    "sortNewest": "En yeni",
+    "sortOldest": "En eski",
+    "sortAmount": "Alış değeri",
+    "openDelivery": "Teslimatı aç"
   },
   "mksale": {
     "title": "MK satışları",
