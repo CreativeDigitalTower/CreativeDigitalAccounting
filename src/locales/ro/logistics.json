@@ -511,7 +511,22 @@
     "sortNewest": "Cele mai noi",
     "sortOldest": "Cele mai vechi",
     "sortAmount": "Valoare achiziție",
-    "openDelivery": "Deschide livrarea"
+    "openDelivery": "Deschide livrarea",
+    "tipTotal": "Valoarea totală a livrărilor facturate și nefacturate către Holcim.",
+    "tipPaid": "Plăți înregistrate către Holcim (pe facturi + livrări nefacturate plătite).",
+    "tipRemaining": "Partea neachitată din obligațiile totale.",
+    "tipUninvoiced": "Livrări încă neasociate unei facturi Holcim.",
+    "selectedN": "Selectate: {n}",
+    "selectAll": "Selectează tot",
+    "bulkMarkPaid": "Marchează plătite",
+    "bulkMarkUnpaid": "Marchează neplătite",
+    "bulkPaidConfirm": "Veți marca {count} livrări în valoare de {totals} ca plătite către Holcim. Continuați?",
+    "bulkUnpaidConfirm": "Veți marca {count} livrări ca neplătite. Continuați?",
+    "rowUnpaidConfirm": "Sigur marcați livrarea №{number} ca neplătită?",
+    "awaitingPaid": "Așteaptă factură · Plătit",
+    "awaitingUnpaid": "Așteaptă factură · Neplătit",
+    "markPaidShort": "Marchează plătit",
+    "markUnpaid": "Marchează neplătit"
   },
   "mksale": {
     "title": "Vânzări MK",

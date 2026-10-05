@@ -511,7 +511,22 @@
     "sortNewest": "Newest",
     "sortOldest": "Oldest",
     "sortAmount": "Purchase value",
-    "openDelivery": "Open delivery"
+    "openDelivery": "Open delivery",
+    "tipTotal": "Total value of invoiced and uninvoiced deliveries to Holcim.",
+    "tipPaid": "Registered payments to Holcim (invoice payments + paid uninvoiced deliveries).",
+    "tipRemaining": "Outstanding part of total obligations.",
+    "tipUninvoiced": "Deliveries not yet linked to a Holcim invoice.",
+    "selectedN": "Selected: {n}",
+    "selectAll": "Select all",
+    "bulkMarkPaid": "Mark as paid",
+    "bulkMarkUnpaid": "Mark as unpaid",
+    "bulkPaidConfirm": "You will mark {count} deliveries totalling {totals} as paid to Holcim. Continue?",
+    "bulkUnpaidConfirm": "You will mark {count} deliveries as unpaid. Continue?",
+    "rowUnpaidConfirm": "Are you sure you want to mark delivery №{number} as unpaid?",
+    "awaitingPaid": "Awaiting invoice · Paid",
+    "awaitingUnpaid": "Awaiting invoice · Unpaid",
+    "markPaidShort": "Mark paid",
+    "markUnpaid": "Mark unpaid"
   },
   "mksale": {
     "title": "MK sales",

@@ -39,37 +39,49 @@ export function wouldOverpay(total: number, alreadyPaid: number, newPayment: num
 }
 
 export type PayableInvoice = { currency: string; total: number; paid: number };
-export type UninvoicedDelivery = { purchaseCurrency: string | null; purchaseAmount: number | null };
+// Нефактурирана (без SupplierInvoiceExportLink) доставка. `paid` = provisional settlement
+// (ExportDocumentSet.purchasePaidAt != null) — отбелязана като платена ПРЕДИ Holcim фактура.
+export type UninvoicedDelivery = { purchaseCurrency: string | null; purchaseAmount: number | null; paid?: boolean };
 
 export type CurrencyPayable = {
   currency: string;
-  invoiced: number;    // ОБЩО ЗАДЪЛЖЕНИЯ (реални Holcim фактури)
-  paid: number;        // ПЛАТЕНО
-  remaining: number;   // ОСТАВА ЗА ПЛАЩАНЕ
-  uninvoiced: number;  // НЕФАКТУРИРАНИ / ОЧАКВАЩИ Holcim фактура (estimated)
+  totalObligations: number; // ОБЩО ЗАДЪЛЖЕНИЯ = фактурирани + нефактурирани (grand total, §3)
+  paid: number;             // ПЛАТЕНО = плащания по фактури + provisional платени доставки (§4)
+  remaining: number;        // ОСТАВА = ОБЩО − ПЛАТЕНО (§5)
+  uninvoiced: number;       // НЕФАКТУРИРАНИ (без Holcim фактура) — платени ИЛИ не (§11)
 };
 
 /**
- * KPI по валута (§E) — БЕЗ смесване на различни валути (§E/§18). `uninvoicedDeliveries` са
- * доставки с purchaseAmount, които НЯМАТ свързана Holcim фактура (double-counting защита, §F).
+ * KPI по валута (§3/§4/§5/§11) — БЕЗ смесване на валути (§17), Decimal (§15).
+ *
+ * totalObligations = Σ фактури (gross) + Σ нефактурирани purchaseAmount (без double counting —
+ *   свързаните доставки не влизат в `uninvoicedDeliveries`, §10).
+ * paid = Σ плащания по фактури + Σ purchaseAmount на provisional-ПЛАТЕНИ нефактурирани доставки.
+ * remaining = totalObligations − paid (≥ 0).
+ * uninvoiced = Σ всички нефактурирани purchaseAmount (платени или не — нефактурирано ≠ неплатено).
  */
 export function buildPayableSummary(invoices: PayableInvoice[], uninvoicedDeliveries: UninvoicedDelivery[]): CurrencyPayable[] {
-  const byCur = new Map<string, CurrencyPayable>();
+  type Acc = { currency: string; invoicedTotal: number; invoicedPaid: number; provTotal: number; provPaid: number };
+  const byCur = new Map<string, Acc>();
   const ensure = (cur: string) => {
     let r = byCur.get(cur);
-    if (!r) { r = { currency: cur, invoiced: 0, paid: 0, remaining: 0, uninvoiced: 0 }; byCur.set(cur, r); }
+    if (!r) { r = { currency: cur, invoicedTotal: 0, invoicedPaid: 0, provTotal: 0, provPaid: 0 }; byCur.set(cur, r); }
     return r;
   };
   for (const inv of invoices) {
     const r = ensure(inv.currency || "EUR");
-    r.invoiced = sumMoney([r.invoiced, inv.total]);
-    r.paid = sumMoney([r.paid, inv.paid]);
+    r.invoicedTotal = sumMoney([r.invoicedTotal, inv.total]);
+    r.invoicedPaid = sumMoney([r.invoicedPaid, inv.paid]);
   }
   for (const d of uninvoicedDeliveries) {
     if (d.purchaseAmount == null) continue;
     const r = ensure(d.purchaseCurrency || "EUR");
-    r.uninvoiced = sumMoney([r.uninvoiced, d.purchaseAmount]);
+    r.provTotal = sumMoney([r.provTotal, d.purchaseAmount]);
+    if (d.paid) r.provPaid = sumMoney([r.provPaid, d.purchaseAmount]);
   }
-  for (const r of byCur.values()) r.remaining = invoiceRemaining(r.invoiced, r.paid);
-  return [...byCur.values()].sort((a, b) => a.currency.localeCompare(b.currency));
+  return [...byCur.values()].map((r) => {
+    const totalObligations = sumMoney([r.invoicedTotal, r.provTotal]);
+    const paid = sumMoney([r.invoicedPaid, r.provPaid]);
+    return { currency: r.currency, totalObligations, paid, remaining: invoiceRemaining(totalObligations, paid), uninvoiced: r.provTotal };
+  }).sort((a, b) => a.currency.localeCompare(b.currency));
 }

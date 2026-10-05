@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useT } from "@/components/i18n/I18nProvider";
 
 type Invoice = { id: string; number: string; date: string | null; currency: string; lines: number; unresolved: number; base: number; vat: number; total: number; mismatch: boolean; paid: number; remaining: number; paymentStatus: "unpaid" | "partially_paid" | "paid" };
-type CurrencyPayable = { currency: string; invoiced: number; paid: number; remaining: number; uninvoiced: number };
-type UninvRow = { id: string; invoiceNumber: string; date: string | null; product: string | null; quantity: number | null; unit: string; purchaseUnitPrice: number | null; purchaseCurrency: string | null; purchaseAmount: number | null };
-type UninvTotal = { currency: string; amount: number; quantity: number; count: number };
+type CurrencyPayable = { currency: string; totalObligations: number; paid: number; remaining: number; uninvoiced: number };
+type UninvRow = { id: string; invoiceNumber: string; date: string | null; product: string | null; quantity: number | null; unit: string; purchaseUnitPrice: number | null; purchaseCurrency: string | null; purchaseAmount: number | null; paid: boolean };
+type UninvTotal = { currency: string; amount: number; paidAmount: number; unpaidAmount: number; quantity: number; count: number };
 
 const MONTHS = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
 const YEARS = (() => { const y = new Date().getFullYear(); return [y, y - 1, y - 2, y - 3]; })();
@@ -31,8 +31,10 @@ export function LogisticsHolcimInvoices({ canManage }: { canManage: boolean }) {
   const [uninv, setUninv] = useState<UninvRow[]>([]);
   const [uninvTotals, setUninvTotals] = useState<UninvTotal[]>([]);
   const [uninvCount, setUninvCount] = useState(0);
-  const [uf, setUf] = useState({ q: "", product: "", currency: "", year: "", month: "", sort: "date_desc" });
+  const [uf, setUf] = useState({ q: "", product: "", currency: "", year: "", month: "", sort: "invoice" });
   const [uPage, setUPage] = useState(1);
+  const [uSel, setUSel] = useState<Set<string>>(new Set());
+  const [uBusy, setUBusy] = useState(false);
   const uninvRef = useRef<HTMLDivElement>(null);
   const uPageSize = 25;
   const [md, setMd] = useState<MatchData>({ products: [], vehicles: [], dispatchNotes: [] });
@@ -52,7 +54,8 @@ export function LogisticsHolcimInvoices({ canManage }: { canManage: boolean }) {
   }
   useEffect(() => { load(); }, []);
 
-  useEffect(() => { setUPage(1); }, [uf.q, uf.product, uf.currency, uf.year, uf.month, uf.sort]);
+  const [uReload, setUReload] = useState(0);
+  useEffect(() => { setUPage(1); setUSel(new Set()); }, [uf.q, uf.product, uf.currency, uf.year, uf.month, uf.sort]);
   useEffect(() => {
     const p = new URLSearchParams();
     if (uf.q) p.set("q", uf.q);
@@ -65,7 +68,37 @@ export function LogisticsHolcimInvoices({ canManage }: { canManage: boolean }) {
     fetch(`/api/logistics/holcim-payables/uninvoiced?${p.toString()}`).then((r) => r.ok ? r.json() : null).then((j) => {
       if (j) { setUninv(j.rows ?? []); setUninvTotals(j.totals ?? []); setUninvCount(j.total ?? 0); }
     });
-  }, [uf, uPage]);
+  }, [uf, uPage, uReload]);
+
+  function toggleUSel(id: string) { setUSel((prev) => { const n = new Set(prev); if (n.has(id)) n.delete(id); else n.add(id); return n; }); }
+  const allPageSelected = uninv.length > 0 && uninv.every((r) => uSel.has(r.id));
+  function toggleUAll() { setUSel((prev) => { if (allPageSelected) return new Set(); const n = new Set(prev); uninv.forEach((r) => n.add(r.id)); return n; }); }
+
+  // Bulk mark paid/unpaid със confirmation + totals по валута (§7).
+  async function bulkMark(paid: boolean) {
+    const ids = [...uSel];
+    if (ids.length === 0) return;
+    const chosen = uninv.filter((r) => uSel.has(r.id));
+    const totalsByCur: Record<string, number> = {};
+    for (const r of chosen) { const c = r.purchaseCurrency || "EUR"; totalsByCur[c] = Math.round(((totalsByCur[c] ?? 0) + (r.purchaseAmount ?? 0)) * 100) / 100; }
+    const totalsStr = Object.entries(totalsByCur).map(([c, v]) => `${v.toFixed(2)} ${c}`).join(", ");
+    const msg = paid
+      ? t("logistics.payable.bulkPaidConfirm", { count: ids.length, totals: totalsStr })
+      : t("logistics.payable.bulkUnpaidConfirm", { count: ids.length });
+    if (!confirm(msg)) return;
+    await markPaid(ids, paid);
+  }
+  async function markPaid(ids: string[], paid: boolean) {
+    setUBusy(true);
+    const r = await fetch("/api/logistics/holcim-payables/mark-paid", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids, paid }) });
+    setUBusy(false);
+    if (r.ok) { setUSel(new Set()); setUReload((x) => x + 1); load(); } // load() refreshes KPI cards too
+  }
+  async function toggleRowPaid(row: UninvRow) {
+    const next = !row.paid;
+    if (!next && !confirm(t("logistics.payable.rowUnpaidConfirm", { number: row.invoiceNumber }))) return;
+    await markPaid([row.id], next);
+  }
 
   const rate = hdr.vatRate ? Number(hdr.vatRate) : 0;
 
@@ -163,10 +196,10 @@ export function LogisticsHolcimInvoices({ canManage }: { canManage: boolean }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
           {payables.map((p) => (
             <div key={p.currency} style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "stretch" }}>
-              <PayCard label={`${t("logistics.payable.totalDue")} (${p.currency})`} value={`${p.invoiced.toFixed(2)} ${p.currency}`} />
-              <PayCard label={t("logistics.payable.paid")} value={`${p.paid.toFixed(2)} ${p.currency}`} />
-              <PayCard label={t("logistics.payable.remaining")} value={`${p.remaining.toFixed(2)} ${p.currency}`} warn={p.remaining > 0} />
-              <PayCard label={t("logistics.payable.uninvoiced")} value={`${p.uninvoiced.toFixed(2)} ${p.currency}`} muted onClick={() => uninvRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })} />
+              <PayCard label={`${t("logistics.payable.totalDue")} (${p.currency})`} value={`${p.totalObligations.toFixed(2)} ${p.currency}`} help={t("logistics.payable.tipTotal")} />
+              <PayCard label={t("logistics.payable.paid")} value={`${p.paid.toFixed(2)} ${p.currency}`} help={t("logistics.payable.tipPaid")} />
+              <PayCard label={t("logistics.payable.remaining")} value={`${p.remaining.toFixed(2)} ${p.currency}`} warn={p.remaining > 0} help={t("logistics.payable.tipRemaining")} />
+              <PayCard label={t("logistics.payable.uninvoiced")} value={`${p.uninvoiced.toFixed(2)} ${p.currency}`} muted help={t("logistics.payable.tipUninvoiced")} onClick={() => uninvRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })} />
             </div>
           ))}
         </div>
@@ -301,18 +334,29 @@ export function LogisticsHolcimInvoices({ canManage }: { canManage: boolean }) {
             </select>
           )}
           <select style={{ padding: "5px 8px", fontSize: 12.5 }} value={uf.sort} onChange={(e) => setUf({ ...uf, sort: e.target.value })}>
+            <option value="invoice">{t("logistics.export.sortInvoice")}</option>
             <option value="date_desc">{t("logistics.payable.sortNewest")}</option>
             <option value="date_asc">{t("logistics.payable.sortOldest")}</option>
-            <option value="invoice">{t("logistics.export.sortInvoice")}</option>
             <option value="quantity">{t("logistics.export.sortQty")}</option>
             <option value="amount">{t("logistics.payable.sortAmount")}</option>
           </select>
         </div>
 
+        {/* Bulk action bar (§7) — selection → отделен action + confirmation. */}
+        {canManage && uSel.size > 0 && (
+          <div className="glass panel" style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10, padding: "8px 14px", flexWrap: "wrap" }}>
+            <span style={{ fontSize: 13 }}>{t("logistics.payable.selectedN", { n: uSel.size })}</span>
+            <button className="btn btn-primary btn-sm" style={{ marginLeft: "auto" }} disabled={uBusy} onClick={() => bulkMark(true)}>{t("logistics.payable.bulkMarkPaid")}</button>
+            <button className="btn btn-ghost btn-sm" disabled={uBusy} onClick={() => bulkMark(false)}>{t("logistics.payable.bulkMarkUnpaid")}</button>
+            <button className="btn btn-ghost btn-sm" disabled={uBusy} onClick={() => setUSel(new Set())}>{t("logistics.common.cancel")}</button>
+          </div>
+        )}
+
         <div className="glass panel" style={{ overflowX: "auto" }}>
           {uninv.length === 0 ? <div style={{ fontSize: 13, color: "var(--muted)" }}>{t("logistics.payable.uninvEmpty")}</div> : (
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead><tr>
+                {canManage && <th style={{ ...th, width: 30 }}><input type="checkbox" checked={allPageSelected} onChange={toggleUAll} aria-label={t("logistics.payable.selectAll")} /></th>}
                 <th style={th}>{t("logistics.export.invoiceNumber")}</th><th style={th}>{t("logistics.payable.date")}</th><th style={th}>{t("logistics.export.product")}</th>
                 <th style={{ ...th, textAlign: "right" }}>{t("logistics.export.quantity")}</th><th style={{ ...th, textAlign: "right" }}>{t("logistics.payable.purchasePrice")}</th>
                 <th style={{ ...th, textAlign: "right" }}>{t("logistics.payable.purchaseAmount")}</th><th style={th}>{t("logistics.payable.status")}</th><th style={th} />
@@ -320,25 +364,37 @@ export function LogisticsHolcimInvoices({ canManage }: { canManage: boolean }) {
               <tbody>
                 {uninv.map((r) => (
                   <tr key={r.id}>
+                    {canManage && <td style={td}><input type="checkbox" checked={uSel.has(r.id)} onChange={() => toggleUSel(r.id)} aria-label={r.invoiceNumber} /></td>}
                     <td style={td}><Link href={`/dashboard/logistics/export/${r.id}`} style={{ fontWeight: 600 }}>{r.invoiceNumber}</Link></td>
                     <td style={td}>{dt(r.date)}</td>
                     <td style={td}>{r.product ?? "—"}</td>
                     <td style={{ ...td, textAlign: "right" }} className="num">{r.quantity != null ? `${r.quantity} ${r.unit}` : "—"}</td>
                     <td style={{ ...td, textAlign: "right" }} className="num">{r.purchaseUnitPrice != null ? `${r.purchaseUnitPrice.toFixed(2)} ${r.purchaseCurrency}/${r.unit}` : "—"}</td>
                     <td style={{ ...td, textAlign: "right" }} className="num">{r.purchaseAmount != null ? `${r.purchaseAmount.toFixed(2)} ${r.purchaseCurrency}` : "—"}</td>
-                    <td style={td}><span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 10, background: "var(--brass-soft,rgba(192,138,45,.14))", color: "var(--brass,#9A6B18)", whiteSpace: "nowrap" }}>{t("logistics.payable.awaitingInvoice")}</span></td>
-                    <td style={td}><Link href={`/dashboard/logistics/export/${r.id}`} className="btn btn-ghost btn-sm" style={{ fontSize: 11, padding: "2px 10px" }}>{t("logistics.payable.openDelivery")}</Link></td>
+                    <td style={td}>
+                      <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 10, whiteSpace: "nowrap", ...(r.paid
+                        ? { background: "rgba(15,138,106,.14)", color: "var(--emerald-dark,#0F8A6A)" }
+                        : { background: "var(--brass-soft,rgba(192,138,45,.14))", color: "var(--brass,#9A6B18)" }) }}>
+                        {r.paid ? t("logistics.payable.awaitingPaid") : t("logistics.payable.awaitingUnpaid")}
+                      </span>
+                    </td>
+                    <td style={{ ...td, whiteSpace: "nowrap" }}>
+                      {canManage && <button className="btn btn-ghost btn-sm" style={{ fontSize: 11, padding: "2px 10px" }} disabled={uBusy} onClick={() => toggleRowPaid(r)}>{r.paid ? t("logistics.payable.markUnpaid") : t("logistics.payable.markPaidShort")}</button>}
+                      <Link href={`/dashboard/logistics/export/${r.id}`} className="btn btn-ghost btn-sm" style={{ fontSize: 11, padding: "2px 10px" }}>{t("logistics.payable.openDelivery")}</Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
                 {uninvTotals.map((x) => (
                   <tr key={x.currency}>
-                    <td style={{ ...td, fontWeight: 700 }} colSpan={3}>{t("logistics.payable.uninvFooter", { count: x.count })}</td>
+                    <td style={{ ...td, fontWeight: 700 }} colSpan={canManage ? 4 : 3}>{t("logistics.payable.uninvFooter", { count: x.count })}</td>
                     <td style={{ ...td, textAlign: "right", fontWeight: 700 }} className="num">{Math.round(x.quantity * 100) / 100} t</td>
                     <td style={td} />
                     <td style={{ ...td, textAlign: "right", fontWeight: 700 }} className="num">{x.amount.toFixed(2)} {x.currency}</td>
-                    <td style={td} colSpan={2} />
+                    <td style={td} colSpan={2}>
+                      <span style={{ fontSize: 11, color: "var(--muted)" }}>{t("logistics.payable.paid")}: {x.paidAmount.toFixed(2)} · {t("logistics.payable.awaitingUnpaid")}: {x.unpaidAmount.toFixed(2)}</span>
+                    </td>
                   </tr>
                 ))}
               </tfoot>
@@ -358,8 +414,8 @@ export function LogisticsHolcimInvoices({ canManage }: { canManage: boolean }) {
   );
 }
 
-function PayCard({ label, value, warn, muted, onClick }: { label: string; value: string; warn?: boolean; muted?: boolean; onClick?: () => void }) {
-  return <div className="glass panel" onClick={onClick} style={{ padding: "8px 13px", minWidth: 150, flex: "1 1 150px", cursor: onClick ? "pointer" : undefined }} title={onClick ? label : undefined}>
+function PayCard({ label, value, warn, muted, onClick, help }: { label: string; value: string; warn?: boolean; muted?: boolean; onClick?: () => void; help?: string }) {
+  return <div className="glass panel" onClick={onClick} style={{ padding: "8px 13px", minWidth: 150, flex: "1 1 150px", cursor: onClick ? "pointer" : undefined }} title={help ?? (onClick ? label : undefined)}>
     <div style={{ fontSize: 16, fontWeight: 600, fontFamily: "'Fraunces', serif", color: warn ? "var(--brass)" : muted ? "var(--muted)" : "inherit" }}>{value}</div>
     <div style={{ fontSize: 10.5, color: "var(--muted)" }}>{label}{onClick ? " →" : ""}</div>
   </div>;

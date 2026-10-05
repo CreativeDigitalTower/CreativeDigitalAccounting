@@ -39,11 +39,12 @@ describe("payable summary — double counting + валути (§F/§Q10/§Q11/§
       [{ purchaseCurrency: "EUR", purchaseAmount: 1000 }], // несвързана
     );
     const eur = sum.find((s) => s.currency === "EUR")!;
-    expect(eur.invoiced).toBe(1744.81);     // реалното задължение (веднъж)
-    expect(eur.uninvoiced).toBe(1000);      // очаквано (отделно)
-    expect(eur.remaining).toBe(1744.81);
-    // НЕ се сумира 1744.81 + 1744.81.
-    expect(eur.invoiced).not.toBe(3489.62);
+    // Grand total = фактура (1744.81) + нефактурирано (1000) без double counting.
+    expect(eur.totalObligations).toBe(2744.81);
+    expect(eur.uninvoiced).toBe(1000);      // нефактурирано (отделно subset)
+    expect(eur.remaining).toBe(2744.81);    // нищо платено
+    // Свързаната доставка не влиза пак → не 1744.81+1744.81.
+    expect(eur.totalObligations).not.toBe(3489.62);
   });
   it("18) различни валути не се сумират в едно", () => {
     const sum = buildPayableSummary(
@@ -52,8 +53,8 @@ describe("payable summary — double counting + валути (§F/§Q10/§Q11/§
     );
     const eur = sum.find((s) => s.currency === "EUR")!;
     const bgn = sum.find((s) => s.currency === "BGN")!;
-    expect(eur.invoiced).toBe(1000); expect(eur.paid).toBe(200); expect(eur.remaining).toBe(800);
-    expect(bgn.invoiced).toBe(500); expect(bgn.remaining).toBe(500);
+    expect(eur.totalObligations).toBe(1000); expect(eur.paid).toBe(200); expect(eur.remaining).toBe(800);
+    expect(bgn.totalObligations).toBe(500); expect(bgn.remaining).toBe(500);
     expect(sum).toHaveLength(2);
   });
 });
