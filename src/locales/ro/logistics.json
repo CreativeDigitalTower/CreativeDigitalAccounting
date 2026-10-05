@@ -1018,7 +1018,20 @@
     "cancel": "Anulează",
     "issue": "Emite factura",
     "sourceDelivery": "Sursă (livrare)",
-    "dashWarn": "livrări așteaptă facturarea"
+    "dashWarn": "livrări așteaptă facturarea",
+    "bulkSelectAll": "Selectează tot (pentru acest client)",
+    "bulkSameClient": "Puteți selecta doar livrări către același client final.",
+    "bulkSelected": "Selectate: {n} livrări",
+    "bulkCreate": "Creează factură MK comună",
+    "bulkClear": "Șterge selecția",
+    "bulkTitle": "Factură MK comună",
+    "bulkDeliveries": "livrări",
+    "bulkNeedPrices": "Introduceți un preț de vânzare pentru fiecare livrare.",
+    "bulkIssue": "Emite factura comună",
+    "bulkIncluded": "Livrări incluse",
+    "amount": "Valoare",
+    "subtotal": "Subtotal",
+    "grandTotal": "Total"
   },
   "calendar": {
     "mon": "Lu",

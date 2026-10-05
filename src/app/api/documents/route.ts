@@ -113,6 +113,12 @@ export async function POST(req: Request) {
         select: { id: true, number: true },
       });
       if (dup) return NextResponse.json({ error: "Вече е издадена фактура за тази доставка.", invoiceId: dup.id, invoiceNumber: dup.number }, { status: 409 });
+      // Също и ако доставката вече е включена в ОБЩА (bulk) MK фактура (§13).
+      const linked = await prisma.mkInvoiceDeliveryLink.findFirst({
+        where: { exportSetId: set.id, document: { deletedAt: null, status: { not: "cancelled" } } },
+        select: { document: { select: { id: true, number: true } } },
+      });
+      if (linked) return NextResponse.json({ error: "Вече е издадена фактура за тази доставка.", invoiceId: linked.document.id, invoiceNumber: linked.document.number }, { status: 409 });
     }
 
     // Шаблон по подразбиране от фирмения профил, ако не е зададен
