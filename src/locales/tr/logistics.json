@@ -511,7 +511,22 @@
     "sortNewest": "En yeni",
     "sortOldest": "En eski",
     "sortAmount": "Alış değeri",
-    "openDelivery": "Teslimatı aç"
+    "openDelivery": "Teslimatı aç",
+    "tipTotal": "Holcim'e faturalı ve faturasız teslimatların toplam değeri.",
+    "tipPaid": "Holcim'e kayıtlı ödemeler (fatura ödemeleri + ödenen faturasız teslimatlar).",
+    "tipRemaining": "Toplam borcun ödenmemiş kısmı.",
+    "tipUninvoiced": "Henüz bir Holcim faturasına bağlanmamış teslimatlar.",
+    "selectedN": "Seçili: {n}",
+    "selectAll": "Tümünü seç",
+    "bulkMarkPaid": "Ödendi işaretle",
+    "bulkMarkUnpaid": "Ödenmedi işaretle",
+    "bulkPaidConfirm": "{count} teslimatı toplam {totals} tutarında Holcim'e ödendi olarak işaretleyeceksiniz. Devam?",
+    "bulkUnpaidConfirm": "{count} teslimatı ödenmedi olarak işaretleyeceksiniz. Devam?",
+    "rowUnpaidConfirm": "№{number} teslimatını ödenmedi olarak işaretlemek istediğinize emin misiniz?",
+    "awaitingPaid": "Fatura bekliyor · Ödendi",
+    "awaitingUnpaid": "Fatura bekliyor · Ödenmedi",
+    "markPaidShort": "Ödendi",
+    "markUnpaid": "Ödenmedi"
   },
   "mksale": {
     "title": "MK satışları",

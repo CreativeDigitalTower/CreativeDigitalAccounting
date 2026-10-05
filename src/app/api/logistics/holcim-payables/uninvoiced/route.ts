@@ -40,28 +40,33 @@ export async function GET(req: Request) {
     ] } : {}),
   };
 
+  // Default sort = № доставка DESC (§2/§16). invoiceNumber е zero-padded фиксирана ширина →
+  // лексикографското DESC съвпада с числовото.
   const orderBy: Prisma.ExportDocumentSetOrderByWithRelationInput =
-    sort === "date_asc" ? { invoiceDate: "asc" }
-    : sort === "invoice" ? { invoiceNumber: "desc" }
+    sort === "date_desc" ? { invoiceDate: "desc" }
+    : sort === "date_asc" ? { invoiceDate: "asc" }
     : sort === "quantity" ? { quantity: "desc" }
     : sort === "amount" ? { purchaseAmount: "desc" }
-    : { invoiceDate: "desc" }; // date_desc (default — най-новите първи)
+    : { invoiceNumber: "desc" }; // invoice (default)
 
-  const sel = { id: true, invoiceNumber: true, invoiceDate: true, productSnapshot: true, quantity: true, unit: true, purchaseUnitPrice: true, purchaseCurrency: true, purchaseAmount: true } as const;
+  const sel = { id: true, invoiceNumber: true, invoiceDate: true, productSnapshot: true, quantity: true, unit: true, purchaseUnitPrice: true, purchaseCurrency: true, purchaseAmount: true, purchasePaidAt: true } as const;
 
   const [total, all, pageRows] = await Promise.all([
     prisma.exportDocumentSet.count({ where }),
-    // Леко извличане за totals по ЦЕЛИЯ филтриран dataset (не само страницата, §6).
-    prisma.exportDocumentSet.findMany({ where, select: { purchaseCurrency: true, purchaseAmount: true, quantity: true } }),
+    // Леко извличане за totals по ЦЕЛИЯ филтриран dataset (не само страницата, §6/§16).
+    prisma.exportDocumentSet.findMany({ where, select: { purchaseCurrency: true, purchaseAmount: true, quantity: true, purchasePaidAt: true } }),
     prisma.exportDocumentSet.findMany({ where, select: sel, orderBy, skip: (page - 1) * pageSize, take: pageSize }),
   ]);
 
-  // Totals ПО ВАЛУТА (Decimal, §4/§12) — без смесване, без FX.
-  const byCurrency: Record<string, { amount: number; quantity: number; count: number }> = {};
+  // Totals ПО ВАЛУТА (Decimal, §4/§17) — без смесване, без FX. amount = общо; paidAmount =
+  // provisional платено (§6); unpaidAmount = остатъкът.
+  const byCurrency: Record<string, { amount: number; paidAmount: number; quantity: number; count: number }> = {};
   for (const d of all) {
     const cur = d.purchaseCurrency || "EUR";
-    const r = byCurrency[cur] ?? { amount: 0, quantity: 0, count: 0 };
-    r.amount = sumMoney([r.amount, d.purchaseAmount == null ? 0 : Number(d.purchaseAmount)]);
+    const r = byCurrency[cur] ?? { amount: 0, paidAmount: 0, quantity: 0, count: 0 };
+    const amt = d.purchaseAmount == null ? 0 : Number(d.purchaseAmount);
+    r.amount = sumMoney([r.amount, amt]);
+    if (d.purchasePaidAt != null) r.paidAmount = sumMoney([r.paidAmount, amt]);
     r.quantity = Math.round((r.quantity + (d.quantity ?? 0)) * 1000) / 1000;
     r.count += 1;
     byCurrency[cur] = r;
@@ -72,7 +77,8 @@ export async function GET(req: Request) {
     product: d.productSnapshot, quantity: d.quantity, unit: d.unit,
     purchaseUnitPrice: d.purchaseUnitPrice == null ? null : Number(d.purchaseUnitPrice),
     purchaseCurrency: d.purchaseCurrency, purchaseAmount: d.purchaseAmount == null ? null : Number(d.purchaseAmount),
+    paid: d.purchasePaidAt != null,
   }));
 
-  return NextResponse.json({ rows, total, page, pageSize, totals: Object.entries(byCurrency).map(([currency, v]) => ({ currency, ...v })).sort((a, b) => a.currency.localeCompare(b.currency)) });
+  return NextResponse.json({ rows, total, page, pageSize, totals: Object.entries(byCurrency).map(([currency, v]) => ({ currency, ...v, unpaidAmount: sumMoney([v.amount, -v.paidAmount]) })).sort((a, b) => a.currency.localeCompare(b.currency)) });
 }

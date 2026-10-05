@@ -1469,6 +1469,13 @@ model ExportDocumentSet {
   purchaseUnitPrice  Decimal?  @db.Decimal(12, 4)
   purchaseCurrency   String?
   purchaseAmount     Decimal?  @db.Decimal(14, 4)
+  // Provisional settlement (§6/§18): доставката е отбелязана като ПЛАТЕНА към Holcim ПРЕДИ да
+  // има SupplierInvoice. Nullable/additive → reversible (null = неплатено), с история (кой/кога)
+  // и audit. НЕ създава Payment запис → без double counting с плащания по фактури. Платената
+  // сума = purchaseAmount, докато доставката е нефактурирана. При свързване с SupplierInvoice
+  // доставката излиза от provisional компонента (§10) — флагът остава като история.
+  purchasePaidAt     DateTime?
+  purchasePaidById   String?
   // „Празна Испратница" (§1/§10): само за документа Испратница — initial snapshot за „До:" и
   // реда „Денес…" е празен (без клиент/адрес). НЕ влияе на clientId relation, на другите
   // документи или на Client/Product master. Additive/nullable-safe с default false (§12).

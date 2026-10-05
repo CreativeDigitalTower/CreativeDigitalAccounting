@@ -48,11 +48,11 @@ describe("search / filter / sort / pagination (§5/§6)", () => {
   it("9) поддържа q/product/currency/year-month/sort + server-side pagination", () => {
     for (const k of ["q", "product", "currency", "sort", "page", "pageSize"]) expect(LIST).toContain(`sp.get("${k}")`);
     expect(LIST).toContain("skip: (page - 1) * pageSize");
-    expect(LIST).toContain('{ invoiceDate: "desc" }'); // default най-новите
+    expect(LIST).toContain('{ invoiceNumber: "desc" }'); // default № доставка DESC (§2)
   });
-  it("sort опции: date_asc/invoice/quantity/amount", () => {
+  it("sort опции: date_desc/date_asc/quantity/amount + default invoice", () => {
+    expect(LIST).toContain('sort === "date_desc"');
     expect(LIST).toContain('sort === "date_asc"');
-    expect(LIST).toContain('sort === "invoice"');
     expect(LIST).toContain('sort === "quantity"');
     expect(LIST).toContain('sort === "amount"');
   });

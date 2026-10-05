@@ -18,9 +18,10 @@ export async function GET() {
     prisma.supplierInvoice.findMany({ where: { companyId: g.companyId }, select: { id: true, currency: true, links: { select: { grossAmount: true } } } }),
     prisma.payment.findMany({ where: { companyId: g.companyId, direction: "out", documentId: { not: null } }, select: { documentId: true, amount: true } }),
     // Доставки с покупна стойност, но БЕЗ свързана Holcim фактура → очаквано задължение.
+    // purchasePaidAt → provisional платена (§6/§4).
     prisma.exportDocumentSet.findMany({
       where: { companyId: g.companyId, deletedAt: null, purchaseAmount: { not: null }, supplierInvoiceLinks: { none: {} } },
-      select: { purchaseCurrency: true, purchaseAmount: true },
+      select: { purchaseCurrency: true, purchaseAmount: true, purchasePaidAt: true },
     }),
   ]);
 
@@ -34,7 +35,7 @@ export async function GET() {
     paid: paidByInvoice.get(i.id) ?? 0,
   }));
   const uninvoicedDeliveries: UninvoicedDelivery[] = uninvoiced.map((d) => ({
-    purchaseCurrency: d.purchaseCurrency, purchaseAmount: d.purchaseAmount == null ? null : Number(d.purchaseAmount),
+    purchaseCurrency: d.purchaseCurrency, purchaseAmount: d.purchaseAmount == null ? null : Number(d.purchaseAmount), paid: d.purchasePaidAt != null,
   }));
 
   return NextResponse.json({ byCurrency: buildPayableSummary(payableInvoices, uninvoicedDeliveries) });
