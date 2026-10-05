@@ -502,7 +502,16 @@
     "noPurchasePrice": "Δεν έχει οριστεί τιμή αγοράς",
     "purchasePrice": "Τιμή αγοράς",
     "holcimInvoice": "Τιμολόγιο Holcim",
-    "awaitingInvoice": "Αναμονή τιμολογίου"
+    "awaitingInvoice": "Αναμονή τιμολογίου",
+    "uninvTitle": "Μη τιμολογημένες παραδόσεις",
+    "uninvHint": "Παραδόσεις εξαγωγής με υπολογισμένη αξία αγοράς που δεν έχουν συνδεθεί ακόμη με τιμολόγιο Holcim.",
+    "uninvSearch": "Αναζήτηση (αρ. παράδοσης, προϊόν)…",
+    "uninvEmpty": "Δεν υπάρχουν παραδόσεις σε αναμονή τιμολογίου Holcim.",
+    "uninvFooter": "Σύνολο μη τιμολογημένων παραδόσεων: {count}",
+    "sortNewest": "Νεότερες",
+    "sortOldest": "Παλαιότερες",
+    "sortAmount": "Αξία αγοράς",
+    "openDelivery": "Άνοιγμα παράδοσης"
   },
   "mksale": {
     "title": "Πωλήσεις MK",

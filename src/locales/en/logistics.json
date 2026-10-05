@@ -502,7 +502,16 @@
     "noPurchasePrice": "No purchase price set",
     "purchasePrice": "Purchase price",
     "holcimInvoice": "Holcim invoice",
-    "awaitingInvoice": "Awaiting invoice"
+    "awaitingInvoice": "Awaiting invoice",
+    "uninvTitle": "Uninvoiced deliveries",
+    "uninvHint": "Export deliveries with a computed purchase value that are not yet linked to a Holcim invoice.",
+    "uninvSearch": "Search (delivery no., product)…",
+    "uninvEmpty": "No deliveries awaiting a Holcim invoice.",
+    "uninvFooter": "Total uninvoiced deliveries: {count}",
+    "sortNewest": "Newest",
+    "sortOldest": "Oldest",
+    "sortAmount": "Purchase value",
+    "openDelivery": "Open delivery"
   },
   "mksale": {
     "title": "MK sales",

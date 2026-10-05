@@ -502,7 +502,16 @@
     "noPurchasePrice": "Няма зададена покупна цена",
     "purchasePrice": "Покупна цена",
     "holcimInvoice": "Holcim фактура",
-    "awaitingInvoice": "Очаква фактура"
+    "awaitingInvoice": "Очаква фактура",
+    "uninvTitle": "Нефактурирани доставки",
+    "uninvHint": "Експортни доставки с изчислена покупна стойност, които все още не са свързани с фактура от Holcim.",
+    "uninvSearch": "Търсене (№ доставка, продукт)…",
+    "uninvEmpty": "Няма доставки, очакващи фактура от Holcim.",
+    "uninvFooter": "Общо нефактурирани доставки: {count}",
+    "sortNewest": "Най-нови",
+    "sortOldest": "Най-стари",
+    "sortAmount": "Покупна стойност",
+    "openDelivery": "Отвори доставка"
   },
   "mksale": {
     "title": "MK продажби",
