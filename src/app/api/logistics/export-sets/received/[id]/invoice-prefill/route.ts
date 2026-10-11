@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { logisticsApiGuard, inSameGroup } from "@/lib/logistics/access";
 import { normalizeCompanyName } from "@/lib/logistics/normalize";
 import { MK_DEFAULT_VAT_RATE } from "@/lib/logistics/config";
+import { getDefaultDocumentLanguage } from "@/lib/constants";
 import { loadDeliveryInvoiceMap } from "@/lib/logistics/deliveryInvoice";
 
 // Prefill за СТАНДАРТНАТА фактура (Document) от получена BG→MK доставка (§4/§7/§40).
@@ -30,7 +31,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   // Дубликат (§22): вече издадена фактура (bulk link / легаси source / легаси MkInvoice).
   const [invMap, company, bgClient, mkClients] = await Promise.all([
     loadDeliveryInvoiceMap(g.companyId, [set.id]),
-    prisma.company.findUnique({ where: { id: g.companyId }, select: { defaultCurrency: true, defaultLanguage: true } }),
+    prisma.company.findUnique({ where: { id: g.companyId }, select: { defaultCurrency: true, defaultLanguage: true, countryCode: true } }),
     set.clientId ? prisma.client.findUnique({ where: { id: set.clientId }, select: { companyId: true, name: true, eik: true, vatNumber: true, city: true, address: true, contactEmail: true } }) : Promise.resolve(null),
     prisma.client.findMany({ where: { companyId: g.companyId }, select: { id: true, name: true } }),
   ]);
@@ -59,7 +60,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     clientSnapshot: matchedClientId ? null : (bgClient ? { name: bgClient.name, eik: bgClient.eik ?? "", vatNumber: bgClient.vatNumber ?? "", city: bgClient.city ?? "", address: bgClient.address ?? "", contactEmail: bgClient.contactEmail ?? "" } : null),
     line: { description: set.productSnapshot ?? "", quantity: set.quantity ?? 0, unit: set.unit || "t", vatRate: MK_DEFAULT_VAT_RATE },
     currency: company?.defaultCurrency ?? "MKD",
-    language: company?.defaultLanguage ?? undefined,
+    language: getDefaultDocumentLanguage(company),
     notes: refs,
     bgInvoiceNumber: set.invoiceNumber,
     shipmentDate: set.shipmentDate?.toISOString() ?? set.invoiceDate?.toISOString() ?? null,

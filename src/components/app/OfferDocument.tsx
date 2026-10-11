@@ -1,15 +1,13 @@
 import { formatCurrency, toBGN, shouldShowDualCurrency, EUR_TO_BGN, getTemplate, paymentMethodLabel, PLATFORM_NAME, PLATFORM_URL_DISPLAY } from "@/lib/constants";
 import type { InvoiceData } from "@/components/app/InvoiceDocument";
-import { getMessages, makeT } from "@/lib/i18n/messages";
-import { normalizeLocale, intlLocale } from "@/lib/i18n/config";
+import { getDocMessages, docIntlLocale, makeT } from "@/lib/i18n/messages";
 
 /** Професионална оферта (за документи от тип „quote"). */
 export function OfferDocument({ data }: { data: InvoiceData }) {
   const tpl = getTemplate(data.template);
-  const lang = normalizeLocale(data.language);
-  const dt = makeT(getMessages(lang));
+  const dt = makeT(getDocMessages(data.language));
   const L = (k: string, vars?: Record<string, string | number>) => dt(`pdf.${k}`, vars);
-  const fmtDate = (d: string | Date) => new Date(d).toLocaleDateString(intlLocale(lang));
+  const fmtDate = (d: string | Date) => new Date(d).toLocaleDateString(docIntlLocale(data.language));
   const accent = tpl.accent;
   // Двойно EUR/BGN обозначаване само за оферти, издадени преди края на периода.
   const dual = shouldShowDualCurrency(data.issueDate, data.currency);

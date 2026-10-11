@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   formatCurrency,
-  CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, PAYMENT_METHODS, allowedTemplateCount, VAT_EXEMPT_REASONS, VAT_RATES, type PlanId,
+  CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, PAYMENT_METHODS, allowedTemplateCount, getDefaultDocumentLanguage, VAT_EXEMPT_REASONS, VAT_RATES, type PlanId,
 } from "@/lib/constants";
 import { TemplateGallery } from "@/components/app/TemplateGallery";
 import { useI18n } from "@/components/i18n/I18nProvider";
@@ -145,7 +145,8 @@ function NewDocumentForm() {
     // Зареди основните настройки от профила на фирмата
     fetch("/api/company").then((r) => r.json()).then((c) => {
       if (c?.defaultCurrency) setCurrency(c.defaultCurrency);
-      if (c?.defaultLanguage) setLanguage(c.defaultLanguage);
+      // Език на документа по подразбиране според издателя (MK фирма → македонски, §3/§17).
+      if (c) setLanguage(getDefaultDocumentLanguage(c));
       if (c?.invoiceTemplate) setTemplate(c.invoiceTemplate);
       if (c?.plan) setPlan(c.plan as PlanId);
       // ДДС по подразбиране: нерегистрирана фирма → авто освобождаване (чл.113 ал.9)

@@ -1,5 +1,5 @@
 import type { Locale } from "./config";
-import { DEFAULT_LOCALE } from "./config";
+import { DEFAULT_LOCALE, isLocale, intlLocale, normalizeLocale } from "./config";
 
 // Регистър на преводните пространства (namespaces). Добавяне на нов namespace =
 // нов JSON файл за всеки език + нов ред тук. Добавяне на нов език = нов блок.
@@ -351,6 +351,38 @@ export function getMessages(locale: Locale): Messages {
   const merged = locale === DEFAULT_LOCALE ? DICTS[DEFAULT_LOCALE] : deepMerge(DICTS[DEFAULT_LOCALE], DICTS[locale] ?? {});
   CACHE.set(locale, merged);
   return merged;
+}
+
+// ── Document-only езици (не са UI platform locale, §13/§21) ──
+// Македонски: само за СЪДЪРЖАНИЕТО на документите (фактури/оферти). Renderer-ът ползва
+// единствено `pdf.*`, затова е достатъчен pdf namespace — останалите ключове идват от bg
+// чрез deepMerge. Платформеният UI остава на своите 6 locale-а.
+import mkPdf from "@/locales/mk/pdf.json";
+const DOC_ONLY_DICTS: Record<string, Messages> = { mk: { pdf: mkPdf } };
+const DOC_INTL: Record<string, string> = { mk: "mk-MK" };
+const DOC_CACHE = new Map<string, Messages>();
+
+/** Поддържани ЕЗИЦИ НА ДОКУМЕНТИ = platform locale-ите + document-only (mk). */
+export function isDocLanguage(code: unknown): code is string {
+  return typeof code === "string" && (isLocale(code) || code in DOC_ONLY_DICTS);
+}
+
+/** Съобщения за език на ДОКУМЕНТ (superset на Locale). Непознат → bg. */
+export function getDocMessages(code: string | null | undefined): Messages {
+  const c = code ?? DEFAULT_LOCALE;
+  if (isLocale(c)) return getMessages(c);
+  const extra = DOC_ONLY_DICTS[c];
+  if (!extra) return getMessages(DEFAULT_LOCALE);
+  if (DOC_CACHE.has(c)) return DOC_CACHE.get(c)!;
+  const merged = deepMerge(DICTS[DEFAULT_LOCALE], extra);
+  DOC_CACHE.set(c, merged);
+  return merged;
+}
+
+/** Intl locale за форматиране на дати/числа за език на документ. */
+export function docIntlLocale(code: string | null | undefined): string {
+  const c = code ?? DEFAULT_LOCALE;
+  return DOC_INTL[c] ?? intlLocale(normalizeLocale(c));
 }
 
 /** Резолвва ключ „namespace.path.to.key" + интерполация на {променливи}. */
