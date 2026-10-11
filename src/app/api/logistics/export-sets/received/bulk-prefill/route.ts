@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logisticsApiGuard, inSameGroup } from "@/lib/logistics/access";
 import { MK_DEFAULT_VAT_RATE } from "@/lib/logistics/config";
+import { getDefaultDocumentLanguage } from "@/lib/constants";
 import { invoicedSetIds, resolveFinalClientIds } from "@/lib/logistics/deliveryInvoice";
 
 /**
@@ -35,7 +36,7 @@ export async function GET(req: Request) {
   if (already.size > 0) return NextResponse.json({ error: "already_invoiced", invoiced: [...already] }, { status: 409 });
 
   const [company, client] = await Promise.all([
-    prisma.company.findUnique({ where: { id: g.companyId }, select: { defaultCurrency: true, defaultLanguage: true } }),
+    prisma.company.findUnique({ where: { id: g.companyId }, select: { defaultCurrency: true, defaultLanguage: true, countryCode: true } }),
     prisma.client.findFirst({ where: { id: clientId, companyId: g.companyId }, select: { id: true, name: true } }),
   ]);
 
@@ -53,7 +54,7 @@ export async function GET(req: Request) {
     clientName: client?.name ?? null,
     lines,
     currency: company?.defaultCurrency ?? "MKD",
-    language: company?.defaultLanguage ?? undefined,
+    language: getDefaultDocumentLanguage(company),
     notes: `Логистични доставки: ${ordered.map((s) => s.invoiceNumber).join(", ")}`,
     context: { count: ordered.length, totalQuantity, unit: ordered[0]?.unit || "t", sourceNumbers: ordered.map((s) => s.invoiceNumber) },
   });

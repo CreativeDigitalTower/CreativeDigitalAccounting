@@ -94,7 +94,20 @@ export const DOC_LANGUAGES = [
   { code: "ro", label: "Română" },
   { code: "tr", label: "Türkçe" },
   { code: "el", label: "Ελληνικά" },
+  // Document-only език (не е UI platform locale): само за съдържанието на фактури/оферти.
+  { code: "mk", label: "Македонски" },
 ] as const;
+
+/**
+ * Език на документа по подразбиране според ИЗДАТЕЛЯ (country-aware, §3/§17). MK фирма →
+ * македонски; иначе явно зададеният фирмен език, иначе bg. DEFAULT, не forced (§4) — UI-ят
+ * позволява ръчна смяна. Не hardcode-ва име/ID на фирма.
+ */
+export function getDefaultDocumentLanguage(company: { countryCode?: string | null; defaultLanguage?: string | null } | null | undefined): string {
+  const cc = (company?.countryCode ?? "").trim().toUpperCase();
+  if (cc === "MK") return "mk";
+  return company?.defaultLanguage || "bg";
+}
 
 // 10 дизайна за фактури (layout: classic | band | minimal)
 export const INVOICE_TEMPLATES = [
