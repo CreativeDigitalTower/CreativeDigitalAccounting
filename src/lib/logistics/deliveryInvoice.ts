@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { resolveReceivedInvoice, type ReceivedMkInvoice } from "@/lib/logistics/received";
+import { normalizeCompanyName } from "@/lib/logistics/normalize";
 
 /**
  * Канонична резолюция „коя MK фактура покрива дадена получена доставка" (§12/§13).
@@ -46,4 +47,27 @@ export async function loadDeliveryInvoiceMap(companyId: string, setIds: string[]
 export async function invoicedSetIds(companyId: string, setIds: string[]): Promise<Set<string>> {
   const map = await loadDeliveryInvoiceMap(companyId, setIds);
   return new Set(map.keys());
+}
+
+/**
+ * Канонична идентичност на крайния клиент (SEM CRM client id) за всяка получена доставка (§4):
+ * ако доставката вече сочи CRM клиент на активната (MK) фирма → него; иначе match по
+ * нормализирано име към CRM клиент на фирмата. ID, не fuzzy име. Връща Map<setId, clientId|null>.
+ * Доставките трябва да са на активната фирма като получател (buyerCompanyId === companyId).
+ */
+export async function resolveFinalClientIds(companyId: string, sets: { id: string; clientId: string | null }[]): Promise<Map<string, string | null>> {
+  const out = new Map<string, string | null>();
+  const bgIds = [...new Set(sets.map((s) => s.clientId).filter((x): x is string => !!x))];
+  const [bgClients, semClients] = await Promise.all([
+    bgIds.length ? prisma.client.findMany({ where: { id: { in: bgIds } }, select: { id: true, name: true, companyId: true } }) : Promise.resolve([]),
+    prisma.client.findMany({ where: { companyId }, select: { id: true, name: true } }),
+  ]);
+  const bgById = new Map(bgClients.map((c) => [c.id, c]));
+  const semByNorm = new Map(semClients.map((c) => [normalizeCompanyName(c.name), c.id]));
+  for (const s of sets) {
+    if (!s.clientId) { out.set(s.id, null); continue; }
+    const c = bgById.get(s.clientId);
+    out.set(s.id, c ? (c.companyId === companyId ? s.clientId : (semByNorm.get(normalizeCompanyName(c.name)) ?? null)) : null);
+  }
+  return out;
 }
