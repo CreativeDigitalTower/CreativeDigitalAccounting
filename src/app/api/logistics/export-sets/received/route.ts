@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { logisticsApiGuard } from "@/lib/logistics/access";
 import { normalizeCompanyName } from "@/lib/logistics/normalize";
-import { buildReceivedView, resolveReceivedInvoice, type ReceivedSetInput } from "@/lib/logistics/received";
+import { buildReceivedView, type ReceivedSetInput } from "@/lib/logistics/received";
+import { loadDeliveryInvoiceMap } from "@/lib/logistics/deliveryInvoice";
 
 // Споделена intercompany visibility (§2/§4): получените доставки са export set-овете,
 // в които АКТИВНАТА фирма (MK) е купувач (buyerCompanyId), издадени от продавач (BG) в
@@ -29,38 +30,37 @@ export async function GET() {
   const bgClientIds = [...new Set(sets.map((s) => s.clientId).filter((x): x is string => !!x))];
   const setIds = sets.map((s) => s.id);
 
-  const [sellers, bgClients, docInvoices, mkInvoices, mkClients] = await Promise.all([
+  const [sellers, bgClients, invoiceBySetId, mkClients] = await Promise.all([
     sellerIds.length ? prisma.company.findMany({ where: { id: { in: sellerIds } }, select: { id: true, name: true } }) : Promise.resolve([]),
     // Имената на крайните клиенти, посочени от BG страната (за предложение при фактуриране).
-    bgClientIds.length ? prisma.client.findMany({ where: { id: { in: bgClientIds } }, select: { id: true, name: true } }) : Promise.resolve([]),
-    // Стандартните фактури (Document, source of truth §17), издадени от тези доставки —
-    // валидни = не изтрити и не анулирани (§21).
-    setIds.length ? prisma.document.findMany({ where: { companyId: g.companyId, type: "invoice", sourceExportSetId: { in: setIds }, deletedAt: null, status: { not: "cancelled" } }, select: { id: true, number: true, sourceExportSetId: true } }) : Promise.resolve([]),
-    // Легаси MkInvoice (operational ledger) — само за доставки без стандартна фактура.
-    setIds.length ? prisma.mkInvoice.findMany({ where: { companyId: g.companyId, sourceExportSetId: { in: setIds } }, select: { id: true, number: true, sourceExportSetId: true, documentId: true } }) : Promise.resolve([]),
+    bgClientIds.length ? prisma.client.findMany({ where: { id: { in: bgClientIds } }, select: { id: true, name: true, companyId: true } }) : Promise.resolve([]),
+    // Канонична резолюция: bulk link → легаси sourceExportSetId → легаси MkInvoice (§12).
+    loadDeliveryInvoiceMap(g.companyId, setIds),
     // Собствените CRM клиенти на MK фирмата — за автопопълване на крайния клиент (§12/§13).
     prisma.client.findMany({ where: { companyId: g.companyId }, select: { id: true, name: true } }),
   ]);
 
   const sellerName = new Map(sellers.map((c) => [c.id, c.name]));
-  const bgClientName = new Map(bgClients.map((c) => [c.id, c.name]));
-  // Приоритет: стандартна фактура (Document). Легаси MkInvoice се показва само ако няма
-  // Document за тази доставка и не е bridge-нат към Document (§23/§43).
-  const docBySet = new Map(docInvoices.filter((d) => d.sourceExportSetId).map((d) => [d.sourceExportSetId as string, { id: d.id, number: d.number }]));
-  const mkBySet = new Map(mkInvoices.filter((m) => m.sourceExportSetId).map((m) => [m.sourceExportSetId as string, { id: m.id, number: m.number, documentId: m.documentId }]));
-  const invoiceBySetId = new Map<string, NonNullable<ReturnType<typeof resolveReceivedInvoice>>>();
-  for (const sid of new Set([...docBySet.keys(), ...mkBySet.keys()])) {
-    const resolved = resolveReceivedInvoice(docBySet.get(sid) ?? null, mkBySet.get(sid) ?? null);
-    if (resolved) invoiceBySetId.set(sid, resolved);
-  }
+  const bgClientById = new Map(bgClients.map((c) => [c.id, c]));
   const mkClientByNorm = new Map(mkClients.map((c) => [normalizeCompanyName(c.name), c.id]));
-  const bgClientNameBySet = new Map(sets.map((s) => [s.id, s.clientId ? (bgClientName.get(s.clientId) ?? null) : null]));
+
+  // Канонична идентичност на крайния клиент (§4): ако доставката вече сочи SEM CRM клиент →
+  // него; иначе match по нормализирано име към SEM CRM клиент. ID, не fuzzy име.
+  const finalClientIdFor = (clientId: string | null): string | null => {
+    if (!clientId) return null;
+    const c = bgClientById.get(clientId);
+    if (!c) return null;
+    if (c.companyId === g.companyId) return clientId; // вече SEM клиент
+    return mkClientByNorm.get(normalizeCompanyName(c.name)) ?? null;
+  };
 
   const input: ReceivedSetInput[] = sets.map((s) => ({
     id: s.id, invoiceNumber: s.invoiceNumber, invoiceDate: s.invoiceDate, destination: s.destination,
     deliveryTerm: s.deliveryTerm, truckRegSnapshot: s.truckRegSnapshot, trailerReg: s.trailerReg,
     productSnapshot: s.productSnapshot, quantity: s.quantity, unit: s.unit, status: s.status,
-    sellerName: sellerName.get(s.companyId) ?? null, clientName: bgClientNameBySet.get(s.id) ?? null,
+    sellerName: sellerName.get(s.companyId) ?? null,
+    clientName: s.clientId ? (bgClientById.get(s.clientId)?.name ?? null) : null,
+    finalClientId: finalClientIdFor(s.clientId),
   }));
 
   // Предложен MK клиент: match по нормализирано име на BG-посочения краен клиент (§13).

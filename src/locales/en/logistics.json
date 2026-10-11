@@ -1018,7 +1018,20 @@
     "cancel": "Cancel",
     "issue": "Issue invoice",
     "sourceDelivery": "Source (delivery)",
-    "dashWarn": "deliveries awaiting invoicing"
+    "dashWarn": "deliveries awaiting invoicing",
+    "bulkSelectAll": "Select all (for this client)",
+    "bulkSameClient": "You can only select deliveries for the same final client.",
+    "bulkSelected": "Selected: {n} deliveries",
+    "bulkCreate": "Create combined MK invoice",
+    "bulkClear": "Clear selection",
+    "bulkTitle": "Combined MK invoice",
+    "bulkDeliveries": "deliveries",
+    "bulkNeedPrices": "Enter a selling price for each delivery.",
+    "bulkIssue": "Issue combined invoice",
+    "bulkIncluded": "Included deliveries",
+    "amount": "Amount",
+    "subtotal": "Subtotal",
+    "grandTotal": "Total"
   },
   "calendar": {
     "mon": "Mon",

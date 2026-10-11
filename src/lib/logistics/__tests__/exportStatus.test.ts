@@ -100,11 +100,13 @@ describe("§9 source: списъкът ползва derived статус, не �
 describe("§B MK фактура: detail резолвва И Document, И легаси MkInvoice", () => {
   const api = read("src/app/api/logistics/export-sets/[id]/route.ts");
   const detail = read("src/components/app/logistics/ExportSetDetail.tsx");
-  it("detail GET чете стандартна фактура (Document) освен легаси MkInvoice", () => {
-    expect(api).toContain("prisma.document.findFirst");
-    expect(api).toContain('type: "invoice"');
-    expect(api).toContain("sourceExportSetId: set.id");
-    expect(api).toContain("resolveReceivedInvoice(");
+  it("detail GET резолвва MK фактурата канонично (bulk link + Document + легаси) чрез shared lib", () => {
+    expect(api).toContain("loadDeliveryInvoiceMap(set.buyerCompanyId, [set.id])");
+    // Споделената резолюция покрива и Document (source), и легаси MkInvoice.
+    const lib = read("src/lib/logistics/deliveryInvoice.ts");
+    expect(lib).toContain('type: "invoice"');
+    expect(lib).toContain("resolveReceivedInvoice(");
+    expect(lib).toContain("mkInvoiceDeliveryLink.findMany");
   });
   it("detail отваря фактурата през read-only cross-company изглед (без смяна на фирма)", () => {
     expect(detail).toContain("/dashboard/logistics/mk-invoice/${s.mkInvoice.id}");

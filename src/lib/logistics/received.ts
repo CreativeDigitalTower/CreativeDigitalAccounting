@@ -24,6 +24,8 @@ export type ReceivedSetInput = {
   status: string;
   sellerName: string | null;
   clientName: string | null;
+  // Канонична идентичност на крайния клиент (SEM CRM client id) за bulk фактуриране (§3/§4).
+  finalClientId?: string | null;
 };
 
 // „document" = стандартна фактура (Document, source of truth, §17); „mk" = легаси
@@ -39,6 +41,8 @@ export type ReceivedRow = ReceivedSetInput & {
   mkInvoice: ReceivedMkInvoice;
   invoiceStatus: ReceivedInvoiceStatus;
   suggestedClientId: string | null;
+  // Може ли да участва в bulk обща фактура: нефактурирана + с канонична идентичност на клиент.
+  bulkEligible: boolean;
 };
 
 export type ReceivedKpi = { received: number; uninvoiced: number; invoiced: number; totalQuantity: number };
@@ -59,7 +63,10 @@ export function buildReceivedView(
     kpi.received++;
     if (invoiceStatus === "invoiced") kpi.invoiced++; else kpi.uninvoiced++;
     kpi.totalQuantity += s.quantity ?? 0;
-    return { ...s, mkInvoice, invoiceStatus, suggestedClientId: suggestClientId(s) };
+    const suggestedClientId = suggestClientId(s);
+    // Bulk-eligible: нефактурирана + има канонична идентичност на краен клиент (§3/§4/§13).
+    const bulkEligible = invoiceStatus === "uninvoiced" && !!(s.finalClientId ?? suggestedClientId);
+    return { ...s, mkInvoice, invoiceStatus, suggestedClientId, bulkEligible };
   });
   // Закръгляне на общото количество на 3 знака (§6), без float drift.
   kpi.totalQuantity = Math.round(kpi.totalQuantity * 1000) / 1000;

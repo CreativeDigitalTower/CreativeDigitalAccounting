@@ -1018,7 +1018,20 @@
     "cancel": "İptal",
     "issue": "Fatura kes",
     "sourceDelivery": "Kaynak (sevkiyat)",
-    "dashWarn": "sevkiyat faturalandırma bekliyor"
+    "dashWarn": "sevkiyat faturalandırma bekliyor",
+    "bulkSelectAll": "Tümünü seç (bu müşteri için)",
+    "bulkSameClient": "Yalnızca aynı nihai müşteriye ait teslimatları seçebilirsiniz.",
+    "bulkSelected": "Seçili: {n} teslimat",
+    "bulkCreate": "Ortak MK faturası oluştur",
+    "bulkClear": "Seçimi temizle",
+    "bulkTitle": "Ortak MK faturası",
+    "bulkDeliveries": "teslimat",
+    "bulkNeedPrices": "Her teslimat için satış fiyatı girin.",
+    "bulkIssue": "Ortak faturayı düzenle",
+    "bulkIncluded": "Dahil edilen teslimatlar",
+    "amount": "Tutar",
+    "subtotal": "Ara toplam",
+    "grandTotal": "Toplam"
   },
   "calendar": {
     "mon": "Pzt",

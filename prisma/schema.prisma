@@ -1496,6 +1496,7 @@ model ExportDocumentSet {
   destinationRef LogisticsDestination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
   documents   ExportDocument[]
   supplierInvoiceLinks SupplierInvoiceExportLink[] // връзки към Holcim фактури (payable, §G)
+  mkInvoiceLinks MkInvoiceDeliveryLink[] // bulk MK фактура (SEM → краен клиент) — N доставки → 1 фактура
   mkInvoices  MkInvoice[]       // легаси MK фактури (operational ledger) за тази доставка (§18)
   invoices    Document[]        @relation("ExportSetInvoices") // стандартни фактури (§17/§41)
   attachments ExportAttachment[] // допълнителни (качени) документи в досието (§7/§14)
@@ -1834,6 +1835,7 @@ model Document {
   parentDocument Document?      @relation("DocumentChain", fields: [parentDocumentId], references: [id])
   childDocuments Document[]     @relation("DocumentChain")
   sourceExportSet ExportDocumentSet? @relation("ExportSetInvoices", fields: [sourceExportSetId], references: [id], onDelete: SetNull)
+  deliveryLinks   MkInvoiceDeliveryLink[] // bulk MK фактура → много получени доставки (§12)
   lines          DocumentLine[]
   attachments    DocumentAttachment[]
   events         DocumentEvent[]
@@ -1843,6 +1845,24 @@ model Document {
   @@index([recipientCompanyId])
   @@index([companyId, deletedAt])
   @@index([sourceExportSetId])
+}
+
+// Връзка MK фактура (Document, издадена от SEM към краен клиент) ↔ получена доставка
+// (ExportDocumentSet). Една обща фактура може да покрива N доставки (§12). `exportSetId` е
+// @unique → една доставка участва в НАЙ-МНОГО една активна MK фактура → защита от двойно
+// фактуриране на DB ниво (§13/§20). Additive; легаси single-invoice flow продължава да ползва
+// Document.sourceExportSetId (без линк).
+model MkInvoiceDeliveryLink {
+  id          String   @id @default(cuid())
+  documentId  String
+  exportSetId String   @unique
+  createdAt   DateTime @default(now())
+  createdById String?
+
+  document  Document          @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  exportSet ExportDocumentSet @relation(fields: [exportSetId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
 }
 
 // ─── Document Tracking ───────────────────────────────────────────────────
