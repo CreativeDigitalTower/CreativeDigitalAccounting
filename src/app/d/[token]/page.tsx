@@ -27,7 +27,7 @@ export default async function PublicDocumentPage({ params }: { params: Promise<{
     currency: doc.currency, paymentMethod: doc.paymentMethod, notes: doc.notes, template: doc.template,
     logoUrl: showLogo ? doc.company.logoUrl : null,
     company: {
-      name: doc.company.name, mol: doc.company.mol, address: doc.company.address, city: doc.company.city,
+      name: doc.company.name, mol: doc.issuerMol ?? doc.company.mol, address: doc.company.address, city: doc.issuerCity ?? doc.company.city,
       eik: doc.company.eik, vatNumber: doc.company.vatRegistered ? doc.company.vatNumber : null, bankIban: doc.company.bankIban,
       bankName: doc.company.bankName, bankBic: doc.company.bankBic,
             phone: doc.company.phone, email: doc.company.email, website: doc.company.website,

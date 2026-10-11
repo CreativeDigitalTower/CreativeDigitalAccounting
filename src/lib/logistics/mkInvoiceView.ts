@@ -10,6 +10,8 @@ export type MkDocForView = {
   type: string; number: string; issueDate: Date; taxEventDate: Date | null; dueDate: Date | null;
   currency: string; paymentMethod: string; notes: string | null; template: string; language: string | null;
   vatExempt: boolean; vatExemptReason: string | null; clientIsIndividual: boolean;
+  // Snapshot на издателя (§6/§7); fallback към живите Company данни за стари документи.
+  issuerCity?: string | null; issuerMol?: string | null;
   company: {
     name: string; mol: string | null; address: string | null; city: string | null; eik: string | null;
     vatRegistered: boolean; vatNumber: string | null; bankIban: string | null; bankName: string | null;
@@ -25,7 +27,7 @@ export function buildInvoiceViewData(doc: MkDocForView, opts: { vatExemptReasonT
     currency: doc.currency, paymentMethod: doc.paymentMethod, notes: doc.notes, template: doc.template,
     logoUrl: opts.showLogo ? doc.company.logoUrl : null,
     company: {
-      name: doc.company.name, mol: doc.company.mol, address: doc.company.address, city: doc.company.city,
+      name: doc.company.name, mol: doc.issuerMol ?? doc.company.mol, address: doc.company.address, city: doc.issuerCity ?? doc.company.city,
       eik: doc.company.eik, vatNumber: doc.company.vatRegistered ? doc.company.vatNumber : null, bankIban: doc.company.bankIban,
       bankName: doc.company.bankName, bankBic: doc.company.bankBic, phone: doc.company.phone, email: doc.company.email, website: doc.company.website,
     },
