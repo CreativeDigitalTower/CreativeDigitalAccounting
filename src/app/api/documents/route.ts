@@ -12,6 +12,7 @@ import {
   audit,
 } from "@/lib/documents";
 import { Prisma } from "@prisma/client";
+import { resolveFinalClientIds, invoicedSetIds } from "@/lib/logistics/deliveryInvoice";
 import { z } from "zod";
 
 type CreatedDoc = Prisma.DocumentGetPayload<{ include: { lines: true } }>;
@@ -48,6 +49,9 @@ const schema = z.object({
   clientIsIndividual: z.boolean().optional(),
   // Логистика: издаване на стандартна фактура от получена BG→MK доставка (§18/§41).
   sourceExportSetId: z.string().optional(),
+  // Bulk MK фактуриране (§10): N получени доставки → една стандартна фактура. Additive;
+  // когато е подадено, се валидира server-side и се създават MkInvoiceDeliveryLink записи.
+  sourceExportSetIds: z.array(z.string()).min(1).max(200).optional(),
 });
 
 export async function POST(req: Request) {
@@ -121,6 +125,28 @@ export async function POST(req: Request) {
       if (linked) return NextResponse.json({ error: "Вече е издадена фактура за тази доставка.", invoiceId: linked.document.id, invoiceNumber: linked.document.number }, { status: 409 });
     }
 
+    // Bulk MK фактуриране (§10/§11): валидирай ВСИЧКИ избрани доставки server-side.
+    let bulkSetIds: string[] = [];
+    if (data.sourceExportSetIds && data.sourceExportSetIds.length > 0) {
+      bulkSetIds = [...new Set(data.sourceExportSetIds)];
+      if (bulkSetIds.length !== data.sourceExportSetIds.length) return NextResponse.json({ error: "Дублирана доставка в заявката." }, { status: 400 });
+      if (data.type !== "invoice") return NextResponse.json({ error: "Само фактура може да се издаде от доставки." }, { status: 400 });
+      const sets = await prisma.exportDocumentSet.findMany({
+        where: { id: { in: bulkSetIds }, buyerCompanyId: companyId, deletedAt: null },
+        select: { id: true, clientId: true },
+      });
+      if (sets.length !== bulkSetIds.length) return NextResponse.json({ error: "Една или повече доставки не са намерени." }, { status: 404 });
+      // SAME-CLIENT HARD RULE (§11/§12): всяка доставка → същия canonical finalClient == buyer.
+      if (!data.clientId) return NextResponse.json({ error: "Липсва клиент за общата фактура." }, { status: 400 });
+      const finalByset = await resolveFinalClientIds(companyId, sets);
+      for (const s of sets) {
+        if (finalByset.get(s.id) !== data.clientId) return NextResponse.json({ error: "Всички доставки трябва да са към един и същ краен клиент." }, { status: 400 });
+      }
+      // No double invoicing (§13): нито една вече фактурирана (линк/легаси/MkInvoice).
+      const already = await invoicedSetIds(companyId, bulkSetIds);
+      if (already.size > 0) return NextResponse.json({ error: "Една или повече от избраните доставки вече са фактурирани.", invoiced: [...already] }, { status: 409 });
+    }
+
     // Шаблон по подразбиране от фирмения профил, ако не е зададен
     let template = data.template;
     if (!template) {
@@ -179,13 +205,25 @@ export async function POST(req: Request) {
             },
             include: { lines: true },
           });
+          // Bulk: свържи всички доставки към тази фактура (§9). @unique(exportSetId) →
+          // concurrent дубликат → P2002 → 409 (§13/§20), в рамките на транзакцията.
+          if (bulkSetIds.length > 0) {
+            try {
+              await tx.mkInvoiceDeliveryLink.createMany({ data: bulkSetIds.map((exportSetId) => ({ documentId: doc.id, exportSetId, createdById: userId })) });
+            } catch (le) {
+              // Unique(exportSetId) конфликт = доставка вече фактурирана concurrent (§20) → 409, не retry.
+              if ((le as { code?: string }).code === "P2002") throw { __bulkConflict: true };
+              throw le;
+            }
+          }
           if (data.type === "invoice") await advanceInvoiceSequence(tx, companyId, num!);
           return { doc, num: num! };
         }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
         if ("taken" in result) { numberTaken = true; break; }
         document = result.doc; number = result.num; break;
       } catch (e) {
-        const err = e as { __retry?: boolean; code?: string };
+        const err = e as { __retry?: boolean; __bulkConflict?: boolean; code?: string };
+        if (err.__bulkConflict) return NextResponse.json({ error: "Една или повече от избраните доставки вече са фактурирани." }, { status: 409 });
         if ((err.__retry || err.code === "P2034" || err.code === "P2002") && attempt < 4) continue;
         throw e;
       }

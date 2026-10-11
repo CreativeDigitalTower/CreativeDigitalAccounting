@@ -48,31 +48,51 @@ describe("резолюция: bulk link има приоритет (§12)", () =>
   });
 });
 
-describe("bulk-invoice endpoint — source assertions (§3/§13/§19/§20/§26)", () => {
-  const api = read("src/app/api/logistics/export-sets/received/bulk-invoice/route.ts");
-  it("финансов write → manage_invoices; SEM scope (buyerCompanyId)", () => {
-    expect(api).toContain('logisticsApiGuard("manage_invoices")');
-    expect(api).toContain("buyerCompanyId: g.companyId");
+describe("standard POST /api/documents — bulk през СЪЩИЯ engine (§10/§3/§13/§20)", () => {
+  const api = read("src/app/api/documents/route.ts");
+  it("приема sourceExportSetIds (additive, backward-compatible)", () => {
+    expect(api).toContain("sourceExportSetIds: z.array(z.string())");
+    expect(api).toContain("sourceExportSetId: z.string().optional()"); // легаси single остава
   });
-  it("same-client HARD rule се валидира server-side (§3)", () => {
-    expect(api).toContain("finalClientIdFor(s.clientId) !== d.clientId");
-    expect(api).toContain("към един и същ краен клиент");
+  it("same-client HARD rule server-side (§3/§11/§12)", () => {
+    expect(api).toContain("resolveFinalClientIds(companyId, sets)");
+    expect(api).toContain("finalByset.get(s.id) !== data.clientId");
   });
-  it("no double invoicing: invoicedSetIds проверка + @unique линк (§13/§20)", () => {
-    expect(api).toContain("invoicedSetIds(g.companyId, setIds)");
-    expect(api).toContain("mkInvoiceDeliveryLink.createMany");
-    expect(api).toContain('err.code === "P2002"');
+  it("SEM scope + no double invoicing (§13)", () => {
+    expect(api).toContain("buyerCompanyId: companyId");
+    expect(api).toContain("invoicedSetIds(companyId, bulkSetIds)");
   });
-  it("суми server-side: количество от snapshot, не от браузъра (§26)", () => {
-    expect(api).toContain("const qty = s.quantity ?? 0");
-    expect(api).toContain("lineFinancials(qty, l.unitPrice");
+  it("създава N links в СЪЩАТА транзакция; concurrent дубликат → 409, не retry (§9/§20)", () => {
+    expect(api).toContain("tx.mkInvoiceDeliveryLink.createMany");
+    expect(api).toContain("__bulkConflict");
   });
-  it("атомарно: Serializable транзакция + advanceInvoiceSequence (§19)", () => {
+  it("прахът на bulk-create endpoint е премахнат — ONE source of truth (§20)", () => {
+    expect(fs.existsSync("src/app/api/logistics/export-sets/received/bulk-invoice/route.ts")).toBe(false);
+  });
+  it("standard numbering/VAT/tx остават (§17): generateDocumentNumber + Serializable", () => {
+    expect(api).toContain("generateDocumentNumber");
     expect(api).toContain("TransactionIsolationLevel.Serializable");
-    expect(api).toContain("advanceInvoiceSequence");
   });
-  it("audit запис за общата фактура (§25)", () => {
-    expect(api).toContain('audit(g.companyId, g.userId, "create", "Document"');
+});
+
+describe("bulk-prefill + UI → СТАНДАРТНАТА форма (§2/§3/§5/§21)", () => {
+  const prefill = read("src/app/api/logistics/export-sets/received/bulk-prefill/route.ts");
+  const ui = read("src/components/app/logistics/ReceivedDeliveries.tsx");
+  const form = read("src/app/(app)/dashboard/documents/new/page.tsx");
+  it("bulk бутонът навигира към стандартната Нова фактура (без custom modal, §2)", () => {
+    expect(ui).toContain("/dashboard/documents/new?fromDeliveries=");
+    expect(ui).not.toContain("BulkInvoiceModal");
+  });
+  it("prefill: един краен клиент + ред на доставка; не Holcim цена (§4/§5/§6)", () => {
+    expect(prefill).toContain("resolveFinalClientIds");
+    expect(prefill).toContain("client_mismatch");
+    expect(prefill).toContain("доставка №");
+    expect(prefill).not.toContain("purchasePrice");
+  });
+  it("стандартната форма чете fromDeliveries, праща sourceExportSetIds, заключва клиента (§3/§12)", () => {
+    expect(form).toContain("fromDeliveries");
+    expect(form).toContain("sourceExportSetIds: sourceExportSetIds.length > 0");
+    expect(form).toContain("clientLocked");
   });
 });
 

@@ -203,7 +203,10 @@
     "vatInvalid": "Format invalid al numărului de TVA.",
     "vatInconsistent": "Este introdus un număr de TVA, dar clientul este marcat ca neînregistrat în scopuri de TVA. Verificați datele.",
     "duplicateInvoice": "Duplică factura",
-    "fromDelivery": "Factură nouă dintr-o livrare logistică (factură BG №{number}) — verificați și ajustați înainte de emitere."
+    "fromDelivery": "Factură nouă dintr-o livrare logistică (factură BG №{number}) — verificați și ajustați înainte de emitere.",
+    "fromDeliveries": "Factură nouă din {count} livrări primite — verificați înainte de emitere.",
+    "fromDeliveriesQty": "Cantitate totală: {qty}",
+    "clientLocked": "Clientul este blocat deoarece factura este generată din livrările selectate."
   },
   "detail": {
     "back": "← Documente",

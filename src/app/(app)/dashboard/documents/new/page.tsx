@@ -78,6 +78,12 @@ function NewDocumentForm() {
   const [fromDelivery] = useState(searchParams.get("fromDelivery") ?? "");
   const [sourceExportSetId, setSourceExportSetId] = useState("");
   const [deliveryInfo, setDeliveryInfo] = useState<{ bgInvoiceNumber: string } | null>(null);
+  // Bulk: стандартната форма, отворена от НЯКОЛКО получени доставки (§3/§10/§21).
+  const [fromDeliveries] = useState(searchParams.get("fromDeliveries") ?? "");
+  const [sourceExportSetIds, setSourceExportSetIds] = useState<string[]>([]);
+  const [bulkContext, setBulkContext] = useState<{ count: number; totalQuantity: number; unit: string; sourceNumbers: string[] } | null>(null);
+  // Клиентът е заключен, когато фактурата е генерирана от доставки (§12).
+  const clientLocked = sourceExportSetIds.length > 0;
 
   // Предложения за клиент при ръчно въвеждане (по име или ЕИК)
   const suggestions = mClient.name.length >= 2 || mClient.eik.length >= 2
@@ -234,6 +240,32 @@ function NewDocumentForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromDelivery]);
 
+  // Bulk: предварително попълване на СТАНДАРТНАТА форма от няколко доставки (§3/§4/§5).
+  useEffect(() => {
+    if (!fromDeliveries) return;
+    fetch(`/api/logistics/export-sets/received/bulk-prefill?ids=${encodeURIComponent(fromDeliveries)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!d || d.error) return;
+        setType("invoice");
+        setSourceExportSetIds(d.sourceExportSetIds ?? []);
+        setBulkContext(d.context ?? null);
+        // Всяка доставка → отделен ред; продажната цена се въвежда (както single flow, §6).
+        if (Array.isArray(d.lines)) setLines(d.lines.map((l: { description: string; quantity: number; vatRate: number }) => ({ description: l.description, quantity: l.quantity, unitPrice: 0, vatRate: l.vatRate })));
+        if (d.currency) setCurrency(d.currency);
+        if (d.language) setLanguage(d.language);
+        if (d.notes) setNotes(d.notes);
+        if (d.matchedClientId) {
+          fetch("/api/clients").then((r) => r.json()).then((list: ClientFull[]) => {
+            const c = list.find((x) => x.id === d.matchedClientId);
+            if (c) { setClientMode("manual"); pickClient(c); }
+          }).catch(() => {});
+        }
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromDeliveries]);
+
   // Зареди предложен номер при смяна на типа
   useEffect(() => {
     fetch(`/api/documents/next-number?type=${type}`)
@@ -323,6 +355,7 @@ function NewDocumentForm() {
         copyAttachmentsFrom: parentId && copyAttachments ? parentId : undefined,
         duplicate: isDuplicate || undefined,
         sourceExportSetId: sourceExportSetId || undefined,
+        sourceExportSetIds: sourceExportSetIds.length > 0 ? sourceExportSetIds : undefined,
       }),
     });
     setSaving(false);
@@ -347,6 +380,12 @@ function NewDocumentForm() {
       {deliveryInfo && (
         <div className="glass panel" style={{ marginBottom: 18, padding: "12px 16px", borderLeft: "3px solid var(--brass)", fontSize: 13 }}>
           {t("documents.form.fromDelivery", { number: deliveryInfo.bgInvoiceNumber })}
+        </div>
+      )}
+      {bulkContext && (
+        <div className="glass panel" style={{ marginBottom: 18, padding: "12px 16px", borderLeft: "3px solid var(--brass)", fontSize: 13 }}>
+          <div style={{ fontWeight: 600 }}>{t("documents.form.fromDeliveries", { count: bulkContext.count })}</div>
+          <div style={{ color: "var(--muted)", marginTop: 4 }}>{t("documents.form.fromDeliveriesQty", { qty: `${bulkContext.totalQuantity} ${bulkContext.unit}` })} · {bulkContext.sourceNumbers.join(", ")}</div>
         </div>
       )}
       {parentInfo && (
@@ -427,8 +466,9 @@ function NewDocumentForm() {
           </div>
         </div>
 
-        {/* Клиент: избор / ръчно */}
-        <div style={{ borderTop: "1px solid var(--border)", paddingTop: 16, marginBottom: 20 }}>
+        {/* Клиент: избор / ръчно. При фактура от доставки клиентът е ЗАКЛЮЧЕН (§12). */}
+        <div style={{ borderTop: "1px solid var(--border)", paddingTop: 16, marginBottom: 20, ...(clientLocked ? { pointerEvents: "none" as const, opacity: 0.9 } : {}) }} aria-disabled={clientLocked || undefined}>
+          {clientLocked && <div style={{ fontSize: 11.5, color: "var(--muted)", marginBottom: 6 }}>🔒 {t("documents.form.clientLocked")}</div>}
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, flexWrap: "wrap" }}>
             <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 14, margin: 0 }}>{t("documents.form.recipient")}</h3>
             <div style={{ display: "flex", gap: 6, marginLeft: "auto" }}>

@@ -203,7 +203,10 @@
     "vatInvalid": "Invalid VAT number format.",
     "vatInconsistent": "A VAT number is entered, but the client is marked as not VAT-registered. Please check the data.",
     "duplicateInvoice": "Duplicate invoice",
-    "fromDelivery": "New invoice from a logistics delivery (BG invoice №{number}) — review and adjust before issuing."
+    "fromDelivery": "New invoice from a logistics delivery (BG invoice №{number}) — review and adjust before issuing.",
+    "fromDeliveries": "New invoice from {count} received deliveries — review and adjust before issuing.",
+    "fromDeliveriesQty": "Total quantity: {qty}",
+    "clientLocked": "Client is locked because the invoice is generated from selected deliveries."
   },
   "detail": {
     "back": "← Documents",

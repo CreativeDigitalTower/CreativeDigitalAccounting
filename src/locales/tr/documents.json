@@ -203,7 +203,10 @@
     "vatInvalid": "Geçersiz KDV numarası biçimi.",
     "vatInconsistent": "Bir KDV numarası girildi, ancak müşteri KDV mükellefi değil olarak işaretlendi. Verileri kontrol edin.",
     "duplicateInvoice": "Faturayı çoğalt",
-    "fromDelivery": "Bir lojistik sevkiyattan yeni fatura (BG fatura №{number}) — kesmeden önce inceleyip düzenleyin."
+    "fromDelivery": "Bir lojistik sevkiyattan yeni fatura (BG fatura №{number}) — kesmeden önce inceleyip düzenleyin.",
+    "fromDeliveries": "{count} alınan teslimattan yeni fatura — düzenlemeden önce kontrol edin.",
+    "fromDeliveriesQty": "Toplam miktar: {qty}",
+    "clientLocked": "Fatura seçili teslimatlardan oluşturulduğu için müşteri kilitli."
   },
   "detail": {
     "back": "← Belgeler",
