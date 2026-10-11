@@ -147,12 +147,11 @@ export async function POST(req: Request) {
       if (already.size > 0) return NextResponse.json({ error: "Една или повече от избраните доставки вече са фактурирани.", invoiced: [...already] }, { status: 409 });
     }
 
-    // Шаблон по подразбиране от фирмения профил, ако не е зададен
-    let template = data.template;
-    if (!template) {
-      const comp = await prisma.company.findUnique({ where: { id: companyId }, select: { invoiceTemplate: true } });
-      template = comp?.invoiceTemplate ?? "classic";
-    }
+    // Шаблон по подразбиране + snapshot на издателя (city/mol) от фирмения профил (§6).
+    const comp = await prisma.company.findUnique({ where: { id: companyId }, select: { invoiceTemplate: true, city: true, mol: true } });
+    const template = data.template || comp?.invoiceTemplate || "classic";
+    const issuerCity = comp?.city ?? null;
+    const issuerMol = comp?.mol ?? null;
 
     // Присвояване на номер + създаване атомарно (§18): Serializable транзакция с повторение
     // при конфликт → двама едновременни потребители никога не получават един и същ авто-номер.
@@ -193,6 +192,7 @@ export async function POST(req: Request) {
               vatExempt: data.vatExempt ?? false,
               vatExemptReason: data.vatExempt ? (data.vatExemptReason ?? null) : null,
               clientIsIndividual: data.clientIsIndividual ?? false,
+              issuerCity, issuerMol,
               lines: {
                 create: data.lines.map((l) => ({
                   description: l.description,

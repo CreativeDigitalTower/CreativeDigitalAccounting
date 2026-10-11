@@ -1812,6 +1812,12 @@ model Document {
   vatExempt          Boolean        @default(false)
   vatExemptReason    String?        // код/текст на основанието
   clientIsIndividual Boolean        @default(false) // получателят е физическо лице (без ЕИК/ДДС)
+  // Snapshot на ИЗДАТЕЛЯ към момента на издаване (§6/§7). Additive/nullable: стари документи
+  // са null → renderer fallback-ва към живите Company данни (byte-unchanged, §19). Новите
+  // документи ги снапшотват при създаване → бъдеща промяна на Company.city/mol НЕ пипа
+  // историческата фактура. Само тези две полета са променливи/чувствителни тук.
+  issuerCity         String?
+  issuerMol          String?
   // Логистика: ако фактурата е издадена от получена BG→MK доставка, пази relation към
   // изходния ExportDocumentSet (§18/§41). Additive/nullable — стандартните фактури са с
   // null. Статусът „Фактурирана" на доставката се извежда от СЪЩЕСТВУВАНЕТО на активен
