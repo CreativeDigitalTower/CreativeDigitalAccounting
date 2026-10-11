@@ -107,7 +107,9 @@
       "cityPh": "Sofya",
       "email": "İletişim e-postası",
       "emailPh": "office@firma.com",
-      "phone": "Telefon"
+      "phone": "Telefon",
+      "country": "Ülke (ISO2 veya ad)",
+      "regNo": "Kayıt numarası"
     }
   },
   "taskType": {

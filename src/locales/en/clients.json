@@ -107,7 +107,9 @@
       "cityPh": "Sofia",
       "email": "Contact email",
       "emailPh": "office@company.com",
-      "phone": "Phone"
+      "phone": "Phone",
+      "country": "Country (ISO2 or name)",
+      "regNo": "Registration number"
     }
   },
   "taskType": {

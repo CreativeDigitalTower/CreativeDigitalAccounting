@@ -544,6 +544,9 @@ model Supplier {
   companyId    String
   name         String
   eik          String?
+  // Държава (ISO2 или име) за чуждестранни доставчици (§11). Additive/nullable; празно → BG
+  // (backward-compatible). Решава дали `eik` се валидира с БГ checksum или като рег. номер.
+  country      String?
   vatNumber    String?
   address      String?
   city         String?

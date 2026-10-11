@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession, getMyFirm } from "@/lib/session";
 import { accountantMaxClients } from "@/lib/constants";
-import { validateEik } from "@/lib/validation/eik";
+import { validateCompanyIdentity } from "@/lib/validation/companyIdentity";
 import { notifyAdmin } from "@/lib/email/send";
 import { z } from "zod";
 import { firmHasFullAccess } from "@/lib/billing";
@@ -10,6 +10,8 @@ import { firmHasFullAccess } from "@/lib/billing";
 const schema = z.object({
   name: z.string().min(2),
   eik: z.string().optional().nullable(),
+  countryCode: z.string().max(3).optional().nullable(),      // ISO2; за чуждестранни клиентски фирми (§10)
+  registrationNumber: z.string().max(40).optional().nullable(),
   vatRegistered: z.boolean().optional(),
   vatNumber: z.string().optional().nullable(),
   address: z.string().optional().nullable(),
@@ -44,22 +46,29 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: `Достигнахте лимита от ${max === Infinity ? "∞" : max} клиентски фирми за плана си. Надградете тарифата, за да добавите повече.` }, { status: 403 });
     }
 
-    // ЕИК: по избор, но ако е въведен — валидираме и проверяваме за дублиране
+    // Идентичност country-aware (§3/§10): BG → ЕИК checksum + dup по eik; чужбина → рег. номер
+    // + dup по (countryCode, registrationNumber). Не налага фиктивен БГ ЕИК на чужда фирма.
     let eik: string | null = null;
-    if (d.eik && d.eik.trim()) {
-      const check = validateEik(d.eik.trim());
-      if (!check.isValid) return NextResponse.json({ error: check.error ?? "Невалиден ЕИК/БУЛСТАТ." }, { status: 400 });
-      eik = check.normalized;
+    let registrationNumber: string | null = null;
+    const idCheck = validateCompanyIdentity({ countryCode: d.countryCode, eik: d.eik, registrationNumber: d.registrationNumber }, { requireIdentifier: false });
+    if (!idCheck.ok) return NextResponse.json({ error: idCheck.error }, { status: 400 });
+    if (idCheck.isBg && idCheck.eik) {
+      eik = idCheck.eik;
       const dup = await prisma.company.findFirst({ where: { eik }, select: { id: true } });
       if (dup) return NextResponse.json({ error: "Фирма с този ЕИК вече съществува в платформата." }, { status: 400 });
+    } else if (!idCheck.isBg && idCheck.registrationNumber) {
+      registrationNumber = idCheck.registrationNumber;
+      const dup = await prisma.company.findFirst({ where: { countryCode: idCheck.countryCode, registrationNumber }, select: { id: true } });
+      if (dup) return NextResponse.json({ error: "Фирма с този регистрационен номер вече съществува." }, { status: 400 });
     }
+    const countryCode = idCheck.countryCode;
 
     const vatReg = !!d.vatRegistered && !!(d.vatNumber && d.vatNumber.trim());
 
     const company = await prisma.$transaction(async (tx) => {
       const c = await tx.company.create({
         data: {
-          name: d.name, eik, managedByFirmId: firm.id,
+          name: d.name, eik, countryCode, registrationNumber, managedByFirmId: firm.id,
           vatRegistered: vatReg, vatNumber: d.vatNumber?.trim() || null,
           defaultVatExempt: !vatReg, defaultVatExemptReason: vatReg ? null : "art113_9",
           address: d.address || null, city: d.city || null, mol: d.mol || null,

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCompany } from "@/lib/session";
-import { validateEik } from "@/lib/validation/eik";
+import { validateTaxIdentifier } from "@/lib/validation/companyIdentity";
 import { prepareClientEmails } from "@/lib/clientEmails";
 import { z } from "zod";
 
@@ -21,6 +21,7 @@ const emailInputSchema = z.object({
 const schema = z.object({
   name: z.string().min(2),
   eik: z.string().optional().nullable(),
+  country: z.string().max(80).optional().nullable(),
   vatNumber: z.string().optional().nullable(),
   address: z.string().optional().nullable(),
   city: z.string().optional().nullable(),
@@ -46,16 +47,18 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const { id } = await params;
     const data = schema.parse(await req.json());
 
-    // Валидация на ЕИК/БУЛСТАT (ако е попълнен)
-    if (data.eik && data.eik.trim() !== "") {
-      const c = validateEik(data.eik);
-      if (!c.isValid) return NextResponse.json({ error: c.error ?? "Невалиден ЕИК/БУЛСТАТ." }, { status: 400 });
-      data.eik = c.normalized;
-    }
-
     const existing = await prisma.client.findUnique({ where: { id } });
     if (!existing || existing.companyId !== companyId) {
       return NextResponse.json({ error: "Не е намерен." }, { status: 404 });
+    }
+
+    // Country-aware валидация (BG → ЕИК checksum; чужбина → рег. номер). Държавата се взема
+    // от payload-а, иначе от съществуващия запис (§3/§7).
+    if (data.eik && data.eik.trim() !== "") {
+      const country = data.country !== undefined ? data.country : existing.country;
+      const c = validateTaxIdentifier({ country, eik: data.eik });
+      if (!c.ok) return NextResponse.json({ error: c.error }, { status: 400 });
+      data.eik = c.normalized;
     }
 
     const { birthday, clientSince, emails: emailsInput, ...rest } = data;

@@ -2,12 +2,13 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCompany, getPlan } from "@/lib/session";
 import { SUBSCRIPTION_PLANS } from "@/lib/constants";
-import { validateEik } from "@/lib/validation/eik";
+import { validateTaxIdentifier } from "@/lib/validation/companyIdentity";
 import { z } from "zod";
 
 const schema = z.object({
   name: z.string().min(2),
   eik: z.string().optional(),
+  country: z.string().max(80).optional().nullable(),
   vatNumber: z.string().optional(),
   address: z.string().optional(),
   contactEmail: z.string().email().optional().or(z.literal("")),
@@ -43,9 +44,9 @@ export async function POST(req: Request) {
     const body = await req.json();
     const data = schema.parse(body);
     if (data.eik && data.eik.trim() !== "") {
-      const c = validateEik(data.eik);
-      if (!c.isValid) return NextResponse.json({ error: c.error ?? "Невалиден ЕИК/БУЛСТАТ." }, { status: 400 });
-      data.eik = c.normalized;
+      const c = validateTaxIdentifier({ country: data.country, eik: data.eik });
+      if (!c.ok) return NextResponse.json({ error: c.error }, { status: 400 });
+      data.eik = c.normalized ?? undefined;
     }
     const supplier = await prisma.supplier.create({
       data: { companyId, ...data, contactEmail: data.contactEmail || null },

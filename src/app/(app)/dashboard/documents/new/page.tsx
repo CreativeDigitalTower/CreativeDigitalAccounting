@@ -163,8 +163,9 @@ function NewDocumentForm() {
         setDefaultVatRate(c.defaultVatRate);
         setLines((p) => p.map((l) => ({ ...l, vatRate: c.defaultVatRate })));
       }
-      // Изисква попълнени фирмени данни преди фактуриране
-      setCompanyReady(!!(c?.name && c?.eik && c?.address));
+      // Изисква попълнени фирмени данни преди фактуриране. Country-aware (§7): чуждестранен
+      // издател ползва registrationNumber вместо български ЕИК.
+      setCompanyReady(!!(c?.name && c?.address && (c?.eik || c?.registrationNumber)));
     }).catch(() => {});
   }, []);
 

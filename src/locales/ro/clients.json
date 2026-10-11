@@ -107,7 +107,9 @@
       "cityPh": "Sofia",
       "email": "E-mail de contact",
       "emailPh": "office@firma.ro",
-      "phone": "Telefon"
+      "phone": "Telefon",
+      "country": "Țară (ISO2 sau nume)",
+      "regNo": "Număr de înregistrare"
     }
   },
   "taskType": {
