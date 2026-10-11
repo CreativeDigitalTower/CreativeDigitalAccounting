@@ -4,11 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { validateEik } from "@/lib/validation/eik";
+import { isBgCountryLike } from "@/lib/validation/companyIdentity";
 import { useT } from "@/components/i18n/I18nProvider";
 import { ClientEmailsEditor, type EmailRow } from "@/components/app/ClientEmailsEditor";
 
-type Form = { name: string; eik: string; vatNumber: string; contactPerson: string; mol: string; address: string; city: string; contactEmail: string; phone: string };
-const EMPTY: Form = { name: "", eik: "", vatNumber: "", contactPerson: "", mol: "", address: "", city: "", contactEmail: "", phone: "" };
+type Form = { name: string; eik: string; country: string; vatNumber: string; contactPerson: string; mol: string; address: string; city: string; contactEmail: string; phone: string };
+const EMPTY: Form = { name: "", eik: "", country: "", vatNumber: "", contactPerson: "", mol: "", address: "", city: "", contactEmail: "", phone: "" };
 
 export default function NewClientPage() {
   const t = useT();
@@ -22,10 +23,14 @@ export default function NewClientPage() {
 
   function set<K extends keyof Form>(k: K, v: string) { setF((p) => ({ ...p, [k]: v })); }
 
+  const isBg = isBgCountryLike(f.country);
+
   async function lookupEik() {
     const eik = f.eik.trim();
     setMatch(null);
     if (!eik) { setEikErr(""); return; }
+    // Чуждестранен клиент: без БГ checksum/lookup — приема се регистрационен номер (§3/§12).
+    if (!isBg) { setEikErr(""); return; }
     // Валидация на формат + контролна цифра (ЕИК не е задължителен за клиент)
     const v = validateEik(eik, { required: false });
     setEikErr(v.isValid ? "" : (v.error ?? t("clients.err.eik")));
@@ -53,7 +58,7 @@ export default function NewClientPage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (f.eik.trim()) {
+    if (f.eik.trim() && isBg) {
       const v = validateEik(f.eik, { required: false });
       if (!v.isValid) { setEikErr(v.error ?? t("clients.err.eik")); setError(v.error ?? t("clients.err.eik")); return; }
     }
@@ -62,7 +67,7 @@ export default function NewClientPage() {
     const res = await fetch("/api/clients", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name: f.name, eik: f.eik || undefined, vatNumber: f.vatNumber || undefined,
+        name: f.name, eik: f.eik || undefined, country: f.country || undefined, vatNumber: f.vatNumber || undefined,
         contactPerson: f.contactPerson || undefined, mol: f.mol || undefined, address: f.address || undefined,
         city: f.city || undefined, contactEmail: f.contactEmail || undefined, phone: f.phone || undefined,
         ...(emails.filter((e) => e.email.trim()).length ? { emails: emails.filter((e) => e.email.trim()) } : {}),
@@ -97,8 +102,12 @@ export default function NewClientPage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14 }}>
             <div style={{ gridColumn: "1 / -1" }}><label>{t("clients.new.f.name")}</label><input value={f.name} onChange={(e) => set("name", e.target.value)} required placeholder={t("clients.new.f.namePh")} /></div>
             <div>
-              <label>{t("clients.new.f.eik")}</label>
-              <input value={f.eik} onChange={(e) => { set("eik", e.target.value); if (eikErr) setEikErr(""); }} onBlur={lookupEik} placeholder="123456789" style={eikErr ? { borderColor: "var(--brick)" } : undefined} />
+              <label>{t("clients.new.f.country")}</label>
+              <input value={f.country} onChange={(e) => { set("country", e.target.value); if (eikErr) setEikErr(""); }} placeholder="BG" />
+            </div>
+            <div>
+              <label>{isBg ? t("clients.new.f.eik") : t("clients.new.f.regNo")}</label>
+              <input value={f.eik} onChange={(e) => { set("eik", e.target.value); if (eikErr) setEikErr(""); }} onBlur={lookupEik} placeholder={isBg ? "123456789" : "MK registration №"} style={eikErr ? { borderColor: "var(--brick)" } : undefined} />
               {eikErr && <div style={{ color: "var(--brick)", fontSize: 11.5, marginTop: 3 }}>{eikErr}</div>}
             </div>
             <div><label>{t("clients.new.f.vat")}</label><input value={f.vatNumber} onChange={(e) => set("vatNumber", e.target.value)} placeholder="BG123456789" /></div>

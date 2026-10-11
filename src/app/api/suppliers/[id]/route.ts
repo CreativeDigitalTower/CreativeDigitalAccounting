@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCompany } from "@/lib/session";
-import { validateEik } from "@/lib/validation/eik";
+import { validateTaxIdentifier } from "@/lib/validation/companyIdentity";
 import { z } from "zod";
 
 const schema = z.object({
   name: z.string().min(2),
   eik: z.string().nullable().optional(),
+  country: z.string().max(80).nullable().optional(),
   vatNumber: z.string().nullable().optional(),
   address: z.string().nullable().optional(),
   city: z.string().nullable().optional(),
@@ -22,12 +23,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   try {
     const { companyId } = await requireCompany();
     const { id } = await params;
-    const existing = await prisma.supplier.findFirst({ where: { id, companyId }, select: { id: true } });
+    const existing = await prisma.supplier.findFirst({ where: { id, companyId }, select: { id: true, country: true } });
     if (!existing) return NextResponse.json({ error: "Не е намерен" }, { status: 404 });
     const data = schema.parse(await req.json());
     if (data.eik && data.eik.trim() !== "") {
-      const c = validateEik(data.eik);
-      if (!c.isValid) return NextResponse.json({ error: c.error ?? "Невалиден ЕИК/БУЛСТАТ." }, { status: 400 });
+      const country = data.country !== undefined ? data.country : existing.country;
+      const c = validateTaxIdentifier({ country, eik: data.eik });
+      if (!c.ok) return NextResponse.json({ error: c.error }, { status: 400 });
       data.eik = c.normalized;
     }
     const supplier = await prisma.supplier.update({

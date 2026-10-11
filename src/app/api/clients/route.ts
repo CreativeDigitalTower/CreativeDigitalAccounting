@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCompany, getPlan } from "@/lib/session";
 import { SUBSCRIPTION_PLANS } from "@/lib/constants";
-import { validateEik } from "@/lib/validation/eik";
+import { validateTaxIdentifier } from "@/lib/validation/companyIdentity";
 import { prepareClientEmails } from "@/lib/clientEmails";
 import { z } from "zod";
 
@@ -22,6 +22,7 @@ const emailInputSchema = z.object({
 const schema = z.object({
   name: z.string().min(2),
   eik: z.string().optional(),
+  country: z.string().max(80).optional().nullable(), // ISO2 или име; за чуждестранни клиенти (§3/§11)
   vatNumber: z.string().optional(),
   address: z.string().optional(),
   city: z.string().optional(),
@@ -67,11 +68,11 @@ export async function POST(req: Request) {
       catch (e) { return NextResponse.json({ error: (e as Error).message }, { status: 400 }); }
     }
 
-    // ── Валидация на ЕИК/БУЛСТАT (формат + контролна цифра), ако е попълнен ──
+    // ── Country-aware валидация на идентификатора (BG → ЕИК checksum; чужбина → рег. номер) ──
     if (clientData.eik && clientData.eik.trim() !== "") {
-      const c = validateEik(clientData.eik);
-      if (!c.isValid) return NextResponse.json({ error: c.error ?? "Невалиден ЕИК/БУЛСТАТ." }, { status: 400 });
-      clientData.eik = c.normalized;
+      const c = validateTaxIdentifier({ country: clientData.country, eik: clientData.eik });
+      if (!c.ok) return NextResponse.json({ error: c.error }, { status: 400 });
+      clientData.eik = c.normalized ?? undefined;
     }
 
     // Без дублиране: ако вече има клиент със същия ЕИК (или същото име), връщаме него.

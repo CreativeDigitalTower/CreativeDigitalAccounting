@@ -107,7 +107,9 @@
       "cityPh": "София",
       "email": "Контактный e-mail",
       "emailPh": "office@firma.bg",
-      "phone": "Телефон"
+      "phone": "Телефон",
+      "country": "Страна (ISO2 или название)",
+      "regNo": "Регистрационный номер"
     }
   },
   "taskType": {

@@ -21,6 +21,46 @@ export function isBulgarianCompany(countryCode: string | null | undefined): bool
 }
 
 /**
+ * Дали дадена стойност за „държава" означава България. Приема ISO2 код (BG) ИЛИ име
+ * (България/Bulgaria). Празно → BG (backward-compatible за съществуващите записи).
+ * Ползва се за Client/Supplier, където полето е свободен текст `country`.
+ */
+export function isBgCountryLike(value: string | null | undefined): boolean {
+  const v = (value ?? "").trim().toUpperCase();
+  if (!v) return true; // празно → третирай като BG (стари BG записи)
+  return v === "BG" || v === "BGR" || v.startsWith("БЪЛГАР") || v.startsWith("BULGAR");
+}
+
+export type TaxIdResult = { ok: true; normalized: string | null; isBg: boolean } | { ok: false; error: string };
+
+/**
+ * Country-aware валидация на данъчен/регистрационен идентификатор за Client/Supplier,
+ * където идентификаторът се пази в полето `eik` (legacy). BG → български ЕИК/БУЛСТАТ
+ * checksum. Чужбина → общ регистрационен низ (БЕЗ BG checksum, БЕЗ допускане за 9/13 цифри,
+ * пази leading zeros и букви, не се преобразува в число). Празно → ok (идентификаторът не е
+ * задължителен за клиент/доставчик). `required` налага непразна стойност.
+ */
+export function validateTaxIdentifier(input: { country?: string | null; eik?: string | null }, opts: { required?: boolean } = {}): TaxIdResult {
+  const raw = (input.eik ?? "").trim();
+  const isBg = isBgCountryLike(input.country);
+  if (!raw) {
+    return opts.required
+      ? { ok: false, error: isBg ? "Невалиден ЕИК/БУЛСТАТ" : "Въведете регистрационен номер" }
+      : { ok: true, normalized: null, isBg };
+  }
+  if (isBg) {
+    const c = validateEik(raw);
+    if (!c.isValid) return { ok: false, error: c.error ?? "Невалиден ЕИК/БУЛСТАТ" };
+    return { ok: true, normalized: c.normalized, isBg: true };
+  }
+  const reg = normalizeRegistrationNumber(raw);
+  if (reg.length < 2 || reg.length > 40 || !/^[A-Za-z0-9][A-Za-z0-9 .\-/]*$/.test(reg)) {
+    return { ok: false, error: "Въведете валиден регистрационен номер" };
+  }
+  return { ok: true, normalized: reg, isBg: false };
+}
+
+/**
  * Нормализира международен регистрационен номер: trim, свива интервали. Позволява
  * букви, цифри и разумни разделители; пази оригиналната стойност (без checksum).
  */

@@ -107,7 +107,9 @@
       "cityPh": "Σόφια",
       "email": "E-mail επικοινωνίας",
       "emailPh": "office@firma.gr",
-      "phone": "Τηλέφωνο"
+      "phone": "Τηλέφωνο",
+      "country": "Χώρα (ISO2 ή όνομα)",
+      "regNo": "Αριθμός μητρώου"
     }
   },
   "taskType": {
