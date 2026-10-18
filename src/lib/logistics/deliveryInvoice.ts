@@ -43,6 +43,28 @@ export async function loadDeliveryInvoiceMap(companyId: string, setIds: string[]
   return out;
 }
 
+export type BuyerPrefill = {
+  id: string | null; name: string; eik: string; vatNumber: string; city: string;
+  address: string; mol: string; country: string; contactEmail: string;
+};
+
+/**
+ * Пълните billing данни на крайния клиент за prefill на фактурата (§4/§5/§8). Единен
+ * authoritative източник за single и bulk flow. `id` е CRM Client id (за селектора/snapshot),
+ * null → ръчни данни. Градът идва от Client.city (НЕ от адрес/дестинация, §6). Unicode-safe.
+ */
+export async function loadBuyerPrefill(companyId: string, clientId: string): Promise<BuyerPrefill | null> {
+  const c = await prisma.client.findFirst({
+    where: { id: clientId, companyId },
+    select: { id: true, name: true, eik: true, vatNumber: true, city: true, address: true, mol: true, country: true, contactEmail: true },
+  });
+  if (!c) return null;
+  return {
+    id: c.id, name: c.name, eik: c.eik ?? "", vatNumber: c.vatNumber ?? "", city: c.city ?? "",
+    address: c.address ?? "", mol: c.mol ?? "", country: c.country ?? "", contactEmail: c.contactEmail ?? "",
+  };
+}
+
 /** Множество от exportSetId, които ВЕЧЕ са фактурирани (за блокиране на повторно фактуриране). */
 export async function invoicedSetIds(companyId: string, setIds: string[]): Promise<Set<string>> {
   const map = await loadDeliveryInvoiceMap(companyId, setIds);

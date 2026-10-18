@@ -106,6 +106,17 @@ function NewDocumentForm() {
     setSuggestOpen(false);
   }
 
+  // Прилага единния authoritative buyer обект от prefill (§4/§5/§8). Директно — без втори
+  // /api/clients fetch → без race (§9/§10). Градът идва от Client.city (§6).
+  function applyBuyer(b: { id: string | null; name: string; eik: string; vatNumber: string; city: string; address: string; mol: string; contactEmail: string }) {
+    setClientMode("manual");
+    setMClient((m) => ({
+      ...m, name: b.name, eik: b.eik, vatNumber: b.vatNumber, vatRegistered: isValidVat(b.vatNumber) ? true : m.vatRegistered,
+      mol: b.mol, city: b.city, address: b.address, contactEmail: b.contactEmail || m.contactEmail,
+    }));
+    setClientId(b.id ?? "");
+  }
+
   // Избор от падащото меню („От списък") → пълно попълване на данните.
   function selectClientById(id: string) {
     setClientId(id);
@@ -227,8 +238,10 @@ function NewDocumentForm() {
         if (d.currency) setCurrency(d.currency);
         if (d.language) setLanguage(d.language);
         if (d.notes) setNotes(d.notes);
-        // Краен клиент: match към CRM → select; иначе ръчно попълнени данни (§6).
-        if (d.matchedClientId) {
+        // Краен клиент — единен authoritative buyer обект (§4/§5/§8): city/MOL/адрес директно,
+        // без втори fetch (без race, §9/§10). Fallback към legacy полета за съвместимост.
+        if (d.buyer) applyBuyer(d.buyer);
+        else if (d.matchedClientId) {
           fetch("/api/clients").then((r) => r.json()).then((list: ClientFull[]) => {
             const c = list.find((x) => x.id === d.matchedClientId);
             if (c) { setClientMode("manual"); pickClient(c); }
@@ -257,7 +270,9 @@ function NewDocumentForm() {
         if (d.currency) setCurrency(d.currency);
         if (d.language) setLanguage(d.language);
         if (d.notes) setNotes(d.notes);
-        if (d.matchedClientId) {
+        // Същата shared buyer-prefill логика като single (§8): city/MOL директно от buyer обекта.
+        if (d.buyer) applyBuyer(d.buyer);
+        else if (d.matchedClientId) {
           fetch("/api/clients").then((r) => r.json()).then((list: ClientFull[]) => {
             const c = list.find((x) => x.id === d.matchedClientId);
             if (c) { setClientMode("manual"); pickClient(c); }
