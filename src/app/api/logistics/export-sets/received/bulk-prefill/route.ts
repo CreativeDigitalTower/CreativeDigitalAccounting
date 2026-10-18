@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { logisticsApiGuard, inSameGroup } from "@/lib/logistics/access";
 import { MK_DEFAULT_VAT_RATE } from "@/lib/logistics/config";
 import { getDefaultDocumentLanguage } from "@/lib/constants";
-import { invoicedSetIds, resolveFinalClientIds } from "@/lib/logistics/deliveryInvoice";
+import { invoicedSetIds, resolveFinalClientIds, loadBuyerPrefill } from "@/lib/logistics/deliveryInvoice";
 
 /**
  * Prefill за СТАНДАРТНАТА форма „Нова фактура" от НЯКОЛКО получени доставки (§3/§4/§5).
@@ -35,9 +35,9 @@ export async function GET(req: Request) {
   const already = await invoicedSetIds(g.companyId, ids);
   if (already.size > 0) return NextResponse.json({ error: "already_invoiced", invoiced: [...already] }, { status: 409 });
 
-  const [company, client] = await Promise.all([
+  const [company, buyer] = await Promise.all([
     prisma.company.findUnique({ where: { id: g.companyId }, select: { defaultCurrency: true, defaultLanguage: true, countryCode: true } }),
-    prisma.client.findFirst({ where: { id: clientId, companyId: g.companyId }, select: { id: true, name: true } }),
+    loadBuyerPrefill(g.companyId, clientId),
   ]);
 
   // Подреждаме по № фактура/доставка DESC (консистентно с останалите логистични списъци).
@@ -51,7 +51,8 @@ export async function GET(req: Request) {
   return NextResponse.json({
     sourceExportSetIds: ordered.map((s) => s.id),
     matchedClientId: clientId,
-    clientName: client?.name ?? null,
+    clientName: buyer?.name ?? null,
+    buyer, // единен authoritative buyer billing обект (§8) — city/mol/address включени
     lines,
     currency: company?.defaultCurrency ?? "MKD",
     language: getDefaultDocumentLanguage(company),

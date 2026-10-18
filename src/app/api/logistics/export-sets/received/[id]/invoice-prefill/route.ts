@@ -4,7 +4,7 @@ import { logisticsApiGuard, inSameGroup } from "@/lib/logistics/access";
 import { normalizeCompanyName } from "@/lib/logistics/normalize";
 import { MK_DEFAULT_VAT_RATE } from "@/lib/logistics/config";
 import { getDefaultDocumentLanguage } from "@/lib/constants";
-import { loadDeliveryInvoiceMap } from "@/lib/logistics/deliveryInvoice";
+import { loadDeliveryInvoiceMap, loadBuyerPrefill } from "@/lib/logistics/deliveryInvoice";
 
 // Prefill за СТАНДАРТНАТА фактура (Document) от получена BG→MK доставка (§4/§7/§40).
 // Само данни — не създава нищо. Създаването минава през стандартния POST /api/documents
@@ -32,7 +32,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const [invMap, company, bgClient, mkClients] = await Promise.all([
     loadDeliveryInvoiceMap(g.companyId, [set.id]),
     prisma.company.findUnique({ where: { id: g.companyId }, select: { defaultCurrency: true, defaultLanguage: true, countryCode: true } }),
-    set.clientId ? prisma.client.findUnique({ where: { id: set.clientId }, select: { companyId: true, name: true, eik: true, vatNumber: true, city: true, address: true, contactEmail: true } }) : Promise.resolve(null),
+    set.clientId ? prisma.client.findUnique({ where: { id: set.clientId }, select: { companyId: true, name: true, eik: true, vatNumber: true, city: true, address: true, mol: true, country: true, contactEmail: true } }) : Promise.resolve(null),
     prisma.client.findMany({ where: { companyId: g.companyId }, select: { id: true, name: true } }),
   ]);
 
@@ -47,6 +47,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     ? (bgClient.companyId === g.companyId ? set.clientId : (byNorm.get(normalizeCompanyName(bgClient.name)) ?? null))
     : null;
 
+  // Единен authoritative buyer обект (§4/§5/§8): CRM клиент (ако е match-нат) ИЛИ snapshot на
+  // BG-посочения клиент. Градът идва от Client.city (НЕ от адрес/дестинация, §6).
+  const buyer = matchedClientId
+    ? await loadBuyerPrefill(g.companyId, matchedClientId)
+    : (bgClient ? { id: null, name: bgClient.name, eik: bgClient.eik ?? "", vatNumber: bgClient.vatNumber ?? "", city: bgClient.city ?? "", address: bgClient.address ?? "", mol: bgClient.mol ?? "", country: bgClient.country ?? "", contactEmail: bgClient.contactEmail ?? "" } : null);
+
   const refs = [
     `Логистична доставка: BG фактура ${set.invoiceNumber}`,
     [set.truckRegSnapshot, set.trailerReg].filter(Boolean).join(" / "),
@@ -57,6 +63,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     sourceExportSetId: set.id,
     existing,
     matchedClientId,
+    buyer, // единен authoritative buyer billing обект (§8) — формата го ползва директно
     clientSnapshot: matchedClientId ? null : (bgClient ? { name: bgClient.name, eik: bgClient.eik ?? "", vatNumber: bgClient.vatNumber ?? "", city: bgClient.city ?? "", address: bgClient.address ?? "", contactEmail: bgClient.contactEmail ?? "" } : null),
     line: { description: set.productSnapshot ?? "", quantity: set.quantity ?? 0, unit: set.unit || "t", vatRate: MK_DEFAULT_VAT_RATE },
     currency: company?.defaultCurrency ?? "MKD",
