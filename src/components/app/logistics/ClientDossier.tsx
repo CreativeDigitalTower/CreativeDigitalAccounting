@@ -5,6 +5,7 @@ import { useT, useI18n } from "@/components/i18n/I18nProvider";
 import { confirmDelete } from "@/lib/confirmDelete";
 import { parseQuantity } from "@/lib/i18n/format";
 import { ClientFormModal, type ClientForm } from "@/components/app/logistics/ClientFormModal";
+import { ClientPaymentsPanel } from "@/components/app/logistics/ClientPaymentsPanel";
 
 type ByProduct = { product: string; quantity: number; revenue: number };
 type Summary = { invoicesCount: number; revenue: number; quantity: number; lastPurchase: string | null; avgPricePerUnit: number | null; byProduct: ByProduct[] };
@@ -157,6 +158,9 @@ export function ClientDossier({ id, canManage, canEdit = false }: { id: string; 
           </table>
         )}
       </div>
+
+      {/* Плащания и салдо (§4/§7/§8/§13) */}
+      <ClientPaymentsPanel id={id} canManage={canManage} />
 
       {/* Исторически данни */}
       <div className="glass panel">

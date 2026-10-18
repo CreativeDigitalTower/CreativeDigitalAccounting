@@ -169,6 +169,7 @@ model Company {
   auditLogs         AuditLog[]
   cashRegisters     CashRegister[]
   payments          Payment[]
+  clientPayments    ClientPayment[]
   bankStatements    BankStatement[]
 
   companyUsers      CompanyUser[]
@@ -429,6 +430,7 @@ model Client {
   files     ClientFile[]
   emails    ClientEmail[]
   mkInvoices MkInvoice[]
+  clientPayments ClientPayment[] // регистрирани плащания (receivables, логистика)
   historicalMetrics        ClientHistoricalMetric[]
   historicalProductMetrics ClientHistoricalProductMetric[]
 }
@@ -1850,6 +1852,7 @@ model Document {
   childDocuments Document[]     @relation("DocumentChain")
   sourceExportSet ExportDocumentSet? @relation("ExportSetInvoices", fields: [sourceExportSetId], references: [id], onDelete: SetNull)
   deliveryLinks   MkInvoiceDeliveryLink[] // bulk MK фактура → много получени доставки (§12)
+  paymentAllocations PaymentAllocation[]  // разпределения на клиентски плащания (receivables)
   lines          DocumentLine[]
   attachments    DocumentAttachment[]
   events         DocumentEvent[]
@@ -1876,6 +1879,54 @@ model MkInvoiceDeliveryLink {
   document  Document          @relation(fields: [documentId], references: [id], onDelete: Cascade)
   exportSet ExportDocumentSet @relation(fields: [exportSetId], references: [id], onDelete: Cascade)
 
+  @@index([documentId])
+}
+
+// ─── Клиентски плащания и разпределения (receivables, логистика/MK) ──────────
+// Реално постъпление от клиент. Салдата/статусите се ИЗВЕЖДАТ от разпределенията
+// (PaymentAllocation), не от мутируемо поле (§4/§12). Валута на ниво плащане; без смесване.
+// Анулиране = status "voided" + история (кой/кога/защо), разпределенията се сторнират (§9).
+model ClientPayment {
+  id             String    @id @default(cuid())
+  companyId      String
+  clientId       String
+  date           DateTime
+  amount         Decimal   @db.Decimal(14, 2)
+  currency       String    @default("MKD")
+  method         String    @default("bank_transfer")
+  reference      String?   // № банков превод / платежно
+  note           String?   @db.Text
+  status         String    @default("active") // active | voided
+  idempotencyKey String?   // защита срещу двойно записване при повторна заявка (§12)
+  createdById    String?
+  createdAt      DateTime  @default(now())
+  voidedAt       DateTime?
+  voidedById     String?
+  voidReason     String?
+
+  company     Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  client      Client              @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  allocations PaymentAllocation[]
+
+  @@unique([companyId, idempotencyKey])
+  @@index([companyId, clientId])
+  @@index([companyId, status])
+}
+
+// Разпределение на плащане към конкретна фактура (Document). Сума ≤ остатъка по фактурата.
+// Изтрива се при анулиране на плащането (сторниране); тогава статусът на фактурата се преизчислява.
+model PaymentAllocation {
+  id          String   @id @default(cuid())
+  paymentId   String
+  documentId  String
+  amount      Decimal  @db.Decimal(14, 2)
+  createdAt   DateTime @default(now())
+  createdById String?
+
+  payment  ClientPayment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  document Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([paymentId])
   @@index([documentId])
 }
 
