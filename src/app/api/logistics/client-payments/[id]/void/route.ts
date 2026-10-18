@@ -21,13 +21,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const { id } = await params;
     const { reason } = schema.parse(await req.json());
     const result = await prisma.$transaction(async (tx) => {
-      const pay = await tx.clientPayment.findFirst({ where: { id, companyId: g.companyId }, select: { id: true, status: true, allocations: { select: { documentId: true } } } });
+      const pay = await tx.clientPayment.findFirst({ where: { id, companyId: g.companyId }, select: { id: true, status: true, source: true, priorStatus: true, allocations: { select: { documentId: true } } } });
       if (!pay) return { notFound: true as const };
       if (pay.status === "voided") return { already: true as const };
       const docIds = [...new Set(pay.allocations.map((a) => a.documentId))];
       await tx.paymentAllocation.deleteMany({ where: { paymentId: id } });
       await tx.clientPayment.update({ where: { id }, data: { status: "voided", voidedAt: new Date(), voidedById: g.userId, voidReason: reason } });
-      for (const docId of docIds) await recomputeInvoice(tx, g.companyId, docId);
+      // При анулиране на ИСТОРИЧЕСКО съгласуване връщаме заварения статус (§8), за да се покаже
+      // отново нужда от съгласуване, вместо фактурата да стане изцяло неплатена.
+      const restore = pay.source === "historical" ? (pay.priorStatus ?? null) : null;
+      for (const docId of docIds) await recomputeInvoice(tx, g.companyId, docId, { restoreStatusIfZero: restore });
       return { affected: docIds.length };
     }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
 
