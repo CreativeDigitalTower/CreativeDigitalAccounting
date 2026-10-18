@@ -5,7 +5,7 @@ import { CURRENCIES } from "@/lib/constants";
 
 export type ProductForm = {
   id: string; canonicalName: string; category: string | null; materialCode: string | null; unit: string;
-  packaging: string | null; certificateNumber: string | null; dispatchName: string | null; purchasePrice: number | null; purchaseCurrency: string | null;
+  packaging: string | null; certificateNumber: string | null; dispatchName: string | null; purchasePrice: number | null; purchaseCurrency: string | null; salePriceMk: number | null;
   active: boolean; hasCertificatePdf: boolean; certificateFileName: string | null;
 };
 
@@ -26,7 +26,9 @@ export function ProductEditModal({ initial, onClose, onSaved }: { initial: Produ
       canonicalName: f.canonicalName, category: f.category, materialCode: f.materialCode || null, unit: f.unit,
       packaging: f.packaging || null, certificateNumber: f.certificateNumber || null, dispatchName: f.dispatchName || null,
       purchasePrice: f.purchasePrice === null || Number.isNaN(f.purchasePrice) ? null : Number(f.purchasePrice),
-      purchaseCurrency: f.purchaseCurrency || "EUR", active: f.active,
+      purchaseCurrency: f.purchaseCurrency || "EUR",
+      salePriceMk: f.salePriceMk === null || Number.isNaN(f.salePriceMk as number) ? null : Number(f.salePriceMk),
+      active: f.active,
     };
     const r = await fetch(`/api/logistics/products/${f.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     const j = await r.json().catch(() => ({}));
@@ -81,6 +83,9 @@ export function ProductEditModal({ initial, onClose, onSaved }: { initial: Produ
             <select style={inp} value={f.purchaseCurrency ?? "EUR"} onChange={(e) => setF({ ...f, purchaseCurrency: e.target.value })}>
               {CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.code}</option>)}
             </select></div>
+          <div style={{ gridColumn: "1 / -1" }}><label style={lbl}>{t("logistics.products.salePriceMk")}</label>
+            <input style={inp} type="number" min={0} step="0.01" value={f.salePriceMk ?? ""} placeholder="MKD" onChange={(e) => setF({ ...f, salePriceMk: e.target.value === "" ? null : Number(e.target.value) })} />
+            <div style={{ fontSize: 10.5, color: "var(--muted)", marginTop: 3 }}>{t("logistics.products.salePriceMkHint")}</div></div>
         </div>
 
         {/* PDF сертификат */}

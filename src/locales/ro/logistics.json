@@ -47,7 +47,11 @@
     "replaceCert": "Înlocuiește",
     "deleteCert": "Șterge",
     "pdfOnly": "Sunt permise doar fișiere PDF.",
-    "dispatchName": "Nume pentru aviz"
+    "dispatchName": "Nume pentru aviz",
+    "salePriceMk": "Preț de vânzare pentru clienți MK",
+    "salePriceMkHint": "Preț unitar orientativ de vânzare (MKD) pentru clienții firmei macedonene. Poate fi modificat la emiterea facturii.",
+    "salePriceMkCol": "Preț vânzare MK",
+    "salePriceMkNone": "Nesetat"
   },
   "vehicles": {
     "title": "Vehicule",

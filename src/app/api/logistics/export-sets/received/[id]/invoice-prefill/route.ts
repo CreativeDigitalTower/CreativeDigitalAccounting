@@ -20,7 +20,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     select: {
       id: true, companyId: true, buyerCompanyId: true, clientId: true, invoiceNumber: true,
       invoiceDate: true, shipmentDate: true, productSnapshot: true, quantity: true, unit: true,
-      destination: true, truckRegSnapshot: true, trailerReg: true, deletedAt: true,
+      destination: true, truckRegSnapshot: true, trailerReg: true, deletedAt: true, logisticsProductId: true,
     },
   });
   if (!set || set.deletedAt) return NextResponse.json({ error: "not_found" }, { status: 404 });
@@ -59,14 +59,22 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     set.destination ? `Дестинация: ${set.destination}` : "",
   ].filter(Boolean).join(" · ");
 
+  // Ориентировъчна продажна цена за MK клиенти (§3). Само в MKD фактура (§9) — за друга
+  // валута НЕ пренасяме MKD число. Празна цена → unitPrice null (ръчно въвеждане, §6).
+  const currency = company?.defaultCurrency ?? "MKD";
+  const prod = set.logisticsProductId
+    ? await prisma.logisticsProduct.findFirst({ where: { id: set.logisticsProductId, companyId: g.companyId }, select: { salePriceMk: true } })
+    : null;
+  const unitPrice = currency === "MKD" && prod?.salePriceMk != null ? Number(prod.salePriceMk) : null;
+
   return NextResponse.json({
     sourceExportSetId: set.id,
     existing,
     matchedClientId,
     buyer, // единен authoritative buyer billing обект (§8) — формата го ползва директно
     clientSnapshot: matchedClientId ? null : (bgClient ? { name: bgClient.name, eik: bgClient.eik ?? "", vatNumber: bgClient.vatNumber ?? "", city: bgClient.city ?? "", address: bgClient.address ?? "", contactEmail: bgClient.contactEmail ?? "" } : null),
-    line: { description: set.productSnapshot ?? "", quantity: set.quantity ?? 0, unit: set.unit || "t", vatRate: MK_DEFAULT_VAT_RATE },
-    currency: company?.defaultCurrency ?? "MKD",
+    line: { description: set.productSnapshot ?? "", quantity: set.quantity ?? 0, unit: set.unit || "t", vatRate: MK_DEFAULT_VAT_RATE, unitPrice },
+    currency,
     language: getDefaultDocumentLanguage(company),
     notes: refs,
     bgInvoiceNumber: set.invoiceNumber,

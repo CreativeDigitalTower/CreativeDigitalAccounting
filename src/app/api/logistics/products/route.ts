@@ -11,15 +11,15 @@ const CURRENCY_CODES: string[] = CURRENCIES.map((c) => c.code);
 const select = {
   id: true, canonicalName: true, materialCode: true, unit: true, packaging: true,
   category: true, isSystemDefault: true, active: true, notes: true, createdAt: true, updatedAt: true,
-  certificateNumber: true, purchasePrice: true, purchaseCurrency: true, dispatchName: true,
+  certificateNumber: true, purchasePrice: true, purchaseCurrency: true, salePriceMk: true, dispatchName: true,
   certificateFileName: true, certificateFileMime: true, certificateUploadedAt: true,
   aliases: { select: { id: true, alias: true } },
 } as const;
 
 /** Сериализира продукт: Decimal → number; blob-ът на сертификата не се връща (само метаданни). */
-function serialize<T extends { purchasePrice: unknown; certificateFileName: string | null }>(p: T) {
-  const { purchasePrice, ...rest } = p;
-  return { ...rest, purchasePrice: purchasePrice == null ? null : Number(purchasePrice), hasCertificatePdf: !!p.certificateFileName };
+function serialize<T extends { purchasePrice: unknown; salePriceMk: unknown; certificateFileName: string | null }>(p: T) {
+  const { purchasePrice, salePriceMk, ...rest } = p;
+  return { ...rest, purchasePrice: purchasePrice == null ? null : Number(purchasePrice), salePriceMk: salePriceMk == null ? null : Number(salePriceMk), hasCertificatePdf: !!p.certificateFileName };
 }
 
 export async function GET() {
@@ -44,6 +44,7 @@ const schema = z.object({
   dispatchName: z.string().trim().max(300).nullable().optional(),
   purchasePrice: z.number().min(0).nullable().optional(),
   purchaseCurrency: z.string().refine((c) => CURRENCY_CODES.includes(c), "Невалидна валута.").nullable().optional(),
+  salePriceMk: z.number().min(0).nullable().optional(), // ориентировъчна продажна цена за MK клиенти (MKD)
 });
 
 export async function POST(req: Request) {
@@ -68,6 +69,7 @@ export async function POST(req: Request) {
         dispatchName: d.dispatchName?.trim() || null,
         purchasePrice: d.purchasePrice ?? null,
         purchaseCurrency: d.purchasePrice != null ? (d.purchaseCurrency ?? "EUR") : (d.purchaseCurrency ?? null),
+        salePriceMk: d.salePriceMk ?? null,
       }, select,
     });
     await audit(g.companyId, g.userId, "create", "LogisticsProduct", product.id, `Продукт „${d.canonicalName}"`);

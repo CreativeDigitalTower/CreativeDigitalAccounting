@@ -47,7 +47,11 @@
     "replaceCert": "Değiştir",
     "deleteCert": "Sil",
     "pdfOnly": "Yalnızca PDF dosyalarına izin verilir.",
-    "dispatchName": "İrsaliye adı"
+    "dispatchName": "İrsaliye adı",
+    "salePriceMk": "MK müşterileri için satış fiyatı",
+    "salePriceMkHint": "Makedon şirketinin müşterileri için gösterge birim satış fiyatı (MKD). Fatura düzenlenirken değiştirilebilir.",
+    "salePriceMkCol": "MK satış fiyatı",
+    "salePriceMkNone": "Belirlenmemiş"
   },
   "vehicles": {
     "title": "Araçlar",

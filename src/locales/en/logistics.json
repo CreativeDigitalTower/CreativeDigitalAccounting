@@ -47,7 +47,11 @@
     "replaceCert": "Replace",
     "deleteCert": "Delete",
     "pdfOnly": "Only PDF files are allowed.",
-    "dispatchName": "Dispatch name"
+    "dispatchName": "Dispatch name",
+    "salePriceMk": "Sale price for MK clients",
+    "salePriceMkHint": "Indicative unit sale price (MKD) for the Macedonian company's clients. Can be changed when issuing an invoice.",
+    "salePriceMkCol": "MK sale price",
+    "salePriceMkNone": "Not set"
   },
   "vehicles": {
     "title": "Vehicles",
