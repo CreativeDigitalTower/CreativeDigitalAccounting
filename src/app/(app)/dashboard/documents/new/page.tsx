@@ -234,7 +234,9 @@ function NewDocumentForm() {
         setType("invoice");
         setSourceExportSetId(d.sourceExportSetId);
         setDeliveryInfo({ bgInvoiceNumber: d.bgInvoiceNumber });
-        if (d.line) setLines([{ description: d.line.description, quantity: d.line.quantity, unitPrice: 0, vatRate: d.line.vatRate }]);
+        // Единична цена = ориентировъчната продажна цена на продукта (ако е върната, MKD §9);
+        // иначе 0 → ръчно въвеждане (§6). Остава свободно редактируема.
+        if (d.line) setLines([{ description: d.line.description, quantity: d.line.quantity, unitPrice: d.line.unitPrice ?? 0, vatRate: d.line.vatRate }]);
         if (d.currency) setCurrency(d.currency);
         if (d.language) setLanguage(d.language);
         if (d.notes) setNotes(d.notes);
@@ -266,7 +268,7 @@ function NewDocumentForm() {
         setSourceExportSetIds(d.sourceExportSetIds ?? []);
         setBulkContext(d.context ?? null);
         // Всяка доставка → отделен ред; продажната цена се въвежда (както single flow, §6).
-        if (Array.isArray(d.lines)) setLines(d.lines.map((l: { description: string; quantity: number; vatRate: number }) => ({ description: l.description, quantity: l.quantity, unitPrice: 0, vatRate: l.vatRate })));
+        if (Array.isArray(d.lines)) setLines(d.lines.map((l: { description: string; quantity: number; vatRate: number; unitPrice?: number | null }) => ({ description: l.description, quantity: l.quantity, unitPrice: l.unitPrice ?? 0, vatRate: l.vatRate })));
         if (d.currency) setCurrency(d.currency);
         if (d.language) setLanguage(d.language);
         if (d.notes) setNotes(d.notes);

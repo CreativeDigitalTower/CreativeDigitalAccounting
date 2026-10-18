@@ -25,6 +25,7 @@ const patchSchema = z.object({
   dispatchName: z.string().trim().max(300).nullable().optional(),
   purchasePrice: z.number().min(0).nullable().optional(),
   purchaseCurrency: z.string().refine((c) => CURRENCY_CODES.includes(c), "Невалидна валута.").nullable().optional(),
+  salePriceMk: z.number().min(0).nullable().optional(),
   // добавяне/премахване на alias
   addAlias: z.string().min(1).max(200).optional(),
   removeAliasId: z.string().optional(),
@@ -68,6 +69,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (d.dispatchName !== undefined) data.dispatchName = d.dispatchName?.trim() || null;
     if (d.purchasePrice !== undefined) data.purchasePrice = d.purchasePrice;
     if (d.purchaseCurrency !== undefined) data.purchaseCurrency = d.purchaseCurrency;
+    if (d.salePriceMk !== undefined) data.salePriceMk = d.salePriceMk;
 
     if (Object.keys(data).length) await prisma.logisticsProduct.update({ where: { id }, data });
 
@@ -83,9 +85,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     await audit(g.companyId, g.userId, "update", "LogisticsProduct", id, "Редакция на продукт");
     const fresh = await prisma.logisticsProduct.findUnique({
       where: { id },
-      select: { id: true, canonicalName: true, materialCode: true, unit: true, packaging: true, category: true, isSystemDefault: true, active: true, notes: true, certificateNumber: true, purchasePrice: true, purchaseCurrency: true, dispatchName: true, certificateFileName: true, certificateFileMime: true, certificateUploadedAt: true, aliases: { select: { id: true, alias: true } } },
+      select: { id: true, canonicalName: true, materialCode: true, unit: true, packaging: true, category: true, isSystemDefault: true, active: true, notes: true, certificateNumber: true, purchasePrice: true, purchaseCurrency: true, salePriceMk: true, dispatchName: true, certificateFileName: true, certificateFileMime: true, certificateUploadedAt: true, aliases: { select: { id: true, alias: true } } },
     });
-    return NextResponse.json(fresh ? { ...fresh, purchasePrice: fresh.purchasePrice == null ? null : Number(fresh.purchasePrice), hasCertificatePdf: !!fresh.certificateFileName } : null);
+    return NextResponse.json(fresh ? { ...fresh, purchasePrice: fresh.purchasePrice == null ? null : Number(fresh.purchasePrice), salePriceMk: fresh.salePriceMk == null ? null : Number(fresh.salePriceMk), hasCertificatePdf: !!fresh.certificateFileName } : null);
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: "Невалидни данни." }, { status: 400 });
     return NextResponse.json({ error: "Сървърна грешка." }, { status: 500 });

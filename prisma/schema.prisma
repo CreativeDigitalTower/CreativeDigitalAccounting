@@ -870,6 +870,11 @@ model LogisticsProduct {
   certificateNumber String?
   purchasePrice     Decimal? @db.Decimal(12, 4)
   purchaseCurrency  String?
+  // Ориентировъчна ПРОДАЖНА цена за MK клиенти (в MKD, за една мерна единица). Отделна от
+  // purchasePrice (§7): това е цената, на която MK фирмата (SEM) продава на крайните си
+  // клиенти. Additive/nullable → празно докато не бъде въведена; не влияе на стари фактури
+  // (единичната цена се снапшотва на реда при издаване). Само за prefill на MK фактурата.
+  salePriceMk       Decimal? @db.Decimal(12, 4)
   // Специално име за документа „Испратница" (само за реда „НАЗИВ НА МАТЕРИЈАЛИТЕ"). Additive/
   // nullable; НЕ влияе на canonicalName и на другите документи (Invoice/CMR/…). Fallback →
   // canonicalName при празно.
