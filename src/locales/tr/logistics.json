@@ -1208,6 +1208,19 @@
     "preview": "Önizleme",
     "confirm": "Onayla",
     "errAmount": "Pozitif bir tutar girin.",
-    "voidedReason": "Neden"
+    "voidedReason": "Neden",
+    "unreconciledWarn": "Bazı geçmiş ödemeler doğrulanmadı. Gösterilen bakiye nihai yükümlülükleri yansıtmayabilir.",
+    "confirmedOutstanding": "Onaylı ödenmemiş",
+    "toReconcile": "Mutabakat gerekli",
+    "reconcile": "Mutabakat",
+    "recHint_historically_paid": "Ödendi olarak işaretlenmiş ancak yeni sistemde kayıtlı ödeme yok. Mutabakat gerekli.",
+    "recHint_historically_partial": "Kısmi ödendi olarak işaretlenmiş ancak alınan tutar girilmemiş. Mutabakat gerekli.",
+    "historicalTag": "geçmiş",
+    "recordedAt": "Girildiği tarih",
+    "historicalTitle": "Geçmiş ödeme gir",
+    "historicalHint": "Mevcut faturaya ait fiilen alınan ödeme:",
+    "realDate": "Gerçek ödeme tarihi",
+    "dupConfirm": "Bu fatura için zaten bir geçmiş ödeme var. Bir tane daha eklemek istediğinize emin misiniz?",
+    "dupCancelled": "Kayıt iptal edildi."
   }
 }

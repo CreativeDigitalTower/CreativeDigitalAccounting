@@ -1897,9 +1897,11 @@ model ClientPayment {
   reference      String?   // № банков превод / платежно
   note           String?   @db.Text
   status         String    @default("active") // active | voided
+  source         String    @default("manual") // manual | historical — историческо съгласуване на заварена фактура
+  priorStatus    String?   // статус на фактурата ПРЕДИ историческото съгласуване (за коректно връщане при анулиране)
   idempotencyKey String?   // защита срещу двойно записване при повторна заявка (§12)
   createdById    String?
-  createdAt      DateTime  @default(now())
+  createdAt      DateTime  @default(now()) // дата на ВЪВЕЖДАНЕ в системата (различна от `date` = реална дата на плащането)
   voidedAt       DateTime?
   voidedById     String?
   voidReason     String?
