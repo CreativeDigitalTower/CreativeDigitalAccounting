@@ -291,6 +291,75 @@ export function periodMonthlyEquivalentEuros(plan: PlanId, periodId: BillingPeri
   return Math.round((periodTotalCents(plan, periodId) / months)) / 100;
 }
 
+// ─── Кампания BLACK FRIDAY 2026 ──────────────────────────────────────────
+// Промоция НАД редовните крайни цени за периода (§4). Отстъпките са в базисни
+// точки по план×период. Не се трупат със стандартните 5%/10% — прилагат се върху
+// редовната крайна цена за периода (periodTotalCents). Промо цената = закръгляне
+// на крайната сума (Math.round, half-up), за да съвпада точно с одобрените таблици.
+//
+// Активност: по АБСОЛЮТЕН момент (край = 30.11.2026 23:59:59 часово време Europe/Sofia,
+// което зимата е UTC+2). Абсолютният инстант е коректен и на сървър, и на клиент,
+// независимо от часовата зона, и спира автоматично без нов deploy.
+export const BLACK_FRIDAY_2026 = {
+  id: "black_friday_2026",
+  name: "BLACK FRIDAY 2026",
+  timezone: "Europe/Sofia",
+  // Начало веднага след внедряване → без начален праг (стартът е в миналото).
+  startsAt: new Date("2026-11-01T00:00:00+02:00"),
+  endsAt: new Date("2026-11-30T23:59:59+02:00"),
+} as const;
+
+// Отстъпки (базисни точки) по план и период — спрямо редовната крайна цена (§4).
+const BF_DISCOUNT_BPS: Record<Exclude<PlanId, "free">, Record<BillingPeriodId, number>> = {
+  start:    { monthly: 2000, semiannual: 3000, annual: 6000 },
+  business: { monthly: 2000, semiannual: 3000, annual: 5000 },
+  pro:      { monthly: 1500, semiannual: 2500, annual: 4000 },
+};
+
+/** Активна ли е Black Friday кампанията към даден момент (по абсолютен инстант). */
+export function blackFridayActive(now: Date = new Date()): boolean {
+  const t = now.getTime();
+  return t >= BLACK_FRIDAY_2026.startsAt.getTime() && t <= BLACK_FRIDAY_2026.endsAt.getTime();
+}
+
+/** Отстъпка в базисни точки за план/период при активна кампания; иначе 0. */
+export function blackFridayDiscountBps(plan: PlanId, periodId: BillingPeriodId, now: Date = new Date()): number {
+  if (!blackFridayActive(now) || plan === "free") return 0;
+  return BF_DISCOUNT_BPS[plan]?.[periodId] ?? 0;
+}
+
+/**
+ * ЕФЕКТИВНА крайна сума за периода в евроцентове, съобразена с кампанията (§10).
+ * При активен Black Friday → редовната сума × (1 − отстъпка), закръглена half-up до цент.
+ * Иначе → редовната сума (periodTotalCents). Авторитетен източник за плащането.
+ */
+export function effectivePeriodCents(plan: PlanId, periodId: BillingPeriodId, now: Date = new Date()): number {
+  const regular = periodTotalCents(plan, periodId);
+  const bps = blackFridayDiscountBps(plan, periodId, now);
+  if (bps === 0) return regular;
+  return Math.round((regular * (10000 - bps)) / 10000);
+}
+
+export function effectivePeriodEuros(plan: PlanId, periodId: BillingPeriodId, now: Date = new Date()): number {
+  return effectivePeriodCents(plan, periodId, now) / 100;
+}
+
+/** Месечен еквивалент на ефективната сума (за визуализация, 2 знака). */
+export function effectiveMonthlyEquivalentEuros(plan: PlanId, periodId: BillingPeriodId, now: Date = new Date()): number {
+  const months = billingPeriod(periodId).months;
+  return Math.round(effectivePeriodCents(plan, periodId, now) / months) / 100;
+}
+
+/** Спестена сума (редовна − ефективна) в евро. */
+export function blackFridaySavingsEuros(plan: PlanId, periodId: BillingPeriodId, now: Date = new Date()): number {
+  return (periodTotalCents(plan, periodId) - effectivePeriodCents(plan, periodId, now)) / 100;
+}
+
+/** Процент отстъпка за визуализация (цяло число), напр. 60 за −60%. */
+export function blackFridayDiscountPercent(plan: PlanId, periodId: BillingPeriodId, now: Date = new Date()): number {
+  return Math.round(blackFridayDiscountBps(plan, periodId, now) / 100);
+}
+
 export function commissionRate(paidClients: number, overridePercent?: number | null): number {
   if (overridePercent != null) return overridePercent / 100;
   let rate: number = COMMISSION_TIERS[0].rate;

@@ -170,6 +170,22 @@
     "genProforma": "Proforma oluşturuluyor…",
     "downloadProforma": "Proforma faturayı indir",
     "gotIt": "Anladım, ödemeyi yapacağım",
-    "proformaAvail": "Proforma No. {number} „Gelen belgeler”de de mevcuttur."
+    "proformaAvail": "Proforma No. {number} „Gelen belgeler”de de mevcuttur.",
+    "monthlyEquiv": "≈ {amount} € / ay"
+  },
+  "bf": {
+    "badge": "BLACK FRIDAY −%{pct}",
+    "save": "{amount} € tasarruf",
+    "bestOffer": "EN İYİ BLACK FRIDAY FIRSATI",
+    "tagline": "Özel fiyatlar sadece 30 Kasım'a kadar!",
+    "annualPitch": "Bir kez ödeyin. Tüm yıl kullanın. %60'a varan tasarruf.",
+    "endsNote": "Teklif 30.11.2026 tarihinde sona eriyor.",
+    "calloutStrong": "BLACK FRIDAY — %60'a varan indirim",
+    "calloutText": "Özel fiyatlar sadece 30 Kasım'a kadar. Yıllık abonelikle daha fazla tasarruf edin.",
+    "barFull": "🖤 CDA'DA BLACK FRIDAY | ABONELİKLERDE −%60'A VARAN | SADECE 30 KASIM'A KADAR!",
+    "barCompact": "🖤 BLACK FRIDAY −%60 | 30.11'E KADAR",
+    "barCta": "TEKLİFLERE BAK →",
+    "barCtaShort": "BAK →",
+    "dismiss": "Kapat"
   }
 }

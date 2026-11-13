@@ -20,8 +20,9 @@ export async function generateSubscriptionProforma(opts: {
   plan: PlanId;
   periodLabel: string;
   amount: number; // нето сума (както е показана при избора на план)
+  validUntil?: Date | null; // краен срок за плащане (§10 — промо офертата не важи безсрочно)
 }): Promise<{ token: string; number: string; documentId: string } | null> {
-  const { clientCompanyId, plan, periodLabel, amount } = opts;
+  const { clientCompanyId, plan, periodLabel, amount, validUntil } = opts;
   if (!amount || amount <= 0) return null;
 
   // Платформената фирма (издател)
@@ -73,6 +74,9 @@ export async function generateSubscriptionProforma(opts: {
 
   const now = new Date();
   const due = new Date(now); due.setDate(due.getDate() + 7);
+  // Промо оферта: срокът за плащане не надхвърля края на кампанията (§10) —
+  // при изтекла валидност е нужна нова заявка по актуалната цена.
+  if (validUntil && validUntil.getTime() < due.getTime()) due.setTime(validUntil.getTime());
 
   const doc = await prisma.document.create({
     data: {

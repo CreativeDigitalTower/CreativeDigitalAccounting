@@ -170,6 +170,22 @@
     "genProforma": "Generating proforma…",
     "downloadProforma": "Download proforma invoice",
     "gotIt": "Got it, I'll make the payment",
-    "proformaAvail": "Proforma No. {number} is also available in “Incoming documents”."
+    "proformaAvail": "Proforma No. {number} is also available in “Incoming documents”.",
+    "monthlyEquiv": "≈ €{amount} / month"
+  },
+  "bf": {
+    "badge": "BLACK FRIDAY −{pct}%",
+    "save": "You save €{amount}",
+    "bestOffer": "BEST BLACK FRIDAY DEAL",
+    "tagline": "Special prices only until 30 November!",
+    "annualPitch": "Pay once. Use it all year. Save up to 60%.",
+    "endsNote": "Offer ends on 30.11.2026.",
+    "calloutStrong": "BLACK FRIDAY — up to 60% off",
+    "calloutText": "Special prices only until 30 November. Save more with an annual plan.",
+    "barFull": "🖤 BLACK FRIDAY AT CDA | UP TO −60% ON SUBSCRIPTIONS | ONLY UNTIL 30 NOVEMBER!",
+    "barCompact": "🖤 BLACK FRIDAY −60% | UNTIL 30.11",
+    "barCta": "SEE OFFERS →",
+    "barCtaShort": "SEE →",
+    "dismiss": "Close"
   }
 }
