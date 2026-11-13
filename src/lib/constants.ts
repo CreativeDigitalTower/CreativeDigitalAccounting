@@ -7,7 +7,7 @@ export const TRASH_RETENTION_DAYS = 90;
 export const DUAL_DISPLAY_END_DATE = new Date("2026-08-08");
 /** @deprecated Използвайте DUAL_DISPLAY_END_DATE. Оставено за backward compatibility. */
 export const DUAL_CURRENCY_UNTIL = DUAL_DISPLAY_END_DATE;
-export const FREE_PLAN_LIMIT = 5; // документа/месец
+export const FREE_PLAN_LIMIT = 10; // документа/месец (fallback = лимитът на Free плана)
 
 export const COMPANY_NAME = "Криейтив Диджитъл Тауър ЕООД";
 export const COMPANY_EIK = "205748188";
@@ -171,27 +171,35 @@ export const DOC_STATUSES = [
   { value: "cancelled", label: "Анулирана", color: "brick" },
 ] as const;
 
-// ─── Абонаментни планове (нови цени) ─────────────────────────────────────
-// Промоционален период — промо цените важат при абониране до тази дата
-export const PROMO_UNTIL = new Date("2026-12-31T23:59:59");
+// ─── Абонаментни планове (РЕДОВНИ цени, в сила от 2026-11) ────────────────
+// Единствен авторитетен източник за месечните редовни цени и месечните лимити
+// на четирите основни плана. Паричните стойности се пазят И в евроцентове
+// (`monthlyCents`), за да се смятат периодите целочислено, без float грешки (§3.4/§8.2).
+//
+// Няма активен промоционален период: `price` == `regularPrice` (редовна цена).
+// Запазват се само стандартните отстъпки за предплащане (виж BILLING_PERIODS):
+// 5% на 6 месеца, 10% на 12 месеца. Старите редовни/промо цени са премахнати.
+export const PROMO_UNTIL: Date | null = null;
+/** Няма активна промоция — новите цени са постоянни редовни цени (§2). */
 export function isPromoActive(): boolean {
-  return new Date() <= PROMO_UNTIL;
+  return false;
 }
 
-// Лимити и цени по план.
-// price = промоционална (launch) цена; regularPrice = редовна цена.
+// Лимити и цени по план. price == regularPrice (без промоция).
+// ВАЖНО: променяме само редовните цени и docsPerMonth; правата/лимитите за
+// потребители, фирми, клиенти, доставчици и PDF шаблони остават непроменени (§5).
 export const SUBSCRIPTION_PLANS = {
-  free:     { name: "Безплатен", regularPrice: 0,  price: 0,  docsPerMonth: 5,        users: 1,        companies: 1,        clients: 5,        suppliers: 5,        pdfTemplates: 2 },
-  start:    { name: "Старт",     regularPrice: 15, price: 9,  docsPerMonth: 30,       users: 2,        companies: 1,        clients: Infinity, suppliers: Infinity, pdfTemplates: 3 },
-  business: { name: "Бизнес",    regularPrice: 39, price: 29, docsPerMonth: 300,      users: 5,        companies: 1,        clients: Infinity, suppliers: Infinity, pdfTemplates: Infinity },
-  pro:      { name: "Про",       regularPrice: 79, price: 59, docsPerMonth: Infinity, users: Infinity, companies: Infinity, clients: Infinity, suppliers: Infinity, pdfTemplates: Infinity },
+  free:     { name: "Безплатен", regularPrice: 0,    price: 0,    monthlyCents: 0,    docsPerMonth: 10,       users: 1,        companies: 1,        clients: 5,        suppliers: 5,        pdfTemplates: 2 },
+  start:    { name: "Старт",     regularPrice: 4.9,  price: 4.9,  monthlyCents: 490,  docsPerMonth: 500,      users: 2,        companies: 1,        clients: Infinity, suppliers: Infinity, pdfTemplates: 3 },
+  business: { name: "Бизнес",    regularPrice: 24.9, price: 24.9, monthlyCents: 2490, docsPerMonth: 2000,     users: 5,        companies: 1,        clients: Infinity, suppliers: Infinity, pdfTemplates: Infinity },
+  pro:      { name: "Про",       regularPrice: 79,   price: 79,   monthlyCents: 7900, docsPerMonth: Infinity, users: Infinity, companies: Infinity, clients: Infinity, suppliers: Infinity, pdfTemplates: Infinity },
 } as const;
 
 export type PlanId = keyof typeof SUBSCRIPTION_PLANS;
 
-// Цена за изобразяване според промо периода
+// Редовна месечна цена (в евро) за изобразяване. Без промоция → редовната цена.
 export function planPrice(plan: PlanId): number {
-  return isPromoActive() ? SUBSCRIPTION_PLANS[plan].price : SUBSCRIPTION_PLANS[plan].regularPrice;
+  return SUBSCRIPTION_PLANS[plan].regularPrice;
 }
 
 // Видове официални изходящи документи, които се броят към месечния лимит
@@ -251,6 +259,37 @@ export const BILLING_PERIODS = [
   { id: "semiannual", label: "6 месеца", months: 6, discount: 0.05 },
   { id: "annual", label: "1 година", months: 12, discount: 0.10 },
 ] as const;
+
+export type BillingPeriodId = (typeof BILLING_PERIODS)[number]["id"];
+
+export function billingPeriod(periodId: string | null | undefined) {
+  return BILLING_PERIODS.find((p) => p.id === periodId) ?? BILLING_PERIODS[0];
+}
+
+/**
+ * Обща сума за периода в ЕВРОЦЕНТОВЕ — целочислено, без float грешки (§3.4/§8.2).
+ * База = месечна цена × брой месеци; отстъпката се прилага в базисни точки
+ * (5% = 500 bps, 10% = 1000 bps) чрез целочислено закръгляне.
+ * Авторитетен източник за реално дължимата сума при плащане.
+ */
+export function periodTotalCents(plan: PlanId, periodId: BillingPeriodId): number {
+  const p = billingPeriod(periodId);
+  const base = SUBSCRIPTION_PLANS[plan].monthlyCents * p.months;
+  const bps = Math.round(p.discount * 10000);
+  const discount = Math.round((base * bps) / 10000);
+  return base - discount;
+}
+
+/** Обща сума за периода в евро (точна до цент). */
+export function periodTotalEuros(plan: PlanId, periodId: BillingPeriodId): number {
+  return periodTotalCents(plan, periodId) / 100;
+}
+
+/** Месечен еквивалент за визуализация (в евро, закръглен до 2 знака). Реалната сума за плащане е periodTotalEuros. */
+export function periodMonthlyEquivalentEuros(plan: PlanId, periodId: BillingPeriodId): number {
+  const months = billingPeriod(periodId).months;
+  return Math.round((periodTotalCents(plan, periodId) / months)) / 100;
+}
 
 export function commissionRate(paidClients: number, overridePercent?: number | null): number {
   if (overridePercent != null) return overridePercent / 100;
