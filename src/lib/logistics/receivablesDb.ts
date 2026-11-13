@@ -1,11 +1,16 @@
 import type { Prisma, PrismaClient } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { sumMoney } from "@/lib/logistics/money";
-import { invoicePaid, invoiceRemaining, invoiceStatus } from "@/lib/logistics/receivables";
+import { invoicePaid, invoiceRemaining, invoiceStatus, reconciliationState, needsReconciliation, type ReconciliationState } from "@/lib/logistics/receivables";
 
 type Tx = PrismaClient | Prisma.TransactionClient;
 
-export type OpenInvoiceRow = { id: string; number: string; issueDate: Date; dueDate: Date | null; status: string; currency: string; total: number; paid: number; remaining: number };
+export type OpenInvoiceRow = {
+  id: string; number: string; issueDate: Date; dueDate: Date | null; status: string; currency: string;
+  total: number; paid: number; remaining: number;
+  recState: ReconciliationState;   // §3/§5 — съгласуване на заварени фактури
+  needsReconciliation: boolean;
+};
 
 /** Валидните продажни фактури на клиент (MK receivables): type invoice, не изтрити, не анулирани. */
 const INVOICE_WHERE = (companyId: string, clientId: string): Prisma.DocumentWhereInput => ({
@@ -30,8 +35,18 @@ export async function loadClientInvoices(db: Tx, companyId: string, clientId: st
   return docs.map((d) => {
     const total = docTotal(d.lines);
     const paid = invoicePaid(d.paymentAllocations.map((a) => ({ amount: Number(a.amount) })));
-    return { id: d.id, number: d.number, issueDate: d.issueDate, dueDate: d.dueDate, status: d.status, currency: d.currency, total, paid, remaining: invoiceRemaining(total, paid) };
+    const recState = reconciliationState(d.status, paid);
+    return { id: d.id, number: d.number, issueDate: d.issueDate, dueDate: d.dueDate, status: d.status, currency: d.currency, total, paid, remaining: invoiceRemaining(total, paid), recState, needsReconciliation: needsReconciliation(recState) };
   });
+}
+
+/**
+ * Фактурите, допустими за АВТОМАТИЧНО FIFO разпределение (§5): с реален остатък и БЕЗ нужда
+ * от съгласуване. Така новото плащане не погасява заварена фактура с неизвестен действителен
+ * остатък, нито „платена" историческа фактура без записи.
+ */
+export function fifoEligible(rows: OpenInvoiceRow[]): OpenInvoiceRow[] {
+  return rows.filter((i) => i.remaining > 0.004 && !i.needsReconciliation);
 }
 
 /**
@@ -39,7 +54,7 @@ export async function loadClientInvoices(db: Tx, companyId: string, clientId: st
  * историческите статуси: пипа статуса само ако има плащания или ако трябва да върне вече
  * маркирана платена/частична към „issued" при сторниране (нулиране на разпределения).
  */
-export async function recomputeInvoice(db: Tx, companyId: string, documentId: string): Promise<void> {
+export async function recomputeInvoice(db: Tx, companyId: string, documentId: string, opts?: { restoreStatusIfZero?: string | null }): Promise<void> {
   const doc = await db.document.findFirst({
     where: { id: documentId, companyId },
     select: { id: true, status: true, lines: { select: { lineTotal: true } }, paymentAllocations: { where: { payment: { status: "active" } }, select: { amount: true } } },
@@ -51,7 +66,12 @@ export async function recomputeInvoice(db: Tx, companyId: string, documentId: st
   let newStatus = doc.status;
   if (st === "paid") newStatus = "paid";
   else if (st === "partially_paid") newStatus = "partially_paid";
-  else if (doc.status === "paid" || doc.status === "partially_paid") newStatus = "issued"; // сторнирано → обратно към издадена
+  else if (doc.status === "paid" || doc.status === "partially_paid") {
+    // Нулирани разпределения (сторниране). При анулиране на ИСТОРИЧЕСКО съгласуване връщаме
+    // заварения статус (§8) → фактурата отново изисква съгласуване, вместо да я приемем за
+    // изцяло неплатена. Иначе връщаме към „issued".
+    newStatus = (opts?.restoreStatusIfZero ?? "issued") as typeof doc.status;
+  }
   await db.document.update({ where: { id: documentId }, data: { paidAmount: paid, status: newStatus } });
 }
 
@@ -64,8 +84,7 @@ export async function clientBalanceAggregates(db: Tx, companyId: string, clientI
   });
   const activePaymentsTotal = sumMoney(payments.map((p) => Number(p.amount)));
   const allocationsTotal = sumMoney(payments.flatMap((p) => p.allocations.map((a) => Number(a.amount))));
-  const outstandingTotal = sumMoney(invoices.map((i) => i.remaining));
-  return { invoices, activePaymentsTotal, allocationsTotal, outstandingTotal };
+  return { invoices, activePaymentsTotal, allocationsTotal };
 }
 
 /** Наличен кредит на клиента (неразпределени активни плащания). */

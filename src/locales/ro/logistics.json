@@ -1208,6 +1208,19 @@
     "preview": "Previzualizare",
     "confirm": "Confirmă",
     "errAmount": "Introduceți o sumă pozitivă.",
-    "voidedReason": "Motiv"
+    "voidedReason": "Motiv",
+    "unreconciledWarn": "Unele plăți istorice nu sunt confirmate. Soldul afișat poate să nu reflecte obligațiile finale.",
+    "confirmedOutstanding": "Restant confirmat",
+    "toReconcile": "De reconciliat",
+    "reconcile": "Reconciliază",
+    "recHint_historically_paid": "Marcată ca plătită, dar fără plăți înregistrate în noul sistem. Este necesară reconcilierea.",
+    "recHint_historically_partial": "Marcată ca parțial plătită, dar fără suma încasată înregistrată. Este necesară reconcilierea.",
+    "historicalTag": "istoric",
+    "recordedAt": "Înregistrat la",
+    "historicalTitle": "Introdu plată istorică",
+    "historicalHint": "Plată efectiv încasată pentru o factură existentă:",
+    "realDate": "Data reală a plății",
+    "dupConfirm": "Există deja o plată istorică pentru această factură. Sigur adăugați încă una?",
+    "dupCancelled": "Înregistrare anulată."
   }
 }

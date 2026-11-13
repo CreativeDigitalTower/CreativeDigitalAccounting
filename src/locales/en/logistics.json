@@ -1208,6 +1208,19 @@
     "preview": "Preview",
     "confirm": "Confirm",
     "errAmount": "Enter a positive amount.",
-    "voidedReason": "Reason"
+    "voidedReason": "Reason",
+    "unreconciledWarn": "Some historical payments are unconfirmed. The shown balance may not reflect final obligations.",
+    "confirmedOutstanding": "Confirmed outstanding",
+    "toReconcile": "To reconcile",
+    "reconcile": "Reconcile",
+    "recHint_historically_paid": "Marked as paid but with no payments recorded in the new system. Reconciliation needed.",
+    "recHint_historically_partial": "Marked as partially paid but with no recorded received amount. Reconciliation needed.",
+    "historicalTag": "historical",
+    "recordedAt": "Recorded on",
+    "historicalTitle": "Enter historical payment",
+    "historicalHint": "Actual payment received on an existing invoice:",
+    "realDate": "Actual payment date",
+    "dupConfirm": "A historical payment already exists for this invoice. Are you sure you want to add another?",
+    "dupCancelled": "Entry cancelled."
   }
 }
