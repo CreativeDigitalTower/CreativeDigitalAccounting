@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { isPromoActive, BILLING_PERIODS } from "@/lib/constants";
+import { SUBSCRIPTION_PLANS, BILLING_PERIODS, periodTotalEuros, periodMonthlyEquivalentEuros, type PlanId } from "@/lib/constants";
 import { IconSeed, IconRocket, IconTrophy, IconCrown, IconBuilding } from "@/components/Icons";
 import { useI18n } from "@/components/i18n/I18nProvider";
 
@@ -11,20 +11,25 @@ type Plan = {
   blurb: string; features: string[]; suited: string; recommended?: boolean; cta: string; href: string;
 };
 
+// Цените идват ЕДИНСТВЕНО от централния източник SUBSCRIPTION_PLANS (§8.2/§17) —
+// без паралелна ценова конфигурация. Тук остават само презентационни данни (икона,
+// секции), а текстът на функциите се поема от i18n (`pricing.plans.*`).
+const pr = (id: PlanId) => ({ price: SUBSCRIPTION_PLANS[id].price, regularPrice: SUBSCRIPTION_PLANS[id].regularPrice });
+
 export const PLAN_DETAILS: Plan[] = [
-  { id: "free", Icon: IconSeed, name: "Безплатен", tagline: "За стартиращи фирми и свободни професии", price: 0, regularPrice: 0,
+  { id: "free", Icon: IconSeed, name: "Безплатен", tagline: "За стартиращи фирми и свободни професии", ...pr("free"),
     blurb: "Перфектен за първите стъпки на вашия бизнес.",
     features: ["До 5 документа месечно", "1 фирма", "1 потребител", "Фактури, проформи и оферти", "До 5 клиента и доставчика", "Базов склад", "Финансово табло", "Данъчен календар", "Двойно EUR/BGN обозначаване", "2 професионални PDF шаблона"],
     suited: "фрийлансъри, консултанти, новорегистрирани фирми.", cta: "Започни безплатно", href: "/register?plan=free" },
-  { id: "start", Icon: IconRocket, name: "Старт", tagline: "За малки фирми с активна ежедневна работа", price: 9, regularPrice: 15,
+  { id: "start", Icon: IconRocket, name: "Старт", tagline: "За малки фирми с активна ежедневна работа", ...pr("start"),
     blurb: "Най-продаваният пакет за малки фирми.",
     features: ["Всичко от Безплатен", "До 30 документа месечно", "Разходи и входящи документи", "Повтарящи се фактури", "Автоматични напомняния", "Управление на разходите с прикачени файлове", "Стандартни бизнес анализи", "Симулация на приходи и складови цени", "Брандирани PDF документи (фирмено лого)", "Архив на документите", "3 професионални PDF шаблона", "1 потребител + 1 гост"],
     suited: "малки търговски фирми, агенции, онлайн магазини и услуги.", cta: "Изберете Старт", href: "/register?plan=start" },
-  { id: "business", Icon: IconTrophy, name: "Бизнес", tagline: "За развиващи се компании", price: 29, regularPrice: 39,
+  { id: "business", Icon: IconTrophy, name: "Бизнес", tagline: "За развиващи се компании", ...pr("business"),
     blurb: "Най-предпочитаният пакет от развиващи се компании.",
     features: ["Всичко от Старт", "До 300 документа месечно", "Управление на проекти (Project Management)", "HR портал за служители", "Заплати и осигуровки", "Онлайн молби за отпуск", "Одобрение на отпуски", "Възлагане и проследяване на задачи", "Пълен склад и наличности", "Производство и себестойност", "Договори", "Активи и амортизации", "HACCP технологична документация", "SAF-T генериране (месечно/годишно)", "Разширени анализи и KPI", "Над 100 шаблона за бизнес документи", "Пълен архив", "До 5 потребители", "Всички PDF шаблони"],
     suited: "растящи компании, производство, хранителна индустрия, по-сложни процеси.", recommended: true, cta: "Изберете Бизнес", href: "/register?plan=business" },
-  { id: "pro", Icon: IconCrown, name: "Про", tagline: "За компании, които искат максимална автоматизация", price: 59, regularPrice: 79,
+  { id: "pro", Icon: IconCrown, name: "Про", tagline: "За компании, които искат максимална автоматизация", ...pr("pro"),
     blurb: "Най-мощната версия на Creative Digital Accounting.",
     features: ["Всичко от Бизнес", "Неограничени документи", "Неограничени потребители", "Неограничен брой фирми", "API интеграции", "AI CFO Assistant", "Персонализирани PDF шаблони", "Приоритетна поддръжка", "Ранен достъп до новите функции"],
     suited: "счетоводни кантори, групи фирми, производители, по-големи бизнеси.", cta: "Изберете Про", href: "/register?plan=pro" },
@@ -37,7 +42,7 @@ export function Pricing() {
   const { t, messages } = useI18n();
   const P = (messages as unknown as { pricing: { plans: Record<string, { name: string; tagline: string; blurb: string; suited: string; cta: string; features: string[] }> } }).pricing;
   const [period, setPeriod] = useState<(typeof BILLING_PERIODS)[number]>(BILLING_PERIODS[0]);
-  const promo = isPromoActive();
+  const promo = false; // няма активна промоция — редовни цени (§2)
 
   return (
     <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 80px" }}>
@@ -69,9 +74,10 @@ export function Pricing() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 16 }}>
         {PLAN_DETAILS.map((plan) => {
-          const promoMonthly = plan.price * (1 - period.discount);
+          // Всички суми от централния източник (целочислени центове) — съвпадат с плащането (§3.4).
+          const promoMonthly = periodMonthlyEquivalentEuros(plan.id as PlanId, period.id);
           const regularMonthly = plan.regularPrice * (1 - period.discount);
-          const total = plan.price * period.months * (1 - period.discount);
+          const total = periodTotalEuros(plan.id as PlanId, period.id);
           const fullTotal = plan.price * period.months;
           const Icon = plan.Icon;
           const hasPromo = promo && plan.regularPrice > plan.price;

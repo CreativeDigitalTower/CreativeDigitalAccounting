@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { PLAN_DETAILS, BILLING_PERIODS } from "@/components/marketing/Pricing";
-import { isPromoActive } from "@/lib/constants";
+import { periodTotalEuros, type PlanId } from "@/lib/constants";
 import { metaTrack } from "@/lib/metaClient";
 import { useI18n } from "@/components/i18n/I18nProvider";
 
@@ -20,7 +20,7 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
   const [proforma, setProforma] = useState<{ token: string; number: string } | null>(null);
   const [proformaLoading, setProformaLoading] = useState(false);
   const [trialMsg, setTrialMsg] = useState("");
-  const promo = isPromoActive();
+  const promo = false; // няма активна промоция — редовни цени (§2)
 
   useEffect(() => { try { metaTrack("ViewContent", { content_name: "Pricing", content_category: "subscription" }); } catch {} }, []);
 
@@ -38,8 +38,8 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
     setPayModal(true);
     setProforma(null);
     setProformaLoading(true);
-    const plan = PLAN_DETAILS.find((p) => p.id === planId);
-    const amount = plan ? +(plan.price * period.months * (1 - period.discount)).toFixed(2) : 0;
+    // Сумата се изчислява централно (ще бъде преизчислена и на backend — авторитет §8.2).
+    const amount = periodTotalEuros(planId as PlanId, period.id);
     // ─── Meta: избор на абонамент ───
     try {
       metaTrack("SubscriptionSelected", { value: amount, currency: "EUR", plan_name: planId, billing_period: period.label });
@@ -48,7 +48,7 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
     // Регистрираме заявката (видима в Супер Админ историята) и автоматично
     // генерираме проформа фактура към фирмата на клиента.
     try {
-      const res = await fetch("/api/subscription/request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: planId, period: period.label, amount }) });
+      const res = await fetch("/api/subscription/request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: planId, period: period.id, amount }) });
       const data = await res.json().catch(() => ({}));
       if (data?.proforma?.token) setProforma(data.proforma);
     } catch { /* без проформа — банковите данни остават видими */ }
@@ -56,7 +56,7 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
   }
 
   const payPlan = PLAN_DETAILS.find((p) => p.id === payPlanId);
-  const payAmount = payPlan ? payPlan.price * period.months * (1 - period.discount) : 0;
+  const payAmount = payPlanId ? periodTotalEuros(payPlanId as PlanId, period.id) : 0;
 
   return (
     <div>
