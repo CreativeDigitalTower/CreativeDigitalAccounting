@@ -91,8 +91,9 @@ describe("Централен източник — няма разминаван�
   it("backend subscription/request изчислява сумата сам (не вярва на клиента §8.3)", () => {
     const fs = require("node:fs") as typeof import("node:fs");
     const src = fs.readFileSync("src/app/api/subscription/request/route.ts", "utf-8");
-    expect(src).toContain("periodTotalEuros");
+    // Сумата се смята на сървъра (BF-aware, авторитетна); клиентската сума само се сверява.
+    expect(src).toContain("effectivePeriodEuros");
     expect(src).toContain("amount: clientAmount"); // клиентската сума е преименувана и не се ползва директно
-    expect(src).toMatch(/const amount = periodTotalEuros/);
+    expect(src).toMatch(/const amount = effectivePeriodEuros/);
   });
 });

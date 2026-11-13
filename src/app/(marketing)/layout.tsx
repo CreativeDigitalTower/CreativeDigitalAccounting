@@ -1,4 +1,5 @@
 import { BlobBackground } from "@/components/Backgrounds";
+import { BlackFridayBar } from "@/components/marketing/BlackFridayBar";
 import { MarketingNavbar } from "@/components/marketing/Navbar";
 import { MarketingFooter } from "@/components/marketing/Footer";
 import { MessengerBubble } from "@/components/marketing/MessengerBubble";
@@ -11,6 +12,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       <VisitTracker area="public" />
       <BlobBackground />
       <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+        <BlackFridayBar />
         <MarketingNavbar />
         <main style={{ flex: 1 }}>{children}</main>
         <MarketingFooter />

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { SUBSCRIPTION_PLANS, BILLING_PERIODS, periodTotalEuros, periodMonthlyEquivalentEuros, type PlanId } from "@/lib/constants";
+import { SUBSCRIPTION_PLANS, BILLING_PERIODS, periodTotalEuros, effectivePeriodEuros, effectiveMonthlyEquivalentEuros, blackFridayActive, blackFridayDiscountPercent, blackFridaySavingsEuros, type PlanId } from "@/lib/constants";
 import { IconSeed, IconRocket, IconTrophy, IconCrown, IconBuilding } from "@/components/Icons";
 import { useI18n } from "@/components/i18n/I18nProvider";
 
@@ -42,10 +42,10 @@ export function Pricing() {
   const { t, messages } = useI18n();
   const P = (messages as unknown as { pricing: { plans: Record<string, { name: string; tagline: string; blurb: string; suited: string; cta: string; features: string[] }> } }).pricing;
   const [period, setPeriod] = useState<(typeof BILLING_PERIODS)[number]>(BILLING_PERIODS[0]);
-  const promo = false; // няма активна промоция — редовни цени (§2)
+  const bfActive = blackFridayActive();
 
   return (
-    <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 80px" }}>
+    <section id="pricing" style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px 80px", scrollMarginTop: 80 }}>
       <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 36, fontWeight: 700, textAlign: "center", marginBottom: 8 }}>
         {t("pricing.title")}
       </h2>
@@ -68,47 +68,55 @@ export function Pricing() {
           ))}
         </div>
       </div>
-      <p style={{ textAlign: "center", color: "var(--emerald)", fontSize: 12.5, fontWeight: 600, marginBottom: 28, minHeight: 18 }}>
-        {period.discount > 0 ? t("pricing.saveNote", { pct: period.discount * 100, period: t(`pricing.periods.${period.id}`).toLowerCase() }) : " "}
+      <p style={{ textAlign: "center", color: bfActive && period.id === "annual" ? "var(--brick)" : "var(--emerald)", fontSize: 12.5, fontWeight: 600, marginBottom: bfActive ? 6 : 28, minHeight: 18 }}>
+        {bfActive
+          ? (period.id === "annual" ? `🖤 ${t("pricing.bf.bestOffer")}` : t("pricing.bf.tagline"))
+          : (period.discount > 0 ? t("pricing.saveNote", { pct: period.discount * 100, period: t(`pricing.periods.${period.id}`).toLowerCase() }) : " ")}
       </p>
+      {bfActive && <p style={{ textAlign: "center", color: "var(--muted)", fontSize: 12, fontWeight: 500, marginBottom: 24 }}>{t("pricing.bf.annualPitch")} · {t("pricing.bf.endsNote")}</p>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 16 }}>
         {PLAN_DETAILS.map((plan) => {
-          // Всички суми от централния източник (целочислени центове) — съвпадат с плащането (§3.4).
-          const promoMonthly = periodMonthlyEquivalentEuros(plan.id as PlanId, period.id);
-          const regularMonthly = plan.regularPrice * (1 - period.discount);
-          const total = periodTotalEuros(plan.id as PlanId, period.id);
-          const fullTotal = plan.price * period.months;
+          // Всички суми от централния източник (целочислени центове) — съвпадат с плащането (§3.4/§10).
+          const pid = plan.id as PlanId;
+          const regularTotal = periodTotalEuros(pid, period.id);
+          const effTotal = effectivePeriodEuros(pid, period.id);
+          const monthlyEq = effectiveMonthlyEquivalentEuros(pid, period.id);
+          const bfPct = blackFridayDiscountPercent(pid, period.id);
+          const savings = blackFridaySavingsEuros(pid, period.id);
+          const isBf = bfActive && bfPct > 0 && plan.price > 0;
           const Icon = plan.Icon;
-          const hasPromo = promo && plan.regularPrice > plan.price;
           const pt = P.plans[plan.id];
           return (
             <div key={plan.id} className="glass panel"
               style={{ padding: "24px 20px", position: "relative", display: "flex", flexDirection: "column", border: plan.recommended ? "2px solid var(--brass)" : undefined }}>
               {plan.recommended && <span className="ribbon">{t("pricing.recommended")}</span>}
-              {hasPromo && (
-                <span style={{ position: "absolute", top: 12, left: 12, background: "var(--brick)", color: "#fff", fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, letterSpacing: .3 }}>{t("pricing.specialPrice")}</span>
+              {isBf && (
+                <span style={{ position: "absolute", top: 12, left: 12, background: "#111111", color: "#fff", fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 20, letterSpacing: .3 }}>🖤 {t("pricing.bf.badge", { pct: bfPct })}</span>
               )}
-              <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, marginTop: hasPromo ? 12 : 0 }}>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 12, marginTop: isBf ? 12 : 0 }}>
                 <div className="icon-tile" style={{ width: 56, height: 56 }}><Icon /></div>
               </div>
               <div style={{ fontFamily: "'Fraunces', serif", fontSize: 21, fontWeight: 700, textAlign: "center" }}>{pt.name}</div>
               <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 2, minHeight: 34, textAlign: "center" }}>{pt.tagline}</div>
 
               <div style={{ textAlign: "center", margin: "12px 0 0" }}>
-                {hasPromo && (
+                {isBf && (
                   <span className="num" style={{ fontSize: 15, color: "var(--muted)", textDecoration: "line-through", marginRight: 8 }}>
-                    {regularMonthly.toFixed(regularMonthly % 1 === 0 ? 0 : 2)} €
+                    {regularTotal.toFixed(2)} €
                   </span>
                 )}
-                <span className="num" style={{ fontSize: 32, fontWeight: 700, color: hasPromo ? "var(--emerald-dark)" : "var(--ink)" }}>
-                  {plan.price === 0 ? "0" : promoMonthly.toFixed(promoMonthly % 1 === 0 ? 0 : 2)}
+                <span className="num" style={{ fontSize: 32, fontWeight: 700, color: isBf ? "var(--emerald-dark)" : "var(--ink)" }}>
+                  {plan.price === 0 ? "0" : (period.months > 1 ? effTotal : monthlyEq).toFixed(2)}
                 </span>
-                <span style={{ fontSize: 14, color: "var(--muted)", fontWeight: 500 }}> {t("pricing.perMonth")}</span>
+                <span style={{ fontSize: 14, color: "var(--muted)", fontWeight: 500 }}> {period.months > 1 ? t(`pricing.periods.${period.id}`).toLowerCase() : t("pricing.perMonth")}</span>
               </div>
               {plan.price > 0 && period.months > 1 && (
                 <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 2, textAlign: "center" }}>
-                  {t("pricing.totalFor", { total: total.toFixed(2), months: period.months })} <span style={{ color: "var(--brass)" }}>{t("pricing.saved", { amount: (fullTotal - total).toFixed(2) })}</span>
+                  {t("pricing.sub.monthlyEquiv", { amount: monthlyEq.toFixed(2) })}
+                  {isBf
+                    ? <span style={{ color: "var(--brick)", fontWeight: 600 }}> · {t("pricing.bf.save", { amount: savings.toFixed(2) })}</span>
+                    : <span style={{ color: "var(--brass)" }}> · {t("pricing.saved", { amount: (periodTotalEuros(pid, "monthly") * period.months - regularTotal).toFixed(2) })}</span>}
                 </div>
               )}
               <p style={{ fontSize: 12.5, color: "var(--ink-soft)", margin: "10px 0 14px", lineHeight: 1.5, textAlign: "center" }}>{pt.blurb}</p>
@@ -128,12 +136,12 @@ export function Pricing() {
         })}
       </div>
 
-      {/* Специално предложение */}
-      {promo && (
-        <div className="glass panel" style={{ marginTop: 18, padding: "16px 24px", textAlign: "center", borderLeft: "4px solid var(--brick)", background: "var(--brick-soft)" }}>
-          <strong style={{ color: "var(--brick)", fontSize: 15 }}>{t("pricing.promoStrong")}</strong>{" "}
-          <span style={{ fontSize: 13.5, color: "var(--ink-soft)" }}>
-            {t("pricing.promoText")}
+      {/* Black Friday — промоционално каре (скрива се автоматично след края на кампанията) */}
+      {bfActive && (
+        <div className="panel" style={{ marginTop: 18, padding: "16px 24px", textAlign: "center", borderRadius: 14, background: "#111111", color: "#fff" }}>
+          <strong style={{ fontSize: 15 }}>🖤 {t("pricing.bf.calloutStrong")}</strong>{" "}
+          <span style={{ fontSize: 13.5, color: "rgba(255,255,255,.82)" }}>
+            {t("pricing.bf.calloutText")}
           </span>
         </div>
       )}

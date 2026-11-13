@@ -170,6 +170,22 @@
     "genProforma": "Se generează proforma…",
     "downloadProforma": "Descarcă factura proformă",
     "gotIt": "Am înțeles, voi efectua plata",
-    "proformaAvail": "Proforma nr. {number} este disponibilă și în „Documente primite”."
+    "proformaAvail": "Proforma nr. {number} este disponibilă și în „Documente primite”.",
+    "monthlyEquiv": "≈ {amount} € / lună"
+  },
+  "bf": {
+    "badge": "BLACK FRIDAY −{pct}%",
+    "save": "Economisești {amount} €",
+    "bestOffer": "CEA MAI BUNĂ OFERTĂ BLACK FRIDAY",
+    "tagline": "Prețuri speciale doar până pe 30 noiembrie!",
+    "annualPitch": "Plătești o dată. Folosești tot anul. Economisești până la 60%.",
+    "endsNote": "Oferta se încheie pe 30.11.2026.",
+    "calloutStrong": "BLACK FRIDAY — până la 60% reducere",
+    "calloutText": "Prețuri speciale doar până pe 30 noiembrie. Economisești mai mult cu abonamentul anual.",
+    "barFull": "🖤 BLACK FRIDAY LA CDA | PÂNĂ LA −60% LA ABONAMENTE | DOAR PÂNĂ PE 30 NOIEMBRIE!",
+    "barCompact": "🖤 BLACK FRIDAY −60% | PÂNĂ 30.11",
+    "barCta": "VEZI OFERTELE →",
+    "barCtaShort": "VEZI →",
+    "dismiss": "Închide"
   }
 }

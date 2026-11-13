@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { PLAN_DETAILS, BILLING_PERIODS } from "@/components/marketing/Pricing";
-import { periodTotalEuros, type PlanId } from "@/lib/constants";
+import { periodTotalEuros, effectivePeriodEuros, effectiveMonthlyEquivalentEuros, blackFridayActive, blackFridayDiscountPercent, blackFridaySavingsEuros, type PlanId } from "@/lib/constants";
 import { metaTrack } from "@/lib/metaClient";
 import { useI18n } from "@/components/i18n/I18nProvider";
 
@@ -38,8 +38,8 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
     setPayModal(true);
     setProforma(null);
     setProformaLoading(true);
-    // Сумата се изчислява централно (ще бъде преизчислена и на backend — авторитет §8.2).
-    const amount = periodTotalEuros(planId as PlanId, period.id);
+    // Сумата се изчислява централно, съобразена с Black Friday (ще бъде преизчислена и на backend — авторитет §8.2/§10).
+    const amount = effectivePeriodEuros(planId as PlanId, period.id);
     // ─── Meta: избор на абонамент ───
     try {
       metaTrack("SubscriptionSelected", { value: amount, currency: "EUR", plan_name: planId, billing_period: period.label });
@@ -56,7 +56,8 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
   }
 
   const payPlan = PLAN_DETAILS.find((p) => p.id === payPlanId);
-  const payAmount = payPlanId ? periodTotalEuros(payPlanId as PlanId, period.id) : 0;
+  const payAmount = payPlanId ? effectivePeriodEuros(payPlanId as PlanId, period.id) : 0;
+  const bfActive = blackFridayActive();
 
   return (
     <div>
@@ -75,41 +76,49 @@ export function SubscriptionPlans({ currentPlan, trialUsed, bank }: { currentPla
           ))}
         </div>
       </div>
-      <p style={{ textAlign: "center", color: "var(--emerald)", fontSize: 12.5, fontWeight: 600, marginBottom: 24, minHeight: 18 }}>
-        {period.discount > 0 ? t("pricing.saveNote", { pct: period.discount * 100, period: t(`pricing.periods.${period.id}`).toLowerCase() }) : " "}
+      <p style={{ textAlign: "center", color: bfActive && period.id === "annual" ? "var(--brick)" : "var(--emerald)", fontSize: 12.5, fontWeight: 600, marginBottom: bfActive ? 6 : 24, minHeight: 18 }}>
+        {bfActive
+          ? (period.id === "annual" ? `🖤 ${t("pricing.bf.bestOffer")}` : t("pricing.bf.tagline"))
+          : (period.discount > 0 ? t("pricing.saveNote", { pct: period.discount * 100, period: t(`pricing.periods.${period.id}`).toLowerCase() }) : " ")}
       </p>
+      {bfActive && <p style={{ textAlign: "center", color: "var(--muted)", fontSize: 11.5, marginBottom: 20 }}>{t("pricing.bf.annualPitch")} · {t("pricing.bf.endsNote")}</p>}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 14 }}>
         {PLAN_DETAILS.map((plan) => {
-          const promoMonthly = plan.price * (1 - period.discount);
-          const regularMonthly = plan.regularPrice * (1 - period.discount);
-          const total = plan.price * period.months * (1 - period.discount);
-          const fullTotal = plan.price * period.months;
+          const pid = plan.id as PlanId;
+          const regularTotal = periodTotalEuros(pid, period.id);
+          const effTotal = effectivePeriodEuros(pid, period.id);
+          const monthlyEq = effectiveMonthlyEquivalentEuros(pid, period.id);
+          const bfPct = blackFridayDiscountPercent(pid, period.id);
+          const savings = blackFridaySavingsEuros(pid, period.id);
+          const isBf = bfActive && bfPct > 0 && plan.price > 0;
           const Icon = plan.Icon;
           const isCurrent = currentPlan === plan.id;
-          const hasPromo = promo && plan.regularPrice > plan.price;
           const pt = P.plans[plan.id];
           return (
             <div key={plan.id} className="glass panel"
               style={{ padding: "22px 20px", position: "relative", display: "flex", flexDirection: "column", border: isCurrent ? "2px solid var(--emerald)" : plan.recommended ? "2px solid var(--brass)" : undefined }}>
               {isCurrent && <span style={{ position: "absolute", top: -10, left: 16, background: "var(--emerald)", color: "#fff", fontSize: 10.5, fontWeight: 600, padding: "3px 10px", borderRadius: 20 }}>{t("pricing.active")}</span>}
               {!isCurrent && plan.recommended && <span className="ribbon">{t("pricing.recommended")}</span>}
-              {!isCurrent && hasPromo && <span style={{ position: "absolute", top: 10, left: 10, background: "var(--brick)", color: "#fff", fontSize: 9.5, fontWeight: 700, padding: "2px 8px", borderRadius: 20 }}>{t("pricing.specialPrice")}</span>}
+              {!isCurrent && isBf && <span style={{ position: "absolute", top: 10, left: 10, background: "#111111", color: "#fff", fontSize: 9.5, fontWeight: 700, padding: "3px 9px", borderRadius: 20, letterSpacing: .3 }}>🖤 {t("pricing.bf.badge", { pct: bfPct })}</span>}
 
-              <div style={{ display: "flex", justifyContent: "center", marginBottom: 10, marginTop: hasPromo && !isCurrent ? 10 : 0 }}>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 10, marginTop: isBf && !isCurrent ? 12 : 0 }}>
                 <div className="icon-tile" style={{ width: 50, height: 50 }}><Icon /></div>
               </div>
               <div style={{ fontFamily: "'Fraunces', serif", fontSize: 19, fontWeight: 700, textAlign: "center" }}>{pt.name}</div>
               <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2, minHeight: 32, textAlign: "center" }}>{pt.tagline}</div>
 
               <div style={{ margin: "10px 0 0", textAlign: "center" }}>
-                {hasPromo && <span className="num" style={{ fontSize: 13.5, color: "var(--muted)", textDecoration: "line-through", marginRight: 6 }}>{regularMonthly.toFixed(regularMonthly % 1 === 0 ? 0 : 2)} €</span>}
-                <span className="num" style={{ fontSize: 28, fontWeight: 700, color: hasPromo ? "var(--emerald-dark)" : "var(--ink)" }}>{plan.price === 0 ? "0" : promoMonthly.toFixed(promoMonthly % 1 === 0 ? 0 : 2)}</span>
-                <span style={{ fontSize: 13, color: "var(--muted)", fontWeight: 500 }}> {t("pricing.perMonth")}</span>
+                {isBf && <span className="num" style={{ fontSize: 13.5, color: "var(--muted)", textDecoration: "line-through", marginRight: 6 }}>{regularTotal.toFixed(2)} €</span>}
+                <span className="num" style={{ fontSize: 28, fontWeight: 700, color: isBf ? "var(--emerald-dark)" : "var(--ink)" }}>{plan.price === 0 ? "0" : (period.months > 1 ? effTotal : monthlyEq).toFixed(2)}</span>
+                <span style={{ fontSize: 13, color: "var(--muted)", fontWeight: 500 }}> {period.months > 1 ? t(`pricing.periods.${period.id}`).toLowerCase() : t("pricing.perMonth")}</span>
               </div>
               {plan.price > 0 && period.months > 1 && (
                 <div style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 2, textAlign: "center" }}>
-                  {t("pricing.totalFor", { total: total.toFixed(2), months: period.months })} <span style={{ color: "var(--brass)" }}>{t("pricing.saved", { amount: (fullTotal - total).toFixed(2) })}</span>
+                  {t("pricing.sub.monthlyEquiv", { amount: monthlyEq.toFixed(2) })}
+                  {isBf
+                    ? <span style={{ color: "var(--brick)", fontWeight: 600 }}> · {t("pricing.bf.save", { amount: savings.toFixed(2) })}</span>
+                    : <span style={{ color: "var(--brass)" }}> · {t("pricing.saved", { amount: (periodTotalEuros(pid, "monthly") * period.months - regularTotal).toFixed(2) })}</span>}
                 </div>
               )}
               <p style={{ fontSize: 12, color: "var(--ink-soft)", margin: "10px 0 12px", lineHeight: 1.5, textAlign: "center" }}>{pt.blurb}</p>

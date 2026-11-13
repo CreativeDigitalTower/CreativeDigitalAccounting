@@ -170,6 +170,22 @@
     "genProforma": "Генериране на проформа…",
     "downloadProforma": "Изтегли проформа фактура",
     "gotIt": "Разбрах, ще извърша плащането",
-    "proformaAvail": "Проформа № {number} е налична и във „Входящи документи“."
+    "proformaAvail": "Проформа № {number} е налична и във „Входящи документи“.",
+    "monthlyEquiv": "≈ {amount} € / месец"
+  },
+  "bf": {
+    "badge": "BLACK FRIDAY −{pct}%",
+    "save": "Спестявате {amount} €",
+    "bestOffer": "НАЙ-ДОБРА BLACK FRIDAY ОФЕРТА",
+    "tagline": "Специални цени само до 30 ноември!",
+    "annualPitch": "Платете веднъж. Използвайте цяла година. Спестете до 60%.",
+    "endsNote": "Офертата приключва на 30.11.2026 г.",
+    "calloutStrong": "BLACK FRIDAY — до 60% отстъпка",
+    "calloutText": "Специални цени само до 30 ноември. Спестете повече с годишен абонамент.",
+    "barFull": "🖤 BLACK FRIDAY В CDA | ДО −60% НА АБОНАМЕНТИТЕ | САМО ДО 30 НОЕМВРИ!",
+    "barCompact": "🖤 BLACK FRIDAY −60% | ДО 30.11",
+    "barCta": "ВИЖ ОФЕРТИТЕ →",
+    "barCtaShort": "ВИЖ →",
+    "dismiss": "Затвори"
   }
 }

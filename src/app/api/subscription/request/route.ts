@@ -6,8 +6,10 @@ import { sendEmail, notifyAdmin } from "@/lib/email/send";
 import { subscriptionSelectedEmail, adminPaidSubEmail } from "@/lib/email/messages";
 import { normalizeLocale } from "@/lib/i18n/config";
 import { generateSubscriptionProforma } from "@/lib/subscriptionProforma";
-import { type PlanId, BILLING_PERIODS, billingPeriod, periodTotalEuros } from "@/lib/constants";
+import { type PlanId, BILLING_PERIODS, billingPeriod, effectivePeriodEuros, blackFridayActive, BLACK_FRIDAY_2026 } from "@/lib/constants";
 import { z } from "zod";
+
+const BF_LABEL = BLACK_FRIDAY_2026.name;
 
 const schema = z.object({
   plan: z.enum(["start", "business", "pro"]),
@@ -25,8 +27,12 @@ export async function POST(req: Request) {
     // ─── Backend е авторитетният източник за сумата (§8.2/§8.3) ───
     // Разпознаваме периода по id или по етикет; при непознат → месечен.
     const periodEntry = BILLING_PERIODS.find((p) => p.id === period || p.label === period) ?? billingPeriod(period);
-    const amount = periodTotalEuros(plan as PlanId, periodEntry.id);
-    const periodLabelResolved = periodEntry.label;
+    // Сървърно време → важи ли Black Friday СЕГА (§10/§14). Промо цената се прилага автоматично
+    // само докато кампанията е активна; след 30.11.2026 новите заявки минават по редовна цена.
+    const now = new Date();
+    const bfActive = blackFridayActive(now);
+    const amount = effectivePeriodEuros(plan as PlanId, periodEntry.id, now);
+    const periodLabelResolved = bfActive ? `${periodEntry.label} · ${BF_LABEL}` : periodEntry.label;
     // Разминаване между подадената от клиента и сървърно изчислената сума (одит; винаги печели сървърната §8.3).
     const amountMismatch = clientAmount != null && Math.abs(clientAmount - amount) > 0.001;
 
@@ -49,6 +55,7 @@ export async function POST(req: Request) {
     try {
       const p = await generateSubscriptionProforma({
         clientCompanyId: companyId, plan: plan as PlanId, periodLabel: periodLabelResolved, amount,
+        validUntil: bfActive ? BLACK_FRIDAY_2026.endsAt : null,
       });
       if (p) proforma = { token: p.token, number: p.number };
     } catch (e) { console.error("subscription proforma", e); }
