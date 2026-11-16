@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireCompany, getPlan } from "@/lib/session";
+import { requireCompany } from "@/lib/session";
 import { z } from "zod";
 
 // Връща съдържанието на избрани бизнес документи за пакетно сваляне (вкл. лого + фирма).
@@ -8,8 +8,7 @@ export async function POST(req: Request) {
   try {
     const { companyId } = await requireCompany();
     const { ids } = z.object({ ids: z.array(z.string()).min(1) }).parse(await req.json());
-    const [plan, company, docs] = await Promise.all([
-      getPlan(companyId),
+    const [company, docs] = await Promise.all([
       prisma.company.findUnique({ where: { id: companyId }, select: { name: true, logoUrl: true } }),
       prisma.businessDocument.findMany({
         where: { companyId, id: { in: ids } },
@@ -17,7 +16,8 @@ export async function POST(req: Request) {
         orderBy: { createdAt: "asc" },
       }),
     ]);
-    const logoUrl = plan !== "free" ? company?.logoUrl ?? null : null;
+    // Фирменото лого е стандартно за всички планове (вкл. Free).
+    const logoUrl = company?.logoUrl ?? null;
     return NextResponse.json({
       logoUrl,
       companyName: company?.name ?? "",

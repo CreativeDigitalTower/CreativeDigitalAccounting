@@ -275,9 +275,6 @@ export default function SettingsPage() {
                   {t("account.settings.upgradeMore")} <Link href="/dashboard/subscription" style={{ color: "var(--navy)", fontWeight: 600 }}>{t("account.settings.upgrade")}</Link>
                 </p>
               )}
-              <p style={{ fontSize: 11.5, color: "var(--muted)", marginTop: 8 }}>
-                {t("account.settings.logoPaidHint")}
-              </p>
             </>
           );
         })()}

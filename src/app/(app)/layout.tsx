@@ -62,7 +62,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <VisitTracker area="app" />
       <BlobBackground />
       <div style={{ position: "relative", zIndex: 1, display: "flex", width: "100%" }}>
-        <SidebarShell companyName={company.name} plan={plan} isSuperAdmin={isSuperAdmin} logoUrl={plan !== "free" ? company.logoUrl : null} inboxUnread={inboxUnread} companyEik={company.eik} companies={myCompanyRows} activeCompanyId={companyId} logisticsEnabled={logisticsEnabled} fashionEnabled={fashionEnabled} />
+        <SidebarShell companyName={company.name} plan={plan} isSuperAdmin={isSuperAdmin} logoUrl={company.logoUrl} inboxUnread={inboxUnread} companyEik={company.eik} companies={myCompanyRows} activeCompanyId={companyId} logisticsEnabled={logisticsEnabled} fashionEnabled={fashionEnabled} />
         <main style={{ flex: 1, minWidth: 0, maxWidth: 1180 }}>
           {/* Chrome-ът (банери + topbar) никога не се печата и не бива да заема място при
               печат (иначе празни страници при A4 документния печат). */}

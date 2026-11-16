@@ -7,8 +7,9 @@ type DocWithRelations = Prisma.DocumentGetPayload<{
 
 /** Преобразува документ (с client/lines/company) в данните за InvoiceDocument/OfferDocument. */
 export function toDocData(doc: DocWithRelations) {
-  const plan = doc.company.subscription?.plan ?? "free";
-  const showLogo = plan !== "free" && !!doc.company.logoUrl;
+  // Фирменото лого е стандартна функционалност за ВСИЧКИ планове (вкл. Free).
+  // Показва се винаги, щом фирмата има качено лого (валидността се проверява в резолвера).
+  const showLogo = !!doc.company.logoUrl;
   return {
     type: doc.type, number: doc.number, issueDate: doc.issueDate, taxEventDate: doc.taxEventDate, dueDate: doc.dueDate,
     currency: doc.currency, paymentMethod: doc.paymentMethod, notes: doc.notes, template: doc.template,

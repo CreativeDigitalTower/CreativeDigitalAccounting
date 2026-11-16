@@ -18,7 +18,7 @@ export default async function BusinessDocEditorPage({ params }: { params: Promis
   ]);
   if (!doc || doc.companyId !== companyId) notFound();
 
-  const showLogo = plan !== "free" && !!company?.logoUrl;
+  const showLogo = !!company?.logoUrl; // лого за всички планове (вкл. Free)
 
   return (
     <DocEditor
