@@ -60,8 +60,8 @@ export default async function DocumentDetailPage({ params }: { params: Promise<{
   const attachmentsForSend = doc.attachments.map((a) => ({ id: a.id, filename: a.filename, size: a.size }));
   const attachmentsInitial = doc.attachments.map((a) => ({ ...a, createdAt: a.createdAt.toISOString() }));
 
-  const plan = doc.company.subscription?.plan ?? "free";
-  const showLogo = plan !== "free" && !!doc.company.logoUrl; // лого във фактурата само за платени планове
+  // Фирменото лого е стандартна функционалност за всички планове (вкл. Free).
+  const showLogo = !!doc.company.logoUrl;
 
   return (
     <>

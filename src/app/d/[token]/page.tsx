@@ -19,8 +19,8 @@ export default async function PublicDocumentPage({ params }: { params: Promise<{
   });
   if (!doc) notFound();
 
-  const plan = doc.company.subscription?.plan ?? "free";
-  const showLogo = plan !== "free" && !!doc.company.logoUrl;
+  // Фирменото лого е стандартно за всички планове (вкл. Free).
+  const showLogo = !!doc.company.logoUrl;
 
   const docData = {
     type: doc.type, number: doc.number, issueDate: doc.issueDate, taxEventDate: doc.taxEventDate, dueDate: doc.dueDate,

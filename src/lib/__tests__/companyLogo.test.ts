@@ -116,8 +116,9 @@ describe("Интеграционни гаранции (§4/§5/§6/§10/§12)", 
     expect(pdf).toContain("toDataURL(\"image/png\")");
     expect(pdf).toContain("restore()"); // възстановяване на оригиналните src
   });
-  it("плановата логика за лого във фактурата е запазена (§15 — без промяна на бизнес правило)", () => {
-    expect(docPage).toContain('plan !== "free"');
+  it("логото във фактурата НЕ зависи от плана (достъпно и за Free) (§2/§B)", () => {
+    expect(docPage).toContain("showLogo = !!doc.company.logoUrl");
+    expect(docPage).not.toContain('plan !== "free"');
   });
   it("company PUT е company-scoped (multi-tenant, §10 №18/№19)", () => {
     expect(companyRoute).toContain("requireCompany");
@@ -128,7 +129,7 @@ describe("Интеграционни гаранции (§4/§5/§6/§10/§12)", 
   it("preview модалът се затваря с Escape и X (§6 №10/№11)", () => {
     expect(modal).toMatch(/Escape/);
     expect(modal).toContain("onClose");
-    expect(modal).toContain("object-fit") || expect(modal).toContain("objectFit");
+    expect(modal).toMatch(/object-fit|objectFit/);
   });
   it("качването валидира и не изтрива старото лого при грешка (§9 №6)", () => {
     expect(settings).toContain("validateLogoFile");

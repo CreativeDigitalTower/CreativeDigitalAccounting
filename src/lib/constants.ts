@@ -380,8 +380,10 @@ export function isPaidClientPlan(plan: string | null | undefined): boolean {
 }
 
 // Кои функции са достъпни за кой план (за заключване в UI и сървъра)
-const FREE_FEATURES = ["documents", "clients", "suppliers", "warehouse", "dashboard", "cash", "tax_calendar"];
-const START_FEATURES = [...FREE_FEATURES, "expenses", "recurring", "analytics", "archive", "invoice_logo", "protocols", "bank_statements"];
+// „invoice_logo" е СТАНДАРТНА функционалност за всички планове (вкл. Free) — логото във
+// фактурите вече не е премиум. Затова стои във FREE_FEATURES и се наследява от всички планове.
+const FREE_FEATURES = ["documents", "clients", "suppliers", "warehouse", "dashboard", "cash", "tax_calendar", "invoice_logo"];
+const START_FEATURES = [...FREE_FEATURES, "expenses", "recurring", "analytics", "archive", "protocols", "bank_statements"];
 const BUSINESS_FEATURES = [
   ...START_FEATURES,
   "projects", "contracts", "assets", "users", "audit",

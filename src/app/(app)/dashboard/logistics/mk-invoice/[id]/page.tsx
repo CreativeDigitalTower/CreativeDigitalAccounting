@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getT } from "@/lib/i18n/server";
-import { getPlan } from "@/lib/session";
 import { vatExemptReasonText } from "@/lib/constants";
 import { InvoiceDocument } from "@/components/app/InvoiceDocument";
 import { PrintButton } from "@/components/app/logistics/PrintButton";
@@ -33,10 +32,9 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   });
 
   if (doc) {
-    const plan = await getPlan(doc.companyId);
     const data = buildInvoiceViewData(
       { ...doc, clientIsIndividual: doc.clientIsIndividual, company: doc.company, client: doc.client },
-      { vatExemptReasonText: vatExemptReasonText(doc.vatExemptReason), showLogo: plan !== "free" && !!doc.company.logoUrl },
+      { vatExemptReasonText: vatExemptReasonText(doc.vatExemptReason), showLogo: !!doc.company.logoUrl }, // лого за всички планове
     );
     return <ReadOnlyShell t={t} issuer={doc.company.name} backSetId={doc.sourceExportSet?.id ?? null} backLabel={doc.sourceExportSet?.invoiceNumber ?? null}>
       <InvoiceDocument data={data} />
