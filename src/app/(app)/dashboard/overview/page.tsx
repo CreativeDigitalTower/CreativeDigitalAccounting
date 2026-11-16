@@ -1,16 +1,21 @@
 import Link from "next/link";
-import { requireCompany } from "@/lib/session";
-import { getMyCompanies } from "@/lib/myCompanies";
+import { requireCompany, getEffectiveContext } from "@/lib/session";
+import { getMyCompanies, getContextCompanies } from "@/lib/myCompanies";
 import { getT } from "@/lib/i18n/server";
 import { fmtMoney } from "@/lib/i18n/format";
 import { OverviewEnter } from "@/components/app/OverviewEnter";
 
-// „Обобщен изглед" — управленски dashboard над всички собствени фирми на потребителя.
-// Обобщава реални per-company данни (изолацията остава непокътната).
+// „Обобщен изглед" — управленски dashboard над собствените фирми в ТЕКУЩИЯ контекст.
+// При Super Admin technical access работи в контекста на ЦЕЛЕВАТА фирма/група
+// (нейния собственик), а не с личните фирми на Super Admin. Данните остават
+// напълно изолирани per companyId — тук само ги обобщаваме.
 export default async function OverviewPage() {
-  const { userId } = await requireCompany();
+  await requireCompany(); // guards (служители → портал, счет. къщи → /firm)
+  const ctx = await getEffectiveContext();
   const { t, locale } = await getT();
-  const companies = await getMyCompanies(userId);
+  const companies = ctx.impersonating
+    ? await getContextCompanies({ contextUserId: ctx.contextUserId, targetCompanyId: ctx.companyId })
+    : await getMyCompanies(ctx.actorUserId);
 
   const totals = companies.reduce((a, c) => {
     a.revenue += c.monthRevenue; a.receivables += c.receivables; a.overdue += c.overdueCount;
