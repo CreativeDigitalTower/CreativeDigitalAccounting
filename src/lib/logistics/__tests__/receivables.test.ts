@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import {
   invoicePaid, invoiceRemaining, invoiceStatus, sortFifo, planFifo, buildClientBalance,
+  reconciliationState, needsReconciliation,
   type OpenInvoice,
 } from "@/lib/logistics/receivables";
 
@@ -95,10 +96,9 @@ describe("planFifo — FIFO allocation + overpayment credit — §5/§6", () => 
 describe("buildClientBalance — derived, never a mutable field — §4", () => {
   it("computes invoiced/received/settled/outstanding/credit/net", () => {
     const b = buildClientBalance({
-      invoices: [{ total: 300 }, { total: 500 }],
+      invoices: [{ total: 300, remaining: 0, recState: "ok" }, { total: 500, remaining: 0, recState: "ok" }],
       activePaymentsTotal: 1000,
       allocationsTotal: 800,
-      outstandingTotal: 0,
     });
     expect(b.totalInvoiced).toBe(800);
     expect(b.totalReceived).toBe(1000);
@@ -107,14 +107,66 @@ describe("buildClientBalance — derived, never a mutable field — §4", () => 
     expect(b.credit).toBe(200);      // unallocated advance
     expect(b.net).toBe(-200);        // customer is in credit
   });
-  it("positive net = customer owes", () => {
-    const b = buildClientBalance({ invoices: [{ total: 1000 }], activePaymentsTotal: 400, allocationsTotal: 400, outstandingTotal: 600 });
+  it("positive net = customer owes (confirmed outstanding only)", () => {
+    const b = buildClientBalance({ invoices: [{ total: 1000, remaining: 600, recState: "ok" }], activePaymentsTotal: 400, allocationsTotal: 400 });
     expect(b.credit).toBe(0);
+    expect(b.confirmedOutstanding).toBe(600);
     expect(b.net).toBe(600);
   });
   it("credit is never negative", () => {
-    const b = buildClientBalance({ invoices: [], activePaymentsTotal: 0, allocationsTotal: 0, outstandingTotal: 0 });
+    const b = buildClientBalance({ invoices: [], activePaymentsTotal: 0, allocationsTotal: 0 });
     expect(b.credit).toBe(0);
+  });
+});
+
+describe("buildClientBalance — confirmed vs unconfirmed (historical safety) — §4/§5", () => {
+  // Пример от заданието: неплатена 100k + частично-платена историческа 200k с неизвестен остатък.
+  const b = buildClientBalance({
+    invoices: [
+      { total: 100000, remaining: 100000, recState: "ok" },                   // реален дълг
+      { total: 200000, remaining: 200000, recState: "historically_partial" }, // неизвестно платено
+    ],
+    activePaymentsTotal: 0, allocationsTotal: 0,
+  });
+  it("keeps the full math in outstanding", () => {
+    expect(b.outstanding).toBe(300000);
+  });
+  it("splits confirmed vs unconfirmed and counts unreconciled", () => {
+    expect(b.confirmedOutstanding).toBe(100000);
+    expect(b.unconfirmedOutstanding).toBe(200000);
+    expect(b.unreconciledCount).toBe(1);
+  });
+  it("net reflects only confirmed debt (unconfirmed is flagged, not asserted as owed)", () => {
+    expect(b.net).toBe(100000);
+  });
+  it("historically_paid with no records contributes nothing but is flagged", () => {
+    const x = buildClientBalance({ invoices: [{ total: 50000, remaining: 50000, recState: "historically_paid" }], activePaymentsTotal: 0, allocationsTotal: 0 });
+    expect(x.confirmedOutstanding).toBe(0);
+    expect(x.unconfirmedOutstanding).toBe(0);
+    expect(x.outstanding).toBe(0);
+    expect(x.unreconciledCount).toBe(1);
+  });
+});
+
+describe("reconciliationState / needsReconciliation — §3", () => {
+  it("partially_paid with zero recorded payments → needs reconciliation (case A)", () => {
+    const s = reconciliationState("partially_paid", 0);
+    expect(s).toBe("historically_partial");
+    expect(needsReconciliation(s)).toBe(true);
+  });
+  it("paid with zero recorded payments → needs reconciliation (case B)", () => {
+    const s = reconciliationState("paid", 0);
+    expect(s).toBe("historically_paid");
+    expect(needsReconciliation(s)).toBe(true);
+  });
+  it("partially_paid WITH a recorded payment → ok, no warning (case C)", () => {
+    const s = reconciliationState("partially_paid", 40000);
+    expect(s).toBe("ok");
+    expect(needsReconciliation(s)).toBe(false);
+  });
+  it("plain unpaid/issued invoices never need reconciliation", () => {
+    expect(needsReconciliation(reconciliationState("issued", 0))).toBe(false);
+    expect(needsReconciliation(reconciliationState("unpaid", 0))).toBe(false);
   });
 });
 
@@ -171,9 +223,44 @@ describe("API/DB layer safety guarantees — §9/§10/§11/§12", () => {
   });
 });
 
+describe("Historical payments & FIFO safety guarantees — §2/§5/§8", () => {
+  const route = read("src/app/api/logistics/client-payments/route.ts");
+  const voidRoute = read("src/app/api/logistics/client-payments/[id]/void/route.ts");
+  const preview = read("src/app/api/logistics/client-payments/preview/route.ts");
+  const db = read("src/lib/logistics/receivablesDb.ts");
+
+  it("auto-FIFO only uses fifo-eligible invoices (excludes unreconciled) (§5)", () => {
+    expect(route).toContain("fifoEligible");
+    expect(preview).toContain("fifoEligible");
+    expect(db).toMatch(/fifoEligible[\s\S]*needsReconciliation/);
+  });
+  it("historical payments are tagged with source=historical and keep priorStatus (§2/§8)", () => {
+    expect(route).toContain('source: "historical"');
+    expect(route).toContain("priorStatus");
+  });
+  it("historical payment records a real payment date distinct from the recorded-at date (§2)", () => {
+    // `date` = реална дата; createdAt (@default(now)) = дата на въвеждане
+    expect(route).toContain("date: d.date ? new Date(d.date) : new Date()");
+    const schema = read("prisma/schema.prisma");
+    expect(schema).toMatch(/createdAt\s+DateTime\s+@default\(now\(\)\)/);
+    expect(schema).toContain("source");
+    expect(schema).toContain("priorStatus");
+  });
+  it("duplicate historical payment requires explicit confirmation (§2)", () => {
+    expect(route).toContain("duplicate_historical");
+    expect(route).toContain("confirmDuplicate");
+  });
+  it("voiding a historical payment restores the prior status (needs reconciliation again) (§8)", () => {
+    expect(voidRoute).toContain("restoreStatusIfZero");
+    expect(voidRoute).toMatch(/source === "historical"/);
+    expect(db).toContain("restoreStatusIfZero");
+  });
+});
+
 describe("i18n — payment keys exist in all 6 locales", () => {
   const locales = ["bg", "en", "ru", "ro", "tr", "el"];
-  const keys = ["sectionTitle", "register", "totalInvoiced", "outstanding", "credit", "net", "void", "modeAuto", "modeInvoice", "confirm", "method_bank_transfer"];
+  const keys = ["sectionTitle", "register", "totalInvoiced", "outstanding", "credit", "net", "void", "modeAuto", "modeInvoice", "confirm", "method_bank_transfer",
+    "unreconciledWarn", "confirmedOutstanding", "toReconcile", "reconcile", "historicalTitle", "historicalHint", "realDate", "dupConfirm", "recHint_historically_paid", "recHint_historically_partial", "historicalTag"];
   for (const l of locales) {
     it(`${l} has logistics.pay.*`, () => {
       const j = JSON.parse(read(`src/locales/${l}/logistics.json`));

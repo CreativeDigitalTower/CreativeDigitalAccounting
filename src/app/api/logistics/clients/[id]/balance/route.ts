@@ -17,16 +17,15 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 
   const agg = await clientBalanceAggregates(prisma, g.companyId, id);
   const balance = buildClientBalance({
-    invoices: agg.invoices.map((i) => ({ total: i.total })),
+    invoices: agg.invoices.map((i) => ({ total: i.total, remaining: i.remaining, recState: i.recState })),
     activePaymentsTotal: agg.activePaymentsTotal,
     allocationsTotal: agg.allocationsTotal,
-    outstandingTotal: agg.outstandingTotal,
   });
   return NextResponse.json({
     client,
     balance,
     invoices: agg.invoices
       .sort((a, b) => (b.issueDate?.toISOString() ?? "").localeCompare(a.issueDate?.toISOString() ?? ""))
-      .map((i) => ({ id: i.id, number: i.number, issueDate: i.issueDate, dueDate: i.dueDate, status: i.status, currency: i.currency, total: i.total, paid: i.paid, remaining: i.remaining })),
+      .map((i) => ({ id: i.id, number: i.number, issueDate: i.issueDate, dueDate: i.dueDate, status: i.status, currency: i.currency, total: i.total, paid: i.paid, remaining: i.remaining, recState: i.recState, needsReconciliation: i.needsReconciliation })),
   });
 }
