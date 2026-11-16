@@ -50,7 +50,10 @@
     "cityEn": "Πόλη στα αγγλικά (export)",
     "countryEn": "Χώρα στα αγγλικά (export)",
     "correspondenceEmail": "Email αλληλογραφίας",
-    "correspondenceEmailHelp": "Σε αυτή τη διεύθυνση θα λαμβάνετε τις απαντήσεις σε τιμολόγια, υπενθυμίσεις και άλλα έγγραφα που αποστέλλονται μέσω Creative Digital Accounting."
+    "correspondenceEmailHelp": "Σε αυτή τη διεύθυνση θα λαμβάνετε τις απαντήσεις σε τιμολόγια, υπενθυμίσεις και άλλα έγγραφα που αποστέλλονται μέσω Creative Digital Accounting.",
+    "logoFormat": "Αυτή η μορφή εικόνας δεν υποστηρίζεται.",
+    "logoUploadFailed": "Παρουσιάστηκε πρόβλημα κατά τη μεταφόρτωση του λογοτύπου. Δοκιμάστε ξανά.",
+    "logoPreview": "Προεπισκόπηση λογοτύπου"
   },
   "businessProfile": {
     "title": "Επιχειρηματικό προφίλ (Smart Workspace)",

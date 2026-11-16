@@ -3,6 +3,51 @@
 import { useState } from "react";
 import { useT } from "@/components/i18n/I18nProvider";
 
+/**
+ * Подготвя всички изображения в елемента за надеждно улавяне от html2canvas (§5):
+ *  1) изчаква декодирането им (иначе html2canvas може да ги прескочи);
+ *  2) растеризира SVG-лога до PNG (html2canvas не рендира SVG <img> надеждно → празно
+ *     място в PDF, макар че браузърът ги показва) — това е ОСНОВНАТА причина логото да
+ *     се вижда в preview, но да липсва в PDF.
+ * Връща функция за възстановяване на оригиналните src след улавянето. Всяка грешка по
+ * отделно изображение се поглъща — генерирането на PDF никога не се проваля заради лого.
+ */
+async function prepareImagesForCapture(el: HTMLElement): Promise<() => void> {
+  const imgs = Array.from(el.querySelectorAll("img"));
+  const originals: Array<{ img: HTMLImageElement; src: string }> = [];
+
+  await Promise.all(imgs.map(async (img) => {
+    try {
+      if (!img.complete || img.naturalWidth === 0) {
+        await new Promise<void>((res) => { img.onload = () => res(); img.onerror = () => res(); });
+      }
+      try { await img.decode(); } catch { /* вече декодирано или неподдържано */ }
+
+      const src = img.currentSrc || img.src;
+      const isSvg = /^data:image\/svg\+xml/i.test(src) || /\.svg(\?|$)/i.test(src);
+      if (!isSvg) return;
+
+      // Растеризираме SVG → PNG през offscreen canvas (без външни услуги, §5).
+      const rect = img.getBoundingClientRect();
+      const scale = 3; // по-висока резолюция за остро лого в PDF
+      const w = Math.max(1, Math.round((rect.width || img.naturalWidth || 180) * scale));
+      const h = Math.max(1, Math.round((rect.height || img.naturalHeight || 56) * scale));
+      const canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.drawImage(img, 0, 0, w, h);
+      const png = canvas.toDataURL("image/png");
+      if (png && png.startsWith("data:image/png")) {
+        originals.push({ img, src: img.getAttribute("src") || "" });
+        img.setAttribute("src", png);
+      }
+    } catch { /* повредено/недостъпно лого → оставяме както е, PDF продължава */ }
+  }));
+
+  return () => { for (const o of originals) { try { o.img.setAttribute("src", o.src); } catch { /* ignore */ } } };
+}
+
 export function DownloadButtons({ filename = "document", selector = ".printable" }: { filename?: string; selector?: string }) {
   const t = useT();
   const [busy, setBusy] = useState(false);
@@ -17,6 +62,7 @@ export function DownloadButtons({ filename = "document", selector = ".printable"
     const el = document.querySelector(selector) as HTMLElement | null;
     if (!el) { alert(t("billing.pdfNotFound")); return; }
     setBusy(true);
+    const restore = await prepareImagesForCapture(el);
     try {
       const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
         import("html2canvas-pro"),
@@ -46,6 +92,7 @@ export function DownloadButtons({ filename = "document", selector = ".printable"
       alert(t("billing.pdfFailed"));
       printDoc();
     } finally {
+      restore();
       setBusy(false);
     }
   }
