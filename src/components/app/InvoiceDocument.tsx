@@ -1,6 +1,7 @@
 import { formatCurrency, toBGN, shouldShowDualCurrency, EUR_TO_BGN, getTemplate, paymentMethodLabel, PLATFORM_NAME, PLATFORM_URL_DISPLAY } from "@/lib/constants";
 import { getDocMessages, docIntlLocale, makeT } from "@/lib/i18n/messages";
 import { companyIdentifier } from "@/lib/company/identifier";
+import { resolveCompanyLogo } from "@/lib/companyLogo";
 
 export type InvoiceParty = {
   name: string; mol?: string | null; address?: string | null; city?: string | null;
@@ -52,8 +53,9 @@ export function InvoiceDocument({ data }: { data: InvoiceData }) {
       {company.website && <div>{L("website")}: {company.website}</div>}
     </div>
   );
-  const logoOrName = data.logoUrl
-    ? <img src={data.logoUrl} alt={company.name} style={{ maxHeight: 56, maxWidth: 180, objectFit: "contain", marginBottom: 8 }} />
+  const safeLogo = resolveCompanyLogo(data.logoUrl);
+  const logoOrName = safeLogo
+    ? <img src={safeLogo} alt={company.name} style={{ maxHeight: 56, maxWidth: 180, objectFit: "contain", marginBottom: 8 }} />
     : <div style={{ fontFamily: serif, fontWeight: 700, fontSize: 20, color: accent, marginBottom: 6 }}>{company.name}</div>;
 
   const meta = (align: "left" | "right" | "center") => (

@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CURRENCIES, DOC_LANGUAGES, INVOICE_TEMPLATES, allowedTemplateCount, type PlanId } from "@/lib/constants";
+import { validateLogoFile, resolveCompanyLogo } from "@/lib/companyLogo";
+import { LogoPreviewModal } from "@/components/app/LogoPreviewModal";
 import { TemplatePreview } from "@/components/app/TemplatePreview";
 import { BusinessProfileSettings } from "@/components/app/BusinessProfileSettings";
 import { EmailPreferences } from "@/components/app/EmailPreferences";
@@ -29,6 +31,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [logoPreview, setLogoPreview] = useState(false);
 
   useEffect(() => {
     fetch("/api/company").then((r) => r.json()).then(setC);
@@ -39,15 +42,19 @@ export default function SettingsPage() {
     setSaved(false);
   }
 
-  async function handleLogo(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleLogo(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 500 * 1024) {
-      setError(t("account.settings.logoTooLarge"));
+    // Валидация (формат + размер). При грешка НЕ пипаме вече съществуващото лого (§9).
+    const err = validateLogoFile(file);
+    if (err) {
+      setError(t(`account.settings.${err}`));
+      e.target.value = ""; // позволи повторен избор на същия файл
       return;
     }
     const reader = new FileReader();
-    reader.onload = () => set("logoUrl", reader.result as string);
+    reader.onerror = () => setError(t("account.settings.logoUploadFailed"));
+    reader.onload = () => { setError(""); set("logoUrl", reader.result as string); }; // незабавен preview, без reload (§9)
     reader.readAsDataURL(file);
   }
 
@@ -87,18 +94,25 @@ export default function SettingsPage() {
       <div className="glass panel" style={{ padding: "24px 28px", marginBottom: 16 }}>
         <h3 style={{ fontFamily: "'Fraunces', serif", fontSize: 16, margin: "0 0 18px" }}>{t("account.settings.logoTitle")}</h3>
         <div style={{ display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
-          <div style={{ width: 110, height: 110, borderRadius: 12, border: "1px dashed var(--border)", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,.4)", overflow: "hidden" }}>
-            {c.logoUrl
-              ? <img src={c.logoUrl} alt={t("account.settings.logoAlt")} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+          <button type="button" onClick={() => resolveCompanyLogo(c.logoUrl) && setLogoPreview(true)} title={resolveCompanyLogo(c.logoUrl) ? t("account.settings.logoPreview") : undefined}
+            style={{ width: 110, height: 110, padding: 8, borderRadius: 12, border: "1px dashed var(--border)", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,.55)", overflow: "hidden", cursor: resolveCompanyLogo(c.logoUrl) ? "zoom-in" : "default" }}>
+            {resolveCompanyLogo(c.logoUrl)
+              ? <img src={resolveCompanyLogo(c.logoUrl)!} alt={t("account.settings.logoAlt")} style={{ maxWidth: "100%", maxHeight: "100%", width: "auto", height: "auto", objectFit: "contain", display: "block" }} />
               : <span style={{ color: "var(--muted)", fontSize: 12 }}>{t("account.settings.noLogo")}</span>}
-          </div>
+          </button>
           <div>
-            <input type="file" accept="image/*" onChange={handleLogo} style={{ fontSize: 13, marginBottom: 8 }} />
+            <input type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml,.png,.jpg,.jpeg,.webp,.gif,.svg" onChange={handleLogo} style={{ fontSize: 13, marginBottom: 8 }} />
             <div style={{ fontSize: 11.5, color: "var(--muted)" }}>{t("account.settings.logoHint")}</div>
-            {c.logoUrl && <button onClick={() => set("logoUrl", null)} className="btn btn-ghost btn-sm" style={{ marginTop: 8 }}>{t("account.settings.removeLogo")}</button>}
+            <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+              {resolveCompanyLogo(c.logoUrl) && <button type="button" onClick={() => setLogoPreview(true)} className="btn btn-ghost btn-sm">{t("account.settings.logoPreview")}</button>}
+              {c.logoUrl && <button type="button" onClick={() => set("logoUrl", null)} className="btn btn-ghost btn-sm">{t("account.settings.removeLogo")}</button>}
+            </div>
           </div>
         </div>
       </div>
+      {logoPreview && resolveCompanyLogo(c.logoUrl) && (
+        <LogoPreviewModal src={resolveCompanyLogo(c.logoUrl)!} alt={t("account.settings.logoAlt")} onClose={() => setLogoPreview(false)} />
+      )}
 
       {/* Основни данни */}
       <div className="glass panel" style={{ padding: "24px 28px", marginBottom: 16 }}>

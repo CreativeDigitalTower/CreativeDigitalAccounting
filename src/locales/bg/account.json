@@ -50,7 +50,10 @@
     "cityEn": "Град на английски (export)",
     "countryEn": "Държава на английски (export)",
     "correspondenceEmail": "Имейл за кореспонденция",
-    "correspondenceEmailHelp": "На този адрес ще получавате отговорите на фактури, напомняния и други документи, изпратени чрез Creative Digital Accounting."
+    "correspondenceEmailHelp": "На този адрес ще получавате отговорите на фактури, напомняния и други документи, изпратени чрез Creative Digital Accounting.",
+    "logoFormat": "Форматът на изображението не се поддържа.",
+    "logoUploadFailed": "Възникна проблем при качването на логото. Моля, опитайте отново.",
+    "logoPreview": "Преглед на логото"
   },
   "businessProfile": {
     "title": "Бизнес профил (Smart Workspace)",

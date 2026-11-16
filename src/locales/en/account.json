@@ -50,7 +50,10 @@
     "cityEn": "City (EN, export)",
     "countryEn": "Country (EN, export)",
     "correspondenceEmail": "Correspondence email",
-    "correspondenceEmailHelp": "Replies to invoices, reminders and other documents sent through Creative Digital Accounting will arrive at this address."
+    "correspondenceEmailHelp": "Replies to invoices, reminders and other documents sent through Creative Digital Accounting will arrive at this address.",
+    "logoFormat": "This image format is not supported.",
+    "logoUploadFailed": "There was a problem uploading the logo. Please try again.",
+    "logoPreview": "Preview logo"
   },
   "businessProfile": {
     "title": "Business profile (Smart Workspace)",

@@ -1,5 +1,6 @@
 import { formatCurrency, toBGN, shouldShowDualCurrency, EUR_TO_BGN, getTemplate, paymentMethodLabel, PLATFORM_NAME, PLATFORM_URL_DISPLAY } from "@/lib/constants";
 import type { InvoiceData } from "@/components/app/InvoiceDocument";
+import { resolveCompanyLogo } from "@/lib/companyLogo";
 import { getDocMessages, docIntlLocale, makeT } from "@/lib/i18n/messages";
 
 /** Професионална оферта (за документи от тип „quote"). */
@@ -23,8 +24,8 @@ export function OfferDocument({ data }: { data: InvoiceData }) {
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28, gap: 16, flexWrap: "wrap" }}>
           <div>
-            {data.logoUrl
-              ? <img src={data.logoUrl} alt={c.name} style={{ maxHeight: 54, maxWidth: 180, objectFit: "contain", marginBottom: 8 }} />
+            {resolveCompanyLogo(data.logoUrl)
+              ? <img src={resolveCompanyLogo(data.logoUrl)!} alt={c.name} style={{ maxHeight: 54, maxWidth: 180, objectFit: "contain", marginBottom: 8 }} />
               : <div style={{ fontFamily: "'Fraunces', serif", fontWeight: 700, fontSize: 20, color: accent, marginBottom: 6 }}>{c.name}</div>}
             <div style={{ fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.7 }}>
               <div style={{ fontWeight: 600 }}>{c.name}</div>

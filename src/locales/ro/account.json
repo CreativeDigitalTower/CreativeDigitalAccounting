@@ -50,7 +50,10 @@
     "cityEn": "Oraș în engleză (export)",
     "countryEn": "Țară în engleză (export)",
     "correspondenceEmail": "Email de corespondență",
-    "correspondenceEmailHelp": "La această adresă veți primi răspunsurile la facturi, reamintiri și alte documente trimise prin Creative Digital Accounting."
+    "correspondenceEmailHelp": "La această adresă veți primi răspunsurile la facturi, reamintiri și alte documente trimise prin Creative Digital Accounting.",
+    "logoFormat": "Formatul imaginii nu este acceptat.",
+    "logoUploadFailed": "A apărut o problemă la încărcarea logoului. Încercați din nou.",
+    "logoPreview": "Previzualizează logoul"
   },
   "businessProfile": {
     "title": "Profil de afaceri (Smart Workspace)",
